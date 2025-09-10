@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { X } from 'lucide-react';
 import { stateInspector, type StateSnapshot, type PathInfo } from '@/lib/utils/stateInspector';
 import { formatForDebug, getValueTypeInfo } from '@/lib/utils';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import * as stores from '@/state';
 
 /**
@@ -365,14 +368,27 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       {/* Performance Warnings */}
       {snapshot && snapshot.metadata && snapshot.metadata.performanceWarnings && snapshot.metadata.performanceWarnings.length > 0 && (
         <CollapsibleSection 
-          title="⚠️ Performance Warnings" 
+          title="Performance Warnings" 
           initialCollapsed={false}
           data-testid="performance-warnings-section"
+          aria-label="Performance warnings section"
         >
-          <div className="text-xs text-amber-500 space-y-2">
+          <div 
+            className="space-y-2"
+            role="alert"
+            aria-live="polite"
+            aria-label={`${snapshot.metadata.performanceWarnings.length} performance warnings detected`}
+          >
             {snapshot.metadata.performanceWarnings.map((warning, index) => (
-              <div key={index} className="bg-amber-700 bg-opacity-30 p-2 rounded border border-amber-50000">
-                {warning}
+              <div 
+                key={index} 
+                className="bg-warning-background border border-warning-border text-warning-foreground p-3 rounded-md text-sm"
+                role="alert"
+                aria-describedby={`warning-${index}-description`}
+              >
+                <div id={`warning-${index}-description`} className="font-medium">
+                  {warning}
+                </div>
               </div>
             ))}
             
@@ -384,16 +400,27 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               
               if (topStores.length > 0 && topStores[0][1] > 500) {
                 return (
-                  <div className="bg-gray-900 p-2 rounded border border-gray-700">
-                    <div className="font-medium text-amber-300 mb-1">Largest Stores by Path Count:</div>
-                    {topStores.map(([storeName, count]) => (
-                      <div key={storeName} className="text-xs text-gray-100">
-                        • <strong>{storeName}</strong>: {count} paths
-                      </div>
-                    ))}
-                    <div className="text-xs text-gray-300 mt-1">
+                  <div 
+                    className="bg-card border border-border p-3 rounded-md"
+                    role="region"
+                    aria-labelledby="path-analysis-heading"
+                  >
+                    <h4 
+                      id="path-analysis-heading" 
+                      className="font-medium text-foreground mb-2 text-sm"
+                    >
+                      Largest Stores by Path Count:
+                    </h4>
+                    <ul className="space-y-1" role="list">
+                      {topStores.map(([storeName, count]) => (
+                        <li key={storeName} className="text-sm text-muted-foreground">
+                          <strong className="text-foreground">{storeName}</strong>: {count} paths
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-muted-foreground mt-3">
                       Consider clearing data from stores with high path counts if DevTools becomes slow.
-                    </div>
+                    </p>
                   </div>
                 );
               }
@@ -412,15 +439,15 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         <div className="space-y-2">
           {/* Path Input */}
           <div>
-            <label className="text-xs font-medium text-gray-100 block mb-1">
+            <label className="text-xs font-medium text-gray-700 block mb-1">
               Path:
             </label>
-            <input
+            <Input
               type="text"
               value={selectedPath}
               onChange={(e) => handlePathNavigation(e.target.value)}
               placeholder="e.g., worldStore.entities"
-              className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-500 rounded text-gray-100 placeholder-gray-500"
+              className="text-sm"
               data-testid="path-input"
             />
           </div>
@@ -478,7 +505,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Path Value */}
           {pathValue !== null && (
             <div>
-              <div className="text-xs font-medium text-gray-100 mb-1">Value:</div>
+              <div className="text-xs font-medium text-gray-700 mb-1">Value:</div>
               <JsonViewer data={pathValue} className="bg-gray-900 border border-gray-700" />
             </div>
           )}
@@ -486,7 +513,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* State Modification Controls */}
           {pathValue !== null && selectedPath && canModifyValue(pathValue) && (
             <div className="space-y-2">
-              <div className="text-xs font-medium text-gray-100">Modify Value:</div>
+              <div className="text-xs font-medium text-gray-700">Modify Value:</div>
               
               {typeof pathValue === 'boolean' ? (
                 // Direct toggle for boolean values
@@ -531,7 +558,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                     // No additional editor for boolean; toggle button above is used
                     null
                   ) : (
-                    <input
+                    <Input
                       type={typeof pathValue === 'number' ? 'number' : 'text'}
                       value={editValue}
                       onChange={(e) => {
@@ -542,7 +569,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                         }
                       }}
                       placeholder="Enter new value"
-                      className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-500 rounded text-gray-100 placeholder-gray-500"
+                      className="text-xs bg-gray-900 border-gray-500 text-gray-100 placeholder-gray-500"
                       data-testid="edit-value-input"
                       autoFocus
                     />
@@ -582,7 +609,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Child Paths */}
           {childPaths.length > 0 && (
             <div>
-              <div className="text-xs font-medium text-gray-100 mb-1">Child Paths:</div>
+              <div className="text-xs font-medium text-gray-700 mb-1">Child Paths:</div>
               <div className="max-h-32 overflow-y-auto">
                 {childPaths.map((childPath) => (
                   <button
@@ -616,7 +643,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   className="text-red-300 hover:text-red-200 text-xs"
                   data-testid={`unwatch-${path}`}
                 >
-                  ✕
+                  <X className="w-3 h-3" aria-hidden="true" />
                 </button>
               </div>
             ))}
@@ -667,44 +694,47 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         {snapshot && (
           <div className="space-y-2">
             <div className="flex justify-between items-center mb-2">
-              <div className="text-xs text-gray-100">
+              <div className="text-xs text-gray-700">
                 <div>Total Stores: {snapshot.metadata.totalStores}</div>
                 <div>Total Paths: {snapshot.metadata.totalPaths}</div>
                 <div>Snapshot Time: {new Date(snapshot.timestamp).toLocaleTimeString()}</div>
                 <div>Active Watchers: {stateInspector.getWatchCount()}</div>
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={refreshSnapshot}
-                  className="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-700 text-white rounded"
+                  size="sm"
+                  variant="info"
                   data-testid="refresh-snapshot-button"
-                  title="Refresh snapshot to show current state data"
+                  aria-label="Refresh snapshot to show current state data"
                 >
-                  🔄 Refresh
-                </button>
+                  Refresh
+                </Button>
                 
-                <button
+                <Button
                   onClick={getOptimizedSnapshot}
-                  className="px-2 py-1 text-xs bg-blue-700 hover:bg-blue-700 text-white rounded"
+                  size="sm"
+                  variant="default"
                   data-testid="optimized-snapshot-button"
-                  title="Get optimized snapshot with lazy loading to reduce path count"
+                  aria-label="Get optimized snapshot with lazy loading to reduce path count"
                 >
-                  ⚡ Optimize
-                </button>
+                  Optimize
+                </Button>
                 
                 {/* Cleanup Actions */}
                 {getCleanupRecommendations().length > 0 && (
                   <div className="flex gap-1">
                     {getCleanupRecommendations().map((rec, index) => (
-                      <button
+                      <Button
                         key={index}
                         onClick={rec.handler}
-                        className="px-2 py-1 text-xs bg-amber-500 hover:bg-amber-700 text-white rounded"
-                        title={`${rec.action} (${rec.pathCount} paths)`}
+                        size="sm"
+                        variant="warning"
                         data-testid={`cleanup-${rec.store.toLowerCase()}-button`}
+                        aria-label={`${rec.action} (${rec.pathCount} paths)`}
                       >
-                        🧹 Clean {rec.store.replace('use', '').replace('Store', '')}
-                      </button>
+                        Clean {rec.store.replace('use', '').replace('Store', '')}
+                      </Button>
                     ))}
                   </div>
                 )}
