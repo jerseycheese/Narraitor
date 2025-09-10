@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
-import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
