@@ -8,7 +8,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
-import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitSection } from './components/PortraitSection';
 import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';

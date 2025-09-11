@@ -185,7 +185,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
         <DialogHeader className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <DialogTitle className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
+              <DialogTitle id="journal-modal-title" className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
               {entries.length > 0 && (
                 <span className="ml-3 text-sm text-amber-700">
                   {entries.length} {entries.length === 1 ? 'entry' : 'entries'}

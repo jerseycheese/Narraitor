@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { Button } from '@/components/ui/button';
-import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
