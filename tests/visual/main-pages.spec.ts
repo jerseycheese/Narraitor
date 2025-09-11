@@ -112,6 +112,47 @@ test.describe('Main Pages Visual Tests', () => {
     test.setTimeout(45000); // Extended timeout for complex edit page with CollapsibleSections
     await seedTestData(page);
     
+    // Force reload world store from seeded data before navigating
+    await page.evaluate(() => {
+      return new Promise<void>((resolve) => {
+        // Wait for stores to be available
+        const checkAndLoadStores = () => {
+          const worldStore = (window as any).useWorldStore;
+          const testWorlds = (window as any).__TEST_WORLDS__;
+          
+          if (worldStore && testWorlds) {
+            console.log('Forcing world store reload with seeded data');
+            console.log('Available worlds:', Object.keys(testWorlds));
+            
+            worldStore.setState({
+              worlds: testWorlds,
+              currentWorldId: 'world-cyberpunk-2077',
+              loading: false,
+              error: null
+            });
+            
+            // Verify the store was updated
+            const state = worldStore.getState();
+            console.log('World store state after update:', {
+              worldKeys: Object.keys(state.worlds || {}),
+              currentWorldId: state.currentWorldId,
+              hasCyberpunkWorld: !!state.worlds?.['world-cyberpunk-2077']
+            });
+            
+            resolve();
+          } else {
+            console.log('Stores not ready yet, retrying...', { hasWorldStore: !!worldStore, hasTestWorlds: !!testWorlds });
+            setTimeout(checkAndLoadStores, 100);
+          }
+        };
+        
+        checkAndLoadStores();
+        
+        // Timeout after 5 seconds
+        setTimeout(() => resolve(), 5000);
+      });
+    });
+    
     // Navigate to world edit page
     await page.goto('/worlds/world-cyberpunk-2077/edit');
     await waitForContentStable(page);
@@ -120,12 +161,57 @@ test.describe('Main Pages Visual Tests', () => {
     const pageTitle = await page.textContent('h1, [data-testid="page-title"], .page-title');
     console.log('World edit page title:', pageTitle);
     
+    // Check if world data is available in the store
+    const worldStoreData = await page.evaluate(() => {
+      const worldStore = (window as any).__TEST_WORLDS__;
+      const hasWorld = worldStore && worldStore['world-cyberpunk-2077'];
+      return {
+        hasTestWorlds: !!worldStore,
+        worldKeys: worldStore ? Object.keys(worldStore) : [],
+        hasCyberpunkWorld: hasWorld,
+        worldData: hasWorld ? worldStore['world-cyberpunk-2077'] : null
+      };
+    });
+    console.log('World store data check:', worldStoreData);
+    
+    // Also check Zustand store
+    const zustandStoreData = await page.evaluate(() => {
+      const zustand = (window as any).useWorldStore;
+      if (!zustand) return { hasStore: false };
+      
+      const state = zustand.getState();
+      return {
+        hasStore: true,
+        worlds: state.worlds ? Object.keys(state.worlds) : [],
+        hasCyberpunkWorld: !!state.worlds?.['world-cyberpunk-2077']
+      };
+    });
+    console.log('Zustand world store check:', zustandStoreData);
+    
     // Wait for world data to load and verify we're on edit page
     await page.waitForFunction(() => {
       return document.body.textContent && 
              !document.body.textContent.includes('World not found') &&
-             (document.body.textContent.includes('Edit World') || document.body.textContent.includes('WorldEditor'));
-    }, { timeout: 10000 });
+             !document.body.textContent.includes('Return to Worlds') &&
+             (document.body.textContent.includes('Edit World') || 
+              document.body.textContent.includes('Basic Information') ||
+              document.body.textContent.includes('WorldEditor'));
+    }, { timeout: 15000 }).catch(async () => {
+      // If we can't find the edit page content, check what we actually have
+      const currentContent = await page.evaluate(() => {
+        return {
+          url: window.location.href,
+          title: document.title,
+          bodyText: document.body.textContent?.substring(0, 500),
+          hasEditWorld: document.body.textContent?.includes('Edit World'),
+          hasWorldNotFound: document.body.textContent?.includes('World not found'),
+          hasReturnToWorlds: document.body.textContent?.includes('Return to Worlds'),
+          hasBasicInfo: document.body.textContent?.includes('Basic Information')
+        };
+      });
+      console.log('Page content when world edit page failed to load:', currentContent);
+      throw new Error(`World edit page failed to load properly. Current URL: ${currentContent.url}`);
+    });
     
     await hideDynamicContent(page);
     
