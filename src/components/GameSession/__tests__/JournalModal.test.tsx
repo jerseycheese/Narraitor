@@ -112,7 +112,7 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} onClose={mockOnClose} />);
       
-      const closeButton = screen.getByLabelText('Close journal');
+      const closeButton = screen.getByLabelText('Close');
       fireEvent.click(closeButton);
       
       expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -248,7 +248,7 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      const closeButton = screen.getByLabelText('Close journal');
+      const closeButton = screen.getByLabelText('Close');
       expect(closeButton).toBeInTheDocument();
     });
   });

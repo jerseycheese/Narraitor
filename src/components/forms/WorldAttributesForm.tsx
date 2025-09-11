@@ -6,10 +6,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
 import { 
   Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter 
+  DialogContent 
 } from '@/components/ui/dialog';
 
 

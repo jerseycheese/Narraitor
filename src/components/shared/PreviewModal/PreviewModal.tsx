@@ -57,8 +57,6 @@ function PreviewModalInner<T>({
   confirmText = 'Use This',
   cancelText = 'Back',
   footerNote,
-  size = 'xl',
-  closeOnBackdropClick = false,
   className
 }: PreviewModalProps<T>) {
   return (

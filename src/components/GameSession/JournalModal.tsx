@@ -23,7 +23,7 @@ import {
   formatAIResponse 
 } from '@/lib/utils';
 import { formatSessionDuration } from '@/lib/utils/sessionUtils';
-import { Play, Square, Settings, X } from 'lucide-react';
+import { Play, Square, Settings } from 'lucide-react';
 
 /**
  * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
