@@ -123,6 +123,35 @@ export async function waitForInteraction(
 }
 
 /**
+ * Expand all CollapsibleSection components on the page for consistent visual testing.
+ * This ensures all collapsible content is visible in screenshots.
+ */
+export async function expandAllCollapsibleSections(page: Page): Promise<void> {
+  // Find all collapsible section toggle buttons that are collapsed (showing '+')
+  const collapsedSections = page.locator('[data-testid="collapsible-section-toggle"]').filter({
+    hasText: '+'
+  });
+  
+  const count = await collapsedSections.count();
+  console.log(`Found ${count} collapsed sections to expand`);
+  
+  // Click each collapsed section to expand it
+  for (let i = 0; i < count; i++) {
+    try {
+      await collapsedSections.nth(i).click();
+      // Small wait between clicks to ensure proper expansion
+      await page.waitForTimeout(100);
+    } catch (error) {
+      console.log(`Failed to expand section ${i}:`, error);
+      // Continue with other sections even if one fails
+    }
+  }
+  
+  // Final wait to ensure all expansions are complete
+  await page.waitForTimeout(300);
+}
+
+/**
  * Enhanced screenshot helper that combines stability waiting and dynamic content hiding.
  * Use this instead of direct toHaveScreenshot() calls for better reliability.
  */

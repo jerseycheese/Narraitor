@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForInteraction, expandAllCollapsibleSections } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/data-seeder';
 
 /**
@@ -116,7 +116,10 @@ test.describe('Main Pages Visual Tests', () => {
     await waitForContentStable(page);
     await hideDynamicContent(page);
     
-    // Take screenshot of world edit page - should show world editing interface
+    // Expand all CollapsibleSections to show full content
+    await expandAllCollapsibleSections(page);
+    
+    // Take screenshot of world edit page - should show world editing interface with all sections expanded
     await expect(page).toHaveScreenshot('world-edit.png', { fullPage: true });
   });
 
@@ -128,7 +131,10 @@ test.describe('Main Pages Visual Tests', () => {
     await waitForContentStable(page);
     await hideDynamicContent(page);
     
-    // Take screenshot of character edit page - should show character editing interface
+    // Expand all CollapsibleSections to show full content
+    await expandAllCollapsibleSections(page);
+    
+    // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
   });
 });
