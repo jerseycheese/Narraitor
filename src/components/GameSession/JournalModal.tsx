@@ -11,7 +11,8 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle 
+  DialogTitle,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
@@ -181,11 +182,18 @@ export const JournalModal: React.FC<JournalModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500">
+      <DialogContent 
+        className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500"
+      >
         <DialogHeader className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <DialogTitle id="journal-modal-title" className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
+              <div>
+                <DialogTitle className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
+                <DialogDescription className="sr-only">
+                  View and read journal entries from this session
+                </DialogDescription>
+              </div>
               {entries.length > 0 && (
                 <span className="ml-3 text-sm text-amber-700">
                   {entries.length} {entries.length === 1 ? 'entry' : 'entries'}

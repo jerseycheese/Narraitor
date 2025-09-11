@@ -7,11 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter 
-} from '@/components/ui/dialog';
 
 
 export interface AttributeEditorProps {
@@ -150,11 +145,11 @@ export function AttributeEditor({
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>
+      <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+        <h2 className="text-lg font-semibold leading-none tracking-tight">
           {mode === 'create' ? 'Create New Attribute' : 'Edit Attribute'}
-        </DialogTitle>
-      </DialogHeader>
+        </h2>
+      </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
@@ -230,7 +225,7 @@ export function AttributeEditor({
         )}
       </div>
 
-      <DialogFooter className="flex justify-between items-center">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 justify-between items-center">
         <div className="flex gap-2">
           {mode === 'edit' && onDelete && (
             <Button
@@ -257,7 +252,7 @@ export function AttributeEditor({
             {mode === 'create' ? 'Create Attribute' : 'Save Changes'}
           </Button>
         </div>
-      </DialogFooter>
+      </div>
 
       {showDeleteDialog && (
         <DeleteConfirmationDialog

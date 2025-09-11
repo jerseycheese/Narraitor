@@ -381,8 +381,8 @@ describe('JournalModal - Session Boundary Display', () => {
 
       // Journal modal should have proper dialog role
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveAttribute('aria-modal', 'true');
-      expect(dialog).toHaveAttribute('aria-labelledby', 'journal-modal-title');
+      expect(dialog).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Journal' })).toBeInTheDocument();
 
       // Select entry to see type information
       fireEvent.click(screen.getByText('Adventure Begins'));

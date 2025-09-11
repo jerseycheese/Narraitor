@@ -223,8 +223,11 @@ describe('WorldEditor - MVP Level Tests', () => {
     const updateNameButton = screen.getByText('Update Name');
     fireEvent.click(updateNameButton);
 
-    // Save changes
-    const saveButton = screen.getByText('Save Changes');
+    // Save changes - wait for save button to appear after form change
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+    });
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
     fireEvent.click(saveButton);
 
     // Should save with updated data
