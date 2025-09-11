@@ -688,7 +688,7 @@ export async function seedTestData(page: Page): Promise<void> {
         if (!(window as any).useWorldStore) {
           // Try to expose the store by importing it
           try {
-            const { useWorldStore } = await import('/src/state/worldStore.ts');
+            const { useWorldStore } = await import('@/state/worldStore');
             (window as any).useWorldStore = useWorldStore;
             seedApproaches.push('✅ Exposed useWorldStore on window');
           } catch (importError) {
