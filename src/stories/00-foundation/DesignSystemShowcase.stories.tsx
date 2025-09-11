@@ -133,6 +133,23 @@ export const CompleteShowcase: Story = {
               <Button disabled>Disabled</Button>
             </div>
           </div>
+
+          {/* Semantic Action Buttons */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Semantic Action Buttons</h3>
+            <div className="flex flex-wrap gap-3">
+              <Button variant="success">Start Game</Button>
+              <Button variant="success">Create Character</Button>
+              <Button variant="success">Play World</Button>
+              <Button variant="success">Continue</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">Edit</Button>
+              <Button variant="destructive">Delete</Button>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Green buttons (success variant) are used for forward momentum actions like starting games or creating content.
+              They provide 4.6:1 contrast ratio for WCAG AA compliance.
+            </p>
+          </div>
         </div>
       </section>
 

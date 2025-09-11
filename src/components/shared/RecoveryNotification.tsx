@@ -38,8 +38,16 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '../ui/dialog';
 import { formatDateTime } from '@/lib/utils';
 
 /**
@@ -134,21 +142,17 @@ export function RecoveryNotification({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-      role="alertdialog"
-      aria-labelledby="recovery-title"
-      aria-describedby="recovery-description"
-    >
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-        <div className="flex items-start justify-between mb-4">
+    <Dialog open={isVisible} onOpenChange={onDismiss}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
           <div className="flex items-center">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 mr-3">
               <svg
                 className="h-6 w-6 text-amber-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -158,22 +162,13 @@ export function RecoveryNotification({
                 />
               </svg>
             </div>
-            <h3 id="recovery-title" className="ml-3 text-lg font-medium text-gray-900">
+            <DialogTitle className="text-lg font-medium">
               Character Creation Progress Found
-            </h3>
+            </DialogTitle>
           </div>
-          <button
-            onClick={onDismiss}
-            className="ml-3 flex-shrink-0 rounded-md bg-white text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Close"
-          >
-            <span className="sr-only">Close</span>
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div id="recovery-description" className="mb-6">
-          <p className="text-sm text-gray-700 mb-4">
+          <DialogDescription asChild>
+            <div>
+          <p className="text-sm text-muted-foreground mb-4">
             Found saved character creation progress from a previous session.
             {hasCurrentData && (
               <span className="block mt-2 text-amber-500 font-medium inline-flex items-center gap-1">
@@ -186,9 +181,9 @@ export function RecoveryNotification({
 
           {/* Recovery Data Preview */}
           {recoveryData && (
-            <div className="bg-gray-100 rounded-md p-4 mb-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Saved Progress Preview:</h4>
-              <div className="space-y-1 text-sm text-gray-700">
+            <div className="bg-muted rounded-md p-4 mb-4">
+              <h4 className="text-sm font-medium text-foreground mb-2">Saved Progress Preview:</h4>
+              <div className="space-y-1 text-sm text-muted-foreground">
                 {recoveryData.name && (
                   <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
                 )}
@@ -209,13 +204,15 @@ export function RecoveryNotification({
           )}
 
           {validDate && (
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-muted-foreground mb-3">
               Last saved: {validDate}
             </p>
           )}
-        </div>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <DialogFooter className="flex flex-col sm:flex-row gap-3">
           <Button
             ref={recoverButtonRef}
             onClick={onRecover}
@@ -230,8 +227,8 @@ export function RecoveryNotification({
           >
             Start Fresh
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

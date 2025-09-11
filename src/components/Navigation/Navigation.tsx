@@ -249,7 +249,8 @@ export function Navigation() {
                   <Button 
                     type="button"
                     onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
-                    className="hidden sm:inline-flex items-center bg-green-500 hover:bg-green-700 text-white text-sm font-medium"
+                    variant="success"
+                    className="hidden sm:inline-flex items-center text-sm font-medium"
                   >
                     <Play className="w-4 h-4 mr-1" aria-hidden="true" />
                     Play

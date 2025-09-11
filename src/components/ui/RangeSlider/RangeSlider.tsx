@@ -156,29 +156,37 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
   const visualRange = getVisualRange();
 
-  // Generate notches - one for each value in visual range
+  // Generate notches with absolute positioning
   const generateScaleNotches = () => {
     const notches = [];
-    const count = visualRange.max - visualRange.min + 1;
     
-    for (let i = 0; i < count; i++) {
+    for (let i = visualRange.min; i <= visualRange.max; i++) {
+      const percentage = ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
+      
       notches.push(
         <div
           key={`notch-${i}`}
-          className="w-0.5 h-2 bg-gray-500"
+          className="absolute w-0.5 h-2 bg-muted-foreground"
+          style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         />
       );
     }
     return notches;
   };
 
-  // Generate labels - show visual scale
+  // Generate labels with absolute positioning
   const generateScaleLabels = () => {
     const labels = [];
     
     for (let i = visualRange.min; i <= visualRange.max; i++) {
+      const percentage = ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
+      
       labels.push(
-        <div key={`label-${i}`} className="text-xs text-gray-500">
+        <div 
+          key={`label-${i}`} 
+          className="absolute text-xs text-muted-foreground"
+          style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
+        >
           {i}
         </div>
       );
@@ -189,10 +197,10 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   return (
     <div className="py-2" data-testid={testId}>
       {showLabel && (
-        <div className="flex justify-between mb-1 text-sm text-gray-700">
+        <div className="flex justify-between mb-1 text-sm">
           <span>{labelText}</span>
           {showLevelDescription && currentLevelDescription && (
-            <span className="font-medium text-blue-700" data-testid={`${testId}-level-label`}>
+            <span className="font-medium text-primary" data-testid={`${testId}-level-label`}>
               {currentLevelDescription.label}
             </span>
           )}
@@ -203,7 +211,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
         {/* Slider container with scale */}
         <div className="space-y-1">
           {/* Scale notches */}
-          <div className="flex justify-between items-center h-2">
+          <div className="relative h-2">
             {generateScaleNotches()}
           </div>
           
@@ -217,32 +225,25 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               value={valueToScale(value)}
               onChange={handleChange}
               disabled={disabled}
-              className={`w-full m-0 appearance-none bg-transparent cursor-pointer h-6 flex items-center 
-                [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-full
-                [&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-full
-                ${isConstrained && effectiveMax !== undefined && value === effectiveMax 
-                  ? '[&::-webkit-slider-runnable-track]:bg-amber-300 [&::-moz-range-track]:bg-amber-300' 
-                  : '[&::-webkit-slider-runnable-track]:bg-gray-200 [&::-moz-range-track]:bg-gray-200'
-                }
-                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:mt-0
+              className={`w-full m-0 appearance-none bg-transparent cursor-pointer h-1.5
+                accent-primary
                 ${isConstrained && effectiveMax !== undefined && value === effectiveMax
-                  ? '[&::-webkit-slider-thumb]:bg-amber-500 [&::-moz-range-thumb]:bg-amber-500'
-                  : '[&::-webkit-slider-thumb]:bg-blue-500 [&::-moz-range-thumb]:bg-blue-500'
+                  ? 'accent-amber-500'
+                  : ''
                 }`}
               data-testid={`${testId}-slider`}
             />
           </div>
           
           {/* Scale labels */}
-          <div className="flex justify-between items-start">
+          <div className="relative h-4 mt-1">
             {generateScaleLabels()}
           </div>
         </div>
         
         {/* Level description */}
         {showLevelDescription && currentLevelDescription && currentLevelDescription.description && (
-          <div className="mt-2 text-sm text-gray-700" data-testid={`${testId}-description`}>
+          <div className="mt-2 text-sm" data-testid={`${testId}-description`}>
             <span className="font-medium">{currentLevelDescription.label}:</span> {currentLevelDescription.description}
           </div>
         )}

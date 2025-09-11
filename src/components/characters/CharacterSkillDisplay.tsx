@@ -18,7 +18,7 @@ interface CharacterSkillDisplayProps {
 export function CharacterSkillDisplay({ skills, showCategories = false }: CharacterSkillDisplayProps) {
   if (skills.length === 0) {
     return (
-      <div className="text-gray-500 text-center py-4">
+      <div className="text-muted-foreground text-center py-4">
         No skills assigned to this character.
       </div>
     );
@@ -39,9 +39,9 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
       <div className="space-y-6">
         {Object.entries(categorizedSkills).map(([category, skillList]) => (
           <div key={category}>
-            <h4 className="text-lg font-semibold mb-3 text-gray-700 capitalize">
+            <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
               {category} Skills
-            </h4>
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {skillList.map((skill, index) => (
                 <SkillItem key={skill.id || `skill-${category}-${index}`} skill={skill} />
@@ -64,14 +64,14 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
 
 function SkillItem({ skill }: { skill: CharacterSkill }) {
   return (
-    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-      <div className="text-sm font-medium text-blue-700 mb-1">
+    <div className="bg-muted rounded-lg p-4 border border-l-4 border-l-primary">
+      <div className="text-sm font-medium text-muted-foreground mb-1">
         {skill.name}
       </div>
-      <div className="text-2xl font-bold text-blue-900">
+      <div className="text-2xl font-bold">
         {skill.level}
       </div>
-      <div className="text-xs text-blue-500">
+      <div className="text-xs text-muted-foreground">
         Level
       </div>
     </div>

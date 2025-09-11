@@ -63,9 +63,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
   };
   
   return (
-    <section className="p-4 bg-white rounded shadow">
+    <section className="p-4 bg-background rounded">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Skills</h2>
+        <h3 className="text-xl font-semibold">Skills</h3>
         <Button
           onClick={handleAddSkill}
           size="sm"
@@ -75,13 +75,13 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       </div>
       
       {skills.length === 0 ? (
-        <p className="text-gray-500 italic">No skills defined yet.</p>
+        <p className="text-muted-foreground italic">No skills defined yet.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {skills.map((skill, index) => (
-            <div key={skill.id || skill.name || index} className="p-3 border border-gray-200 rounded">
-              <div className="flex justify-between mb-2">
-                <h3 className="font-medium">{skill.name}</h3>
+            <div key={skill.id || skill.name || index} className="bg-muted rounded-lg p-4 border border-l-4 border-l-primary">
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-medium text-lg">{skill.name}</h4>
                 <Button
                   onClick={() => handleRemoveSkill(index)}
                   variant="destructive"
@@ -130,7 +130,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
@@ -155,9 +155,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                       Linked Attributes
                     </Label>
                     {attributes.length === 0 ? (
-                      <p className="text-gray-500 text-sm">No attributes available</p>
+                      <p className="text-muted-foreground text-sm">No attributes available</p>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="flex flex-wrap gap-4">
                         {attributes.map((attr, aIndex) => (
                           <div key={attr.id || attr.name || aIndex} className="flex items-center space-x-2">
                             <Checkbox
@@ -180,13 +180,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                 </div>
                 
-                <div className="mt-4 border-t pt-4">
-                  <h4 className="font-medium mb-2">Skill Default Level</h4>
+                <div className="mt-4 border-t border-border pt-4">
+                  <h5 className="font-medium mb-2">Skill Default Level</h5>
                   <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-2">
-                      Set the default starting value for this skill. Skill values range from 1 (Novice) to 5 (Master).
-                    </p>
-                    
                     {/* Use the SkillRangeEditor component */}
                     <SkillRangeEditor
                       skill={{

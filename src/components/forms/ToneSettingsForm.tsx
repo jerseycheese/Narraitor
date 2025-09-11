@@ -51,74 +51,85 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg border shadow-sm">
+    <div className="p-6 bg-background rounded-lg border">
       {showHeader && (
         <div className="mb-6">
           <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-muted-foreground">
             Configure the narrative style, content rating, and language complexity for generated content.
           </p>
         </div>
       )}
       <div className="space-y-6">
-        {/* Content Rating */}
-        <div className="space-y-2">
-          <Label htmlFor="content-rating">Content Rating</Label>
-          <Select
-            id="content-rating"
-            value={toneSettings.contentRating}
-            onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
-          >
-            {contentRatingOptions.map((option) => (
-              <option key={option.value} value={option.value} title={option.description}>
-                {option.label} - {option.description}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {/* Tone Settings Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Content Rating */}
+          <div className="space-y-2">
+            <Label htmlFor="content-rating">Content Rating</Label>
+            <p id="content-rating-description" className="text-xs text-muted-foreground">Set the age-appropriate content level for generated narratives</p>
+            <Select
+              id="content-rating"
+              value={toneSettings.contentRating}
+              onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
+              aria-describedby="content-rating-description"
+            >
+              {contentRatingOptions.map((option) => (
+                <option key={option.value} value={option.value} title={option.description}>
+                  {option.label} - {option.description}
+                </option>
+              ))}
+            </Select>
+          </div>
 
-        {/* Narrative Style */}
-        <div className="space-y-2">
-          <Label htmlFor="narrative-style">Narrative Style</Label>
-          <Select
-            id="narrative-style"
-            value={toneSettings.narrativeStyle}
-            onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
-          >
-            {narrativeStyleOptions.map((option) => (
-              <option key={option.value} value={option.value} title={option.description}>
-                {option.label} - {option.description}
-              </option>
-            ))}
-          </Select>
-        </div>
+          {/* Narrative Style */}
+          <div className="space-y-2">
+            <Label htmlFor="narrative-style">Narrative Style</Label>
+            <p id="narrative-style-description" className="text-xs text-muted-foreground">Choose how the story will be told and presented</p>
+            <Select
+              id="narrative-style"
+              value={toneSettings.narrativeStyle}
+              onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
+              aria-describedby="narrative-style-description"
+            >
+              {narrativeStyleOptions.map((option) => (
+                <option key={option.value} value={option.value} title={option.description}>
+                  {option.label} - {option.description}
+                </option>
+              ))}
+            </Select>
+          </div>
 
-        {/* Language Complexity */}
-        <div className="space-y-2">
-          <Label htmlFor="language-complexity">Language Complexity</Label>
-          <Select
-            id="language-complexity"
-            value={toneSettings.languageComplexity}
-            onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
-          >
-            {languageComplexityOptions.map((option) => (
-              <option key={option.value} value={option.value} title={option.description}>
-                {option.label} - {option.description}
-              </option>
-            ))}
-          </Select>
-        </div>
+          {/* Language Complexity */}
+          <div className="space-y-2">
+            <Label htmlFor="language-complexity">Language Complexity</Label>
+            <p id="language-complexity-description" className="text-xs text-muted-foreground">Set the vocabulary and sentence complexity level</p>
+            <Select
+              id="language-complexity"
+              value={toneSettings.languageComplexity}
+              onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
+              aria-describedby="language-complexity-description"
+            >
+              {languageComplexityOptions.map((option) => (
+                <option key={option.value} value={option.value} title={option.description}>
+                  {option.label} - {option.description}
+                </option>
+              ))}
+            </Select>
+          </div>
 
-        {/* Custom Instructions */}
-        <div className="space-y-2">
-          <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
-          <Textarea
-            id="custom-instructions"
-            placeholder="Enter specific tone or style instructions..."
-            value={toneSettings.customInstructions || ''}
-            onChange={(e) => handleCustomInstructionsChange(e.target.value)}
-            rows={3}
-          />
+          {/* Custom Instructions */}
+          <div className="space-y-2">
+            <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
+            <p id="custom-instructions-description" className="text-xs text-muted-foreground">Add specific guidance for tone, style, or narrative elements</p>
+            <Textarea
+              id="custom-instructions"
+              placeholder="Enter specific tone or style instructions..."
+              value={toneSettings.customInstructions || ''}
+              onChange={(e) => handleCustomInstructionsChange(e.target.value)}
+              className="h-20"
+              aria-describedby="custom-instructions-description"
+            />
+          </div>
         </div>
 
         {/* Validation Errors */}

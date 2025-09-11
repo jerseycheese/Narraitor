@@ -140,12 +140,12 @@ export const WorldsPageExample: Story = {
             <h3 className="text-lg font-semibold mb-2">{world}</h3>
             <p className="text-gray-700 mb-4">A sample world description...</p>
             <div className="flex gap-2">
-              <button className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-500">
+              <Button variant="success" size="sm">
                 Make Active
-              </button>
-              <button className="px-3 py-1 bg-blue-700 text-white rounded text-sm hover:bg-blue-900">
+              </Button>
+              <Button variant="default" size="sm">
                 Edit
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -192,15 +192,15 @@ export const CharactersPageExample: Story = {
             <h3 className="text-lg font-semibold mb-2">{character}</h3>
             <p className="text-gray-700 mb-4">Level 5 Warrior</p>
             <div className="flex gap-2 flex-wrap">
-              <button className="px-3 py-1 bg-blue-700 text-white rounded text-sm hover:bg-blue-900">
+              <Button variant="default" size="sm">
                 View
-              </button>
-              <button className="px-3 py-1 bg-blue-700 text-white rounded text-sm hover:bg-blue-900">
+              </Button>
+              <Button variant="default" size="sm">
                 Edit
-              </button>
-              <button className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-700">
+              </Button>
+              <Button variant="success" size="sm">
                 Play
-              </button>
+              </Button>
             </div>
           </div>
         ))}

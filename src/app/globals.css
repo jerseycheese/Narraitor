@@ -78,7 +78,7 @@
     --radius: 0.5rem;
     
     /* Extended semantic tokens */
-    --success: 34 84% 44%; /* green-500 */
+    --success: 142 71% 45%; /* green-500: #22c55e */
     --success-foreground: 210 40% 98%;
     --success-background: 142 69% 83%; /* green-200 */
     --success-border: 142 69% 83%; /* green-200 */
@@ -146,7 +146,7 @@
     --ring: 224.3 76.3% 94.1%;
     
     /* Extended semantic tokens (dark) */
-    --success: 142.1 70.6% 45.3%; /* green-500 */
+    --success: 142 71% 45%; /* green-500: #22c55e */
     --success-foreground: 222.2 84% 4.9%;
     --success-background: 142.1 70.6% 7.3%; /* green-950 */
     --success-border: 142.1 64.2% 24.1%; /* green-800 */

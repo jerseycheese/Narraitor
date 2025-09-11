@@ -4,10 +4,14 @@ import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogFooter 
+} from '@/components/ui/dialog';
 
-// Constants
-const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-const MODAL_CONTENT_CLASSES = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto';
 
 /**
  * Props for the WorldAttributesForm component
@@ -133,9 +137,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   }, [attributeToDelete, getLinkedSkills]);
   
   return (
-    <section className="p-4 bg-white rounded shadow">
+    <section className="p-4 bg-background rounded">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Attributes</h2>
+        <h3 className="text-xl font-semibold">Attributes</h3>
         <div className="flex flex-col items-end">
           <Button
             onClick={() => setShowCreateModal(true)}
@@ -151,7 +155,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             Add Attribute
           </Button>
           {isLimitReached && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Maximum {maxAttributes} attributes reached
             </p>
           )}
@@ -159,13 +163,13 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       </div>
       
       {attributes.length === 0 ? (
-        <p className="text-gray-500 italic">No attributes defined yet.</p>
+        <p className="text-muted-foreground italic">No attributes defined yet.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {attributes.map((attribute, index) => (
-            <div key={`${attribute.id ?? attribute.name ?? index}`} className="p-3 border border-gray-200 rounded">
-              <div className="flex justify-between mb-2">
-                <h3 className="font-medium">{attribute.name}</h3>
+            <div key={`${attribute.id ?? attribute.name ?? index}`} className="bg-muted rounded-lg p-4 border">
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-medium text-lg">{attribute.name}</h4>
                 <div className="flex gap-2">
                   <Button
                     onClick={() => setEditingAttribute(attribute.id)}
@@ -185,8 +189,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
               </div>
               
               <div className="space-y-2">
-                <p className="text-sm text-gray-700">{attribute.description}</p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <p className="text-sm text-muted-foreground">{attribute.description}</p>
+                <div className="space-y-1 text-sm">
                   <div>
                     <span className="font-medium">Range:</span> {attribute.minValue} - {attribute.maxValue}
                   </div>
@@ -203,26 +207,24 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       )}
       
       {/* Create Modal */}
-      {showCreateModal && (
-        <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="create-attribute-title">
-          <div className={MODAL_CONTENT_CLASSES}>
-            <AttributeEditor
-              worldId={worldId as EntityID}
-              mode="create"
-              onSave={handleCreateAttribute}
-              onCancel={() => setShowCreateModal(false)}
-              existingAttributes={attributes}
-              existingSkills={skills}
-              maxAttributes={maxAttributes}
-            />
-          </div>
-        </div>
-      )}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <AttributeEditor
+            worldId={worldId as EntityID}
+            mode="create"
+            onSave={handleCreateAttribute}
+            onCancel={() => setShowCreateModal(false)}
+            existingAttributes={attributes}
+            existingSkills={skills}
+            maxAttributes={maxAttributes}
+          />
+        </DialogContent>
+      </Dialog>
       
       {/* Edit Modal */}
-      {editingAttribute && (
-        <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="edit-attribute-title">
-          <div className={MODAL_CONTENT_CLASSES}>
+      <Dialog open={!!editingAttribute} onOpenChange={(open) => !open && setEditingAttribute(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {editingAttribute && (
             <AttributeEditor
               worldId={worldId as EntityID}
               mode="edit"
@@ -233,9 +235,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
               existingAttributes={attributes}
               existingSkills={skills}
             />
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
       
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog

@@ -252,7 +252,7 @@ export const AIMockingSection: React.FC = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button onClick={handleAddCustomScenario} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                  <Button onClick={handleAddCustomScenario} size="sm" variant="success">
                     Add Scenario
                   </Button>
                   <Button 

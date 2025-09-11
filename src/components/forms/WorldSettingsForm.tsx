@@ -27,20 +27,22 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
   
   return (
     <div className="space-y-6">
-      <section className="p-4 bg-white rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">World Settings</h2>
+      <section className="p-4 bg-background rounded">
+        <h3 className="text-xl font-semibold mb-4">World Settings</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="maxAttributes">
               Maximum Attributes
             </Label>
+            <p id="maxAttributes-description" className="text-xs text-muted-foreground">Maximum number of attributes characters can have</p>
             <Input
               id="maxAttributes"
               type="number"
               value={settings.maxAttributes}
               onChange={(e) => handleChange('maxAttributes', parseInt(e.target.value))}
               min={1}
+              aria-describedby="maxAttributes-description"
             />
           </div>
           
@@ -48,12 +50,14 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             <Label htmlFor="maxSkills">
               Maximum Skills
             </Label>
+            <p id="maxSkills-description" className="text-xs text-muted-foreground">Maximum number of skills characters can have</p>
             <Input
               id="maxSkills"
               type="number"
               value={settings.maxSkills}
               onChange={(e) => handleChange('maxSkills', parseInt(e.target.value))}
               min={1}
+              aria-describedby="maxSkills-description"
             />
           </div>
           
@@ -61,12 +65,14 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             <Label htmlFor="attributePointPool">
               Attribute Point Pool
             </Label>
+            <p id="attributePointPool-description" className="text-xs text-muted-foreground">Total points available to distribute among attributes</p>
             <Input
               id="attributePointPool"
               type="number"
               value={settings.attributePointPool}
               onChange={(e) => handleChange('attributePointPool', parseInt(e.target.value))}
               min={1}
+              aria-describedby="attributePointPool-description"
             />
           </div>
           
@@ -74,12 +80,14 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             <Label htmlFor="skillPointPool">
               Skill Point Pool
             </Label>
+            <p id="skillPointPool-description" className="text-xs text-muted-foreground">Total points available to distribute among skills</p>
             <Input
               id="skillPointPool"
               type="number"
               value={settings.skillPointPool}
               onChange={(e) => handleChange('skillPointPool', parseInt(e.target.value))}
               min={1}
+              aria-describedby="skillPointPool-description"
             />
           </div>
         </div>

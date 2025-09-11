@@ -7,6 +7,12 @@ import { JournalEntry } from '@/types/journal.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle 
+} from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { 
@@ -161,9 +167,6 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   const { getSessionEntries, markAsRead } = useJournalStore();
   const [selectedEntryId, setSelectedEntryId] = useState<EntityID | null>(null);
   
-  // Don't render if not open
-  if (!isOpen) return null;
-
   // Get entries for this session
   const entries = getSessionEntries(sessionId);
   const selectedEntry = selectedEntryId ? entries.find(e => e.id === selectedEntryId) : null;
@@ -177,37 +180,20 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   };
 
   return (
-    <div 
-      role="dialog" 
-      aria-modal="true" 
-      aria-labelledby="journal-modal-title"
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in"
-      onClick={onClose}
-    >
-      <Card 
-        className="bg-gradient-to-br from-amber-50 to-amber-50 rounded-lg max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-amber-500"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header with book-like styling */}
-        <div className="flex justify-between items-center p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100">
-          <div className="flex items-center">
-            <h2 id="journal-modal-title" className="text-2xl font-bold text-amber-900">Journal</h2>
-            {entries.length > 0 && (
-              <span className="ml-3 text-sm text-amber-700">
-                {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
-              </span>
-            )}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500">
+        <DialogHeader className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <DialogTitle className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
+              {entries.length > 0 && (
+                <span className="ml-3 text-sm text-amber-700">
+                  {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
+                </span>
+              )}
+            </div>
           </div>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="sm"
-            aria-label="Close journal"
-            className="text-amber-700 hover:text-amber-900 hover:bg-amber-200"
-          >
-            <X className="w-4 h-4" aria-hidden="true" />
-          </Button>
-        </div>
+        </DialogHeader>
 
         {/* Content with responsive list-detail layout */}
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
@@ -345,7 +331,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
             </>
           )}
         </div>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

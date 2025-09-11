@@ -19,7 +19,7 @@ interface CharacterAttributeDisplayProps {
 export function CharacterAttributeDisplay({ attributes, showCategories = false }: CharacterAttributeDisplayProps) {
   if (attributes.length === 0) {
     return (
-      <div className="text-gray-500 text-center py-4">
+      <div className="text-muted-foreground text-center py-4">
         No attributes assigned to this character.
       </div>
     );
@@ -40,9 +40,9 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
       <div className="space-y-6">
         {Object.entries(categorizedAttributes).map(([category, attrs]) => (
           <div key={category}>
-            <h4 className="text-lg font-semibold mb-3 text-gray-700 capitalize">
+            <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
               {category} Attributes
-            </h4>
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {attrs.map((attr, index) => (
                 <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
@@ -65,15 +65,15 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
 
 function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
   return (
-    <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
-      <div className="text-sm font-medium text-gray-700 mb-1">
+    <div className="bg-muted rounded-lg p-4 border">
+      <div className="text-sm font-medium text-muted-foreground mb-1">
         {attribute.name}
       </div>
-      <div className="text-2xl font-bold text-gray-900">
+      <div className="text-2xl font-bold">
         {attribute.modifiedValue}
       </div>
       {attribute.baseValue !== attribute.modifiedValue && (
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground">
           Base: {attribute.baseValue}
         </div>
       )}

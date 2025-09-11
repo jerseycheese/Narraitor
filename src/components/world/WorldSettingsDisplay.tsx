@@ -10,7 +10,7 @@ interface WorldSettingsDisplayProps {
 
 export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
   return (
-    <section className="bg-white rounded-lg p-6 shadow mb-6">
+    <section className="bg-background rounded-lg p-6 mb-6">
       <h2 className="text-2xl font-semibold mb-4">Character creation rules for this world</h2>
       <div className="grid grid-cols-2 gap-4">
         <DataField 

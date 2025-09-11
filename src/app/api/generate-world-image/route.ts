@@ -7,6 +7,7 @@ const logger = new Logger('WorldImageAPI');
 
 interface GenerateWorldImageRequest {
   world: World;
+  customPrompt?: string;
 }
 
 // Generate a detailed image prompt based on world characteristics
@@ -107,23 +108,39 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-world-image', 'Starting image generation for world:', body.world.name);
 
     try {
-      // Generate image prompt using AI
+      // Use custom prompt if provided, otherwise generate one using AI
       const client = createDefaultGeminiClient();
-      const imagePrompt = generateImagePrompt(body.world);
+      let imagePrompt: string;
       
-      logger.debug('generate-world-image', 'Generated image prompt:', imagePrompt);
+      if (body.customPrompt) {
+        // Use the custom prompt directly
+        imagePrompt = body.customPrompt;
+        logger.debug('generate-world-image', 'Using custom prompt:', imagePrompt);
+      } else {
+        // Generate image prompt using AI
+        imagePrompt = generateImagePrompt(body.world);
+        logger.debug('generate-world-image', 'Generated image prompt:', imagePrompt);
+      }
 
       // Generate a detailed description that could be used with real AI image generation
-      const promptResponse = await client.generateContent(`
-        Generate a detailed, artistic description for an image of this world that could be used as a prompt for an AI image generator like DALL-E or Midjourney. Be very specific about visual elements, atmosphere, lighting, and composition.
-        
-        ${imagePrompt}
-        
-        Respond with only the detailed visual description, no other text.
-      `);
-
-      const imageDescription = promptResponse.content;
-      logger.debug('generate-world-image', 'Generated image description:', imageDescription);
+      let imageDescription: string;
+      
+      if (body.customPrompt) {
+        // Use the custom prompt as the image description directly
+        imageDescription = body.customPrompt;
+        logger.debug('generate-world-image', 'Using custom prompt as image description:', imageDescription);
+      } else {
+        // Generate a detailed description using AI
+        const promptResponse = await client.generateContent(`
+          Generate a detailed, artistic description for an image of this world that could be used as a prompt for an AI image generator like DALL-E or Midjourney. Be very specific about visual elements, atmosphere, lighting, and composition.
+          
+          ${imagePrompt}
+          
+          Respond with only the detailed visual description, no other text.
+        `);
+        imageDescription = promptResponse.content;
+        logger.debug('generate-world-image', 'Generated image description:', imageDescription);
+      }
 
       // Try to generate real AI image using Gemini's image generation model
       let imageUrl = '';

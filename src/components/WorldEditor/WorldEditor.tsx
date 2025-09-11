@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { Button } from '@/components/ui/button';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
@@ -73,16 +74,16 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-lg text-gray-700">Loading world data...</div>
+      <div className="flex justify-center items-center p-8" role="status" aria-label="Loading world data">
+        <div className="text-lg text-muted-foreground">Loading world data...</div>
       </div>
     );
   }
   
   if (error || !world) {
     return (
-      <div className="p-4">
-        <div className="text-red-500">{error || 'World not found'}</div>
+      <div className="p-4" role="alert">
+        <div className="text-destructive">{error || 'World not found'}</div>
         <Button 
           onClick={() => router.push('/worlds')}
           className="mt-4"
@@ -94,41 +95,72 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   }
   
   return (
-    <div className="space-y-8">
-      <WorldBasicInfoForm 
-        world={world} 
-        onChange={handleWorldChange} 
-      />
+    <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
+      <CollapsibleSection 
+        title="Basic Information" 
+        initiallyExpanded={true}
+        className="bg-background"
+      >
+        <WorldBasicInfoForm 
+          world={world} 
+          onChange={handleWorldChange} 
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection 
+        title="World Image" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <WorldImageForm
+          world={world}
+          onChange={handleWorldChange}
+        />
+      </CollapsibleSection>
       
-      <WorldImageForm
-        world={world}
-        onChange={handleWorldChange}
-      />
+      <CollapsibleSection 
+        title="Attributes" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <WorldAttributesForm 
+          attributes={world.attributes} 
+          skills={world.skills}
+          worldId={worldId} 
+          maxAttributes={world.settings.maxAttributes}
+          onChange={(attributes) => handleWorldChange({ attributes })} 
+        />
+      </CollapsibleSection>
       
-      <WorldAttributesForm 
-        attributes={world.attributes} 
-        skills={world.skills}
-        worldId={worldId} 
-        maxAttributes={world.settings.maxAttributes}
-        onChange={(attributes) => handleWorldChange({ attributes })} 
-      />
+      <CollapsibleSection 
+        title="Skills" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <WorldSkillsForm 
+          skills={world.skills} 
+          attributes={world.attributes} 
+          worldId={worldId} 
+          onChange={(skills) => handleWorldChange({ skills })} 
+        />
+      </CollapsibleSection>
       
-      <WorldSkillsForm 
-        skills={world.skills} 
-        attributes={world.attributes} 
-        worldId={worldId} 
-        onChange={(skills) => handleWorldChange({ skills })} 
-      />
+      <CollapsibleSection 
+        title="World Settings" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <WorldSettingsForm 
+          settings={world.settings} 
+          toneSettings={world.toneSettings}
+          onChange={(settings) => handleWorldChange({ settings })} 
+          onToneSettingsChange={(toneSettings) => handleWorldChange({ toneSettings })}
+        />
+      </CollapsibleSection>
       
-      <WorldSettingsForm 
-        settings={world.settings} 
-        toneSettings={world.toneSettings}
-        onChange={(settings) => handleWorldChange({ settings })} 
-        onToneSettingsChange={(toneSettings) => handleWorldChange({ toneSettings })}
-      />
-      
-      <div className="flex justify-end space-x-4 pt-4 border-t">
+      <div className="flex justify-end space-x-4 pt-6 border-t border-border">
         <Button 
+          type="button"
           variant="outline"
           onClick={handleCancel}
           disabled={saving}
@@ -136,13 +168,13 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
           Cancel
         </Button>
         <Button 
-          onClick={handleSave}
+          type="submit"
           disabled={saving}
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

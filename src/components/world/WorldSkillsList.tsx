@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
+import { SectionWrapper } from '@/components/shared/SectionWrapper';
 
 interface WorldSkillsListProps {
   skills: WorldSkill[];
@@ -14,35 +15,34 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
   }
 
   return (
-    <section className="bg-white rounded-lg p-6 shadow mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Skills that characters can learn in this world</h2>
-      <div className="space-y-3">
+    <SectionWrapper title="Skills that characters can learn in this world">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {skills.map((skill, index) => (
-          <div key={`${skill.id ?? skill.name ?? index}`} className="border-l-4 border-blue-500 bg-gray-100 rounded-r-lg p-4">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">{skill.name}</h3>
-                {skill.description && (
-                  <p className="text-gray-700 text-sm mb-2">{skill.description}</p>
-                )}
-                <div className="flex gap-4 text-sm text-gray-500">
-                  {skill.attributeIds?.[0] && (
-                    <span>
-                      Linked to: {attributes.find(a => a.id === skill.attributeIds?.[0])?.name || 'Unknown'}
-                    </span>
-                  )}
-                  {skill.difficulty && (
-                    <span>Difficulty: {skill.difficulty}</span>
-                  )}
-                  {skill.category && (
-                    <span>Category: {skill.category}</span>
-                  )}
-                </div>
-              </div>
+          <div key={`${skill.id ?? skill.name ?? index}`} className="bg-muted rounded-lg p-4 border-l-4 border-primary">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-semibold text-lg">{skill.name}</h3>
+              {skill.difficulty && (
+                <span className="text-sm text-muted-foreground">
+                  Difficulty: {skill.difficulty}
+                </span>
+              )}
+            </div>
+            {skill.description && (
+              <p className="text-muted-foreground text-sm mb-2">{skill.description}</p>
+            )}
+            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+              {skill.attributeIds?.[0] && (
+                <span>
+                  Linked to: {attributes.find(a => a.id === skill.attributeIds?.[0])?.name || 'Unknown'}
+                </span>
+              )}
+              {skill.category && (
+                <span>Category: {skill.category}</span>
+              )}
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </SectionWrapper>
   );
 }

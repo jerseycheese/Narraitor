@@ -23,9 +23,9 @@ export function WorldDetailsDisplay({
   return (
     <>
       {showDescription && (
-        <section className="bg-white rounded-lg p-6 shadow mb-6">
+        <section className="bg-background rounded-lg p-6 mb-6 border">
           <h2 className="text-2xl font-semibold mb-4">About this world</h2>
-          <p className="text-gray-700 leading-relaxed">{world.description}</p>
+          <p className="text-muted-foreground leading-relaxed">{world.description}</p>
         </section>
       )}
       
