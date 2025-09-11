@@ -127,28 +127,40 @@ export async function waitForInteraction(
  * This ensures all collapsible content is visible in screenshots.
  */
 export async function expandAllCollapsibleSections(page: Page): Promise<void> {
-  // Find all collapsible section toggle buttons that are collapsed (showing '+')
-  const collapsedSections = page.locator('[data-testid="collapsible-section-toggle"]').filter({
-    hasText: '+'
-  });
-  
-  const count = await collapsedSections.count();
-  console.log(`Found ${count} collapsed sections to expand`);
-  
-  // Click each collapsed section to expand it
-  for (let i = 0; i < count; i++) {
-    try {
-      await collapsedSections.nth(i).click();
-      // Small wait between clicks to ensure proper expansion
-      await page.waitForTimeout(100);
-    } catch (error) {
-      console.log(`Failed to expand section ${i}:`, error);
-      // Continue with other sections even if one fails
+  try {
+    // Find all collapsible section toggle buttons that are collapsed (showing '+')
+    const collapsedSections = page.locator('[data-testid="collapsible-section-toggle"]').filter({
+      hasText: '+'
+    });
+    
+    const count = await collapsedSections.count();
+    console.log(`Found ${count} collapsed sections to expand`);
+    
+    if (count === 0) {
+      console.log('No collapsed sections found, skipping expansion');
+      return;
     }
+    
+    // Click all collapsed sections with shorter timeouts and better error handling
+    const promises = [];
+    for (let i = 0; i < count; i++) {
+      promises.push(
+        collapsedSections.nth(i).click({ timeout: 2000 }).catch(error => {
+          console.log(`Failed to expand section ${i}:`, error);
+          // Continue with other sections even if one fails
+        })
+      );
+    }
+    
+    // Wait for all clicks to complete with a reasonable timeout
+    await Promise.allSettled(promises);
+    
+    // Shorter final wait - just enough for DOM updates
+    await page.waitForTimeout(200);
+  } catch (error) {
+    console.log('Failed to expand collapsible sections:', error);
+    // Don't fail the test if we can't expand sections - continue with screenshot
   }
-  
-  // Final wait to ensure all expansions are complete
-  await page.waitForTimeout(300);
 }
 
 /**

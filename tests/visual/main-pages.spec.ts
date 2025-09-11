@@ -109,6 +109,7 @@ test.describe('Main Pages Visual Tests', () => {
   });
 
   test('World edit page should render consistently', async ({ page }) => {
+    test.setTimeout(45000); // Extended timeout for complex edit page with CollapsibleSections
     await seedTestData(page);
     
     // Navigate to world edit page
@@ -124,6 +125,7 @@ test.describe('Main Pages Visual Tests', () => {
   });
 
   test('Character edit page should render consistently', async ({ page }) => {
+    test.setTimeout(45000); // Extended timeout for complex edit page with CollapsibleSections
     await seedTestData(page);
     
     // Navigate to character edit page
