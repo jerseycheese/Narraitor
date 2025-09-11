@@ -128,35 +128,80 @@ export async function waitForInteraction(
  */
 export async function expandAllCollapsibleSections(page: Page): Promise<void> {
   try {
-    // Find all collapsible section toggle buttons that are collapsed (showing '+')
-    const collapsedSections = page.locator('[data-testid="collapsible-section-toggle"]').filter({
+    // Wait for any dynamic content to load first
+    await page.waitForTimeout(500);
+    
+    // Find all collapsible sections (not just buttons) to get a complete count
+    const allSections = page.locator('[data-testid="collapsible-section"]');
+    const totalCount = await allSections.count();
+    console.log(`Found ${totalCount} total CollapsibleSections on page`);
+    
+    // Multiple approaches to find collapsed sections
+    const approaches = [
+      // Approach 1: Find buttons with '+' text
+      page.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' }),
+      // Approach 2: Find buttons with aria-expanded="false"
+      page.locator('[data-testid="collapsible-section-toggle"][aria-expanded="false"]'),
+      // Approach 3: Find section headers where content is hidden
+      page.locator('[data-testid="collapsible-section-header"][aria-expanded="false"]')
+    ];
+    
+    let expandedCount = 0;
+    
+    for (const [index, approach] of approaches.entries()) {
+      try {
+        const collapsedSections = approach;
+        const count = await collapsedSections.count();
+        console.log(`Approach ${index + 1}: Found ${count} collapsed sections`);
+        
+        if (count === 0) continue;
+        
+        // Click each collapsed section individually with verification
+        for (let i = 0; i < count; i++) {
+          try {
+            const section = collapsedSections.nth(i);
+            
+            // Verify the section is still collapsed before clicking
+            const isStillCollapsed = await section.getAttribute('aria-expanded') !== 'true' ||
+                                     await section.textContent() === '+';
+            
+            if (isStillCollapsed) {
+              await section.click({ timeout: 3000 });
+              expandedCount++;
+              
+              // Wait for the expansion animation to complete
+              await page.waitForTimeout(150);
+              
+              console.log(`Successfully expanded section ${i + 1} using approach ${index + 1}`);
+            }
+          } catch (error) {
+            console.log(`Failed to expand section ${i} with approach ${index + 1}:`, error);
+            // Continue with next section
+          }
+        }
+        
+        // If we successfully expanded sections with this approach, we can stop
+        if (count > 0 && expandedCount > 0) {
+          break;
+        }
+      } catch (error) {
+        console.log(`Approach ${index + 1} failed:`, error);
+        // Try next approach
+      }
+    }
+    
+    // Final verification - check how many sections are still collapsed
+    await page.waitForTimeout(300);
+    const remainingCollapsed = await page.locator('[data-testid="collapsible-section-toggle"]').filter({
       hasText: '+'
-    });
+    }).count();
     
-    const count = await collapsedSections.count();
-    console.log(`Found ${count} collapsed sections to expand`);
+    console.log(`Expansion complete: expanded ${expandedCount} sections, ${remainingCollapsed} remain collapsed`);
     
-    if (count === 0) {
-      console.log('No collapsed sections found, skipping expansion');
-      return;
+    if (remainingCollapsed > 0) {
+      console.log('WARNING: Some sections remain collapsed after expansion attempts');
     }
     
-    // Click all collapsed sections with shorter timeouts and better error handling
-    const promises = [];
-    for (let i = 0; i < count; i++) {
-      promises.push(
-        collapsedSections.nth(i).click({ timeout: 2000 }).catch(error => {
-          console.log(`Failed to expand section ${i}:`, error);
-          // Continue with other sections even if one fails
-        })
-      );
-    }
-    
-    // Wait for all clicks to complete with a reasonable timeout
-    await Promise.allSettled(promises);
-    
-    // Shorter final wait - just enough for DOM updates
-    await page.waitForTimeout(200);
   } catch (error) {
     console.log('Failed to expand collapsible sections:', error);
     // Don't fail the test if we can't expand sections - continue with screenshot

@@ -115,6 +115,18 @@ test.describe('Main Pages Visual Tests', () => {
     // Navigate to world edit page
     await page.goto('/worlds/world-cyberpunk-2077/edit');
     await waitForContentStable(page);
+    
+    // Debug: Check if we're on the right page
+    const pageTitle = await page.textContent('h1, [data-testid="page-title"], .page-title');
+    console.log('World edit page title:', pageTitle);
+    
+    // Wait for world data to load and verify we're on edit page
+    await page.waitForFunction(() => {
+      return document.body.textContent && 
+             !document.body.textContent.includes('World not found') &&
+             (document.body.textContent.includes('Edit World') || document.body.textContent.includes('WorldEditor'));
+    }, { timeout: 10000 });
+    
     await hideDynamicContent(page);
     
     // Expand all CollapsibleSections to show full content
@@ -131,10 +143,38 @@ test.describe('Main Pages Visual Tests', () => {
     // Navigate to character edit page
     await page.goto('/characters/char-cyberpunk-hacker/edit');
     await waitForContentStable(page);
+    
+    // Debug: Check if we're on the right page
+    const pageTitle = await page.textContent('h1, [data-testid="page-title"], .page-title');
+    console.log('Character edit page title:', pageTitle);
+    
+    // Wait for character data to load
+    await page.waitForFunction(() => {
+      return document.body.textContent && 
+             !document.body.textContent.includes('Character not found') &&
+             (document.body.textContent.includes('Edit Character') || document.body.textContent.includes('CharacterEditor'));
+    }, { timeout: 10000 });
+    
     await hideDynamicContent(page);
+    
+    // Debug: Check how many CollapsibleSections exist before expansion
+    const totalSections = await page.locator('[data-testid="collapsible-section"]').count();
+    console.log(`Found ${totalSections} total CollapsibleSections on character edit page`);
+    
+    // Debug: Check how many are collapsed before expansion
+    const collapsedSections = await page.locator('[data-testid="collapsible-section-toggle"]').filter({
+      hasText: '+'
+    }).count();
+    console.log(`Found ${collapsedSections} collapsed sections before expansion`);
     
     // Expand all CollapsibleSections to show full content
     await expandAllCollapsibleSections(page);
+    
+    // Debug: Check how many are still collapsed after expansion
+    const stillCollapsed = await page.locator('[data-testid="collapsible-section-toggle"]').filter({
+      hasText: '+'
+    }).count();
+    console.log(`Found ${stillCollapsed} collapsed sections after expansion`);
     
     // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
