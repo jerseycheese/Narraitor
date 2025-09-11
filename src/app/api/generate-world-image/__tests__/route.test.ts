@@ -47,7 +47,7 @@ describe('/api/generate-world-image', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as any);
+    mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as ReturnType<typeof createDefaultGeminiClient>);
     
     // Mock environment variable
     process.env.GEMINI_API_KEY = 'test-api-key';
@@ -107,7 +107,7 @@ describe('/api/generate-world-image', () => {
             }
           }]
         })
-      } as any);
+      } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -146,7 +146,7 @@ describe('/api/generate-world-image', () => {
             }
           }]
         })
-      } as any);
+      } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -208,7 +208,7 @@ describe('/api/generate-world-image', () => {
             }
           }]
         })
-      } as any);
+      } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -243,7 +243,7 @@ describe('/api/generate-world-image', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         text: () => Promise.resolve('API Error'),
-      } as any);
+      } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -275,7 +275,7 @@ describe('/api/generate-world-image', () => {
             }
           }]
         })
-      } as any);
+      } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -320,7 +320,7 @@ describe('/api/generate-world-image', () => {
         { key: 'MOCK_API_KEY', description: 'mock API key' }
       ];
 
-      for (const { key, description } of testCases) {
+      for (const { key } of testCases) {
         if (key) {
           process.env.GEMINI_API_KEY = key;
         } else {
