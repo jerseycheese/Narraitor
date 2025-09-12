@@ -114,10 +114,6 @@ test.describe('Main Pages Visual Tests', () => {
     // Navigate to world edit page
     await page.goto('/worlds/world-cyberpunk-2077/edit');
     await waitForContentStable(page);
-    
-    // Simple check: wait for the edit page to load
-    await page.waitForSelector('[data-testid="collapsible-section"]', { timeout: 10000 });
-    
     await hideDynamicContent(page);
     
     // Expand all CollapsibleSections to show full content
