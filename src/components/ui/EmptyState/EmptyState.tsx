@@ -37,6 +37,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div className={cn(
+      'component-empty-state',
       'text-center',
       baseClasses,
       className

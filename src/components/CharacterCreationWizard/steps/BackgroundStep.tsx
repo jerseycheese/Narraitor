@@ -66,10 +66,11 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
-    <WizardFormSection
-      title="Character Background"
-      description="Provide details about your character's history, personality, and motivations."
-    >
+    <div className="component-background-step">
+      <WizardFormSection
+        title="Character Background"
+        description="Provide details about your character's history, personality, and motivations."
+      >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
         <p className="text-sm text-blue-900">
@@ -159,6 +160,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       {showErrors && (
         <ErrorBlock errors={validation.errors} />
       )}
-    </WizardFormSection>
+      </WizardFormSection>
+    </div>
   );
 };

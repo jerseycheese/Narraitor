@@ -52,6 +52,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       aria-label={label}
       title={label}
       className={cn(
+        'component-floating-action-button',
         'fixed z-40',
         'rounded-full shadow-lg',
         'text-white border-2',

@@ -500,7 +500,7 @@ export default function WorldCreationWizard({
 
   return (
     <WizardContainer title="Create New World">
-      <div data-testid="wizard-container">
+      <div className="component-world-creation-wizard" data-testid="wizard-container">
         <WizardProgress 
           steps={steps} 
           currentStep={wizard.state.currentStep}

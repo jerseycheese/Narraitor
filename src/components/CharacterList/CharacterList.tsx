@@ -35,7 +35,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
   onDeleteCharacter,
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="component-character-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {characters.map(character => (
         <div
           key={character.id}

@@ -30,8 +30,8 @@ export function TabNavigation<T = string>({
   mobileLayout = 'wrap'
 }: TabNavigationProps<T>) {
   const containerClasses = mobileLayout === 'scroll' 
-    ? `flex gap-1 sm:gap-2 overflow-x-auto pb-1 ${className}` 
-    : `flex flex-wrap gap-1 sm:gap-2 ${className}`;
+    ? `component-tab-navigation flex gap-1 sm:gap-2 overflow-x-auto pb-1 ${className}` 
+    : `component-tab-navigation flex flex-wrap gap-1 sm:gap-2 ${className}`;
 
   return (
     <div className={containerClasses}>

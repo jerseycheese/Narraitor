@@ -180,7 +180,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="component-character-editor space-y-6">
       <CollapsibleSection 
         title="Character Portrait" 
         initiallyExpanded={false}

@@ -41,10 +41,11 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
   const remaining = data.pointPools.attributes.total - totalSpent;
 
   return (
-    <WizardFormSection
-      title="Allocate Attribute Points"
-      description={`Distribute ${data.pointPools.attributes.total} points across your character's attributes. Each attribute affects different aspects of gameplay.`}
-    >
+    <div className="component-attributes-step">
+      <WizardFormSection
+        title="Allocate Attribute Points"
+        description={`Distribute ${data.pointPools.attributes.total} points across your character's attributes. Each attribute affects different aspects of gameplay.`}
+      >
       <PointPoolManager
         allocations={allocations}
         poolConfig={{
@@ -72,6 +73,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
           </p>
         </div>
       )}
-    </WizardFormSection>
+      </WizardFormSection>
+    </div>
   );
 };

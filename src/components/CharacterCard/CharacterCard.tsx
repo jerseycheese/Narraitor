@@ -64,6 +64,7 @@ export function CharacterCard({
     <ActiveStateCard 
       isActive={isActive}
       activeText="Currently Active Character"
+      className="component-character-card"
     >
 
       <div className="p-8 flex-grow flex flex-col">

@@ -21,7 +21,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
   onPlayerTypeChange
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="component-basic-info-form space-y-4">
       <div className="space-y-2">
         <Label htmlFor="character-name">
           Character Name <span className="text-destructive">*</span>

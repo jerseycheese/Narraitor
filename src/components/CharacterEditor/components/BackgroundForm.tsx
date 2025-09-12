@@ -27,7 +27,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
   };
 
   return (
-    <div className="bg-background rounded-lg p-6">
+    <div className="component-background-form bg-background rounded-lg p-6">
       <h2 className="text-xl font-bold mb-4">Background</h2>
       <div className="space-y-4">
         <div className="space-y-2">

@@ -34,10 +34,11 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
-    <WizardFormSection
-      title="Select Starting Skills"
-      description="Choose skills that define your character's initial abilities and expertise. You can select between 1 and 8 skills. All selected skills start at level 1."
-    >
+    <div className="component-skills-step">
+      <WizardFormSection
+        title="Select Starting Skills"
+        description="Choose skills that define your character's initial abilities and expertise. You can select between 1 and 8 skills. All selected skills start at level 1."
+      >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
         <p className="text-sm text-blue-900">
@@ -110,6 +111,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           ))}
         </div>
       )}
-    </WizardFormSection>
+      </WizardFormSection>
+    </div>
   );
 };
