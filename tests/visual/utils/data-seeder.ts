@@ -683,32 +683,14 @@ export async function seedTestData(page: Page): Promise<void> {
     
     // Approach 1: Direct Zustand store access through window
     try {
-      // Dynamically import and expose the store on window for testing
-      const setupStores = async () => {
-        if (!(window as any).useWorldStore) {
-          // Try to expose the store by importing it
-          try {
-            const { useWorldStore } = await import('@/state/worldStore');
-            (window as any).useWorldStore = useWorldStore;
-            seedApproaches.push('✅ Exposed useWorldStore on window');
-          } catch (importError) {
-            seedApproaches.push('❌ Failed to import useWorldStore: ' + (importError as Error).message);
-          }
-        }
-        
-        // Now try to set the state
-        if ((window as any).useWorldStore) {
-          (window as any).useWorldStore.setState({
-            worlds: worldsRecord,
-            currentWorldId: SAMPLE_WORLDS[0]?.id || null,
-            loading: false,
-            error: null
-          });
-          seedApproaches.push('✅ Direct useWorldStore.setState');
-        }
-      };
-      
-      await setupStores();
+      // Look for useWorldStore on window (may be exposed in dev)
+      if ((window as any).useWorldStore) {
+        (window as any).useWorldStore.setState({
+          worlds: worldsRecord,
+          currentWorldId: SAMPLE_WORLDS[0]?.id || null
+        });
+        seedApproaches.push('✅ Direct useWorldStore.setState');
+      }
     } catch (e) {
       seedApproaches.push('❌ Direct useWorldStore.setState: ' + (e as Error).message);
     }
