@@ -73,6 +73,7 @@ export const CollapsibleSection = ({
           {title}
         </h3>
         <button
+          type="button"
           data-testid="collapsible-section-toggle"
           onClick={(e) => {
             e.stopPropagation(); // Prevent double toggle when clicking button

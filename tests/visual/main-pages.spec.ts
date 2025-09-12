@@ -30,6 +30,8 @@ test.describe('Main Pages Visual Tests', () => {
     await seedTestData(page);
     await page.goto('/');
     await waitForContentStable(page);
+    // Ensure the Continue section appears (seeded session present)
+    await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
     await hideDynamicContent(page);
     
     // Verify page loaded with expected content
@@ -111,13 +113,22 @@ test.describe('Main Pages Visual Tests', () => {
   test('World edit page should render consistently', async ({ page }) => {
     await seedTestData(page);
     
-    // Navigate to world edit page
+    // Navigate directly to the edit page to avoid any list-page fallbacks
     await page.goto('/worlds/world-cyberpunk-2077/edit');
+    await expect(page).toHaveURL(/\/worlds\/world-cyberpunk-2077\/edit/);
     await waitForContentStable(page);
+    // Confirm editor root and sections present before expansion
+    const editor = page.locator('[data-testid="world-editor-root"]');
+    await editor.waitFor({ timeout: 8000 });
+    await page.waitForSelector('[data-testid="collapsible-section"]', { timeout: 8000 });
     await hideDynamicContent(page);
     
-    // Expand all CollapsibleSections to show full content
-    await expandAllCollapsibleSections(page);
+    // Expand all CollapsibleSections to show full content (scoped to editor)
+    await expandAllCollapsibleSections(page, editor);
+    // Ensure no collapsed sections remain
+    await expect(
+      editor.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' })
+    ).toHaveCount(0);
     
     // Take screenshot of world edit page - should show world editing interface with all sections expanded
     await expect(page).toHaveScreenshot('world-edit.png', { fullPage: true });

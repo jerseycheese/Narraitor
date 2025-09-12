@@ -1,23 +1,10 @@
-'use client';
-
-import React, { FC, use } from 'react';
 import WorldEditor from '@/components/WorldEditor/WorldEditor';
 import { PageLayout } from '@/components/shared/PageLayout';
 
-interface EditWorldPageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-const EditWorldPage: FC<EditWorldPageProps> = ({ params }) => {
-  const resolvedParams = use(params);
-  
+export default function EditWorldPage({ params }: { params: { id: string } }) {
   return (
     <PageLayout title="Edit World">
-      <WorldEditor worldId={resolvedParams.id} />
+      <WorldEditor worldId={params.id} />
     </PageLayout>
   );
-};
-
-export default EditWorldPage;
+}

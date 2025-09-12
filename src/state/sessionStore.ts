@@ -605,3 +605,8 @@ export const useSessionStore = create<SessionStore>()(
 ));
 
 // Named export for consistent usage
+// Also expose store globally for dev/test to allow direct state seeding
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).useSessionStore = useSessionStore;
+}

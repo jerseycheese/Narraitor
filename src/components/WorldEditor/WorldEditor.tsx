@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
@@ -21,25 +23,43 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   
-  // Load world data on mount
+  // Reactive store selectors for hydration-safe loading
+  const storeWorld = useWorldStore((state) => state.worlds[worldId]);
+  const storeWorlds = useWorldStore((state) => state.worlds);
+  const storeLoading = useWorldStore((state) => state.loading);
+  const fetchWorlds = useWorldStore((state) => state.fetchWorlds);
+
+  // Kick off store hydration on mount
   useEffect(() => {
-    try {
-      const { worlds } = useWorldStore.getState();
-      const worldData = worlds[worldId];
-      
-      if (!worldData) {
-        setError('World not found');
-        setLoading(false);
-        return;
-      }
-      
-      setWorld(worldData);
-      setLoading(false);
-    } catch {
-      setError('Failed to load world data');
-      setLoading(false);
+    fetchWorlds().catch(() => {
+      // Swallow errors; UI will show fallback error state
+    });
+  }, [fetchWorlds]);
+
+  // Update local component state when store changes (supports delayed hydration)
+  useEffect(() => {
+    // While store reports loading OR the store has no worlds yet, keep loading
+    const hasAnyWorlds = storeWorlds && Object.keys(storeWorlds).length > 0;
+
+    if (storeLoading || !hasAnyWorlds) {
+      setLoading(true);
+      setError(null);
+      return;
     }
-  }, [worldId]);
+
+    if (storeWorld) {
+      setWorld(storeWorld);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    // Store is hydrated and has worlds, but not this id
+    setError('World not found');
+    setLoading(false);
+  }, [storeWorld, storeWorlds, storeLoading, worldId]);
+
+  // No SSR gating here; component is client-only via directive at top
   
   // Handle saving all world changes
   const handleSave = async () => {
@@ -95,7 +115,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   }
   
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
+    <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
       <CollapsibleSection 
         title="Basic Information" 
         initiallyExpanded={true}

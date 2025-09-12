@@ -23,9 +23,64 @@ async function globalSetup(config: FullConfig) {
     await page.evaluate(async (testData) => {
       const { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } = testData;
       
+      // Transform legacy SAMPLE_WORLDS to current World schema
+      const toValidWorld = (world: any) => {
+        const now = new Date().toISOString();
+        const makeAttrId = (idx: number) => `attr-${world.id}-${idx + 1}`;
+        const makeSkillId = (idx: number) => `skill-${world.id}-${idx + 1}`;
+
+        const attributes = Array.isArray(world.attributes)
+          ? world.attributes.map((attr: any, i: number) => ({
+              id: makeAttrId(i),
+              worldId: world.id,
+              name: String(attr?.name ?? `Attribute ${i + 1}`),
+              description: String(attr?.description ?? ''),
+              baseValue: typeof attr?.defaultValue === 'number' ? attr.defaultValue : (typeof attr?.baseValue === 'number' ? attr.baseValue : 0),
+              minValue: typeof attr?.minValue === 'number' ? attr.minValue : 0,
+              maxValue: typeof attr?.maxValue === 'number' ? attr.maxValue : 10,
+            }))
+          : [];
+
+        const skills = Array.isArray(world.skills)
+          ? world.skills.map((skill: any, i: number) => ({
+              id: makeSkillId(i),
+              worldId: world.id,
+              name: String(skill?.name ?? `Skill ${i + 1}`),
+              description: String(skill?.description ?? ''),
+              difficulty: 'medium',
+              baseValue: 0,
+              minValue: 0,
+              maxValue: 10,
+              attributeIds: [],
+            }))
+          : [];
+
+        const image = world.image
+          ? { type: 'placeholder', url: world.image?.url ?? null, generatedAt: now }
+          : undefined;
+
+        return {
+          id: world.id,
+          name: String(world.name ?? 'Untitled World'),
+          description: String(world.description ?? ''),
+          genre: String(world.genre ?? 'cyberpunk'),
+          attributes,
+          skills,
+          settings: {
+            maxAttributes: 10,
+            maxSkills: 10,
+            attributePointPool: 20,
+            skillPointPool: 20,
+          },
+          image,
+          createdAt: String(world.createdAt ?? now),
+          updatedAt: String(world.updatedAt ?? now),
+        };
+      };
+      
       // Convert arrays to Record format that Zustand expects
       const worldsRecord = SAMPLE_WORLDS.reduce((acc: Record<string, unknown>, world) => {
-        acc[world.id] = world;
+        acc[world.id] = toValidWorld(world);
         return acc;
       }, {});
       
@@ -157,6 +212,38 @@ async function globalSetup(config: FullConfig) {
       testWindow.__TEST_CURRENT_WORLD_ID__ = SAMPLE_WORLDS[0]?.id || null;
       testWindow.__TEST_SEEDED__ = true;
       
+      // Also update the live stores if available to avoid hydration races
+      const anyWin = window as any;
+      if (anyWin.useWorldStore) {
+        anyWin.useWorldStore.setState({
+          worlds: worldsRecord,
+          currentWorldId: SAMPLE_WORLDS[0]?.id || null,
+          loading: false,
+          error: null,
+        });
+      }
+      if (anyWin.useCharacterStore) {
+        anyWin.useCharacterStore.setState({
+          characters: charactersRecord,
+          currentCharacterId: SAMPLE_CHARACTERS[0]?.id || null,
+          loading: false,
+          error: null,
+        });
+      }
+      if (anyWin.useSessionStore) {
+        anyWin.useSessionStore.setState({
+          savedSessions: sessionStoreData.state.savedSessions,
+          onboardingCompleted: true,
+          id: sessionStoreData.state.currentSessionId,
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
+          status: 'active',
+          currentSceneId: null,
+          playerChoices: [],
+          error: null,
+        });
+      }
+
       console.log('✅ Global setup: Test data seeded successfully');
       
     }, { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS });
