@@ -1,0 +1,173 @@
+
+> narraitor@0.1.0 dev
+> bash scripts/kill-port.sh 3000 && next dev -p 3000
+
+Checking for processes running on port 3000...
+No processes found running on port 3000
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.158:3000
+   - Environments: .env.local, .env.development
+
+ ✓ Starting...
+ ⨯ Failed to load env from /Users/jackhaas/Projects/narraitor/.env.development [RangeError: Maximum call stack size exceeded]
+ ✓ Ready in 1205ms
+ ○ Compiling / ...
+
+warn - The utility `card` contains an invalid theme value and was not generated.
+ ✓ Compiled / in 2.9s (1508 modules)
+[22:20:25.892] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET / 200 in 3368ms
+ ✓ Compiled in 432ms (613 modules)
+ GET / 200 in 26ms
+ GET / 200 in 35ms
+ ○ Compiling /worlds/[id]/play ...
+ ✓ Compiled /worlds/[id]/play in 1685ms (1743 modules)
+[22:20:32.423] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET / 200 in 2233ms
+ GET / 200 in 2214ms
+ GET /settings 200 in 2256ms
+ GET /worlds 200 in 2260ms
+ GET /worlds 200 in 2270ms
+ GET /worlds/world-cyberpunk-2077/play 200 in 3057ms
+ ○ Compiling /characters/create ...
+ ✓ Compiled /characters/[id] in 1005ms (1798 modules)
+ ✓ Compiled in 314ms (772 modules)
+[22:20:46.693] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET /characters 200 in 1081ms
+ GET /worlds 200 in 1285ms
+ GET /characters/create?worldId=world-cyberpunk-2077 200 in 2032ms
+ GET /worlds/world-cyberpunk-2077 200 in 1082ms
+ GET /characters/char-cyberpunk-hacker 200 in 1083ms
+ ○ Compiling /worlds/[id]/edit ...
+ ✓ Compiled /worlds/[id]/edit in 544ms (1902 modules)
+[22:20:51.195] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET /worlds/world-cyberpunk-2077/edit 200 in 1147ms
+ ○ Compiling /characters/[id]/edit ...
+ ✓ Compiled /characters/[id]/edit in 587ms (1923 modules)
+[22:21:00.444] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET /worlds 200 in 380ms
+ GET /characters/char-cyberpunk-hacker/edit 200 in 1119ms
+ GET /worlds 200 in 10ms
+ GET /worlds 200 in 7ms
+ ○ Compiling /worlds/create ...
+ ✓ Compiled /worlds/create in 795ms (1992 modules)
+[22:21:12.948] DEBUG [StateInspector] StateInspector initialized
+[Persistence] Creating new storage instance
+[ResilientStorage] Initializing IndexedDB adapter
+[Persistence] Storage instance created and cached
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+Using real Gemini client with server-side API key
+[Persistence] Reusing existing storage promise
+[Persistence] Reusing existing storage promise
+[ResilientStorage] IndexedDB adapter initialized successfully
+[ResilientStorage] Using memory fallback for narraitor-world-store
+[ResilientStorage] Using memory fallback for narraitor-session-store
+[ResilientStorage] Using memory fallback for narraitor-character-store
+[ResilientStorage] Using memory fallback for narraitor-journal-store
+[ResilientStorage] Using memory fallback for narraitor-goal-store
+[ResilientStorage] Using memory fallback for lore-store
+ GET /worlds/create 200 in 1138ms
+ GET / 200 in 89ms
+ GET / 200 in 24ms
+ GET / 200 in 33ms
+ GET / 200 in 441ms
+ GET /worlds 200 in 460ms
+ GET / 200 in 587ms
+ GET /settings 200 in 607ms
+ GET /worlds 200 in 582ms
+ GET /worlds/world-cyberpunk-2077/play 200 in 550ms
+ GET /characters/create?worldId=world-cyberpunk-2077 200 in 320ms
+ GET /worlds 200 in 48ms
+ GET /characters 200 in 206ms
+ GET /worlds/world-cyberpunk-2077 200 in 215ms
+ GET /characters/char-cyberpunk-hacker 200 in 251ms
+ GET /worlds/world-cyberpunk-2077/edit 200 in 57ms
+ GET /characters/char-cyberpunk-hacker/edit 200 in 105ms
+ GET /worlds 200 in 120ms
+ GET /worlds 200 in 9ms
+ GET /worlds 200 in 5ms
+ GET /worlds/create 200 in 48ms
+ ✓ Compiled in 647ms (1897 modules)

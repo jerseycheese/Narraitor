@@ -12,11 +12,13 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock worldStore
-jest.mock('@/state/worldStore', () => ({
-  useWorldStore: {
-    getState: jest.fn(),
-  },
-}));
+jest.mock('@/state/worldStore', () => {
+  const mockUseWorldStore = jest.fn();
+  mockUseWorldStore.getState = jest.fn();
+  return {
+    useWorldStore: mockUseWorldStore,
+  };
+});
 
 interface MockBasicInfoFormProps {
   world: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -113,12 +115,27 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    
+    // Mock the store state
+    const mockState = {
       worlds: {
         'world-123': mockWorld,
       },
+      loading: false,
+      fetchWorlds: jest.fn().mockResolvedValue(undefined),
       updateWorld: mockUpdateWorld,
+    };
+    
+    // Mock useWorldStore to return different values based on the selector
+    (useWorldStore as jest.Mock).mockImplementation((selector) => {
+      if (typeof selector === 'function') {
+        return selector(mockState);
+      }
+      return mockState;
     });
+    
+    // Mock the direct getState access
+    (useWorldStore as jest.Mock).getState.mockReturnValue(mockState);
   });
 
   // Acceptance Criteria: Selecting a world allows viewing/editing its details via the WorldEditor
@@ -195,10 +212,23 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   // Test error handling when world not found
   test('shows error when world is not found', async () => {
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
-      worlds: {},
+    // State with some worlds loaded, but not the one we're looking for
+    const stateWithOtherWorlds = {
+      worlds: {
+        'world-456': mockWorld, // Different world ID
+      },
+      loading: false,
+      fetchWorlds: jest.fn().mockResolvedValue(undefined),
       updateWorld: mockUpdateWorld,
+    };
+    
+    (useWorldStore as jest.Mock).mockImplementation((selector) => {
+      if (typeof selector === 'function') {
+        return selector(stateWithOtherWorlds);
+      }
+      return stateWithOtherWorlds;
     });
+    (useWorldStore as jest.Mock).getState.mockReturnValue(stateWithOtherWorlds);
 
     render(<WorldEditor worldId="non-existent" />);
 

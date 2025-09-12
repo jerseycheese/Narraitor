@@ -42,6 +42,8 @@ test.describe('Main Pages Visual Tests', () => {
   });
 
   test('Settings page should render consistently', async ({ page }) => {
+    test.setTimeout(60000); // Increase timeout for this test to handle resource contention
+    
     await seedTestData(page);
     
     await page.goto('/settings');
