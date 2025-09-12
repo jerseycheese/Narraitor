@@ -35,6 +35,7 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
   return (
     <div 
       className={`
+        component-character-portrait-placeholder
         ${backgroundClass}
         rounded-full flex items-center justify-center 
         font-bold text-2xl w-24 h-24

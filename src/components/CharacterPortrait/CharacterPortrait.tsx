@@ -57,6 +57,7 @@ export function CharacterPortrait({
   };
 
   const containerClasses = cn(
+    'component-character-portrait',
     'relative rounded-full overflow-hidden',
     sizeClasses[size],
     onClick && 'cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all',

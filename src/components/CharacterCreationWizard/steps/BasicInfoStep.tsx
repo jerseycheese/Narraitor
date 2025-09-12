@@ -63,10 +63,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
-    <WizardFormSection
-      title="Basic Information"
-      description="Create your character by providing their name and basic details."
-    >
+    <div className="component-basic-info-step">
+      <WizardFormSection
+        title="Basic Information"
+        description="Create your character by providing their name and basic details."
+      >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
         <p className="text-sm text-blue-900">
@@ -136,6 +137,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       {showErrors && (
         <ErrorBlock errors={validation.errors} />
       )}
-    </WizardFormSection>
+      </WizardFormSection>
+    </div>
   );
 };

@@ -27,7 +27,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
   };
 
   return (
-    <div className="bg-background rounded-lg p-6">
+    <div className="component-attributes-form bg-background rounded-lg p-6">
       <h2 className="text-xl font-bold mb-4">Attributes</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {attributes.map((attr, index) => {

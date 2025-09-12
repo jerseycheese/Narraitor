@@ -35,7 +35,7 @@ const Tabs: React.FC<TabsProps> = ({
   
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={className}>
+      <div className={cn('component-tabs', className)}>
         {children}
       </div>
     </TabsContext.Provider>

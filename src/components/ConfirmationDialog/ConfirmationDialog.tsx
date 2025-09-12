@@ -77,7 +77,7 @@ export function ConfirmationDialog({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-md sm:rounded-lg',
+          'component-confirmation-dialog max-w-md sm:rounded-lg',
           variantClasses[variant]
         )}
         aria-labelledby="confirmation-title"

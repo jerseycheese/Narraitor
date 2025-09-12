@@ -13,7 +13,7 @@ interface WorldBasicInfoFormProps {
 
 const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange }) => {
   return (
-    <div className="space-y-4">
+    <div className="component-world-basic-info-form space-y-4">
       <div className="space-y-2">
         <Label htmlFor="worldName">
           Name

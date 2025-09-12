@@ -53,6 +53,7 @@ export const AccessButton: React.FC<AccessButtonProps> = ({
       title={title || label}
       data-testid={dataTestId}
       className={cn(
+        'component-access-button',
         'flex items-center gap-2',
         className
       )}

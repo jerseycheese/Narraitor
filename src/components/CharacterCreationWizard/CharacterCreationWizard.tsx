@@ -431,7 +431,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   return (
     <>
-      <WizardContainer title={`Create Character in ${world.name}`}>
+      <WizardContainer title={`Create Character in ${world.name}`} className="component-character-creation-wizard">
         <div onBlur={handleFieldBlur}>
           {/* Auto-save status indicator */}
           <div className="mb-4 flex justify-end">

@@ -128,7 +128,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
   };
 
   return (
-    <div className="space-y-6">
+    <div className="component-portrait-step space-y-6">
       <div className="text-center">
         <h3 className="text-lg font-semibold mb-2">Character Portrait</h3>
         <p className="text-sm text-gray-700">

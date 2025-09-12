@@ -71,7 +71,7 @@ export function AchievementDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className={cn(
-          'max-w-lg text-center',
+          'component-achievement-dialog max-w-lg text-center',
           achievementTypeClasses[type]
         )}
         showCloseButton={false}
