@@ -65,7 +65,7 @@ describe('RecoveryNotification', () => {
     test('has proper ARIA attributes', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      const notification = screen.getByRole('alertdialog');
+      const notification = screen.getByRole('dialog');
       expect(notification).toHaveAttribute('aria-labelledby');
       expect(notification).toHaveAttribute('aria-describedby');
     });

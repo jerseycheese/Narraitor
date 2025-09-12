@@ -1,8 +1,13 @@
 "use client"
 
 import React, { useEffect, useRef } from 'react';
-import { Modal } from '@/components/ui/Modal/Modal';
 import { Button } from '@/components/ui/button';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle 
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils/classNames';
 
 export type AchievementType = 'quest' | 'skill' | 'discovery' | 'milestone' | 'default';
@@ -63,19 +68,21 @@ export function AchievementDialog({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title || "Achievement Unlocked"}
-      showCloseButton={false}
-      closeOnBackdropClick={false}
-      size="lg"
-      className={cn(
-        'text-center',
-        achievementTypeClasses[type]
-      )}
-    >
-      <div className="space-y-4">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        className={cn(
+          'max-w-lg text-center',
+          achievementTypeClasses[type]
+        )}
+        showCloseButton={false}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-center">
+            {title || "Achievement Unlocked"}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
         {icon && (
           <div className="flex justify-center text-4xl mb-2">
             {icon}
@@ -83,7 +90,7 @@ export function AchievementDialog({
         )}
         
         {description && (
-          <div className="text-base text-gray-700">
+          <div className="text-base text-muted-foreground">
             {description}
           </div>
         )}
@@ -91,19 +98,19 @@ export function AchievementDialog({
         
         <div className="py-6" role="status" aria-live="polite">
           <div className="bg-white/50 rounded-lg p-4 border border-white/20 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Achievement Unlocked
             </h3>
-            <p className="text-xl font-bold text-gray-900 mb-4">
+            <p className="text-xl font-bold text-foreground mb-4">
               {achievement}
             </p>
             
             {reward && (
-              <div className="border-t border-gray-200 pt-3">
-                <p className="text-sm text-gray-700 mb-1">
+              <div className="border-t border-border pt-3">
+                <p className="text-sm text-muted-foreground mb-1">
                   <span className="font-medium">Reward:</span>
                 </p>
-                <p className="text-base font-semibold text-gray-900">
+                <p className="text-base font-semibold text-foreground">
                   {reward}
                 </p>
               </div>
@@ -121,7 +128,8 @@ export function AchievementDialog({
             {buttonText}
           </Button>
         </div>
-      </div>
-    </Modal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

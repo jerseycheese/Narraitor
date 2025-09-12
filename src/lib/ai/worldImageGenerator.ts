@@ -102,7 +102,7 @@ export class WorldImageGenerator {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ world }),
+        body: JSON.stringify({ world, customPrompt }),
       });
 
       if (!response.ok) {

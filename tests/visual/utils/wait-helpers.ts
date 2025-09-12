@@ -5,7 +5,7 @@
  * by ensuring content is truly stable before taking screenshots.
  */
 
-import { Page } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Wait for content to be fully stable before taking screenshots.
@@ -70,7 +70,20 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         display: none !important;
         visibility: hidden !important;
       }
-      
+
+      /* Hide DevTools during visual tests to avoid duplicate UI and noise */
+      [data-testid="devtools-panel-container"],
+      [data-testid="devtools-panel-header"],
+      [data-testid="devtools-panel-content"],
+      [data-testid="devtools-panel-toggle"],
+      .devtools-panel,
+      .devtools-toggle,
+      .devtools-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
       /* Disable animations for consistent screenshots */
       *, *::before, *::after {
         animation-duration: 0s !important;
@@ -119,6 +132,34 @@ export async function waitForInteraction(
     } catch (e) {
       // Continue if network idle times out
     }
+  }
+}
+
+/**
+ * Expand all CollapsibleSection components on the page for consistent visual testing.
+ * This ensures all collapsible content is visible in screenshots.
+ */
+export async function expandAllCollapsibleSections(page: Page, container?: Locator): Promise<void> {
+  try {
+    const scope = container ?? page;
+    // Up to 5 passes in case sections render lazily/nested
+    for (let pass = 0; pass < 5; pass++) {
+      const collapsed = scope
+        .locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' });
+      const remaining = await collapsed.count();
+      if (remaining === 0) break;
+      for (let i = 0; i < remaining; i++) {
+        try {
+          await collapsed.nth(i).click({ timeout: 1000 });
+        } catch {
+          // Ignore and continue expanding remaining
+        }
+      }
+      // Allow DOM to settle between passes
+      await page.waitForTimeout(150);
+    }
+  } catch {
+    // Don't fail the test if expansion fails - continue with screenshot
   }
 }
 

@@ -8,6 +8,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitSection } from './components/PortraitSection';
 import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
@@ -179,86 +180,111 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   }
   
   return (
-    <div className="space-y-8 p-4">
-      {/* Portrait Section */}
-      <PortraitSection
-        portrait={character.portrait}
-        characterName={character.name}
-        generatingPortrait={generatingPortrait}
-        onGeneratePortrait={handleGeneratePortrait}
-        onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
-      />
+    <div className="space-y-6">
+      <CollapsibleSection 
+        title="Character Portrait" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <PortraitSection
+          portrait={character.portrait}
+          characterName={character.name}
+          generatingPortrait={generatingPortrait}
+          onGeneratePortrait={handleGeneratePortrait}
+          onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
+        />
+      </CollapsibleSection>
       
-      {/* Basic Info Section */}
-      <BasicInfoForm
-        name={character.name}
-        level={character.level}
-        isPlayer={character.isPlayer}
-        onNameChange={(name) => setCharacter({ ...character, name })}
-        onLevelChange={(level) => setCharacter({ ...character, level })}
-        onPlayerTypeChange={(isPlayer) => setCharacter({ ...character, isPlayer })}
-      />
+      <CollapsibleSection 
+        title="Basic Information" 
+        initiallyExpanded={true}
+        className="bg-background"
+      >
+        <BasicInfoForm
+          name={character.name}
+          level={character.level}
+          isPlayer={character.isPlayer}
+          onNameChange={(name) => setCharacter({ ...character, name })}
+          onLevelChange={(level) => setCharacter({ ...character, level })}
+          onPlayerTypeChange={(isPlayer) => setCharacter({ ...character, isPlayer })}
+        />
+      </CollapsibleSection>
       
-      {/* Background Section */}
-      <BackgroundForm
-        background={{
-          history: character.background.history,
-          personality: character.background.personality,
-          goals: character.background.goals,
-          fears: character.background.fears,
-          physicalDescription: character.background.physicalDescription
-        }}
-        onBackgroundChange={(background) => setCharacter({ 
-          ...character, 
-          background: {
-            ...character.background,
-            ...background
-          }
-        })}
-      />
+      <CollapsibleSection 
+        title="Background" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <BackgroundForm
+          background={{
+            history: character.background.history,
+            personality: character.background.personality,
+            goals: character.background.goals,
+            fears: character.background.fears,
+            physicalDescription: character.background.physicalDescription
+          }}
+          onBackgroundChange={(background) => setCharacter({ 
+            ...character, 
+            background: {
+              ...character.background,
+              ...background
+            }
+          })}
+        />
+      </CollapsibleSection>
       
-      {/* Attributes Section */}
-      <AttributesForm
-        attributes={character.attributes.map((attr: CharacterAttribute) => ({
-          attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
-          value: attr.baseValue
-        }))}
-        world={world}
-        onAttributesChange={(formAttributes) => {
-          const updatedAttributes = character.attributes.map((attr: CharacterAttribute) => {
-            const formAttr = formAttributes.find(fa => {
-              const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
-              return worldAttr?.name === attr.name;
+      <CollapsibleSection 
+        title="Attributes" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <AttributesForm
+          attributes={character.attributes.map((attr: CharacterAttribute) => ({
+            attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+            value: attr.baseValue
+          }))}
+          world={world}
+          onAttributesChange={(formAttributes) => {
+            const updatedAttributes = character.attributes.map((attr: CharacterAttribute) => {
+              const formAttr = formAttributes.find(fa => {
+                const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
+                return worldAttr?.name === attr.name;
+              });
+              return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
             });
-            return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
-          });
-          setCharacter({ ...character, attributes: updatedAttributes });
-        }}
-      />
+            setCharacter({ ...character, attributes: updatedAttributes });
+          }}
+        />
+      </CollapsibleSection>
       
-      {/* Skills Section */}
-      <SkillsForm
-        skills={character.skills.map((skill: CharacterSkill) => ({
-          skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
-          level: skill.level,
-          experience: 0,
-          isActive: true
-        }))}
-        world={world}
-        onSkillsChange={(formSkills) => {
-          const updatedSkills = character.skills.map((skill: CharacterSkill) => {
-            const formSkill = formSkills.find(fs => {
-              const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
-              return worldSkill?.name === skill.name;
+      <CollapsibleSection 
+        title="Skills" 
+        initiallyExpanded={false}
+        className="bg-background"
+      >
+        <SkillsForm
+          skills={character.skills.map((skill: CharacterSkill) => ({
+            skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+            level: skill.level,
+            experience: 0,
+            isActive: true
+          }))}
+          world={world}
+          onSkillsChange={(formSkills) => {
+            const updatedSkills = character.skills.map((skill: CharacterSkill) => {
+              const formSkill = formSkills.find(fs => {
+                const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
+                return worldSkill?.name === skill.name;
+              });
+              return formSkill ? { ...skill, level: formSkill.level } : skill;
             });
-            return formSkill ? { ...skill, level: formSkill.level } : skill;
-          });
-          setCharacter({ ...character, skills: updatedSkills });
-        }}
-      />
+            setCharacter({ ...character, skills: updatedSkills });
+          }}
+        />
+      </CollapsibleSection>
       
       {/* Action Buttons */}
-      <div className="flex justify-between pt-4 border-t">
+      <div className="flex justify-between pt-6 border-t border-border">
         <Button 
           variant="destructive"
           onClick={() => setShowDeleteDialog(true)}

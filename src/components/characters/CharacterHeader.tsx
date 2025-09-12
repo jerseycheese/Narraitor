@@ -24,17 +24,17 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
       />
       <div className="flex-1">
         <h2 className="text-3xl font-bold mb-2">{character.name}</h2>
-        <p className="text-gray-700 mb-4">Level {character.level}</p>
+        <p className="text-muted-foreground mb-4">Level {character.level}</p>
         {character.background.personality && (
-          <p className="text-gray-700 mb-4 italic">
+          <p className="text-muted-foreground mb-4 italic">
             {character.background.personality}
           </p>
         )}
         <div className="space-y-2">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             <strong>Created:</strong> {formatDate(character.createdAt)}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             <strong>World:</strong> {world.name}
           </p>
         </div>

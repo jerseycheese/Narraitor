@@ -37,8 +37,8 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
           <>
             <Button 
               onClick={handleCreateCharacter}
-              variant="default"
-              className="flex-1 bg-green-500 hover:bg-green-700 text-white font-medium"
+              variant="success"
+              className="flex-1 font-medium"
               data-testid="world-card-actions-create-character-button"
             >
               <Plus className="w-4 h-4" aria-hidden="true" />
@@ -57,8 +57,8 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
         ) : (
           <Button 
             onClick={onMakeActive}
-            variant="default"
-            className="w-full bg-green-500 hover:bg-green-700 text-white font-medium"
+            variant="success"
+            className="w-full font-medium"
             data-testid="world-card-actions-make-active-button"
           >
             <CheckCircle className="w-4 h-4" aria-hidden="true" />

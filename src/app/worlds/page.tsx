@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
@@ -13,37 +13,23 @@ import { WorldFormFields } from '@/components/shared/WorldFormFields';
 import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector/utils';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter 
+} from '@/components/ui/dialog';
 
 export default function WorldsPage() {
   const router = useRouter();
-  const modalRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  // Handle focus when modal opens/closes
-  useEffect(() => {
-    if (showPrompt && modalRef.current) {
-      // Focus the modal when it opens
-      modalRef.current.focus();
-      
-      // Trap focus within the modal
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isGenerating) {
-          setShowPrompt(false);
-          setWorldTypeData(createInitialWorldTypeData());
-          setWorldName('');
-          setError(null);
-        }
-      };
-      
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [showPrompt, isGenerating]);
 
   const handleCreateWorld = () => {
     router.push('/worlds/create');
@@ -132,21 +118,12 @@ export default function WorldsPage() {
     >
 
       {/* World Generation Prompt */}
-      {showPrompt && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="generate-world-title"
-            aria-describedby="generate-world-description"
-          >
-            <div 
-              className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
-              tabIndex={-1}
-              ref={modalRef}
-            >
-              <h2 id="generate-world-title" className="text-xl font-bold mb-4">Generate World</h2>
-              <div id="generate-world-description" className="space-y-4">
+      <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Generate World</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-4">
                 <WorldFormFields.NameInput
                   value={worldName}
                   onChange={setWorldName}
@@ -154,7 +131,7 @@ export default function WorldsPage() {
                   required={false}
                   placeholder="e.g., The Lost Kingdom"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Give your world a custom name, or leave empty for a generated name
                 </p>
                 
@@ -167,46 +144,50 @@ export default function WorldsPage() {
                   size="medium"
                 />
               </div>
-              {error && (
-                <div className="mt-4 mb-4">
-                  <InlineError error={error} />
-                </div>
-              )}
-              {isGenerating && (
-                <p className="text-blue-700 text-sm mt-4 mb-4 flex items-center gap-2">
-                  <span className="inline-block w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></span>
-                  {generatingStatus}
-                </p>
-              )}
-              <div className="flex justify-end mt-6">
-                <ActionButtonGroup
-                  actions={[
-                    {
-                      label: 'Cancel',
-                      onClick: () => {
-                        setShowPrompt(false);
-                        setWorldTypeData(createInitialWorldTypeData());
-                        setWorldName('');
-                        setError(null);
-                      },
-                      variant: 'secondary',
-                      disabled: isGenerating
-                    },
-                    {
-                      label: isGenerating ? 'Generating...' : 'Generate',
-                      onClick: handleGenerateWorld,
-                      variant: 'primary',
-                      disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-                      icon: (
-                        <Sparkles className="w-4 h-4" aria-hidden="true" />
-                      )
-                    }
-                  ]}
-                />
-              </div>
+            </DialogDescription>
+          </DialogHeader>
+          
+          {error && (
+            <div className="mb-4">
+              <InlineError error={error} />
             </div>
-          </div>
-        )}
+          )}
+          
+          {isGenerating && (
+            <p className="text-primary text-sm mb-4 flex items-center gap-2">
+              <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+              {generatingStatus}
+            </p>
+          )}
+          
+          <DialogFooter>
+            <ActionButtonGroup
+              actions={[
+                {
+                  label: 'Cancel',
+                  onClick: () => {
+                    setShowPrompt(false);
+                    setWorldTypeData(createInitialWorldTypeData());
+                    setWorldName('');
+                    setError(null);
+                  },
+                  variant: 'secondary',
+                  disabled: isGenerating
+                },
+                {
+                  label: isGenerating ? 'Generating...' : 'Generate',
+                  onClick: handleGenerateWorld,
+                  variant: 'primary',
+                  disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+                  icon: (
+                    <Sparkles className="w-4 h-4" aria-hidden="true" />
+                  )
+                }
+              ]}
+            />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <WorldListScreen />
     </PageLayout>

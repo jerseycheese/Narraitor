@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export default function AttributeEditorTestPage() {
   const [attributes, setAttributes] = useState<WorldAttribute[]>([
@@ -159,25 +160,23 @@ export default function AttributeEditorTestPage() {
       </div>
 
       {/* Create Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <AttributeEditor
-              worldId={'world-test' as EntityID}
-              mode="create"
-              onSave={handleCreateAttribute}
-              onCancel={() => setShowCreateModal(false)}
-              existingAttributes={attributes}
-              existingSkills={skills}
-            />
-          </div>
-        </div>
-      )}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <AttributeEditor
+            worldId={'world-test' as EntityID}
+            mode="create"
+            onSave={handleCreateAttribute}
+            onCancel={() => setShowCreateModal(false)}
+            existingAttributes={attributes}
+            existingSkills={skills}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Modal */}
-      {editingAttribute && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <Dialog open={!!editingAttribute} onOpenChange={(open) => !open && setEditingAttribute(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {editingAttribute && (
             <AttributeEditor
               worldId={'world-test' as EntityID}
               mode="edit"
@@ -188,9 +187,9 @@ export default function AttributeEditorTestPage() {
               existingAttributes={attributes}
               existingSkills={skills}
             />
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Globe, User } from 'lucide-react';
+import { Home, Globe, User, Users } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -145,9 +145,9 @@ export function Breadcrumbs({
                 });
               }
             }}
-            className="text-sm px-3 py-1 bg-green-500 hover:bg-green-700 text-white rounded-md transition-colors"
-            variant="default"
+            variant="success"
             size="sm"
+            className="text-sm px-3 py-1 rounded-md transition-colors"
           >
             Play as {character?.name}
           </Button>
@@ -244,8 +244,13 @@ function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
     return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
   }
   
-  // Character segments (both /characters list and individual characters)
-  if (segment.href === '/characters' || (segment.href.startsWith('/characters/') && segment.href !== '/characters/create')) {
+  // Characters list page (multiple people)
+  if (segment.href === '/characters') {
+    return <Users className="w-4 h-4" data-testid="icon-users" aria-hidden="true" />;
+  }
+  
+  // Individual character page (single person)
+  if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
     return <User className="w-4 h-4" data-testid="icon-user" aria-hidden="true" />;
   }
   

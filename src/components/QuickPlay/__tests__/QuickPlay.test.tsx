@@ -247,9 +247,9 @@ describe('QuickPlay', () => {
           expect(screen.getByRole('dialog')).toBeInTheDocument();
         });
         
-        // Click the confirm delete button in the dialog (there will be 2 delete buttons now)
-        const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-        fireEvent.click(deleteButtons[1]); // Second one is in the dialog
+        // Click the confirm delete button in the dialog
+        const confirmButton = screen.getByRole('button', { name: /Delete Test World - Test Hero/i });
+        fireEvent.click(confirmButton);
         
         await waitFor(() => {
           expect(mockCleanupSessionData).toHaveBeenCalledWith('session-1');

@@ -186,7 +186,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                     variant="ghost"
                     className={`w-full min-h-11 flex items-center justify-between px-4 py-3 text-left ${
                       world.id === currentWorldId 
-                        ? 'bg-green-500 text-white hover:bg-green-700' 
+                        ? 'bg-success text-success-foreground hover:bg-success/90' 
                         : 'text-link-nav-dark hover:bg-gray-900'
                     }`}
                   >
@@ -209,7 +209,8 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           {currentWorld ? (
             <Button
               onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-700 text-white text-lg font-medium"
+              variant="success"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 text-lg font-medium"
            >
               <Play className="w-6 h-6" aria-hidden="true" />
               Play {currentWorld.name}

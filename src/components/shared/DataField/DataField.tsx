@@ -18,12 +18,12 @@ export function DataField({
   className = '' 
 }: DataFieldProps) {
   const labelClasses = size === 'sm' 
-    ? 'text-xs text-gray-500 font-bold uppercase tracking-wide'
-    : 'text-sm text-gray-500 font-bold uppercase tracking-wide';
+    ? 'text-xs text-muted-foreground font-bold uppercase tracking-wide'
+    : 'text-sm text-muted-foreground font-bold uppercase tracking-wide';
     
   const valueClasses = size === 'sm'
-    ? 'text-sm text-gray-900 font-medium'
-    : 'text-base text-gray-900 font-medium';
+    ? 'text-sm font-medium'
+    : 'text-base font-medium';
 
   if (variant === 'inline') {
     return (

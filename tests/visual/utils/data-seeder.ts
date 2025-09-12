@@ -646,9 +646,66 @@ export async function seedTestData(page: Page): Promise<void> {
   await page.addInitScript(async (testData) => {
     const { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } = testData;
     
-    // Convert arrays to Record format that Zustand expects
+    // Helper: transform legacy SAMPLE_WORLDS to current World schema
+    const toValidWorld = (world: any) => {
+      const now = new Date().toISOString();
+      const makeAttrId = (idx: number) => `attr-${world.id}-${idx + 1}`;
+      const makeSkillId = (idx: number) => `skill-${world.id}-${idx + 1}`;
+
+      const attributes = Array.isArray(world.attributes)
+        ? world.attributes.map((attr: any, i: number) => ({
+            id: makeAttrId(i),
+            worldId: world.id,
+            name: String(attr?.name ?? `Attribute ${i + 1}`),
+            description: String(attr?.description ?? ''),
+            baseValue: typeof attr?.defaultValue === 'number' ? attr.defaultValue : (typeof attr?.baseValue === 'number' ? attr.baseValue : 0),
+            minValue: typeof attr?.minValue === 'number' ? attr.minValue : 0,
+            maxValue: typeof attr?.maxValue === 'number' ? attr.maxValue : 10,
+          }))
+        : [];
+
+      const skills = Array.isArray(world.skills)
+        ? world.skills.map((skill: any, i: number) => ({
+            id: makeSkillId(i),
+            worldId: world.id,
+            name: String(skill?.name ?? `Skill ${i + 1}`),
+            description: String(skill?.description ?? ''),
+            difficulty: 'medium',
+            baseValue: 0,
+            minValue: 0,
+            maxValue: 10,
+            attributeIds: [],
+          }))
+        : [];
+
+      // Normalize image to WorldImage type
+      const image = world.image
+        ? { type: 'placeholder', url: world.image?.url ?? null, generatedAt: now }
+        : undefined;
+
+      return {
+        id: world.id,
+        name: String(world.name ?? 'Untitled World'),
+        description: String(world.description ?? ''),
+        genre: String(world.genre ?? 'cyberpunk'),
+        attributes,
+        skills,
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20,
+        },
+        image,
+        // toneSettings is optional; omit to use defaults in UI
+        createdAt: String(world.createdAt ?? now),
+        updatedAt: String(world.updatedAt ?? now),
+      };
+    };
+
+    // Convert arrays to Record format that Zustand expects (after transforming to valid schema)
     const worldsRecord = SAMPLE_WORLDS.reduce((acc: Record<string, unknown>, world) => {
-      acc[world.id] = world;
+      acc[world.id] = toValidWorld(world);
       return acc;
     }, {});
     
@@ -681,16 +738,34 @@ export async function seedTestData(page: Page): Promise<void> {
     // Try multiple approaches to seed the data
     const seedApproaches = [];
     
-    // Approach 1: Direct Zustand store access through window
+    // Approach 1: Direct Zustand store access through window (with brief polling)
     try {
-      // Look for useWorldStore on window (may be exposed in dev)
-      if ((window as any).useWorldStore) {
-        (window as any).useWorldStore.setState({
-          worlds: worldsRecord,
-          currentWorldId: SAMPLE_WORLDS[0]?.id || null
+      const trySetStore = () => {
+        const anyWin = window as any;
+        if (anyWin.useWorldStore) {
+          anyWin.useWorldStore.setState({
+            worlds: worldsRecord,
+            currentWorldId: SAMPLE_WORLDS[0]?.id || null,
+            loading: false,
+            error: null,
+          });
+          return true;
+        }
+        return false;
+      };
+
+      if (!trySetStore()) {
+        const start = Date.now();
+        await new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+            if (trySetStore() || Date.now() - start > 1500) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 50);
         });
-        seedApproaches.push('✅ Direct useWorldStore.setState');
       }
+      seedApproaches.push('✅ Direct useWorldStore.setState (polled)');
     } catch (e) {
       seedApproaches.push('❌ Direct useWorldStore.setState: ' + (e as Error).message);
     }
@@ -830,6 +905,38 @@ export async function seedTestData(page: Page): Promise<void> {
       localStorage.setItem('narraitor-narrative-store', JSON.stringify(narrativeStoreData));
       localStorage.setItem('narraitor-journal-store', JSON.stringify({ state: { entries: {}, sessionEntries: {} }, version: 1 }));
       seedApproaches.push('✅ localStorage fallback seeding');
+
+      // Also update live stores when available to avoid hydration races
+      const anyWin = window as any;
+      if (anyWin.useWorldStore) {
+        anyWin.useWorldStore.setState({
+          worlds: worldsRecord,
+          currentWorldId: SAMPLE_WORLDS[0]?.id || null,
+          loading: false,
+          error: null,
+        });
+      }
+      if (anyWin.useCharacterStore) {
+        anyWin.useCharacterStore.setState({
+          characters: charactersRecord,
+          currentCharacterId: SAMPLE_CHARACTERS[0]?.id || null,
+          loading: false,
+          error: null,
+        });
+      }
+      if (anyWin.useSessionStore) {
+        anyWin.useSessionStore.setState({
+          savedSessions: sessionStoreData.state.savedSessions,
+          onboardingCompleted: true,
+          id: sessionStoreData.state.currentSessionId,
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
+          status: 'active',
+          currentSceneId: null,
+          playerChoices: [],
+          error: null,
+        });
+      }
     } catch (e) {
       seedApproaches.push('❌ Storage seeding: ' + (e as Error).message);
     }

@@ -27,9 +27,9 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-background rounded-lg p-6">
       <h2 className="text-xl font-bold mb-4">Attributes</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {attributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.attributeId);
           const minValue = worldAttr?.minValue || 1;
@@ -40,12 +40,12 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
           const uniqueKey = attr.attributeId || `attr-${index}`;
           
           return (
-            <div key={uniqueKey}>
-              <Label className="block text-sm font-medium text-gray-700 mb-1">
+            <div key={uniqueKey} className="bg-muted rounded-lg p-4 border">
+              <Label className="block text-sm font-medium mb-1">
                 {worldAttr?.name || `Attribute ${index + 1}`}
               </Label>
               {worldAttr?.description && (
-                <p className="text-xs text-gray-500 mb-2">{worldAttr.description}</p>
+                <p className="text-xs text-muted-foreground mb-2">{worldAttr.description}</p>
               )}
               <RangeSlider
                 value={attr.value}
@@ -55,7 +55,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 showLabel={false}
                 testId={`attribute-${attr.attributeId}`}
               />
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-muted-foreground mt-1">
                 Range: {minValue} - {maxValue}
               </div>
             </div>

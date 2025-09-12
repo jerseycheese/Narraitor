@@ -285,8 +285,8 @@ describe('AttributeEditor', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
       
-      // Find the confirm button in the dialog and click it
-      const dialogDeleteButton = screen.getByRole('dialog').querySelector('button[class*="bg-red-500"]') as HTMLElement;
+      // Find the confirm button in the dialog and click it  
+      const dialogDeleteButton = screen.getByRole('button', { name: /delete attribute/i });
       fireEvent.click(dialogDeleteButton);
 
       await waitFor(() => {

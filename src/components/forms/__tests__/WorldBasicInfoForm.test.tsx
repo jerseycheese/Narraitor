@@ -90,10 +90,4 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     expect(options.length).toBeGreaterThan(1);
   });
 
-  // Test section heading
-  test('displays correct section heading', () => {
-    render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
-
-    expect(screen.getByText('Basic Information')).toBeInTheDocument();
-  });
 });

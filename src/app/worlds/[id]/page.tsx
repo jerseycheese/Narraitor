@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Play } from 'lucide-react';
+import { Play, Users, Settings } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
@@ -73,12 +73,18 @@ export default function WorldViewPage() {
     {
       label: 'View Characters',
       onClick: () => router.push(`/characters?worldId=${worldId}`),
-      variant: 'primary' as const
+      variant: 'primary' as const,
+      icon: (
+        <Users className="w-4 h-4" aria-hidden="true" />
+      )
     },
     {
       label: 'Edit World',
       onClick: () => router.push(`/worlds/${worldId}/edit`),
-      variant: 'secondary' as const
+      variant: 'secondary' as const,
+      icon: (
+        <Settings className="w-4 h-4" aria-hidden="true" />
+      )
     },
     {
       label: 'Play in World',

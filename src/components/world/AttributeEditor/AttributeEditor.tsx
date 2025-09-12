@@ -144,15 +144,17 @@ export function AttributeEditor({
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">
-        {mode === 'create' ? 'Create New Attribute' : 'Edit Attribute'}
-      </h2>
+    <>
+      <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+        <h2 className="text-lg font-semibold leading-none tracking-tight">
+          {mode === 'create' ? 'Create New Attribute' : 'Edit Attribute'}
+        </h2>
+      </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="attribute-name">
-            Attribute Name <span className="text-red-500">*</span>
+            Attribute Name <span className="text-destructive">*</span>
           </Label>
           <Input
             id="attribute-name"
@@ -160,6 +162,8 @@ export function AttributeEditor({
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="e.g., Strength, Intelligence"
+            aria-describedby={errors.length > 0 ? "attribute-errors" : undefined}
+            aria-invalid={errors.length > 0}
           />
         </div>
 
@@ -206,9 +210,14 @@ export function AttributeEditor({
         </div>
 
         {errors.length > 0 && (
-          <div className="bg-red-200 border border-red-500 rounded-lg p-3 space-y-1">
+          <div 
+            id="attribute-errors"
+            role="alert" 
+            aria-live="polite"
+            className="bg-destructive/10 border border-destructive rounded-lg p-3 space-y-1"
+          >
             {errors.map((error, index) => (
-              <p key={index} className="text-sm text-red-500">
+              <p key={index} className="text-sm text-destructive">
                 {error}
               </p>
             ))}
@@ -216,13 +225,12 @@ export function AttributeEditor({
         )}
       </div>
 
-      <div className="flex justify-between items-center pt-4 border-t">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 justify-between items-center">
         <div className="flex gap-2">
           {mode === 'edit' && onDelete && (
             <Button
               onClick={handleDeleteClick}
               variant="destructive"
-              className="font-medium"
               aria-label="Delete attribute"
             >
               Delete Attribute
@@ -234,14 +242,12 @@ export function AttributeEditor({
           <Button
             onClick={onCancel}
             variant="outline"
-            className="font-medium"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             variant="default"
-            className="font-medium"
           >
             {mode === 'create' ? 'Create Attribute' : 'Save Changes'}
           </Button>
@@ -265,6 +271,6 @@ export function AttributeEditor({
           isDeleting={false}
         />
       )}
-    </div>
+    </>
   );
 }

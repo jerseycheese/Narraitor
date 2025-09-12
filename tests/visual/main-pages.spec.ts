@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForInteraction, expandAllCollapsibleSections } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/data-seeder';
 
 /**
@@ -30,6 +30,8 @@ test.describe('Main Pages Visual Tests', () => {
     await seedTestData(page);
     await page.goto('/');
     await waitForContentStable(page);
+    // Ensure the Continue section appears (seeded session present)
+    await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
     await hideDynamicContent(page);
     
     // Verify page loaded with expected content
@@ -40,6 +42,8 @@ test.describe('Main Pages Visual Tests', () => {
   });
 
   test('Settings page should render consistently', async ({ page }) => {
+    test.setTimeout(60000); // Increase timeout for this test to handle resource contention
+    
     await seedTestData(page);
     
     await page.goto('/settings');
@@ -111,24 +115,68 @@ test.describe('Main Pages Visual Tests', () => {
   test('World edit page should render consistently', async ({ page }) => {
     await seedTestData(page);
     
-    // Navigate to world edit page
+    // Navigate directly to the edit page to avoid any list-page fallbacks
     await page.goto('/worlds/world-cyberpunk-2077/edit');
+    await expect(page).toHaveURL(/\/worlds\/world-cyberpunk-2077\/edit/);
     await waitForContentStable(page);
+    // Confirm editor root and sections present before expansion
+    const editor = page.locator('[data-testid="world-editor-root"]');
+    await editor.waitFor({ timeout: 8000 });
+    await page.waitForSelector('[data-testid="collapsible-section"]', { timeout: 8000 });
     await hideDynamicContent(page);
     
-    // Take screenshot of world edit page - should show world editing interface
+    // Expand all CollapsibleSections to show full content (scoped to editor)
+    await expandAllCollapsibleSections(page, editor);
+    // Ensure no collapsed sections remain
+    await expect(
+      editor.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' })
+    ).toHaveCount(0);
+    
+    // Take screenshot of world edit page - should show world editing interface with all sections expanded
     await expect(page).toHaveScreenshot('world-edit.png', { fullPage: true });
   });
 
   test('Character edit page should render consistently', async ({ page }) => {
+    test.setTimeout(45000); // Extended timeout for complex edit page with CollapsibleSections
     await seedTestData(page);
     
     // Navigate to character edit page
     await page.goto('/characters/char-cyberpunk-hacker/edit');
     await waitForContentStable(page);
+    
+    // Debug: Check if we're on the right page
+    const pageTitle = await page.textContent('h1, [data-testid="page-title"], .page-title');
+    console.log('Character edit page title:', pageTitle);
+    
+    // Wait for character data to load
+    await page.waitForFunction(() => {
+      return document.body.textContent && 
+             !document.body.textContent.includes('Character not found') &&
+             (document.body.textContent.includes('Edit Character') || document.body.textContent.includes('CharacterEditor'));
+    }, { timeout: 10000 });
+    
     await hideDynamicContent(page);
     
-    // Take screenshot of character edit page - should show character editing interface
+    // Debug: Check how many CollapsibleSections exist before expansion
+    const totalSections = await page.locator('[data-testid="collapsible-section"]').count();
+    console.log(`Found ${totalSections} total CollapsibleSections on character edit page`);
+    
+    // Debug: Check how many are collapsed before expansion
+    const collapsedSections = await page.locator('[data-testid="collapsible-section-toggle"]').filter({
+      hasText: '+'
+    }).count();
+    console.log(`Found ${collapsedSections} collapsed sections before expansion`);
+    
+    // Expand all CollapsibleSections to show full content
+    await expandAllCollapsibleSections(page);
+    
+    // Debug: Check how many are still collapsed after expansion
+    const stillCollapsed = await page.locator('[data-testid="collapsible-section-toggle"]').filter({
+      hasText: '+'
+    }).count();
+    console.log(`Found ${stillCollapsed} collapsed sections after expansion`);
+    
+    // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
   });
 });

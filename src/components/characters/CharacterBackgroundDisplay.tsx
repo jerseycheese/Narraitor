@@ -19,20 +19,20 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
     <div className="space-y-6">
       {/* History Section */}
       <div>
-        <h4 className="text-lg font-semibold mb-2 text-gray-700">
+        <h3 className="text-lg font-semibold mb-2">
           History
-        </h4>
-        <p className="text-gray-700 leading-relaxed">
+        </h3>
+        <p className="text-foreground leading-relaxed">
           {background.history}
         </p>
       </div>
 
       {/* Personality Section */}
       <div>
-        <h4 className="text-lg font-semibold mb-2 text-gray-700">
+        <h3 className="text-lg font-semibold mb-2">
           Personality
-        </h4>
-        <p className="text-gray-700 leading-relaxed">
+        </h3>
+        <p className="text-foreground leading-relaxed">
           {background.personality}
         </p>
       </div>
@@ -40,15 +40,15 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Goals Section */}
       {background.goals && background.goals.length > 0 && (
         <div>
-          <h4 className="text-lg font-semibold mb-2 text-gray-700">
+          <h3 className="text-lg font-semibold mb-2">
             Goals & Motivations
-          </h4>
+          </h3>
           {background.goals.length === 1 ? (
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-foreground leading-relaxed">
               {background.goals[0]}
             </p>
           ) : (
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
+            <ul className="list-disc list-inside text-foreground space-y-1">
               {background.goals.map((goal, index) => (
                 <li key={index}>{goal}</li>
               ))}
@@ -60,10 +60,10 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Fears Section */}
       {background.fears && background.fears.length > 0 && (
         <div>
-          <h4 className="text-lg font-semibold mb-2 text-gray-700">
+          <h3 className="text-lg font-semibold mb-2">
             Fears
-          </h4>
-          <ul className="list-disc list-inside text-gray-700 space-y-1">
+          </h3>
+          <ul className="list-disc list-inside text-foreground space-y-1">
             {background.fears.map((fear, index) => (
               <li key={index}>{fear}</li>
             ))}
@@ -74,10 +74,10 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Physical Description Section (optional) */}
       {background.physicalDescription && (
         <div>
-          <h4 className="text-lg font-semibold mb-2 text-gray-700">
+          <h3 className="text-lg font-semibold mb-2">
             Physical Appearance
-          </h4>
-          <p className="text-gray-700 leading-relaxed">
+          </h3>
+          <p className="text-foreground leading-relaxed">
             {background.physicalDescription}
           </p>
         </div>
