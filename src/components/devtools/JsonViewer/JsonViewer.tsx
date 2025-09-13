@@ -94,7 +94,7 @@ function syntaxHighlight(json: string): string {
           if (/:$/.test(match)) {
             cls = 'color: #374151; font-weight: 600;'; // key - gray-700, semibold
           } else {
-            cls = 'color: #059669;'; // string - emerald-600
+            cls = 'color: #22c55e;'; // string - green-500
           }
         } else if (/true|false/.test(match)) {
           cls = 'color: #d97706;'; // boolean - amber-600

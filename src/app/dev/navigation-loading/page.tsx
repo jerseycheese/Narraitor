@@ -88,7 +88,7 @@ export default function NavigationLoadingTestPage() {
               </ul>
             </div>
             <div>
-              <p className="font-medium text-gray-700 mb-1">⚡ Fast Navigation (No overlay):</p>
+              <p className="font-medium text-gray-700 mb-1">Fast Navigation (No overlay):</p>
               <ul className="text-gray-700 space-y-1">
                 <li>• Worlds/Characters links</li>
                 <li>• Home/Logo navigation</li>

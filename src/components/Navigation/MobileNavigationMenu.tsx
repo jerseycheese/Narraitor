@@ -120,7 +120,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           className="min-h-11 min-w-11 text-white hover:bg-gray-700"
           aria-label="Close menu"
         >
-          <X className="w-6 h-6" aria-hidden="true" />
+          <X className="w-5 h-5" aria-hidden="true" />
         </Button>
       </div>
 
@@ -135,7 +135,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           }`}
         >
-          <Globe className="w-6 h-6" aria-hidden="true" />
+          <Globe className="w-5 h-5" aria-hidden="true" />
           Worlds
         </Button>
 
@@ -150,7 +150,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           } ${!hasWorlds ? 'hidden' : ''}`}
         >
-          <User className="w-6 h-6" aria-hidden="true" />
+          <User className="w-5 h-5" aria-hidden="true" />
           Characters
         </Button>
 
@@ -163,7 +163,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           }`}
         >
-          <Settings className="w-6 h-6" aria-hidden="true" />
+          <Settings className="w-5 h-5" aria-hidden="true" />
           Settings
         </Button>
 
@@ -212,7 +212,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               variant="success"
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 text-lg font-medium"
            >
-              <Play className="w-6 h-6" aria-hidden="true" />
+              <Play className="w-5 h-5" aria-hidden="true" />
               Play {currentWorld.name}
             </Button>
           ) : Object.keys(worlds).length === 0 ? (
@@ -220,7 +220,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
            >
-              <Plus className="w-6 h-6" aria-hidden="true" />
+              <Plus className="w-5 h-5" aria-hidden="true" />
               Create Your First World
             </Button>
           ) : (
@@ -228,7 +228,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
            >
-              <Plus className="w-6 h-6" aria-hidden="true" />
+              <Plus className="w-5 h-5" aria-hidden="true" />
               Create New World
             </Button>
           )}

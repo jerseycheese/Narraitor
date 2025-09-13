@@ -62,7 +62,7 @@ export const useSessionStore = create<SessionStore>()(
   initializeSession: async (worldId, characterId, onComplete) => {
     const currentState = get();
     
-    logger.debug('🎯 initializeSession called:', {
+    logger.debug('TARGET: initializeSession called:', {
       worldId,
       characterId,
       currentState: {
