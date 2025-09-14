@@ -82,6 +82,21 @@ Neo-Tokyo's skyline still gleamed with neon, but now it represented hope rather 
     // Wait for initial load
     await page.waitForLoadState('networkidle', { timeout: 5000 });
     
+    // Click the "End Story" button to trigger the ending screen
+    await page.click('[data-testid="game-session-end-story"]');
+    
+    // Handle potential confirmation dialog
+    try {
+      await page.waitForSelector('[role="dialog"]', { timeout: 3000 });
+      // If there's a confirmation dialog, click the confirm button
+      await page.click('text=End Story');
+    } catch {
+      // No confirmation dialog appeared
+    }
+    
+    // Wait for ending generation to start or complete
+    await page.waitForTimeout(5000);
+    
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
     
