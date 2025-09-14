@@ -9,60 +9,75 @@ import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
  * ensuring proper design system compliance and WCAG 2.0 accessibility.
  */
 
+// Helper function to seed ending-specific test data
+async function seedEndingTestData(page: any, ending: any): Promise<void> {
+  await page.addInitScript(async (params: any) => {
+    const { ending } = params;
+    
+    // Create narrative store data with the ending
+    const narrativeStoreData = {
+      state: {
+        segments: {},
+        sessionSegments: {},
+        decisions: {},
+        sessionDecisions: {},
+        currentEnding: ending,
+        isGeneratingEnding: false,
+        endingError: null,
+        responseCache: {},
+        generationCounter: 0
+      },
+      version: 1
+    };
+
+    // Set in localStorage
+    localStorage.setItem('narraitor-narrative-store', JSON.stringify(narrativeStoreData));
+    
+    console.log('✅ Ending data seeded in narrative store');
+  }, { ending });
+}
+
 test.describe('EndingScreen Visual Tests', () => {
   
-  test.beforeEach(async ({ page }) => {
-    await seedTestData(page);
-    await mockApiEndpoints(page);
-  });
-
   test('EndingScreen - Triumphant ending should render consistently', async ({ page }) => {
-    // Seed ending data using addInitScript (runs before page loads)
-    await page.addInitScript(() => {
-      const mockEnding = {
-        id: 'ending-triumphant-test',
-        sessionId: 'session-cyberpunk-ghost',
-        characterId: 'char-cyberpunk-ghost',
-        worldId: 'world-cyberpunk-2077',
-        type: 'story-complete',
-        tone: 'triumphant',
-        epilogue: `Victory came with the dawn. As the first rays of sunlight pierced through the smog-shrouded corporate district, you stood atop the Arasaka Tower, the stolen data secured and your mission complete. The city below pulsed with neon life, unaware that their digital prison had just gained a crack in its foundation.
+    const mockEnding = {
+      id: 'ending-triumphant-test',
+      sessionId: 'session-cyberpunk-ghost',
+      characterId: 'char-cyberpunk-ghost',
+      worldId: 'world-cyberpunk-2077',
+      type: 'story-complete',
+      tone: 'triumphant',
+      epilogue: `Victory came with the dawn. As the first rays of sunlight pierced through the smog-shrouded corporate district, you stood atop the Arasaka Tower, the stolen data secured and your mission complete. The city below pulsed with neon life, unaware that their digital prison had just gained a crack in its foundation.
 
 Your neural interface crackled with satisfaction as you transmitted the corporate secrets to every newsnet in the city. Within hours, the truth would be out, and the people would know what their overlords had been hiding. This was more than a heist - this was liberation.
 
 The elevator descended toward street level, carrying you back to the underground where heroes are made in shadows and legends are born in neon light.`,
-        characterLegacy: `Ghost became more than just another street mercenary - they became a symbol of resistance against corporate tyranny. Stories of the Arasaka infiltration spread through the underground networks like wildfire, inspiring a new generation of hackers and rebels.
+      characterLegacy: `Ghost became more than just another street mercenary - they became a symbol of resistance against corporate tyranny. Stories of the Arasaka infiltration spread through the underground networks like wildfire, inspiring a new generation of hackers and rebels.
 
 Corporate executives now spoke their name in whispered warnings, and street kids looked up to the legend of the hacker who brought down the most secure tower in Neo-Tokyo. Ghost's methods became the blueprint for every resistance cell that followed.`,
-        worldImpact: `The Arasaka data breach marked the beginning of the Corporate Wars' end. With their secrets exposed, public opinion turned decisively against the mega-corporations. Government regulation increased, worker rights were restored, and the stranglehold of corporate feudalism began to loosen.
+      worldImpact: `The Arasaka data breach marked the beginning of the Corporate Wars' end. With their secrets exposed, public opinion turned decisively against the mega-corporations. Government regulation increased, worker rights were restored, and the stranglehold of corporate feudalism began to loosen.
 
 Neo-Tokyo's skyline still gleamed with neon, but now it represented hope rather than oppression. The city became a beacon for other urban centers struggling under corporate rule, proving that even the mightiest towers could fall.`,
-        achievements: [
-          'Data Liberator: Successfully extracted and released classified corporate files',
-          'Tower Climber: Infiltrated the most secure building in Neo-Tokyo',
-          'Digital Revolutionary: Sparked citywide resistance against corporate control',
-          'Shadow Legend: Became a mythical figure in the underground',
-          'System Breaker: Permanently damaged Arasaka\'s digital infrastructure'
-        ],
-        playTime: 8640, // 2.4 hours
-        timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+      achievements: [
+        'Data Liberator: Successfully extracted and released classified corporate files',
+        'Tower Climber: Infiltrated the most secure building in Neo-Tokyo',
+        'Digital Revolutionary: Sparked citywide resistance against corporate control',
+        'Shadow Legend: Became a mythical figure in the underground',
+        'System Breaker: Permanently damaged Arasaka\'s digital infrastructure'
+      ],
+      playTime: 8640, // 2.4 hours
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
 
-      // Set the ending in the narrative store
-      const narrativeStore = localStorage.getItem('narraitor-narrative-store');
-      if (narrativeStore) {
-        const store = JSON.parse(narrativeStore);
-        store.state.currentEnding = mockEnding;
-        store.state.isGeneratingEnding = false;
-        store.state.endingError = null;
-        localStorage.setItem('narraitor-narrative-store', JSON.stringify(store));
-      }
-    });
+    // Seed test data with ending
+    await seedTestData(page);
+    await seedEndingTestData(page, mockEnding);
+    await mockApiEndpoints(page);
 
-    // Navigate directly to the ending screen dev page
-    await page.goto('/dev/ending-screen');
+    // Navigate to the user-facing play route where ending screen is displayed
+    await page.goto('/worlds/world-cyberpunk-2077/play');
     
     // Wait for initial load
     await page.waitForLoadState('networkidle', { timeout: 5000 });
@@ -81,7 +96,7 @@ Neo-Tokyo's skyline still gleamed with neon, but now it represented hope rather 
   });
 
   test('EndingScreen - Tragic ending should render consistently', async ({ page }) => {
-    // Seed tragic ending data using addInitScript (runs before page loads)
+    // Seed tragic ending data using addInitScript (runs AFTER seedTestData)
     await page.addInitScript(() => {
       const mockEnding = {
         id: 'ending-tragic-test',
@@ -114,7 +129,7 @@ Neo-Tokyo's transformation was painful and slow, marked by corporate retaliation
         updatedAt: new Date().toISOString()
       };
 
-      // Set the ending in the narrative store
+      // Update both localStorage and IndexedDB with ending
       const narrativeStore = localStorage.getItem('narraitor-narrative-store');
       if (narrativeStore) {
         const store = JSON.parse(narrativeStore);
@@ -123,10 +138,35 @@ Neo-Tokyo's transformation was painful and slow, marked by corporate retaliation
         store.state.endingError = null;
         localStorage.setItem('narraitor-narrative-store', JSON.stringify(store));
       }
+      
+      // Also try to update IndexedDB
+      const dbName = 'narraitor-app-storage';
+      const storeName = 'narraitor-narrative-store';
+      
+      if (typeof window !== 'undefined' && window.indexedDB) {
+        const request = window.indexedDB.open(dbName, 1);
+        request.onsuccess = function(event) {
+          const db = (event.target as any).result;
+          if (db.objectStoreNames.contains(storeName)) {
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const getRequest = store.get('state');
+            getRequest.onsuccess = function(event) {
+              const currentData = (event.target as any).result;
+              if (currentData && currentData.state) {
+                currentData.state.currentEnding = mockEnding;
+                currentData.state.isGeneratingEnding = false;
+                currentData.state.endingError = null;
+                store.put(currentData, 'state');
+              }
+            };
+          }
+        };
+      }
     });
 
-    // Navigate directly to the ending screen dev page
-    await page.goto('/dev/ending-screen');
+    // Navigate to the user-facing play route where ending screen is displayed
+    await page.goto('/worlds/world-cyberpunk-2077/play');
     await page.waitForLoadState('networkidle', { timeout: 5000 });
     await hideDynamicContent(page);
     await waitForContentStable(page);
@@ -139,7 +179,7 @@ Neo-Tokyo's transformation was painful and slow, marked by corporate retaliation
   });
 
   test('EndingScreen - Bittersweet ending should render consistently', async ({ page }) => {
-    // Seed bittersweet ending data using addInitScript (runs before page loads)
+    // Seed bittersweet ending data using addInitScript (runs AFTER seedTestData)
     await page.addInitScript(() => {
       const mockEnding = {
         id: 'ending-bittersweet-test',
@@ -172,7 +212,7 @@ The city learned to honor both its heroes and its victims, building memorials no
         updatedAt: new Date().toISOString()
       };
 
-      // Set the ending in the narrative store
+      // Update both localStorage and IndexedDB with ending
       const narrativeStore = localStorage.getItem('narraitor-narrative-store');
       if (narrativeStore) {
         const store = JSON.parse(narrativeStore);
@@ -181,10 +221,35 @@ The city learned to honor both its heroes and its victims, building memorials no
         store.state.endingError = null;
         localStorage.setItem('narraitor-narrative-store', JSON.stringify(store));
       }
+      
+      // Also try to update IndexedDB
+      const dbName = 'narraitor-app-storage';
+      const storeName = 'narraitor-narrative-store';
+      
+      if (typeof window !== 'undefined' && window.indexedDB) {
+        const request = window.indexedDB.open(dbName, 1);
+        request.onsuccess = function(event) {
+          const db = (event.target as any).result;
+          if (db.objectStoreNames.contains(storeName)) {
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const getRequest = store.get('state');
+            getRequest.onsuccess = function(event) {
+              const currentData = (event.target as any).result;
+              if (currentData && currentData.state) {
+                currentData.state.currentEnding = mockEnding;
+                currentData.state.isGeneratingEnding = false;
+                currentData.state.endingError = null;
+                store.put(currentData, 'state');
+              }
+            };
+          }
+        };
+      }
     });
 
-    // Navigate directly to the ending screen dev page
-    await page.goto('/dev/ending-screen');
+    // Navigate to the user-facing play route where ending screen is displayed
+    await page.goto('/worlds/world-cyberpunk-2077/play');
     await page.waitForLoadState('networkidle', { timeout: 5000 });
     await hideDynamicContent(page);
     await waitForContentStable(page);
