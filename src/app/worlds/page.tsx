@@ -13,14 +13,7 @@ import { WorldFormFields } from '@/components/shared/WorldFormFields';
 import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector/utils';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -118,34 +111,35 @@ export default function WorldsPage() {
     >
 
       {/* World Generation Prompt */}
-      <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Generate World</DialogTitle>
-            <DialogDescription asChild>
-              <div className="space-y-4">
-                <WorldFormFields.NameInput
-                  value={worldName}
-                  onChange={setWorldName}
-                  disabled={isGenerating}
-                  required={false}
-                  placeholder="e.g., The Lost Kingdom"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Give your world a custom name, or leave empty for a generated name
-                </p>
-                
-                <WorldTypeSelector
-                  value={worldTypeData}
-                  onChange={setWorldTypeData}
-                  disabled={isGenerating}
-                  showLabels={true}
-                  layout="vertical"
-                  size="medium"
-                />
-              </div>
-            </DialogDescription>
-          </DialogHeader>
+      <SimpleModal 
+        isOpen={showPrompt} 
+        onClose={() => setShowPrompt(false)}
+        title="Generate World"
+        showCloseButton={false}
+        size="md"
+        className="max-w-md"
+      >
+        <div className="space-y-4">
+          <WorldFormFields.NameInput
+            value={worldName}
+            onChange={setWorldName}
+            disabled={isGenerating}
+            required={false}
+            placeholder="e.g., The Lost Kingdom"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Give your world a custom name, or leave empty for a generated name
+          </p>
+          
+          <WorldTypeSelector
+            value={worldTypeData}
+            onChange={setWorldTypeData}
+            disabled={isGenerating}
+            showLabels={true}
+            layout="vertical"
+            size="medium"
+          />
+        </div>
           
           {error && (
             <div className="mb-4">
@@ -160,34 +154,31 @@ export default function WorldsPage() {
             </p>
           )}
           
-          <DialogFooter>
-            <ActionButtonGroup
-              actions={[
-                {
-                  label: 'Cancel',
-                  onClick: () => {
-                    setShowPrompt(false);
-                    setWorldTypeData(createInitialWorldTypeData());
-                    setWorldName('');
-                    setError(null);
-                  },
-                  variant: 'secondary',
-                  disabled: isGenerating
-                },
-                {
-                  label: isGenerating ? 'Generating...' : 'Generate',
-                  onClick: handleGenerateWorld,
-                  variant: 'primary',
-                  disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-                  icon: (
-                    <Sparkles className="w-4 h-4" aria-hidden="true" />
-                  )
-                }
-              ]}
-            />
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <ActionButtonGroup
+          actions={[
+            {
+              label: 'Cancel',
+              onClick: () => {
+                setShowPrompt(false);
+                setWorldTypeData(createInitialWorldTypeData());
+                setWorldName('');
+                setError(null);
+              },
+              variant: 'secondary',
+              disabled: isGenerating
+            },
+            {
+              label: isGenerating ? 'Generating...' : 'Generate',
+              onClick: handleGenerateWorld,
+              variant: 'primary',
+              disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+              icon: (
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
+              )
+            }
+          ]}
+        />
+      </SimpleModal>
 
       <WorldListScreen />
     </PageLayout>

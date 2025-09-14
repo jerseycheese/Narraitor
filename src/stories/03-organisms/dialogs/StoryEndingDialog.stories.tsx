@@ -34,26 +34,32 @@ type Story = StoryObj<typeof meta>;
 export const Triumphant: Story = {
   args: {
     isOpen: true,
-    title: '03-Organisms/dialogs/StoryEndingDialog',
+    title: 'Victory Achieved',
     content: 'Your choices led to a positive outcome. The characters you helped are now thriving, and the world is a better place because of your decisions.',
     endingType: 'triumphant',
+    continueText: 'Generate Ending',
+    closeText: 'Continue Playing',
   },
 };
 
 export const Bittersweet: Story = {
   args: {
     isOpen: true,
-    title: '03-Organisms/dialogs/StoryEndingDialog',
+    title: 'A Meaningful End',
     content: 'Your journey has come to an end. While you achieved your main goal, some sacrifices were necessary along the way. The choices you made will have lasting consequences.',
     endingType: 'bittersweet',
+    continueText: 'Generate Ending',
+    closeText: 'Continue Playing',
   },
 };
 
 export const Tragic: Story = {
   args: {
     isOpen: true,
-    title: '03-Organisms/dialogs/StoryEndingDialog',
+    title: 'A Heavy Price',
     content: 'Despite your best efforts, things did not turn out as hoped. Your decisions led to unforeseen consequences, but even in failure, there are lessons to be learned.',
     endingType: 'tragic',
+    continueText: 'Generate Ending',
+    closeText: 'Continue Playing',
   },
 };

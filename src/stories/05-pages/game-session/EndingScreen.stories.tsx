@@ -1,5 +1,6 @@
 // src/components/GameSession/EndingScreen.stories.tsx
 
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { EndingScreen } from '@/components/GameSession/EndingScreen';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -125,6 +126,15 @@ The alliances forged during the dark times grew stronger, uniting neighboring ki
   playTime: 7200 // 2 hours
 };
 
+// Mock data URIs for ending images
+const mockEndingImages = {
+  triumphant: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRkZCRjAwIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzkyNDAwRCI+VHJpdW1waGFudDwvdGV4dD4KPHN2Zz4K',
+  tragic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjREMyNjI2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlRyYWdpYzwvdGV4dD4KPHN2Zz4K',
+  bittersweet: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMzE3NEY2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkJpdHRlcnN3ZWV0PC90ZXh0Pgo8c3ZnPgo=',
+  mysterious: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk15c3RlcmlvdXM8L3RleHQ+Cjwvc3ZnPgo=',
+  hopeful: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMjJDNTVFIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkhvcGVmdWw8L3RleHQ+Cjwvc3ZnPgo='
+};
+
 // Story decorator to set up store state
 const withEndingState = (ending: StoryEnding) => {
   const EndingStateDecorator = (Story: React.ComponentType) => {
@@ -142,6 +152,28 @@ const withEndingState = (ending: StoryEnding) => {
   useWorldStore.setState({
     worlds: { 'world-456': mockWorld }
   });
+
+  // Mock fetch API for ending image generation
+  const originalFetch = global.fetch;
+  global.fetch = ((url: string | Request, init?: RequestInit) => {
+    const urlString = typeof url === 'string' ? url : url.url;
+    if (urlString.includes('/api/generate-ending-image')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          imageUrl: mockEndingImages[ending.tone as keyof typeof mockEndingImages] || mockEndingImages.triumphant
+        })
+      } as Response);
+    }
+    return originalFetch(url, init);
+  }) as typeof fetch;
+
+  // Cleanup mock after story renders
+  React.useEffect(() => {
+    return () => {
+      global.fetch = originalFetch;
+    };
+  }, []);
 
   return <Story />;
 };

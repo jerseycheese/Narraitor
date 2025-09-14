@@ -3,13 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { safeTrim } from '@/lib/utils';
 
 
@@ -41,11 +35,17 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
   onGenerationTypeChange,
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Generate Character</DialogTitle>
-        </DialogHeader>
+    <SimpleModal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      title="Generate Character"
+      showCloseButton={false}
+      size="md"
+      className="max-w-md"
+    >
+      <p className="text-sm text-gray-700 mb-6">
+        Choose the type of character you want to generate for your story.
+      </p>
         
         <div className="space-y-4">
           {/* Generation Type Selection */}
@@ -114,7 +114,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           </div>
         )}
         
-        <DialogFooter>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
           <Button
             onClick={onClose}
             disabled={isGenerating}
@@ -129,8 +129,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           >
             {isGenerating ? 'Generating...' : 'Generate'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SimpleModal>
   );
 };

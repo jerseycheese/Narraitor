@@ -1,13 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -33,19 +26,20 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   isDeleting = false,
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="component-delete-confirmation-dialog max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription asChild>
-            <div>
-              <p className="mb-2">{description}</p>
-              <p className="font-medium text-foreground">{itemName}</p>
-            </div>
-          </DialogDescription>
-        </DialogHeader>
-        
-        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2">
+    <SimpleModal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      title={title}
+      showCloseButton={false}
+      size="md"
+      className="component-delete-confirmation-dialog max-w-md"
+    >
+      <div className="mb-6">
+        <p className="mb-2 text-sm text-gray-700">{description}</p>
+        <p className="font-medium text-foreground">{itemName}</p>
+      </div>
+      
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <Button
             type="button"
             onClick={onClose}
@@ -65,9 +59,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           >
             {isDeleting ? 'Deleting...' : confirmButtonText}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </SimpleModal>
   );
 };
 

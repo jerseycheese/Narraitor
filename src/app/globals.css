@@ -97,11 +97,11 @@
     --info-muted: 214 92% 91%; /* blue-100 */
     
     /* Contextual colors for storytelling features */
-    --ending-triumphant: 32 95% 44%; /* amber-500 */
-    --ending-bittersweet: 221.2 83.2% 44.3%; /* blue-700 */
-    --ending-mysterious: 219 14% 32%; /* gray-700 */
-    --ending-tragic: 0 84% 44%; /* red-500 */
-    --ending-hopeful: 142.1 70.6% 45.3%; /* green-500 */
+    --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
+    --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */  
+    --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
+    --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
+    --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
     
     /* Lore category colors */
     --lore-characters-bg: 214 92% 91%; /* blue-100 */
@@ -165,11 +165,11 @@
     --info-muted: 212 100% 15.7%; /* blue-900 */
     
     /* Contextual colors remain the same in dark mode for consistency */
-    --ending-triumphant: 32.1 94.6% 43.7%; /* amber-500 */
-    --ending-bittersweet: 221.2 83.2% 44.3%; /* blue-700 */
-    --ending-mysterious: 219.2 13.9% 32.2%; /* gray-700 */
-    --ending-tragic: 0 84.2% 30.2%; /* red-800 */
-    --ending-hopeful: 142.1 70.6% 45.3%; /* green-500 */
+    --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
+    --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */
+    --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
+    --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
+    --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
     
     /* Lore category colors (adjusted for dark mode) */
     --lore-characters-bg: 213.1 100% 6.1%; /* blue-950 */
