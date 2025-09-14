@@ -89,33 +89,63 @@ The alliances forged during the dark times grew stronger, uniting neighboring ki
       ],
       playTime: 7200 // 2 hours
     },
-    bittersweet: {
-      id: 'ending-bittersweet',
+    tragic: {
+      id: 'ending-tragic',
       sessionId: 'test-session-123',
       characterId: 'test-char-123',
       worldId: 'test-world-456',
       type: 'story-complete',
-      tone: 'bittersweet',
-      epilogue: `Victory came at a great cost. As Aria stood among the ruins of the final battle, she counted the friends who would not see this new dawn. The dark lord was defeated, but the price of peace weighed heavily on her heart.
+      tone: 'tragic',
+      epilogue: `The price of victory was everything. As Aria struck the killing blow against the dark lord, she felt her own life force being drawn away - the ancient magic demanded a soul for a soul, a truth the prophecies had hidden in their cryptic verses.
 
-She had saved the kingdom, but lost pieces of herself along the way. The innocent girl who had first taken up her sword was gone, replaced by a warrior who understood that some battles leave scars that never truly heal.
+She collapsed beside her fallen enemy, her strength ebbing like the tide. Around her, the shadow armies crumbled to dust, and the cursed lands began to heal. The kingdom was saved, but its savior would not live to see the peace she had bought with her blood.
 
-Yet as she watched the sunrise paint the sky in brilliant colors, Aria found hope. The world would remember the fallen, honor their sacrifice, and build something beautiful from the ashes of war.`,
-      characterLegacy: `Aria Stormblade's legacy was complex - a hero who saved the world but carried the weight of necessary sacrifices. Her story became a lesson about the true cost of heroism, teaching that courage isn't the absence of pain, but the choice to act despite it.
+With her final breath, Aria whispered a prayer for those she was leaving behind. The sunrise broke over a free Eldoria, painting the sky in colors that seemed to honor her sacrifice. The darkness was gone forever, but so was the light she had carried within her.`,
+      characterLegacy: `Aria Stormblade became Eldoria's greatest martyr, her sacrifice inspiring generations to come. Her tomb in the capital became a place of pilgrimage, where people came to remember that freedom's price is often paid by those who will never enjoy it.
 
-Veterans of the war would seek her counsel, finding in her someone who understood their struggles. Her quiet moments of grief became as legendary as her moments of triumph, showing that true strength included the willingness to feel deeply.`,
-      worldImpact: `Eldoria's victory ushered in an era of somber prosperity. The kingdom rebuilt stronger than before, but never forgot the price of freedom. Monuments to the fallen stood in every city, and their stories were woven into the very fabric of the new society.
+Her story was told to children as both inspiration and warning - that heroism sometimes demands everything, but that such sacrifice is what separates the truly great from the merely ambitious. Schools were built in her name, teaching that service to others is the highest calling.`,
+      worldImpact: `Eldoria emerged from the shadow war transformed by sacrifice. The kingdom became a realm where selflessness was the highest virtue, where leaders were chosen not for their ambition but for their willingness to serve others before themselves.
 
-The realm's approach to conflict changed forever. Diplomacy became the first choice, not the last, as leaders remembered the devastating cost of the shadow war and vowed to never let such darkness take root again.`,
+A new order rose from the ashes, one dedicated to ensuring that no future hero would have to pay the price that Aria paid. The realm's scholars worked tirelessly to find ways to break such cruel magics, vowing that her sacrifice would be the last of its kind.`,
       timestamp: new Date(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       achievements: [
-        'Pyrrhic Victory',
-        'The Burden Bearer',
-        'Last Stand Hero',
-        'Keeper of Memory',
-        'Guardian of Peace'
+        'Ultimate Sacrifice',
+        'Martyr of Eldoria',
+        'Soul-Price Payer',
+        'The Final Light',
+        'Eternal Guardian'
+      ],
+      playTime: 5400 // 1.5 hours
+    },
+    mysterious: {
+      id: 'ending-mysterious',
+      sessionId: 'test-session-123',
+      characterId: 'test-char-123',
+      worldId: 'test-world-456',
+      type: 'story-complete',
+      tone: 'mysterious',
+      epilogue: `The final battle ended not with clash of steel, but with whispered words in an ancient tongue. As the dark lord fell, his form began to shimmer and fade, revealing something impossible - he bore Aria's own face, twisted by shadow and time.
+
+"You understand now," he gasped with his final breath. "We are two sides of the same coin, forged in different fires."
+
+Aria felt reality shift around her as memories that weren't her own flooded her mind. The victory was complete, but the truth it revealed opened doors to questions she wasn't sure she wanted answered. The prophecy spoke of a chosen one, but it never mentioned what happened after the choosing was done.`,
+      characterLegacy: `The full truth of Aria Stormblade's destiny remained shrouded in mystery. Some claimed she ascended to become a guardian between worlds. Others whispered that she ventured into the spaces between realities, seeking answers to the riddle of her existence.
+
+Her legend grew in the telling, becoming more myth than history. What was certain was that her sacrifice had meaning beyond the simple defeat of evil - she had stepped into a larger pattern, one that touched the very foundations of existence itself.`,
+      worldImpact: `Eldoria prospered, but the kingdom was forever changed by mysteries that Aria's victory had unveiled. Ancient texts were studied with new urgency, and scholars detected patterns in history that suggested cycles repeating across millennia.
+
+The realm became a center of learning for those seeking to understand the deeper mysteries of existence. What had seemed like a simple tale of good versus evil revealed itself as one thread in an incomprehensible tapestry that spanned worlds and ages.`,
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      achievements: [
+        'Paradox Resolver',
+        'Walker Between Worlds',
+        'Truth Seeker',
+        'Pattern Breaker',
+        'Guardian of Mysteries'
       ],
       playTime: 5400 // 1.5 hours
     },
@@ -194,19 +224,25 @@ export default function EndingScreenTestPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => handleTestEnding('triumphant')}
-              className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500"
+              className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600"
             >
               Test Triumphant
             </button>
             <button
-              onClick={() => handleTestEnding('bittersweet')}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+              onClick={() => handleTestEnding('tragic')}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
-              Test Bittersweet
+              Test Tragic
+            </button>
+            <button
+              onClick={() => handleTestEnding('mysterious')}
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
+            >
+              Test Mysterious
             </button>
             <button
               onClick={() => handleTestEnding('hopeful')}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
               Test Hopeful
             </button>
