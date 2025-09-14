@@ -61,20 +61,11 @@ Neo-Tokyo's skyline still gleamed with neon, but now it represented hope rather 
       }
     });
 
-    // Navigate to a game session that will trigger ending screen
-    await page.goto('/worlds/world-cyberpunk-2077/play');
+    // Navigate directly to the ending screen dev page
+    await page.goto('/dev/ending-screen');
     
     // Wait for initial load
     await page.waitForLoadState('networkidle', { timeout: 5000 });
-    
-    // Trigger ending screen navigation (simulate ending trigger)
-    await page.evaluate(() => {
-      // Navigate to ending screen programmatically
-      window.history.pushState({}, '', '/ending');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    
-    await page.waitForTimeout(2000);
     
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
@@ -134,16 +125,9 @@ Neo-Tokyo's transformation was painful and slow, marked by corporate retaliation
       }
     });
 
-    // Navigate and trigger ending screen
-    await page.goto('/worlds/world-cyberpunk-2077/play');
+    // Navigate directly to the ending screen dev page
+    await page.goto('/dev/ending-screen');
     await page.waitForLoadState('networkidle', { timeout: 5000 });
-    
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/ending');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    
-    await page.waitForTimeout(2000);
     await hideDynamicContent(page);
     await waitForContentStable(page);
     
@@ -199,16 +183,9 @@ The city learned to honor both its heroes and its victims, building memorials no
       }
     });
 
-    // Navigate and trigger ending screen
-    await page.goto('/worlds/world-cyberpunk-2077/play');
+    // Navigate directly to the ending screen dev page
+    await page.goto('/dev/ending-screen');
     await page.waitForLoadState('networkidle', { timeout: 5000 });
-    
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/ending');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    
-    await page.waitForTimeout(2000);
     await hideDynamicContent(page);
     await waitForContentStable(page);
     
