@@ -92,16 +92,20 @@ export function EndingScreen() {
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
-    // Skip image generation in Storybook or test environment
+    // Skip image generation in Storybook, test environment, or dev harness
     const isStorybook = typeof window !== 'undefined' && 
       (window.location.port === '6006' || window.location.hostname.includes('storybook'));
     const isTest = process.env.NODE_ENV === 'test';
+    const isDevHarness = typeof window !== 'undefined' && window.location.pathname.includes('/dev/ending-screen');
+    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__playwright);
     
     if (currentEnding && 
         !endingImage && 
         !isGeneratingImage && 
         !isStorybook &&
         !isTest &&
+        !isDevHarness &&
+        !isPlaywright &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }
@@ -246,7 +250,7 @@ export function EndingScreen() {
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <div className="pb-0">
+      <div className="pb-0" data-testid="ending-screen">
         {/* Ending Header with tone-based background */}
         <div className={`p-4 sm:py-8 ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)} rounded-lg shadow-lg mb-8`}>
           <header>
