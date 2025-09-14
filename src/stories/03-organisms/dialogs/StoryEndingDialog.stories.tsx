@@ -20,7 +20,7 @@ const meta: Meta<typeof StoryEndingDialog> = {
     },
     endingType: {
       control: 'select',
-      options: ['triumphant', 'bittersweet', 'tragic', 'default'],
+      options: ['triumphant', 'tragic', 'hopeful', 'mysterious', 'default'],
       description: 'The type of ending, affects visual styling',
     },
     onClose: { action: 'closed' },
@@ -42,16 +42,6 @@ export const Triumphant: Story = {
   },
 };
 
-export const Bittersweet: Story = {
-  args: {
-    isOpen: true,
-    title: 'A Meaningful End',
-    content: 'Your journey has come to an end. While you achieved your main goal, some sacrifices were necessary along the way. The choices you made will have lasting consequences.',
-    endingType: 'bittersweet',
-    continueText: 'Generate Ending',
-    closeText: 'Continue Playing',
-  },
-};
 
 export const Tragic: Story = {
   args: {

@@ -38,9 +38,6 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
     case 'triumphant':
       toneGuidance = 'Victorious, celebratory atmosphere with golden lighting, raised banners, cheering crowds, or the hero standing tall against a bright sky. Convey achievement and success.';
       break;
-    case 'bittersweet':
-      toneGuidance = 'Mixed emotions with contrasting elements - perhaps a sunset/dawn scene, the hero looking back at what was lost while moving toward something new. Soft, melancholic lighting with hints of hope.';
-      break;
     case 'mysterious':
       toneGuidance = 'Enigmatic and open-ended with misty atmosphere, mysterious doorways, paths leading into the unknown, or the hero silhouetted against an uncertain horizon. Ethereal, questioning mood.';
       break;
@@ -125,8 +122,6 @@ function generateFallbackImage(ending: StoryEnding, world?: World): string {
   switch(tone) {
     case 'triumphant':
       return `https://picsum.photos/seed/${seed}/800/600?sepia`;
-    case 'bittersweet':
-      return `https://picsum.photos/seed/${seed}/800/600?blur=1`;
     case 'mysterious':
       return `https://picsum.photos/seed/${seed}/800/600?grayscale&blur=2`;
     case 'tragic':

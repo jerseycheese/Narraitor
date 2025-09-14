@@ -27,14 +27,13 @@ describe('Narrative Ending Types', () => {
     it('should have all required ending tones', () => {
       const validTones: EndingTone[] = [
         'triumphant',
-        'bittersweet',
         'mysterious',
         'tragic',
         'hopeful'
       ];
 
       // This test ensures we have all the required ending tones
-      expect(validTones).toHaveLength(5);
+      expect(validTones).toHaveLength(4);
     });
   });
 

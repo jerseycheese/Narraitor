@@ -173,7 +173,7 @@ class EndingGenerator {
         }
 
         // Validate and clean the tone value
-        const validTones: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
+        const validTones: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
         let cleanTone: EndingTone = 'hopeful'; // default
         
         if (parsed.tone) {

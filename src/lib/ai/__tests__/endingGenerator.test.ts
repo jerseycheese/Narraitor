@@ -261,7 +261,7 @@ describe('endingGenerator', () => {
         characterId: 'char-456',
         worldId: 'world-123',
         endingType: 'player-choice',
-        desiredTone: 'bittersweet'
+        desiredTone: 'triumphant'
       };
 
       const mockContext = {
@@ -275,7 +275,7 @@ describe('endingGenerator', () => {
         "epilogue": "Victory came at a great cost...",
         "characterLegacy": "Aria saved the realm, but lost much along the way...",
         "worldImpact": "Peace was restored, though scars remained...",
-        "tone": "bittersweet",
+        "tone": "triumphant",
         "achievements": ["Pyrrhic Victory", "The Sacrifice"]
       }`;
 
@@ -286,14 +286,14 @@ describe('endingGenerator', () => {
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
-        content: 'Generate bittersweet ending...',
+        content: 'Generate triumphant ending...',
         variables: []
       });
       mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
       const result = await endingGenerator.generateEnding(mockRequest);
 
-      expect(result.tone).toBe('bittersweet');
+      expect(result.tone).toBe('triumphant');
       expect(result.epilogue).toContain('cost');
     });
 

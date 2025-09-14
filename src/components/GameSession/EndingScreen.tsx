@@ -179,8 +179,6 @@ export function EndingScreen() {
         return 'text-foreground'; // Use semantic foreground color
       case 'hopeful': // Green background - needs light text
         return 'text-primary-foreground'; // Use primary foreground for contrast
-      case 'bittersweet': // Blue background - needs light text
-        return 'text-primary-foreground'; // Use primary foreground for contrast
       case 'mysterious': // Dark gray background - needs light text
         return 'text-primary-foreground'; // Use primary foreground for contrast
       case 'tragic': // Red background - needs light text

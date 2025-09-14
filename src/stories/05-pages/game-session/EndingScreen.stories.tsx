@@ -130,7 +130,6 @@ The alliances forged during the dark times grew stronger, uniting neighboring ki
 const mockEndingImages = {
   triumphant: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRkZCRjAwIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzkyNDAwRCI+VHJpdW1waGFudDwvdGV4dD4KPHN2Zz4K',
   tragic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjREMyNjI2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlRyYWdpYzwvdGV4dD4KPHN2Zz4K',
-  bittersweet: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMzE3NEY2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkJpdHRlcnN3ZWV0PC90ZXh0Pgo8c3ZnPgo=',
   mysterious: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk15c3RlcmlvdXM8L3RleHQ+Cjwvc3ZnPgo=',
   hopeful: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMjJDNTVFIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkhvcGVmdWw8L3RleHQ+Cjwvc3ZnPgo='
 };
@@ -194,37 +193,6 @@ export const Triumphant: Story = {
   }
 };
 
-export const Bittersweet: Story = {
-  decorators: [withEndingState({
-    ...baseEnding,
-    tone: 'bittersweet',
-    epilogue: `Victory came at a great cost. As Aria stood among the ruins of the final battle, she counted the friends who would not see this new dawn. The dark lord was defeated, but the price of peace weighed heavily on her heart.
-
-She had saved the kingdom, but lost pieces of herself along the way. The innocent girl who had first taken up her sword was gone, replaced by a warrior who understood that some battles leave scars that never truly heal.
-
-Yet as she watched the sunrise paint the sky in brilliant colors, Aria found hope. The world would remember the fallen, honor their sacrifice, and build something beautiful from the ashes of war.`,
-    characterLegacy: `Aria Stormblade's legacy was complex - a hero who saved the world but carried the weight of necessary sacrifices. Her story became a lesson about the true cost of heroism, teaching that courage isn't the absence of pain, but the choice to act despite it.
-
-Veterans of the war would seek her counsel, finding in her someone who understood their struggles. Her quiet moments of grief became as legendary as her moments of triumph, showing that true strength included the willingness to feel deeply.`,
-    worldImpact: `Eldoria's victory ushered in an era of somber prosperity. The kingdom rebuilt stronger than before, but never forgot the price of freedom. Monuments to the fallen stood in every city, and their stories were woven into the very fabric of the new society.
-
-The realm's approach to conflict changed forever. Diplomacy became the first choice, not the last, as leaders remembered the devastating cost of the shadow war and vowed to never let such darkness take root again.`,
-    achievements: [
-      'Pyrrhic Victory',
-      'The Burden Bearer',
-      'Last Stand Hero',
-      'Keeper of Memory',
-      'Guardian of Peace'
-    ]
-  })],
-  parameters: {
-    docs: {
-      description: {
-        story: 'A bittersweet ending that combines victory with meaningful loss.'
-      }
-    }
-  }
-};
 
 export const Mysterious: Story = {
   decorators: [withEndingState({

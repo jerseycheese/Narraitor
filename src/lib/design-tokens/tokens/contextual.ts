@@ -13,11 +13,6 @@ export const endingTones = {
     foreground: primitiveColors.white,
     border: primitiveColors.amber[700],
   },
-  bittersweet: {
-    background: primitiveColors.blue[700], // Using our blue system instead of violet
-    foreground: primitiveColors.white,
-    border: primitiveColors.blue[900], // Darker blue for border
-  },
   mysterious: {
     background: primitiveColors.gray[700], // #374151
     foreground: primitiveColors.white,

@@ -8,7 +8,6 @@ import type { EndingType, EndingTone } from '../../../types/narrative.types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toneDescriptions: Record<EndingTone, string> = {
   triumphant: 'victorious and celebratory, emphasizing achievements and success',
-  bittersweet: 'mixed emotions combining victory with loss or sacrifice',
   mysterious: 'enigmatic and open-ended, leaving questions unanswered',
   tragic: 'sorrowful and melancholic, focusing on loss and sacrifice',
   hopeful: 'optimistic and forward-looking, emphasizing new beginnings'
@@ -52,7 +51,7 @@ Generate a complete story ending with the following components:
 
 1. CHOOSE AN APPROPRIATE TONE:
    - Analyze the story context and choose the most fitting emotional tone
-   - Available tones: triumphant, bittersweet, mysterious, tragic, hopeful
+   - Available tones: triumphant, mysterious, tragic, hopeful
    - Base your choice on the character's journey and recent events
 
 2. EPILOGUE (2-3 paragraphs):
@@ -85,7 +84,7 @@ FORMAT YOUR RESPONSE AS JSON:
   "achievements": ["Achievement 1", "Achievement 2", "Achievement 3"]
 }
 
-IMPORTANT: The "tone" field must be exactly one of these values: triumphant, bittersweet, mysterious, tragic, hopeful
+IMPORTANT: The "tone" field must be exactly one of these values: triumphant, mysterious, tragic, hopeful
 
 Remember to:
 - Choose the tone that best fits the story's context and events

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Validate desiredTone if provided using type-safe constants
     if (body.desiredTone) {
-      const validTones: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
+      const validTones: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
       if (!validTones.includes(body.desiredTone as EndingTone)) {
         return NextResponse.json(
           { error: `Invalid tone. Must be one of: ${validTones.join(', ')}` },

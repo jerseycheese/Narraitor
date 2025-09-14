@@ -154,10 +154,10 @@ describe('narrativeStore - Ending functionality', () => {
 
     it('should use desired tone when provided', async () => {
       const mockGenerationResult: EndingGenerationResult = {
-        epilogue: 'Bittersweet ending...',
-        characterLegacy: 'Mixed legacy...',
-        worldImpact: 'Complex impact...',
-        tone: 'bittersweet',
+        epilogue: 'Triumphant ending...',
+        characterLegacy: 'Victorious legacy...',
+        worldImpact: 'Positive impact...',
+        tone: 'triumphant',
         achievements: [],
         playTime: 0
       };
@@ -170,7 +170,7 @@ describe('narrativeStore - Ending functionality', () => {
         sessionId: 'session-123',
         characterId: 'char-456',
         worldId: 'world-789',
-        desiredTone: 'bittersweet'
+        desiredTone: 'triumphant'
       });
 
       expect(endingGenerator.generateEnding).toHaveBeenCalledWith({
@@ -178,7 +178,7 @@ describe('narrativeStore - Ending functionality', () => {
         characterId: 'char-456',
         worldId: 'world-789',
         endingType: 'player-choice',
-        desiredTone: 'bittersweet'
+        desiredTone: 'triumphant'
       });
     });
   });

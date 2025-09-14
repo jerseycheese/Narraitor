@@ -851,6 +851,18 @@ export async function seedTestData(page: Page): Promise<void> {
         version: 2
       };
       
+      // Check if there's already a currentEnding in localStorage (preserve ending data)
+      let existingCurrentEnding = null;
+      try {
+        const existingNarrativeStore = localStorage.getItem('narraitor-narrative-store');
+        if (existingNarrativeStore) {
+          const parsed = JSON.parse(existingNarrativeStore);
+          existingCurrentEnding = parsed.state?.currentEnding || null;
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+      
       const narrativeStoreData = {
         state: {
           segments: segmentsRecord,
@@ -876,7 +888,8 @@ export async function seedTestData(page: Page): Promise<void> {
             })
           },
           endedSessions: {},
-          currentEnding: null,
+          // Preserve existing currentEnding if it exists, otherwise set to null
+          currentEnding: existingCurrentEnding,
           isGeneratingEnding: false,
           endingError: null,
           error: null,
