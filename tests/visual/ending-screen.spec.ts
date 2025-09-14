@@ -17,8 +17,8 @@ test.describe('EndingScreen Visual Tests', () => {
   });
 
   test('EndingScreen - Triumphant ending should render consistently', async ({ page }) => {
-    // Seed ending data directly into the narrative store
-    await page.evaluate(() => {
+    // Seed ending data using addInitScript (runs before page loads)
+    await page.addInitScript(() => {
       const mockEnding = {
         id: 'ending-triumphant-test',
         sessionId: 'session-cyberpunk-ghost',
@@ -90,8 +90,8 @@ Neo-Tokyo's skyline still gleamed with neon, but now it represented hope rather 
   });
 
   test('EndingScreen - Tragic ending should render consistently', async ({ page }) => {
-    // Seed tragic ending data
-    await page.evaluate(() => {
+    // Seed tragic ending data using addInitScript (runs before page loads)
+    await page.addInitScript(() => {
       const mockEnding = {
         id: 'ending-tragic-test',
         sessionId: 'session-cyberpunk-ghost',
@@ -155,8 +155,8 @@ Neo-Tokyo's transformation was painful and slow, marked by corporate retaliation
   });
 
   test('EndingScreen - Bittersweet ending should render consistently', async ({ page }) => {
-    // Seed bittersweet ending data
-    await page.evaluate(() => {
+    // Seed bittersweet ending data using addInitScript (runs before page loads)
+    await page.addInitScript(() => {
       const mockEnding = {
         id: 'ending-bittersweet-test',
         sessionId: 'session-cyberpunk-ghost',
@@ -220,8 +220,8 @@ The city learned to honor both its heroes and its victims, building memorials no
   });
 
   test('EndingScreen - Loading state should render consistently', async ({ page }) => {
-    // Set loading state in narrative store
-    await page.evaluate(() => {
+    // Set loading state using addInitScript (runs before page loads)
+    await page.addInitScript(() => {
       const narrativeStore = localStorage.getItem('narraitor-narrative-store');
       if (narrativeStore) {
         const store = JSON.parse(narrativeStore);
@@ -252,8 +252,8 @@ The city learned to honor both its heroes and its victims, building memorials no
   });
 
   test('EndingScreen - Error state should render consistently', async ({ page }) => {
-    // Set error state in narrative store
-    await page.evaluate(() => {
+    // Set error state using addInitScript (runs before page loads)
+    await page.addInitScript(() => {
       const narrativeStore = localStorage.getItem('narraitor-narrative-store');
       if (narrativeStore) {
         const store = JSON.parse(narrativeStore);
