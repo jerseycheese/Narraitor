@@ -64,14 +64,15 @@ export function StoryEndingDialog({
       title={(title && safeTrim(title)) || "Story Ending"}
       showCloseButton={false}
       size="md"
+      ariaDescribedBy="story-ending-content"
       className={cn(
         'max-w-lg sm:rounded-lg',
         endingTypeClasses[endingType]
       )}
     >
       <div
+        id="story-ending-content"
         className="text-base leading-relaxed text-gray-700 mb-6"
-        aria-describedby="story-ending-content"
       >
         {typeof content === 'string' ? (
           <p>{content}</p>

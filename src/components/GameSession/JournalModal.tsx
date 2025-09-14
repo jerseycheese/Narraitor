@@ -178,7 +178,6 @@ export const JournalModal: React.FC<JournalModalProps> = ({
     <SimpleModal 
       isOpen={isOpen} 
       onClose={onClose}
-      title="Journal"
       size="xl"
       className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500"
     >

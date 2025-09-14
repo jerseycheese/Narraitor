@@ -23,6 +23,8 @@ interface SimpleModalProps {
   closeOnEscape?: boolean;
   /** Modal size */
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** ID of element describing the modal content */
+  ariaDescribedBy?: string;
 }
 
 /**
@@ -40,7 +42,8 @@ export function SimpleModal({
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeOnEscape = true,
-  size = 'md'
+  size = 'md',
+  ariaDescribedBy
 }: SimpleModalProps) {
   
   // Handle escape key
@@ -89,6 +92,7 @@ export function SimpleModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? "modal-title" : undefined}
+      aria-describedby={ariaDescribedBy}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />

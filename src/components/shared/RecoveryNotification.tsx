@@ -139,11 +139,12 @@ export function RecoveryNotification({
       isOpen={isVisible} 
       onClose={onDismiss}
       title="Character Creation Progress Found"
-      showCloseButton={false}
+      showCloseButton={true}
       size="md"
+      ariaDescribedBy="recovery-notification-content"
       className="max-w-lg"
     >
-      <div className="flex items-center mb-4">
+      <div id="recovery-notification-content" className="flex items-center mb-4">
         <div className="flex-shrink-0 mr-3">
           <svg
             className="h-6 w-6 text-amber-500"
