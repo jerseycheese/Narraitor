@@ -3,7 +3,8 @@ import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, Choice
 import { EntityID } from '../types/common.types';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
-import { endingGenerator } from '../lib/ai/endingGenerator';
+// IMPORTANT: Do not import AI generators directly in client code.
+// All AI calls must go through server/API routes per project guidelines.
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
@@ -492,21 +493,38 @@ export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
   // Ending actions
   generateEnding: async (endingType, params) => {
     set({ isGeneratingEnding: true, endingError: null });
-    
+
     try {
-      const result = await endingGenerator.generateEnding({
-        sessionId: params.sessionId,
-        characterId: params.characterId,
-        worldId: params.worldId,
-        endingType,
-        desiredTone: params.desiredTone,
-        customPrompt: params.customPrompt
+      // Route through server API to keep AI usage server-side and enable test mocking
+      const response = await fetch('/api/narrative/ending', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: params.sessionId,
+          characterId: params.characterId,
+          worldId: params.worldId,
+          endingType,
+          desiredTone: params.desiredTone,
+          customPrompt: params.customPrompt,
+        })
       });
-      
+
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        throw new Error(`API error ${response.status}: ${errText || 'Failed to generate ending'}`);
+      }
+
+      const json = await response.json();
+      const result = json?.data ?? json; // Support both {success,data} and direct payload
+
+      if (!result || !result.epilogue || !result.characterLegacy || !result.worldImpact) {
+        throw new Error('Invalid ending payload from API');
+      }
+
       const endingId = generateUniqueId('ending');
       const now = new Date();
       const isoNow = now.toISOString();
-      
+
       const ending: StoryEnding = {
         id: endingId,
         sessionId: params.sessionId,
@@ -520,26 +538,25 @@ export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
         timestamp: now,
         createdAt: isoNow,
         updatedAt: isoNow,
-        achievements: result.achievements,
-        playTime: result.playTime
+        achievements: result.achievements || [],
+        playTime: result.playTime,
       };
-      
-      set({ 
-        currentEnding: ending, 
+
+      set({
+        currentEnding: ending,
         isGeneratingEnding: false,
-        endingError: null
+        endingError: null,
       });
-      
+
       // Mark the session as ended to prevent further generation
       get().markSessionEnded(params.sessionId);
     } catch (error) {
       logger.error('Failed to generate ending', { error, endingType, params });
-      
-      // Show the actual error instead of fallback for debugging
-      set({ 
+
+      set({
         currentEnding: null,
-        isGeneratingEnding: false, 
-        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}. Check your GEMINI_API_KEY configuration.`
+        isGeneratingEnding: false,
+        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
   },

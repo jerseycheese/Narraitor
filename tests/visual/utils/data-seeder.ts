@@ -15,8 +15,9 @@ export const SAMPLE_WORLDS = [
     name: 'Cyberpunk Neo-Tokyo',
     description: 'A dystopian future where corporations rule the world and cybernetic enhancements define social status',
     genre: 'cyberpunk',
+    // Use a deterministic placeholder data URL to stabilize Hero visuals
     image: {
-      url: '/visual-assets/world-cyberpunk.png',
+      url: STABLE_WORLD_IMAGE,
       alt: 'Cyberpunk cityscape'
     },
     attributes: [
@@ -68,6 +69,11 @@ export const SAMPLE_WORLDS = [
     name: 'Aethermoor',
     description: 'A magical realm where ancient dragons soar above floating cities and arcane mysteries shape reality',
     genre: 'fantasy',
+    // Also provide a stable placeholder to keep visuals consistent when used
+    image: {
+      url: STABLE_WORLD_IMAGE,
+      alt: 'Fantasy realm'
+    },
     attributes: [
       {
         name: 'Magic Power',

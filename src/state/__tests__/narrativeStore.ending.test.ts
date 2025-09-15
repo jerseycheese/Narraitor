@@ -1,14 +1,19 @@
 // src/state/__tests__/narrativeStore.ending.test.ts
 
 import { useNarrativeStore } from '../narrativeStore';
-import { endingGenerator } from '../../lib/ai/endingGenerator';
 import type { 
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
 
-// Mock the ending generator
-jest.mock('../../lib/ai/endingGenerator');
+// Mock fetch for API-based ending generation
+declare const global: any;
+beforeAll(() => {
+  global.fetch = jest.fn();
+});
+afterEach(() => {
+  (global.fetch as jest.Mock).mockReset();
+});
 
 describe('narrativeStore - Ending functionality', () => {
   beforeEach(() => {
@@ -39,7 +44,10 @@ describe('narrativeStore - Ending functionality', () => {
         playTime: 3600
       };
 
-      (endingGenerator.generateEnding as jest.Mock).mockResolvedValue(mockGenerationResult);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockGenerationResult })
+      });
 
       const store = useNarrativeStore.getState();
       
@@ -68,12 +76,12 @@ describe('narrativeStore - Ending functionality', () => {
     });
 
     it('should set loading state during generation', async () => {
-      let resolveGeneration: (value: EndingGenerationResult) => void;
-      const generationPromise = new Promise<EndingGenerationResult>((resolve) => {
-        resolveGeneration = resolve;
+      let resolveJson: (value: unknown) => void;
+      const jsonPromise = new Promise((resolve) => { resolveJson = resolve; });
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => jsonPromise as unknown as Promise<EndingGenerationResult>
       });
-
-      (endingGenerator.generateEnding as jest.Mock).mockReturnValue(generationPromise);
 
       const store = useNarrativeStore.getState();
       
@@ -87,15 +95,15 @@ describe('narrativeStore - Ending functionality', () => {
       expect(useNarrativeStore.getState().isGeneratingEnding).toBe(true);
       expect(useNarrativeStore.getState().endingError).toBeNull();
 
-      // Resolve the generation
-      resolveGeneration!({
+      // Resolve the API response
+      resolveJson!({ success: true, data: {
         epilogue: 'Story complete...',
         characterLegacy: 'A legend...',
         worldImpact: 'Changed forever...',
         tone: 'triumphant',
         achievements: [],
         playTime: 1800
-      });
+      }});
 
       await generatePromise;
 
@@ -105,7 +113,7 @@ describe('narrativeStore - Ending functionality', () => {
 
     it('should handle generation errors', async () => {
       const mockError = new Error('Failed to generate ending');
-      (endingGenerator.generateEnding as jest.Mock).mockRejectedValue(mockError);
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500, text: async () => mockError.message });
 
       const store = useNarrativeStore.getState();
       
@@ -132,7 +140,10 @@ describe('narrativeStore - Ending functionality', () => {
         playTime: 0
       };
 
-      (endingGenerator.generateEnding as jest.Mock).mockResolvedValue(mockGenerationResult);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockGenerationResult })
+      });
 
       const store = useNarrativeStore.getState();
       
@@ -143,13 +154,11 @@ describe('narrativeStore - Ending functionality', () => {
         customPrompt: 'The character retires to a peaceful cottage'
       });
 
-      expect(endingGenerator.generateEnding).toHaveBeenCalledWith({
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        endingType: 'character-retirement',
-        customPrompt: 'The character retires to a peaceful cottage'
-      });
+      expect(global.fetch).toHaveBeenCalledWith('/api/narrative/ending', expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+        body: expect.stringContaining('character-retirement')
+      }));
     });
 
     it('should use desired tone when provided', async () => {
@@ -162,7 +171,10 @@ describe('narrativeStore - Ending functionality', () => {
         playTime: 0
       };
 
-      (endingGenerator.generateEnding as jest.Mock).mockResolvedValue(mockGenerationResult);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockGenerationResult })
+      });
 
       const store = useNarrativeStore.getState();
       
@@ -173,13 +185,11 @@ describe('narrativeStore - Ending functionality', () => {
         desiredTone: 'triumphant'
       });
 
-      expect(endingGenerator.generateEnding).toHaveBeenCalledWith({
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        endingType: 'player-choice',
-        desiredTone: 'triumphant'
-      });
+      expect(global.fetch).toHaveBeenCalledWith('/api/narrative/ending', expect.objectContaining({
+        method: 'POST',
+        headers: expect.any(Object),
+        body: expect.stringContaining('triumphant')
+      }));
     });
   });
 
