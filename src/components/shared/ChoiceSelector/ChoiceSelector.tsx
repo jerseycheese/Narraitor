@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
-import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { safeTrim } from '@/lib/utils';
 
 
