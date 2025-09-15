@@ -1,14 +1,6 @@
 // src/state/__tests__/narrativeStore.ending.test.ts
 
-// Mock the endingGenerator module
-jest.mock('../../lib/ai/endingGenerator', () => ({
-  endingGenerator: {
-    generateEnding: jest.fn()
-  }
-}));
-
 import { useNarrativeStore } from '../narrativeStore';
-import { endingGenerator } from '../../lib/ai/endingGenerator';
 import type { 
   StoryEnding,
   EndingGenerationResult
