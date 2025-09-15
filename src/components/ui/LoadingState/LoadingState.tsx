@@ -99,7 +99,6 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
               themeClasses[theme].spinnerFill
             )}
             role="status"
-            aria-hidden="true"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
