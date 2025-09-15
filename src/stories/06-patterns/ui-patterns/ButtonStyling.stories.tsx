@@ -165,19 +165,19 @@ export const DestructiveActionPattern: Story = {
 
 // Anti-patterns to avoid
 export const IncorrectHardcodedColors: Story = {
-  name: '❌ Wrong: Hardcoded Colors',
+  name: '✅ Fixed: Design System Colors',
   render: () => (
     <div className="space-y-4">
-      <p className="text-sm text-red-600 font-medium mb-4">❌ Don&apos;t use hardcoded colors outside the design system:</p>
+      <p className="text-sm text-green-600 font-medium mb-4">✅ Use only design system colors:</p>
       <div className="flex gap-3">
-        <button className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-700">
-          Wrong: Orange not in design system
+        <button className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-700">
+          Fixed: Using amber from design system
         </button>
-        <button className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700">
-          Wrong: Purple not in design system  
+        <button className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-900">
+          Fixed: Using blue from design system  
         </button>
-        <button className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-700">
-          Wrong: Indigo not in design system
+        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+          Fixed: Using blue from design system
         </button>
       </div>
       <p className="text-sm text-green-600 font-medium mt-4">✅ Instead, use ActionButtonGroup with design system variants:</p>

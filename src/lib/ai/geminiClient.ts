@@ -64,7 +64,7 @@ export class GeminiClient implements AIClient {
     try {
       // Log request for debugging (consider using configurable logger for production)
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔥 GEMINI API: Making request with prompt length:', prompt.length);
+        console.log('GEMINI API: Making request with prompt length:', prompt.length);
       }
       const response = await this.genAI.models.generateContent({
         model: this.config.modelName,
@@ -76,7 +76,7 @@ export class GeminiClient implements AIClient {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔥 GEMINI API: Response received, content length:', response.text?.length || 0);
+        console.log('GEMINI API: Response received, content length:', response.text?.length || 0);
       }
       return {
         content: response.text || '',
@@ -85,7 +85,7 @@ export class GeminiClient implements AIClient {
         completionTokens: undefined
       };
     } catch (error) {
-      console.error('🔥 GEMINI API: Request failed:', error);
+      console.error('GEMINI API: Request failed:', error);
       throw error;
     }
   }

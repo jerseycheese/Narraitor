@@ -11,7 +11,6 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
-import { PageLayout } from '@/components/shared/PageLayout';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
 import Image from 'next/image';
@@ -20,7 +19,7 @@ import { Button } from '@/components/ui/button';
 
 /**
  * EndingScreen displays the story ending with narrative closure
- * Uses shared components (PageLayout, SectionWrapper, CardActionGroup) and existing tone-based styling
+ * Uses shared components (SectionWrapper, CardActionGroup) and existing tone-based styling
  * Following our TDD approach and acceptance criteria
  */
 export function EndingScreen() {
@@ -93,16 +92,20 @@ export function EndingScreen() {
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
-    // Skip image generation in Storybook or test environment
+    // Skip image generation in Storybook, test environment, or dev harness
     const isStorybook = typeof window !== 'undefined' && 
       (window.location.port === '6006' || window.location.hostname.includes('storybook'));
     const isTest = process.env.NODE_ENV === 'test';
+    const isDevHarness = typeof window !== 'undefined' && window.location.pathname.includes('/dev/ending-screen');
+    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__playwright);
     
     if (currentEnding && 
         !endingImage && 
         !isGeneratingImage && 
         !isStorybook &&
         !isTest &&
+        !isDevHarness &&
+        !isPlaywright &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }
@@ -114,10 +117,10 @@ export function EndingScreen() {
   // Show loading state while generating
   if (isGeneratingEnding) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-background" role="main" aria-live="polite">
         <div className="text-center space-y-4">
           <LoadingState message="Generating your story ending..." />
-          <p className="text-gray-700">
+          <p className="text-muted-foreground">
             Please wait while we craft the perfect conclusion to your journey...
           </p>
         </div>
@@ -141,22 +144,20 @@ export function EndingScreen() {
   // Handle missing ending data
   if (!currentEnding) {
     return (
-      <PageLayout 
-        title="No Ending Available" 
-        description="It looks like the story ending wasn't generated properly."
-        className="bg-gray-100"
-      >
-        <div className="text-center">
-          <CardActionGroup 
-            primaryActions={[{
-              key: 'return-home',
-              text: 'Return to Home',
-              onClick: () => router.push('/worlds'),
-              variant: 'primary'
-            }]}
-          />
-        </div>
-      </PageLayout>
+      <div className="text-center space-y-8">
+        <header>
+          <h1 className="text-4xl font-bold mb-4">No Ending Available</h1>
+          <p className="opacity-90">It looks like the story ending wasn&apos;t generated properly.</p>
+        </header>
+        <CardActionGroup 
+          primaryActions={[{
+            key: 'return-home',
+            text: 'Return to Home',
+            onClick: () => router.push('/worlds'),
+            variant: 'primary'
+          }]}
+        />
+      </div>
     );
   }
 
@@ -175,21 +176,19 @@ export function EndingScreen() {
     return `${minutes} minutes`;
   };
 
-  // Determine header text color based on tone for better contrast
+  // Determine header text color based on tone for better contrast and accessibility
   const getHeaderTextColor = (tone: string) => {
     switch (tone) {
-      case 'triumphant': // Amber background (amber-500: #f59e0b)
-        return 'text-black'; // Black text for bright amber
-      case 'hopeful': // Green background (green-500: #22c55e)
-        return 'text-white'; // White text for green
-      case 'bittersweet': // Blue background (blue-700: #1d4ed8)
-        return 'text-white'; // White text for blue
-      case 'mysterious': // Gray background (gray-700: #374151)
-        return 'text-white'; // White text for dark gray
-      case 'tragic': // Red background (red-700: #b91c1c)
-        return 'text-white'; // White text for dark red
+      case 'triumphant': // Amber background - needs dark text for proper contrast
+        return 'text-foreground'; // Use semantic foreground color
+      case 'hopeful': // Green background - needs light text
+        return 'text-primary-foreground'; // Use primary foreground for contrast
+      case 'mysterious': // Dark gray background - needs light text
+        return 'text-primary-foreground'; // Use primary foreground for contrast
+      case 'tragic': // Red background - needs light text
+        return 'text-primary-foreground'; // Use primary foreground for contrast
       default:
-        return 'text-white'; // Default to white text
+        return 'text-primary-foreground'; // Default to high contrast text
     }
   };
 
@@ -251,19 +250,29 @@ export function EndingScreen() {
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <PageLayout
-        title="The End"
-        description={`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-        className={`ending-screen ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)}`}
-      >
-        <div className="space-y-6">
+      <div className="pb-0" data-testid="ending-screen">
+        {/* Ending Header with tone-based background */}
+        <div className={`p-4 sm:py-8 ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)} rounded-lg shadow-lg mb-8`}>
+          <header>
+            <h1 className="text-4xl font-bold mb-4">
+              The End
+            </h1>
+            <p className="opacity-90">
+              {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+            </p>
+          </header>
+        </div>
+        <div className="space-y-8">
           {/* Ending Image */}
-          <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+          <section 
+            className="rounded-lg overflow-hidden shadow-lg" 
+            aria-label="Story ending illustration"
+          >
             {isGeneratingImage ? (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
+              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
                 <div className="text-center">
                   <LoadingState message="Generating ending image..." />
-                  <p className="text-gray-700 mt-2 text-sm">
+                  <p className="text-muted-foreground mt-2 text-sm">
                     Creating a visual representation of your story&apos;s conclusion...
                   </p>
                 </div>
@@ -275,10 +284,11 @@ export function EndingScreen() {
                 width={800}
                 height={400}
                 className="w-full h-48 md:h-64 lg:h-80 object-cover"
+                priority
               />
             ) : imageError ? (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
-                <div className="text-center text-gray-500">
+              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
                   <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                   <p className="text-sm">Unable to generate ending image</p>
                   <Button 
@@ -286,42 +296,46 @@ export function EndingScreen() {
                     variant="link"
                     size="sm"
                     className="mt-2 text-sm"
+                    aria-label="Retry generating ending image"
                   >
                     Try Again
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
-                <div className="text-center text-gray-500">
+              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
                   <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                   <p className="text-sm">Ending image</p>
                 </div>
               </div>
             )}
-          </div>
-          {/* Epilogue */}
-          <SectionWrapper title="Epilogue" className="bg-white/95 backdrop-blur-sm">
-            <div className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap">
-              {currentEnding.epilogue}
-            </div>
-          </SectionWrapper>
+          </section>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* Epilogue */}
+          <section>
+            <SectionWrapper title="Epilogue" className="bg-card/95 backdrop-blur-sm border border-border">
+              <div className="text-lg text-card-foreground leading-relaxed whitespace-pre-wrap">
+                {currentEnding.epilogue}
+              </div>
+            </SectionWrapper>
+          </section>
+
+          <div className="grid gap-8 lg:grid-cols-2">
             {/* Character Legacy */}
-            <div>
-              <SectionWrapper title="Character Legacy" className="bg-white/90 backdrop-blur-sm h-full">
-                <div className="text-gray-900 leading-relaxed">
+            <section>
+              <SectionWrapper title="Character Legacy" className="bg-card/90 backdrop-blur-sm border border-border h-full">
+                <div className="text-card-foreground leading-relaxed">
                   {currentEnding.characterLegacy}
                 </div>
               </SectionWrapper>
-            </div>
+            </section>
 
             {/* Achievements */}
             {currentEnding.achievements && currentEnding.achievements.length > 0 && (
-              <div>
-                <SectionWrapper title="Achievements" className="bg-white/90 backdrop-blur-sm h-full">
-                  <div className="space-y-2">
+              <section aria-label="Story achievements">
+                <SectionWrapper title="Achievements" className="bg-card/90 backdrop-blur-sm border border-border h-full">
+                  <ul className="space-y-3" role="list">
                     {currentEnding.achievements.map((achievement, index) => {
                       // Split achievement into title and description
                       const colonIndex = achievement.indexOf(':');
@@ -329,41 +343,45 @@ export function EndingScreen() {
                       const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : '';
                       
                       return (
-                        <div
+                        <li
                           key={index}
-                          className="flex items-start justify-start space-x-2 text-gray-900 p-2"
+                          className="flex items-start justify-start space-x-3 text-card-foreground p-2"
                         >
-                          <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                          <Star className="w-5 h-5 text-warning mt-0.5 flex-shrink-0" aria-hidden="true" />
                           <div className="min-w-0 flex-1 break-words">
-                            <span className="font-bold break-words">{title}</span>
-                            {description && <span className="break-words">: {description}</span>}
+                            <span className="font-semibold break-words">{title}</span>
+                            {description && <span className="block text-muted-foreground text-sm mt-1 break-words">{description}</span>}
                           </div>
-                        </div>
+                        </li>
                       );
                     })}
-                  </div>
+                  </ul>
                 </SectionWrapper>
-              </div>
+              </section>
             )}
           </div>
 
           {/* World Impact */}
-          <SectionWrapper title="Impact on the World" className="bg-white/90 backdrop-blur-sm">
-            <div className="text-gray-900 leading-relaxed">
-              {currentEnding.worldImpact}
-            </div>
-          </SectionWrapper>
+          <section>
+            <SectionWrapper title="Impact on the World" className="bg-card/90 backdrop-blur-sm border border-border">
+              <div className="text-card-foreground leading-relaxed">
+                {currentEnding.worldImpact}
+              </div>
+            </SectionWrapper>
+          </section>
 
           {/* Next Steps */}
-          <SectionWrapper title="What's Next?" className="bg-white/95 backdrop-blur-sm">
-            <CardActionGroup
-              primaryActions={navigationActions}
-              layout="horizontal"
-              gap="lg"
-            />
-          </SectionWrapper>
+          <section>
+            <SectionWrapper title="What's Next?" className="bg-card/95 backdrop-blur-sm border border-border">
+              <CardActionGroup
+                primaryActions={navigationActions}
+                layout="horizontal"
+                gap="lg"
+              />
+            </SectionWrapper>
+          </section>
         </div>
-      </PageLayout>
+      </div>
 
     </>
   );

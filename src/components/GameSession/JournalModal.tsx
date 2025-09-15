@@ -7,13 +7,7 @@ import { JournalEntry } from '@/types/journal.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { 
@@ -181,27 +175,26 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500"
-      >
-        <DialogHeader className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <div>
-                <DialogTitle className="text-2xl font-bold text-amber-900">Journal</DialogTitle>
-                <DialogDescription className="sr-only">
-                  View and read journal entries from this session
-                </DialogDescription>
-              </div>
-              {entries.length > 0 && (
-                <span className="ml-3 text-sm text-amber-700">
-                  {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
-                </span>
-              )}
+    <SimpleModal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      size="xl"
+      className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500"
+    >
+      <div className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg -m-6 mb-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-amber-900">Journal</h2>
             </div>
+            {entries.length > 0 && (
+              <span className="ml-3 text-sm text-amber-700">
+                {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
+              </span>
+            )}
           </div>
-        </DialogHeader>
+        </div>
+      </div>
 
         {/* Content with responsive list-detail layout */}
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
@@ -339,7 +332,6 @@ export const JournalModal: React.FC<JournalModalProps> = ({
             </>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+    </SimpleModal>
   );
 };

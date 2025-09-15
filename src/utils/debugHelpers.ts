@@ -45,7 +45,7 @@ export const fixNarrativeCountsManually = () => {
     console.log('[DebugHelper] ✅ Session counts updated successfully');
     return updatedSessions;
   } else {
-    console.log('[DebugHelper] ℹ️ No updates needed');
+    console.log('[DebugHelper] INFO: No updates needed');
     return sessionStore.savedSessions;
   }
 };

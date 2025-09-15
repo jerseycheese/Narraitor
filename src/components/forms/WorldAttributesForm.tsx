@@ -4,10 +4,7 @@ import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 
 
 /**
@@ -204,37 +201,51 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       )}
       
       {/* Create Modal */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <AttributeEditor
-            worldId={worldId as EntityID}
-            mode="create"
-            onSave={handleCreateAttribute}
-            onCancel={() => setShowCreateModal(false)}
-            existingAttributes={attributes}
-            existingSkills={skills}
-            maxAttributes={maxAttributes}
-          />
-        </DialogContent>
-      </Dialog>
+      <SimpleModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)}
+        title="Create Attribute"
+        size="lg"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <div className="mb-4 text-sm text-muted-foreground">
+          Create a new custom attribute for this world.
+        </div>
+        <AttributeEditor
+          worldId={worldId as EntityID}
+          mode="create"
+          onSave={handleCreateAttribute}
+          onCancel={() => setShowCreateModal(false)}
+          existingAttributes={attributes}
+          existingSkills={skills}
+          maxAttributes={maxAttributes}
+        />
+      </SimpleModal>
       
       {/* Edit Modal */}
-      <Dialog open={!!editingAttribute} onOpenChange={(open) => !open && setEditingAttribute(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          {editingAttribute && (
-            <AttributeEditor
-              worldId={worldId as EntityID}
-              mode="edit"
-              attributeId={editingAttribute}
-              onSave={handleSaveAttribute}
-              onDelete={handleDeleteAttribute}
-              onCancel={() => setEditingAttribute(null)}
-              existingAttributes={attributes}
-              existingSkills={skills}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <SimpleModal 
+        isOpen={!!editingAttribute} 
+        onClose={() => setEditingAttribute(null)}
+        title="Edit Attribute"
+        size="lg"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <div className="mb-4 text-sm text-muted-foreground">
+          Modify the details of this world attribute.
+        </div>
+        {editingAttribute && (
+          <AttributeEditor
+            worldId={worldId as EntityID}
+            mode="edit"
+            attributeId={editingAttribute}
+            onSave={handleSaveAttribute}
+            onDelete={handleDeleteAttribute}
+            onCancel={() => setEditingAttribute(null)}
+            existingAttributes={attributes}
+            existingSkills={skills}
+          />
+        )}
+      </SimpleModal>
       
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog

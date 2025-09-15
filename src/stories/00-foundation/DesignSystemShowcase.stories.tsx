@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Settings } from 'lucide-react'
 import { primitiveColors, semanticColors, endingTones, loreCategories } from '@/lib/design-tokens'
 
 const meta: Meta = {
@@ -121,7 +122,9 @@ export const CompleteShowcase: Story = {
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
-              <Button size="icon">⚙</Button>
+              <Button size="icon">
+                <Settings className="w-4 h-4" />
+              </Button>
             </div>
           </div>
 

@@ -125,9 +125,9 @@ export function Navigation() {
                   aria-expanded={isMenuOpen}
                 >
                   {isMenuOpen ? (
-                    <X className="w-6 h-6" aria-hidden="true" />
+                    <X className="w-5 h-5" aria-hidden="true" />
                   ) : (
-                    <Menu className="w-6 h-6" aria-hidden="true" />
+                    <Menu className="w-5 h-5" aria-hidden="true" />
                   )}
                 </Button>
               )}

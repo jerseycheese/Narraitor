@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 
 export default function AttributeEditorTestPage() {
   const [attributes, setAttributes] = useState<WorldAttribute[]>([
@@ -160,36 +160,50 @@ export default function AttributeEditorTestPage() {
       </div>
 
       {/* Create Modal */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <SimpleModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)}
+        title="Create Attribute"
+        size="lg"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <div className="mb-4 text-sm text-muted-foreground">
+          Create a new custom attribute for this test world.
+        </div>
+        <AttributeEditor
+          worldId={'world-test' as EntityID}
+          mode="create"
+          onSave={handleCreateAttribute}
+          onCancel={() => setShowCreateModal(false)}
+          existingAttributes={attributes}
+          existingSkills={skills}
+        />
+      </SimpleModal>
+
+      {/* Edit Modal */}
+      <SimpleModal 
+        isOpen={!!editingAttribute} 
+        onClose={() => setEditingAttribute(null)}
+        title="Edit Attribute"
+        size="lg"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <div className="mb-4 text-sm text-muted-foreground">
+          Modify the details of this test attribute.
+        </div>
+        {editingAttribute && (
           <AttributeEditor
             worldId={'world-test' as EntityID}
-            mode="create"
-            onSave={handleCreateAttribute}
-            onCancel={() => setShowCreateModal(false)}
+            mode="edit"
+            attributeId={editingAttribute}
+            onSave={handleSaveAttribute}
+            onDelete={handleDeleteAttribute}
+            onCancel={() => setEditingAttribute(null)}
             existingAttributes={attributes}
             existingSkills={skills}
           />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Modal */}
-      <Dialog open={!!editingAttribute} onOpenChange={(open) => !open && setEditingAttribute(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          {editingAttribute && (
-            <AttributeEditor
-              worldId={'world-test' as EntityID}
-              mode="edit"
-              attributeId={editingAttribute}
-              onSave={handleSaveAttribute}
-              onDelete={handleDeleteAttribute}
-              onCancel={() => setEditingAttribute(null)}
-              existingAttributes={attributes}
-              existingSkills={skills}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        )}
+      </SimpleModal>
     </div>
   );
 }

@@ -2,12 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { cn } from '@/lib/utils/classNames';
 
 export type AchievementType = 'quest' | 'skill' | 'discovery' | 'milestone' | 'default';
@@ -68,19 +63,17 @@ export function AchievementDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className={cn(
-          'component-achievement-dialog max-w-lg text-center',
-          achievementTypeClasses[type]
-        )}
-        showCloseButton={false}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-center">
-            {title || "Achievement Unlocked"}
-          </DialogTitle>
-        </DialogHeader>
+    <SimpleModal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      title={title || "Achievement Unlocked"}
+      showCloseButton={false}
+      size="md"
+      className={cn(
+        'component-achievement-dialog max-w-lg text-center',
+        achievementTypeClasses[type]
+      )}
+    >
         
         <div className="space-y-4">
         {icon && (
@@ -129,7 +122,6 @@ export function AchievementDialog({
           </Button>
         </div>
         </div>
-      </DialogContent>
-    </Dialog>
+    </SimpleModal>
   );
 }

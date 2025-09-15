@@ -35,7 +35,7 @@ export function EndingImageDebugSection() {
   const characters = useCharacterStore((state: any) => state.characters);
   const worlds = useWorldStore((state) => state.worlds);
   
-  const toneOptions: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
+  const toneOptions: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
   
   // Create a mock ending for testing
   const createMockEnding = (): StoryEnding => {
@@ -204,8 +204,6 @@ export function EndingImageDebugSection() {
         return 'text-black'; // Black text for bright amber
       case 'hopeful': // Emerald background (#10b981)  
         return 'text-white'; // White text for emerald
-      case 'bittersweet': // Violet background (#8b5cf6)
-        return 'text-white'; // White text for violet
       case 'mysterious': // Gray background (#374151)
         return 'text-white'; // White text for dark gray
       case 'tragic': // Dark red background (#991b1b)
@@ -220,8 +218,6 @@ export function EndingImageDebugSection() {
     switch (tone) {
       case 'triumphant':
         return '#f59e0b'; // amber-500
-      case 'bittersweet':
-        return '#1d4ed8'; // blue-700
       case 'mysterious':
         return '#374151'; // gray-700
       case 'tragic':

@@ -188,7 +188,7 @@ export type EndingType = 'player-choice' | 'story-complete' | 'session-limit' | 
 /**
  * Emotional tone of story endings
  */
-export type EndingTone = 'triumphant' | 'bittersweet' | 'mysterious' | 'tragic' | 'hopeful';
+export type EndingTone = 'triumphant' | 'mysterious' | 'tragic' | 'hopeful';
 
 /**
  * Represents a complete story ending with narrative closure

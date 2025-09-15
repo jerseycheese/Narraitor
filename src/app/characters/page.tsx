@@ -500,7 +500,7 @@ export default function CharactersPage() {
                   icon: isGenerating ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <Sparkles className="w-6 h-6" aria-hidden="true" />
+                    <Sparkles className="w-5 h-5" aria-hidden="true" />
                   )
                 },
                 {
@@ -509,7 +509,7 @@ export default function CharactersPage() {
                   variant: 'primary',
                   size: 'lg',
                   icon: (
-                    <Plus className="w-6 h-6" aria-hidden="true" />
+                    <Plus className="w-5 h-5" aria-hidden="true" />
                   )
                 }
               ]}

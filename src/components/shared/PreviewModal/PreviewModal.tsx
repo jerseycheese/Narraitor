@@ -2,14 +2,7 @@
 
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter 
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 
 interface PreviewModalProps<T> {
@@ -60,48 +53,48 @@ function PreviewModalInner<T>({
   className
 }: PreviewModalProps<T>) {
   return (
-    <Dialog open={isOpen} onOpenChange={onCancel}>
-      <DialogContent className={className}>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {subtitle && (
-            <DialogDescription>{subtitle}</DialogDescription>
-          )}
-        </DialogHeader>
+    <SimpleModal 
+      isOpen={isOpen} 
+      onClose={onCancel}
+      title={title}
+      showCloseButton={false}
+      size="lg"
+      className={className}
+    >
+      <p className="text-sm text-gray-700 mb-6">
+        {subtitle || "Preview content before confirming your selection."}
+      </p>
 
-        <div className="space-y-6">
-          {renderContent(data)}
+      <div className="space-y-6">
+        {renderContent(data)}
 
-          {/* Footer Note */}
-          {footerNote && (
-            <div className="text-center text-sm text-muted-foreground italic border-t pt-4 mt-6">
-              {footerNote}
-            </div>
-          )}
-        </div>
-
-        <DialogFooter>
-          <div className={wizardStyles.navigation.container}>
-            <Button
-              onClick={onCancel}
-              variant="outline"
-              size="default"
-            >
-              {cancelText}
-            </Button>
-            <div className={wizardStyles.navigation.buttonGroup}>
-              <Button
-                onClick={onConfirm}
-                variant="default"
-                size="default"
-              >
-                {confirmText}
-              </Button>
-            </div>
+        {/* Footer Note */}
+        {footerNote && (
+          <div className="text-center text-sm text-muted-foreground italic border-t pt-4 mt-6">
+            {footerNote}
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        )}
+      </div>
+
+      <div className={wizardStyles.navigation.container + " mt-6"}>
+        <Button
+          onClick={onCancel}
+          variant="outline"
+          size="default"
+        >
+          {cancelText}
+        </Button>
+        <div className={wizardStyles.navigation.buttonGroup}>
+          <Button
+            onClick={onConfirm}
+            variant="default"
+            size="default"
+          >
+            {confirmText}
+          </Button>
+        </div>
+      </div>
+    </SimpleModal>
   );
 }
 

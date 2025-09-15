@@ -7,7 +7,7 @@ import React from 'react';
 import { useLoreStore } from '@/state/loreStore';
 import { FactEditor } from './FactEditor';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { EntityID } from '@/types/common.types';
 
@@ -36,11 +36,16 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Fact Inspector</DialogTitle>
-        </DialogHeader>
+    <SimpleModal 
+      isOpen={true} 
+      onClose={onClose}
+      title="Fact Inspector"
+      size="lg"
+      className="max-w-2xl max-h-[80vh] overflow-y-auto"
+    >
+      <div className="mb-4 text-sm text-muted-foreground">
+        Inspect and edit lore fact details, history, and relationships.
+      </div>
 
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -201,7 +206,6 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
             Close
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+    </SimpleModal>
   );
 };

@@ -23,6 +23,43 @@ async function globalSetup(config: FullConfig) {
     await page.evaluate(async (testData) => {
       const { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } = testData;
       
+      // Deterministic bitmap placeholder generator (runs in browser)
+      const generateBitmapPlaceholder = (seed: string): string => {
+        try {
+          const hash = (str: string) => {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+            return Math.abs(h);
+          };
+          const h = hash(seed) % 360;
+          const canvas = document.createElement('canvas');
+          canvas.width = 320; canvas.height = 180;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return '';
+          ctx.fillStyle = `hsl(${(h + 200) % 360} 50% 12%)`;
+          ctx.fillRect(0, 0, 320, 180);
+          ctx.fillStyle = `hsl(${(h + 210) % 360} 55% 16%)`;
+          ctx.fillRect(0, 0, 320, 120);
+          ctx.fillStyle = `hsl(${(h + 220) % 360} 60% 20%)`;
+          ctx.fillRect(0, 0, 320, 80);
+          const rng = (() => { let s = hash(seed) + 13; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 0xffffffff; })();
+          for (let i = 0; i < 16; i++) {
+            const x = i * 20 + Math.floor(rng() * 4);
+            const w = 14 + Math.floor(rng() * 6);
+            const ht = 30 + Math.floor(rng() * 90);
+            ctx.fillStyle = `hsl(${(h + 240 + i * 2) % 360} 40% ${25 + (i % 3) * 5}%)`;
+            ctx.fillRect(x, 150 - ht, w, ht);
+            ctx.fillStyle = `hsl(${(h + 60) % 360} 90% 70%)`;
+            for (let y = 150 - ht + 6; y < 150; y += 12) {
+              for (let wx = x + 2; wx < x + w - 2; wx += 6) {
+                if (rng() > 0.4) ctx.fillRect(wx, y, 3, 4);
+              }
+            }
+          }
+          return canvas.toDataURL('image/png');
+        } catch { return ''; }
+      };
+
       // Transform legacy SAMPLE_WORLDS to current World schema
       const toValidWorld = (world: any) => {
         const now = new Date().toISOString();
@@ -55,9 +92,7 @@ async function globalSetup(config: FullConfig) {
             }))
           : [];
 
-        const image = world.image
-          ? { type: 'placeholder', url: world.image?.url ?? null, generatedAt: now }
-          : undefined;
+        const image = { type: 'placeholder', url: world.image?.url ?? generateBitmapPlaceholder(world.id || world.name || 'world'), generatedAt: now };
 
         return {
           id: world.id,

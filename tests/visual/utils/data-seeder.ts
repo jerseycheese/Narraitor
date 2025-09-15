@@ -15,7 +15,9 @@ export const SAMPLE_WORLDS = [
     name: 'Cyberpunk Neo-Tokyo',
     description: 'A dystopian future where corporations rule the world and cybernetic enhancements define social status',
     genre: 'cyberpunk',
+    // Use a deterministic placeholder data URL to stabilize Hero visuals
     image: {
+      // Use a real bitmap from public assets for clear demonstration
       url: '/visual-assets/world-cyberpunk.png',
       alt: 'Cyberpunk cityscape'
     },
@@ -68,6 +70,11 @@ export const SAMPLE_WORLDS = [
     name: 'Aethermoor',
     description: 'A magical realm where ancient dragons soar above floating cities and arcane mysteries shape reality',
     genre: 'fantasy',
+    // Use gradient-style stable placeholder to contrast with bitmap world above
+    image: {
+      url: STABLE_WORLD_IMAGE,
+      alt: 'Fantasy realm'
+    },
     attributes: [
       {
         name: 'Magic Power',
@@ -646,6 +653,54 @@ export async function seedTestData(page: Page): Promise<void> {
   await page.addInitScript(async (testData) => {
     const { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } = testData;
     
+    // Deterministic bitmap placeholder generator (runs in browser)
+    const generateBitmapPlaceholder = (seed: string): string => {
+      try {
+        const hash = (str: string) => {
+          let h = 0;
+          for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+          return Math.abs(h);
+        };
+        const h = hash(seed) % 360;
+        const canvas = document.createElement('canvas');
+        canvas.width = 320; // small but visibly bitmap
+        canvas.height = 180;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+
+        // Background bands
+        ctx.fillStyle = `hsl(${(h + 200) % 360} 50% 12%)`;
+        ctx.fillRect(0, 0, 320, 180);
+        ctx.fillStyle = `hsl(${(h + 210) % 360} 55% 16%)`;
+        ctx.fillRect(0, 0, 320, 120);
+        ctx.fillStyle = `hsl(${(h + 220) % 360} 60% 20%)`;
+        ctx.fillRect(0, 0, 320, 80);
+
+        // Simple skyline bars (deterministic heights)
+        const rng = (() => {
+          let s = hash(seed) + 13;
+          return () => (s = (s * 1664525 + 1013904223) >>> 0) / 0xffffffff;
+        })();
+        for (let i = 0; i < 16; i++) {
+          const x = i * 20 + Math.floor(rng() * 4);
+          const w = 14 + Math.floor(rng() * 6);
+          const ht = 30 + Math.floor(rng() * 90);
+          ctx.fillStyle = `hsl(${(h + 240 + i * 2) % 360} 40% ${25 + (i % 3) * 5}%)`;
+          ctx.fillRect(x, 150 - ht, w, ht);
+          // window rows
+          ctx.fillStyle = `hsl(${(h + 60) % 360} 90% 70%)`;
+          for (let y = 150 - ht + 6; y < 150; y += 12) {
+            for (let wx = x + 2; wx < x + w - 2; wx += 6) {
+              if (rng() > 0.4) ctx.fillRect(wx, y, 3, 4);
+            }
+          }
+        }
+        return canvas.toDataURL('image/png');
+      } catch {
+        return '';
+      }
+    };
+
     // Helper: transform legacy SAMPLE_WORLDS to current World schema
     const toValidWorld = (world: any) => {
       const now = new Date().toISOString();
@@ -678,10 +733,9 @@ export async function seedTestData(page: Page): Promise<void> {
           }))
         : [];
 
-      // Normalize image to WorldImage type
-      const image = world.image
-        ? { type: 'placeholder', url: world.image?.url ?? null, generatedAt: now }
-        : undefined;
+      // Normalize image to WorldImage type, generating a bitmap placeholder if absent
+      const generated = generateBitmapPlaceholder(world.id || world.name || 'world');
+      const image = { type: 'placeholder', url: world.image?.url ?? generated ?? null, generatedAt: now };
 
       return {
         id: world.id,
@@ -851,6 +905,18 @@ export async function seedTestData(page: Page): Promise<void> {
         version: 2
       };
       
+      // Check if there's already a currentEnding in localStorage (preserve ending data)
+      let existingCurrentEnding = null;
+      try {
+        const existingNarrativeStore = localStorage.getItem('narraitor-narrative-store');
+        if (existingNarrativeStore) {
+          const parsed = JSON.parse(existingNarrativeStore);
+          existingCurrentEnding = parsed.state?.currentEnding || null;
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+      
       const narrativeStoreData = {
         state: {
           segments: segmentsRecord,
@@ -876,7 +942,8 @@ export async function seedTestData(page: Page): Promise<void> {
             })
           },
           endedSessions: {},
-          currentEnding: null,
+          // Preserve existing currentEnding if it exists, otherwise set to null
+          currentEnding: existingCurrentEnding,
           isGeneratingEnding: false,
           endingError: null,
           error: null,

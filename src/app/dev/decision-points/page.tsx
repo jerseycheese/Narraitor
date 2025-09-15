@@ -220,8 +220,8 @@ export default function DecisionPointsTestPage() {
                 <li>• Major: Yellow border (4px) - important decisions</li>
                 <li>• Critical: Bright red border (6px) - urgent/high-stakes decisions</li>
                 <li>• Choice alignment: Icons + muted colors</li>
-                <li>• Lawful choices: ⚖️ icon + blue background</li>
-                <li>• Chaotic choices: 🔥 icon + red background</li>
+                <li>• Lawful choices: Scale icon + blue background</li>
+                <li>• Chaotic choices: Flame icon + red background</li>
                 <li>• Neutral choices: No icon + gray background</li>
                 <li>• Clear visual separation from narrative text</li>
                 <li>• Responsive design for all screen sizes</li>

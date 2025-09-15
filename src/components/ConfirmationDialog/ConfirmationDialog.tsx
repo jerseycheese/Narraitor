@@ -1,14 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/classNames';
 
@@ -28,10 +21,10 @@ export interface ConfirmationDialogProps {
 }
 
 const variantClasses: Record<ConfirmationVariant, string> = {
-  default: 'border-gray-200 bg-white',
-  destructive: 'border-red-500 bg-red-200',
-  warning: 'border-amber-200 bg-amber-200',
-  info: 'border-blue-200 bg-blue-50',
+  default: 'border-gray-300 bg-white',
+  destructive: 'border-red-700 bg-white',
+  warning: 'border-amber-700 bg-white',
+  info: 'border-blue-300 bg-white',
 };
 
 const confirmButtonVariants: Record<ConfirmationVariant, "default" | "destructive"> = {
@@ -73,60 +66,48 @@ export function ConfirmationDialog({
   }, [isOpen, isLoading, variant]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        className={cn(
-          'component-confirmation-dialog max-w-md sm:rounded-lg',
-          variantClasses[variant]
+    <SimpleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title || "Confirmation Required"}
+      showCloseButton={false}
+      size="md"
+      className={cn(
+        'component-confirmation-dialog max-w-md sm:rounded-lg',
+        variantClasses[variant]
+      )}
+    >
+      <div className="text-sm text-gray-700 mb-6">
+        {typeof message === 'string' ? (
+          message
+        ) : (
+          message
         )}
-        aria-labelledby="confirmation-title"
-        aria-describedby="confirmation-message"
-      >
-        <DialogHeader>
-          <DialogTitle
-            id="confirmation-title"
-            className={title ? "text-lg font-semibold" : "sr-only"}
-          >
-            {title || "Confirmation"}
-          </DialogTitle>
-        </DialogHeader>
-        
-        <DialogDescription
-          id="confirmation-message"
-          className="text-sm text-gray-700 py-4"
+      </div>
+      
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+        <Button
+          ref={cancelButtonRef}
+          onClick={onClose}
+          variant="outline"
+          disabled={isLoading}
+          className="w-full sm:w-auto"
         >
-          {typeof message === 'string' ? (
-            message
-          ) : (
-            message
+          {cancelText}
+        </Button>
+        <Button
+          ref={confirmButtonRef}
+          onClick={onConfirm}
+          variant={confirmButtonVariants[variant]}
+          disabled={isLoading}
+          className={cn(
+            'w-full sm:w-auto',
+            variant === 'destructive' && 'bg-red-700 hover:bg-red-900 text-white'
           )}
-        </DialogDescription>
-        
-        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-          <Button
-            ref={cancelButtonRef}
-            onClick={onClose}
-            variant="outline"
-            disabled={isLoading}
-            className="w-full sm:w-auto"
-          >
-            {cancelText}
-          </Button>
-          <Button
-            ref={confirmButtonRef}
-            onClick={onConfirm}
-            variant={confirmButtonVariants[variant]}
-            disabled={isLoading}
-            className={cn(
-              'w-full sm:w-auto',
-              variant === 'destructive' && 'bg-red-500 hover:bg-red-700 text-white'
-            )}
-          >
-            {isLoading ? loadingText : confirmText}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        >
+          {isLoading ? loadingText : confirmText}
+        </Button>
+      </div>
+    </SimpleModal>
   );
 }

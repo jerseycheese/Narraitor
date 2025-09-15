@@ -40,14 +40,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '../ui/dialog';
+import { SimpleModal } from './SimpleModal';
 import { formatDateTime } from '@/lib/utils';
 
 /**
@@ -142,32 +135,35 @@ export function RecoveryNotification({
   };
 
   return (
-    <Dialog open={isVisible} onOpenChange={onDismiss}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <div className="flex items-center">
-            <div className="flex-shrink-0 mr-3">
-              <svg
-                className="h-6 w-6 text-amber-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <DialogTitle className="text-lg font-medium">
-              Character Creation Progress Found
-            </DialogTitle>
-          </div>
-          <DialogDescription asChild>
-            <div>
+    <SimpleModal 
+      isOpen={isVisible} 
+      onClose={onDismiss}
+      title="Character Creation Progress Found"
+      showCloseButton={true}
+      size="md"
+      ariaDescribedBy="recovery-notification-content"
+      className="max-w-lg"
+    >
+      <div id="recovery-notification-content" className="flex items-center mb-4">
+        <div className="flex-shrink-0 mr-3">
+          <svg
+            className="h-6 w-6 text-amber-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+      </div>
+      
+      <div>
           <p className="text-sm text-muted-foreground mb-4">
             Found saved character creation progress from a previous session.
             {hasCurrentData && (
@@ -208,27 +204,24 @@ export function RecoveryNotification({
               Last saved: {validDate}
             </p>
           )}
-            </div>
-          </DialogDescription>
-        </DialogHeader>
+      </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-3">
-          <Button
-            ref={recoverButtonRef}
-            onClick={onRecover}
-            className="flex-1"
-          >
-            Recover Progress
-          </Button>
-          <Button
-            onClick={onDismiss}
-            variant="outline"
-            className="flex-1"
-          >
-            Start Fresh
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <div className="flex flex-col sm:flex-row gap-3 mt-6">
+        <Button
+          ref={recoverButtonRef}
+          onClick={onRecover}
+          className="flex-1"
+        >
+          Recover Progress
+        </Button>
+        <Button
+          onClick={onDismiss}
+          variant="outline"
+          className="flex-1"
+        >
+          Start Fresh
+        </Button>
+      </div>
+    </SimpleModal>
   );
 }

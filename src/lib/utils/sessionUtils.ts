@@ -19,13 +19,13 @@ export const formatSessionDuration = (ms: number): string => {
 /**
  * Gets system event icon for journal display
  * @param type Journal entry type
- * @returns Unicode emoji for the event type
+ * @returns Text indicator for the event type
  */
 export const getSystemEventIcon = (type: string): string => {
   switch (type) {
-    case 'session_start': return '🎮';
-    case 'session_end': return '⏹️';
-    default: return '⚙️';
+    case 'session_start': return '[START]';
+    case 'session_end': return '[END]';
+    default: return '[SYS]';
   }
 };
 

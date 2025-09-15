@@ -119,6 +119,8 @@ export const Hero: React.FC<HeroProps> = ({
           width={800}
           height={400}
           className="w-full h-full object-cover"
+          // Use unoptimized for data URLs and tests to avoid Next optimization proxy
+          unoptimized={typeof image.url === 'string' && image.url.startsWith('data:')}
         />
       )}
 
