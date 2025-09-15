@@ -101,6 +101,10 @@ interface EntityWithName {
   id: string;
 }
 
+interface CharacterWithWorld extends EntityWithName {
+  worldId: string;
+}
+
 /**
  * Build breadcrumb segments from pathname and store data
  * @param pathname Current pathname
@@ -112,7 +116,7 @@ interface EntityWithName {
 export function buildBreadcrumbSegments(
   pathname: string,
   worlds: Record<string, EntityWithName>,
-  characters: Record<string, EntityWithName>,
+  characters: Record<string, CharacterWithWorld>,
   currentWorldId: string | null
 ): BreadcrumbSegment[] {
   const segments: BreadcrumbSegment[] = [];
@@ -174,11 +178,23 @@ export function buildBreadcrumbSegments(
   
   // Handle character routes - need world context
   if (pathname.includes('/characters')) {
-    // Add world breadcrumb if we have a current world
-    if (currentWorldId && worlds[currentWorldId]) {
+    // For specific character routes, get the world from the character data
+    const charIdMatch = pathname.match(/\/characters\/([^\/]+)(?:\/|$)/);
+    let worldToShow = currentWorldId;
+    
+    if (charIdMatch && charIdMatch[1] !== 'create') {
+      const charId = charIdMatch[1];
+      const character = characters[charId];
+      if (character && character.worldId) {
+        worldToShow = character.worldId;
+      }
+    }
+    
+    // Add world breadcrumb if we have a world to show
+    if (worldToShow && worlds[worldToShow]) {
       segments.push({
-        label: worlds[currentWorldId].name,
-        href: `/worlds/${currentWorldId}`,
+        label: worlds[worldToShow].name,
+        href: `/worlds/${worldToShow}`,
         isCurrentPage: false
       });
     }
@@ -191,8 +207,7 @@ export function buildBreadcrumbSegments(
       isCurrentPage: isCharactersList || pathname === '/characters/create'
     });
     
-    // Handle specific character
-    const charIdMatch = pathname.match(/\/characters\/([^\/]+)(?:\/|$)/);
+    // Handle specific character (reuse the match from above)
     if (charIdMatch && charIdMatch[1] !== 'create') {
       const charId = charIdMatch[1];
       const character = characters[charId];
