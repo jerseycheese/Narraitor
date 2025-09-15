@@ -682,7 +682,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : isGeneratingChoices ? (
             <div className="player-choices-container">
-              <LoadingState message="Thinking up some options..." />
+              <LoadingState message="Thinking up..." />
             </div>
           ) : choices && choices.length > 0 ? (
             <div className="player-choices-container">

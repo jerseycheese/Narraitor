@@ -6,7 +6,7 @@ describe('GameSessionLoading', () => {
   test('renders loading spinner and message', () => {
     render(<GameSessionLoading />);
 
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByTestId('game-session-loading')).toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(screen.getByText('Loading your game...')).toBeInTheDocument();
   });

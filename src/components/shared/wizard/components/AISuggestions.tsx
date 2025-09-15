@@ -1,4 +1,5 @@
 import React from 'react';
+import { LoadingState } from '@/components/ui/LoadingState/LoadingState';
 
 export interface AISuggestion {
   id?: string;
@@ -37,11 +38,13 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
 
   if (isProcessing) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent mb-4" />
-          <p className="text-gray-700">Generating suggestions...</p>
-        </div>
+      <div className="p-8">
+        <LoadingState
+          message="Generating suggestions..."
+          size="md"
+          theme="light"
+          centered={true}
+        />
       </div>
     );
   }
