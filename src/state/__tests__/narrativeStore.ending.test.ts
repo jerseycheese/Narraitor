@@ -6,13 +6,19 @@ import type {
   EndingGenerationResult
 } from '../../types/narrative.types';
 
-// Mock fetch for API-based ending generation
+// Mock fetch for API-based ending generation and restore after suite
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const global: any;
+let originalFetch: unknown;
 beforeAll(() => {
+  originalFetch = global.fetch;
   global.fetch = jest.fn();
 });
 afterEach(() => {
   (global.fetch as jest.Mock).mockReset();
+});
+afterAll(() => {
+  global.fetch = originalFetch;
 });
 
 describe('narrativeStore - Ending functionality', () => {
