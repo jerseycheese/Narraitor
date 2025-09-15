@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils/classNames';
 import { safeTrim } from '@/lib/utils';
 
 
-export type EndingType = 'triumphant' | 'bittersweet' | 'tragic' | 'default';
+export type EndingType = 'triumphant' | 'mysterious' | 'tragic' | 'default';
 
 export interface StoryEndingDialogProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ export interface StoryEndingDialogProps {
 
 const endingTypeClasses: Record<EndingType, string> = {
   triumphant: 'ending-triumphant border-amber-200 bg-gradient-to-br from-amber-50 to-amber-50',
-  bittersweet: 'ending-bittersweet border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50',
+  mysterious: 'ending-mysterious border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
   tragic: 'ending-tragic border-red-500 bg-gradient-to-br from-red-50 to-red-50',
   default: 'ending-default border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
 };

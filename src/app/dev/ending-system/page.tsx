@@ -35,7 +35,7 @@ export default function EndingSystemTestHarness() {
     worldId: mockWorldId,
     type: endingType,
     tone: desiredTone,
-    epilogue: `As the sun set over the kingdom, our brave hero ${endingType === 'character-retirement' ? 'decided to lay down their sword and live peacefully' : 'stood victorious after their great adventure'}. The journey that began with uncertainty ended with ${desiredTone === 'tragic' ? 'great sacrifice' : desiredTone === 'bittersweet' ? 'mixed emotions' : 'celebration'}.
+    epilogue: `As the sun set over the kingdom, our brave hero ${endingType === 'character-retirement' ? 'decided to lay down their sword and live peacefully' : 'stood victorious after their great adventure'}. The journey that began with uncertainty ended with ${desiredTone === 'tragic' ? 'great sacrifice' : desiredTone === 'mysterious' ? 'lingering questions' : 'celebration'}.
 
 The lands would remember this day for generations to come, when a simple adventurer became the ${desiredTone === 'mysterious' ? 'enigmatic figure of legend' : 'hero the realm needed'}. Through trials and tribulations, they proved that courage and determination can overcome any obstacle.
 
@@ -118,7 +118,6 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="triumphant">Triumphant</option>
-                  <option value="bittersweet">Bittersweet</option>
                   <option value="mysterious">Mysterious</option>
                   <option value="tragic">Tragic</option>
                   <option value="hopeful">Hopeful</option>
