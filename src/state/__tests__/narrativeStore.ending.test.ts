@@ -1,6 +1,14 @@
 // src/state/__tests__/narrativeStore.ending.test.ts
 
+// Mock the endingGenerator module
+jest.mock('../../lib/ai/endingGenerator', () => ({
+  endingGenerator: {
+    generateEnding: jest.fn()
+  }
+}));
+
 import { useNarrativeStore } from '../narrativeStore';
+import { endingGenerator } from '../../lib/ai/endingGenerator';
 import type { 
   StoryEnding,
   EndingGenerationResult
@@ -363,7 +371,11 @@ describe('narrativeStore - Ending functionality', () => {
         playTime: 3600
       };
 
-      (endingGenerator.generateEnding as jest.Mock).mockResolvedValue(mockGenerationResult);
+      // Mock the fetch response for the API call
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue(mockGenerationResult)
+      });
 
       const store = useNarrativeStore.getState();
       const sessionId = 'session-123';
