@@ -629,12 +629,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   return (
     <div data-testid="game-session-active" role="region" aria-label="Game session">
-      {/* Character Summary Panel */}
-      {character && (
-        <div className="mb-6">
-          <CharacterSummary character={character} />
-        </div>
-      )}
       
       {/* Two-column layout for larger screens */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
@@ -775,6 +769,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           </div>
         )}
       </div>
+
+      {/* Character Summary Panel moved below buttons */}
+      {character && (
+        <div className="mt-6">
+          <CharacterSummary character={character} />
+        </div>
+      )}
 
       {/* Ending Suggestion Dialog */}
       <StoryEndingDialog
