@@ -166,7 +166,7 @@ test.describe('EndingScreen Visual Tests', () => {
           data: {
             epilogue: 'As the network quiets, a new signal whispers from the shadows. The story ends—or perhaps begins again.',
             characterLegacy: 'Some say you vanished into the code itself; others claim you walk the alleys still.',
-            worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city's fate.',
+            worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city\'s fate.',
             tone: 'mysterious',
             achievements: ['Ghost In The Wires', 'Whispers of the Grid'],
             playTime: 456
