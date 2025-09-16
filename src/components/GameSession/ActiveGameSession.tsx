@@ -19,7 +19,6 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
-import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -625,7 +624,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       narrativeStore.clearSessionSegments(sessionId);
       narrativeStore.clearSessionDecisions(sessionId);
       narrativeStore.clearEnding();
-      await sessionStore.endSession();
+      sessionStore.endSession();
       Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
         const savedSession = sessionStore.savedSessions[savedSessionId];
         if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
