@@ -246,9 +246,9 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     >
       <ScrollArea 
         ref={scrollAreaRef}
-        className={`${heightClass} bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner mobile-scroll`}
+        className={`${heightClass} mobile-scroll`}
       >
-        <div className="space-y-4 px-4 py-4">
+        <div className="space-y-4">
           {renderContent()}
         </div>
       </ScrollArea>

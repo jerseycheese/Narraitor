@@ -115,7 +115,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   }
   
   return (
-    <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
+    <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6 w-full">
       <CollapsibleSection 
         title="Basic Information" 
         initiallyExpanded={true}

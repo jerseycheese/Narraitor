@@ -147,6 +147,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     };
   }, [currentDecision, choices, isGeneratingChoices]);
   
+  // No viewport calculations needed; rely on flex layout with internal scroll
+  
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -661,12 +663,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }
 
   return (
-    <div data-testid="game-session-active" role="region" aria-label="Game session">
+    <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
       
       {/* Two-column layout for larger screens */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0">
         {/* Story Column */}
-        <div className="lg:flex-1" id="narrative-container">
+        <div className="lg:flex-1 min-h-0 overflow-auto" id="narrative-container">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
@@ -693,7 +695,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
 
         {/* Choices Column */}
-        <div className="lg:flex-1" id="choices-container">
+        <div className="lg:flex-1 min-h-0 overflow-auto" id="choices-container">
           {/* Show AI-generated choices, loading state, or fallback */}
           {currentDecision ? (
             <div className="player-choices-container">
@@ -709,7 +711,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : isGeneratingChoices ? (
             <div className="player-choices-container">
-              <LoadingState message="Thinking up..." />
+              <LoadingState message="Thinking..." />
             </div>
           ) : choices && choices.length > 0 ? (
             <div className="player-choices-container">
