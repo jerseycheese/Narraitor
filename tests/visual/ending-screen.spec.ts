@@ -76,8 +76,9 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-triumphant.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-triumphant.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
@@ -143,8 +144,9 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-tragic.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-tragic.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
@@ -209,8 +211,9 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-mysterious.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-mysterious.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
@@ -274,8 +277,9 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-hopeful.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 });
