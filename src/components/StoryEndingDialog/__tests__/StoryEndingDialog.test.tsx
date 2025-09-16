@@ -49,7 +49,7 @@ describe('StoryEndingDialog', () => {
   describe('Ending Types', () => {
     it('accepts different ending types without errors', () => {
       // Test that component renders with different ending types
-      const endingTypes = ['player-choice', 'story-complete', 'session-limit'] as const;
+      const endingTypes = ['player-choice', 'story-complete', 'session-limit', 'character-retirement'] as const;
       
       endingTypes.forEach(endingType => {
         const { unmount } = render(<StoryEndingDialog {...mockProps} endingType={endingType} />);
