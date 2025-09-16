@@ -63,10 +63,10 @@ export function StoryEndingDialog({
       onClose={onClose}
       title={(title && safeTrim(title)) || "Story Ending"}
       showCloseButton={false}
-      size="md"
+      size="xl"
       ariaDescribedBy="story-ending-content"
       className={cn(
-        'max-w-lg sm:rounded-lg',
+        'sm:rounded-lg',
         endingTypeClasses[endingType]
       )}
     >

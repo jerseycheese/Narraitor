@@ -58,10 +58,10 @@ function PreviewModalInner<T>({
       onClose={onCancel}
       title={title}
       showCloseButton={false}
-      size="lg"
+      size="xl"
       className={className}
     >
-      <p className="text-sm text-gray-700 mb-6">
+      <p className="text-sm text-gray-700 mb-6" id="preview-modal-desc">
         {subtitle || "Preview content before confirming your selection."}
       </p>
 

@@ -86,6 +86,7 @@ export function WorldTypeSelector({
   const sizeClasses = {
     small: {
       container: 'space-y-2',
+      conditionalTop: 'mt-3',
       radio: 'p-2',
       title: 'text-sm font-medium',
       description: 'text-xs',
@@ -94,6 +95,7 @@ export function WorldTypeSelector({
     },
     medium: {
       container: 'space-y-3',
+      conditionalTop: 'mt-4',
       radio: 'p-3',
       title: 'font-medium',
       description: 'text-sm',
@@ -102,6 +104,7 @@ export function WorldTypeSelector({
     },
     large: {
       container: 'space-y-4',
+      conditionalTop: 'mt-6',
       radio: 'p-4',
       title: 'text-lg font-semibold',
       description: 'text-base',
@@ -149,7 +152,7 @@ export function WorldTypeSelector({
 
       {/* Conditional Fields */}
       {selectedOption?.requiresReference && (
-        <div className={styles.container}>
+        <div className={`${styles.conditionalTop} ${styles.container}`}>
           {/* Existing Setting Field */}
           <div>
             <Label htmlFor="world-reference" className={`block ${styles.label} text-gray-700 mb-2`}>

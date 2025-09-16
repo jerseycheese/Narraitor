@@ -116,8 +116,8 @@ export default function WorldsPage() {
         onClose={() => setShowPrompt(false)}
         title="Generate World"
         showCloseButton={false}
-        size="md"
-        className="max-w-md"
+        size="xl"
+        ariaDescribedBy="generate-world-desc"
       >
         <div className="space-y-4">
           <WorldFormFields.NameInput
@@ -127,7 +127,7 @@ export default function WorldsPage() {
             required={false}
             placeholder="e.g., The Lost Kingdom"
           />
-          <p className="text-xs text-muted-foreground mt-1">
+          <p id="generate-world-desc" className="text-xs text-muted-foreground mt-1">
             Give your world a custom name, or leave empty for a generated name
           </p>
           
@@ -177,6 +177,7 @@ export default function WorldsPage() {
               )
             }
           ]}
+          className="mt-6 justify-end"
         />
       </SimpleModal>
 

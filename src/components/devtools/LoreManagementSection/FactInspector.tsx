@@ -40,8 +40,8 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
       isOpen={true} 
       onClose={onClose}
       title="Fact Inspector"
-      size="lg"
-      className="max-w-2xl max-h-[80vh] overflow-y-auto"
+      size="xl"
+      className="max-h-[80vh] overflow-y-auto"
     >
       <div className="mb-4 text-sm text-muted-foreground">
         Inspect and edit lore fact details, history, and relationships.
