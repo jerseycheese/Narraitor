@@ -348,7 +348,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       )}
       
       {allOptions.length > 0 && (
-        <CollapsibleSection title="Suggested Actions" initialCollapsed={false}>
+        <CollapsibleSection title="Suggested Actions" initialCollapsed={true}>
           {/* Regular choice options */}
           <div 
             className="space-y-2" 
