@@ -613,6 +613,39 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     handleEndStory();
   };
 
+  // Global event handlers to support hero action buttons from parent pages
+  React.useEffect(() => {
+    const onEndStory = () => handleEndStoryClick();
+    const onEndSession = () => { if (onEnd) onEnd(); };
+    const onNewSession = async () => {
+      const sessionStore = useSessionStore.getState();
+      const narrativeStore = useNarrativeStore.getState();
+      narrativeStore.clearSessionSegments(sessionId);
+      narrativeStore.clearSessionDecisions(sessionId);
+      narrativeStore.clearEnding();
+      await sessionStore.endSession();
+      Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
+        const savedSession = sessionStore.savedSessions[savedSessionId];
+        if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
+          sessionStore.deleteSavedSession(savedSessionId);
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const url = new URL(window.location.href);
+      url.searchParams.set('fresh', 'true');
+      window.location.href = url.toString();
+    };
+
+    window.addEventListener('narraitor:end-story', onEndStory as EventListener);
+    window.addEventListener('narraitor:end-session', onEndSession as EventListener);
+    window.addEventListener('narraitor:new-session', onNewSession as EventListener);
+    return () => {
+      window.removeEventListener('narraitor:end-story', onEndStory as EventListener);
+      window.removeEventListener('narraitor:end-session', onEndSession as EventListener);
+      window.removeEventListener('narraitor:new-session', onNewSession as EventListener);
+    };
+  }, [sessionId, worldId, characterId, onEnd]);
+
   // If we have an ending, show the ending screen instead
   if (currentEnding) {
     return <EndingScreen />;
@@ -705,72 +738,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           )}
 
-          {/* Session Control Buttons placed below choices (right column) */}
-          <div className="mt-6 flex justify-end">
-            {onEnd && (
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <Button
-                  data-testid="game-session-new"
-                  variant="default"
-                  className="w-full sm:w-auto"
-                  onClick={async () => {
-                    // Force a completely fresh start by clearing everything
-                    const sessionStore = useSessionStore.getState();
-                    const narrativeStore = useNarrativeStore.getState();
-                    
-                    // Clear all narrative data for this session
-                    narrativeStore.clearSessionSegments(sessionId);
-                    narrativeStore.clearSessionDecisions(sessionId);
-                    narrativeStore.clearEnding();
-                    
-                    // End the current session first
-                    await sessionStore.endSession();
-                    
-                    // THEN clear all saved sessions for this world/character combination
-                    // This must happen after endSession() to prevent the session from being re-saved
-                    Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
-                      const savedSession = sessionStore.savedSessions[savedSessionId];
-                      if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
-                        sessionStore.deleteSavedSession(savedSessionId);
-                      }
-                    });
-                    
-                    // Wait a moment for the deletion to persist to storage
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // Navigate with a fresh parameter to signal a new session
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('fresh', 'true');
-                    window.location.href = url.toString();
-                  }}
-                >
-                  Start New Session
-                </Button>
-                <Button
-                  data-testid="game-session-end-story"
-                  variant="secondary"
-                  className="w-full sm:w-auto bg-blue-700 hover:bg-blue-700 text-white"
-                  onClick={handleEndStoryClick}
-                  disabled={isGeneratingEnding || isSessionEnded(sessionId)}
-                  title="End your story with an AI-generated epilogue"
-                >
-                  {isGeneratingEnding ? 'Generating...' : 'End Story'}
-                </Button>
-                <Button
-                  data-testid="game-session-end"
-                  variant="destructive"
-                  className="w-full sm:w-auto"
-                  onClick={onEnd}
-                >
-                  End Session
-                </Button>
-              </div>
-            )}
-          </div>
+          {/* Session control buttons now live in the Hero actions slot */}
         </div>
       </div>
 
-      {/* Character Summary Panel moved below buttons */}
+      {/* Character Summary Panel below hero */}
       {character && (
         <div className="mt-6">
           <CharacterSummary character={character} />
