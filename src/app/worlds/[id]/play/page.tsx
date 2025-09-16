@@ -5,6 +5,7 @@ import { notFound, useParams, useSearchParams } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
+import { Button } from '@/components/ui/button';
 import { useWorldStore } from '@/state/worldStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 
@@ -65,27 +66,15 @@ export default function PlayPage() {
             titleElement="h1"
             actions={
               <div className="hidden sm:flex flex-row gap-2">
-                <button
-                  type="button"
-                  className="px-2 py-1 text-xs bg-white/90 text-gray-900 rounded hover:bg-white"
-                  onClick={() => window.dispatchEvent(new Event('narraitor:new-session'))}
-                >
+                <Button size="sm" variant="default" onClick={() => window.dispatchEvent(new Event('narraitor:new-session'))}>
                   Start New
-                </button>
-                <button
-                  type="button"
-                  className="px-2 py-1 text-xs bg-blue-700 text-white rounded hover:bg-blue-700/90"
-                  onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}
-                >
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}>
                   End Story
-                </button>
-                <button
-                  type="button"
-                  className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
-                  onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
-                >
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}>
                   End Session
-                </button>
+                </Button>
               </div>
             }
           />
