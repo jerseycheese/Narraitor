@@ -5,6 +5,7 @@ import { notFound, useParams, useSearchParams } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
+import { Button } from '@/components/ui/button';
 import { useWorldStore } from '@/state/worldStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 
@@ -63,6 +64,19 @@ export default function PlayPage() {
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
             height="h-20 sm:h-24"
             titleElement="h1"
+            actions={
+              <div className="hidden sm:flex flex-row gap-2">
+                <Button size="sm" variant="default" onClick={() => window.dispatchEvent(new Event('narraitor:new-session'))}>
+                  Start New
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}>
+                  End Story
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}>
+                  End Session
+                </Button>
+              </div>
+            }
           />
         </div>
       )}

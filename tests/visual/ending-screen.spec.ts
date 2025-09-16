@@ -12,6 +12,9 @@ import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
 test.describe('EndingScreen Visual Tests', () => {
   
   test('EndingScreen - Triumphant ending should render consistently', async ({ page }) => {
+    // Set viewport size to ensure desktop layout (Hero actions visible)
+    await page.setViewportSize({ width: 1280, height: 720 });
+
     // Seed normal test data
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -40,9 +43,9 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for active session UI
     await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
 
-    // Trigger End Story and confirm in dialog (light settle only)
+    // Trigger End Story button from Hero actions (now in top right)
     await page.waitForTimeout(100);
-    const endButton = page.getByTestId('game-session-end-story');
+    const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
     await expect(endButton).toBeVisible();
     await expect(endButton).toBeEnabled();
@@ -73,12 +76,16 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-triumphant.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-triumphant.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
   test('EndingScreen - Tragic ending should render consistently', async ({ page }) => {
+    // Set viewport size to ensure desktop layout (Hero actions visible)
+    await page.setViewportSize({ width: 1280, height: 720 });
+
     // Seed normal test data
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -106,7 +113,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077/play');
     await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
     await page.waitForTimeout(100);
-    const endButton = page.getByTestId('game-session-end-story');
+    const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
     await expect(endButton).toBeVisible();
     await expect(endButton).toBeEnabled();
@@ -137,12 +144,16 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-tragic.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-tragic.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
   test('EndingScreen - Mysterious ending should render consistently', async ({ page }) => {
+    // Set viewport size to ensure desktop layout (Hero actions visible)
+    await page.setViewportSize({ width: 1280, height: 720 });
+
     // Seed normal test data
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -157,7 +168,7 @@ test.describe('EndingScreen Visual Tests', () => {
           data: {
             epilogue: 'As the network quiets, a new signal whispers from the shadows. The story ends—or perhaps begins again.',
             characterLegacy: 'Some say you vanished into the code itself; others claim you walk the alleys still.',
-            worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city’s fate.',
+            worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city\'s fate.',
             tone: 'mysterious',
             achievements: ['Ghost In The Wires', 'Whispers of the Grid'],
             playTime: 456
@@ -170,7 +181,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077/play');
     await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
     await page.waitForTimeout(100);
-    const endButton = page.getByTestId('game-session-end-story');
+    const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
     await expect(endButton).toBeVisible();
     await expect(endButton).toBeEnabled();
@@ -200,12 +211,16 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-mysterious.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-mysterious.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 
   test('EndingScreen - Hopeful ending should render consistently', async ({ page }) => {
+    // Set viewport size to ensure desktop layout (Hero actions visible)
+    await page.setViewportSize({ width: 1280, height: 720 });
+
     // Seed normal test data
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -233,7 +248,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077/play');
     await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
     await page.waitForTimeout(100);
-    const endButton = page.getByTestId('game-session-end-story');
+    const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
     await expect(endButton).toBeVisible();
     await expect(endButton).toBeEnabled();
@@ -262,8 +277,9 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
-    await expect(page).toHaveScreenshot('ending-screen-hopeful.png', { 
-      threshold: 0.05
+    await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {
+      threshold: 0.05,
+      fullPage: true
     });
   });
 });

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { safeTrim } from '@/lib/utils';
 
 
@@ -346,65 +347,62 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         </div>
       )}
       
-      {/* Label for suggested actions */}
       {allOptions.length > 0 && (
-        <div className="mb-2">
-          <span className="text-sm font-medium text-gray-700">Or try a suggested action:</span>
-        </div>
-      )}
-      
-      {/* Regular choice options */}
-      <div 
-        className="space-y-2" 
-        role="radiogroup" 
-        aria-labelledby="choices-heading"
-      >
-        {allOptions.map((option) => (
-          <Button
-            key={option.id}
-            data-testid={`choice-option-${option.id}`}
-            variant="ghost"
-            className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
-              option.isSelected
-                ? 'bg-blue-100 border-blue-500 font-bold'
-                : getAlignmentClasses(option.alignment, isDisabled)
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-            onClick={() => handleOptionSelect(option.id)}
-            disabled={isDisabled}
-            aria-checked={option.isSelected}
-            role="radio"
+        <CollapsibleSection title="Suggested Actions" initialCollapsed={true}>
+          {/* Regular choice options */}
+          <div 
+            className="space-y-2" 
+            role="radiogroup" 
+            aria-labelledby="choices-heading"
           >
-            <div className="flex items-start gap-2">
-              {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
-              {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
-              )}
-              <span className="flex-1">{option.text}</span>
-            </div>
-            {showHints && option.hint && (
-              <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
-            )}
-            {option.skillRequirements && option.skillRequirements.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {option.skillRequirements.map((skillReq, index) => {
-                  const operatorSuffix = skillReq.requirement?.operator === 'gte' ? '+' : '';
-                  const label = `${skillReq.skillName} ${skillReq.requirement?.value}${operatorSuffix}`;
-                  const variant = skillReq.isAvailable ? 'available' : 'unavailable';
-                  
-                  return (
-                    <Badge
-                      key={`${option.id}-skill-${index}`}
-                      variant={variant}
-                    >
-                      {label}
-                    </Badge>
-                  );
-                })}
-              </div>
-            )}
-          </Button>
-        ))}
-      </div>
+            {allOptions.map((option) => (
+              <Button
+                key={option.id}
+                data-testid={`choice-option-${option.id}`}
+                variant="ghost"
+                className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
+                  option.isSelected
+                    ? 'bg-blue-100 border-blue-500 font-bold'
+                    : getAlignmentClasses(option.alignment, isDisabled)
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={() => handleOptionSelect(option.id)}
+                disabled={isDisabled}
+                aria-checked={option.isSelected}
+                role="radio"
+              >
+                <div className="flex items-start gap-2">
+                  {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
+                  {!option.isSelected && getAlignmentIcon(option.alignment) && (
+                    <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
+                  )}
+                  <span className="flex-1">{option.text}</span>
+                </div>
+                {showHints && option.hint && (
+                  <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
+                )}
+                {option.skillRequirements && option.skillRequirements.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {option.skillRequirements.map((skillReq, index) => {
+                      const operatorSuffix = skillReq.requirement?.operator === 'gte' ? '+' : '';
+                      const label = `${skillReq.skillName} ${skillReq.requirement?.value}${operatorSuffix}`;
+                      const variant = skillReq.isAvailable ? 'available' : 'unavailable';
+                      
+                      return (
+                        <Badge
+                          key={`${option.id}-skill-${index}`}
+                          variant={variant}
+                        >
+                          {label}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+              </Button>
+            ))}
+          </div>
+        </CollapsibleSection>
+      )}
     </div>
   );
 };

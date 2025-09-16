@@ -172,7 +172,7 @@ const withEndingState = (ending: StoryEnding) => {
     return () => {
       global.fetch = originalFetch;
     };
-  }, []);
+  }, [originalFetch]);
 
   return <Story />;
 };

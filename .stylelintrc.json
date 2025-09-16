@@ -39,10 +39,15 @@
   },
   "ignoreFiles": [
     "node_modules/**/*",
-    "dist/**/*", 
+    "dist/**/*",
     "build/**/*",
     ".next/**/*",
     "storybook-static/**/*",
-    ".storybook/**/*"
+    ".storybook/**/*",
+    "playwright-html-report/**/*",
+    "**/trace/**/*",
+    "coverage/**/*",
+    "**/*.test.css",
+    "**/*.spec.css"
   ]
 }

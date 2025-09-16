@@ -22,7 +22,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   if (isLoading) {
     return (
       <div className="p-8 snap-center">
-        <LoadingState message="Writing your story..." theme="dark" />
+        <LoadingState message="Writing your story..." theme="light" />
       </div>
     );
   }

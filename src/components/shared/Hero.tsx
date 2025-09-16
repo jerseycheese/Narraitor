@@ -23,6 +23,8 @@ interface HeroProps {
   theme?: 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other' | 'default';
   /** Border radius style - 'all' for all corners, 'top' for top only, 'none' for no radius */
   borderRadius?: 'all' | 'top' | 'none';
+  /** Optional actions to render anchored at bottom-right of the hero */
+  actions?: React.ReactNode;
 }
 
 /**
@@ -68,6 +70,7 @@ export const Hero: React.FC<HeroProps> = ({
   titleElement: TitleElement = 'h1',
   theme = 'default',
   borderRadius = 'all',
+  actions,
 }) => {
   // Genre-based background gradients using design system colors only
   const getThemeBackground = (theme: string) => {
@@ -147,6 +150,12 @@ export const Hero: React.FC<HeroProps> = ({
           {badge && <div className="mt-2">{badge}</div>}
         </div>
       </div>
+
+      {actions && (
+        <div className="absolute bottom-4 right-4">
+          {actions}
+        </div>
+      )}
     </div>
   );
 };

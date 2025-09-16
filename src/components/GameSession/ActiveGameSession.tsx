@@ -19,7 +19,6 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
-import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -146,6 +145,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       window.removeEventListener('resize', syncHeights);
     };
   }, [currentDecision, choices, isGeneratingChoices]);
+  
+  // No viewport calculations needed; rely on flex layout with internal scroll
   
   
   // Initialize the narrative only once per session
@@ -613,6 +614,39 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     handleEndStory();
   };
 
+  // Global event handlers to support hero action buttons from parent pages
+  React.useEffect(() => {
+    const onEndStory = () => handleEndStoryClick();
+    const onEndSession = () => { if (onEnd) onEnd(); };
+    const onNewSession = async () => {
+      const sessionStore = useSessionStore.getState();
+      const narrativeStore = useNarrativeStore.getState();
+      narrativeStore.clearSessionSegments(sessionId);
+      narrativeStore.clearSessionDecisions(sessionId);
+      narrativeStore.clearEnding();
+      sessionStore.endSession();
+      Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
+        const savedSession = sessionStore.savedSessions[savedSessionId];
+        if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
+          sessionStore.deleteSavedSession(savedSessionId);
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const url = new URL(window.location.href);
+      url.searchParams.set('fresh', 'true');
+      window.location.href = url.toString();
+    };
+
+    window.addEventListener('narraitor:end-story', onEndStory as EventListener);
+    window.addEventListener('narraitor:end-session', onEndSession as EventListener);
+    window.addEventListener('narraitor:new-session', onNewSession as EventListener);
+    return () => {
+      window.removeEventListener('narraitor:end-story', onEndStory as EventListener);
+      window.removeEventListener('narraitor:end-session', onEndSession as EventListener);
+      window.removeEventListener('narraitor:new-session', onNewSession as EventListener);
+    };
+  }, [sessionId, worldId, characterId, onEnd]);
+
   // If we have an ending, show the ending screen instead
   if (currentEnding) {
     return <EndingScreen />;
@@ -628,18 +662,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }
 
   return (
-    <div data-testid="game-session-active" role="region" aria-label="Game session">
-      {/* Character Summary Panel */}
-      {character && (
-        <div className="mb-6">
-          <CharacterSummary character={character} />
-        </div>
-      )}
+    <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
       
       {/* Two-column layout for larger screens */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0">
         {/* Story Column */}
-        <div className="lg:flex-1" id="narrative-container">
+        <div className="lg:flex-1 min-h-0 overflow-auto" id="narrative-container">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
@@ -666,7 +694,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
 
         {/* Choices Column */}
-        <div className="lg:flex-1" id="choices-container">
+        <div className="lg:flex-1 min-h-0 overflow-auto" id="choices-container">
           {/* Show AI-generated choices, loading state, or fallback */}
           {currentDecision ? (
             <div className="player-choices-container">
@@ -682,7 +710,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : isGeneratingChoices ? (
             <div className="player-choices-container">
-              <LoadingState message="Thinking up some options..." />
+              <LoadingState message="Thinking..." />
             </div>
           ) : choices && choices.length > 0 ? (
             <div className="player-choices-container">
@@ -710,71 +738,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               />
             </div>
           )}
+
+          {/* Session control buttons now live in the Hero actions slot */}
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
-        {/* Session Control Buttons */}
-        {onEnd && (
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button
-              data-testid="game-session-new"
-              variant="default"
-              className="w-full sm:w-auto"
-              onClick={async () => {
-                // Force a completely fresh start by clearing everything
-                const sessionStore = useSessionStore.getState();
-                const narrativeStore = useNarrativeStore.getState();
-                
-                // Clear all narrative data for this session
-                narrativeStore.clearSessionSegments(sessionId);
-                narrativeStore.clearSessionDecisions(sessionId);
-                narrativeStore.clearEnding();
-                
-                // End the current session first
-                await sessionStore.endSession();
-                
-                // THEN clear all saved sessions for this world/character combination
-                // This must happen after endSession() to prevent the session from being re-saved
-                Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
-                  const savedSession = sessionStore.savedSessions[savedSessionId];
-                  if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
-                    sessionStore.deleteSavedSession(savedSessionId);
-                  }
-                });
-                
-                // Wait a moment for the deletion to persist to storage
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // Navigate with a fresh parameter to signal a new session
-                const url = new URL(window.location.href);
-                url.searchParams.set('fresh', 'true');
-                window.location.href = url.toString();
-              }}
-            >
-              Start New Session
-            </Button>
-            <Button
-              data-testid="game-session-end-story"
-              variant="secondary"
-              className="w-full sm:w-auto bg-blue-700 hover:bg-blue-700 text-white"
-              onClick={handleEndStoryClick}
-              disabled={isGeneratingEnding || isSessionEnded(sessionId)}
-              title="End your story with an AI-generated epilogue"
-            >
-              {isGeneratingEnding ? 'Generating...' : 'End Story'}
-            </Button>
-            <Button
-              data-testid="game-session-end"
-              variant="destructive"
-              className="w-full sm:w-auto"
-              onClick={onEnd}
-            >
-              End Session
-            </Button>
-          </div>
-        )}
-      </div>
+      {/* Character Summary Panel below hero */}
+      {character && (
+        <div className="mt-6">
+          <CharacterSummary character={character} />
+        </div>
+      )}
 
       {/* Ending Suggestion Dialog */}
       <StoryEndingDialog

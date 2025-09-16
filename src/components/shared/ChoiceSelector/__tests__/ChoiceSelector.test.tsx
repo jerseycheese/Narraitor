@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
@@ -35,6 +35,14 @@ describe('ChoiceSelector', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  // Expand the Suggested Actions collapsible if it's present
+  const expandSuggestions = () => {
+    const toggle = screen.queryByLabelText(/Expand Suggested Actions/i);
+    if (toggle) {
+      fireEvent.click(toggle);
+    }
+  };
 
   const simpleChoices: SimpleChoice[] = [
     { id: 'choice-1', text: 'Go north' },
@@ -92,6 +100,7 @@ describe('ChoiceSelector', () => {
     it('displays all choices and handles selection', async () => {
       const user = userEvent.setup();
       render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
+      expandSuggestions();
       
       // All choices should be visible
       expect(screen.getByText('Go north')).toBeInTheDocument();
@@ -105,6 +114,7 @@ describe('ChoiceSelector', () => {
 
     it('displays decisions with hints when enabled', () => {
       render(<ChoiceSelector decision={decision} onSelect={mockOnSelect} showHints />);
+      expandSuggestions();
       
       expect(screen.getByText('Attack')).toBeInTheDocument();
       expect(screen.getByText('Requires courage')).toBeInTheDocument();
@@ -123,6 +133,7 @@ describe('ChoiceSelector', () => {
           onCustomSubmit={mockOnCustomSubmit}
         />
       );
+      expandSuggestions();
       
       expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
     });
@@ -137,6 +148,7 @@ describe('ChoiceSelector', () => {
           onCustomSubmit={mockOnCustomSubmit}
         />
       );
+      expandSuggestions();
       
       const input = screen.getByPlaceholderText('Type your custom response...');
       await user.type(input, 'Custom action');
@@ -155,6 +167,7 @@ describe('ChoiceSelector', () => {
           character={mockCharacter}
         />
       );
+      expandSuggestions();
       
       // Stealth option should show as unavailable (character has level 3, needs 5)
       expect(screen.getByText('Sneak past')).toBeInTheDocument();
@@ -175,6 +188,7 @@ describe('ChoiceSelector', () => {
           character={mockCharacter}
         />
       );
+      expandSuggestions();
       
       // Should be able to select intimidation option (character meets requirement)
       await user.click(screen.getByText('Intimidate the guard'));
@@ -190,6 +204,7 @@ describe('ChoiceSelector', () => {
           onSelect={mockOnSelect}
         />
       );
+      expandSuggestions();
       
       // Component should render even when loading
       expect(screen.getByText('Go north')).toBeInTheDocument();
@@ -203,6 +218,7 @@ describe('ChoiceSelector', () => {
           onSelect={mockOnSelect}
         />
       );
+      expandSuggestions();
       
       // Try to click - component should handle loading state appropriately
       try {
@@ -241,6 +257,7 @@ describe('ChoiceSelector', () => {
           character={mockCharacter}
         />
       );
+      expandSuggestions();
       
       // Should display the choice text
       expect(screen.getByText('Sneak past')).toBeInTheDocument();

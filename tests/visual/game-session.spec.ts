@@ -215,10 +215,15 @@ test.describe('Game Session Visual Tests', () => {
                 <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3" disabled>Submit</button>
               </div>
             </div>
-            <div class="mb-2">
-              <span class="text-sm font-medium text-gray-700">Or try a suggested action:</span>
-            </div>
-            <div class="space-y-2" role="radiogroup" aria-labelledby="choices-heading">
+            <!-- Suggested Actions Collapsible Section (Expanded for VR test) -->
+            <div data-testid="collapsible-section" class="component-collapsible-section w-full border border-border rounded-md mb-3 bg-card shadow-sm" role="region" aria-labelledby="section-title-suggested-actions">
+              <button data-testid="collapsible-section-toggle" class="w-full flex items-center justify-between p-4 text-left bg-background hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-t-md" aria-expanded="true" aria-controls="section-content-suggested-actions">
+                <h3 class="text-base font-medium" id="section-title-suggested-actions">Suggested Actions</h3>
+                <span class="text-sm font-mono ml-2 transition-transform duration-200 rotate-90" aria-hidden="true">▶</span>
+              </button>
+              <div data-testid="collapsible-section-content" id="section-content-suggested-actions" class="border-t border-border">
+                <div class="p-4">
+                  <div class="space-y-2" role="radiogroup" aria-labelledby="choices-heading">
               <button class="block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal bg-white border-gray-300 hover:bg-gray-100 cursor-pointer" role="radio" aria-checked="false">
                 <div class="flex items-start gap-2">
                   <span class="flex-1">Hack into the security system directly</span>
@@ -258,6 +263,9 @@ test.describe('Game Session Visual Tests', () => {
                   </div>
                 </div>
               </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         `;

@@ -46,7 +46,7 @@ export const CollapsibleSection = ({
   return (
     <div 
       data-testid="collapsible-section" 
-      className={`component-collapsible-section border border-border rounded-md mb-3 bg-card shadow-sm ${className}`}
+      className={`component-collapsible-section w-full border border-border rounded-md mb-3 bg-card shadow-sm ${className}`}
       role="region"
       aria-labelledby={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
