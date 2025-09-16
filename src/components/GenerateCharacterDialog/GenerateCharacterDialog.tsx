@@ -40,10 +40,10 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
       onClose={onClose}
       title="Generate Character"
       showCloseButton={false}
-      size="md"
-      className="max-w-md"
+      size="xl"
+      ariaDescribedBy="generate-character-desc"
     >
-      <p className="text-sm text-gray-700 mb-6">
+      <p id="generate-character-desc" className="text-sm text-gray-700 mb-6">
         Choose the type of character you want to generate for your story.
       </p>
         

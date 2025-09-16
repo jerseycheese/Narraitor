@@ -164,8 +164,8 @@ export default function AttributeEditorTestPage() {
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)}
         title="Create Attribute"
-        size="lg"
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
       >
         <div className="mb-4 text-sm text-muted-foreground">
           Create a new custom attribute for this test world.
@@ -185,8 +185,8 @@ export default function AttributeEditorTestPage() {
         isOpen={!!editingAttribute} 
         onClose={() => setEditingAttribute(null)}
         title="Edit Attribute"
-        size="lg"
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
       >
         <div className="mb-4 text-sm text-muted-foreground">
           Modify the details of this test attribute.

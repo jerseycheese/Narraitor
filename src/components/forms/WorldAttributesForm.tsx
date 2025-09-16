@@ -205,8 +205,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)}
         title="Create Attribute"
-        size="lg"
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
       >
         <div className="mb-4 text-sm text-muted-foreground">
           Create a new custom attribute for this world.
@@ -227,8 +227,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         isOpen={!!editingAttribute} 
         onClose={() => setEditingAttribute(null)}
         title="Edit Attribute"
-        size="lg"
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
       >
         <div className="mb-4 text-sm text-muted-foreground">
           Modify the details of this world attribute.

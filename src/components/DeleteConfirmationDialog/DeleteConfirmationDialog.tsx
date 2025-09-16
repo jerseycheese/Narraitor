@@ -31,15 +31,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       onClose={onClose}
       title={title}
       showCloseButton={false}
-      size="md"
-      className="component-delete-confirmation-dialog max-w-md"
+      size="lg"
+      ariaDescribedBy="delete-confirmation-desc"
+      className="component-delete-confirmation-dialog"
     >
       <div className="mb-6">
-        <p className="mb-2 text-sm text-gray-700">{description}</p>
+        <p id="delete-confirmation-desc" className="mb-2 text-sm text-gray-700">{description}</p>
         <p className="font-medium text-foreground">{itemName}</p>
       </div>
       
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
           <Button
             type="button"
             onClick={onClose}

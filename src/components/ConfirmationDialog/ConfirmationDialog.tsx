@@ -71,13 +71,13 @@ export function ConfirmationDialog({
       onClose={onClose}
       title={title || "Confirmation Required"}
       showCloseButton={false}
-      size="md"
+      size="lg"
       className={cn(
-        'component-confirmation-dialog max-w-md sm:rounded-lg',
+        'component-confirmation-dialog sm:rounded-lg',
         variantClasses[variant]
       )}
     >
-      <div className="text-sm text-gray-700 mb-6">
+      <div className="text-sm text-gray-700 mb-6" id="confirmation-dialog-desc">
         {typeof message === 'string' ? (
           message
         ) : (
@@ -85,7 +85,7 @@ export function ConfirmationDialog({
         )}
       </div>
       
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6">
         <Button
           ref={cancelButtonRef}
           onClick={onClose}
