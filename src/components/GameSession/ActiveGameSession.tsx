@@ -59,7 +59,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Game readiness state for coordinated loading
-  const [isNarrativeStabilized, setIsNarrativeStabilized] = React.useState(false);
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   
   // Ending suggestion state
@@ -122,10 +121,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Track previous height to retain during loading states
   const previousHeightRef = React.useRef<number>(0);
 
+  // Stable callback for onStabilized
+  const handleStabilized = React.useCallback(() => {}, []);
+
   // Debug: log key state changes to help diagnose skeleton readiness
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
-    // eslint-disable-next-line no-console
     console.log('[ActiveGameSession]', {
       sessionId,
       worldId,
@@ -494,7 +495,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Narrative segment was successfully generated
     setIsGenerating(false);
     setShouldTriggerGeneration(false); // Reset trigger
-    setIsNarrativeStabilized(false); // Reset narrative stabilization
     // Start generating choices
     setIsGeneratingChoices(true);
     
@@ -789,7 +789,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
             sessionId={sessionId}
-            onStabilized={() => setIsNarrativeStabilized(true)}
+            onStabilized={handleStabilized}
           />
 
           {/* Hidden controller just to generate content - always include it but hide from view */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
@@ -57,7 +57,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Load existing segments on mount and reset state when session changes
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
       console.log('[NarrativeController] mount', { sessionId, worldId, characterId });
     }
     // Create a unique session key to track this instance
@@ -113,7 +112,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
-  }, [sessionId, getSessionSegments]);
+  }, [sessionId, worldId, characterId, generateChoices, getSessionSegments]);
 
   /**
    * Pure AI-based ending detection - analyzes narrative context for natural conclusions
@@ -288,7 +287,6 @@ Respond with JSON format:
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
         console.log('[NarrativeController] triggerGeneration', { triggerGeneration, choiceId, segments: segments.length, initialGenerationCompleted });
       }
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
@@ -322,9 +320,8 @@ Respond with JSON format:
   /**
    * Generate player choices based on current narrative context
    */
-  const generatePlayerChoices = async () => {
+  const generatePlayerChoices = useCallback(async () => {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
       console.log('[NarrativeController] generatePlayerChoices:start');
     }
     if (!mountedRef.current) {
@@ -433,7 +430,6 @@ Respond with JSON format:
             const decisionCopy = JSON.parse(JSON.stringify(decision));
             onChoicesGenerated(decisionCopy);
             if (process.env.NODE_ENV !== 'production') {
-              // eslint-disable-next-line no-console
               console.log('[NarrativeController] onChoicesGenerated (AI)');
             }
           } catch (error) {
@@ -480,7 +476,6 @@ Respond with JSON format:
             const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
             onChoicesGenerated(decisionCopy);
             if (process.env.NODE_ENV !== 'production') {
-              // eslint-disable-next-line no-console
               console.log('[NarrativeController] onChoicesGenerated (fallback)');
             }
           }
@@ -494,11 +489,10 @@ Respond with JSON format:
         setIsGeneratingChoices(false);
       }
     }
-  };
+  }, [sessionId, worldId, onChoicesGenerated, narrativeGenerator]);
 
   const generateInitialNarrative = async () => {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
       console.log('[NarrativeController] generateInitialNarrative:start');
     }
     
@@ -574,7 +568,6 @@ Respond with JSON format:
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
         if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
           console.log('[NarrativeController] onNarrativeGenerated (initial)');
         }
       }
@@ -594,7 +587,6 @@ Respond with JSON format:
       // Error generating initial narrative — create a graceful fallback segment
       try {
         if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
           console.log('[NarrativeController] generateInitialNarrative:error', e instanceof Error ? e.message : String(e));
         }
         const now = new Date();
@@ -629,7 +621,6 @@ Respond with JSON format:
         if (onNarrativeGenerated) {
           onNarrativeGenerated(fallbackSegment);
           if (process.env.NODE_ENV !== 'production') {
-            // eslint-disable-next-line no-console
             console.log('[NarrativeController] onNarrativeGenerated (fallback)');
           }
         }
@@ -738,7 +729,6 @@ Respond with JSON format:
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
         if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
           console.log('[NarrativeController] onNarrativeGenerated (choice)');
         }
       }

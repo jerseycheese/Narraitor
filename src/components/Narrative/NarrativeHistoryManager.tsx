@@ -125,7 +125,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     return () => {
       clearTimeout(stabilizeTimer);
     };
-  }, [sessionId, segments.length]);
+  }, [sessionId, segments.length, onStabilized]);
   
   // Reset stabilized state when session changes
   useEffect(() => {
