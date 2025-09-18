@@ -30,42 +30,48 @@ const sampleSkills = [
     characterId: 'char-1',
     name: 'Swordsmanship',
     level: 3,
-    category: 'combat'
+    category: 'combat',
+    description: 'The art of wielding bladed weapons with precision and skill'
   },
   {
     id: 'skill-2',
     characterId: 'char-1',
     name: 'Stealth',
     level: 2,
-    category: 'agility'
+    category: 'agility',
+    description: 'Moving unseen and unheard through shadows and crowds'
   },
   {
     id: 'skill-3',
     characterId: 'char-1',
     name: 'Persuasion',
     level: 4,
-    category: 'social'
+    category: 'social',
+    description: 'The ability to convince others through charm and reasoning'
   },
   {
     id: 'skill-4',
     characterId: 'char-1',
     name: 'Archery',
     level: 5,
-    category: 'combat'
+    category: 'combat',
+    description: 'Expert marksmanship with bow and arrow'
   },
   {
     id: 'skill-5',
     characterId: 'char-1',
     name: 'Lockpicking',
     level: 1,
-    category: 'agility'
+    category: 'agility',
+    description: 'Opening locks without the proper key using tools and finesse'
   },
   {
     id: 'skill-6',
     characterId: 'char-1',
     name: 'History',
     level: 3,
-    category: 'knowledge'
+    category: 'knowledge',
+    description: 'Knowledge of past events, cultures, and civilizations'
   }
 ];
 
@@ -91,21 +97,24 @@ export const VariedLevels: Story = {
         characterId: 'char-1',
         name: 'Master Swordsmanship',
         level: 5,
-        category: 'combat'
+        category: 'combat',
+        description: 'Legendary proficiency with bladed weapons, capable of defeating multiple opponents'
       },
       {
         id: 'skill-2',
         characterId: 'char-1',
         name: 'Novice Stealth',
         level: 1,
-        category: 'agility'
+        category: 'agility',
+        description: 'Basic ability to move quietly and avoid detection'
       },
       {
         id: 'skill-3',
         characterId: 'char-1',
         name: 'Expert Negotiation',
         level: 4,
-        category: 'social'
+        category: 'social',
+        description: 'Advanced diplomatic skills for resolving conflicts and striking deals'
       }
     ],
     showCategories: false

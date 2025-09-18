@@ -56,6 +56,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   // Load existing segments on mount and reset state when session changes
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('[NarrativeController] mount', { sessionId, worldId, characterId });
+    }
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -86,6 +90,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
     // Set mounted flag
     mountedRef.current = true;
+
+    // If we already have narrative content (e.g., injected by a bootstrap/safety net)
+    // and we haven't produced any decisions yet, proactively generate choices so the
+    // UI can progress without waiting for another narrative generation.
+    try {
+      const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
+      if (generateChoices && existingSegments.length > 0 && existingDecisions.length === 0) {
+        setTimeout(() => {
+          if (mountedRef.current) {
+            generatePlayerChoices();
+          }
+        }, 300);
+      }
+    } catch {
+      // Non-critical; continue
+    }
     
     return () => {
       // Clear mounted flag when component unmounts
@@ -267,6 +287,10 @@ Respond with JSON format:
     
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[NarrativeController] triggerGeneration', { triggerGeneration, choiceId, segments: segments.length, initialGenerationCompleted });
+      }
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
       if (segments.length === 0 && !initialGenerationCompleted && !initialGenerationInitiated.current) {
         // Set both state and refs to prevent duplicate generation
@@ -299,6 +323,10 @@ Respond with JSON format:
    * Generate player choices based on current narrative context
    */
   const generatePlayerChoices = async () => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('[NarrativeController] generatePlayerChoices:start');
+    }
     if (!mountedRef.current) {
       return;
     }
@@ -404,6 +432,10 @@ Respond with JSON format:
             // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = JSON.parse(JSON.stringify(decision));
             onChoicesGenerated(decisionCopy);
+            if (process.env.NODE_ENV !== 'production') {
+              // eslint-disable-next-line no-console
+              console.log('[NarrativeController] onChoicesGenerated (AI)');
+            }
           } catch (error) {
             console.error('Error calling onChoicesGenerated callback:', error);
           }
@@ -447,6 +479,10 @@ Respond with JSON format:
           if (onChoicesGenerated && mountedRef.current) {
             const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
             onChoicesGenerated(decisionCopy);
+            if (process.env.NODE_ENV !== 'production') {
+              // eslint-disable-next-line no-console
+              console.log('[NarrativeController] onChoicesGenerated (fallback)');
+            }
           }
         }
       } catch {
@@ -461,6 +497,10 @@ Respond with JSON format:
   };
 
   const generateInitialNarrative = async () => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('[NarrativeController] generateInitialNarrative:start');
+    }
     
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
@@ -479,7 +519,16 @@ Respond with JSON format:
     setError(null);
     
     try {
-      const result = await narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []);
+      // Race AI generation with a timeout so we can fallback gracefully
+      // Allow more time for first-call cold-starts and slower generation
+      const timeoutMs = 15000;
+      const timeoutPromise = new Promise<ReturnType<typeof narrativeGenerator.generateInitialScene>>((_, reject) => {
+        setTimeout(() => reject(new Error(`Initial generation timed out after ${timeoutMs}ms`)), timeoutMs);
+      });
+      const result = await Promise.race([
+        narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []),
+        timeoutPromise as unknown as Promise<ReturnType<typeof narrativeGenerator.generateInitialScene>>,
+      ]);
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
@@ -524,6 +573,10 @@ Respond with JSON format:
       
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log('[NarrativeController] onNarrativeGenerated (initial)');
+        }
       }
       
       // Check for ending indicators
@@ -537,9 +590,60 @@ Respond with JSON format:
           generatePlayerChoices();
         }, 500); // Reduced timeout since we're not showing immediate choices
       }
-    } catch {
-      // Error generating narrative
-      setError('Unable to generate narrative. Please check your connection and try again.');
+    } catch (e) {
+      // Error generating initial narrative — create a graceful fallback segment
+      try {
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log('[NarrativeController] generateInitialNarrative:error', e instanceof Error ? e.message : String(e));
+        }
+        const now = new Date();
+        const segmentId = `seg-${worldId}-fallback-${Date.now()}`;
+        const fallbackSegment: NarrativeSegment = {
+          id: segmentId,
+          content: 'The adventure begins. You find yourself at the edge of a new journey. What will you do next?',
+          type: 'scene',
+          metadata: {
+            location: 'Starting Location',
+            tags: ['intro', 'fallback']
+          },
+          sessionId,
+          worldId,
+          timestamp: now,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString()
+        };
+
+        // Add locally and to the store to unblock the UI
+        setSegments(prev => [...prev, fallbackSegment]);
+        addSegment(sessionId, {
+          content: fallbackSegment.content,
+          type: fallbackSegment.type,
+          characterIds: [],
+          metadata: fallbackSegment.metadata,
+          updatedAt: fallbackSegment.updatedAt,
+          timestamp: fallbackSegment.timestamp
+        });
+
+        // Notify parent so it can progress to choices skeleton + generation
+        if (onNarrativeGenerated) {
+          onNarrativeGenerated(fallbackSegment);
+          if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.log('[NarrativeController] onNarrativeGenerated (fallback)');
+          }
+        }
+
+        // Kick off choice generation (will provide AI or fallback choices)
+        if (generateChoices) {
+          setTimeout(() => {
+            generatePlayerChoices();
+          }, 500);
+        }
+      } catch {
+        // Surface the original error if fallback insert also fails
+        setError('Unable to generate narrative. Please check your connection and try again.');
+      }
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -633,6 +737,10 @@ Respond with JSON format:
       
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log('[NarrativeController] onNarrativeGenerated (choice)');
+        }
       }
       
       // Check for ending indicators

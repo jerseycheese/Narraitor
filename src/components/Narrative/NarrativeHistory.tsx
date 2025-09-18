@@ -56,6 +56,23 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     prevSegmentCountRef.current = segments.length;
   }, [segments.length]);
 
+  // Auto-scroll to bottom on initial load for existing sessions
+  useEffect(() => {
+    if (segments.length > 0 && scrollViewportRef.current && !isLoading) {
+      // Use a small delay to ensure content is rendered
+      const scrollTimer = setTimeout(() => {
+        if (scrollViewportRef.current) {
+          scrollViewportRef.current.scrollTo({
+            top: scrollViewportRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [segments.length, isLoading]);
+
   // Keyboard navigation handler with snap-to-center behavior
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (!scrollViewportRef.current) return;

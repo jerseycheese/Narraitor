@@ -19,6 +19,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
+import { GameSessionSkeleton } from './GameSessionSkeleton';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -56,6 +57,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Game readiness state for coordinated loading
+  const [isNarrativeStabilized, setIsNarrativeStabilized] = React.useState(false);
+  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   
   // Ending suggestion state
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
@@ -88,8 +93,27 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
-  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  
+
+  // Reactively track segment count using a stable snapshot to avoid infinite loops.
+  // Selecting derived arrays from Zustand can cause non-cached snapshots.
+  const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
+
+  const hasExistingNarrative = segmentCount > 0;
+
+  // Simple computed state - game is ready when we have content and are not in loading states
+  // For sessions with existing narrative, we need either a current decision OR actual choices
+  // Don't show interface if we only have fallback choices (indicates failed AI generation)
+  const hasValidChoices = currentDecision || (choices && choices.length > 0);
+
+  // Game is ready when:
+  // 1. We're initialized
+  // 2. We have narrative content OR we're not generating narrative
+  // 3. We have valid choices OR we're still generating choices (don't show broken state)
+  // Consider the game ready as soon as we have narrative content.
+  // Choices may still be generating; the active layout will render
+  // and the choices column will populate when ready.
+  const isGameReady = initialized && hasExistingNarrative;
+
   // Get journal store for auto-creating entries
   const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
@@ -97,6 +121,65 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Track previous height to retain during loading states
   const previousHeightRef = React.useRef<number>(0);
+
+  // Debug: log key state changes to help diagnose skeleton readiness
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    // eslint-disable-next-line no-console
+    console.log('[ActiveGameSession]', {
+      sessionId,
+      worldId,
+      initialized,
+      segments: segmentCount,
+      isGenerating,
+      isGeneratingChoices,
+      hasValidChoices: !!hasValidChoices,
+      isGameReady,
+    });
+  }, [sessionId, worldId, initialized, segmentCount, isGenerating, isGeneratingChoices, hasValidChoices, isGameReady]);
+
+  // Safety net: if no narrative segment arrives within a reasonable window,
+  // inject a minimal fallback scene so the UI can progress.
+  // Only trigger if we're not actively generating content.
+  React.useEffect(() => {
+    if (!initialized) return;
+    if (segmentCount > 0) return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      if (cancelled) return;
+      // Don't inject fallback if AI generation is still in progress
+      if (isGenerating) return;
+
+      try {
+        const now = new Date();
+        const fallback: NarrativeSegment = {
+          id: `seg-${sessionId}-bootstrap-${now.getTime()}`,
+          content: 'You take a breath as your adventure begins. The world awaits your first move.',
+          type: 'scene',
+          metadata: { location: 'Starting Location', tags: ['intro', 'bootstrap'] },
+          sessionId,
+          worldId,
+          timestamp: now,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+        } as NarrativeSegment;
+        // Add to store only; NarrativeHistoryManager reads from store
+        useNarrativeStore.getState().addSegment(sessionId, {
+          content: fallback.content,
+          type: fallback.type,
+          characterIds: [],
+          metadata: fallback.metadata,
+          updatedAt: fallback.updatedAt,
+          timestamp: fallback.timestamp,
+        });
+        // Begin generating choices after bootstrap
+        setIsGeneratingChoices(true);
+      } catch {
+        // Ignore errors; controller may be mid-flight
+      }
+    }, 4000); // Increased timeout to 4 seconds to give AI more time
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [initialized, segmentCount, sessionId, worldId, isGenerating]);
   
   // Sync narrative height with choices height
   React.useEffect(() => {
@@ -189,6 +272,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           // Don't clear existing narrative history
           setInitialized(true);
           setIsGenerating(false);
+          // Choice generation will be triggered by NarrativeController after narrative generation
         }
         else {
           // No segments at all - normal case for new session
@@ -410,6 +494,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Narrative segment was successfully generated
     setIsGenerating(false);
     setShouldTriggerGeneration(false); // Reset trigger
+    setIsNarrativeStabilized(false); // Reset narrative stabilization
     // Start generating choices
     setIsGeneratingChoices(true);
     
@@ -455,7 +540,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     if (isSessionEnded(sessionId)) {
       return;
     }
-    
+
     // Player choice was selected
     setIsGenerating(true);
     setIsGeneratingChoices(true); // Start generating new choices
@@ -522,18 +607,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
-    
+
     if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
       setIsGeneratingChoices(false);
       return;
     }
-    
+
     // Clear the fallback timeout since we have real AI choices
     if (choiceGenerationTimeoutRef.current) {
       clearTimeout(choiceGenerationTimeoutRef.current);
       choiceGenerationTimeoutRef.current = null;
     }
-    
+
     // Force update with a new object reference to ensure React detects the change
     const decisionCopy: Decision = {
       id: decision.id,
@@ -543,7 +628,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       decisionWeight: decision.decisionWeight,
       contextSummary: decision.contextSummary,
     };
-    
+
     // Update the current decision state with the copy
     setCurrentDecision(decisionCopy);
     // Stop the choice generation loading state
@@ -661,21 +746,52 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     );
   }
 
+  // Show skeleton until the first narrative segment exists, but
+  // always mount the hidden NarrativeController to drive generation.
+  if (!isGameReady) {
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <GameSessionSkeleton />
+        {/* Hidden controller that actually performs generation while skeleton shows */}
+        <div aria-hidden="true" className="hidden h-0 overflow-hidden">
+          <NarrativeController
+            key={`generator-${controllerKey}`}
+            worldId={worldId}
+            sessionId={sessionId}
+            characterId={characterId || undefined}
+            triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
+            choiceId={localSelectedChoiceId || selectedChoiceId}
+            onNarrativeGenerated={handleNarrativeGenerated}
+            onChoicesGenerated={handleChoicesGenerated}
+            onEndingSuggested={handleEndingSuggested}
+            generateChoices={true}
+          />
+        </div>
+
+        {/* Character Summary Panel - show immediately when character data is available */}
+        {character && (
+          <div className="mt-6">
+            <CharacterSummary character={character} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
-      
+
       {/* Two-column layout for larger screens */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0">
         {/* Story Column */}
-        <div className="lg:flex-1 min-h-0 overflow-auto" id="narrative-container">
+        <div className="lg:flex-1 min-h-0 max-h-[600px] overflow-auto" id="narrative-container">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
             sessionId={sessionId}
+            onStabilized={() => setIsNarrativeStabilized(true)}
           />
-          
-          {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
-          
+
           {/* Hidden controller just to generate content - always include it but hide from view */}
           <div aria-hidden="true" className="hidden h-0 overflow-hidden">
             <NarrativeController
@@ -695,9 +811,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
         {/* Choices Column */}
         <div className="lg:flex-1 min-h-0 overflow-auto" id="choices-container">
-          {/* Show AI-generated choices, loading state, or fallback */}
-          {currentDecision ? (
-            <div className="player-choices-container">
+          <div className="player-choices-container">
+            {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
+            {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
               <ChoiceSelector
                 decision={currentDecision}
                 onSelect={handleChoiceSelected}
@@ -707,39 +823,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 character={character}
                 worldSkills={world?.skills || []}
               />
-            </div>
-          ) : isGeneratingChoices ? (
-            <div className="player-choices-container">
-              <LoadingState message="Thinking..." />
-            </div>
-          ) : choices && choices.length > 0 ? (
-            <div className="player-choices-container">
-              <ChoiceSelector
-                choices={choices}
-                onSelect={handleChoiceSelected}
-                onCustomSubmit={handleCustomSubmit}
-                enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                character={character}
-                worldSkills={world?.skills || []}
-              />
-            </div>
-          ) : (
-            <div className="player-choices-container">
-              <ChoiceSelector
-                choices={[]} // No predefined choices
-                prompt="What will you do?"
-                onSelect={handleChoiceSelected}
-                onCustomSubmit={handleCustomSubmit}
-                enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                character={character}
-                worldSkills={world?.skills || []}
-              />
-            </div>
-          )}
+            ) : (
+              <div className="space-y-4 p-4">
+                {/* Choice decision skeleton - matches ChoiceSelector layout */}
+                <div className="space-y-3">
+                  {/* Choice prompt skeleton */}
+                  <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
 
-          {/* Session control buttons now live in the Hero actions slot */}
+                  {/* Choice buttons skeleton */}
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="h-12 bg-gray-200 border border-gray-300 rounded-lg animate-pulse"
+                    />
+                  ))}
+
+                  {/* Custom input skeleton */}
+                  <div className="mt-4 space-y-2">
+                    <div className="h-4 bg-gray-300 rounded w-1/3 animate-pulse" />
+                    <div className="h-10 bg-gray-200 border border-gray-300 rounded animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

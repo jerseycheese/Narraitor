@@ -9,6 +9,7 @@ interface CharacterAttribute {
   baseValue: number;
   modifiedValue: number;
   category?: string;
+  description?: string;
 }
 
 interface CharacterAttributeDisplayProps {
@@ -41,7 +42,7 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
         {Object.entries(categorizedAttributes).map(([category, attrs]) => (
           <div key={category}>
             <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
-              {category} Attributes
+              {category}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {attrs.map((attr, index) => (
@@ -73,9 +74,12 @@ function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
         {attribute.modifiedValue}
       </div>
       {attribute.baseValue !== attribute.modifiedValue && (
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground mb-2">
           Base: {attribute.baseValue}
         </div>
+      )}
+      {attribute.description && (
+        <p className="text-xs text-muted-foreground">{attribute.description}</p>
       )}
     </div>
   );

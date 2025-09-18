@@ -358,9 +358,11 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  if (sessionState.status === 'loading') {
-    return <GameSessionLoading />;
-  }
+  // Treat 'loading' as an active session to allow the
+  // ActiveGameSession to show its coordinated skeleton and
+  // continue initialization even if the store is still 'loading'
+  // (fresh sessions should not be blocked by this gate).
+  // Previously this returned <GameSessionLoading /> and could get stuck.
   
   if (error || sessionState.error) {
     return (
@@ -372,18 +374,24 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  if (sessionState.status === 'active' || sessionState.status === 'paused') {
+  if (sessionState.status === 'active' || sessionState.status === 'paused' || sessionState.status === 'loading') {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('[GameSession] render ActiveGameSession', { status: sessionState.status, stableSessionId });
+    }
     // Use the new narrative integration component
     return (
       <ActiveGameSession
         worldId={worldId}
         sessionId={stableSessionId}
         world={world}
-        status={sessionState.status}
+        // Map 'loading' to 'active' to keep the UI enabled
+        status={sessionState.status === 'paused' ? 'paused' : 'active'}
         onChoiceSelected={handleSelectChoice}
         onEnd={handleEndSession}
         choices={sessionState.playerChoices || []}
-        triggerGeneration={sessionState.status === 'active'}
+        // Kick off generation in both 'active' and 'loading' states
+        triggerGeneration={sessionState.status === 'active' || sessionState.status === 'loading'}
       />
     );
   }

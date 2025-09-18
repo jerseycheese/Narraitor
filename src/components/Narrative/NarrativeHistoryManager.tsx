@@ -10,11 +10,13 @@ import { NarrativeSegment } from '@/types/narrative.types';
 interface NarrativeHistoryManagerProps {
   sessionId: string;
   className?: string;
+  onStabilized?: () => void;
 }
 
 export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = ({
   sessionId,
-  className
+  className,
+  onStabilized
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +114,12 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     const stabilizeTimer = setTimeout(() => {
       setStabilized(true);
       setIsLoading(false);
-    }, 100);  // Reduced from 1000ms to 100ms for faster response
+
+      // Notify parent that stabilization is complete
+      if (onStabilized) {
+        onStabilized();
+      }
+    }, 50);  // Reduced to 50ms for faster response
     
     // Cleanup timer on unmount or when segments change again
     return () => {

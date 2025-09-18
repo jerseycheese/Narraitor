@@ -54,9 +54,9 @@ When the API is unavailable or fails:
 ### Character-Specific Prompts
 The prompt builder creates detailed descriptions like:
 ```
-"detailed character portrait of Elara Moonshadow, wise and mysterious mage 
-with high intelligence, skilled in magic and arcana, fantasy art style, 
-high quality, detailed"
+"headshot portrait of Elara Moonshadow, wise and mysterious mage
+with high intelligence, skilled in magic and arcana, fantasy art headshot portrait,
+face close-up digital painting, high quality, detailed"
 ```
 
 ## API Details
