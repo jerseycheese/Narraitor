@@ -10,8 +10,10 @@ interface WorldSettingsDisplayProps {
 
 export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
   return (
-    <section className="bg-background rounded-lg p-6 mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Character creation rules for this world</h2>
+    <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm" aria-labelledby="settings-heading">
+      <h2 id="settings-heading" className="text-2xl font-semibold mb-4">
+        Character creation rules for this world
+      </h2>
       <div className="grid grid-cols-2 gap-4">
         <DataField 
           label="Max Attributes" 

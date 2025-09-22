@@ -2,9 +2,12 @@ import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
-import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
 import { normalizeText } from '@/lib/utils/textNormalization';
+import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { logger } from '@/lib/utils/logger';
 
 export interface CreateWorldFromGenerationParams {
   generatedData: GeneratedWorldData;
@@ -22,6 +25,35 @@ export interface CreateWorldResult {
 }
 
 /**
+ * Generate AI-powered tone settings for world data
+ */
+async function generateAIToneSettings(worldData: Partial<World>): Promise<ToneSettings> {
+  try {
+    const client = createDefaultGeminiClient();
+    const generator = new ToneSettingsGenerator(client);
+    const analysisData = extractWorldAnalysisData(worldData);
+
+    const result = await generator.generateToneSettings(analysisData);
+
+    logger.info('AI tone settings generated:', {
+      contentRating: result.contentRating,
+      narrativeStyle: result.narrativeStyle,
+      languageComplexity: result.languageComplexity,
+      reasoning: result.reasoning
+    });
+
+    return {
+      contentRating: result.contentRating,
+      narrativeStyle: result.narrativeStyle,
+      languageComplexity: result.languageComplexity
+    };
+  } catch (error) {
+    logger.warn('Failed to generate AI tone settings, using defaults:', error);
+    return DEFAULT_TONE_SETTINGS;
+  }
+}
+
+/**
  * Centralized service for world creation operations
  */
 export const worldCreationService = {
@@ -35,17 +67,25 @@ export const worldCreationService = {
   }: CreateWorldFromGenerationParams): Promise<CreateWorldResult> {
     const { createWorld, updateWorld } = useWorldStore.getState();
 
-    // Prepare world data with customizations
-    const worldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
+    // Prepare initial world data with customizations
+    const initialWorldData = {
       name: customizations.name || generatedData.name,
       description: customizations.description || generatedData.description,
       genre: customizations.genre || generatedData.genre,
       reference: generatedData.reference,
       relationship: generatedData.relationship,
+    };
+
+    // Generate AI-powered tone settings based on world data
+    const aiToneSettings = await generateAIToneSettings(initialWorldData);
+
+    // Prepare complete world data
+    const worldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
+      ...initialWorldData,
       attributes: [], // Will be populated below
       skills: [], // Will be populated below
       settings: generatedData.settings,
-      toneSettings: DEFAULT_TONE_SETTINGS,
+      toneSettings: aiToneSettings,
     };
 
     // Create the world first

@@ -69,7 +69,7 @@ export default function SmartTemplatesTestPage() {
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div className="bg-background rounded-lg border shadow-sm p-6 mb-8">
           <h1 className="text-3xl font-bold mb-4">SmartTemplates Test Harness</h1>
           <p className="text-gray-700 mb-6">
             Test the SmartTemplates component with live AI generation and template history. 
@@ -82,7 +82,7 @@ export default function SmartTemplatesTestPage() {
         </div>
 
         {generatedTemplate && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-background rounded-lg border shadow-sm p-6">
             <h2 className="text-2xl font-bold mb-4">Last Generated Template</h2>
             <div className="space-y-4">
               <div>
