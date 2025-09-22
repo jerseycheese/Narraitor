@@ -111,7 +111,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
       </div>
       
       <div className="max-w-4xl mx-auto p-8">
-        <div className="bg-white rounded-lg shadow-lg">
+        <div className="bg-background rounded-lg border shadow-sm">
           <div key={resetKey} className="p-8">
             <GuidedFirstTimeExperience />
             

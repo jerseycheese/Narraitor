@@ -74,7 +74,7 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-background rounded-lg border shadow-sm p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Ending System Test Harness
           </h1>

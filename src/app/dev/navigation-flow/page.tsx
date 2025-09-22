@@ -35,7 +35,7 @@ export default function NavigationFlowTestPage() {
         </header>
 
         {/* Test Navigation */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div className="bg-background rounded-lg border shadow-sm p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Test Components</h2>
           <div className="flex flex-wrap gap-2">
             <button
@@ -82,7 +82,7 @@ export default function NavigationFlowTestPage() {
         </div>
 
         {/* Current State Display */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div className="bg-background rounded-lg border shadow-sm p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Current App State</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
             <div>
@@ -131,7 +131,7 @@ export default function NavigationFlowTestPage() {
         </div>
 
         {/* Test Component Display */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-background rounded-lg border shadow-sm p-6">
           {activeTest === 'quickplay' && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Quick Play Component</h2>

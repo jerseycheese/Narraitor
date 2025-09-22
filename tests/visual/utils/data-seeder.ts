@@ -19,7 +19,10 @@ export const SAMPLE_WORLDS = [
     image: {
       // Use a real bitmap from public assets for clear demonstration
       url: '/visual-assets/world-cyberpunk.png',
-      alt: 'Cyberpunk cityscape'
+      alt: 'Cyberpunk cityscape',
+      type: 'ai-generated',
+      prompt: 'A cyberpunk cityscape with neon lights, towering skyscrapers, and flying vehicles in a dystopian future setting',
+      generatedAt: '2024-01-01T00:00:00.000Z'
     },
     attributes: [
       {
@@ -73,7 +76,10 @@ export const SAMPLE_WORLDS = [
     // Use gradient-style stable placeholder to contrast with bitmap world above
     image: {
       url: STABLE_WORLD_IMAGE,
-      alt: 'Fantasy realm'
+      alt: 'Fantasy realm',
+      type: 'ai-generated',
+      prompt: 'A magical fantasy realm with floating cities, ancient dragons soaring through mystical clouds, and arcane energy flowing through the sky',
+      generatedAt: '2024-01-02T00:00:00.000Z'
     },
     attributes: [
       {
@@ -733,9 +739,19 @@ export async function seedTestData(page: Page): Promise<void> {
           }))
         : [];
 
-      // Normalize image to WorldImage type, generating a bitmap placeholder if absent
+      // Normalize image to WorldImage type, preserving AI metadata or generating a bitmap placeholder if absent
       const generated = generateBitmapPlaceholder(world.id || world.name || 'world');
-      const image = { type: 'placeholder', url: world.image?.url ?? generated ?? null, generatedAt: now };
+      const image = world.image ? {
+        type: world.image.type || 'placeholder',
+        url: world.image.url ?? generated ?? null,
+        alt: world.image.alt,
+        prompt: world.image.prompt,
+        generatedAt: world.image.generatedAt || now
+      } : {
+        type: 'placeholder',
+        url: generated ?? null,
+        generatedAt: now
+      };
 
       return {
         id: world.id,

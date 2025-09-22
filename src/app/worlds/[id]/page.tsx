@@ -115,7 +115,9 @@ export default function WorldViewPage() {
 
       <ActionButtonGroup actions={actionButtons} className="mb-8" />
 
-      <WorldDetailsDisplay world={world} />
+      <main role="main" aria-label="World details">
+        <WorldDetailsDisplay world={world} />
+      </main>
     </PageLayout>
   );
 }

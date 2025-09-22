@@ -27,7 +27,7 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
   
   return (
     <div className="space-y-6">
-      <section className="p-4 bg-background rounded">
+      <section className="p-6 bg-background rounded-lg border">
         <h3 className="text-xl font-semibold mb-4">World Settings</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

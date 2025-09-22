@@ -18,6 +18,14 @@ const meta = {
       control: 'boolean',
       description: 'Whether to show the settings section',
     },
+    showToneSettings: {
+      control: 'boolean',
+      description: 'Whether to show the tone settings section',
+    },
+    showImageDetails: {
+      control: 'boolean',
+      description: 'Whether to show the image details section',
+    },
     showInfo: {
       control: 'boolean',
       description: 'Whether to show the info section',
@@ -178,6 +186,18 @@ const mockWorld: World = {
     attributePointPool: 27,
     skillPointPool: 15,
   },
+  toneSettings: {
+    contentRating: 'PG-13',
+    narrativeStyle: 'epic',
+    languageComplexity: 'moderate',
+    customInstructions: 'Emphasize the heroic journey and ancient wisdom themes'
+  },
+  image: {
+    type: 'ai-generated',
+    url: 'https://example.com/middle-earth.jpg',
+    generatedAt: '2024-12-03T09:30:00Z',
+    prompt: 'A sweeping view of Middle Earth with the Shire in the foreground, featuring rolling green hills, hobbit holes, and the distant mountains of Mordor under a dramatic sky'
+  },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
 };
@@ -188,82 +208,6 @@ export const Default: Story = {
   },
 };
 
-export const DescriptionOnly: Story = {
-  args: {
-    world: mockWorld,
-    showDescription: true,
-    showSettings: false,
-    showInfo: false,
-  },
-};
-
-export const WithoutDescription: Story = {
-  args: {
-    world: mockWorld,
-    showDescription: false,
-    showSettings: true,
-    showInfo: true,
-  },
-};
-
-export const SettingsOnly: Story = {
-  args: {
-    world: mockWorld,
-    showDescription: false,
-    showSettings: true,
-    showInfo: false,
-  },
-};
-
-export const InfoOnly: Story = {
-  args: {
-    world: mockWorld,
-    showDescription: false,
-    showSettings: false,
-    showInfo: true,
-  },
-};
-
-export const MinimalWorld: Story = {
-  args: {
-    world: {
-      ...mockWorld,
-      name: 'Simple World',
-      description: 'A basic world with minimal configuration.',
-      attributes: [
-        {
-          id: 'power',
-          worldId: 'world-simple',
-          name: 'Power Level',
-          description: 'Overall character strength',
-          minValue: 1,
-          maxValue: 10,
-          baseValue: 5,
-        },
-      ],
-      skills: [
-        {
-          id: 'combat',
-          worldId: 'world-simple',
-          name: 'Combat',
-          description: 'Fighting ability',
-          attributeIds: ['power'],
-          difficulty: 'medium',
-          category: 'Combat',
-          minValue: 1,
-          maxValue: 10,
-          baseValue: 3,
-        },
-      ],
-      settings: {
-        maxAttributes: 1,
-        maxSkills: 3,
-        attributePointPool: 10,
-        skillPointPool: 5,
-      },
-    },
-  },
-};
 
 export const SciFiWorld: Story = {
   args: {
@@ -360,6 +304,18 @@ export const SciFiWorld: Story = {
         attributePointPool: 20,
         skillPointPool: 12,
       },
+      toneSettings: {
+        contentRating: 'R',
+        narrativeStyle: 'dramatic',
+        languageComplexity: 'advanced',
+        customInstructions: 'Focus on the dark cyberpunk atmosphere and technological dystopia'
+      },
+      image: {
+        type: 'ai-generated',
+        url: 'https://example.com/new-tokyo-2087.jpg',
+        generatedAt: '2024-12-03T08:45:00Z',
+        prompt: 'Neon-lit cyberpunk cityscape of New Tokyo 2087 with towering corporate skyscrapers, flying cars, and holographic advertisements in perpetual night'
+      },
     },
   },
 };
@@ -436,33 +392,12 @@ export const OriginalWorld: Story = {
         attributePointPool: 30,
         skillPointPool: 20,
       },
-    },
-  },
-};
-
-export const EmptyWorld: Story = {
-  args: {
-    world: {
-      ...mockWorld,
-      name: 'Blank Slate',
-      description: 'A world template with no attributes or skills defined yet.',
-      attributes: [],
-      skills: [],
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 12,
-        attributePointPool: 27,
-        skillPointPool: 15,
+      toneSettings: {
+        contentRating: 'PG',
+        narrativeStyle: 'contemplative',
+        languageComplexity: 'literary'
       },
     },
   },
 };
 
-export const LongDescription: Story = {
-  args: {
-    world: {
-      ...mockWorld,
-      description: 'This is an incredibly detailed world with a very long description that spans multiple paragraphs and contains extensive lore and background information. The world has been carefully crafted over many years, with intricate political systems, complex magical laws, and a rich history that spans millennia. Every aspect of this realm has been considered, from the smallest village customs to the grandest cosmic forces that shape reality itself. The description continues on and on, providing readers with a comprehensive understanding of this fantastical realm and all its wonders. It includes details about the various races that inhabit the world, their cultures, their conflicts, and their alliances. The magical system is particularly well-developed, with specific rules governing how different types of magic interact with each other and with the physical world.',
-    },
-  },
-};

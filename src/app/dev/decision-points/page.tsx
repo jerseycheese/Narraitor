@@ -104,7 +104,7 @@ export default function DecisionPointsTestPage() {
 
 
         {/* Enhanced Choice Selectors */}
-        <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
+        <div className="mb-12 bg-background rounded-lg border shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">Enhanced Choice Selectors</h2>
           <div className="space-y-8">
             {Object.entries(sampleDecisions).map(([key, decision]) => (
@@ -139,7 +139,7 @@ export default function DecisionPointsTestPage() {
         </div>
 
         {/* Narrative Flow with Enhanced Choices */}
-        <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
+        <div className="mb-12 bg-background rounded-lg border shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">Narrative Flow with Enhanced Choices</h2>
           <div className="space-y-6">
             {sampleSegments.map((segment, index) => {
@@ -171,7 +171,7 @@ export default function DecisionPointsTestPage() {
         </div>
 
         {/* Mobile Responsiveness Test */}
-        <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
+        <div className="mb-12 bg-background rounded-lg border shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">Mobile Responsiveness</h2>
           <p className="text-gray-700 mb-4">
             Resize your browser window to test mobile behavior of the enhanced choice selector.
@@ -191,7 +191,7 @@ export default function DecisionPointsTestPage() {
         </div>
 
         {/* Accessibility Test */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-background rounded-lg border shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">Accessibility Features</h2>
           <div className="space-y-4">
             <div className="p-4 bg-blue-50 border border-blue-200 rounded">
