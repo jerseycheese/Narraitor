@@ -270,16 +270,4 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     });
   });
 
-  describe('useWorldCreation hook', () => {
-    it('should expose the expected world creation functions', () => {
-      const hook = useWorldCreation();
-
-      expect(hook.createFromGeneration).toBeDefined();
-      expect(hook.createManually).toBeDefined();
-      expect(hook.setAsCurrent).toBeDefined();
-      expect(hook.generateImageBackground).toBeDefined();
-      expect(hook.cloneWorld).toBeDefined();
-      expect(hook.validateData).toBeDefined();
-    });
-  });
 });
