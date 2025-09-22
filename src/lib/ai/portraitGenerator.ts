@@ -372,8 +372,8 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
       }
       
-      // STYLE: Keep it minimal
-      style.push(`portrait photograph`);
+      // STYLE: Keep it minimal - ensure headshot
+      style.push(`headshot portrait photograph`);
       
     } else {
       // Unknown/original characters - context-based approach
@@ -470,12 +470,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
       }
       
-      // STYLE: Based on fantasy vs realistic
+      // STYLE: Based on fantasy vs realistic - ensure headshot
       if (isFantasy) {
-        style.push(`fantasy art portrait`);
-        style.push(`digital painting`);
+        style.push(`fantasy art headshot portrait`);
+        style.push(`face close-up digital painting`);
       } else {
-        style.push(`portrait`);
+        style.push(`headshot portrait`);
       }
       
       // Add strong emphasis on realistic diversity for non-actor characters
@@ -529,25 +529,25 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       promptParts.push(subjectText);
     }
     
-    // Handle photography style based on whether we have an actor
+    // Handle photography style based on whether we have an actor - ensure headshot
     if (options.actorName) {
       // For actor-based portraits, use high-quality photography to capture likeness
-      promptParts.push('professional portrait photography');
-      promptParts.push('high resolution');
+      promptParts.push('professional headshot photography');
+      promptParts.push('face close-up high resolution');
       promptParts.push('accurate facial likeness');
     } else if (!options.isKnownFigure) {
       // For non-actor characters, add photographic specifics for realism
       const physicalDesc = subject.join(' ') + ' ' + context.join(' ');
       const hasAttractiveDescriptor = physicalDesc.match(/\b(beautiful|handsome|pretty|gorgeous|attractive|stunning)\b/i);
-      
+
       if (!hasAttractiveDescriptor) {
         // For average/imperfect characters, use documentary photography style
-        promptParts.push('35mm portrait');
+        promptParts.push('35mm headshot portrait');
         promptParts.push('documentary photography');
-        promptParts.push('candid portrait with visible skin texture and imperfections');
+        promptParts.push('candid face close-up with visible skin texture and imperfections');
       } else {
         // For attractive characters, use standard portrait style
-        promptParts.push('35mm portrait');
+        promptParts.push('35mm headshot portrait');
       }
     }
     
@@ -556,11 +556,11 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       promptParts.push(context.join(', '));
     }
     
-    // STYLE - Photography style and technical details
+    // STYLE - Photography style and technical details - ensure headshot
     if (isFantasy) {
-      promptParts.push('fantasy art portrait, digital painting');
+      promptParts.push('fantasy art headshot portrait, face close-up digital painting');
     } else {
-      promptParts.push('photorealistic portrait');
+      promptParts.push('photorealistic headshot portrait');
     }
     
     // For non-beautiful characters, emphasize the imperfections

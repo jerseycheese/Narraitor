@@ -31,7 +31,8 @@ const sampleAttributes = [
     name: 'Strength',
     baseValue: 8,
     modifiedValue: 8,
-    category: 'physical'
+    category: 'physical',
+    description: 'Physical power and muscle strength for combat and lifting'
   },
   {
     id: 'attr-2',
@@ -39,7 +40,8 @@ const sampleAttributes = [
     name: 'Intelligence',
     baseValue: 6,
     modifiedValue: 7,
-    category: 'mental'
+    category: 'mental',
+    description: 'Reasoning ability, memory, and learning capacity'
   },
   {
     id: 'attr-3',
@@ -47,7 +49,8 @@ const sampleAttributes = [
     name: 'Charisma',
     baseValue: 7,
     modifiedValue: 7,
-    category: 'social'
+    category: 'social',
+    description: 'Force of personality, persuasiveness, and leadership ability'
   },
   {
     id: 'attr-4',
@@ -55,7 +58,8 @@ const sampleAttributes = [
     name: 'Agility',
     baseValue: 9,
     modifiedValue: 9,
-    category: 'physical'
+    category: 'physical',
+    description: 'Speed, reflexes, and nimbleness in movement'
   },
   {
     id: 'attr-5',
@@ -63,7 +67,8 @@ const sampleAttributes = [
     name: 'Wisdom',
     baseValue: 5,
     modifiedValue: 5,
-    category: 'mental'
+    category: 'mental',
+    description: 'Insight, willpower, and understanding of the world'
   }
 ];
 
@@ -90,7 +95,8 @@ export const ModifiedValues: Story = {
         name: 'Strength',
         baseValue: 6,
         modifiedValue: 8,
-        category: 'physical'
+        category: 'physical',
+        description: 'Physical power enhanced by magical equipment or temporary buffs'
       },
       {
         id: 'attr-2',
@@ -98,7 +104,8 @@ export const ModifiedValues: Story = {
         name: 'Intelligence',
         baseValue: 7,
         modifiedValue: 5,
-        category: 'mental'
+        category: 'mental',
+        description: 'Reasoning ability, currently impaired by curse or debuff'
       }
     ],
     showCategories: false

@@ -210,5 +210,6 @@ describe('PortraitGenerator', () => {
       expect(prompt).toMatch(/portrait|character art|fantasy art/i);
       expect(prompt).toMatch(/photorealistic|documentary photography/i);
     });
+
   });
 });

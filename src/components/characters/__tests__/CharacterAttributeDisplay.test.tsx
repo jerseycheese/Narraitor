@@ -68,7 +68,7 @@ describe('CharacterAttributeDisplay', () => {
     render(<CharacterAttributeDisplay attributes={attributesWithoutCategory} showCategories={true} />);
     
     // Should show as general category
-    expect(screen.getByText(/general attributes/i)).toBeInTheDocument();
+    expect(screen.getByText(/^general$/i)).toBeInTheDocument();
     expect(screen.getByText('Luck')).toBeInTheDocument();
   });
 

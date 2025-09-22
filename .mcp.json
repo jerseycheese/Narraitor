@@ -6,6 +6,9 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
       }
+    },
+    "playwright": {
+      "command": "./scripts/mcp-playwright.sh"
     }
   }
 }

@@ -8,6 +8,7 @@ interface CharacterSkill {
   name: string;
   level: number;
   category?: string;
+  description?: string;
 }
 
 interface CharacterSkillDisplayProps {
@@ -40,7 +41,7 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
         {Object.entries(categorizedSkills).map(([category, skillList]) => (
           <div key={category}>
             <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
-              {category} Skills
+              {category}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {skillList.map((skill, index) => (
@@ -71,9 +72,12 @@ function SkillItem({ skill }: { skill: CharacterSkill }) {
       <div className="text-2xl font-bold">
         {skill.level}
       </div>
-      <div className="text-xs text-muted-foreground">
+      <div className="text-xs text-muted-foreground mb-2">
         Level
       </div>
+      {skill.description && (
+        <p className="text-xs text-muted-foreground">{skill.description}</p>
+      )}
     </div>
   );
 }
