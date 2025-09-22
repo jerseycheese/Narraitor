@@ -1,6 +1,5 @@
 import { ToneSettingsGenerator, extractWorldAnalysisData, WorldAnalysisData } from '../toneSettingsGenerator';
 import { AIClient, AIResponse } from '../types';
-import { ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
 import { World } from '@/types/world.types';
 
 // Mock the logger

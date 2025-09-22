@@ -1,4 +1,4 @@
-import { worldCreationService, useWorldCreation } from '../worldCreationService';
+import { worldCreationService } from '../worldCreationService';
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 
@@ -12,17 +12,18 @@ jest.mock('@/lib/utils/logger');
 // Import mocked modules
 import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { ToneSettingsGenerator } from '@/lib/ai/toneSettingsGenerator';
+import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
 const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
 const mockGenerateUniqueId = generateUniqueId as jest.MockedFunction<typeof generateUniqueId>;
 const mockToneSettingsGenerator = ToneSettingsGenerator as jest.MockedClass<typeof ToneSettingsGenerator>;
 const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
+const mockExtractWorldAnalysisData = extractWorldAnalysisData as jest.MockedFunction<typeof extractWorldAnalysisData>;
 
 describe('worldCreationService - AI Tone Settings Integration', () => {
-  let mockStore: any;
-  let mockClient: any;
+  let mockStore: ReturnType<typeof useWorldStore>;
+  let mockClient: ReturnType<typeof createDefaultGeminiClient>;
   let mockGenerator: jest.Mocked<ToneSettingsGenerator>;
 
   beforeEach(() => {
@@ -64,8 +65,17 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
 
     mockGenerator = {
       generateToneSettings: jest.fn()
-    } as any;
+    } as jest.Mocked<ToneSettingsGenerator>;
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
+
+    // Mock the extractWorldAnalysisData function
+    mockExtractWorldAnalysisData.mockImplementation((worldData) => ({
+      name: worldData.name || '',
+      description: worldData.description || '',
+      genre: worldData.genre || '',
+      reference: worldData.reference,
+      relationship: worldData.relationship
+    }));
 
     // Setup ID generation
     mockGenerateUniqueId

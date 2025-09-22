@@ -1,5 +1,5 @@
 import { AIClient } from './types';
-import { ToneSettings, ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
+import { ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
 import { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
 
@@ -58,6 +58,9 @@ export class ToneSettingsGenerator {
           throw new Error('Network error occurred. Please check your connection and try again.');
         } else if (error.message.includes('No JSON found') || error.message.includes('Unable to parse')) {
           throw new Error('AI response was invalid. Please try generating again.');
+        } else if (error.message.startsWith('Invalid ') || error.message.startsWith('Missing ') || error.message.includes('empty response')) {
+          // Re-throw validation errors and empty response errors as-is
+          throw error;
         } else {
           throw new Error('Unable to generate tone settings. Please try again or set them manually.');
         }
@@ -126,6 +129,11 @@ Consider the world's genre conventions, target audience, thematic content, and t
    */
   private parseResponse(content: string): ToneAnalysisResult {
     try {
+      // Handle empty response
+      if (!content || content.trim() === '') {
+        throw new Error('AI service returned empty response');
+      }
+
       // Extract JSON from response (handle cases where AI adds extra text)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
@@ -144,6 +152,15 @@ Consider the world's genre conventions, target audience, thematic content, and t
         reasoning: parsed.reasoning
       };
     } catch (error) {
+      // Re-throw validation errors and empty response errors as-is
+      if (error instanceof Error && (
+        error.message.startsWith('Invalid ') ||
+        error.message.startsWith('Missing ') ||
+        error.message.includes('empty response')
+      )) {
+        throw error;
+      }
+
       logger.error('Failed to parse AI tone settings response:', error);
       throw new Error('Unable to parse AI response. Please try again.');
     }
@@ -152,7 +169,13 @@ Consider the world's genre conventions, target audience, thematic content, and t
   /**
    * Validate that parsed response contains valid values
    */
-  private validateParsedResponse(parsed: any): void {
+  private validateParsedResponse(parsed: unknown): void {
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Response must be an object');
+    }
+
+    const response = parsed as Record<string, unknown>;
+
     const validContentRatings: ContentRating[] = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
     const validNarrativeStyles: NarrativeStyle[] = [
       'serious', 'humorous', 'dramatic', 'lighthearted', 'mysterious',
@@ -160,19 +183,19 @@ Consider the world's genre conventions, target audience, thematic content, and t
     ];
     const validLanguageComplexities: LanguageComplexity[] = ['simple', 'moderate', 'advanced', 'literary'];
 
-    if (!validContentRatings.includes(parsed.contentRating)) {
-      throw new Error(`Invalid content rating: ${parsed.contentRating}`);
+    if (!validContentRatings.includes(response.contentRating as ContentRating)) {
+      throw new Error(`Invalid content rating: ${response.contentRating}`);
     }
 
-    if (!validNarrativeStyles.includes(parsed.narrativeStyle)) {
-      throw new Error(`Invalid narrative style: ${parsed.narrativeStyle}`);
+    if (!validNarrativeStyles.includes(response.narrativeStyle as NarrativeStyle)) {
+      throw new Error(`Invalid narrative style: ${response.narrativeStyle}`);
     }
 
-    if (!validLanguageComplexities.includes(parsed.languageComplexity)) {
-      throw new Error(`Invalid language complexity: ${parsed.languageComplexity}`);
+    if (!validLanguageComplexities.includes(response.languageComplexity as LanguageComplexity)) {
+      throw new Error(`Invalid language complexity: ${response.languageComplexity}`);
     }
 
-    if (!parsed.reasoning || typeof parsed.reasoning !== 'string') {
+    if (!response.reasoning || typeof response.reasoning !== 'string') {
       throw new Error('Missing or invalid reasoning in response');
     }
   }

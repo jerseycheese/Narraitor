@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
 import { World } from '@/types/world.types';
-import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 
 const meta = {
   title: '03-Organisms/world/display/WorldDetailsDisplay',
