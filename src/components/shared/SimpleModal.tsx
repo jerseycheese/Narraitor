@@ -1,8 +1,16 @@
 // src/components/shared/SimpleModal.tsx
 
-import React, { useEffect } from 'react';
+import React, { useId } from 'react';
 import { X } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils/classNames';
 
 interface SimpleModalProps {
   /** Whether the modal is open */
@@ -12,9 +20,11 @@ interface SimpleModalProps {
   /** Modal title */
   title?: string;
   /** Modal content */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /** Additional CSS classes for the modal content */
   className?: string;
+  /** Optional classes for the scrolling content wrapper */
+  contentClassName?: string;
   /** Whether to show the close button */
   showCloseButton?: boolean;
   /** Whether to close on backdrop click */
@@ -25,107 +35,179 @@ interface SimpleModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   /** ID of element describing the modal content */
   ariaDescribedBy?: string;
+  /** Optional contextual descriptor rendered under the title */
+  description?: React.ReactNode;
+  /** Footer region rendered inside a padded container */
+  footer?: React.ReactNode;
+  /** Optional class overrides for the footer wrapper */
+  footerClassName?: string;
+  /** Contextual tone to align borders and accents with design tokens */
+  tone?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
 }
 
+const SIZE_CLASSES: Record<NonNullable<SimpleModalProps['size']>, string> = {
+  sm: '!max-w-sm',
+  md: '!max-w-md',
+  lg: '!max-w-lg',
+  xl: '!max-w-xl',
+};
+
+const TONE_STYLES: Record<NonNullable<SimpleModalProps['tone']>, {
+  frame: string;
+  header: string;
+  headerBorder: string;
+  footerBorder: string;
+  closeButton: string;
+}> = {
+  default: {
+    frame: 'border border-border',
+    header: '',
+    headerBorder: 'border-border',
+    footerBorder: 'border-border',
+    closeButton: 'text-muted-foreground hover:text-foreground',
+  },
+  info: {
+    frame: 'border border-info/50',
+    header: 'bg-info/10',
+    headerBorder: 'border-info/40',
+    footerBorder: 'border-info/40',
+    closeButton: 'text-info hover:text-info/80',
+  },
+  success: {
+    frame: 'border border-success/50',
+    header: 'bg-success/10',
+    headerBorder: 'border-success/40',
+    footerBorder: 'border-success/40',
+    closeButton: 'text-success hover:text-success/80',
+  },
+  warning: {
+    frame: 'border border-warning/60',
+    header: 'bg-warning/10',
+    headerBorder: 'border-warning/40',
+    footerBorder: 'border-warning/40',
+    closeButton: 'text-warning hover:text-warning/80',
+  },
+  destructive: {
+    frame: 'border border-destructive/60',
+    header: 'bg-destructive/10',
+    headerBorder: 'border-destructive/40',
+    footerBorder: 'border-destructive/40',
+    closeButton: 'text-destructive hover:text-destructive/80',
+  },
+};
+
 /**
- * SimpleModal - A basic modal component without Radix UI dependencies
- * 
- * Provides essential modal functionality with backdrop, close button,
- * and keyboard/click handling. Uses only CSS and standard React patterns.
+ * SimpleModal - Accessible dialog wrapper using the shared design-system primitives.
+ *
+ * Provides consistent styling, Radix-driven focus management, and configurable
+ * close affordances while keeping the existing component API intact.
  */
 export function SimpleModal({
   isOpen,
   onClose,
   title,
   children,
-  className = '',
+  className,
+  contentClassName,
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeOnEscape = true,
   size = 'md',
-  ariaDescribedBy
+  ariaDescribedBy,
+  description,
+  footer,
+  footerClassName,
+  tone = 'default',
 }: SimpleModalProps) {
-  
-  // Handle escape key
-  useEffect(() => {
-    if (!isOpen || !closeOnEscape) return;
-    
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-    
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, closeOnEscape, onClose]);
-  
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = 'unset';
-      };
-    }
-  }, [isOpen]);
-  
-  if (!isOpen) return null;
-  
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg', 
-    xl: 'max-w-xl'
-  };
-  
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && closeOnBackdropClick) {
-      onClose();
-    }
-  };
-  
+  const toneStyles = TONE_STYLES[tone];
+  const fallbackDescriptionId = useId();
+  const resolvedDescriptionId =
+    ariaDescribedBy || (description ? `${fallbackDescriptionId}-description` : undefined);
+  const hasHeaderContent = Boolean(title || showCloseButton || description);
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={title ? "modal-title" : undefined}
-      aria-describedby={ariaDescribedBy}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-      
-      {/* Modal Content */}
-      <div className={`relative bg-background rounded-lg shadow-lg border border-border w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto ${className}`}>
-        {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-border">
-            {title && (
-              <h2 id="modal-title" className="text-lg font-semibold">
-                {title}
-              </h2>
+    <Dialog open={isOpen} onOpenChange={open => (open ? undefined : onClose())}>
+      <DialogContent
+        aria-describedby={resolvedDescriptionId}
+        showCloseButton={false}
+        className={cn(
+          '!flex !flex-col !gap-0 !p-0 overflow-hidden bg-background text-foreground shadow-xl focus:outline-none focus-visible:outline-none',
+          'dark:bg-white dark:text-gray-900',
+          toneStyles.frame,
+          'max-h-[90vh] w-full sm:rounded-xl',
+          SIZE_CLASSES[size],
+          className,
+        )}
+        onInteractOutside={event => {
+          if (!closeOnBackdropClick) {
+            event.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={event => {
+          if (!closeOnEscape) {
+            event.preventDefault();
+          }
+        }}
+      >
+        {hasHeaderContent && (
+          <div
+            className={cn(
+              'flex items-start justify-between gap-4 border-b px-6 py-5',
+              toneStyles.header,
+              toneStyles.headerBorder,
             )}
+          >
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              {title && (
+                <DialogTitle className="text-lg font-semibold text-foreground dark:text-gray-900">
+                  {title}
+                </DialogTitle>
+              )}
+              {description && (
+                <div
+                  id={ariaDescribedBy ? undefined : resolvedDescriptionId}
+                  className="text-sm text-muted-foreground"
+                >
+                  {description}
+                </div>
+              )}
+            </div>
             {showCloseButton && (
-              <Button
-                onClick={onClose}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                aria-label="Close modal"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <DialogClose asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-9 w-9 shrink-0',
+                    toneStyles.closeButton,
+                  )}
+                  aria-label="Close modal"
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </DialogClose>
             )}
           </div>
         )}
-        
-        {/* Content */}
-        <div className="p-6">
-          {children}
-        </div>
-      </div>
-    </div>
+
+        {(children !== undefined && children !== null) || !hasHeaderContent ? (
+          <div className={cn('flex-1 overflow-y-auto px-6 py-6', contentClassName)}>
+            {children}
+          </div>
+        ) : null}
+
+        {footer && (
+          <div
+            className={cn(
+              'border-t px-6 py-5',
+              toneStyles.footerBorder,
+              footerClassName,
+            )}
+          >
+            {footer}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

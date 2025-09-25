@@ -39,6 +39,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Access store methods in a way that works with testing
   const addSegment = useNarrativeStore(state => state.addSegment);
   const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
+  const hasHydrated = useNarrativeStore(state => state._hasHydrated);
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(createDefaultGeminiClient()), []);
 
   // Track if we've already generated a narrative for this session
@@ -54,65 +55,31 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Track if we've already suggested an ending for this session
   const endingSuggestedRef = useRef(false);
 
-  // Load existing segments on mount and reset state when session changes
+  // Initialize component state on mount
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[NarrativeController] mount', { sessionId, worldId, characterId });
-    }
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
-    
-    // Initialize controller for the session
-    
+
     // Reset state when session changes
     setProcessedChoices(new Set());
     setError(null);
     generateCount.current = 0;
-    
-    // Load segments for the current session
-    const existingSegments = getSessionSegments(sessionId);
-    setSegments(existingSegments);
-    
-    // Check if we already have an initial scene - more precise than just checking if any segments exist
-    const hasInitialScene = existingSegments.some(segment => 
-      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
-    );
-    
-    // Critical: mark initial generation as completed if we already have an initial scene
-    // This MUST be done before any effect that might trigger generation
-    setInitialGenerationCompleted(hasInitialScene);
-    
-    if (hasInitialScene) {
-      initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
-    }
 
     // Set mounted flag
     mountedRef.current = true;
 
-    // If we already have narrative content (e.g., injected by a bootstrap/safety net)
-    // and we haven't produced any decisions yet, proactively generate choices so the
-    // UI can progress without waiting for another narrative generation.
-    try {
-      const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
-      if (generateChoices && existingSegments.length > 0 && existingDecisions.length === 0) {
-        setTimeout(() => {
-          if (mountedRef.current) {
-            generatePlayerChoices();
-          }
-        }, 300);
-      }
-    } catch {
-      // Non-critical; continue
-    }
-    
+    // Reset generation flags
+    initialGenerationInitiated.current = false;
+    choiceGenerationInProgress.current = false;
+    endingSuggestedRef.current = false;
+
     return () => {
-      // Clear mounted flag when component unmounts
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
-  }, [sessionId, worldId, characterId, generateChoices, getSessionSegments]);
+  }, [sessionId, worldId, characterId]);
 
   /**
    * Pure AI-based ending detection - analyzes narrative context for natural conclusions
@@ -286,9 +253,6 @@ Respond with JSON format:
     
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[NarrativeController] triggerGeneration', { triggerGeneration, choiceId, segments: segments.length, initialGenerationCompleted });
-      }
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
       if (segments.length === 0 && !initialGenerationCompleted && !initialGenerationInitiated.current) {
         // Set both state and refs to prevent duplicate generation
@@ -321,9 +285,6 @@ Respond with JSON format:
    * Generate player choices based on current narrative context
    */
   const generatePlayerChoices = useCallback(async () => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[NarrativeController] generatePlayerChoices:start');
-    }
     if (!mountedRef.current) {
       return;
     }
@@ -423,15 +384,12 @@ Respond with JSON format:
       // Check if this is a fallback decision by comparing the ID pattern
       const isFallbackDecision = decision.id.includes('decision-fallback-');
       
-      if (!isFallbackDecision) {
+     if (!isFallbackDecision) {
         if (onChoicesGenerated) {
           try {
             // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = JSON.parse(JSON.stringify(decision));
             onChoicesGenerated(decisionCopy);
-            if (process.env.NODE_ENV !== 'production') {
-              console.log('[NarrativeController] onChoicesGenerated (AI)');
-            }
           } catch (error) {
             console.error('Error calling onChoicesGenerated callback:', error);
           }
@@ -475,9 +433,6 @@ Respond with JSON format:
           if (onChoicesGenerated && mountedRef.current) {
             const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
             onChoicesGenerated(decisionCopy);
-            if (process.env.NODE_ENV !== 'production') {
-              console.log('[NarrativeController] onChoicesGenerated (fallback)');
-            }
           }
         }
       } catch {
@@ -491,11 +446,44 @@ Respond with JSON format:
     }
   }, [sessionId, worldId, onChoicesGenerated, narrativeGenerator]);
 
-  const generateInitialNarrative = async () => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[NarrativeController] generateInitialNarrative:start');
+  // Load segments after hydration is complete
+  useEffect(() => {
+    if (!hasHydrated) {
+      return; // Wait for persistence to load
     }
-    
+
+    // Load segments for the current session
+    const existingSegments = getSessionSegments(sessionId);
+    setSegments(existingSegments);
+
+    // Check if we already have an initial scene - more precise than just checking if any segments exist
+    const hasInitialScene = existingSegments.some(segment =>
+      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
+    );
+
+    // Critical: mark initial generation as completed if we already have an initial scene
+    setInitialGenerationCompleted(hasInitialScene);
+
+    if (hasInitialScene) {
+      initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
+    }
+
+    // If we already have narrative content and no decisions yet, proactively generate choices
+    try {
+      const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
+      if (generateChoices && existingSegments.length > 0 && existingDecisions.length === 0) {
+        setTimeout(() => {
+          if (mountedRef.current) {
+            generatePlayerChoices();
+          }
+        }, 300);
+      }
+    } catch {
+      // Non-critical; continue
+    }
+  }, [hasHydrated, sessionId, generateChoices, getSessionSegments, generatePlayerChoices]);
+
+  const generateInitialNarrative = async () => {
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
@@ -567,9 +555,6 @@ Respond with JSON format:
       
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[NarrativeController] onNarrativeGenerated (initial)');
-        }
       }
       
       // Check for ending indicators
@@ -583,12 +568,9 @@ Respond with JSON format:
           generatePlayerChoices();
         }, 500); // Reduced timeout since we're not showing immediate choices
       }
-    } catch (e) {
+    } catch {
       // Error generating initial narrative — create a graceful fallback segment
       try {
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[NarrativeController] generateInitialNarrative:error', e instanceof Error ? e.message : String(e));
-        }
         const now = new Date();
         const segmentId = `seg-${worldId}-fallback-${Date.now()}`;
         const fallbackSegment: NarrativeSegment = {
@@ -620,9 +602,6 @@ Respond with JSON format:
         // Notify parent so it can progress to choices skeleton + generation
         if (onNarrativeGenerated) {
           onNarrativeGenerated(fallbackSegment);
-          if (process.env.NODE_ENV !== 'production') {
-            console.log('[NarrativeController] onNarrativeGenerated (fallback)');
-          }
         }
 
         // Kick off choice generation (will provide AI or fallback choices)
@@ -728,9 +707,6 @@ Respond with JSON format:
       
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[NarrativeController] onNarrativeGenerated (choice)');
-        }
       }
       
       // Check for ending indicators

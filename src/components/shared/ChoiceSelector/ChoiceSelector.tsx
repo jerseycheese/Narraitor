@@ -291,12 +291,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   
 
   return (
-    <div 
-      data-testid="choice-selector" 
+    <div
+      data-testid="choice-selector"
       className={`choice-selector rounded-lg ${weightStyling.container} ${className}`}
       role="group"
       aria-labelledby="choices-heading"
     >
+      <div className="p-4">
 
       {/* Context Summary */}
       {isDecisionMode && decision.contextSummary && (
@@ -403,6 +404,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           </div>
         </CollapsibleSection>
       )}
+      </div>
     </div>
   );
 };

@@ -8,8 +8,8 @@ import { SaveIndicator } from '../SaveIndicator';
 describe('SaveIndicator', () => {
   it('should display idle status', () => {
     render(<SaveIndicator status="idle" />);
-    
-    expect(screen.getByText(/auto-save/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/saved/i)).toBeInTheDocument();
   });
 
   it('should display saving status with loading indicator', () => {

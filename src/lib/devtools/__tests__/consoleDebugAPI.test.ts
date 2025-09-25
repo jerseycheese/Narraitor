@@ -165,6 +165,18 @@ describe('consoleDebugAPI', () => {
       });
     });
 
+    describe('sessionStoreState', () => {
+      it('should provide sessionStoreState function', () => {
+        expect(typeof mockWindow.NARRAITOR_DEBUG?.sessionStoreState).toBe('function');
+      });
+
+      it('should return session store snapshot', () => {
+        const result = mockWindow.NARRAITOR_DEBUG?.sessionStoreState();
+        expect(result).toHaveProperty('autoSave');
+        expect(result).toHaveProperty('status');
+      });
+    });
+
     describe('resetStores', () => {
       it('should provide resetStores function', () => {
         expect(typeof mockWindow.NARRAITOR_DEBUG?.resetStores).toBe('function');
@@ -221,6 +233,7 @@ describe('consoleDebugAPI', () => {
       expect(api).toHaveProperty('triggerError');
       expect(api).toHaveProperty('simulateCondition');
       expect(api).toHaveProperty('getStoreState');
+      expect(api).toHaveProperty('sessionStoreState');
       expect(api).toHaveProperty('resetStores');
       expect(api).toHaveProperty('help');
     });

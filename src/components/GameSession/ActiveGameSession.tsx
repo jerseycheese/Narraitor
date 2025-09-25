@@ -20,6 +20,10 @@ import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { useAutoSave } from '@/hooks/useAutoSave';
+
+const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -117,6 +121,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
+  const autoSave = useAutoSave();
   
   // Track previous height to retain during loading states
   const previousHeightRef = React.useRef<number>(0);
@@ -181,6 +186,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }, 4000); // Increased timeout to 4 seconds to give AI more time
     return () => { cancelled = true; clearTimeout(t); };
   }, [initialized, segmentCount, sessionId, worldId, isGenerating]);
+
+  // Ensure we eventually release the generating flag to allow safety fallbacks
+  React.useEffect(() => {
+    if (!initialized) return;
+    if (segmentCount > 0) return;
+    if (!isGenerating) return;
+
+    let cancelled = false;
+    const timeoutId = setTimeout(() => {
+      if (cancelled) return;
+      setIsGenerating(false);
+    }, INITIAL_GENERATION_MAX_WAIT_MS);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [initialized, segmentCount, isGenerating]);
   
   // Sync narrative height with choices height
   React.useEffect(() => {
@@ -189,19 +212,56 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       const narrativeContainer = document.getElementById('narrative-container');
       
       if (choicesContainer && narrativeContainer) {
-        const choicesHeight = choicesContainer.getBoundingClientRect().height;
+        // Get the actual content height, not the artificially inflated container height
+        const playerChoicesContainer = choicesContainer.querySelector('.player-choices-container');
+        let choicesHeight = playerChoicesContainer
+          ? playerChoicesContainer.getBoundingClientRect().height
+          : choicesContainer.getBoundingClientRect().height;
+
+        // Check if suggested actions are expanded and adjust height accordingly
+        const suggestedActionsButton = document.querySelector('[aria-expanded="true"]');
+        const isSuggestedActionsExpanded = !!suggestedActionsButton;
+
+        // If suggested actions are expanded, use a reasonable base height instead of the full expanded height
+        if (isSuggestedActionsExpanded && choicesHeight > 600) {
+          // Use a more reasonable height when suggested actions are expanded
+          // Look for the base choices content without the expanded suggestions
+          const baseChoicesContent = choicesContainer.querySelector('.space-y-4, .flex, .grid');
+          if (baseChoicesContent) {
+            const baseHeight = baseChoicesContent.getBoundingClientRect().height;
+            if (baseHeight > 0 && baseHeight < choicesHeight) {
+              choicesHeight = Math.max(baseHeight + 100, 400); // Add padding and ensure minimum height
+            }
+          } else {
+            // Fallback to a reasonable default when suggestions are expanded
+            choicesHeight = Math.min(choicesHeight, 500);
+          }
+        }
+
         let finalHeight: number;
-        
+
         // Use actual loading state instead of height heuristic
         if (isGeneratingChoices && previousHeightRef.current > 0) {
           // Preserve previous height during loading
           finalHeight = previousHeightRef.current;
         } else {
-          // Use the current choices height and remember it
+          // Use the adjusted choices height and remember it
           finalHeight = choicesHeight;
           if (!isGeneratingChoices && choicesHeight > 0) {
             previousHeightRef.current = choicesHeight;
           }
+        }
+
+        // Fallback: If no height is calculated and we're not loading, force a re-sync
+        if (finalHeight <= 0 && !isGeneratingChoices && choicesHeight > 0) {
+          finalHeight = choicesHeight;
+          previousHeightRef.current = choicesHeight;
+        }
+
+        // Additional fallback for refresh scenarios where previousHeightRef is 0
+        if (finalHeight <= 0 && previousHeightRef.current === 0 && choicesHeight > 0) {
+          finalHeight = choicesHeight;
+          previousHeightRef.current = choicesHeight;
         }
         
         // Target the ScrollArea component within the narrative history
@@ -228,7 +288,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       clearTimeout(timeoutId);
       window.removeEventListener('resize', syncHeights);
     };
-  }, [currentDecision, choices, isGeneratingChoices]);
+  }, [currentDecision, choices, isGeneratingChoices, sessionId, showJournalModal, showEndingSuggestion, showEndConfirmation, character]);
   
   // No viewport calculations needed; rely on flex layout with internal scroll
   
@@ -277,14 +337,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         }
         else {
           // No segments at all - normal case for new session
-          // No existing segments found, will generate initial scene
+          // Keep UI in generating state until first segment arrives or we explicitly fallback
           setInitialized(true);
-          setIsGenerating(false);
+          setIsGenerating(true);
         }
       } catch {
         // Error setting up narrative, continue with initialization
         setInitialized(true);
-        setIsGenerating(false);
+        setIsGenerating(true);
       }
     };
     
@@ -533,6 +593,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Store timeout ID for potential cleanup
     choiceGenerationTimeoutRef.current = timeoutId;
+
+    void autoSave.triggerSave('scene-change');
   };
 
   const handleChoiceSelected = (choiceId: string) => {
@@ -561,6 +623,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setCurrentDecision(null);
     
     onChoiceSelected(choiceId);
+
+    void autoSave.triggerSave('player-choice');
   };
 
   const handleCustomSubmit = (customText: string) => {
@@ -603,6 +667,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setShouldTriggerGeneration(true);
     
     onChoiceSelected(customChoiceId);
+
+    void autoSave.triggerSave('player-choice');
   };
   
   // Handle newly generated player choices
@@ -647,13 +713,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Handle ending story functionality with confirmation
   const handleEndStory = async () => {
-    if (!characterId || !world) return;
-    
+    if (!characterId || !world || !character) return;
+
     try {
       await generateEnding('player-choice', {
         sessionId,
         characterId,
-        worldId: world.id
+        worldId: world.id,
+        world: world,  // Pass the full world object
+        character: character  // Pass the full character object
       });
     } catch (error) {
       console.error('Failed to generate ending:', error);
@@ -670,13 +738,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Accept AI ending suggestion
   const handleAcceptEndingSuggestion = async () => {
     setShowEndingSuggestion(false);
-    if (!characterId || !world) return;
-    
+    if (!characterId || !world || !character) return;
+
     try {
       await generateEnding(suggestedEndingType, {
         sessionId,
         characterId,
-        worldId: world.id
+        worldId: world.id,
+        world: world,  // Pass the full world object
+        character: character  // Pass the full character object
       });
     } catch (error) {
       console.error('Failed to generate ending:', error);
@@ -857,6 +927,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
       )}
 
+      {/* Autosave indicator anchored under the main content */}
+      <div className="mt-4">
+        <SaveIndicator
+          status={autoSave.status}
+          lastSaveTime={autoSave.lastSaveTime}
+          errorMessage={autoSave.errorMessage}
+          totalSaves={autoSave.totalSaves}
+          onManualSave={autoSave.triggerSave}
+          onRetryError={autoSave.retry}
+          retryable
+          compact
+          className="text-xs sm:text-sm"
+        />
+      </div>
+
       {/* Ending Suggestion Dialog */}
       <StoryEndingDialog
         isOpen={showEndingSuggestion}
@@ -896,6 +981,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         isOpen={showJournalModal}
         onClose={() => setShowJournalModal(false)}
         sessionId={sessionId}
+        characterId={character?.id}
       />
 
       {/* Journal Floating Button - Issue #562 */}

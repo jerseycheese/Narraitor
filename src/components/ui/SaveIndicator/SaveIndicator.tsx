@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { CheckCircle, Circle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -33,14 +33,13 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   compact = false,
 }) => {
   const getStatusText = () => {
-    switch (status) {
-      case 'saved':
-        return lastSaveTime ? `Saved at ${formatTime(lastSaveTime)}` : 'Saved';
-      case 'idle':
-        return 'Auto-save ready';
-      default:
-        return '';
+    if (status === 'saving') {
+      return 'Saving...';
     }
+    if (lastSaveTime) {
+      return `Saved at ${formatTime(lastSaveTime)}`;
+    }
+    return 'Saved';
   };
 
   // Handle error state with ErrorDisplay component
@@ -88,11 +87,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   return (
     <div className={cn('flex items-center gap-2 text-sm', className)}>
       <div className="flex items-center gap-1">
-        {status === 'saved' ? (
-          <CheckCircle className="w-4 h-4 text-green-500" aria-hidden="true" />
-        ) : (
-          <Circle className="w-4 h-4 text-gray-500" aria-hidden="true" />
-        )}
+        <CheckCircle className="w-4 h-4 text-green-500" aria-hidden="true" />
         
         <div className="flex flex-col">
           <span className="text-gray-700">{getStatusText()}</span>

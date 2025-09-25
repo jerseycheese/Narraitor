@@ -33,6 +33,7 @@ interface JournalStore {
   
   // Query actions
   getSessionEntries: (sessionId: EntityID) => JournalEntry[];
+  getSessionEntriesWithCharacter: (sessionId: EntityID, characterId?: EntityID | null) => JournalEntry[];
   getEntriesByType: (type: JournalEntryType) => JournalEntry[];
   
   // Cleanup actions
@@ -161,20 +162,38 @@ export const useJournalStore = create<JournalStore>()(
   }),
 
   // Get session entries in reverse chronological order (newest first)
-  getSessionEntries: (sessionId) => {
+  getSessionEntries: (sessionId) => get().getSessionEntriesWithCharacter(sessionId),
+
+  getSessionEntriesWithCharacter: (sessionId, characterId) => {
     const state = get();
     const entryIds = state.sessionEntries[sessionId] || [];
-    return entryIds
+    const filtered = entryIds
       .map((id) => state.entries[id])
-      .filter(Boolean)
-      .sort((a, b) => {
-        const dateDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        if (dateDiff !== 0) {
-          return dateDiff;
-        }
-        // Fallback to ID comparison for stable sorting when timestamps are identical
-        return a.id.localeCompare(b.id);
+      .filter((entry): entry is JournalEntry => {
+        if (!entry) return false;
+        if (!characterId) return true;
+        return entry.characterId === characterId;
       });
+
+    const sorted = filtered.sort((a, b) => {
+      const dateDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+      return a.id.localeCompare(b.id);
+    });
+
+    const latestSessionStart = sorted.find((entry) => entry.type === 'session_start');
+    if (!latestSessionStart) {
+      return sorted;
+    }
+
+    const startTimestamp = new Date(latestSessionStart.createdAt).getTime();
+    if (Number.isNaN(startTimestamp)) {
+      return sorted;
+    }
+
+    return sorted.filter((entry) => new Date(entry.createdAt).getTime() >= startTimestamp);
   },
 
   // Get entries by type

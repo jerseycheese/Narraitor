@@ -282,8 +282,8 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       await user.click(cancelButton);
       
       // Verify warning styling is applied to the modal content
-      const modalContent = document.querySelector('.component-confirmation-dialog');
-      expect(modalContent).toHaveClass('border-amber-700', 'bg-white');
+      const modalContent = document.querySelector('[role="dialog"]');
+      expect(modalContent).toHaveClass('border', 'border-warning/60');
     });
   });
 });

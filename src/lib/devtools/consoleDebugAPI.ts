@@ -8,12 +8,14 @@
 
 import { stateInspector } from '../utils/stateInspector';
 import { requestLogger } from '../ai/requestLogger';
+import { useSessionStore } from '@/state/sessionStore';
 
 export interface DebugAPIInterface {
   clearLogs: () => void;
   triggerError: (message?: string) => never;
   simulateCondition: (condition: 'offline' | 'slow_network' | 'api_error') => string;
   getStoreState: () => string;
+  sessionStoreState: () => Record<string, unknown>;
   resetStores: () => string;
   help: () => string;
 }
@@ -123,6 +125,29 @@ class ConsoleDebugAPI implements DebugAPIInterface {
   }
 
   /**
+   * Quick snapshot of the session store (non-string for easy console inspection)
+   */
+  sessionStoreState(): Record<string, unknown> {
+    const {
+      id,
+      status,
+      worldId,
+      characterId,
+      autoSave,
+      playerChoices,
+    } = useSessionStore.getState();
+
+    return {
+      id,
+      status,
+      worldId,
+      characterId,
+      autoSave,
+      playerChoicesLength: playerChoices.length,
+    };
+  }
+
+  /**
    * Reset all stores to initial state
    */
   resetStores(): string {
@@ -158,6 +183,9 @@ class ConsoleDebugAPI implements DebugAPIInterface {
 
 📊 NARRAITOR_DEBUG.getStoreState()
    Access current Zustand store state via StateInspector
+
+📁 NARRAITOR_DEBUG.sessionStoreState()
+   Snapshot of session store status and autosave metadata
 
 🔄 NARRAITOR_DEBUG.resetStores()
    Reset all stores to initial state

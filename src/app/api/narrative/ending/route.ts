@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
       worldId,
       endingType,
       desiredTone: body.desiredTone,
-      customPrompt: body.customPrompt
+      customPrompt: body.customPrompt,
+      world: body.world, // Pass world data from client
+      character: body.character // Pass character data from client
     };
 
     logger.info('Generating story ending', { 

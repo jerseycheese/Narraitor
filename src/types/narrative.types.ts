@@ -1,6 +1,8 @@
 // src/types/narrative.types.ts
 
 import { EntityID, TimestampedEntity } from './common.types';
+import { World } from './world.types';
+import { Character } from '../state/characterStore';
 
 /**
  * Represents a segment of narrative in the game
@@ -219,6 +221,8 @@ export interface EndingGenerationRequest {
   endingType: EndingType;
   desiredTone?: EndingTone;
   customPrompt?: string;
+  world?: World; // Optional world data passed from client
+  character?: Character; // Optional character data passed from client
 }
 
 /**

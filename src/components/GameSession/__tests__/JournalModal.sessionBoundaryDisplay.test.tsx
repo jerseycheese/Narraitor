@@ -87,6 +87,7 @@ describe('JournalModal - Session Boundary Display', () => {
     it('displays session start entry with system indicators', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionStartEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionStartEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -124,6 +125,7 @@ describe('JournalModal - Session Boundary Display', () => {
     it('shows session start metadata when entry is selected', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionStartEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionStartEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -155,6 +157,7 @@ describe('JournalModal - Session Boundary Display', () => {
     it('displays session end entry with duration information', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionEndEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionEndEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -186,6 +189,7 @@ describe('JournalModal - Session Boundary Display', () => {
       const mockMarkAsRead = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionEndEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionEndEntry]),
         markAsRead: mockMarkAsRead,
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -216,6 +220,7 @@ describe('JournalModal - Session Boundary Display', () => {
       
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue(mixedEntries),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue(mixedEntries),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -261,6 +266,7 @@ describe('JournalModal - Session Boundary Display', () => {
       
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue(mixedEntries),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue(mixedEntries),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -298,6 +304,7 @@ describe('JournalModal - Session Boundary Display', () => {
     it('displays session start entry with proper content formatting', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionStartEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionStartEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -331,6 +338,7 @@ describe('JournalModal - Session Boundary Display', () => {
       
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([unreadSessionEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([unreadSessionEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -361,6 +369,7 @@ describe('JournalModal - Session Boundary Display', () => {
     it('provides proper ARIA labels for session boundary entry types', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockSessionStartEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockSessionStartEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
