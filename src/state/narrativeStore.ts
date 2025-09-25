@@ -54,6 +54,7 @@ interface NarrativeStore {
   setError: (error: string | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
   
   // Ending actions
   generateEnding: (endingType: EndingType, params: {
