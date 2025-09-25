@@ -659,6 +659,10 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }));
   },
+
+  setHasHydrated: (hasHydrated: boolean) => {
+    set({ _hasHydrated: hasHydrated });
+  },
 }),
 {
   name: 'narraitor-narrative-store',
@@ -675,7 +679,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
   }),
   onRehydrateStorage: () => (state) => {
     if (state) {
-      state._hasHydrated = true;
+      // Use proper state setter to trigger subscriptions
+      state.setHasHydrated(true);
     }
   },
 }
