@@ -99,14 +99,14 @@ export class NarrativeContextManager {
   }
 
   async buildEndingContext(request: EndingGenerationRequest): Promise<EndingContext> {
-    // Get world
-    const world = useWorldStore.getState().worlds[request.worldId];
+    // Get world from request data or fallback to store
+    const world = request.world || useWorldStore.getState().worlds[request.worldId];
     if (!world) {
       throw new Error(`World not found: ${request.worldId}`);
     }
 
-    // Get character
-    const character = useCharacterStore.getState().characters[request.characterId];
+    // Get character from request data or fallback to store
+    const character = request.character || useCharacterStore.getState().characters[request.characterId];
     if (!character) {
       throw new Error(`Character not found: ${request.characterId}`);
     }

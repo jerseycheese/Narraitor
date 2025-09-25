@@ -37,6 +37,7 @@ export type SaveResult = {
 
 export type AutoSaveOptions = {
   onSave?: (result: SaveResult) => void;
+  onSaveStart?: (reason: SaveTriggerReason) => void;
   onError?: (error: Error) => void;
   debounceMs?: number;
   compressionEnabled?: boolean;
@@ -84,6 +85,11 @@ export class AutoSaveService {
     this.intervalId = setInterval(() => {
       this.performAutoSave('periodic');
     }, this.intervalMs);
+
+    // Run an immediate save so the first interval isn't delayed for users
+    this.performAutoSave('periodic').catch(error => {
+      this.logger.error('Initial auto-save failed:', error);
+    });
   }
 
   /**
@@ -138,6 +144,7 @@ export class AutoSaveService {
     const startTime = Date.now();
     
     try {
+      this.options.onSaveStart?.(reason);
       this.logger.debug('Starting auto-save operation:', { reason, operationId });
       const gameState = await this.stateProvider();
       
@@ -146,6 +153,11 @@ export class AutoSaveService {
         await this.performSaveWithRetry(gameState, reason, startTime, operationId);
       } else {
         this.logger.debug('Skipping save - session not active:', gameState.session.status);
+        this.options.onSave?.({
+          success: false,
+          timestamp: new Date(),
+          reason,
+        });
       }
     } catch (error) {
       await this.handleSaveError(error as Error, reason, operationId);

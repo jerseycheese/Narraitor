@@ -21,7 +21,6 @@ let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
  */
 const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
   if (!resilientStoragePromise) {
-    console.log('[Persistence] Creating new storage instance');
     resilientStoragePromise = (async () => {
       const storage = new ResilientStorageMiddleware({
         retryAttempts: 3,
@@ -30,18 +29,15 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
         onStatusChange: (status, error) => {
           // Notify user about storage status changes
           if (error?.shouldNotify) {
-            console.warn('[Persistence] Storage status changed:', status, error);
+            console.error('[Persistence] Storage status changed:', status, error);
           }
         },
       });
       
       // Start health monitoring
       storage.startHealthMonitoring(30000); // Check every 30 seconds
-      console.log('[Persistence] Storage instance created and cached');
       return storage;
     })();
-  } else {
-    console.log('[Persistence] Reusing existing storage promise');
   }
   
   return resilientStoragePromise;
@@ -71,10 +67,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       const storage = await getResilientStorage();
       // Convert the StorageValue object to a JSON string
       await storage.setItem(name, JSON.stringify(value));
-    } catch (error) {
+    } catch {
       // Resilient storage handles errors internally with retry logic and fallback
-      // No need to handle errors here as the storage middleware manages them
-      console.warn('Persistence setItem failed:', error);
     }
   },
   
@@ -82,9 +76,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
     try {
       const storage = await getResilientStorage();
       await storage.removeItem(name);
-    } catch (error) {
+    } catch {
       // Resilient storage handles errors internally
-      console.warn('Persistence removeItem failed:', error);
     }
   }
 });

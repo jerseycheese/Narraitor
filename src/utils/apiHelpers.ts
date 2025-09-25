@@ -143,18 +143,37 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
       }
       return pgSettings;
     case 'r':
-    case 'nc-17':
-      // R/NC-17: Allow most content but block extreme
+      // R-rated: Permissive for sexual content.
       const rSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+        console.log('🔒 APPLIED SAFETY SETTINGS:', {
+          contentRating: 'R',
+          threshold: 'Custom (BLOCK_NONE for explicit)',
+          settingsApplied: '4 categories'
+        });
       }
       return rSettings;
+    case 'nc-17':
+      // NC-17: Highly permissive, no blocking on sexual content or harassment.
+      const nc17Settings = [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+      ];
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔒 APPLIED SAFETY SETTINGS:', {
+          contentRating: 'NC-17',
+          threshold: 'Custom (BLOCK_NONE for explicit and harassment)',
+          settingsApplied: '4 categories'
+        });
+      }
+      return nc17Settings;
     default:
       // Default: Medium filtering for safety
       const defaultSettings = [
@@ -166,9 +185,9 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
       
       if (process.env.NODE_ENV === 'development') {
         console.log('🔒 APPLIED SAFETY SETTINGS:', {
-          contentRating: contentRating || 'default',
-          threshold: contentRating ? getThresholdForRating(contentRating) : 'BLOCK_MEDIUM_AND_ABOVE',
-          settingsApplied: defaultSettings.length + ' categories'
+          contentRating: `fallback-default (detected: ${contentRating || 'none'})`,
+          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          settingsApplied: '4 categories'
         });
       }
       
@@ -176,16 +195,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   }
 }
 
-function getThresholdForRating(rating: string): string {
-  switch (rating) {
-    case 'g': return 'BLOCK_MEDIUM_AND_ABOVE';
-    case 'pg':
-    case 'pg-13':
-    case 'r':
-    case 'nc-17': return 'BLOCK_ONLY_HIGH';
-    default: return 'BLOCK_MEDIUM_AND_ABOVE';
-  }
-}
 
 /**
  * Make secure request to Gemini API using header authentication

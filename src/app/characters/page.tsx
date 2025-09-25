@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
@@ -20,6 +22,7 @@ import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -120,8 +123,10 @@ export default function CharactersPage() {
   const searchParams = useSearchParams();
   const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
   const { worlds, currentWorldId } = useWorldStore();
+  const currentSessionId = useSessionStore((state) => state.id);
+  const { getSessionSegments } = useNarrativeStore();
   const [mounted, setMounted] = useState(false);
-  
+
   // No test globals – use persisted store state only
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
@@ -134,6 +139,11 @@ export default function CharactersPage() {
     characterId: null as string | null,
     characterName: '',
     isDeleting: false
+  });
+  const [characterSwitchDialog, setCharacterSwitchDialog] = useState({
+    isOpen: false,
+    characterId: null as string | null,
+    characterName: '',
   });
   const [toasts, setToasts] = useState<Array<{
     id: string;
@@ -152,6 +162,9 @@ export default function CharactersPage() {
   const worldCharacters = (Object.values(characters) as Character[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
+
+  // Get current session progress for confirmation dialog
+  const currentProgress = currentSessionId ? getSessionSegments(currentSessionId).length : 0;
 
   // Mark mounted after first client render to make header SSR-safe
   useEffect(() => {
@@ -352,11 +365,56 @@ export default function CharactersPage() {
   };
 
   const handleCancelDelete = () => {
-    setDeleteDialog({ 
-      isOpen: false, 
-      characterId: null, 
-      characterName: '', 
-      isDeleting: false 
+    setDeleteDialog({
+      isOpen: false,
+      characterId: null,
+      characterName: '',
+      isDeleting: false
+    });
+  };
+
+  // Handle character play with confirmation for character switching
+  const handleCharacterPlay = (characterId: string) => {
+    const character = characters[characterId];
+    if (!character) return;
+
+    // If switching to a different character and there's active progress, show confirmation
+    if (currentCharacterId !== characterId && currentProgress > 0) {
+      setCharacterSwitchDialog({
+        isOpen: true,
+        characterId,
+        characterName: character.name,
+      });
+    } else {
+      // No confirmation needed - either same character or no progress to lose
+      setCurrentCharacter(characterId);
+      router.push(`/worlds/${character.worldId}/play`);
+    }
+  };
+
+  // Handle confirmed character switch
+  const handleConfirmedCharacterSwitch = () => {
+    const { characterId } = characterSwitchDialog;
+    if (characterId) {
+      const character = characters[characterId];
+      if (character) {
+        setCurrentCharacter(characterId);
+        router.push(`/worlds/${character.worldId}/play`);
+      }
+    }
+    setCharacterSwitchDialog({
+      isOpen: false,
+      characterId: null,
+      characterName: '',
+    });
+  };
+
+  // Handle cancel character switch
+  const handleCancelCharacterSwitch = () => {
+    setCharacterSwitchDialog({
+      isOpen: false,
+      characterId: null,
+      characterName: '',
     });
   };
 
@@ -539,10 +597,7 @@ export default function CharactersPage() {
                 isActive={currentCharacterId === character.id}
                 onMakeActive={() => handleSelectCharacter(character.id)}
                 onView={() => handleViewCharacter(character.id)}
-                onPlay={() => {
-                  setCurrentCharacter(character.id);
-                  router.push(`/worlds/${character.worldId}/play`);
-                }}
+                onPlay={() => handleCharacterPlay(character.id)}
                 onEdit={() => handleEditCharacter(character.id)}
                 onDelete={() => handleDeleteCharacter(character.id)}
               />
@@ -582,6 +637,16 @@ export default function CharactersPage() {
         confirmButtonText="Delete Character"
         cancelButtonText="Cancel"
         isDeleting={deleteDialog.isDeleting}
+      />
+
+      {/* Character Switch Confirmation Dialog */}
+      <GameSessionConfirmationDialog
+        isOpen={characterSwitchDialog.isOpen}
+        onClose={handleCancelCharacterSwitch}
+        onConfirm={handleConfirmedCharacterSwitch}
+        type="character-switch"
+        characterName={characterSwitchDialog.characterName}
+        currentProgress={currentProgress}
       />
 
       {/* Toast Notifications */}

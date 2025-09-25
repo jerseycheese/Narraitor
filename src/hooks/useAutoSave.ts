@@ -71,45 +71,64 @@ import { useToast } from '@/components/ui/toast';
  * @hook
  */
 export const useAutoSave = () => {
-  const sessionStore = useSessionStore();
-  const worldStore = useWorldStore();
-  const characterStore = useCharacterStore();
-  const narrativeStore = useNarrativeStore();
-  const journalStore = useJournalStore();
+  const autoSaveState = useSessionStore(state => state.autoSave);
+  const sessionStatus = useSessionStore(state => state.status);
   const toast = useToast();
   
   const autoSaveServiceRef = useRef<AutoSaveService | null>(null);
 
-  // Create state provider function
+  // Create state provider function using direct store accessors to avoid re-subscribing
   const stateProvider = useCallback(async (): Promise<GameState> => {
+    const sessionState = useSessionStore.getState();
+    const worldState = useWorldStore.getState();
+    const characterState = useCharacterStore.getState();
+    const narrativeState = useNarrativeStore.getState();
+    const journalState = useJournalStore.getState();
+
     return {
       session: {
-        id: sessionStore.id || 'unknown',
-        status: sessionStore.status,
+        id: sessionState.id || 'unknown',
+        status: sessionState.status,
       },
-      world: sessionStore.worldId ? worldStore.worlds[sessionStore.worldId] : undefined,
-      character: sessionStore.characterId ? characterStore.characters[sessionStore.characterId] : undefined,
+      world: sessionState.worldId ? worldState.worlds[sessionState.worldId] : undefined,
+      character: sessionState.characterId ? characterState.characters[sessionState.characterId] : undefined,
       narrative: {
-        entries: Object.values(narrativeStore.segments || {}),
-        currentEntry: narrativeStore.currentEnding,
+        entries: Object.values(narrativeState.segments || {}),
+        currentEntry: narrativeState.currentEnding,
       },
       journal: {
-        entries: Object.values(journalStore.entries || {}),
+        entries: Object.values(journalState.entries || {}),
       },
     };
-  }, [sessionStore, worldStore, characterStore, narrativeStore, journalStore]);
+  }, []);
 
   // Initialize auto-save service
   useEffect(() => {
     if (!autoSaveServiceRef.current) {
       autoSaveServiceRef.current = new AutoSaveService(stateProvider, {
+        onSaveStart: (reason) => {
+          // Manual saves set the status before calling triggerSave
+          if (reason !== 'manual') {
+            useSessionStore.getState().updateAutoSaveStatus('saving');
+          }
+        },
         onSave: (result) => {
-          sessionStore.recordAutoSave(result.timestamp.toISOString());
-          
-          // Show success toast for manual saves only (non-intrusive for auto-saves)
-          if (result.reason === 'manual') {
-            toast.success('Game saved successfully', 
-              `Your progress has been saved (${result.size ? Math.round(result.size / 1024) : 0}KB)`);
+          if (result.success) {
+            const timestamp = new Date().toISOString();
+            setTimeout(() => {
+              useSessionStore.getState().recordAutoSave(timestamp);
+            }, 150);
+
+            // Show success toast for manual saves only (non-intrusive for auto-saves)
+            if (result.reason === 'manual') {
+              toast.success(
+                'Game saved successfully',
+                `Your progress has been saved (${result.size ? Math.round(result.size / 1024) : 0}KB)`
+              );
+            }
+          } else {
+            // No changes saved (e.g., session inactive) — reset status to idle
+            useSessionStore.getState().updateAutoSaveStatus('idle');
           }
         },
         onError: (error) => {
@@ -118,7 +137,7 @@ export const useAutoSave = () => {
             userFriendlyError?: { message: string } 
           };
           const errorMessage = enhancedError.userFriendlyError?.message || error.message;
-          sessionStore.updateAutoSaveStatus('error', errorMessage);
+          useSessionStore.getState().updateAutoSaveStatus('error', errorMessage);
           
           // Show error toast for all save failures (both manual and automatic)
           toast.error('Save failed', errorMessage);
@@ -129,16 +148,25 @@ export const useAutoSave = () => {
     return () => {
       if (autoSaveServiceRef.current) {
         autoSaveServiceRef.current.stop();
+        autoSaveServiceRef.current = null;
       }
     };
-  }, [stateProvider, sessionStore, toast]);
+  }, [stateProvider, toast]);
 
   // Auto-start when session becomes active
   useEffect(() => {
-    if (sessionStore.autoSave.enabled && sessionStore.status === 'active' && autoSaveServiceRef.current) {
-      autoSaveServiceRef.current.start();
+    const service = autoSaveServiceRef.current;
+    if (!service) return;
+
+    if (autoSaveState.enabled && sessionStatus === 'active' && !service.isRunning()) {
+      service.start();
     }
-  }, [sessionStore.autoSave.enabled, sessionStore.status]);
+
+    // If auto-save is disabled, stop immediately
+    if (!autoSaveState.enabled && service.isRunning()) {
+      service.stop();
+    }
+  }, [autoSaveState.enabled, sessionStatus]);
 
   const start = useCallback(() => {
     if (autoSaveServiceRef.current) {
@@ -154,42 +182,55 @@ export const useAutoSave = () => {
 
   const triggerSave = useCallback(async (reason: SaveTriggerReason) => {
     if (autoSaveServiceRef.current) {
-      sessionStore.updateAutoSaveStatus('saving');
+      const wasRunning = autoSaveServiceRef.current.isRunning();
+      if (!wasRunning) {
+        autoSaveServiceRef.current.start();
+      }
+      useSessionStore.getState().updateAutoSaveStatus('saving');
+      const fallbackTimer = setTimeout(() => {
+        const currentStatus = useSessionStore.getState().autoSave.status;
+        if (currentStatus === 'saving') {
+          useSessionStore.getState().updateAutoSaveStatus('idle');
+        }
+      }, 10000);
       try {
         await autoSaveServiceRef.current.triggerSave(reason);
       } catch (error) {
-        sessionStore.updateAutoSaveStatus('error', error instanceof Error ? error.message : 'Unknown error');
+        useSessionStore.getState().updateAutoSaveStatus('error', error instanceof Error ? error.message : 'Unknown error');
+      } finally {
+        clearTimeout(fallbackTimer);
+        if (!wasRunning) {
+          autoSaveServiceRef.current?.stop();
+        }
       }
     }
-  }, [sessionStore]);
+  }, []);
 
   const setEnabled = useCallback((enabled: boolean) => {
-    sessionStore.setAutoSaveEnabled(enabled);
-    if (!enabled && autoSaveServiceRef.current) {
+    useSessionStore.getState().setAutoSaveEnabled(enabled);
+    if (!enabled && autoSaveServiceRef.current?.isRunning()) {
       autoSaveServiceRef.current.stop();
-    } else if (enabled && sessionStore.status === 'active' && autoSaveServiceRef.current) {
-      autoSaveServiceRef.current.start();
     }
-  }, [sessionStore]);
+  }, []);
 
   const retry = useCallback(async () => {
-    if (autoSaveServiceRef.current && sessionStore.autoSave.status === 'error') {
-      sessionStore.updateAutoSaveStatus('saving');
+    if (autoSaveServiceRef.current && useSessionStore.getState().autoSave.status === 'error') {
+      useSessionStore.getState().updateAutoSaveStatus('saving');
       try {
         await autoSaveServiceRef.current.triggerSave('manual');
       } catch {
         // Error will be handled by the service's onError callback
       }
     }
-  }, [sessionStore]);
+  }, []);
 
   return {
     // State
-    isEnabled: sessionStore.autoSave.enabled,
-    status: sessionStore.autoSave.status,
-    lastSaveTime: sessionStore.autoSave.lastSaveTime,
-    errorMessage: sessionStore.autoSave.errorMessage,
-    totalSaves: sessionStore.autoSave.totalSaves,
+    isEnabled: autoSaveState.enabled,
+    status: autoSaveState.status,
+    lastSaveTime: autoSaveState.lastSaveTime,
+    errorMessage: autoSaveState.errorMessage,
+    totalSaves: autoSaveState.totalSaves,
     isRunning: autoSaveServiceRef.current?.isRunning() ?? false,
     
     // Actions

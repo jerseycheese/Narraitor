@@ -26,21 +26,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   isDeleting = false,
 }) => {
   return (
-    <SimpleModal 
-      isOpen={isOpen} 
+    <SimpleModal
+      isOpen={isOpen}
       onClose={onClose}
       title={title}
       showCloseButton={false}
       size="lg"
-      ariaDescribedBy="delete-confirmation-desc"
-      className="component-delete-confirmation-dialog"
-    >
-      <div className="mb-6">
-        <p id="delete-confirmation-desc" className="mb-2 text-sm text-gray-700">{description}</p>
-        <p className="font-medium text-foreground">{itemName}</p>
-      </div>
-      
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      tone="destructive"
+      description={description}
+      footer={(
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             type="button"
             onClick={onClose}
@@ -50,7 +45,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           >
             {cancelButtonText}
           </Button>
-          
+
           <Button
             type="button"
             onClick={onConfirm}
@@ -60,7 +55,11 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           >
             {isDeleting ? 'Deleting...' : confirmButtonText}
           </Button>
-      </div>
+        </div>
+      )}
+      footerClassName="bg-background"
+    >
+      <p className="text-sm font-medium text-foreground">{itemName}</p>
     </SimpleModal>
   );
 };

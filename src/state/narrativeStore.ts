@@ -1,6 +1,9 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
+import { World } from '../types/world.types';
+import { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
 // IMPORTANT: Do not import AI generators directly in client code.
@@ -8,6 +11,7 @@ import { generateUniqueId } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
+import { createIndexedDBStorage } from './persistence';
 
 
 /**
@@ -25,6 +29,7 @@ interface NarrativeStore {
   endingError: string | null;
   error: string | null;
   loading: boolean;
+  _hasHydrated: boolean; // Track if persistence has loaded
 
   // Actions
   addSegment: (sessionId: EntityID, segment: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>) => EntityID;
@@ -57,6 +62,8 @@ interface NarrativeStore {
     worldId: EntityID;
     desiredTone?: EndingTone;
     customPrompt?: string;
+    world?: World;
+    character?: Character;
   }) => Promise<void>;
   clearEnding: () => void;
   setCurrentEnding: (ending: StoryEnding | null) => void;
@@ -79,6 +86,7 @@ const getInitialState = () => ({
   endingError: null,
   error: null,
   loading: false,
+  _hasHydrated: false,
 });
 
 const initialState = getInitialState();
@@ -159,8 +167,10 @@ const extractDecisionContext = (
   return context;
 };
 
-// Narrative Store implementation without persistence for now
-export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
+// Narrative Store implementation with persistence
+export const useNarrativeStore = create<NarrativeStore>()(
+  persist(
+    (set, get) => ({
   ...initialState,
 
   // Add segment
@@ -506,6 +516,8 @@ export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
           endingType,
           desiredTone: params.desiredTone,
           customPrompt: params.customPrompt,
+          world: params.world, // Pass the world data from client
+          character: params.character, // Pass the character data from client
         })
       });
 
@@ -647,4 +659,24 @@ export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
       }
     }));
   },
-}));
+}),
+{
+  name: 'narraitor-narrative-store',
+  storage: createIndexedDBStorage(),
+  version: 1,
+  // Persist narrative data to maintain story progress across browser refreshes
+  partialize: (state) => ({
+    segments: state.segments,
+    sessionSegments: state.sessionSegments,
+    decisions: state.decisions,
+    sessionDecisions: state.sessionDecisions,
+    endedSessions: state.endedSessions,
+    currentEnding: state.currentEnding,
+  }),
+  onRehydrateStorage: () => (state) => {
+    if (state) {
+      state._hasHydrated = true;
+    }
+  },
+}
+));

@@ -9,8 +9,6 @@ import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
-import { useAutoSave } from '@/hooks/useAutoSave';
-import { SaveIndicator } from '@/components/ui/SaveIndicator';
 
 export default function PlayPage() {
   const router = useRouter();
@@ -24,8 +22,6 @@ export default function PlayPage() {
   const initializeSession = useSessionStore(state => state.initializeSession);
   const currentSessionId = useSessionStore(state => state.id);
   
-  // Auto-save functionality for header save button
-  const autoSave = useAutoSave();
   useEffect(() => {
     const setupSession = async () => {
       try {
@@ -105,23 +101,8 @@ export default function PlayPage() {
   const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
   const pageDescription = currentWorld?.genre;
 
-  // Create SaveIndicator as page action
-  const saveAction = (
-    <SaveIndicator
-      status={autoSave.status}
-      lastSaveTime={autoSave.lastSaveTime}
-      errorMessage={autoSave.errorMessage}
-      totalSaves={autoSave.totalSaves}
-      onManualSave={autoSave.triggerSave}
-      onRetryError={autoSave.retry}
-      retryable={true}
-      compact={true}
-      className="text-sm"
-    />
-  );
-
   return (
-    <PageLayout title={pageTitle} description={pageDescription} className="pb-0" actions={saveAction}>
+    <PageLayout title={pageTitle} description={pageDescription} className="pb-0">
       <GameSession worldId={currentWorldId!} />
     </PageLayout>
   );

@@ -42,6 +42,7 @@ interface JournalModalProps {
   isOpen: boolean;
   onClose: () => void;
   sessionId: EntityID;
+  characterId?: EntityID | null;
 }
 
 // EntryDetail component for displaying complete formatted content
@@ -158,12 +159,13 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   isOpen,
   onClose,
   sessionId,
+  characterId,
 }) => {
-  const { getSessionEntries, markAsRead } = useJournalStore();
+  const { getSessionEntriesWithCharacter, markAsRead } = useJournalStore();
   const [selectedEntryId, setSelectedEntryId] = useState<EntityID | null>(null);
   
   // Get entries for this session
-  const entries = getSessionEntries(sessionId);
+  const entries = getSessionEntriesWithCharacter(sessionId, characterId);
   const selectedEntry = selectedEntryId ? entries.find(e => e.id === selectedEntryId) : null;
 
   // Handle entry selection
@@ -174,30 +176,24 @@ export const JournalModal: React.FC<JournalModalProps> = ({
     }
   };
 
+  const entrySummary = entries.length
+    ? `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`
+    : 'No entries yet';
+
   return (
-    <SimpleModal 
-      isOpen={isOpen} 
+    <SimpleModal
+      isOpen={isOpen}
       onClose={onClose}
       size="xl"
-      className="max-w-6xl max-h-[90vh] p-0 bg-gradient-to-br from-amber-50 to-amber-50 border-2 border-amber-500"
+      title="Journal"
+      tone="warning"
+      description={entrySummary}
+      className="max-w-6xl"
+      contentClassName="!p-0"
     >
-      <div className="p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100 rounded-t-lg -m-6 mb-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-amber-900">Journal</h2>
-            </div>
-            {entries.length > 0 && (
-              <span className="ml-3 text-sm text-amber-700">
-                {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-        {/* Content with responsive list-detail layout */}
-        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+      {/* Content with responsive list-detail layout */}
+      <div className="flex h-full min-h-0 flex-col gap-6 px-6 pb-6 pt-6">
+        <div className="flex-1 min-h-0 overflow-hidden rounded-lg border border-warning/30 bg-background dark:bg-white flex flex-col md:flex-row">
           {entries.length === 0 ? (
             <div className="flex-1 p-6">
               <EmptyState
@@ -210,7 +206,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
           ) : (
             <>
               {/* Entry List - Full width on mobile, sidebar on desktop */}
-              <div className={`w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-500 flex flex-col ${
+              <div className={`w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-500 flex min-h-0 flex-col ${
                 selectedEntry ? 'hidden md:flex' : 'flex'
               }`}>
                 <div className="p-4 border-b border-amber-500 bg-amber-50 flex items-center justify-between">
@@ -226,7 +222,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                     </Button>
                   )}
                 </div>
-                <div className="flex-1 overflow-auto p-4 space-y-2">
+                <div className="flex-1 min-h-0 overflow-auto p-4 space-y-2">
                   {entries.map(entry => {
                     // Detect system events for list styling (Issue #176)
                     const isSystemEvent = entry.metadata.automaticEntry && 
@@ -300,7 +296,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
               </div>
 
               {/* Entry Detail - Full width when selected on mobile, always visible on desktop */}
-              <div className={`flex-1 bg-white ${
+              <div className={`flex-1 min-h-0 bg-white md:w-[28rem] xl:w-[32rem] ${
                 selectedEntry ? 'flex flex-col' : 'hidden md:flex md:flex-col'
               }`}>
                 {selectedEntry ? (
@@ -332,6 +328,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
             </>
           )}
         </div>
+      </div>
     </SimpleModal>
   );
 };

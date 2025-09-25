@@ -71,7 +71,8 @@ export interface SessionStore {
   templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
   onboardingCompleted: boolean;
-  
+  narrativeHeight: number; // Persisted height for narrative container
+
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
   endSession: () => void;

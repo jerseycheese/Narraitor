@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils/classNames';
 
 export type ConfirmationVariant = 'default' | 'destructive' | 'warning' | 'info';
 
@@ -20,18 +19,18 @@ export interface ConfirmationDialogProps {
   loadingText?: string;
 }
 
-const variantClasses: Record<ConfirmationVariant, string> = {
-  default: 'border-gray-300 bg-white',
-  destructive: 'border-red-700 bg-white',
-  warning: 'border-amber-700 bg-white',
-  info: 'border-blue-300 bg-white',
-};
-
-const confirmButtonVariants: Record<ConfirmationVariant, "default" | "destructive"> = {
+const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive'> = {
   default: 'default',
   destructive: 'destructive',
   warning: 'default',
   info: 'default',
+};
+
+const modalToneMap: Record<ConfirmationVariant, NonNullable<React.ComponentProps<typeof SimpleModal>['tone']>> = {
+  default: 'default',
+  destructive: 'destructive',
+  warning: 'warning',
+  info: 'info',
 };
 
 export function ConfirmationDialog({
@@ -69,45 +68,34 @@ export function ConfirmationDialog({
     <SimpleModal
       isOpen={isOpen}
       onClose={onClose}
-      title={title || "Confirmation Required"}
+      title={title || 'Confirmation Required'}
       showCloseButton={false}
       size="lg"
-      className={cn(
-        'component-confirmation-dialog sm:rounded-lg',
-        variantClasses[variant]
+      tone={modalToneMap[variant]}
+      description={message}
+      footer={(
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            ref={cancelButtonRef}
+            onClick={onClose}
+            variant="outline"
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
+            {cancelText}
+          </Button>
+          <Button
+            ref={confirmButtonRef}
+            onClick={onConfirm}
+            variant={confirmButtonVariants[variant]}
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
+            {isLoading ? loadingText : confirmText}
+          </Button>
+        </div>
       )}
-    >
-      <div className="text-sm text-gray-700 mb-6" id="confirmation-dialog-desc">
-        {typeof message === 'string' ? (
-          message
-        ) : (
-          message
-        )}
-      </div>
-      
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6">
-        <Button
-          ref={cancelButtonRef}
-          onClick={onClose}
-          variant="outline"
-          disabled={isLoading}
-          className="w-full sm:w-auto"
-        >
-          {cancelText}
-        </Button>
-        <Button
-          ref={confirmButtonRef}
-          onClick={onConfirm}
-          variant={confirmButtonVariants[variant]}
-          disabled={isLoading}
-          className={cn(
-            'w-full sm:w-auto',
-            variant === 'destructive' && 'bg-red-700 hover:bg-red-900 text-white'
-          )}
-        >
-          {isLoading ? loadingText : confirmText}
-        </Button>
-      </div>
-    </SimpleModal>
+      footerClassName="bg-background"
+    />
   );
 }

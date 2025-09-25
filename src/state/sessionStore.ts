@@ -46,6 +46,8 @@ const initialState = {
     errorMessage: null,
     totalSaves: 0,
   },
+  // UI state
+  narrativeHeight: 600, // Default height for narrative container
   // Onboarding state
   onboardingCompleted: false,
 };
@@ -91,25 +93,32 @@ export const useSessionStore = create<SessionStore>()(
       : currentState.id;
     logger.debug('🆔 Using session ID:', sessionId, { isNewCharacterSession, previousCharacterId: currentState.characterId });
     
-    // Clear narrative data when starting a fresh session or changing characters
-    // This prevents new characters from inheriting previous game narratives
+    // Clear narrative data only for the new session to prevent inheritance
+    // IMPORTANT: We preserve old session data when changing characters to avoid data loss
     if (sessionId && (isNewCharacterSession || !currentState.id)) {
       try {
         const { useNarrativeStore } = await import('./narrativeStore');
         const narrativeStore = useNarrativeStore.getState();
-        
-        // If changing characters, clear the old session's data
+
+        // CHANGED: We no longer clear old session data when changing characters
+        // The old session data is preserved so users can return to it later
         if (isNewCharacterSession && currentState.id) {
-          narrativeStore.clearSessionSegments(currentState.id);
-          narrativeStore.clearSessionDecisions(currentState.id);
-          logger.debug('🧹 Cleared old session data for:', currentState.id);
+          // Save the current session before switching (but don't clear its data)
+          logger.debug('💾 Preserving old session data for potential return:', currentState.id);
+          // The old session data remains intact in the narrative store
         }
-        
-        // Clear any existing data for the new session
-        narrativeStore.clearSessionSegments(sessionId);
-        narrativeStore.clearSessionDecisions(sessionId);
+
+        // Only clear data for the new session if it exists (to start fresh)
+        const existingSegments = narrativeStore.getSessionSegments(sessionId);
+        if (existingSegments.length > 0) {
+          narrativeStore.clearSessionSegments(sessionId);
+          narrativeStore.clearSessionDecisions(sessionId);
+          logger.debug('🧹 Cleared existing data for session:', sessionId);
+        }
+
+        // Always clear any global ending state
         narrativeStore.clearEnding();
-        logger.debug('🧹 Cleared narrative data for new session:', sessionId);
+        logger.debug('🧹 Cleared global ending state for new session:', sessionId);
       } catch (error) {
         logger.warn('Failed to clear narrative data:', error);
       }
