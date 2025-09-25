@@ -44,6 +44,7 @@ describe('JournalModal', () => {
     it('renders when isOpen is true', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -69,6 +70,7 @@ describe('JournalModal', () => {
     it('does not render when isOpen is false', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -94,6 +96,7 @@ describe('JournalModal', () => {
       const mockOnClose = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -122,6 +125,7 @@ describe('JournalModal', () => {
       const mockOnClose = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -152,6 +156,7 @@ describe('JournalModal', () => {
     it('displays empty state when no entries exist', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -177,6 +182,7 @@ describe('JournalModal', () => {
     it('displays journal entries when they exist', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockJournalEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -205,6 +211,7 @@ describe('JournalModal', () => {
     it('has proper dialog structure', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -230,6 +237,7 @@ describe('JournalModal', () => {
     it('has accessible close button', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -258,6 +266,7 @@ describe('JournalModal', () => {
     it('shows significance badge correctly', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue([mockJournalEntry]),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -303,6 +312,7 @@ describe('JournalModal', () => {
     beforeEach(() => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue(mockEntries),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue(mockEntries),
         markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
@@ -343,6 +353,7 @@ describe('JournalModal', () => {
       const mockMarkAsRead = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue(mockEntries),
+        getSessionEntriesWithCharacter: jest.fn().mockReturnValue(mockEntries),
         markAsRead: mockMarkAsRead,
         addEntry: jest.fn(),
         updateEntry: jest.fn(),

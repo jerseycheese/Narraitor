@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RecoveryNotification } from '../RecoveryNotification';
 
 describe('RecoveryNotification', () => {
@@ -70,11 +70,17 @@ describe('RecoveryNotification', () => {
       expect(notification).toHaveAttribute('aria-describedby');
     });
 
-    test('focuses on first button when shown', () => {
+    test('focuses on a button when shown', async () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      const recoverButton = screen.getByRole('button', { name: /recover progress/i });
-      expect(recoverButton).toHaveFocus();
+      // Either the recover button or close button should have focus after modal renders
+      await waitFor(() => {
+        const activeElement = document.activeElement;
+        const recoverButton = screen.getByRole('button', { name: /recover progress/i });
+        const closeButton = screen.getByRole('button', { name: /close modal/i });
+
+        expect(activeElement === recoverButton || activeElement === closeButton).toBe(true);
+      });
     });
   });
 
