@@ -32,13 +32,29 @@ const mockSessionStore = {
 };
 
 jest.mock('../../state/sessionStore', () => ({
-  useSessionStore: () => ({
-    ...mockSessionStore,
-    id: 'test-session',
-    status: 'active',
-    worldId: 'world-1',
-    characterId: 'char-1',
-  }),
+  useSessionStore: Object.assign(
+    (selector = (state) => state) => {
+      const fullState = {
+        ...mockSessionStore,
+        id: 'test-session',
+        status: 'active',
+        worldId: 'world-1',
+        characterId: 'char-1',
+        autoSave: mockSessionStore.autoSave,
+      };
+      return selector(fullState);
+    },
+    {
+      getState: () => ({
+        ...mockSessionStore,
+        id: 'test-session',
+        status: 'active',
+        worldId: 'world-1',
+        characterId: 'char-1',
+        autoSave: mockSessionStore.autoSave,
+      }),
+    }
+  ),
 }));
 
 // Mock other stores
