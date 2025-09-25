@@ -71,17 +71,17 @@ describe('getSafetySettingsFromPrompt', () => {
     ]);
   });
 
-  it('returns BLOCK_ONLY_HIGH for R-rated content', () => {
+  it('returns BLOCK_NONE for sexually explicit content for R-rated', () => {
     const prompt = `
       R-RATED CONTENT GUIDELINES:
       - Realistic violence with consequences
       - Strong language and mature themes
     `;
-    
+
     const safetySettings = getSafetySettingsFromPrompt(prompt);
-    
+
     expect(safetySettings).toEqual([
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
       { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
@@ -101,19 +101,19 @@ describe('getSafetySettingsFromPrompt', () => {
     ]);
   });
 
-  it('returns BLOCK_ONLY_HIGH for NC-17 content', () => {
+  it('returns BLOCK_NONE for sexually explicit content for NC-17', () => {
     const prompt = `
       NC-17-RATED CONTENT GUIDELINES:
       - Intense, realistic scenarios with serious consequences
       - Strong language and complex mature themes
     `;
-    
+
     const safetySettings = getSafetySettingsFromPrompt(prompt);
-    
+
     expect(safetySettings).toEqual([
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
     ]);
   });
