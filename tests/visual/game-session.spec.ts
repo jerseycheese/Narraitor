@@ -445,6 +445,24 @@ test.describe('Game Session Visual Tests', () => {
     // Wait for the DOM changes to settle
     await page.waitForTimeout(500);
 
+    // Scroll to bottom to show realistic state - user would be at bottom to see latest content
+    await page.evaluate(() => {
+      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
+      if (storyColumn) {
+        const scrollArea = storyColumn.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollArea) {
+          scrollArea.scrollTo({
+            top: scrollArea.scrollHeight,
+            behavior: 'smooth'
+          });
+          console.log('✅ Scrolled to bottom to show latest content');
+        }
+      }
+    });
+
+    // Wait for scroll to complete
+    await page.waitForTimeout(500);
+
     // Verify the constraints are now applied
     const heightDebug = await page.evaluate(() => {
       const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
