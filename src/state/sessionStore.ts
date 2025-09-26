@@ -61,12 +61,13 @@ export const useSessionStore = create<SessionStore>()(
   ...initialState,
 
   // Initialize a new game session
-  initializeSession: async (worldId, characterId, onComplete) => {
+  initializeSession: async (worldId, characterId, onComplete, force = false) => {
     const currentState = get();
-    
+
     logger.debug('TARGET: initializeSession called:', {
       worldId,
       characterId,
+      force,
       currentState: {
         id: currentState.id,
         status: currentState.status,
@@ -74,10 +75,11 @@ export const useSessionStore = create<SessionStore>()(
         characterId: currentState.characterId
       }
     });
-    
+
     // Don't initialize if we already have an active session for the same world/character
-    if (currentState.status === 'active' && 
-        currentState.worldId === worldId && 
+    // unless force is true (for fresh sessions)
+    if (!force && currentState.status === 'active' &&
+        currentState.worldId === worldId &&
         currentState.characterId === characterId) {
       logger.debug('Session already active for this world/character, skipping initialization');
       if (onComplete) onComplete();

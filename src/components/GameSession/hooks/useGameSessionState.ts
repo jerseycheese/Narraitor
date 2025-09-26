@@ -263,7 +263,7 @@ export const useGameSessionState = ({
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
         logger.debug('[useGameSessionState] Creating new session with character:', sessionCharacterId, 'disableAutoResume:', disableAutoResume);
-        actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
+        actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, disableAutoResume);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
