@@ -124,8 +124,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   
-  // Stable callback for onStabilized
-  const handleStabilized = React.useCallback(() => {}, []);
 
 
   // Debug: log key state changes to help diagnose skeleton readiness
@@ -785,7 +783,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
             sessionId={sessionId}
-            onStabilized={handleStabilized}
             className="flex flex-col flex-1 min-h-0"
             disableInitialAutoScroll={false}
           />
