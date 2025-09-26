@@ -124,7 +124,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   
- 
+
   // Debug: log key state changes to help diagnose skeleton readiness
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
