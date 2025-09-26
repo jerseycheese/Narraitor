@@ -72,9 +72,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Manual end story confirmation
   const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
-  
+
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
+
   
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -123,11 +124,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   
-  // Track previous height to retain during loading states
-  const previousHeightRef = React.useRef<number>(0);
-
   // Stable callback for onStabilized
   const handleStabilized = React.useCallback(() => {}, []);
+
 
   // Debug: log key state changes to help diagnose skeleton readiness
   React.useEffect(() => {
@@ -204,94 +203,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       clearTimeout(timeoutId);
     };
   }, [initialized, segmentCount, isGenerating]);
-  
-  // Sync narrative height with choices height
-  React.useEffect(() => {
-    const syncHeights = () => {
-      const choicesContainer = document.getElementById('choices-container');
-      const narrativeContainer = document.getElementById('narrative-container');
-      
-      if (choicesContainer && narrativeContainer) {
-        // Get the actual content height, not the artificially inflated container height
-        const playerChoicesContainer = choicesContainer.querySelector('.player-choices-container');
-        let choicesHeight = playerChoicesContainer
-          ? playerChoicesContainer.getBoundingClientRect().height
-          : choicesContainer.getBoundingClientRect().height;
-
-        // Check if suggested actions are expanded and adjust height accordingly
-        const suggestedActionsButton = document.querySelector('[aria-expanded="true"]');
-        const isSuggestedActionsExpanded = !!suggestedActionsButton;
-
-        // If suggested actions are expanded, use a reasonable base height instead of the full expanded height
-        if (isSuggestedActionsExpanded && choicesHeight > 600) {
-          // Use a more reasonable height when suggested actions are expanded
-          // Look for the base choices content without the expanded suggestions
-          const baseChoicesContent = choicesContainer.querySelector('.space-y-4, .flex, .grid');
-          if (baseChoicesContent) {
-            const baseHeight = baseChoicesContent.getBoundingClientRect().height;
-            if (baseHeight > 0 && baseHeight < choicesHeight) {
-              choicesHeight = Math.max(baseHeight + 100, 400); // Add padding and ensure minimum height
-            }
-          } else {
-            // Fallback to a reasonable default when suggestions are expanded
-            choicesHeight = Math.min(choicesHeight, 500);
-          }
-        }
-
-        let finalHeight: number;
-
-        // Use actual loading state instead of height heuristic
-        if (isGeneratingChoices && previousHeightRef.current > 0) {
-          // Preserve previous height during loading
-          finalHeight = previousHeightRef.current;
-        } else {
-          // Use the adjusted choices height and remember it
-          finalHeight = choicesHeight;
-          if (!isGeneratingChoices && choicesHeight > 0) {
-            previousHeightRef.current = choicesHeight;
-          }
-        }
-
-        // Fallback: If no height is calculated and we're not loading, force a re-sync
-        if (finalHeight <= 0 && !isGeneratingChoices && choicesHeight > 0) {
-          finalHeight = choicesHeight;
-          previousHeightRef.current = choicesHeight;
-        }
-
-        // Additional fallback for refresh scenarios where previousHeightRef is 0
-        if (finalHeight <= 0 && previousHeightRef.current === 0 && choicesHeight > 0) {
-          finalHeight = choicesHeight;
-          previousHeightRef.current = choicesHeight;
-        }
-        
-        // Target the ScrollArea component within the narrative history
-        const scrollArea = narrativeContainer.querySelector('[data-radix-scroll-area-root]');
-        if (scrollArea && scrollArea instanceof HTMLElement) {
-          scrollArea.style.height = `${finalHeight}px`;
-        }
-        
-        // Also target the narrative history container as fallback
-        const narrativeHistory = narrativeContainer.querySelector('.narrative-history-container');
-        if (narrativeHistory && narrativeHistory instanceof HTMLElement) {
-          narrativeHistory.style.height = `${finalHeight}px`;
-        }
-      }
-    };
-    
-    // Initial sync
-    const timeoutId = setTimeout(syncHeights, 100);
-    
-    // Sync on window resize
-    window.addEventListener('resize', syncHeights);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', syncHeights);
-    };
-  }, [currentDecision, choices, isGeneratingChoices, sessionId, showJournalModal, showEndingSuggestion, showEndConfirmation, character]);
-  
-  // No viewport calculations needed; rely on flex layout with internal scroll
-  
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -852,14 +763,31 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
 
       {/* Two-column layout for larger screens */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0">
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
         {/* Story Column */}
-        <div className="lg:flex-1 min-h-0" id="narrative-container">
+        <div
+          className="lg:flex-1 min-h-0 flex flex-col lg:overflow-hidden relative"
+          id="narrative-container"
+          style={{
+            maxHeight: segmentCount > 1 ? '500px' : 'none'
+          }}
+        >
+          {/* Fade-out overlay at top when multiple segments */}
+          {segmentCount > 1 && (
+            <div
+              className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)'
+              }}
+            />
+          )}
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
             sessionId={sessionId}
             onStabilized={handleStabilized}
+            className="flex flex-col flex-1 min-h-0"
+            disableInitialAutoScroll={false}
           />
 
           {/* Hidden controller just to generate content - always include it but hide from view */}
@@ -880,8 +808,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
 
         {/* Choices Column */}
-        <div className="lg:flex-1 min-h-0 overflow-auto" id="choices-container">
-          <div className="player-choices-container">
+        <div
+          className="lg:flex-1 min-h-0 flex flex-col"
+          id="choices-container"
+        >
+          <div className="player-choices-container flex-1">
             {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
             {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
               <ChoiceSelector

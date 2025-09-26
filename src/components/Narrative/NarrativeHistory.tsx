@@ -9,6 +9,7 @@ interface NarrativeHistoryProps {
   error?: string;
   className?: string;
   onRetry?: () => void;
+  disableInitialAutoScroll?: boolean;
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
@@ -16,7 +17,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   isLoading = false,
   error,
   className = '',
-  onRetry
+  onRetry,
+  disableInitialAutoScroll = false
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -58,7 +60,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
   // Auto-scroll to bottom on initial load for existing sessions
   useEffect(() => {
-    if (segments.length > 0 && scrollViewportRef.current && !isLoading) {
+    if (segments.length > 0 && scrollViewportRef.current && !isLoading && !disableInitialAutoScroll) {
       // Use a small delay to ensure content is rendered
       const scrollTimer = setTimeout(() => {
         if (scrollViewportRef.current) {
@@ -71,7 +73,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
       return () => clearTimeout(scrollTimer);
     }
-  }, [segments.length, isLoading]);
+  }, [segments.length, isLoading, disableInitialAutoScroll]);
 
   // Keyboard navigation handler with snap-to-center behavior
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -237,7 +239,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   };
 
   // Use full height - let the parent container control the height via JavaScript or CSS
-  const heightClass = 'h-full';
+  const heightClass = 'h-full flex-1';
   
   // Get the ScrollArea's viewport element for scroll control
   useEffect(() => {
@@ -264,6 +266,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       <ScrollArea 
         ref={scrollAreaRef}
         className={`${heightClass} mobile-scroll`}
+        viewportClassName="snap-y snap-mandatory scroll-smooth"
+        viewportStyle={{ scrollPaddingBlock: '2rem' }}
       >
         <div className="space-y-4">
           {renderContent()}
