@@ -11,12 +11,14 @@ interface NarrativeHistoryManagerProps {
   sessionId: string;
   className?: string;
   onStabilized?: () => void;
+  disableInitialAutoScroll?: boolean;
 }
 
 export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = ({
   sessionId,
   className,
-  onStabilized
+  onStabilized,
+  disableInitialAutoScroll = false
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,13 +137,14 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
 
   return (
     <div className={`narrative-history-manager ${className || ''}`}>
-      <NarrativeHistory 
+      <NarrativeHistory
         // Only show segments when they've stabilized
         segments={stabilized ? segments : []}
         // Always show loading animation until stabilized, regardless of whether we have segments
         isLoading={isLoading || !stabilized}
         error={error || undefined}
         className={className}
+        disableInitialAutoScroll={disableInitialAutoScroll}
       />
     </div>
   );

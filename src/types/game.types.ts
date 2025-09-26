@@ -74,7 +74,7 @@ export interface SessionStore {
   narrativeHeight: number; // Persisted height for narrative container
 
   // Actions
-  initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
+  initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void, force?: boolean) => Promise<void>;
   endSession: () => void;
   setStatus: (status: GameSessionState['status']) => void;
   setError: (error: string | null) => void;

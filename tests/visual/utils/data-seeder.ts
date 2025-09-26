@@ -466,6 +466,54 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     updatedAt: '2024-01-01T02:01:00.000Z'
   },
   {
+    id: 'segment-cyberpunk-3',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content: 'Elevator shafts and stairwells offer different advantages. The elevator requires a keycard hack but offers direct access. The emergency stairs avoid most sensors but mean a long climb. Your cybernetic legs can handle it, but time is running short.',
+    type: 'choice' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'tactical',
+      location: 'Arasaka building lobby',
+      timeOfDay: 'night'
+    },
+    timestamp: new Date('2024-01-01T02:02:00.000Z'),
+    createdAt: '2024-01-01T02:02:00.000Z',
+    updatedAt: '2024-01-01T02:02:00.000Z'
+  },
+  {
+    id: 'segment-cyberpunk-4',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content: 'The elevator hums to life as your stolen keycard grants access to the restricted floors. Floor numbers flash by: 20... 30... 40... The corporate executives and their secrets await just seven floors above.',
+    type: 'action' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'escalating',
+      location: 'Arasaka elevator',
+      timeOfDay: 'night'
+    },
+    timestamp: new Date('2024-01-01T02:03:00.000Z'),
+    createdAt: '2024-01-01T02:03:00.000Z',
+    updatedAt: '2024-01-01T02:03:00.000Z'
+  },
+  {
+    id: 'segment-cyberpunk-5',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content: 'Floor 47. The doors slide open to reveal a pristine corridor lined with offices. Security cameras track your every movement, but your scrambler keeps you invisible for now. The executive suite is at the end of the hall.',
+    type: 'scene' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'tense',
+      location: 'Arasaka floor 47',
+      timeOfDay: 'night'
+    },
+    timestamp: new Date('2024-01-01T02:04:00.000Z'),
+    createdAt: '2024-01-01T02:04:00.000Z',
+    updatedAt: '2024-01-01T02:04:00.000Z'
+  },
+  {
     id: 'segment-fantasy-1',
     worldId: 'world-fantasy-realm',
     sessionId: 'session-fantasy-mage',
