@@ -466,6 +466,22 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     updatedAt: '2024-01-01T02:01:00.000Z'
   },
   {
+    id: 'segment-cyberpunk-3',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content: 'Elevator shafts and stairwells offer different advantages. The elevator requires a keycard hack but offers direct access. The emergency stairs avoid most sensors but mean a long climb. Your cybernetic legs can handle it, but time is running short.',
+    type: 'choice' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'tactical',
+      location: 'Arasaka building lobby',
+      timeOfDay: 'night'
+    },
+    timestamp: new Date('2024-01-01T02:02:00.000Z'),
+    createdAt: '2024-01-01T02:02:00.000Z',
+    updatedAt: '2024-01-01T02:02:00.000Z'
+  },
+  {
     id: 'segment-fantasy-1',
     worldId: 'world-fantasy-realm',
     sessionId: 'session-fantasy-mage',
