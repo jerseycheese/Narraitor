@@ -260,6 +260,11 @@ async function seedTestData() {
     // Launch browser
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
+
+    // Flag runtime so client code can disable development tooling during seeding
+    await page.addInitScript(() => {
+      window.__PLAYWRIGHT__ = true;
+    });
     
     // Navigate to app to initialize it, but don't wait for network idle (can hang)
     await page.goto('http://localhost:3000', { waitUntil: 'load' });

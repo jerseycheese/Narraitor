@@ -702,6 +702,11 @@ export async function seedBaseData(page: Page): Promise<void> {
  */
 export async function seedTestData(page: Page): Promise<void> {
   console.log('Seeding full test data for populated state tests...');
+
+  // Flag Playwright runtime so the app can disable development-only panels
+  await page.addInitScript(() => {
+    (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__ = true;
+  });
   
   // Use addInitScript to set data BEFORE the app loads
   await page.addInitScript(async (testData) => {
