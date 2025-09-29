@@ -18,7 +18,7 @@ export function ClientOnlyDevTools() {
       return;
     }
 
-    const playwrightFlag = Boolean((window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__);
+    const playwrightFlag = Boolean(window.__PLAYWRIGHT__);
     setIsPlaywright(playwrightFlag);
 
     // Initialize console debug API only when dev tools are enabled
