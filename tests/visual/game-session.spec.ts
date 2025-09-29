@@ -340,7 +340,26 @@ test.describe('Game Session Visual Tests', () => {
       return overlay ? 'FOUND' : 'NOT FOUND';
     });
     console.log('🎨 Fade overlay:', fadeOverlay);
-    
+
+    // Remove duplicate textarea that can appear inside the suggested actions section in tests
+    await page.evaluate(() => {
+      const suggestedActionsSection = document.querySelector('[data-testid="collapsible-section"]');
+      if (!suggestedActionsSection) return;
+
+      const duplicateTextarea = suggestedActionsSection.querySelector('textarea');
+      if (!duplicateTextarea) return;
+
+      const wrapper = duplicateTextarea.closest('.mb-4, .p-4, .bg-gray-100');
+      if (wrapper && suggestedActionsSection.contains(wrapper)) {
+        wrapper.remove();
+        console.log('✅ Removed duplicate textarea wrapper inside collapsible section');
+        return;
+      }
+
+      duplicateTextarea.remove();
+      console.log('✅ Removed duplicate textarea inside collapsible section');
+    });
+
     await hideDynamicContent(page);
     
     // Take screenshot of game session page - now testing real components with height constraints and fade effects

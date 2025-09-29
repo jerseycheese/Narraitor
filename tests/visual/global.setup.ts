@@ -14,6 +14,11 @@ async function globalSetup(config: FullConfig) {
   
   const browser = await chromium.launch();
   const page = await browser.newPage();
+
+  // Ensure the application knows it's under Playwright before any scripts run
+  await page.addInitScript(() => {
+    (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__ = true;
+  });
   
   try {
     // Navigate to the app first to initialize stores

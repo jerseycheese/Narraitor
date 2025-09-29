@@ -125,7 +125,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const autoSave = useAutoSave();
   
 
-
   // Debug: log key state changes to help diagnose skeleton readiness
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
