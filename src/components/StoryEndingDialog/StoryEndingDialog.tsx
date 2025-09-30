@@ -21,10 +21,10 @@ export interface StoryEndingDialogProps {
 }
 
 const endingTypeClasses: Record<EndingType, string> = {
-  triumphant: 'ending-triumphant border-amber-200 bg-gradient-to-br from-amber-50 to-amber-50',
-  mysterious: 'ending-mysterious border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
-  tragic: 'ending-tragic border-red-500 bg-gradient-to-br from-red-50 to-red-50',
-  default: 'ending-default border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
+  triumphant: 'ending-triumphant border-amber-300',
+  mysterious: 'ending-mysterious border-gray-300',
+  tragic: 'ending-tragic border-red-300',
+  default: 'ending-default border-gray-300',
 };
 
 export function StoryEndingDialog({
