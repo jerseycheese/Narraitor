@@ -3,62 +3,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Scale, Flame, ChevronRight } from 'lucide-react';
 import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
-// Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { safeTrim } from '@/lib/utils';
-
-
-// Local character type definition that matches the actual store structure
-// to avoid type mismatches with the main Character type
-interface Character {
-  id: string;
-  name: string;
-  description: string;
-  worldId: string;
-  level: number;
-  attributes: Array<{
-    id: string;
-    characterId: string;
-    worldAttributeId?: string;
-    name: string;
-    baseValue: number;
-    modifiedValue: number;
-    category?: string;
-  }>;
-  skills: Array<{
-    id: string;
-    characterId: string;
-    worldSkillId?: string;
-    name: string;
-    level: number;
-    category?: string;
-  }>;
-  background: {
-    history: string;
-    personality: string;
-    goals: string[];
-    fears: string[];
-    relationships: unknown[];
-  };
-  isPlayer: boolean;
-  status: {
-    health: number;
-    maxHealth: number;
-    conditions: string[];
-  };
-  inventory: {
-    characterId: string;
-    items: unknown[];
-    capacity: number;
-    categories: string[];
-  };
-}
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -87,7 +38,6 @@ interface ChoiceSelectorProps {
   maxCustomLength?: number;
 
   // Skill requirement props
-  character?: Character;
   worldSkills?: WorldSkill[];
 }
 
@@ -172,7 +122,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   onCustomSubmit,
   customInputPlaceholder = 'Type your custom response...',
   maxCustomLength = 250,
-  character,
   worldSkills = [],
 }) => {
   // Custom input state
@@ -195,19 +144,15 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     skillRequirements?: Array<{
       requirement: DecisionRequirement;
       skillName?: string;
-      isAvailable: boolean;
     }>;
   }> = isDecisionMode
     ? (decision.options || []).map(opt => {
         const skillRequirements = opt.requirements?.filter(req => req.type === 'skill').map(req => {
           const skillData = resolveSkillData(req.targetId, worldSkills);
-          const isAvailable = character ? evaluateRequirement(req, character).success : false;
-          
-          
+
           return {
             requirement: req,
-            skillName: skillData?.name || 'Unknown Skill',
-            isAvailable
+            skillName: skillData?.name || 'Unknown Skill'
           };
         }) || [];
 
@@ -386,12 +331,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     {option.skillRequirements.map((skillReq, index) => {
                       const operatorSuffix = skillReq.requirement?.operator === 'gte' ? '+' : '';
                       const label = `${skillReq.skillName} ${skillReq.requirement?.value}${operatorSuffix}`;
-                      const variant = skillReq.isAvailable ? 'available' : 'unavailable';
-                      
+
                       return (
                         <Badge
                           key={`${option.id}-skill-${index}`}
-                          variant={variant}
+                          variant="skill-requirement"
                         >
                           {label}
                         </Badge>

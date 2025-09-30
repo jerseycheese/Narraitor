@@ -10,6 +10,43 @@ export default function DecisionPointsTestPage() {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string>('');
   const [customInput, setCustomInput] = useState<string>('');
 
+  // Fixture world skills
+  const fixtureWorldSkills = [
+    {
+      id: 'stealth',
+      name: 'Stealth',
+      description: 'Move silently and remain undetected',
+      category: 'Physical',
+      worldId: 'world-test-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      difficulty: 'medium' as const
+    },
+    {
+      id: 'intimidation',
+      name: 'Intimidation',
+      description: 'Frighten or coerce others through force of presence',
+      category: 'Social',
+      worldId: 'world-test-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      difficulty: 'medium' as const
+    },
+    {
+      id: 'persuasion',
+      name: 'Persuasion',
+      description: 'Convince others through reasoned argument',
+      category: 'Social',
+      worldId: 'world-test-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      difficulty: 'easy' as const
+    }
+  ];
+
   // Sample narrative segments
   const sampleSegments: NarrativeSegment[] = [
     {
@@ -59,9 +96,30 @@ export default function DecisionPointsTestPage() {
       contextSummary: 'The forest crossroads offers three distinct paths, each leading to unknown dangers and opportunities.',
       decisionWeight: 'major',
       options: [
-        { id: 'option-1', text: 'Follow the mysterious blue lights', alignment: 'chaotic', hint: 'Could lead to magical discoveries' },
-        { id: 'option-2', text: 'Take the well-worn path straight ahead', alignment: 'neutral', hint: 'The safest but most predictable route' },
-        { id: 'option-3', text: 'Head towards the sound of running water', alignment: 'lawful', hint: 'Water often means civilization' }
+        {
+          id: 'option-1',
+          text: 'Follow the mysterious blue lights',
+          alignment: 'chaotic',
+          hint: 'Could lead to magical discoveries',
+          requirements: [
+            { type: 'skill', targetId: 'stealth', operator: 'gte', value: 5 }
+          ]
+        },
+        {
+          id: 'option-2',
+          text: 'Take the well-worn path straight ahead',
+          alignment: 'neutral',
+          hint: 'The safest but most predictable route'
+        },
+        {
+          id: 'option-3',
+          text: 'Head towards the sound of running water',
+          alignment: 'lawful',
+          hint: 'Water often means civilization',
+          requirements: [
+            { type: 'skill', targetId: 'persuasion', operator: 'gte', value: 3 }
+          ]
+        }
       ]
     },
     'decision-critical': {
@@ -70,9 +128,33 @@ export default function DecisionPointsTestPage() {
       contextSummary: 'The village is under attack and the townspeople are looking to you for leadership in this desperate hour.',
       decisionWeight: 'critical',
       options: [
-        { id: 'option-1', text: 'Rally the guards and organize a defense', alignment: 'lawful', hint: 'Leadership in times of crisis' },
-        { id: 'option-2', text: 'Help evacuate the civilians to safety', alignment: 'neutral', hint: 'Protect the innocent' },
-        { id: 'option-3', text: 'Investigate the source of the attack', alignment: 'chaotic', hint: 'Stop the threat at its source' }
+        {
+          id: 'option-1',
+          text: 'Rally the guards and organize a defense',
+          alignment: 'lawful',
+          hint: 'Leadership in times of crisis',
+          requirements: [
+            { type: 'skill', targetId: 'intimidation', operator: 'gte', value: 6 }
+          ]
+        },
+        {
+          id: 'option-2',
+          text: 'Help evacuate the civilians to safety',
+          alignment: 'neutral',
+          hint: 'Protect the innocent',
+          requirements: [
+            { type: 'skill', targetId: 'persuasion', operator: 'gte', value: 4 }
+          ]
+        },
+        {
+          id: 'option-3',
+          text: 'Investigate the source of the attack',
+          alignment: 'chaotic',
+          hint: 'Stop the threat at its source',
+          requirements: [
+            { type: 'skill', targetId: 'stealth', operator: 'gte', value: 8 }
+          ]
+        }
       ]
     }
   };
@@ -118,6 +200,7 @@ export default function DecisionPointsTestPage() {
                   onCustomSubmit={handleCustomSubmit}
                   enableCustomInput={true}
                   isDisabled={false}
+                  worldSkills={fixtureWorldSkills}
                 />
                 {selectedChoiceId && (
                   <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
@@ -161,6 +244,7 @@ export default function DecisionPointsTestPage() {
                         onCustomSubmit={handleCustomSubmit}
                         enableCustomInput={true}
                         isDisabled={false}
+                        worldSkills={fixtureWorldSkills}
                       />
                     </div>
                   )}
@@ -185,6 +269,7 @@ export default function DecisionPointsTestPage() {
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={false}
+                worldSkills={fixtureWorldSkills}
               />
             </div>
           </div>

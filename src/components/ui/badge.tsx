@@ -30,6 +30,7 @@ const badgeVariants = cva(
         // Skill requirement variants
         available: "border-transparent bg-green-200 text-green-700 hover:bg-green-500",
         unavailable: "border-transparent bg-red-200 text-red-700 hover:bg-red-500",
+        "skill-requirement": "border border-gray-300 bg-gray-100 text-gray-700",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",

@@ -812,7 +812,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                character={character}
                 worldSkills={world?.skills || []}
               />
             ) : (
