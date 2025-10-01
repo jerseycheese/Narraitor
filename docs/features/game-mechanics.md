@@ -89,7 +89,7 @@ const alignmentStyles = {
 
 ## Skill Check System
 
-The skill system here focuses on consequences rather than blocking players from actions. When you see a choice like "Sneak past guards [Stealth 8+]", you can attempt it regardless of your character's actual Stealth level. The key difference is what happens next: your character's skill level determines whether the action succeeds or fails in the story.
+The skill system here focuses on consequences rather than blocking players from actions. When you see a choice like "Sneak past guards [Stealth]", you can attempt it regardless of your character's actual Stealth level. The badge just shows which skill is involved - not the difficulty level. This prevents players from avoiding choices they know they'd fail. The key difference is what happens next: your character's skill level determines whether the action succeeds or fails in the story.
 
 This approach means players discover their limitations through play, not through grayed-out options. If your character has Stealth 2 and tries that level 8+ stealth action, they don't get blocked - they get caught. The narrative shows them failing through actual story events, not game messages.
 
@@ -116,14 +116,14 @@ interface DecisionOption {
 
 ### How It Works
 
-The flow is pretty straightforward. Players see choices with skill badges showing requirements (like "Stealth 8+"), pick one, then the system evaluates whether their character's skill level meets the requirement. Based on that check, it creates either a `skill-success:stealth` or `skill-failure:stealth` tag. These tags then guide the AI to generate appropriate narrative - success means the action works out, failure means it goes wrong in the story.
+The flow is pretty straightforward. Players see choices with skill badges showing which skill is involved (like "Stealth"), pick one, then the system evaluates whether their character's skill level meets the requirement. Based on that check, it creates either a `skill-success:stealth` or `skill-failure:stealth` tag. These tags then guide the AI to generate appropriate narrative - success means the action works out, failure means it goes wrong in the story.
 
-The skill badges themselves stay neutral - just showing the requirement without any green/red pass/fail colors. This keeps the focus on the story choice rather than turning it into a stats check.
+The skill badges just show the skill name - no difficulty numbers. This way players know what kind of action it is (sneaking, persuading, etc.) but can't game the system by avoiding choices they'd fail.
 
 ```typescript
-// Badge just shows the requirement
+// Badge shows skill name only
 <Badge variant="skill-requirement">
-  Stealth 8+
+  Stealth
 </Badge>
 
 // Behind the scenes, tags guide AI narrative generation

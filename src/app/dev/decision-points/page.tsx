@@ -308,6 +308,7 @@ export default function DecisionPointsTestPage() {
                 <li>• Lawful choices: Scale icon + blue background</li>
                 <li>• Chaotic choices: Flame icon + red background</li>
                 <li>• Neutral choices: No icon + gray background</li>
+                <li>• Skill badges: Show skill name only (no difficulty level to avoid spoiling outcomes)</li>
                 <li>• Clear visual separation from narrative text</li>
                 <li>• Responsive design for all screen sizes</li>
               </ul>

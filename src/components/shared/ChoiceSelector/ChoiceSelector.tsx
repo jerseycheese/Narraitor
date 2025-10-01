@@ -329,8 +329,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                 {option.skillRequirements && option.skillRequirements.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {option.skillRequirements.map((skillReq, index) => {
-                      const operatorSuffix = skillReq.requirement?.operator === 'gte' ? '+' : '';
-                      const label = `${skillReq.skillName} ${skillReq.requirement?.value}${operatorSuffix}`;
+                      const label = `${skillReq.skillName}`;
 
                       return (
                         <Badge
