@@ -1,7 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type CharacterSkill } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import {
   Decision,
@@ -434,17 +434,10 @@ export class NarrativeGenerator {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
 
     // Build character skill context for AI
-    let characterSkillContext = '';
-    if (playerCharacter && world.skills && playerCharacter.skills?.length > 0) {
-      characterSkillContext = `
-CHARACTER ABILITIES:
-${playerCharacter.skills
-  .map((skill: CharacterSkill) => {
-    const worldSkill = world.skills?.find((ws) => ws.id === skill.worldSkillId);
-    return `- ${worldSkill?.name || skill.name}: Level ${skill.level}`;
-  })
-  .join('\n')}`;
-    }
+    // NOTE: We intentionally DO NOT provide skill levels to the AI
+    // The skill check success/failure tags provide enough guidance without
+    // exposing game mechanics that break narrative immersion
+    const characterSkillContext = '';
     return {
       worldName: world.name,
       worldDescription: world.description,

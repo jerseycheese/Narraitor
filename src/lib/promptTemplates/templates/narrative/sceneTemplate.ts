@@ -31,11 +31,11 @@ ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.curren
 
 ${narrativeContext?.currentTags?.some((tag: string) => tag.includes('skill-success') || tag.includes('skill-failure')) ? `
 SKILL CHECK RESULT GUIDANCE:
-${narrativeContext.currentTags.includes('skill-success') ? '- The player SUCCEEDED at their skill check - acknowledge their competence and expertise' : ''}
-${narrativeContext.currentTags.includes('skill-failure') ? '- The player FAILED at their skill check - show the consequences and areas for improvement' : ''}
-- Reference the specific skill used in a natural way within the narrative
-- Show how the character's abilities (or lack thereof) affected the outcome
-- Make skill usage feel meaningful to the story progression
+${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-success:')) ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
+${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-failure:')) ? '- The player FAILED at their action - show realistic consequences and setbacks' : ''}
+- DO NOT explicitly mention skill names, skill levels, or game mechanics
+- Show the outcome through what actually happens in the story
+- Success = things work out, failure = things go wrong or backfire
 ` : ''}
 
 CRITICAL CONTINUITY RULES:

@@ -51,6 +51,22 @@ const client = new GeminiClient({
 
 ## Narrative Generation
 
+### Skill-Aware Narrative
+
+The narrative generator handles skill checks through a tag system. When a player selects a choice with skill requirements, the system evaluates whether their character meets the requirement and adds a success or failure tag to the narrative context. The AI then uses these tags to generate appropriate story outcomes.
+
+The key thing here is that the AI never sees the character's actual skill levels - just the success/failure tags. This prevents it from exposing game mechanics in the narrative. So instead of generating something like "Your Stealth skill of 3 isn't enough," it generates actual story consequences: "Your footstep echoes. Guards turn toward you."
+
+```typescript
+// Success tag
+currentTags: ['skill-success:stealth']
+// Generates: "You slip past unnoticed..."
+
+// Failure tag
+currentTags: ['skill-failure:stealth']
+// Generates: "Your footstep echoes. Guards turn toward you..."
+```
+
 ### Quick Start
 ```tsx
 import { GameSessionActiveWithNarrative } from '@/components/GameSession';
@@ -59,7 +75,7 @@ import { GameSessionActiveWithNarrative } from '@/components/GameSession';
   worldId="world-id"
   sessionId="session-id"
   onChoiceSelected={(choiceId) => {
-    // Choice automatically processed
+    // Choice automatically processed with skill evaluation
   }}
 />
 ```
@@ -81,14 +97,14 @@ import { NarrativeController } from '@/components/Narrative';
 ## Choice Generation
 
 ### AI-Generated Choices
-- 3-4 contextual options based on current narrative
-- Generated automatically using world context
-- Filtered for appropriate difficulty and tone
+
+The choice generator creates 3-4 contextual options based on the current narrative and world context. When adding skill requirements to choices, it only knows about the world's available skills - not the character's actual skill levels. This is intentional: the AI generates varied difficulty levels to create challenging choices without being able to "tune" them to the character's capabilities.
+
+This means you'll see choices you might fail at, which is the point. The AI can't soften the difficulty just because your character has low skills.
 
 ### Custom Player Input
-- Free-text input for player actions
-- Processed through same narrative pipeline
-- 250-character limit with visual feedback
+
+Players can type their own actions instead of picking from AI suggestions. These custom inputs go through the same narrative pipeline as generated choices, just with a 250-character limit and visual feedback as you type.
 
 ### Integration Example
 ```tsx
@@ -105,21 +121,9 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 
 ## World Suggestions
 
-AI-powered attribute and skill suggestions during world creation.
+The AI can suggest attributes and skills during world creation. You describe your world setting and themes, the system analyzes what you wrote and generates relevant suggestions, then you review and decide which ones to use. You're in full control - accept the ones that fit, ignore the rest.
 
-### How It Works
-1. **Describe Your World**: Provide detailed description of setting and themes
-2. **AI Analysis**: System analyzes themes and generates suggestions
-3. **Review Suggestions**: AI presents relevant attributes and skills
-4. **Accept/Reject**: Full control over which suggestions to use
-
-### Example Usage
-For a fantasy world description:
-> "A mystical realm where ancient magic flows through crystalline ley lines..."
-
-**AI Suggestions:**
-- **Attributes**: Arcane Power, Dragon Affinity, Mystic Insight
-- **Skills**: Spellcasting, Ley Line Navigation, Crystal Resonance
+For example, describe a fantasy world as "A mystical realm where ancient magic flows through crystalline ley lines" and the AI might suggest attributes like Arcane Power, Dragon Affinity, and Mystic Insight, along with skills like Spellcasting, Ley Line Navigation, and Crystal Resonance.
 
 ### Integration
 ```tsx
@@ -135,14 +139,8 @@ import { WorldCreationWizard } from '@/components/World';
 
 ## Smart Templates
 
-AI-powered world template generation with three modes:
+The AI can generate complete world templates in three ways: "Inspired By" takes your description and builds a template from it, "Genre Mixer" combines multiple genres for unique worlds, and "Surprise Me" generates unexpected concepts.
 
-### Generation Modes
-1. **Inspired By**: Generate templates based on user descriptions
-2. **Genre Mixer**: Combine multiple genres for unique worlds
-3. **Surprise Me**: Generate unexpected world concepts
-
-### Components
 ```tsx
 import { SmartTemplates } from '@/components/World/SmartTemplates';
 
@@ -153,31 +151,13 @@ import { SmartTemplates } from '@/components/World/SmartTemplates';
 />
 ```
 
-### Template Preview
-Generated templates include:
-- World name and description
-- Suggested attributes and skills
-- Theme and genre information
-- Template preview modal before selection
+Each template includes the world name and description, suggested attributes and skills, theme and genre info, and a preview modal so you can review before using it.
 
 ## Goal Tracking System
 
-AI-powered extraction and tracking of player objectives for narrative consistency.
+The AI automatically extracts and tracks player objectives to keep the narrative consistent. It identifies goals from the story (both explicit and implicit), monitors progress and completion, and includes active goals in AI prompts so the narrative stays focused on what matters.
 
-### Key Features
-- **Automatic Extraction**: AI identifies explicit and implicit goals from narrative content
-- **Progress Tracking**: Monitors goal mentions, status, and completion
-- **Context Integration**: Goals automatically included in AI prompts for consistency
-- **Priority Management**: Critical, high, medium, and low priority classification
-- **Session Isolation**: Goals organized by game session
-
-### Goal Types
-- **Immediate**: Right-now actions requiring immediate attention
-- **Quest**: Specific objectives with clear completion criteria
-- **Exploration**: Discovery-based goals for world exploration
-- **Social**: Relationship and interaction objectives
-- **Mystery**: Investigation and puzzle-solving goals
-- **Survival**: Life-threatening situations requiring urgent action
+Goals get prioritized as critical, high, medium, or low, and they're organized by game session so each playthrough maintains its own focus. There are six types: Immediate (right-now actions), Quest (specific objectives with clear completion), Exploration (discovery-based), Social (relationship and interaction), Mystery (investigation and puzzles), and Survival (life-threatening situations).
 
 ### Integration Example
 ```typescript
@@ -210,13 +190,7 @@ const context = aiContextStore.buildContextForSession(sessionId, {
 
 ## Ending Detection
 
-AI-powered detection of natural story conclusion points.
-
-### Key Features
-- **Pure AI Analysis**: No keyword matching: understands narrative structure
-- **Context-Aware**: Analyzes recent segments and broader story context
-- **Confidence-Based**: Only suggests endings with medium/high confidence
-- **Multiple Types**: story-complete, character-retirement, session-limit
+The AI detects when the story reaches a natural conclusion point. It uses pure AI analysis instead of keyword matching, so it actually understands narrative structure. The system looks at recent segments and the broader story context, then only suggests endings when it has medium or high confidence. Types include story-complete, character-retirement, and session-limit.
 
 ### Response Format
 ```json
@@ -239,9 +213,8 @@ await checkForEndingIndicators(newSegment);
 ```
 
 ### Context Analysis
-- **Recent Context**: Last 5 narrative segments for immediate analysis
-- **Broader Context**: Earlier story summary for overall understanding
-- **Minimum Requirements**: At least 3 narrative segments before analysis
+
+The system looks at the last 5 narrative segments for immediate analysis and earlier story summary for overall understanding. It needs at least 3 segments before it starts analyzing for potential endings.
 
 ## AI Mocking System
 
@@ -300,37 +273,16 @@ The testing harnesses let you try out different scenarios without having to set 
 
 ## Error Handling
 
-### AI Service Failures
-- **Graceful degradation**: System continues without AI features
-- **Retry logic**: Automatic retries with exponential backoff
-- **Fallback content**: Default options when AI unavailable
+When AI service fails, the system degrades gracefully and continues without AI features. There's automatic retry logic with exponential backoff, and fallback content provides default options when AI is unavailable.
 
-### Network Issues
-- **Timeout handling**: 15-second timeout on AI requests
-- **Rate limit responses**: Clear error messages when limits exceeded
-- **Connection errors**: User-friendly error states
+For network issues, there's a 15-second timeout on AI requests, clear error messages when rate limits are exceeded, and user-friendly error states for connection problems.
 
 ## Configuration
 
-### Environment Variables
-```bash
-# Required: Server-side only
-GEMINI_API_KEY=your-api-key
+Environment variables are straightforward: `GEMINI_API_KEY` is required and server-side only (never use NEXT_PUBLIC_ prefix), and `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging.
 
-# Optional: Development debugging
-NEXT_PUBLIC_DEBUG_LOGGING=true
-```
-
-### Model Configuration
-- **Primary Model**: gemini-2.0-flash
-- **Temperature**: 0.7 for creative content
-- **Max Tokens**: Varies by use case (choices: 200, narrative: 500)
+The model configuration uses gemini-2.0-flash as the primary model, temperature of 0.7 for creative content, and max tokens vary by use case (200 for choices, 500 for narrative).
 
 ## Best Practices
 
-1. **Server-side Only**: Never expose API keys to client
-2. **Rate Limiting**: Respect API limits and user quotas
-3. **Error Handling**: Always provide fallback experiences
-4. **Context Management**: Optimize prompt context for token efficiency
-5. **User Control**: Allow users to accept/reject AI suggestions
-6. **Testing**: Use development harnesses for AI feature testing
+Keep API keys server-side only - never expose them to the client. Respect API limits and user quotas. Always provide fallback experiences when AI fails. Optimize prompt context for token efficiency since you're paying per token. Let users accept or reject AI suggestions rather than forcing them. Use the development harnesses for testing AI features.

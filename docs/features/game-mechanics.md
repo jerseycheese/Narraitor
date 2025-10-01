@@ -43,24 +43,11 @@ interface Decision {
 
 ## Choice Alignment System
 
-Personality-driven narrative variety through character alignments: Lawful, Neutral, and Chaotic.
+The alignment system adds personality variety to choices. When the AI generates options, it tags them as Lawful, Neutral, or Chaotic to give players different approaches to the same situation.
 
-### Alignment Types
+Lawful choices follow rules and respect authority - things like following protocols or seeking official help. These get a blue accent. Neutral choices are pragmatic and situational - investigating, gathering information, practical solutions. Standard gray styling. Chaotic choices break conventions and use creative approaches - unconventional tactics or dramatic actions. These get a red accent.
 
-**Lawful**
-- **Philosophy**: Rule-following, honor-bound, methodical approaches
-- **Visual**: Blue accent with structured appearance
-- **Examples**: Following protocols, seeking official help, respecting authority
-
-**Neutral**
-- **Philosophy**: Balanced, pragmatic, situational responses
-- **Visual**: Gray accent with standard appearance
-- **Examples**: Investigating, gathering information, practical solutions
-
-**Chaotic**
-- **Philosophy**: Unpredictable, creative, rule-breaking approaches
-- **Visual**: Red accent with dynamic appearance
-- **Examples**: Unconventional tactics, creative solutions, dramatic actions
+The point is giving players ways to express their character's personality through choices, not just picking the "right" answer.
 
 ### Implementation
 
@@ -100,24 +87,77 @@ const alignmentStyles = {
 };
 ```
 
+## Skill Check System
+
+The skill system here focuses on consequences rather than blocking players from actions. When you see a choice like "Sneak past guards [Stealth]", you can attempt it regardless of your character's actual Stealth level. The badge just shows which skill is involved - not the difficulty level. This prevents players from avoiding choices they know they'd fail. The key difference is what happens next: your character's skill level determines whether the action succeeds or fails in the story.
+
+This approach means players discover their limitations through play, not through grayed-out options. If your character has Stealth 2 and tries that level 8+ stealth action, they don't get blocked - they get caught. The narrative shows them failing through actual story events, not game messages.
+
+The other critical piece is keeping game mechanics invisible in the narrative. The AI never mentions skill names or levels when generating story text. When your low-Mechanics character tries to fix a radio, the narrative doesn't say "Your Mechanics skill, while only at level two, allows you to salvage a few components." Instead it shows what actually happens: "Your hands fumble with the radio's internals. Despite your best efforts, wires snap and components crack under your inexperienced touch."
+
+### Implementation
+
+```typescript
+interface DecisionRequirement {
+  type: 'skill' | 'attribute' | 'item' | 'relationship';
+  targetId: EntityID;
+  operator: 'gt' | 'gte' | 'lt' | 'lte' | 'eq' | 'neq';
+  value: number | string;
+}
+
+interface DecisionOption {
+  id: EntityID;
+  text: string;
+  alignment?: ChoiceAlignment;
+  requirements?: DecisionRequirement[];
+  hint?: string;
+}
+```
+
+### How It Works
+
+The flow is pretty straightforward. Players see choices with skill badges showing which skill is involved (like "Stealth"), pick one, then the system evaluates whether their character's skill level meets the requirement. Based on that check, it creates either a `skill-success:stealth` or `skill-failure:stealth` tag. These tags then guide the AI to generate appropriate narrative - success means the action works out, failure means it goes wrong in the story.
+
+The skill badges just show the skill name - no difficulty numbers. This way players know what kind of action it is (sneaking, persuading, etc.) but can't game the system by avoiding choices they'd fail.
+
+```typescript
+// Badge shows skill name only
+<Badge variant="skill-requirement">
+  Stealth
+</Badge>
+
+// Behind the scenes, tags guide AI narrative generation
+// Success: "You slip past the guards unnoticed..."
+// Failure: "Your foot catches on loose gravel, alerting the nearest guard..."
+```
+
+### Character Skills
+
+Skills defined at world level, assigned values at character level:
+
+```typescript
+interface WorldSkill {
+  id: EntityID;
+  name: string;
+  description: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+interface CharacterSkill {
+  id: EntityID;
+  worldSkillId: EntityID;
+  name: string;
+  level: number;  // 1-10
+  category?: string;
+}
+```
+
 ## Character Attributes
 
-Foundation system for character capabilities and world configuration.
+Attributes are the foundation for character capabilities. For the MVP, all attributes use a fixed 1-10 range where 1 is minimal capability, 5-6 is average, and 10 is peak human or beyond.
 
-### Attribute Ranges
-
-**Fixed Range (MVP)**: 1-10 for all attributes
-- **1**: Extremely low value (minimal capability)
-- **5-6**: Average value (normal human capability)
-- **10**: Extremely high value (peak human or beyond)
-
-### Default Values
-
-Default values represent "normal" in the game world:
-- Influence starting character creation
-- Guide NPC generation
-- Set relative difficulty of challenges
-- Can be set anywhere within 1-10 range
+The key thing about attributes is the default value. This represents what's "normal" in your game world. Set it to 3 and characters start weaker, set it to 7 and they start stronger. This default influences character creation, guides NPC generation, and sets the relative difficulty of challenges.
 
 ### Data Structure
 
@@ -143,11 +183,7 @@ export interface CharacterAttribute {
 
 ### Attribute Configuration
 
-Attributes are configurable per world:
-- **Name**: Custom attribute names (Strength, Arcane Power, etc.)
-- **Description**: Explains the attribute's purpose
-- **Default Value**: What's considered "normal" in this world
-- **Range**: Fixed 1-10 for MVP, expandable later
+Each world configures its own attributes. You set the name (Strength, Arcane Power, whatever fits your world), add a description explaining what it does, choose the default value for what's "normal" in this world, and use the fixed 1-10 range. The range is locked for MVP but could expand later.
 
 ### Integration Examples
 
@@ -208,28 +244,14 @@ interface ChoiceSelectorProps {
 
 ### Visual Feedback
 
-- **Decision Weight**: Border styling and shadows indicate importance
-- **Choice Alignment**: Left border colors show personality alignment
-- **Custom Input**: Prominent textarea for player creativity
-- **Context Summary**: Clear explanation of decision stakes
+The UI shows decision weight through border styling and shadows - heavier borders mean more important choices. Alignment shows through left border colors (blue for lawful, red for chaotic, gray for neutral). Custom input gets a prominent textarea so players can write their own actions. Context summaries explain what's at stake without spoiling outcomes.
 
 ## Testing & Development
 
-### Manual Testing Routes
-- `/dev/game-session` - Test all mechanics in context
-- `/dev/choice-selector` - Test individual choice components
-- `/dev/world-creation-wizard` - Test attribute configuration
+There are a few dev routes set up for testing these mechanics. `/dev/game-session` lets you test everything in context, `/dev/choice-selector` focuses on individual choice components, and `/dev/world-creation-wizard` handles attribute configuration.
 
-### Test Scenarios
-1. **Decision Weights**: Minor, major, and critical choices
-2. **Alignments**: All three alignment types in various contexts
-3. **Attributes**: Different attribute configurations and ranges
-4. **Integration**: Combined systems working together
+When testing, try out different decision weights (minor, major, critical), all three alignment types in various situations, different attribute configurations, and how these systems work together.
 
 ## Best Practices
 
-1. **Weight Assignment**: Use AI to determine appropriate decision weights
-2. **Alignment Balance**: Ensure all three alignments are viable options
-3. **Attribute Defaults**: Set meaningful defaults for world context
-4. **Visual Clarity**: Maintain clear visual distinction between mechanics
-5. **Player Agency**: Always allow custom input alongside generated choices
+Let the AI determine decision weights rather than hardcoding them - it's better at judging what actually matters in the moment. Make sure all three alignments are viable options, not just chaotic being "the fun one." Set meaningful attribute defaults that make sense for your world's power level. Keep visual distinctions clear between different mechanics so players aren't confused. Always allow custom input alongside generated choices - player agency matters more than perfect AI suggestions.

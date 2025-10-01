@@ -4,29 +4,6 @@ import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 
-// Simplified character interface for testing
-interface TestCharacter {
-  id: string;
-  name: string;
-  description: string;
-  worldId: string;
-  level: number;
-  attributes: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
-  skills: Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    level: number;
-    worldSkillId?: string;
-    category?: string;
-  }>;
-  background: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  inventory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  status: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  createdAt: string;
-  updatedAt: string;
-  isPlayer: boolean;
-}
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
@@ -77,24 +54,30 @@ describe('ChoiceSelector', () => {
     ],
   };
 
-  const mockCharacter: TestCharacter = {
-    id: 'char-1',
-    name: 'Test Hero',
-    description: 'A test character',
-    worldId: 'world-1',
-    level: 5,
-    attributes: [],
-    skills: [
-      { id: 'skill-1', characterId: 'char-1', name: 'Stealth', level: 3 },
-      { id: 'skill-2', characterId: 'char-1', name: 'Intimidation', level: 8 },
-    ],
-    background: {},
-    inventory: {},
-    status: {},
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    isPlayer: true,
-  };
+  const mockWorldSkills = [
+    {
+      id: 'stealth-skill',
+      name: 'Stealth',
+      description: 'Move silently',
+      category: 'Physical',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      difficulty: 'medium' as const,
+    },
+    {
+      id: 'intimidation-skill',
+      name: 'Intimidation',
+      description: 'Frighten others',
+      category: 'Social',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      difficulty: 'medium' as const,
+    },
+  ];
 
   describe('Basic Choice Selection', () => {
     it('displays all choices and handles selection', async () => {
@@ -159,40 +142,40 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill requirements and availability based on character skills', () => {
+    it('shows skill badges with skill names only (no difficulty)', () => {
       render(
-        <ChoiceSelector 
-          decision={decisionWithSkillRequirements} 
+        <ChoiceSelector
+          decision={decisionWithSkillRequirements}
           onSelect={mockOnSelect}
-          character={mockCharacter}
+          worldSkills={mockWorldSkills}
         />
       );
       expandSuggestions();
-      
-      // Stealth option should show as unavailable (character has level 3, needs 5)
+
+      // All choices should be visible regardless of character skill levels
       expect(screen.getByText('Sneak past')).toBeInTheDocument();
-      
-      // Intimidation option should show as available (character has level 8, needs 7)
       expect(screen.getByText('Intimidate the guard')).toBeInTheDocument();
-      
-      // Direct option has no requirements
       expect(screen.getByText('Walk directly')).toBeInTheDocument();
+
+      // Skill badges should show skill name only (no numbers)
+      expect(screen.getByText('Stealth')).toBeInTheDocument();
+      expect(screen.getByText('Intimidation')).toBeInTheDocument();
     });
 
-    it('allows selection of available skill-based choices', async () => {
+    it('allows selection of any skill-based choice (no client-side gating)', async () => {
       const user = userEvent.setup();
       render(
-        <ChoiceSelector 
-          decision={decisionWithSkillRequirements} 
+        <ChoiceSelector
+          decision={decisionWithSkillRequirements}
           onSelect={mockOnSelect}
-          character={mockCharacter}
+          worldSkills={mockWorldSkills}
         />
       );
       expandSuggestions();
-      
-      // Should be able to select intimidation option (character meets requirement)
-      await user.click(screen.getByText('Intimidate the guard'));
-      expect(mockOnSelect).toHaveBeenCalledWith('intimidate-opt');
+
+      // Should be able to select any option regardless of requirements
+      await user.click(screen.getByText('Sneak past'));
+      expect(mockOnSelect).toHaveBeenCalledWith('stealth-opt');
     });
   });
 
@@ -251,10 +234,10 @@ describe('ChoiceSelector', () => {
 
     it('displays skill requirement information accessibly', () => {
       render(
-        <ChoiceSelector 
-          decision={decisionWithSkillRequirements} 
+        <ChoiceSelector
+          decision={decisionWithSkillRequirements}
           onSelect={mockOnSelect}
-          character={mockCharacter}
+          worldSkills={mockWorldSkills}
         />
       );
       expandSuggestions();

@@ -5,6 +5,10 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { truncate, safeTrim } from '@/lib/utils';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
+import type { Character as UtilCharacter } from '@/types/character.types';
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -41,6 +45,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
   const hasHydrated = useNarrativeStore(state => state._hasHydrated);
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(createDefaultGeminiClient()), []);
+
+  // Access character and world stores for skill evaluation
+  const characters = useCharacterStore(state => state.characters);
+  const worlds = useWorldStore(state => state.worlds);
 
   // Track if we've already generated a narrative for this session
   const [sessionKey, setSessionKey] = useState('');
@@ -640,18 +648,94 @@ Respond with JSON format:
       
       // Find the decision that contains this choice
       let isCustomInput = false;
+      let selectedOption = null;
       for (const decision of decisions) {
-        const selectedOption = decision.options.find(opt => opt.id === triggeringChoiceId);
-        if (selectedOption) {
+        const option = decision.options.find(opt => opt.id === triggeringChoiceId);
+        if (option) {
+          selectedOption = option;
           // For custom input, use the customText, otherwise use the regular text
-          choiceText = selectedOption.isCustomInput && selectedOption.customText 
-            ? selectedOption.customText 
-            : selectedOption.text;
-          isCustomInput = selectedOption.isCustomInput || false;
+          choiceText = option.isCustomInput && option.customText
+            ? option.customText
+            : option.text;
+          isCustomInput = option.isCustomInput || false;
           break;
         }
       }
-      
+
+      // Evaluate skill requirements if present
+      const skillCheckTags: string[] = [];
+      if (selectedOption?.requirements && characterId) {
+        const character = characters[characterId];
+        const world = worlds[worldId];
+
+        if (character && world) {
+          // Filter for skill requirements only
+          const skillRequirements = selectedOption.requirements.filter(req => req.type === 'skill');
+
+          for (const requirement of skillRequirements) {
+            // Create SkillCheck object for evaluateSkillCheck
+            const difficulty = typeof requirement.value === 'number'
+              ? requirement.value
+              : parseInt(requirement.value, 10);
+
+            const skillCheck = {
+              skillId: requirement.targetId,
+              difficulty
+            };
+
+            // Adapt store character format to evaluator's expected format
+            const adaptedCharacter: UtilCharacter = {
+              id: character.id,
+              name: character.name,
+              description: character.description,
+              worldId: character.worldId,
+              skills: character.skills.map(skill => ({
+                skillId: skill.worldSkillId || skill.id,
+                level: skill.level,
+                experience: 0,
+                isActive: true // Store doesn't track this, assume all skills are active
+              })),
+              attributes: character.attributes.map(attr => ({
+                attributeId: attr.worldAttributeId || attr.id,
+                value: attr.modifiedValue || attr.baseValue
+              })),
+              background: {
+                history: character.background?.history || '',
+                personality: character.background?.personality || '',
+                goals: character.background?.goals || [],
+                fears: character.background?.fears || [],
+                relationships: [] // Store uses unknown[], evaluator expects CharacterRelationship[]
+              },
+              inventory: {
+                characterId: character.inventory.characterId,
+                items: [], // Store uses unknown[], evaluator expects InventoryItem[]
+                capacity: character.inventory.capacity,
+                categories: [] // Store uses string[], evaluator expects InventoryCategory[]
+              },
+              status: character.status,
+              createdAt: character.createdAt,
+              updatedAt: character.updatedAt
+            };
+
+            const success = evaluateSkillCheck(
+              adaptedCharacter,
+              skillCheck,
+              world.skills || []
+            );
+
+            // Add success or failure tags for each skill check
+            const tag = success
+              ? `skill-success:${requirement.targetId}`
+              : `skill-failure:${requirement.targetId}`;
+            skillCheckTags.push(tag);
+          }
+        }
+      }
+
+      // Combine existing tags with skill check tags
+      const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
+      const currentTags = [...existingTags, ...skillCheckTags];
+
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
@@ -661,7 +745,7 @@ Respond with JSON format:
           currentSceneId: `scene-${Date.now()}`,
           characterIds: characterId ? [characterId] : [],
           previousSegments: recentSegments,
-          currentTags: recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
+          currentTags,
           sessionId: sessionId || 'temp-session',
           recentSegments,
           currentSituation: `Player chose: "${choiceText}"`
