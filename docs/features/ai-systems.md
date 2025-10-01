@@ -51,6 +51,27 @@ const client = new GeminiClient({
 
 ## Narrative Generation
 
+### Skill-Aware Narrative
+
+The narrative generator uses skill check tags to generate appropriate success/failure outcomes:
+
+```typescript
+// When player selects a choice with skill requirements:
+// 1. System evaluates skill check
+// 2. Adds skill-success:skillId or skill-failure:skillId tag
+// 3. AI uses tags to generate narrative
+
+// Success tag guidance:
+currentTags: ['skill-success:stealth']
+// AI generates: "You slip past unnoticed..."
+
+// Failure tag guidance:
+currentTags: ['skill-failure:stealth']
+// AI generates: "Your footstep echoes. Guards turn toward you..."
+```
+
+**Important**: AI never receives character skill levels, only success/failure tags. This prevents exposing game mechanics in the narrative.
+
 ### Quick Start
 ```tsx
 import { GameSessionActiveWithNarrative } from '@/components/GameSession';
@@ -59,7 +80,7 @@ import { GameSessionActiveWithNarrative } from '@/components/GameSession';
   worldId="world-id"
   sessionId="session-id"
   onChoiceSelected={(choiceId) => {
-    // Choice automatically processed
+    // Choice automatically processed with skill evaluation
   }}
 />
 ```
@@ -83,7 +104,9 @@ import { NarrativeController } from '@/components/Narrative';
 ### AI-Generated Choices
 - 3-4 contextual options based on current narrative
 - Generated automatically using world context
-- Filtered for appropriate difficulty and tone
+- Skill requirements added based on world skills (not character skills)
+- AI generates varied difficulty levels to create challenging choices
+- No access to character skill levels prevents AI from "tuning" difficulty
 
 ### Custom Player Input
 - Free-text input for player actions

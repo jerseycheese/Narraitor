@@ -100,6 +100,97 @@ const alignmentStyles = {
 };
 ```
 
+## Skill Check System
+
+Consequence-based gameplay where skill requirements are displayed but not evaluated until after the player commits to an action.
+
+### Philosophy: Consequence Over Gating
+
+Players see skill requirements on choices (e.g., "Sneak past guards [Stealth 8+]") but can attempt any action regardless of their skill level. The outcome is determined by their character's actual skill:
+
+**Success** - Character has sufficient skill level, the action succeeds naturally in the narrative
+**Failure** - Character lacks sufficient skill, the action fails or backfires with story consequences
+
+### No Game Mechanics in Narrative
+
+The AI never mentions skill names, skill levels, or game mechanics in the narrative. Outcomes are shown purely through what happens in the story:
+
+- ❌ Wrong: "Your Mechanics skill, while only at level two, allows you to salvage a few components"
+- ✅ Right: "Your hands fumble with the radio's internals. Despite your best efforts, wires snap and components crack under your inexperienced touch"
+
+### Implementation
+
+```typescript
+interface DecisionRequirement {
+  type: 'skill' | 'attribute' | 'item' | 'relationship';
+  targetId: EntityID;
+  operator: 'gt' | 'gte' | 'lt' | 'lte' | 'eq' | 'neq';
+  value: number | string;
+}
+
+interface DecisionOption {
+  id: EntityID;
+  text: string;
+  alignment?: ChoiceAlignment;
+  requirements?: DecisionRequirement[];
+  hint?: string;
+}
+```
+
+### Skill Evaluation Flow
+
+1. **Choice Display**: Player sees options with skill badges showing requirements
+2. **Player Selection**: Player chooses an action (not blocked by requirements)
+3. **Skill Check**: System evaluates character's skill level against requirement
+4. **Tag Generation**: Creates `skill-success:skillId` or `skill-failure:skillId` tag
+5. **AI Guidance**: Tags guide AI to generate success or failure narrative
+6. **Story Outcome**: Narrative reflects what actually happens, no mechanics mentioned
+
+### Badge Display
+
+```typescript
+// Neutral badge showing requirement, no pass/fail colors
+<Badge variant="skill-requirement">
+  Stealth 8+
+</Badge>
+```
+
+### AI Context Tags
+
+The system adds contextual tags to guide narrative generation:
+
+```typescript
+// Success scenario
+currentTags: ['skill-success:stealth']
+// AI generates: "You slip past the guards unnoticed..."
+
+// Failure scenario
+currentTags: ['skill-failure:stealth']
+// AI generates: "Your foot catches on loose gravel, alerting the nearest guard..."
+```
+
+### Character Skills
+
+Skills defined at world level, assigned values at character level:
+
+```typescript
+interface WorldSkill {
+  id: EntityID;
+  name: string;
+  description: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+interface CharacterSkill {
+  id: EntityID;
+  worldSkillId: EntityID;
+  name: string;
+  level: number;  // 1-10
+  category?: string;
+}
+```
+
 ## Character Attributes
 
 Foundation system for character capabilities and world configuration.
