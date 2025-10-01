@@ -53,24 +53,19 @@ const client = new GeminiClient({
 
 ### Skill-Aware Narrative
 
-The narrative generator uses skill check tags to generate appropriate success/failure outcomes:
+The narrative generator handles skill checks through a tag system. When a player selects a choice with skill requirements, the system evaluates whether their character meets the requirement and adds a success or failure tag to the narrative context. The AI then uses these tags to generate appropriate story outcomes.
+
+The key thing here is that the AI never sees the character's actual skill levels - just the success/failure tags. This prevents it from exposing game mechanics in the narrative. So instead of generating something like "Your Stealth skill of 3 isn't enough," it generates actual story consequences: "Your footstep echoes. Guards turn toward you."
 
 ```typescript
-// When player selects a choice with skill requirements:
-// 1. System evaluates skill check
-// 2. Adds skill-success:skillId or skill-failure:skillId tag
-// 3. AI uses tags to generate narrative
-
-// Success tag guidance:
+// Success tag
 currentTags: ['skill-success:stealth']
-// AI generates: "You slip past unnoticed..."
+// Generates: "You slip past unnoticed..."
 
-// Failure tag guidance:
+// Failure tag
 currentTags: ['skill-failure:stealth']
-// AI generates: "Your footstep echoes. Guards turn toward you..."
+// Generates: "Your footstep echoes. Guards turn toward you..."
 ```
-
-**Important**: AI never receives character skill levels, only success/failure tags. This prevents exposing game mechanics in the narrative.
 
 ### Quick Start
 ```tsx
@@ -102,11 +97,10 @@ import { NarrativeController } from '@/components/Narrative';
 ## Choice Generation
 
 ### AI-Generated Choices
-- 3-4 contextual options based on current narrative
-- Generated automatically using world context
-- Skill requirements added based on world skills (not character skills)
-- AI generates varied difficulty levels to create challenging choices
-- No access to character skill levels prevents AI from "tuning" difficulty
+
+The choice generator creates 3-4 contextual options based on the current narrative and world context. When adding skill requirements to choices, it only knows about the world's available skills - not the character's actual skill levels. This is intentional: the AI generates varied difficulty levels to create challenging choices without being able to "tune" them to the character's capabilities.
+
+This means you'll see choices you might fail at, which is the point. The AI can't soften the difficulty just because your character has low skills.
 
 ### Custom Player Input
 - Free-text input for player actions

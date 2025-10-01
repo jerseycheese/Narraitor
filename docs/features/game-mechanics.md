@@ -102,21 +102,11 @@ const alignmentStyles = {
 
 ## Skill Check System
 
-Consequence-based gameplay where skill requirements are displayed but not evaluated until after the player commits to an action.
+The skill system here focuses on consequences rather than blocking players from actions. When you see a choice like "Sneak past guards [Stealth 8+]", you can attempt it regardless of your character's actual Stealth level. The key difference is what happens next: your character's skill level determines whether the action succeeds or fails in the story.
 
-### Philosophy: Consequence Over Gating
+This approach means players discover their limitations through play, not through grayed-out options. If your character has Stealth 2 and tries that level 8+ stealth action, they don't get blocked - they get caught. The narrative shows them failing through actual story events, not game messages.
 
-Players see skill requirements on choices (e.g., "Sneak past guards [Stealth 8+]") but can attempt any action regardless of their skill level. The outcome is determined by their character's actual skill:
-
-**Success** - Character has sufficient skill level, the action succeeds naturally in the narrative
-**Failure** - Character lacks sufficient skill, the action fails or backfires with story consequences
-
-### No Game Mechanics in Narrative
-
-The AI never mentions skill names, skill levels, or game mechanics in the narrative. Outcomes are shown purely through what happens in the story:
-
-- ❌ Wrong: "Your Mechanics skill, while only at level two, allows you to salvage a few components"
-- ✅ Right: "Your hands fumble with the radio's internals. Despite your best efforts, wires snap and components crack under your inexperienced touch"
+The other critical piece is keeping game mechanics invisible in the narrative. The AI never mentions skill names or levels when generating story text. When your low-Mechanics character tries to fix a radio, the narrative doesn't say "Your Mechanics skill, while only at level two, allows you to salvage a few components." Instead it shows what actually happens: "Your hands fumble with the radio's internals. Despite your best efforts, wires snap and components crack under your inexperienced touch."
 
 ### Implementation
 
@@ -137,36 +127,21 @@ interface DecisionOption {
 }
 ```
 
-### Skill Evaluation Flow
+### How It Works
 
-1. **Choice Display**: Player sees options with skill badges showing requirements
-2. **Player Selection**: Player chooses an action (not blocked by requirements)
-3. **Skill Check**: System evaluates character's skill level against requirement
-4. **Tag Generation**: Creates `skill-success:skillId` or `skill-failure:skillId` tag
-5. **AI Guidance**: Tags guide AI to generate success or failure narrative
-6. **Story Outcome**: Narrative reflects what actually happens, no mechanics mentioned
+The flow is pretty straightforward. Players see choices with skill badges showing requirements (like "Stealth 8+"), pick one, then the system evaluates whether their character's skill level meets the requirement. Based on that check, it creates either a `skill-success:stealth` or `skill-failure:stealth` tag. These tags then guide the AI to generate appropriate narrative - success means the action works out, failure means it goes wrong in the story.
 
-### Badge Display
+The skill badges themselves stay neutral - just showing the requirement without any green/red pass/fail colors. This keeps the focus on the story choice rather than turning it into a stats check.
 
 ```typescript
-// Neutral badge showing requirement, no pass/fail colors
+// Badge just shows the requirement
 <Badge variant="skill-requirement">
   Stealth 8+
 </Badge>
-```
 
-### AI Context Tags
-
-The system adds contextual tags to guide narrative generation:
-
-```typescript
-// Success scenario
-currentTags: ['skill-success:stealth']
-// AI generates: "You slip past the guards unnoticed..."
-
-// Failure scenario
-currentTags: ['skill-failure:stealth']
-// AI generates: "Your foot catches on loose gravel, alerting the nearest guard..."
+// Behind the scenes, tags guide AI narrative generation
+// Success: "You slip past the guards unnoticed..."
+// Failure: "Your foot catches on loose gravel, alerting the nearest guard..."
 ```
 
 ### Character Skills
