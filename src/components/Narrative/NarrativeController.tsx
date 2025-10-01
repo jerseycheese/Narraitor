@@ -683,8 +683,23 @@ Respond with JSON format:
               difficulty
             };
 
+            // Adapt store character format to evaluator's expected format
+            const adaptedCharacter: UtilCharacter = {
+              ...character,
+              skills: character.skills.map(skill => ({
+                skillId: skill.worldSkillId || skill.id,
+                level: skill.level,
+                experience: 0,
+                isActive: true // Store doesn't track this, assume all skills are active
+              })),
+              attributes: character.attributes.map(attr => ({
+                attributeId: attr.worldAttributeId || attr.id,
+                value: attr.modifiedValue || attr.baseValue
+              }))
+            };
+
             const success = evaluateSkillCheck(
-              character as unknown as UtilCharacter,
+              adaptedCharacter,
               skillCheck,
               world.skills || []
             );
