@@ -685,7 +685,10 @@ Respond with JSON format:
 
             // Adapt store character format to evaluator's expected format
             const adaptedCharacter: UtilCharacter = {
-              ...character,
+              id: character.id,
+              name: character.name,
+              description: character.description,
+              worldId: character.worldId,
               skills: character.skills.map(skill => ({
                 skillId: skill.worldSkillId || skill.id,
                 level: skill.level,
@@ -695,7 +698,23 @@ Respond with JSON format:
               attributes: character.attributes.map(attr => ({
                 attributeId: attr.worldAttributeId || attr.id,
                 value: attr.modifiedValue || attr.baseValue
-              }))
+              })),
+              background: {
+                history: character.background?.history || '',
+                personality: character.background?.personality || '',
+                goals: character.background?.goals || [],
+                fears: character.background?.fears || [],
+                relationships: [] // Store uses unknown[], evaluator expects CharacterRelationship[]
+              },
+              inventory: {
+                characterId: character.inventory.characterId,
+                items: [], // Store uses unknown[], evaluator expects InventoryItem[]
+                capacity: character.inventory.capacity,
+                categories: [] // Store uses string[], evaluator expects InventoryCategory[]
+              },
+              status: character.status,
+              createdAt: character.createdAt,
+              updatedAt: character.updatedAt
             };
 
             const success = evaluateSkillCheck(

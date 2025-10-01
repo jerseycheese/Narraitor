@@ -4,29 +4,6 @@ import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 
-// Simplified character interface for testing
-interface TestCharacter {
-  id: string;
-  name: string;
-  description: string;
-  worldId: string;
-  level: number;
-  attributes: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
-  skills: Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    level: number;
-    worldSkillId?: string;
-    category?: string;
-  }>;
-  background: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  inventory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  status: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  createdAt: string;
-  updatedAt: string;
-  isPlayer: boolean;
-}
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
