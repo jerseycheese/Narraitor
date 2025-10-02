@@ -8,7 +8,7 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
-import { generateUniqueId } from '@/lib/utils/generateId';
+import { generateUniqueId, getTimestamp } from '@/lib/utils/generateId';
 import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
@@ -138,7 +138,7 @@ export function GuidedFirstTimeExperience() {
             image: {
               type: imageData.aiGenerated ? 'ai-generated' : 'placeholder',
               url: imageData.imageUrl,
-              generatedAt: new Date().toISOString(),
+              generatedAt: getTimestamp(),
               prompt: imageData.prompt
             }
           });
