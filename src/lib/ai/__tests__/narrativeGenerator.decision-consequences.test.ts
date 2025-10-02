@@ -16,6 +16,7 @@ import { PlayerDecision } from '@/types/personalization.types';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the store modules
 jest.mock('@/state/worldStore', () => ({
@@ -59,6 +60,7 @@ const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof pl
 describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
   let narrativeGenerator: NarrativeGenerator;
   let mockAiClient: MockAIClient;
+  let pastDecisions: PlayerDecision[];
 
   const mockWorld = {
     id: 'world-1',
@@ -81,30 +83,45 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
     updatedAt: new Date()
   };
 
-  const pastDecisions: PlayerDecision[] = [
-    {
-      id: 'decision-1',
-      prompt: 'An injured merchant lies on the ground. What do you do?',
-      sessionId: 'session-1',
-      worldId: 'world-1',
-      choiceText: 'Help the injured merchant',
-      choiceType: 'helpful',
-      timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-      context: { situation: 'moral dilemma', charactersPresent: ['merchant'] }
-    },
-    {
-      id: 'decision-2', 
-      prompt: 'Bandits block your path. How do you handle this?',
-      sessionId: 'session-1',
-      worldId: 'world-1',
-      choiceText: 'Negotiate instead of fighting',
-      choiceType: 'diplomatic',
-      timestamp: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-      context: { situation: 'conflict resolution', charactersPresent: ['bandit leader'] }
-    }
-  ];
-
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+    // Create past decisions with deterministic timestamps
+    // Set time to 1 day ago for first decision
+    jest.setSystemTime(new Date('2025-01-14T12:00:00Z'));
+    const oneDayAgo = getTimestamp();
+
+    // Set time to 12 hours ago for second decision
+    jest.setSystemTime(new Date('2025-01-15T00:00:00Z'));
+    const twelveHoursAgo = getTimestamp();
+
+    // Reset to "now"
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+    pastDecisions = [
+      {
+        id: 'decision-1',
+        prompt: 'An injured merchant lies on the ground. What do you do?',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        choiceText: 'Help the injured merchant',
+        choiceType: 'helpful',
+        timestamp: oneDayAgo,
+        context: { situation: 'moral dilemma', charactersPresent: ['merchant'] }
+      },
+      {
+        id: 'decision-2',
+        prompt: 'Bandits block your path. How do you handle this?',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        choiceText: 'Negotiate instead of fighting',
+        choiceType: 'diplomatic',
+        timestamp: twelveHoursAgo,
+        context: { situation: 'conflict resolution', charactersPresent: ['bandit leader'] }
+      }
+    ];
     mockAiClient = new MockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAiClient);
 
@@ -144,6 +161,10 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
     // Mock tone settings guidance
     (getDetailedToneInstructions as jest.Mock).mockReturnValue('');
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('Past Decision Integration in Prompts', () => {
@@ -350,17 +371,28 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
     });
 
     test('should limit decision history to prevent prompt overflow', async () => {
-      // Create many past decisions
-      const manyDecisions = Array.from({ length: 20 }, (_, i) => ({
-        id: `decision-${i}`,
-        prompt: `What will you do next? (Decision ${i})`,
-        sessionId: 'session-1',
-        worldId: 'world-1',
-        choiceText: `Choice ${i}`,
-        choiceType: 'neutral' as const,
-        timestamp: new Date(Date.now() - (i * 1000)).toISOString(),
-        context: { situation: 'generic' }
-      }));
+      // Create many past decisions with deterministic timestamps
+      const manyDecisions = Array.from({ length: 20 }, (_, i) => {
+        // Set time to i seconds ago
+        const timeAgo = new Date('2025-01-15T12:00:00Z');
+        timeAgo.setSeconds(timeAgo.getSeconds() - i);
+        jest.setSystemTime(timeAgo);
+        const timestamp = getTimestamp();
+
+        return {
+          id: `decision-${i}`,
+          prompt: `What will you do next? (Decision ${i})`,
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          choiceText: `Choice ${i}`,
+          choiceType: 'neutral' as const,
+          timestamp,
+          context: { situation: 'generic' }
+        };
+      });
+
+      // Reset to "now"
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 
       mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(manyDecisions);
 

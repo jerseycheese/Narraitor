@@ -1,8 +1,10 @@
 import { useCharacterStore } from '../characterStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
     useCharacterStore.getState().reset();
   });
 
@@ -129,8 +131,8 @@ describe('useCharacterStore', () => {
 
       const originalUpdatedAt = useCharacterStore.getState().characters[characterId].updatedAt;
 
-      // Wait a moment to ensure timestamp difference
-      jest.advanceTimersByTime(1);
+      // Advance time by 1 second to ensure timestamp difference
+      jest.setSystemTime(new Date('2025-01-15T12:00:01Z'));
 
       useCharacterStore.getState().updateCharacter(characterId, {
         name: 'Updated Character',
