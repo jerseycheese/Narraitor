@@ -18,6 +18,10 @@ describe('DecisionRelevanceCalculator', () => {
   let mockConfig: RelevanceScoringConfig;
 
   beforeEach(() => {
+    // Use fake timers for consistent time-based testing
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     mockConfig = {
       weights: {
         recency: 0.25,
@@ -41,8 +45,19 @@ describe('DecisionRelevanceCalculator', () => {
       activeTags: ['social', 'investigation'],
       worldId: 'world-1',
       sessionId: 'session-1',
-      timestamp: getTimestamp()
+      timestamp: getTimestamp() // 2025-01-15T12:00:00Z
     };
+
+    // Set time to 1 hour ago for first decision
+    jest.setSystemTime(new Date('2025-01-15T11:00:00Z'));
+    const oneHourAgo = getTimestamp();
+
+    // Set time to 1 day ago for second decision
+    jest.setSystemTime(new Date('2025-01-14T12:00:00Z'));
+    const oneDayAgo = getTimestamp();
+
+    // Reset to "now"
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 
     mockDecisions = [
       {
@@ -50,7 +65,7 @@ describe('DecisionRelevanceCalculator', () => {
         prompt: 'A stranger offers you information for gold',
         choiceText: 'Pay the stranger for information',
         choiceType: 'helpful' as ChoiceTypePreference,
-        timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
+        timestamp: oneHourAgo,
         sessionId: 'session-1',
         worldId: 'world-1',
         context: {
@@ -64,7 +79,7 @@ describe('DecisionRelevanceCalculator', () => {
         prompt: 'You encounter bandits on the road',
         choiceText: 'Fight the bandits',
         choiceType: 'aggressive' as ChoiceTypePreference,
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+        timestamp: oneDayAgo,
         sessionId: 'session-1',
         worldId: 'world-1',
         context: {
@@ -74,6 +89,10 @@ describe('DecisionRelevanceCalculator', () => {
         }
       }
     ];
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('calculateRelevanceScore', () => {
@@ -209,11 +228,16 @@ describe('DecisionRelevanceCalculator', () => {
     });
 
     test('handles future timestamps gracefully', () => {
+      // Set time to 1 hour in the future
+      jest.setSystemTime(new Date('2025-01-15T13:00:00Z'));
+      const futureTimestamp = getTimestamp();
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z')); // Reset to now
+
       const futureDecision: PlayerDecision = {
         ...mockDecisions[0],
-        timestamp: new Date(Date.now() + 1000 * 60 * 60).toISOString() // 1 hour in future
+        timestamp: futureTimestamp
       };
-      
+
       const result = calculator.calculateRelevanceScore(futureDecision, mockCurrentContext);
       expect(result.recencyScore).toBeGreaterThanOrEqual(0.0);
       expect(result.recencyScore).toBeLessThanOrEqual(1.0);
@@ -222,17 +246,23 @@ describe('DecisionRelevanceCalculator', () => {
 
   describe('performance requirements', () => {
     test('scores large number of decisions efficiently', () => {
-      // Create 100 mock decisions
-      const manyDecisions = Array.from({ length: 100 }, (_, i) => ({
+      // Create timestamps for 100 decisions, each 1 minute apart
+      const timestamps = Array.from({ length: 100 }, (_, i) => {
+        jest.setSystemTime(new Date('2025-01-15T12:00:00Z').getTime() - i * 1000 * 60);
+        return getTimestamp();
+      });
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z')); // Reset to now
+
+      const manyDecisions = timestamps.map((timestamp, i) => ({
         ...mockDecisions[0],
         id: `decision-${i}`,
-        timestamp: new Date(Date.now() - i * 1000 * 60).toISOString()
+        timestamp
       }));
-      
+
       const startTime = performance.now();
       const results = calculator.scoreDecisions(manyDecisions, mockCurrentContext);
       const endTime = performance.now();
-      
+
       expect(results).toHaveLength(100);
       expect(endTime - startTime).toBeLessThan(100); // Should complete in under 100ms
     });
