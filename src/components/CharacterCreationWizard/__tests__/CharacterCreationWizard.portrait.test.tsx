@@ -7,7 +7,7 @@ import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useCharacterStore } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies

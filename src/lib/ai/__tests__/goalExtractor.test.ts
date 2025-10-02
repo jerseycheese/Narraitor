@@ -2,7 +2,7 @@
 
 import { goalExtractor } from '../goalExtractor';
 import { NarrativeGoal, GoalExtractionRequest } from '../../../types/goal.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AI client
 jest.mock('../geminiClient', () => ({

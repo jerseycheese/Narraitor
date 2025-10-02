@@ -3,7 +3,7 @@
 import { PortraitGenerator } from '../portraitGenerator';
 import { Character } from '../../../types/character.types';
 import { AIClient } from '../types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AI client
 const mockAIClient: AIClient = {

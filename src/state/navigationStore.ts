@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { isStorageAvailable } from '@/utils/storageHelpers';
 import Logger from '@/lib/utils/logger';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 /**
  * Create logger instance for this store

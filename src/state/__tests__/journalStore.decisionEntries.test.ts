@@ -6,7 +6,7 @@
  */
 
 import { useJournalStore } from '../journalStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Initialize the store for testing
 const getStore = () => useJournalStore.getState();

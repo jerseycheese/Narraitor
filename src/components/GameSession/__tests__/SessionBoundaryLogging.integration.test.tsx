@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useSessionStore } from '@/state/sessionStore';
 import { useJournalStore } from '@/state/journalStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the stores
 jest.mock('@/state/sessionStore');

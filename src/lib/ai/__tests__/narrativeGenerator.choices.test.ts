@@ -2,7 +2,7 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { AIClient } from '../types';
 import { ChoiceGenerator } from '../choiceGenerator';
 import { NarrativeContext } from '@/types/narrative.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AIClient
 const mockAIClient: jest.Mocked<AIClient> = {

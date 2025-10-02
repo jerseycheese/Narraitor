@@ -9,7 +9,7 @@ import {
   CurrentNarrativeContext,
   RelevanceScoringConfig
 } from '@/types/relevance.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('DecisionRelevanceCalculator', () => {
   let calculator: DecisionRelevanceCalculator;

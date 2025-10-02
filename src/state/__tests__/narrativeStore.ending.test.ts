@@ -5,7 +5,7 @@ import type {
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock fetch for API-based ending generation and restore after suite
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

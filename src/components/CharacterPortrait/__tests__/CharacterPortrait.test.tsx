@@ -4,7 +4,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CharacterPortrait } from '../CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('CharacterPortrait', () => {
   describe('rendering states', () => {

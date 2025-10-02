@@ -1,5 +1,5 @@
 import { useNavigationStore } from '../navigationStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock storage helpers to prevent issues in test environment
 jest.mock('@/utils/storageHelpers', () => ({

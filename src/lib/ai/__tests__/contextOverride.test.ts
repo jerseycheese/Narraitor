@@ -1,6 +1,6 @@
 import { createTestContext, mergeTestOverrides } from '../contextOverride';
 import type { World, Character, NarrativeContext, AITestConfig } from '../../../types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('contextOverride', () => {
   const mockWorld: World = {

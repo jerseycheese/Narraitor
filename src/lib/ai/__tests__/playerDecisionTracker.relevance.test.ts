@@ -5,7 +5,7 @@
 
 import { PlayerDecisionTracker } from '../playerDecisionTracker';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('PlayerDecisionTracker - Relevance Integration', () => {
   let tracker: PlayerDecisionTracker;

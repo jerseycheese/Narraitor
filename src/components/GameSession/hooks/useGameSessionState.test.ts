@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameSessionState } from './useGameSessionState';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Create a complete mock of the stores
 const mockWorldStoreState = {

@@ -1,6 +1,6 @@
 import { buildLoreContext } from '../loreContext';
 import type { LoreFact } from '../../../types/lore.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('buildLoreContext', () => {
   describe('Basic Functionality', () => {

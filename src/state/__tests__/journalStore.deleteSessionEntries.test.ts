@@ -1,5 +1,5 @@
 import { useJournalStore } from '../journalStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { JournalEntry } from '../../types/journal.types';
 
 describe('journalStore - deleteSessionEntries', () => {

@@ -1,7 +1,7 @@
 // src/types/__tests__/character-portrait.types.test.ts
 
 import { Character, CharacterPortrait, PortraitGenerationStatus } from '../character.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('Character Portrait Types', () => {
   describe('CharacterPortrait', () => {

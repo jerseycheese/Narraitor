@@ -4,7 +4,7 @@ import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 /**
  * Create logger instance for this store

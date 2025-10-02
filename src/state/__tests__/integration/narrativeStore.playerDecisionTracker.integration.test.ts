@@ -8,7 +8,7 @@
  */
 
 import { useNarrativeStore } from '../../narrativeStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { PlayerDecisionTracker } from '../../../lib/ai/playerDecisionTracker';
 import { DecisionOption } from '../../../types/narrative.types';
 import { ChoiceTypePreference } from '../../../types/personalization.types';

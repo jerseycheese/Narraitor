@@ -12,7 +12,7 @@ import { AIClient } from '../types';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { Character } from '@/types/character.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock dependencies
 const mockAIClient: jest.Mocked<AIClient> = {

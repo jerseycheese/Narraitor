@@ -1,5 +1,5 @@
 import { NarrativeContextManager } from '../contextManager';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('NarrativeContextManager', () => {
   let contextManager: NarrativeContextManager;

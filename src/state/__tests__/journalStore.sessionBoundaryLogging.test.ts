@@ -1,5 +1,5 @@
 import { useJournalStore } from '../journalStore';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { useSessionStore } from '../sessionStore';
 
 describe('Journal Store - Session Boundary Logging', () => {

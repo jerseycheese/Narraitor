@@ -7,7 +7,7 @@
 
 import { PersonalizationEngine } from '../personalizationEngine';
 import { PlayerDecision, PersonalizedNarrativeContext } from '@/types/personalization.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
   let personalizationEngine: PersonalizationEngine;

@@ -1,7 +1,7 @@
 // src/components/Narrative/__tests__/checkForEndingIndicators.test.ts
 
 import type { NarrativeSegment } from '@/types/narrative.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AI client
 const mockGenerateContent = jest.fn();

@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { Character } from '@/types/character.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('Portrait Generation Documentation Examples', () => {
   describe('Integration Guide Examples', () => {

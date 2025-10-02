@@ -6,7 +6,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({

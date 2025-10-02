@@ -2,7 +2,7 @@ import { GeminiClient } from './geminiClient';
 import { ClientGeminiClient } from './clientGeminiClient';
 import { getDefaultConfig } from './config';
 import { AIResponse, AIClient } from './types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // For development/test environments, use mock implementation
 class MockGeminiClient implements AIClient {

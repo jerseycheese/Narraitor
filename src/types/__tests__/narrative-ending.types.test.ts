@@ -7,7 +7,7 @@ import {
   EndingGenerationRequest,
   EndingGenerationResult
 } from '../narrative.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('Narrative Ending Types', () => {
   describe('EndingType', () => {

@@ -4,7 +4,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('NarrativeDisplay - Formatting Integration', () => {
   const createMockSegment = (

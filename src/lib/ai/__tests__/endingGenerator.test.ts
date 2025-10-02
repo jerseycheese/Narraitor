@@ -1,6 +1,6 @@
 // src/lib/ai/__tests__/endingGenerator.test.ts
 
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock modules that have dependency issues first
 jest.mock('../../../state/sessionStore', () => ({

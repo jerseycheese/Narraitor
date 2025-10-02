@@ -3,7 +3,7 @@ import { MockGeminiClient } from '../__mocks__/geminiClient.mock';
 import { useWorldStore } from '@/state/worldStore';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the store
 jest.mock('@/state/worldStore');

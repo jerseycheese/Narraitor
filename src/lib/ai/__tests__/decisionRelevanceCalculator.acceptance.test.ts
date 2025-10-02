@@ -6,7 +6,7 @@
 import { DecisionRelevanceCalculator } from '../decisionRelevanceCalculator';
 import { PlayerDecision } from '@/types/personalization.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
   let calculator: DecisionRelevanceCalculator;
