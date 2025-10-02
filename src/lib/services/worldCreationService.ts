@@ -1,5 +1,5 @@
 import { useWorldStore } from '@/state/worldStore';
-import { generateUniqueId } from '@/lib/utils/generateId';
+import { generateUniqueId, getTimestamp } from '@/lib/utils/generateId';
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
@@ -193,7 +193,7 @@ export const worldCreationService = {
         image: {
           type: imageData.aiGenerated ? 'ai-generated' : 'placeholder',
           url: imageData.imageUrl,
-          generatedAt: new Date().toISOString(),
+          generatedAt: getTimestamp(),
           prompt: imageData.prompt,
         },
       });

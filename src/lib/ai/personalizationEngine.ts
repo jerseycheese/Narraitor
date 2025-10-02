@@ -38,6 +38,7 @@ import {
   sanitizeString
 } from '@/types/type-guards';
 import { memoize, memoizeWithTTL } from '../utils/memoization';
+import { getTimestamp } from '../utils';
 // Simple character interface for personalization - avoids complex type dependencies
 interface PersonalizationCharacter {
   id: string;
@@ -367,7 +368,7 @@ export class PersonalizationEngine {
       detailLevel: this.inferDetailLevel(decisions),
       contentFocus: this.inferContentFocus(decisions),
       confidenceLevel: Math.min(85, decisions.length * 15),
-      lastUpdated: new Date().toISOString()
+      lastUpdated: getTimestamp()
     };
   }
 
@@ -516,7 +517,7 @@ export class PersonalizationEngine {
         detailLevel: 'moderate',
         contentFocus: 'balanced',
         confidenceLevel: 0,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: getTimestamp()
       },
       narrativeEmphasis: {
         characterFocus: [],

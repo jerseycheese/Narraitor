@@ -2,6 +2,7 @@
 
 import { World, WorldImage } from '../../types/world.types';
 import { AIClient } from './types';
+import { getTimestamp } from '@/lib/utils';
 
 export class WorldImageGenerator {
   constructor(private aiClient: AIClient) {}
@@ -91,7 +92,7 @@ export class WorldImageGenerator {
         return {
           type: 'ai-generated',
           url: mockImage,
-          generatedAt: new Date().toISOString(),
+          generatedAt: getTimestamp(),
           prompt: prompt
         };
       }
@@ -115,7 +116,7 @@ export class WorldImageGenerator {
       return {
         type: data.aiGenerated ? 'ai-generated' : 'placeholder',
         url: data.imageUrl,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: data.prompt || prompt
       };
     } catch (error) {

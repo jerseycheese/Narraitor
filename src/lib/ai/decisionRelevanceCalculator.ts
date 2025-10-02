@@ -97,7 +97,7 @@ export class DecisionRelevanceCalculator {
       impactScore,
       tagMatchScore,
       characterScore,
-      calculatedAt: new Date().toISOString(),
+      calculatedAt: getTimestamp(),
       metadata: {
         daysSinceDecision,
         matchedTags: this.getMatchedTags(decision, currentContext),

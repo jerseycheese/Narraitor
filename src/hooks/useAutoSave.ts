@@ -45,6 +45,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { getTimestamp } from '@/lib/utils';
 import { useJournalStore } from '@/state/journalStore';
 import { AutoSaveService, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
 import { useToast } from '@/components/ui/toast';
@@ -114,7 +115,7 @@ export const useAutoSave = () => {
         },
         onSave: (result) => {
           if (result.success) {
-            const timestamp = new Date().toISOString();
+            const timestamp = getTimestamp();
             setTimeout(() => {
               useSessionStore.getState().recordAutoSave(timestamp);
             }, 150);

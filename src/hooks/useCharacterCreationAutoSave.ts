@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { EntityID } from '@/types/common.types';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Character creation state interface for auto-save functionality
@@ -190,7 +191,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
         try {
           const dataWithTimestamp = { 
             ...data, 
-            lastSaved: new Date().toISOString() 
+            lastSaved: getTimestamp() 
           };
           localStorage.setItem(saveKey, JSON.stringify(dataWithTimestamp));
           setSaveStatus('saved');

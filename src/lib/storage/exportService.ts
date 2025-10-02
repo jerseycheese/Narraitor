@@ -12,6 +12,7 @@ import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
 import { validateWorld } from '../../types/type-guards';
+import { getTimestamp } from '../utils';
 
 
 export interface GameStateExport {
@@ -47,7 +48,7 @@ export class ExportService {
     try {
       const gameState: GameStateExport = {
         version: this.CURRENT_VERSION,
-        exportedAt: new Date().toISOString(),
+        exportedAt: getTimestamp(),
         worldState: useWorldStore.getState(),
         characterState: useCharacterStore.getState(),
         sessionState: useSessionStore.getState(),
@@ -81,7 +82,7 @@ export class ExportService {
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
-    const filename = `narraitor-save-${new Date().toISOString().split('T')[0]}.json`;
+    const filename = `narraitor-save-${getTimestamp().split('T')[0]}.json`;
 
     const element = document.createElement('a');
     element.setAttribute('href', url);
