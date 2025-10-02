@@ -32,9 +32,8 @@ export const NoSavedSessions: Story = {
 
 export const WithSavedSession: Story = {
   name: 'With Saved Session',
-  decorators: [createMockStoreState({ 
+  decorators: [createMockStoreState({
     hasSession: true,
     narrativeCount: 12,
-    timeAgo: 3600000, // 1 hour ago
   })],
 };
