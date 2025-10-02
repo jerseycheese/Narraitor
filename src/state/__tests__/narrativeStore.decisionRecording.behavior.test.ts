@@ -5,6 +5,10 @@ import { DecisionOption } from '../../types/narrative.types';
 
 describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () => {
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     // Reset store state before each test
     useNarrativeStore.setState({
       segments: {},
@@ -18,6 +22,10 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       loading: false,
       error: null
     });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('Core Acceptance Criteria', () => {
@@ -39,21 +47,19 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       });
       
       // Player selects an option
-      const beforeSelection = Date.now();
+      const expectedTime = new Date('2025-01-15T12:00:00Z');
       store.selectDecisionOption(decisionId, 'option-attack', characterId);
-      const afterSelection = Date.now();
-      
+
       // Verify complete record was created
       const updatedState = useNarrativeStore.getState();
       const decision = updatedState.decisions[decisionId];
-      
+
       // Core requirements verification
       expect(decision.id).toBe(decisionId); // Decision ID
-      expect(decision.selectedOptionId).toBe('option-attack'); // Option ID  
+      expect(decision.selectedOptionId).toBe('option-attack'); // Option ID
       expect(decision.characterId).toBe(characterId); // Character association
       expect(decision.selectedAt).toBeInstanceOf(Date); // Timestamp
-      expect(decision.selectedAt!.getTime()).toBeGreaterThanOrEqual(beforeSelection);
-      expect(decision.selectedAt!.getTime()).toBeLessThanOrEqual(afterSelection);
+      expect(decision.selectedAt!.getTime()).toBe(expectedTime.getTime());
     });
 
     it('should persist choice records between browser sessions', () => {
