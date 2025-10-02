@@ -1,7 +1,7 @@
 import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 import { normalizeGenre } from '@/lib/constants/genres';
-import { normalizeText } from '@/lib/utils/textNormalization';
+import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/types/type-guards';
 
 // Default fallback values for AI validation failures
@@ -288,13 +288,7 @@ Make the world interesting and playable with concepts appropriate to the setting
           id: 'temp-id', // Temporary ID for validation
           worldId: 'temp-world-id', // Temporary worldId for validation
           name: String(attrObj.name || 'Unknown Attribute'),
-          description: normalizeText(String(attrObj.description || ''), {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          description: normalizeText(String(attrObj.description || ''), NORM_DESC),
           baseValue: Number(attrObj.defaultValue) || 5,
           minValue: Number(attrObj.minValue) || 1,
           maxValue: Number(attrObj.maxValue) || 10,
@@ -328,13 +322,7 @@ Make the world interesting and playable with concepts appropriate to the setting
           id: 'temp-id', // Temporary ID for validation
           worldId: 'temp-world-id', // Temporary worldId for validation
           name: String(skillObj.name || 'Unknown Skill'),
-          description: normalizeText(String(skillObj.description || ''), {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          description: normalizeText(String(skillObj.description || ''), NORM_DESC),
           difficulty: ['easy', 'medium', 'hard'].includes(skillObj.difficulty as string) ? skillObj.difficulty as 'easy' | 'medium' | 'hard' : 'medium',
           category: (skillObj.category as string) || 'General',
           baseValue: 1,
@@ -382,20 +370,9 @@ Make the world interesting and playable with concepts appropriate to the setting
       }
       
       return {
-        name: normalizeText(worldName, {
-          normalizeWhitespace: true,
-          normalizeQuotes: true,
-          normalizeSpecialChars: true,
-          preserveStructure: false
-        }),
+        name: normalizeText(worldName, NORM_NAME),
         genre: normalizeGenre(String(parsed.genre)),
-        description: normalizeText(String(parsed.description), {
-          normalizeWhitespace: true,
-          normalizeLineEndings: true,
-          normalizeQuotes: true,
-          normalizeSpecialChars: true,
-          preserveStructure: true
-        }),
+        description: normalizeText(String(parsed.description), NORM_DESC),
         reference: options.reference,
         relationship: options.relationship,
         attributes,
