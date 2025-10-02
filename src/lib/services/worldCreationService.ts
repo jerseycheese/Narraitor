@@ -1,5 +1,6 @@
 import { useWorldStore } from '@/state/worldStore';
-import { generateUniqueId, getTimestamp } from '@/lib/utils/generateId';
+import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';

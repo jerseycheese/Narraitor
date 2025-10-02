@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import { create } from 'zustand';
+import { getTimestamp } from '@/lib/utils';
 
 // Create a test store specifically for the test harness
 interface TestState {
@@ -25,7 +26,7 @@ const getStableDate = () => {
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     return '2023-01-01T00:00:00.000Z'; // Static date for consistent rendering
   }
-  return new Date().toISOString(); // Use actual date in production
+  return getTimestamp(); // Use actual date in production
 };
 
 const useTestStore = create<TestState>((set) => ({

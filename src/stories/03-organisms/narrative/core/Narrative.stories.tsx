@@ -2,6 +2,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 // NarrativeController and NarrativeDisplay are imported in docstrings but not directly used in this file
 
 const meta = {
@@ -46,8 +47,8 @@ export const CompleteNarrativeSystem: Story = {
             sessionId: 'demo-session',
             worldId: 'demo-world',
             timestamp: new Date(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp(),
             metadata: { 
               tags: ['opening', 'introduction'], 
               mood: 'mysterious' 
@@ -60,8 +61,8 @@ export const CompleteNarrativeSystem: Story = {
             sessionId: 'demo-session',
             worldId: 'demo-world',
             timestamp: new Date(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp(),
             metadata: { 
               tags: ['exploration', 'journey'], 
               mood: 'neutral' 

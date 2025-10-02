@@ -145,11 +145,13 @@ export const MyComponent = ({ data }) => {
 
 ### Stable Date Values
 ```tsx
+import { getTimestamp } from '@/lib/utils';
+
 const getStableDate = () => {
   if (process.env.NODE_ENV === 'development') {
     return '2023-01-01T00:00:00.000Z'; // Static for consistency
   }
-  return new Date().toISOString();
+  return getTimestamp();
 };
 ```
 

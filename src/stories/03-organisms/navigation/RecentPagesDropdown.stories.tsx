@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { RecentPagesDropdown } from '@/components/Navigation/RecentPagesDropdown';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useEffect } from 'react';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the navigation loading context
 const mockNavigationLoadingContext = {
@@ -158,7 +159,7 @@ export const DisabledInPreferences: Story = {
       history: [
         {
           path: '/worlds',
-          timestamp: new Date().toISOString(),
+          timestamp: getTimestamp(),
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
       ],
@@ -244,7 +245,7 @@ export const VariousTimestamps: Story = {
       history: [
         {
           path: '/just-now',
-          timestamp: new Date().toISOString(),
+          timestamp: getTimestamp(),
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
         {

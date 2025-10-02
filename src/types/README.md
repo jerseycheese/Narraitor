@@ -100,7 +100,7 @@ When you're creating new entities, you'll typically use the full interface:
 
 ```typescript
 import { Character, EntityID } from '@/types';
-import { generateUniqueId } from '@/lib/utils';
+import { generateUniqueId, getTimestamp } from '@/lib/utils';
 
 const newCharacter: Character = {
   id: generateUniqueId('char'),
@@ -126,8 +126,8 @@ const newCharacter: Character = {
     maxHealth: 100,
     conditions: []
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 };
 ```
 

@@ -6,6 +6,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Move mock data outside component to prevent re-creation
 const MOCK_CHARACTER_DATA = {
@@ -78,8 +79,8 @@ Her name became synonymous with honor and courage throughout Eldoria. Young warr
 
 The alliances forged during the dark times grew stronger, uniting neighboring kingdoms in lasting peace. Eldoria became a beacon of hope for other realms struggling against their own darkness, proving that even the deepest shadows could be overcome through courage and unity.`,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       achievements: [
         'Dragon Slayer',
         'Savior of Eldoria', 
@@ -108,8 +109,8 @@ Her story was told to children as both inspiration and warning - that heroism so
 
 A new order rose from the ashes, one dedicated to ensuring that no future hero would have to pay the price that Aria paid. The realm's scholars worked tirelessly to find ways to break such cruel magics, vowing that her sacrifice would be the last of its kind.`,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       achievements: [
         'Ultimate Sacrifice',
         'Martyr of Eldoria',
@@ -138,8 +139,8 @@ Her legend grew in the telling, becoming more myth than history. What was certai
 
 The realm became a center of learning for those seeking to understand the deeper mysteries of existence. What had seemed like a simple tale of good versus evil revealed itself as one thread in an incomprehensible tapestry that spanned worlds and ages.`,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       achievements: [
         'Paradox Resolver',
         'Walker Between Worlds',
@@ -168,8 +169,8 @@ Her methods spread to other kingdoms, sparking a renaissance of learning and gro
 
 The realm's approach to challenges shifted from combat to collaboration. Problems that once would have required heroes to solve were instead addressed by communities working together, creating solutions that were both more effective and more lasting than any sword could provide.`,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       achievements: [
         'Kingdom\'s Teacher',
         'Hope Bringer',

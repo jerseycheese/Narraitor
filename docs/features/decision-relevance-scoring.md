@@ -152,6 +152,8 @@ The algorithm is memory efficient too, so you don't have to worry about it eatin
 
 ### Basic Scoring
 ```typescript
+import { getTimestamp } from '@/lib/utils';
+
 const context: CurrentNarrativeContext = {
   location: 'Town Square',
   charactersPresent: ['Guard Captain'],
@@ -160,7 +162,7 @@ const context: CurrentNarrativeContext = {
   activeTags: ['mystery', 'social'],
   worldId: 'world-1',
   sessionId: 'session-1',
-  timestamp: new Date().toISOString()
+  timestamp: getTimestamp()
 };
 
 const score = calculator.calculateRelevanceScore(decision, context);

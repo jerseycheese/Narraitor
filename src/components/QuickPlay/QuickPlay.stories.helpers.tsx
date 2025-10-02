@@ -57,12 +57,11 @@ export const mockCharacter = {
 interface MockStoreOptions {
   hasSession: boolean;
   narrativeCount?: number;
-  timeAgo?: number; // milliseconds ago
 }
 
 export const createMockStoreState = (options: MockStoreOptions) => {
   const MockStateWrapper = (Story: React.ComponentType) => {
-    const { hasSession, narrativeCount = 12, timeAgo = 3600000 } = options;
+    const { hasSession, narrativeCount = 12 } = options;
     
     if (!hasSession) {
       // Empty state

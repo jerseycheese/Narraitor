@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Updated stories aligned with actual app usage patterns
 
@@ -40,8 +41,8 @@ const createMockSegment = (
   sessionId: 'session-1',
   worldId: 'world-1',
   timestamp: new Date(),
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
   metadata: {
     characterIds: [],
     tags: [],
@@ -146,4 +147,3 @@ Their quest would require both courage and wisdom to succeed.`,
     ),
   },
 };
-

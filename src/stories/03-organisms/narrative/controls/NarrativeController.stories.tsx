@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/narrative/controls/NarrativeController',
@@ -66,8 +67,8 @@ function DefaultNarrativeControllerStory() {
         sessionId: 'session-1',
         worldId: 'world-1',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['opening', 'introduction'],
           mood: 'mysterious'
@@ -113,8 +114,8 @@ function WithExistingSegmentsStory() {
       sessionId: 'session-multi',
       worldId: 'world-1',
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         tags: ['opening', 'introduction'],
         mood: 'mysterious'
@@ -127,8 +128,8 @@ function WithExistingSegmentsStory() {
       sessionId: 'session-multi',
       worldId: 'world-1',
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         tags: ['discovery', 'artifact'],
         mood: 'mysterious'
@@ -141,8 +142,8 @@ function WithExistingSegmentsStory() {
       sessionId: 'session-multi',
       worldId: 'world-1',
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         tags: ['action', 'magic'],
         mood: 'tense'
@@ -172,8 +173,8 @@ function GeneratingFromChoiceStory() {
       sessionId: 'session-choice',
       worldId: 'world-1',
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         tags: ['choice', 'decision'],
         mood: 'neutral'
@@ -200,8 +201,8 @@ function GeneratingFromChoiceStory() {
         sessionId: 'session-choice',
         worldId: 'world-1',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['choice', 'path'],
           mood: 'neutral'

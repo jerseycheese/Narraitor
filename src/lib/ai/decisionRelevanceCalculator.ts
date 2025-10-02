@@ -24,6 +24,7 @@ import {
   RelevanceScoringConfig,
   DecisionRelevanceResult
 } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Default configuration for relevance scoring

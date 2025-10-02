@@ -147,7 +147,7 @@ initializeSession: (worldId, characterId, onComplete) => {
     metadata: {
       tags: ['system', 'session'],
       automaticEntry: true,
-      sessionStartTime: new Date().toISOString()
+      sessionStartTime: getTimestamp() // import from '@/lib/utils'
     }
   });
 }

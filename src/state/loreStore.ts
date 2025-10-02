@@ -9,7 +9,8 @@ import type {
   StructuredLoreExtraction 
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
-import { generateUniqueId, getTimestamp } from '../lib/utils/generateId';
+import { generateUniqueId } from '../lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 

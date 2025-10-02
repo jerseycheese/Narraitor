@@ -25,7 +25,8 @@ import {
   ChoiceTypePreference 
 } from '@/types/personalization.types';
 import { EntityID } from '@/types/common.types';
-import { generateUniqueId, getTimestamp } from '@/lib/utils/generateId';
+import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { DecisionRelevanceCalculator } from './decisionRelevanceCalculator';
 import { 
   CurrentNarrativeContext, 

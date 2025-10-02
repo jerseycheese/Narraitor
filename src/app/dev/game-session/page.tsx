@@ -8,6 +8,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import Logger from '@/lib/utils/logger';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock world
 const mockWorld: World = {
@@ -190,8 +191,8 @@ const mockCharacter = {
     capacity: 20,
     categories: []
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 };
 
 type SessionStateDisplay = {

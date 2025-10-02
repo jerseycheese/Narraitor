@@ -6,6 +6,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
 
 export default function ChoiceAlignmentTestPage() {
@@ -98,8 +99,8 @@ export default function ChoiceAlignmentTestPage() {
             location: scenarios[scenario].location
           },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }],
         currentTags: ['adventure'],
         sessionId: generateUniqueId('session'),

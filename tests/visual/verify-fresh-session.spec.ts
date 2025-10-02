@@ -1,24 +1,38 @@
 import { test, expect } from '@playwright/test';
+import { getTimestamp } from '@/lib/utils';
+
+const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 
 // Targeted smoke check for fresh-session skeleton → content transition.
 // Assumes dev server is available at baseURL (default http://localhost:3000).
 
 test.describe('Fresh GameSession skeleton → content', () => {
-  test('shows skeleton, then reveals active session with choices', async ({ page, baseURL }) => {
+  test('shows skeleton, then reveals active session with choices', async ({
+    page,
+    baseURL,
+  }) => {
     // Capture console logs to help debug skeleton transitions
     const logs: string[] = [];
     page.on('console', (msg) => {
       const txt = msg.text();
-      if (txt.includes('[GameSession]') || txt.includes('[ActiveGameSession]') || txt.includes('[NarrativeController]')) {
+      if (
+        txt.includes('[GameSession]') ||
+        txt.includes('[ActiveGameSession]') ||
+        txt.includes('[NarrativeController]')
+      ) {
         logs.push(txt);
       }
     });
-    const path = '/worlds/world_8b927b31-f6d0-4e17-8391-74033dd8323a/play?fresh=true';
+    const path =
+      '/worlds/world_8b927b31-f6d0-4e17-8391-74033dd8323a/play?fresh=true';
     // Seed IndexedDB before any app script runs to avoid hydration overwrites
-    await page.addInitScript(() => {
+    await page.addInitScript(({ getTimestampSource }) => {
+      const instantiateGetTimestamp = (source: string) =>
+        new Function(`return (${source});`)() as () => string;
+      const getTimestamp = instantiateGetTimestamp(getTimestampSource);
       const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
       const CHAR_ID = 'char-playwright-e2e';
-      const now = new Date().toISOString();
+      const now = getTimestamp();
       const dbName = 'narraitor-state';
       const storeName = 'narraitor-store';
 
@@ -27,7 +41,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
           const open = indexedDB.open(dbName, 1);
           open.onupgradeneeded = () => {
             const db = open.result;
-            if (!db.objectStoreNames.contains(storeName)) db.createObjectStore(storeName);
+            if (!db.objectStoreNames.contains(storeName))
+              db.createObjectStore(storeName);
           };
           open.onsuccess = () => {
             const db = open.result;
@@ -73,9 +88,20 @@ test.describe('Fresh GameSession skeleton → content', () => {
               isPlayer: true,
               attributes: [],
               skills: [],
-              background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+              background: {
+                history: '',
+                personality: '',
+                goals: [],
+                fears: [],
+                relationships: [],
+              },
               status: { health: 100, maxHealth: 100, conditions: [] },
-              inventory: { characterId: CHAR_ID, items: [], capacity: 100, categories: [] },
+              inventory: {
+                characterId: CHAR_ID,
+                items: [],
+                capacity: 100,
+                categories: [],
+              },
               createdAt: now,
               updatedAt: now,
             },
@@ -98,7 +124,13 @@ test.describe('Fresh GameSession skeleton → content', () => {
           characterId: null,
           savedSessions: {},
           templateHistory: [],
-          autoSave: { enabled: true, lastSaveTime: null, status: 'idle', errorMessage: null, totalSaves: 0 },
+          autoSave: {
+            enabled: true,
+            lastSaveTime: null,
+            status: 'idle',
+            errorMessage: null,
+            totalSaves: 0,
+          },
           onboardingCompleted: false,
         },
         version: 2,
@@ -107,147 +139,181 @@ test.describe('Fresh GameSession skeleton → content', () => {
       put('narraitor-world-store', worldPersist);
       put('narraitor-character-store', characterPersist);
       put('narraitor-session-store', sessionPersist);
-    });
+    }, { getTimestampSource: GET_TIMESTAMP_SOURCE });
     // First navigate to the app root to seed stores via localStorage
     await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded' });
 
     // Seed minimal world + character using dev-exposed stores (IndexedDB-backed)
-    await page.evaluate(() => {
-      const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
-      const CHAR_ID = 'char-playwright-e2e';
-      const now = new Date().toISOString();
+    await page.evaluate(
+      ({ getTimestampSource }) => {
+        const instantiateGetTimestamp = (source: string) =>
+          new Function(`return (${source});`)() as () => string;
+        const getTimestamp = instantiateGetTimestamp(getTimestampSource);
+        const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
+        const CHAR_ID = 'char-playwright-e2e';
+        const now = getTimestamp();
 
-      // Ensure world
-      const worldHook = (window as any).useWorldStore;
-      if (worldHook?.setState) {
-        const world = {
-          id: WORLD_ID,
-          name: 'Playwright Test World',
-          description: 'Seeded world for fresh-session test',
-          genre: 'fantasy',
-          attributes: [],
-          skills: [],
-          createdAt: now,
-          updatedAt: now,
-        };
-        worldHook.setState((prev: any) => ({
-          worlds: { ...(prev?.worlds || {}), [WORLD_ID]: world },
-          currentWorldId: WORLD_ID,
-          error: null,
-          loading: false,
-        }));
-      }
+        // Ensure world
+        const worldHook = (window as any).useWorldStore;
+        if (worldHook?.setState) {
+          const world = {
+            id: WORLD_ID,
+            name: 'Playwright Test World',
+            description: 'Seeded world for fresh-session test',
+            genre: 'fantasy',
+            attributes: [],
+            skills: [],
+            createdAt: now,
+            updatedAt: now,
+          };
+          worldHook.setState((prev: any) => ({
+            worlds: { ...(prev?.worlds || {}), [WORLD_ID]: world },
+            currentWorldId: WORLD_ID,
+            error: null,
+            loading: false,
+          }));
+        }
 
-      // Ensure character
-      const charHook = (window as any).useCharacterStore;
-      if (charHook?.setState) {
-        const character = {
-          id: CHAR_ID,
-          name: 'E2E Hero',
-          description: 'Playwright seeded character',
-          worldId: WORLD_ID,
-          level: 1,
-          isPlayer: true,
-          attributes: [],
-          skills: [],
-          background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-          status: { health: 100, maxHealth: 100, conditions: [] },
-          inventory: { characterId: CHAR_ID, items: [], capacity: 100, categories: [] },
-          createdAt: now,
-          updatedAt: now
-        };
-        charHook.setState((prev: any) => ({
-          characters: { ...(prev?.characters || {}), [CHAR_ID]: character },
-          currentCharacterId: CHAR_ID,
-          error: null,
-          loading: false,
-        }));
-      }
+        // Ensure character
+        const charHook = (window as any).useCharacterStore;
+        if (charHook?.setState) {
+          const character = {
+            id: CHAR_ID,
+            name: 'E2E Hero',
+            description: 'Playwright seeded character',
+            worldId: WORLD_ID,
+            level: 1,
+            isPlayer: true,
+            attributes: [],
+            skills: [],
+            background: {
+              history: '',
+              personality: '',
+              goals: [],
+              fears: [],
+              relationships: [],
+            },
+            status: { health: 100, maxHealth: 100, conditions: [] },
+            inventory: {
+              characterId: CHAR_ID,
+              items: [],
+              capacity: 100,
+              categories: [],
+            },
+            createdAt: now,
+            updatedAt: now,
+          };
+          charHook.setState((prev: any) => ({
+            characters: { ...(prev?.characters || {}), [CHAR_ID]: character },
+            currentCharacterId: CHAR_ID,
+            error: null,
+            loading: false,
+          }));
+        }
 
-      // Reset session store to initializing for a fresh start
-      const sessionHook = (window as any).useSessionStore;
-      if (sessionHook?.setState) {
-        sessionHook.setState((prev: any) => ({
-          ...prev,
-          id: null,
-          status: 'initializing',
-          currentSceneId: null,
-          playerChoices: [],
-          error: null,
-          worldId: null,
-          characterId: null,
-        }));
-      }
-    });
+        // Reset session store to initializing for a fresh start
+        const sessionHook = (window as any).useSessionStore;
+        if (sessionHook?.setState) {
+          sessionHook.setState((prev: any) => ({
+            ...prev,
+            id: null,
+            status: 'initializing',
+            currentSceneId: null,
+            playerChoices: [],
+            error: null,
+            worldId: null,
+            characterId: null,
+          }));
+        }
+      },
+      { getTimestampSource: GET_TIMESTAMP_SOURCE }
+    );
 
     // Now navigate to the target fresh-session URL
     await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
 
     // Seed again on the target page to avoid any late hydration races
-    await page.evaluate(() => {
-      const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
-      const CHAR_ID = 'char-playwright-e2e';
-      const now = new Date().toISOString();
+    await page.evaluate(
+      ({ getTimestampSource }) => {
+        const instantiateGetTimestamp = (source: string) =>
+          new Function(`return (${source});`)() as () => string;
+        const getTimestamp = instantiateGetTimestamp(getTimestampSource);
+        const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
+        const CHAR_ID = 'char-playwright-e2e';
+        const now = getTimestamp();
 
-      const worldHook = (window as any).useWorldStore;
-      if (worldHook?.setState) {
-        const world = {
-          id: WORLD_ID,
-          name: 'Playwright Test World',
-          description: 'Seeded world for fresh-session test',
-          genre: 'fantasy',
-          attributes: [],
-          skills: [],
-          createdAt: now,
-          updatedAt: now,
-        };
-        worldHook.setState((prev: any) => ({
-          worlds: { ...(prev?.worlds || {}), [WORLD_ID]: world },
-          currentWorldId: WORLD_ID,
-          error: null,
-          loading: false,
-        }));
-      }
+        const worldHook = (window as any).useWorldStore;
+        if (worldHook?.setState) {
+          const world = {
+            id: WORLD_ID,
+            name: 'Playwright Test World',
+            description: 'Seeded world for fresh-session test',
+            genre: 'fantasy',
+            attributes: [],
+            skills: [],
+            createdAt: now,
+            updatedAt: now,
+          };
+          worldHook.setState((prev: any) => ({
+            worlds: { ...(prev?.worlds || {}), [WORLD_ID]: world },
+            currentWorldId: WORLD_ID,
+            error: null,
+            loading: false,
+          }));
+        }
 
-      const charHook = (window as any).useCharacterStore;
-      if (charHook?.setState) {
-        const character = {
-          id: CHAR_ID,
-          name: 'E2E Hero',
-          description: 'Playwright seeded character',
-          worldId: WORLD_ID,
-          level: 1,
-          isPlayer: true,
-          attributes: [],
-          skills: [],
-          background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-          status: { health: 100, maxHealth: 100, conditions: [] },
-          inventory: { characterId: CHAR_ID, items: [], capacity: 100, categories: [] },
-          createdAt: now,
-          updatedAt: now
-        };
-        charHook.setState((prev: any) => ({
-          characters: { ...(prev?.characters || {}), [CHAR_ID]: character },
-          currentCharacterId: CHAR_ID,
-          error: null,
-          loading: false,
-        }));
-      }
+        const charHook = (window as any).useCharacterStore;
+        if (charHook?.setState) {
+          const character = {
+            id: CHAR_ID,
+            name: 'E2E Hero',
+            description: 'Playwright seeded character',
+            worldId: WORLD_ID,
+            level: 1,
+            isPlayer: true,
+            attributes: [],
+            skills: [],
+            background: {
+              history: '',
+              personality: '',
+              goals: [],
+              fears: [],
+              relationships: [],
+            },
+            status: { health: 100, maxHealth: 100, conditions: [] },
+            inventory: {
+              characterId: CHAR_ID,
+              items: [],
+              capacity: 100,
+              categories: [],
+            },
+            createdAt: now,
+            updatedAt: now,
+          };
+          charHook.setState((prev: any) => ({
+            characters: { ...(prev?.characters || {}), [CHAR_ID]: character },
+            currentCharacterId: CHAR_ID,
+            error: null,
+            loading: false,
+          }));
+        }
 
-      const sessionHook = (window as any).useSessionStore;
-      if (sessionHook?.setState) {
-        sessionHook.setState((prev: any) => ({
-          ...prev,
-          id: null,
-          status: 'initializing',
-          currentSceneId: null,
-          playerChoices: [],
-          error: null,
-          worldId: null,
-          characterId: null,
-        }));
-      }
-    });
+        const sessionHook = (window as any).useSessionStore;
+        if (sessionHook?.setState) {
+          sessionHook.setState((prev: any) => ({
+            ...prev,
+            id: null,
+            status: 'initializing',
+            currentSceneId: null,
+            playerChoices: [],
+            error: null,
+            worldId: null,
+            characterId: null,
+          }));
+        }
+      },
+      { getTimestampSource: GET_TIMESTAMP_SOURCE }
+    );
 
     // Ensure we are not on the "World Not Found" error path
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -255,27 +321,36 @@ test.describe('Fresh GameSession skeleton → content', () => {
     // If still world-not-found, retry reseed + reload once more
     const worldNotFound = page.getByText('World Not Found');
     if (await worldNotFound.isVisible().catch(() => false)) {
-      await page.evaluate(() => {
-        const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
-        const worldHook = (window as any).useWorldStore;
-        if (worldHook?.setState) {
-          worldHook.setState((prev: any) => ({
-            worlds: { ...(prev?.worlds || {}), [WORLD_ID]: prev?.worlds?.[WORLD_ID] || {
-              id: WORLD_ID,
-              name: 'Playwright Test World',
-              description: 'Seeded world for fresh-session test',
-              genre: 'fantasy',
-              attributes: [],
-              skills: [],
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            } },
-            currentWorldId: WORLD_ID,
-            error: null,
-            loading: false,
-          }));
-        }
-      });
+      await page.evaluate(
+        ({ getTimestampSource }) => {
+          const instantiateGetTimestamp = (source: string) =>
+            new Function(`return (${source});`)() as () => string;
+          const getTimestamp = instantiateGetTimestamp(getTimestampSource);
+          const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
+          const worldHook = (window as any).useWorldStore;
+          if (worldHook?.setState) {
+            worldHook.setState((prev: any) => ({
+              worlds: {
+                ...(prev?.worlds || {}),
+                [WORLD_ID]: prev?.worlds?.[WORLD_ID] || {
+                  id: WORLD_ID,
+                  name: 'Playwright Test World',
+                  description: 'Seeded world for fresh-session test',
+                  genre: 'fantasy',
+                  attributes: [],
+                  skills: [],
+                  createdAt: getTimestamp(),
+                  updatedAt: getTimestamp(),
+                },
+              },
+              currentWorldId: WORLD_ID,
+              error: null,
+              loading: false,
+            }));
+          }
+        },
+        { getTimestampSource: GET_TIMESTAMP_SOURCE }
+      );
       await page.reload({ waitUntil: 'domcontentloaded' });
     }
     await expect(worldNotFound).toHaveCount(0);
@@ -291,15 +366,21 @@ test.describe('Fresh GameSession skeleton → content', () => {
 
     // Skeleton should appear briefly
     const skeleton = page.locator('[data-testid="game-session-skeleton"]');
-    await skeleton.first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+    await skeleton
+      .first()
+      .waitFor({ state: 'visible', timeout: 5000 })
+      .catch(() => {});
 
     // Then the active session container should become visible (allow time for AI/fallback)
-    await page.locator('[data-testid="game-session-active"]').waitFor({ state: 'visible', timeout: 20000 }).catch(async (e) => {
-      // Attach logs to help diagnose
-      console.log('--- Debug logs ---');
-      for (const l of logs) console.log(l);
-      throw e;
-    });
+    await page
+      .locator('[data-testid="game-session-active"]')
+      .waitFor({ state: 'visible', timeout: 20000 })
+      .catch(async (e) => {
+        // Attach logs to help diagnose
+        console.log('--- Debug logs ---');
+        for (const l of logs) console.log(l);
+        throw e;
+      });
 
     // Choices panel must be visible
     await expect(page.locator('[data-testid="choice-selector"]')).toBeVisible();

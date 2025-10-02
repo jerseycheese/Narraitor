@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '06-Patterns/data-management/RecoveryNotification',
@@ -39,7 +40,7 @@ type Story = StoryObj<typeof meta>;
 export const Visible: Story = {
   args: {
     isVisible: true,
-    lastSaved: new Date().toISOString(),
+    lastSaved: getTimestamp(),
     onRecover: () => console.log('Recover clicked'),
     onDismiss: () => console.log('Dismiss clicked'),
   },
@@ -83,4 +84,3 @@ export const VisibleWithoutTimestamp: Story = {
     },
   },
 };
-

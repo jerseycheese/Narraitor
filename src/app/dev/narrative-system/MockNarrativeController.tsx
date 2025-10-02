@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 interface MockNarrativeControllerProps {
   worldId: string;
@@ -93,8 +94,8 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
         sessionId,
         worldId,
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
         metadata: {
           location: 'Frontier Town', // Add Western-specific location
           tags: isInitial ? ['opening', 'western'] : ['action', 'western'],

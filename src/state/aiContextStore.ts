@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { NarrativeGoal, GoalPriority } from '../types/goal.types';
-import { generateUniqueId, getTimestamp } from '../lib/utils/generateId';
+import { generateUniqueId } from '../lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { useGoalStore } from './goalStore';
 
 // Simplified AI context types for MVP implementation
