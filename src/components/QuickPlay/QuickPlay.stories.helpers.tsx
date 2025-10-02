@@ -2,6 +2,7 @@ import React from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { getTimestamp } from '@/lib/utils';
 
 // Shared mock data
 export const mockWorld = {
@@ -17,8 +18,8 @@ export const mockWorld = {
     attributePointPool: 100,
     skillPointPool: 100,
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
 };
 
 export const mockCharacter = {
@@ -49,8 +50,8 @@ export const mockCharacter = {
     conditions: [],
   },
   portrait: { type: 'placeholder' as const, url: null },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
 };
 
 interface MockStoreOptions {
@@ -87,7 +88,7 @@ export const createMockStoreState = (options: MockStoreOptions) => {
         id: 'session-1',
         worldId: 'world-1',
         characterId: 'char-1',
-        lastPlayed: new Date(Date.now() - timeAgo).toISOString(),
+        lastPlayed: getTimestamp(),
         narrativeCount,
       };
 

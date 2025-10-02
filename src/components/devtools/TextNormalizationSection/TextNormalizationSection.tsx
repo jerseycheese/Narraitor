@@ -13,6 +13,7 @@ import {
   type TextAnalysis,
   type WhitespaceStats
 } from '@/lib/utils/textNormalization';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Props for the TextNormalizationSection component
@@ -91,7 +92,7 @@ export function TextNormalizationSection({
       stats: normalizationResult.stats,
       analysis: textAnalysis,
       whitespaceStats,
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp()
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });

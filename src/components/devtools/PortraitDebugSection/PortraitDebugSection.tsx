@@ -12,6 +12,7 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { getTimestamp } from '@/lib/utils';
 
 
 interface PortraitDebugSectionProps {
@@ -103,13 +104,13 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         categories: [], 
         characterId: id 
       },
-      status: { 
-        health: getStatusProp('health') || getStatusProp('hp') || 100, 
-        maxHealth: getStatusProp('maxHealth') || 100, 
-        conditions: getStatusProp('conditions') || [] 
+      status: {
+        health: getStatusProp('health') || getStatusProp('hp') || 100,
+        maxHealth: getStatusProp('maxHealth') || 100,
+        conditions: getStatusProp('conditions') || []
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     };
   };
 

@@ -9,6 +9,7 @@ import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { Button } from '@/components/ui/button';
+import { getTimestamp } from '@/lib/utils';
 
 interface FinalizeStepProps {
   worldData: Partial<World>;
@@ -86,7 +87,7 @@ export default function FinalizeStep({
     const placeholderImage: WorldImage = {
       type: 'placeholder',
       url: null,
-      generatedAt: new Date().toISOString()
+      generatedAt: getTimestamp()
     };
     
     onUpdateWorldData({ image: placeholderImage });
