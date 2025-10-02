@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -80,25 +80,14 @@ const initialState = {
 
 // Validation function for goal data
 const validateGoalData = (data: Partial<NarrativeGoal>): void => {
-  const normalizedTitle = normalizeText(data.title || '', {
-    normalizeWhitespace: true,
-    normalizeQuotes: true,
-    normalizeSpecialChars: true,
-    preserveStructure: false
-  });
+  const normalizedTitle = normalizeText(data.title || '', NORM_NAME);
   if (!normalizedTitle) {
     throw new Error('Goal title is required');
   }
   if (!data.sessionId) {
     throw new Error('Session ID is required');
   }
-  const normalizedDescription = normalizeText(data.description || '', {
-    normalizeWhitespace: true,
-    normalizeLineEndings: true,
-    normalizeQuotes: true,
-    normalizeSpecialChars: true,
-    preserveStructure: true
-  });
+  const normalizedDescription = normalizeText(data.description || '', NORM_DESC);
   if (!normalizedDescription) {
     throw new Error('Goal description is required');
   }
@@ -128,19 +117,8 @@ export const useGoalStore = create<GoalStore>()(
 
         const newGoal: NarrativeGoal = {
           ...goalData,
-          title: normalizeText(goalData.title, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          }),
-          description: normalizeText(goalData.description, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          title: normalizeText(goalData.title, NORM_NAME),
+          description: normalizeText(goalData.description, NORM_DESC),
           id: goalId,
           createdAt: now,
           updatedAt: now,

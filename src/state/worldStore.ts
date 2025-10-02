@@ -5,8 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
-import { safeTrim } from '@/lib/utils';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
 
 /**
@@ -75,19 +74,8 @@ export const useWorldStore = create<WorldStore>()(
         // Normalize text fields for consistent storage
         const newWorld: World = {
           ...worldData,
-          name: normalizeText(worldData.name, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          }),
-          description: normalizeText(worldData.description, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          name: normalizeText(worldData.name, NORM_NAME),
+          description: normalizeText(worldData.description, NORM_DESC),
           id: worldId,
           createdAt: now,
           updatedAt: now,
@@ -112,21 +100,10 @@ export const useWorldStore = create<WorldStore>()(
         // Normalize text fields in updates
         const normalizedUpdates = { ...updates };
         if (updates.name) {
-          normalizedUpdates.name = normalizeText(updates.name, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          });
+          normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
         }
         if (updates.description) {
-          normalizedUpdates.description = normalizeText(updates.description, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          });
+          normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
         }
 
         const updatedWorld: World = {
@@ -196,19 +173,8 @@ export const useWorldStore = create<WorldStore>()(
         const attributeId = generateUniqueId('attr');
         const newAttribute: WorldAttribute = {
           ...attributeData,
-          name: normalizeText(attributeData.name, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          }),
-          description: normalizeText(attributeData.description, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          name: normalizeText(attributeData.name, NORM_NAME),
+          description: normalizeText(attributeData.description, NORM_DESC),
           id: attributeId,
           worldId,
         };
@@ -294,19 +260,8 @@ export const useWorldStore = create<WorldStore>()(
         const skillId = generateUniqueId('skill');
         const newSkill: WorldSkill = {
           ...skillData,
-          name: normalizeText(skillData.name, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          }),
-          description: normalizeText(skillData.description, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
+          name: normalizeText(skillData.name, NORM_NAME),
+          description: normalizeText(skillData.description, NORM_DESC),
           id: skillId,
           worldId,
         };

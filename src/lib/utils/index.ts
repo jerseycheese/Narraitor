@@ -43,7 +43,9 @@ export {
   normalizeQuotationMarks,
   normalizeSpecialCharacters,
   analyzeText,
-  getWhitespaceStats
+  getWhitespaceStats,
+  NORM_NAME,
+  NORM_DESC
 } from './textNormalization';
 
 /** Type definitions for text normalization */

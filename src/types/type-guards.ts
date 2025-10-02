@@ -8,7 +8,7 @@ import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';
 import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './personalization.types';
 import { safeTrim } from '@/lib/utils';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { ValidationResult } from '../lib/utils/validationUtils';
 
 /**
@@ -857,13 +857,7 @@ export function sanitizeString(value: unknown, maxLength: number = 200): string 
   if (typeof value !== 'string' || value.length === 0) return undefined;
   
   // First normalize the text to handle whitespace, quotes, and special characters
-  let sanitized = normalizeText(value, {
-    normalizeWhitespace: true,
-    normalizeLineEndings: true,
-    normalizeQuotes: true,
-    normalizeSpecialChars: true,
-    preserveStructure: false
-  });
+  let sanitized = normalizeText(value, NORM_NAME);
   
   // Remove HTML tags and dangerous characters
   sanitized = safeTrim(sanitized

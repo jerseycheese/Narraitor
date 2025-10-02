@@ -9,7 +9,7 @@ import { generateUniqueId } from '../lib/utils';
 // IMPORTANT: Do not import AI generators directly in client code.
 // All AI calls must go through server/API routes per project guidelines.
 import { logger } from '../lib/utils/logger';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { createIndexedDBStorage } from './persistence';
 
@@ -176,17 +176,11 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
   // Add segment
   addSegment: (sessionId, segmentData) => {
-    const normalizedContent = normalizeText(segmentData.content || '', {
-      normalizeWhitespace: true,
-      normalizeLineEndings: true,
-      normalizeQuotes: true,
-      normalizeSpecialChars: true,
-      preserveStructure: true
-    });
+    const normalizedContent = normalizeText(segmentData.content || '', NORM_DESC);
     if (!normalizedContent) {
       throw new Error('Segment content is required');
     }
-    
+
     // Prevent adding segments to ended sessions
     if (get().isSessionEnded(sessionId)) {
       throw new Error('Cannot add segments to an ended session');
@@ -194,16 +188,10 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
     const segmentId = generateUniqueId('segment');
     const now = new Date().toISOString();
-    
+
     const newSegment: NarrativeSegment = {
       ...segmentData,
-      content: normalizeText(segmentData.content, {
-        normalizeWhitespace: true,
-        normalizeLineEndings: true,
-        normalizeQuotes: true,
-        normalizeSpecialChars: true,
-        preserveStructure: true
-      }),
+      content: normalizeText(segmentData.content, NORM_DESC),
       id: segmentId,
       sessionId,
       createdAt: now,

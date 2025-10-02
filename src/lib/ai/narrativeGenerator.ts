@@ -23,7 +23,7 @@ import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { CharacterGoal } from '@/types/personalization.types';
 import { safeTrim, getNestedValue } from '@/lib/utils';
-import { normalizeText } from '@/lib/utils/textNormalization';
+import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -597,13 +597,7 @@ export class NarrativeGenerator {
     const fallbackLocation = this.getLocationForGenre(this.getWorldGenre());
 
     // Normalize the content for consistent formatting
-    const normalizedContent = normalizeText(actualContent, {
-      normalizeWhitespace: true,
-      normalizeLineEndings: true,
-      normalizeQuotes: true,
-      normalizeSpecialChars: true,
-      preserveStructure: true
-    });
+    const normalizedContent = normalizeText(actualContent, NORM_DESC);
 
     return {
       content: normalizedContent,

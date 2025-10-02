@@ -11,19 +11,13 @@ import type {
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 
 /**
  * Helper function to generate normalized lore keys
  */
 function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
-  const normalizedName = normalizeText(name, {
-    normalizeWhitespace: true,
-    normalizeQuotes: true,
-    normalizeSpecialChars: true,
-    normalizeLineEndings: true,
-    preserveStructure: false
-  }).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const normalizedName = normalizeText(name, NORM_NAME).toLowerCase().replace(/[^a-z0-9]+/g, '_');
   
   const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
   return `${worldId}:${category}_${truncatedName}`;
@@ -311,22 +305,10 @@ export const useLoreStore = create<LoreStore>()(
       findSimilarFacts: (worldId, value) => {
         const { facts } = get();
         const worldFacts = Object.values(facts).filter(f => f.worldId === worldId);
-        const normalizedValue = normalizeText(value, {
-          normalizeWhitespace: true,
-          normalizeQuotes: true,
-          normalizeSpecialChars: true,
-          normalizeLineEndings: true,
-          preserveStructure: false
-        }).toLowerCase();
-        
+        const normalizedValue = normalizeText(value, NORM_NAME).toLowerCase();
+
         return worldFacts.filter(fact => {
-          const normalizedFactValue = normalizeText(fact.value, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            normalizeLineEndings: true,
-            preserveStructure: false
-          }).toLowerCase();
+          const normalizedFactValue = normalizeText(fact.value, NORM_NAME).toLowerCase();
           
           return normalizedFactValue === normalizedValue;
         });
