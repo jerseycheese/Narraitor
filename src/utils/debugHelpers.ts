@@ -4,6 +4,7 @@
 
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Manually fix narrative counts for all existing sessions
@@ -62,7 +63,7 @@ export const createTestNarrativeSegment = (sessionId: string, content: string = 
     type: 'scene',
     content,
     timestamp: new Date(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: getTimestamp(),
     metadata: {
       characterIds: [],
       location: 'Test Location',

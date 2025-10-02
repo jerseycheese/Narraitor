@@ -4,6 +4,7 @@ import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
+import { getTimestamp } from '@/lib/utils';
 
 interface WorldImageFormProps {
   world: World;
@@ -34,7 +35,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
     const placeholderImage: WorldImage = {
       type: 'placeholder',
       url: null,
-      generatedAt: new Date().toISOString()
+      generatedAt: getTimestamp()
     };
     
     onChange({ image: placeholderImage });

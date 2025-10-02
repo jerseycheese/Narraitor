@@ -9,6 +9,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { CharacterDeletionService } from '@/services/characterDeletionService';
+import { getTimestamp } from '@/lib/utils';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
@@ -105,7 +106,7 @@ async function generateCharacterPortrait(
       const portrait = result.portrait || {
         type: 'ai-generated',
         url: result.image,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: result.prompt
       };
       // Update character with generated portrait

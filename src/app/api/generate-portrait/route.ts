@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
-import { truncate } from '@/lib/utils';
+import { truncate, getTimestamp } from '@/lib/utils';
 
 const logger = new Logger('API');
 
@@ -55,8 +55,8 @@ async function buildPortraitPrompt(
         maxHealth: 100,
         conditions: []
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     };
     
     logger.debug('generate-portrait API', 'Calling buildPortraitPrompt directly to avoid image generation');
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       const mockPortrait = {
         type: 'ai-generated' as const,
         url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: prompt
       };
       
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
       const fallbackPortrait = {
         type: 'ai-generated' as const,
         url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: prompt
       };
       
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
       const fallbackPortrait = {
         type: 'ai-generated' as const,
         url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: prompt
       };
       
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
     const portraitData = {
       type: 'ai-generated' as const,
       url: `data:${mimeType};base64,${base64Data}`,
-      generatedAt: new Date().toISOString(),
+      generatedAt: getTimestamp(),
       prompt: prompt
     };
     
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
     const fallbackPortrait = {
       type: 'ai-generated' as const,
       url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
-      generatedAt: new Date().toISOString(),
+      generatedAt: getTimestamp(),
       prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
     
