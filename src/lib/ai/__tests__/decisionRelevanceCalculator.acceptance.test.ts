@@ -6,6 +6,7 @@
 import { DecisionRelevanceCalculator } from '../decisionRelevanceCalculator';
 import { PlayerDecision } from '@/types/personalization.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
   let calculator: DecisionRelevanceCalculator;
@@ -23,7 +24,7 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
       activeTags: ['mystery', 'social'],
       worldId: 'world-1',
       sessionId: 'session-1',
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp()
     };
 
     // Create decisions with different characteristics for testing

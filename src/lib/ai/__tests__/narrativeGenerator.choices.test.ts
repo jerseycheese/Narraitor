@@ -2,6 +2,7 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { AIClient } from '../types';
 import { ChoiceGenerator } from '../choiceGenerator';
 import { NarrativeContext } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the AIClient
 const mockAIClient: jest.Mocked<AIClient> = {
@@ -72,8 +73,8 @@ describe('NarrativeGenerator - Player Choices', () => {
             tags: ['forest', 'fantasy']
           },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }],
         currentLocation: 'Forest clearing'
       };
@@ -123,8 +124,8 @@ describe('NarrativeGenerator - Player Choices', () => {
             tags: ['forest', 'fantasy']
           },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }],
         currentLocation: 'Forest clearing'
       };

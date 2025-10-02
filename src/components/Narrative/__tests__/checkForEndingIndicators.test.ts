@@ -1,6 +1,7 @@
 // src/components/Narrative/__tests__/checkForEndingIndicators.test.ts
 
 import type { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the AI client
 const mockGenerateContent = jest.fn();
@@ -110,8 +111,8 @@ describe('Pure AI Ending Detection', () => {
     type: 'scene',
     timestamp: new Date(),
     sessionId: 'test-session',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
     metadata: {
       tags: []
     }

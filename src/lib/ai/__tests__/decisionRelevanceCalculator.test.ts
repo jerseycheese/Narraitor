@@ -5,10 +5,11 @@
 
 import { DecisionRelevanceCalculator } from '../decisionRelevanceCalculator';
 import { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
-import { 
-  CurrentNarrativeContext, 
-  RelevanceScoringConfig 
+import {
+  CurrentNarrativeContext,
+  RelevanceScoringConfig
 } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('DecisionRelevanceCalculator', () => {
   let calculator: DecisionRelevanceCalculator;
@@ -40,7 +41,7 @@ describe('DecisionRelevanceCalculator', () => {
       activeTags: ['social', 'investigation'],
       worldId: 'world-1',
       sessionId: 'session-1',
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp()
     };
 
     mockDecisions = [
@@ -196,7 +197,7 @@ describe('DecisionRelevanceCalculator', () => {
         prompt: 'What do you do?',
         choiceText: 'Continue',
         choiceType: 'neutral' as ChoiceTypePreference,
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
         sessionId: 'session-1',
         worldId: 'world-1',
         context: {} // Minimal context

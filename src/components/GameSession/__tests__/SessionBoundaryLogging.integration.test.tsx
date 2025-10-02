@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useSessionStore } from '@/state/sessionStore';
 import { useJournalStore } from '@/state/journalStore';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the stores
 jest.mock('@/state/sessionStore');
@@ -480,7 +481,7 @@ describe('Session Boundary Logging Integration', () => {
             content: 'New adventure began',
             significance: 'minor',
             relatedEntities: [],
-            updatedAt: new Date().toISOString(),
+            updatedAt: getTimestamp(),
             isRead: false,
             metadata: { tags: ['system'], automaticEntry: true }
           });
@@ -494,7 +495,7 @@ describe('Session Boundary Logging Integration', () => {
             content: 'Adventure concluded',
             significance: 'minor',
             relatedEntities: [],
-            updatedAt: new Date().toISOString(),
+            updatedAt: getTimestamp(),
             isRead: false,
             metadata: { tags: ['system'], automaticEntry: true }
           });

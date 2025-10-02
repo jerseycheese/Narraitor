@@ -1,4 +1,5 @@
 import { useJournalStore } from '../journalStore';
+import { getTimestamp } from '@/lib/utils';
 import { JournalEntry } from '../../types/journal.types';
 
 describe('journalStore - deleteSessionEntries', () => {
@@ -16,7 +17,7 @@ describe('journalStore - deleteSessionEntries', () => {
     isRead: false,
     relatedEntities: [],
     metadata: { tags: [], automaticEntry: false },
-    updatedAt: new Date().toISOString()
+    updatedAt: getTimestamp()
   };
 
   const mockEntry2: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> = {
@@ -29,7 +30,7 @@ describe('journalStore - deleteSessionEntries', () => {
     isRead: true,
     relatedEntities: [],
     metadata: { tags: [], automaticEntry: true },
-    updatedAt: new Date().toISOString()
+    updatedAt: getTimestamp()
   };
 
   it('should delete all entries for a specific session', () => {

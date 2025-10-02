@@ -1,5 +1,7 @@
 // src/lib/ai/__tests__/endingGenerator.test.ts
 
+import { getTimestamp } from '@/lib/utils';
+
 // Mock modules that have dependency issues first
 jest.mock('../../../state/sessionStore', () => ({
   useSessionStore: {
@@ -111,8 +113,8 @@ describe('endingGenerator', () => {
     },
     attributes: [],
     skills: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockCharacter: Character = {
@@ -148,8 +150,8 @@ describe('endingGenerator', () => {
       conditions: [],
       location: 'Dark Castle'
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockNarrativeSegments: NarrativeSegment[] = [
@@ -161,8 +163,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'castle'], mood: 'tense' },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     },
     {
       id: 'seg-2',
@@ -172,8 +174,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'boss-fight'], mood: 'action' },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   ];
 
@@ -193,8 +195,8 @@ describe('endingGenerator', () => {
         tags: ['achievement', 'dragon'], 
         automaticEntry: false 
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   ];
 

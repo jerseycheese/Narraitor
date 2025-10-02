@@ -1,4 +1,5 @@
 import { NarrativeContextManager } from '../contextManager';
+import { getTimestamp } from '@/lib/utils';
 
 describe('NarrativeContextManager', () => {
   let contextManager: NarrativeContextManager;
@@ -20,8 +21,8 @@ describe('NarrativeContextManager', () => {
           tags: ['forest', 'mystery']
         },
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       contextManager.addSegment(segment);
@@ -38,8 +39,8 @@ describe('NarrativeContextManager', () => {
           type: 'scene' as const,
           metadata: { characterIds: [], tags: [] },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         },
         {
           id: 'seg-2',
@@ -47,8 +48,8 @@ describe('NarrativeContextManager', () => {
           type: 'dialogue' as const,
           metadata: { characterIds: [], tags: [] },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         }
       ];
 
@@ -73,8 +74,8 @@ describe('NarrativeContextManager', () => {
             tags: ['plot-critical']
           },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         },
         {
           id: 'seg-2',
@@ -85,8 +86,8 @@ describe('NarrativeContextManager', () => {
             tags: ['detail']
           },
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         }
       ];
 
@@ -106,8 +107,8 @@ describe('NarrativeContextManager', () => {
         type: 'scene' as const,
         metadata: { characterIds: [], tags: [] },
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       });
 
       contextManager.clear();

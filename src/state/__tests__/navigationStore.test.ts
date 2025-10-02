@@ -1,4 +1,5 @@
 import { useNavigationStore } from '../navigationStore';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock storage helpers to prevent issues in test environment
 jest.mock('@/utils/storageHelpers', () => ({
@@ -179,7 +180,7 @@ describe('navigationStore', () => {
       
       const entry = {
         path: '/test-path',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
         title: 'Test Page',
       };
       
@@ -195,7 +196,7 @@ describe('navigationStore', () => {
       
       addToHistory({
         path: '/test-path',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
       });
       
       clearHistory();
@@ -209,11 +210,11 @@ describe('navigationStore', () => {
       
       addToHistory({
         path: '/path-1',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
       });
       addToHistory({
         path: '/path-2',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
       });
       
       removeFromHistory('/path-1');

@@ -1,5 +1,6 @@
 import { createTestContext, mergeTestOverrides } from '../contextOverride';
 import type { World, Character, NarrativeContext, AITestConfig } from '../../../types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('contextOverride', () => {
   const mockWorld: World = {
@@ -15,8 +16,8 @@ describe('contextOverride', () => {
       attributePointPool: 27,
       skillPointPool: 40
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockCharacter: Character = {
@@ -45,8 +46,8 @@ describe('contextOverride', () => {
       conditions: [],
       location: 'Test Location'
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockNarrativeContext: NarrativeContext = {

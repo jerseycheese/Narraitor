@@ -289,7 +289,7 @@ export const useGoalStore = create<GoalStore>()(
         const updatedGoal = {
           ...goal,
           progressNotes: [...(goal.progressNotes || []), note],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         set((state) => ({

@@ -7,6 +7,7 @@
 
 import { PersonalizationEngine } from '../personalizationEngine';
 import { PlayerDecision, PersonalizedNarrativeContext } from '@/types/personalization.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
   let personalizationEngine: PersonalizationEngine;
@@ -75,7 +76,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'moderate',
           contentFocus: 'dialogue',
           confidenceLevel: 90,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -111,7 +112,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -145,7 +146,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'dialogue',
           confidenceLevel: 90,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -185,7 +186,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'moderate',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -219,7 +220,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'dialogue',
           confidenceLevel: 90,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -253,7 +254,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -289,7 +290,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -322,7 +323,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'detailed',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -365,7 +366,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
         worldId: 'world-1',
         choiceText: 'Saved all the people from the disaster',
         choiceType: 'helpful',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
         context: { 
           situation: 'world-changing',
           charactersPresent: ['leader', 'deputy', 'all citizens'],
@@ -387,7 +388,7 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           detailLevel: 'moderate',
           contentFocus: 'balanced',
           confidenceLevel: 85,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: getTimestamp()
         },
         narrativeHistory: {
           keyEvents: [],

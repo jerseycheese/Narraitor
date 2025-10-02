@@ -8,6 +8,7 @@
  */
 
 import { useNarrativeStore } from '../../narrativeStore';
+import { getTimestamp } from '@/lib/utils';
 import { PlayerDecisionTracker } from '../../../lib/ai/playerDecisionTracker';
 import { DecisionOption } from '../../../types/narrative.types';
 import { ChoiceTypePreference } from '../../../types/personalization.types';
@@ -65,7 +66,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           location: 'Rivertown Marketplace',
           mood: 'neutral'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -78,7 +79,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           tags: ['encounter', 'merchant', 'distress'],
           location: 'Rivertown Marketplace'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -90,7 +91,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         metadata: {
           tags: ['plea', 'backstory', 'quest-hook']
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -243,7 +244,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           location: 'Temple of Forgotten Wisdom',
           mood: 'mysterious'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -255,7 +256,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         metadata: {
           tags: ['warning', 'choice', 'consequence']
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 

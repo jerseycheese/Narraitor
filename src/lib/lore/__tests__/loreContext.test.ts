@@ -1,5 +1,6 @@
 import { buildLoreContext } from '../loreContext';
 import type { LoreFact } from '../../../types/lore.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('buildLoreContext', () => {
   describe('Basic Functionality', () => {
@@ -16,7 +17,7 @@ describe('buildLoreContext', () => {
 
     it('handles invalid facts gracefully', () => {
       const invalidFacts = [
-        { id: 'invalid1', key: 'unknown_fact', category: 'unknown' as 'characters', value: 'Invalid fact', source: 'manual' as const, worldId: 'world1', sessionId: 'session1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        { id: 'invalid1', key: 'unknown_fact', category: 'unknown' as 'characters', value: 'Invalid fact', source: 'manual' as const, worldId: 'world1', sessionId: 'session1', createdAt: getTimestamp(), updatedAt: getTimestamp() }
       ];
       
       const result = buildLoreContext(invalidFacts);
@@ -41,8 +42,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -67,8 +68,8 @@ describe('buildLoreContext', () => {
           source: 'narrative',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -95,8 +96,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -121,8 +122,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -149,8 +150,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -176,8 +177,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -203,8 +204,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         },
         {
           id: 'loc1',
@@ -214,8 +215,8 @@ describe('buildLoreContext', () => {
           source: 'narrative',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         },
         {
           id: 'rule1',
@@ -225,8 +226,8 @@ describe('buildLoreContext', () => {
           source: 'narrative',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 
@@ -250,8 +251,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         },
         {
           id: 'char2',
@@ -261,8 +262,8 @@ describe('buildLoreContext', () => {
           source: 'narrative',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         },
         {
           id: 'char3',
@@ -272,8 +273,8 @@ describe('buildLoreContext', () => {
           source: 'manual',
           worldId: 'world1',
           sessionId: 'session1',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }
       ];
 

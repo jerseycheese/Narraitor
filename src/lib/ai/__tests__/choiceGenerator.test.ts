@@ -2,6 +2,7 @@ import { ChoiceGenerator } from '../choiceGenerator';
 import { AIClient } from '../types';
 import { EntityID } from '@/types/common.types';
 import { NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the AIClient
 const mockAIClient: jest.Mocked<AIClient> = {
@@ -49,8 +50,8 @@ const createMockNarrativeContext = (): NarrativeContext => {
       tags: ['fantasy']
     },
     timestamp: new Date(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   });
 
   return {

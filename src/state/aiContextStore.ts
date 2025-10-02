@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { NarrativeGoal, GoalPriority } from '../types/goal.types';
-import { generateUniqueId } from '../lib/utils/generateId';
+import { generateUniqueId, getTimestamp } from '../lib/utils/generateId';
 import { useGoalStore } from './goalStore';
 
 // Simplified AI context types for MVP implementation
@@ -210,7 +210,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
       constraints: [],
       metadata: {
         tokenCount: 0,
-        lastUpdated: new Date().toISOString(),
+        lastUpdated: getTimestamp(),
       },
     };
 
@@ -237,7 +237,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
         ...updates,
         metadata: {
           ...state.contexts[contextId].metadata,
-          lastUpdated: new Date().toISOString(),
+          lastUpdated: getTimestamp(),
         },
       };
 
@@ -265,7 +265,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
           ...context.metadata,
           tokenCount:
             context.metadata.tokenCount + (promptContext.tokenCount || 0),
-          lastUpdated: new Date().toISOString(),
+          lastUpdated: getTimestamp(),
         },
       };
 
@@ -290,7 +290,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
         recentContext: [],
         metadata: {
           tokenCount: 0,
-          lastUpdated: new Date().toISOString(),
+          lastUpdated: getTimestamp(),
         },
       };
 
@@ -327,7 +327,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
           recentGoals: [],
           tokenCount: 0,
           error: null,
-          timestamp: new Date().toISOString(),
+          timestamp: getTimestamp(),
         };
       }
 
@@ -368,7 +368,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
             recentGoals,
             tokenCount: 0,
             error: null,
-            timestamp: new Date().toISOString(),
+            timestamp: getTimestamp(),
           };
         }
 
@@ -402,7 +402,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
         recentGoals,
         tokenCount,
         error: null,
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
       };
     } catch (error) {
       return {
@@ -417,7 +417,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
           error instanceof Error
             ? error.message
             : 'Unknown error building context',
-        timestamp: new Date().toISOString(),
+        timestamp: getTimestamp(),
       };
     }
   },

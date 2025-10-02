@@ -5,6 +5,7 @@
 
 import { PlayerDecisionTracker } from '../playerDecisionTracker';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('PlayerDecisionTracker - Relevance Integration', () => {
   let tracker: PlayerDecisionTracker;
@@ -23,7 +24,7 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
       activeTags: ['mystery', 'social'],
       worldId: 'world-test',
       sessionId: 'session-test',
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp()
     };
   });
 
@@ -188,7 +189,7 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
         activeTags: [],
         worldId: 'world-test',
         sessionId: 'session-test',
-        timestamp: new Date().toISOString()
+        timestamp: getTimestamp()
         // location and situation are optional
       };
 

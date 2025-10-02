@@ -6,6 +6,7 @@
  */
 
 import { useJournalStore } from '../journalStore';
+import { getTimestamp } from '@/lib/utils';
 
 // Initialize the store for testing
 const getStore = () => useJournalStore.getState();
@@ -41,7 +42,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Help the stranger', 
         decisionPrompt: 'You encounter a suspicious person at the tavern. What do you do?'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     const entries = getStore().getSessionEntries('session-123');
@@ -77,7 +78,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Order ale',
         decisionPrompt: 'The bartender asks what you want to drink'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     // Critical decision  
@@ -97,7 +98,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Fight the dragon',
         decisionPrompt: 'You are confronted with an ancient dragon. What do you do?'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     const entries = getStore().getSessionEntries('session-123');
@@ -132,7 +133,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Investigate the noise',
         decisionPrompt: 'You hear strange noises from the basement'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     // Add non-decision entry for comparison
@@ -149,7 +150,7 @@ describe('journalStore - Decision Entries', () => {
         tags: ['discovery'],
         automaticEntry: true
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     const decisionEntries = getEntriesByType('decision');
@@ -181,7 +182,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Enter the tavern',
         decisionPrompt: 'You approach a tavern. What do you do?'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
     
     addEntry('session-123', {
@@ -200,7 +201,7 @@ describe('journalStore - Decision Entries', () => {
         choiceText: 'Talk to the bartender',
         decisionPrompt: 'You are inside the tavern. What do you do next?'
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     const entries = getSessionEntries('session-123');

@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { Character } from '@/types/character.types';
+import { getTimestamp } from '@/lib/utils';
 
 describe('Portrait Generation Documentation Examples', () => {
   describe('Integration Guide Examples', () => {
@@ -32,8 +33,8 @@ describe('Portrait Generation Documentation Examples', () => {
           conditions: [],
           location: 'Test World'
         },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       // Verify the character structure matches what's documented
@@ -92,7 +93,7 @@ describe('Portrait Generation Documentation Examples', () => {
         portrait: {
           type: 'ai-generated',
           url: 'data:image/png;base64,/9j/4AAQSkZJRg...',
-          generatedAt: new Date().toISOString(),
+          generatedAt: getTimestamp(),
           prompt: 'A fantasy warrior with dark hair...'
         }
       };

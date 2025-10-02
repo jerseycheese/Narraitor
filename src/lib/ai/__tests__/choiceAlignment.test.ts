@@ -3,6 +3,7 @@ import { MockGeminiClient } from '../__mocks__/geminiClient.mock';
 import { useWorldStore } from '@/state/worldStore';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the store
 jest.mock('@/state/worldStore');
@@ -29,8 +30,8 @@ describe('ChoiceGenerator - Alignment System', () => {
         attributePointPool: 27,
         skillPointPool: 40
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     };
     
     mockNarrativeContext = {

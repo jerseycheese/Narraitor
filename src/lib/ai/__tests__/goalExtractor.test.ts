@@ -2,6 +2,7 @@
 
 import { goalExtractor } from '../goalExtractor';
 import { NarrativeGoal, GoalExtractionRequest } from '../../../types/goal.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock the AI client
 jest.mock('../geminiClient', () => ({
@@ -69,8 +70,8 @@ describe('goalExtractor', () => {
         status: 'active',
         mentionCount: 3,
         keywords: ['key', 'door', 'unlock'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       const request: GoalExtractionRequest = {
@@ -102,8 +103,8 @@ describe('goalExtractor', () => {
         mentionCount: 1,
         keywords: ['hole', 'wall', 'investigate'],
         progressNotes: ['Discovered the hole'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       const request: GoalExtractionRequest = {
@@ -179,8 +180,8 @@ describe('goalExtractor', () => {
         status: 'active',
         mentionCount: 2,
         keywords: ['chest', 'locked', 'open'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       const narrativeContent = 'With a satisfying click, the chest opens to reveal a treasure trove of golden coins and precious gems.';
@@ -201,8 +202,8 @@ describe('goalExtractor', () => {
         status: 'active',
         mentionCount: 1,
         keywords: ['tavern', 'investigate', 'suspicious'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       const narrativeContent = 'The tavern burns down completely, leaving nothing but ashes and rubble. The fire department says it was an electrical fault.';
@@ -223,8 +224,8 @@ describe('goalExtractor', () => {
         status: 'active',
         mentionCount: 5,
         keywords: ['magic', 'spells', 'academy', 'study'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       };
 
       const narrativeContent = 'You practice your fire spell in the academy courtyard, managing to create a small flame that dances in your palm.';
@@ -249,8 +250,8 @@ describe('goalExtractor', () => {
           mentionCount: 3,
           contextSummary: 'Player is searching for ancient artifact in temple',
           keywords: ['artifact', 'temple', 'ancient'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         },
         {
           id: 'goal-2',
@@ -263,8 +264,8 @@ describe('goalExtractor', () => {
           mentionCount: 1,
           contextSummary: 'Player needs to repair bridge to continue journey',
           keywords: ['bridge', 'repair', 'river'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         }
       ];
 
@@ -290,8 +291,8 @@ describe('goalExtractor', () => {
           status: 'active',
           mentionCount: 1,
           contextSummary: 'URGENT: Player must escape collapsing building immediately',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         },
         {
           id: 'goal-low',
@@ -303,8 +304,8 @@ describe('goalExtractor', () => {
           status: 'active',
           mentionCount: 1,
           contextSummary: 'Player needs to buy groceries when convenient',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp(),
         }
       ];
 
