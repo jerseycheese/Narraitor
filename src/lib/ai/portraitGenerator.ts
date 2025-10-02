@@ -376,12 +376,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         if (physicalDesc) {
-          const cleanedDesc = normalizeText(physicalDesc, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          });
+          const cleanedDesc = normalizeText(physicalDesc, NORM_NAME);
           if (cleanedDesc) {
             subject.push(`a ${cleanedDesc}`);
           }
@@ -423,12 +418,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         if (physicalDesc) {
-          const cleanedDesc = normalizeText(physicalDesc, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          });
+          const cleanedDesc = normalizeText(physicalDesc, NORM_NAME);
           if (cleanedDesc) {
             subject.push(`${cleanedDesc}`);
           }
@@ -591,13 +581,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Be accurate to their actual appearance. Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        let description = normalizeText(response.content, {
-          normalizeWhitespace: true,
-          normalizeLineEndings: true,
-          normalizeQuotes: true,
-          normalizeSpecialChars: true,
-          preserveStructure: true
-        });
+        let description = normalizeText(response.content, NORM_DESC);
         
         // Clean up the description
         // Remove character name if it starts with it (case insensitive)
