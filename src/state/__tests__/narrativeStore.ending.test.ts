@@ -212,8 +212,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -243,8 +243,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -280,8 +280,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -311,8 +311,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -328,8 +328,8 @@ describe('narrativeStore - Ending functionality', () => {
               endingData: mockEnding
             },
             timestamp: new Date(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp()
           }
         }
       });
@@ -398,7 +398,7 @@ describe('narrativeStore - Ending functionality', () => {
           type: 'scene',
           content: 'New content',
           timestamp: new Date(),
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
           metadata: {
             tags: []
           }
