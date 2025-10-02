@@ -3,6 +3,9 @@
 /** UUID generation utilities */
 export { generateUniqueId } from './generateId';
 
+/** Timestamp generation utilities */
+export { getTimestamp } from './timestamp';
+
 /** AI text formatting utilities */
 export { formatAIResponse } from './textFormatter';
 export type { FormattingOptions } from './textFormatter';
