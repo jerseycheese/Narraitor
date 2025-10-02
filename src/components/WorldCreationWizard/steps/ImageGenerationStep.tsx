@@ -10,7 +10,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { Image as ImageIcon } from 'lucide-react';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, getTimestamp } from '@/lib/utils';
 
 interface ImageGenerationStepProps {
   worldData: Partial<World>;
@@ -65,7 +65,7 @@ export default function ImageGenerationStep({
     const placeholderImage: WorldImage = {
       type: 'placeholder',
       url: null,
-      generatedAt: new Date().toISOString()
+      generatedAt: getTimestamp()
     };
     
     onUpdate({ image: placeholderImage });

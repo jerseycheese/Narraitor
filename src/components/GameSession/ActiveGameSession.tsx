@@ -9,7 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
-import { generateUniqueId, truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { generateUniqueId, truncate, safeTrim, getNestedValue, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { StoryEndingDialog } from '@/components/StoryEndingDialog';
@@ -372,7 +372,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           choiceText: choiceText,
           decisionPrompt: decision.prompt
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
     } catch (error) {
       console.warn('Failed to create decision journal entry:', error);
@@ -426,7 +426,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: getTimestamp()
         });
       } catch (error) {
         console.warn('Failed to create journal entry from narrative segment:', error);
@@ -451,7 +451,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: getTimestamp()
         });
       } catch (fallbackError) {
         console.warn('Failed to create fallback journal entry:', fallbackError);

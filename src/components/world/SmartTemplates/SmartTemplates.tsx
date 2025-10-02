@@ -14,6 +14,7 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
 import { useAIGeneration } from '@/lib/hooks/useAIGeneration';
+import { getTimestamp } from '@/lib/utils';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -47,7 +48,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       // Add to history
       const historyEntry: TemplateHistoryEntry = {
         template,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         generationType: mode,
         userInput: mode === 'inspired-by' ? userInput : undefined,
         genres: mode === 'genre-mix' ? selectedGenres : undefined
