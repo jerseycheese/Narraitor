@@ -1,6 +1,6 @@
 import { WorldTemplate, templates } from './worldTemplates';
 import { useWorldStore } from '../../state/worldStore';
-import { generateUniqueId } from '../utils/generateId';
+import { generateUniqueId, getTimestamp } from '../utils/generateId';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
 
 /**
@@ -67,7 +67,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     }
     
     // Add the new world to the state
-    const now = new Date().toISOString();
+    const now = getTimestamp();
     newState.worlds[worldId] = {
       id: worldId,
       name: worldName || template.name,
