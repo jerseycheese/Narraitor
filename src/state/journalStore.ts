@@ -12,7 +12,7 @@ import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim } from '@/lib/utils';
+import { safeTrim, getTimestamp } from '@/lib/utils';
 
 
 /**
@@ -67,7 +67,7 @@ export const useJournalStore = create<JournalStore>()(
     }
 
     const entryId = generateUniqueId('entry');
-    const now = new Date().toISOString();
+    const now = getTimestamp();
     
     const newEntry: JournalEntry = {
       ...entryData,

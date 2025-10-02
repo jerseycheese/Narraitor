@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
 
 /**
@@ -69,7 +69,7 @@ export const useWorldStore = create<WorldStore>()(
         }
 
         const worldId = generateUniqueId('world');
-        const now = new Date().toISOString();
+        const now = getTimestamp();
         
         // Normalize text fields for consistent storage
         const newWorld: World = {
@@ -109,7 +109,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...state.worlds[id],
           ...normalizedUpdates,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {

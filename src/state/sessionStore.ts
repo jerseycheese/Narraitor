@@ -4,6 +4,7 @@ import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Create logger instance for this store
@@ -178,7 +179,7 @@ export const useSessionStore = create<SessionStore>()(
         const world = worldStore.worlds[worldId];
         const character = characterStore.characters[characterId];
         
-        const sessionStartTime = new Date().toISOString();
+        const sessionStartTime = getTimestamp();
         
         // Get all journal entries to calculate session number
         const allEntries = Object.values(journalStore.entries).flat();
@@ -243,7 +244,7 @@ export const useSessionStore = create<SessionStore>()(
       
       // Create session end journal entry (Issue #176)
       try {
-        const sessionEndTime = new Date().toISOString();
+        const sessionEndTime = getTimestamp();
         const sessionId = state.id;
         
         // Calculate session duration by looking for session start entry
@@ -329,7 +330,7 @@ export const useSessionStore = create<SessionStore>()(
             id: sessionId,
             worldId: state.worldId!,
             characterId: state.characterId!,
-            lastPlayed: new Date().toISOString(),
+            lastPlayed: getTimestamp(),
             narrativeCount: 0, // Will be updated by narrative store
           }
         };
