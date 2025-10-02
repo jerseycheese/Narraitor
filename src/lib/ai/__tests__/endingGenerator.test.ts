@@ -100,6 +100,17 @@ jest.mock('../../../state/journalStore');
 // The mocked modules are now available through imports
 
 describe('endingGenerator', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   const mockWorld: World = {
     id: 'world-123',
     name: 'Epic Fantasy Realm',
@@ -199,10 +210,6 @@ describe('endingGenerator', () => {
       updatedAt: getTimestamp()
     }
   ];
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe('generateEnding', () => {
     it('should generate an ending with all required fields', async () => {
@@ -326,12 +333,19 @@ describe('endingGenerator', () => {
         endingType: 'player-choice'
       };
 
+      // Set time to 1 hour ago for session start
+      jest.setSystemTime(new Date('2025-01-15T11:00:00Z'));
+      const sessionStartTime = new Date();
+
+      // Reset to "now" for the ending generation
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
       const mockContext = {
         world: mockWorld,
         character: mockCharacter,
         narrativeSegments: mockNarrativeSegments,
         journalEntries: mockJournalEntries,
-        sessionStartTime: new Date(Date.now() - 3600000) // 1 hour ago
+        sessionStartTime
       };
 
       const mockResponse = `{
@@ -451,6 +465,8 @@ describe('endingGenerator', () => {
 
   describe('retryGeneration', () => {
     it('should retry failed generation attempts', async () => {
+      // Use real timers for this test since it involves retry delays
+      jest.useRealTimers();
       const mockRequest: EndingGenerationRequest = {
         sessionId: 'session-789',
         characterId: 'char-456',
