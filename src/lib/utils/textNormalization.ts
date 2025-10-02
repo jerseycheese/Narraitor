@@ -94,24 +94,28 @@ export interface WhitespaceStats {
   multipleLineBreaks: number;
 }
 
+// Common normalization patterns used throughout stores
+export const NORM_NAME = { normalizeWhitespace: true, normalizeQuotes: true, normalizeSpecialChars: true, preserveStructure: false };
+export const NORM_DESC = { normalizeWhitespace: true, normalizeLineEndings: true, normalizeQuotes: true, normalizeSpecialChars: true, preserveStructure: true };
+
 /**
  * Main text normalization function with basic options
- * 
+ *
  * Applies text normalization with commonly used settings for consistent text formatting.
  * Perfect for cleaning up AI-generated content, user input, or text from various sources.
- * 
+ *
  * @param text - Text to normalize
  * @param options - Normalization options (all features enabled by default)
  * @returns Normalized text string
- * 
+ *
  * @example
  * ```typescript
  * import { normalizeText } from '@/lib/utils';
- * 
+ *
  * // Basic normalization with default options
  * const result = normalizeText("Hello   world\r\n\r\nThis  is "quoted" text.");
  * // Returns: "Hello world\n\nThis is \"quoted\" text."
- * 
+ *
  * // Selective normalization
  * const result = normalizeText(messyText, {
  *   normalizeWhitespace: true,
@@ -119,7 +123,7 @@ export interface WhitespaceStats {
  *   normalizeLineEndings: false
  * });
  * ```
- * 
+ *
  * @see {@link normalizeTextWithDetails} for detailed analysis and change tracking
  */
 export function normalizeText(text: string, options: TextNormalizationOptions = {}): string {

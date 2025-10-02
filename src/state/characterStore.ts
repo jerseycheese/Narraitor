@@ -4,8 +4,7 @@ import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim } from '@/lib/utils';
-import { normalizeText } from '../lib/utils/textNormalization';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -139,37 +138,14 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         // Normalize character background text
         const normalizedBackground = characterData.background ? {
           ...characterData.background,
-          physicalDescription: characterData.background.physicalDescription ? normalizeText(characterData.background.physicalDescription, {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }) : undefined,
-          personality: normalizeText(characterData.background.personality || '', {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          }),
-          history: normalizeText(characterData.background.history || '', {
-            normalizeWhitespace: true,
-            normalizeLineEndings: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: true
-          })
+          physicalDescription: characterData.background.physicalDescription ? normalizeText(characterData.background.physicalDescription, NORM_DESC) : undefined,
+          personality: normalizeText(characterData.background.personality || '', NORM_DESC),
+          history: normalizeText(characterData.background.history || '', NORM_DESC)
         } : characterData.background;
 
         const newCharacter: Character = {
           ...characterData,
-          name: normalizeText(characterData.name, {
-            normalizeWhitespace: true,
-            normalizeQuotes: true,
-            normalizeSpecialChars: true,
-            preserveStructure: false
-          }),
+          name: normalizeText(characterData.name, NORM_NAME),
           background: normalizedBackground,
           id: characterId,
           level: characterData.level || 1, // Default to level 1 if not provided
