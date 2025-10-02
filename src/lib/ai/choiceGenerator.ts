@@ -8,7 +8,7 @@ import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
-import { normalizeText } from '@/lib/utils/textNormalization';
+import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 /**
  * Parameters for choice generation
@@ -510,13 +510,7 @@ CHOICE GENERATION FOCUS:
    */
   private finalizeOption(option: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }>): DecisionOption {
     // Normalize option text for consistent formatting
-    const normalizedText = normalizeText(option.text || 'Unknown option', {
-      normalizeWhitespace: true,
-      normalizeLineEndings: true,
-      normalizeQuotes: true,
-      normalizeSpecialChars: true,
-      preserveStructure: false // Single line text, no structure needed
-    });
+    const normalizedText = normalizeText(option.text || 'Unknown option', NORM_NAME);
 
     const finalOption: DecisionOption = {
       id: option.id || generateUniqueId('option'),
@@ -526,13 +520,7 @@ CHOICE GENERATION FOCUS:
 
     // Add hint if present
     if (option.hint && safeTrim(option.hint)) {
-      finalOption.hint = normalizeText(safeTrim(option.hint), {
-        normalizeWhitespace: true,
-        normalizeLineEndings: true,
-        normalizeQuotes: true,
-        normalizeSpecialChars: true,
-        preserveStructure: true
-      });
+      finalOption.hint = normalizeText(safeTrim(option.hint), NORM_DESC);
     }
 
     // Add requirements if present
