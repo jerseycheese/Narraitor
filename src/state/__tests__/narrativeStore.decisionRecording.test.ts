@@ -5,6 +5,10 @@ import { Decision, DecisionOption } from '../../types/narrative.types';
 
 describe('narrativeStore - Decision Recording (Issue #207)', () => {
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     // Reset store state before each test
     useNarrativeStore.setState({
       segments: {},
@@ -18,6 +22,10 @@ describe('narrativeStore - Decision Recording (Issue #207)', () => {
       loading: false,
       error: null
     });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('Decision Recording with Timestamps and Character Association', () => {
@@ -36,22 +44,20 @@ describe('narrativeStore - Decision Recording (Issue #207)', () => {
       };
       
       const decisionId = store.addDecision(sessionId, decisionData);
-      
-      // Record the decision selection with timestamp
-      const beforeSelection = new Date();
+
+      // Record the decision selection with deterministic timestamp
+      const expectedTime = new Date('2025-01-15T12:00:00Z');
       store.selectDecisionOption(decisionId, 'option-1', characterId);
-      const afterSelection = new Date();
-      
+
       // Get fresh state after mutation
       const updatedState = useNarrativeStore.getState();
       const updatedDecision = updatedState.decisions[decisionId];
-      
+
       expect(updatedDecision).toBeDefined();
       expect(updatedDecision.selectedOptionId).toBe('option-1');
       expect(updatedDecision.selectedAt).toBeDefined();
       expect(updatedDecision.selectedAt).toBeInstanceOf(Date);
-      expect(updatedDecision.selectedAt!.getTime()).toBeGreaterThanOrEqual(beforeSelection.getTime());
-      expect(updatedDecision.selectedAt!.getTime()).toBeLessThanOrEqual(afterSelection.getTime());
+      expect(updatedDecision.selectedAt!.getTime()).toBe(expectedTime.getTime());
       expect(updatedDecision.characterId).toBe(characterId);
     });
 
@@ -127,12 +133,12 @@ describe('narrativeStore - Decision Recording (Issue #207)', () => {
       };
       
       const decisionId = store.addDecision(sessionId, decisionData);
-      const selectionTime = new Date();
+      const expectedTime = new Date('2025-01-15T12:00:00Z');
       store.selectDecisionOption(decisionId, 'option-1', characterId);
-      
+
       // Get current state
       const currentState = useNarrativeStore.getState();
-      
+
       // Simulate browser session end/restart by creating new store instance
       useNarrativeStore.setState({
         segments: {},
@@ -146,22 +152,22 @@ describe('narrativeStore - Decision Recording (Issue #207)', () => {
         loading: false,
         error: null
       });
-      
+
       // Restore state (simulating persistence load)
       useNarrativeStore.setState({
         decisions: currentState.decisions,
         sessionDecisions: currentState.sessionDecisions
       });
-      
+
       // Verify decision persists with all data
       const restoredState = useNarrativeStore.getState();
       const persistedDecision = restoredState.decisions[decisionId];
-      
+
       expect(persistedDecision).toBeDefined();
       expect(persistedDecision.selectedOptionId).toBe('option-1');
       expect(persistedDecision.characterId).toBe(characterId);
       expect(persistedDecision.selectedAt).toBeInstanceOf(Date);
-      expect(persistedDecision.selectedAt!.getTime()).toBeGreaterThanOrEqual(selectionTime.getTime());
+      expect(persistedDecision.selectedAt!.getTime()).toBe(expectedTime.getTime());
     });
 
     it('should correctly associate choices with player character', () => {
@@ -230,30 +236,29 @@ describe('narrativeStore - Decision Recording (Issue #207)', () => {
       ];
       
       const decisionIds = decisions.map(d => store.addDecision(sessionId, d));
-      
-      // Make selections at different times
-      const time1 = new Date();
+
+      // Make first selection at base time
+      const time1 = new Date('2025-01-15T12:00:00Z');
       store.selectDecisionOption(decisionIds[0], 'opt-1a', characterId);
-      
-      // Add small delay to ensure different timestamps
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
-      const time2 = new Date();
+
+      // Advance time by 10ms for second selection
+      jest.setSystemTime(new Date('2025-01-15T12:00:00.010Z'));
+      const time2 = new Date('2025-01-15T12:00:00.010Z');
       store.selectDecisionOption(decisionIds[1], 'opt-2b', characterId);
-      
+
       // Verify both decisions are recorded correctly
       const updatedState = useNarrativeStore.getState();
       const decision1 = updatedState.decisions[decisionIds[0]];
       const decision2 = updatedState.decisions[decisionIds[1]];
-      
+
       expect(decision1.characterId).toBe(characterId);
       expect(decision1.selectedOptionId).toBe('opt-1a');
-      expect(decision1.selectedAt!.getTime()).toBeGreaterThanOrEqual(time1.getTime());
-      
+      expect(decision1.selectedAt!.getTime()).toBe(time1.getTime());
+
       expect(decision2.characterId).toBe(characterId);
       expect(decision2.selectedOptionId).toBe('opt-2b');
-      expect(decision2.selectedAt!.getTime()).toBeGreaterThanOrEqual(time2.getTime());
-      
+      expect(decision2.selectedAt!.getTime()).toBe(time2.getTime());
+
       // Verify timestamps are different
       expect(decision2.selectedAt!.getTime()).toBeGreaterThan(decision1.selectedAt!.getTime());
     });
