@@ -11,6 +11,7 @@ import { getTimestamp } from '@/lib/utils';
 
 describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
   let personalizationEngine: PersonalizationEngine;
+  let pastDecisions: PlayerDecision[];
 
   const mockCharacter = {
     id: 'char-1',
@@ -22,41 +23,57 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
     updatedAt: '2023-01-01'
   };
 
-  // Note: mockWorld defined but not used in PersonalizationEngine tests - it works directly with context objects
-
-  const pastDecisions: PlayerDecision[] = [
-    {
-      id: 'decision-1',
-      prompt: 'Bandits are threatening the village. What do you do?',
-      sessionId: 'session-1',
-      worldId: 'world-1',
-      choiceText: 'Save the village from bandits',
-      choiceType: 'helpful',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-      context: { 
-        situation: 'moral challenge',
-        charactersPresent: ['village elder', 'scared farmers'],
-        location: 'Millbrook Village'
-      }
-    },
-    {
-      id: 'decision-2',
-      prompt: 'The defeated bandit leader begs for mercy. What do you decide?',
-      sessionId: 'session-1',
-      worldId: 'world-1',
-      choiceText: 'Spare the bandit leader\'s life',
-      choiceType: 'diplomatic',
-      timestamp: new Date(Date.now() - 43200000).toISOString(),
-      context: {
-        situation: 'justice decision', 
-        charactersPresent: ['bandit leader', 'villagers'],
-        location: 'Bandit Camp'
-      }
-    }
-  ];
-
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp testing
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+    // Create timestamps for past decisions
+    jest.setSystemTime(new Date('2025-01-14T12:00:00Z')); // 1 day ago
+    const oneDayAgo = getTimestamp();
+
+    jest.setSystemTime(new Date('2025-01-15T00:00:00Z')); // 12 hours ago
+    const twelveHoursAgo = getTimestamp();
+
+    // Reset to "now"
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+    pastDecisions = [
+      {
+        id: 'decision-1',
+        prompt: 'Bandits are threatening the village. What do you do?',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        choiceText: 'Save the village from bandits',
+        choiceType: 'helpful',
+        timestamp: oneDayAgo,
+        context: {
+          situation: 'moral challenge',
+          charactersPresent: ['village elder', 'scared farmers'],
+          location: 'Millbrook Village'
+        }
+      },
+      {
+        id: 'decision-2',
+        prompt: 'The defeated bandit leader begs for mercy. What do you decide?',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        choiceText: 'Spare the bandit leader\'s life',
+        choiceType: 'diplomatic',
+        timestamp: twelveHoursAgo,
+        context: {
+          situation: 'justice decision',
+          charactersPresent: ['bandit leader', 'villagers'],
+          location: 'Bandit Camp'
+        }
+      }
+    ];
+
     personalizationEngine = new PersonalizationEngine();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('Specific Decision Context Generation', () => {
@@ -346,15 +363,22 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
 
   describe('Token Management and Optimization', () => {
     test('should prioritize most recent and impactful decisions', () => {
+      // Create timestamps for 15 decisions, 1 second apart
+      const timestamps = Array.from({ length: 15 }, (_, i) => {
+        jest.setSystemTime(new Date('2025-01-15T12:00:00Z').getTime() - (i * 1000));
+        return getTimestamp();
+      });
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z')); // Reset to now
+
       // Create many decisions to test prioritization
-      const manyDecisions: PlayerDecision[] = Array.from({ length: 15 }, (_, i) => ({
+      const manyDecisions: PlayerDecision[] = timestamps.map((timestamp, i) => ({
         id: `decision-${i}`,
         prompt: `What do you do in situation ${i}?`,
         sessionId: 'session-1',
         worldId: 'world-1',
         choiceText: `Minor choice ${i}`,
         choiceType: 'neutral' as const,
-        timestamp: new Date(Date.now() - (i * 1000)).toISOString(),
+        timestamp,
         context: { situation: 'minor' }
       }));
 
