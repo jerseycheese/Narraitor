@@ -1,5 +1,4 @@
 import { useCharacterStore } from '../characterStore';
-import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
