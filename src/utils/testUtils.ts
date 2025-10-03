@@ -85,12 +85,16 @@ export const testUtils = {
   // Trigger error state
   async setErrorState(error: string | null) {
     const { useWorldStore } = await import('@/state/worldStore');
+    const { ErrorType } = await import('@/lib/utils/errorUtils');
     const store = useWorldStore.getState() as WorldStore;
-    
+
     if ('setError' in store) {
-      store.setError(error);
+      const userFriendlyError = error
+        ? { title: error, message: error, retryable: false, type: ErrorType.UNKNOWN }
+        : null;
+      store.setError(userFriendlyError);
     }
-    
+
     debugLog(`Set error state to: ${error}`);
   },
 };
