@@ -5,6 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -78,7 +79,7 @@ export interface CharacterStore {
   // State
   characters: Record<EntityID, Character>;
   currentCharacterId: EntityID | null;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 
   // Actions
@@ -86,26 +87,26 @@ export interface CharacterStore {
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
   deleteCharacter: (id: EntityID) => void;
   setCurrentCharacter: (id: EntityID) => void;
-  
+
   // Attribute management
   addAttribute: (characterId: EntityID, attribute: Omit<CharacterAttribute, 'id' | 'characterId'>) => void;
   updateAttribute: (characterId: EntityID, attributeId: EntityID, updates: Partial<CharacterAttribute>) => void;
   removeAttribute: (characterId: EntityID, attributeId: EntityID) => void;
-  
+
   // Skill management
   addSkill: (characterId: EntityID, skill: Omit<CharacterSkill, 'id' | 'characterId'>) => void;
-  
+
   // Path Count Optimization
   cleanupCharacterHistory: (worldId?: EntityID, keepRecentCount?: number) => void;
   compactCharacterData: () => void;
   getCharactersCount: (worldId?: EntityID) => number;
-  
+
   // Cascading delete helper
   deleteCharactersInWorld: (worldId: EntityID) => void;
-  
+
   // State management
   reset: () => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -123,7 +124,16 @@ const initialState = getInitialState();
 // Character Store implementation with persistence
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
   persist(
-    (set) => ({
+    (set, get) => {
+      // Helper to create validation errors
+      const createValidationError = (title: string, message: string): UserFriendlyError => ({
+        title,
+        message,
+        retryable: false,
+        type: ErrorType.VALIDATION,
+      });
+
+      return {
       ...initialState,
 
       // Create character
@@ -176,25 +186,25 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       },
 
       // Update character
-      updateCharacter: (id, updates) => set((state) => {
-        if (!state.characters[id]) {
-          return { error: 'Character not found' };
+      updateCharacter: (id, updates) => {
+        const character = get().characters[id];
+        if (!character) {
+          set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+          return;
         }
 
-        const updatedCharacter: Character = {
-          ...state.characters[id],
-          ...updates,
-          updatedAt: getTimestamp(),
-        };
-
-        return {
+        set((state) => ({
           characters: {
             ...state.characters,
-            [id]: updatedCharacter,
+            [id]: {
+              ...character,
+              ...updates,
+              updatedAt: getTimestamp(),
+            },
           },
           error: null,
-        };
-      }),
+        }));
+      },
 
       // Delete character
       deleteCharacter: (id) => set((state) => {
@@ -217,25 +227,27 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       }),
 
       // Set current character
-      setCurrentCharacter: (id) => set((state) => {
-        if (!state.characters[id]) {
-          return { 
-            error: 'Character not found',
+      setCurrentCharacter: (id) => {
+        if (!get().characters[id]) {
+          set({
+            error: createValidationError('Character Not Found', 'The specified character could not be found'),
             currentCharacterId: null,
-          };
+          });
+          return;
         }
 
-        return {
+        set({
           currentCharacterId: id,
           error: null,
-        };
-      }),
+        });
+      },
 
       // Add attribute
-      addAttribute: (characterId, attributeData) => set((state) => {
-        const character = state.characters[characterId];
+      addAttribute: (characterId, attributeData) => {
+        const character = get().characters[characterId];
         if (!character) {
-          return { error: 'Character not found' };
+          set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+          return;
         }
 
         const attributeId = generateUniqueId('attr');
@@ -245,83 +257,81 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           characterId,
         };
 
-        const updatedCharacter: Character = {
-          ...character,
-          attributes: [...character.attributes, newAttribute],
-          updatedAt: getTimestamp(),
-        };
-
-        return {
+        set((state) => ({
           characters: {
             ...state.characters,
-            [characterId]: updatedCharacter,
+            [characterId]: {
+              ...character,
+              attributes: [...character.attributes, newAttribute],
+              updatedAt: getTimestamp(),
+            },
           },
           error: null,
-        };
-      }),
+        }));
+      },
 
       // Update attribute
-      updateAttribute: (characterId, attributeId, updates) => set((state) => {
-        const character = state.characters[characterId];
+      updateAttribute: (characterId, attributeId, updates) => {
+        const character = get().characters[characterId];
         if (!character) {
-          return { error: 'Character not found' };
+          set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+          return;
         }
 
         const updatedAttributes = character.attributes?.map((attr) =>
           attr.id === attributeId ? { ...attr, ...updates } : attr
         ) || [];
 
-        const updatedCharacter: Character = {
-          ...character,
-          attributes: updatedAttributes,
-          updatedAt: getTimestamp(),
-        };
-
-        return {
+        set((state) => ({
           characters: {
             ...state.characters,
-            [characterId]: updatedCharacter,
+            [characterId]: {
+              ...character,
+              attributes: updatedAttributes,
+              updatedAt: getTimestamp(),
+            },
           },
           error: null,
-        };
-      }),
+        }));
+      },
 
       // Remove attribute
-      removeAttribute: (characterId, attributeId) => set((state) => {
-        const character = state.characters[characterId];
+      removeAttribute: (characterId, attributeId) => {
+        const character = get().characters[characterId];
         if (!character) {
-          return { error: 'Character not found' };
+          set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+          return;
         }
 
         const filteredAttributes = character.attributes?.filter(
           (attr) => attr.id !== attributeId
         ) || [];
 
-        const updatedCharacter: Character = {
-          ...character,
-          attributes: filteredAttributes,
-          updatedAt: getTimestamp(),
-        };
-
-        return {
+        set((state) => ({
           characters: {
             ...state.characters,
-            [characterId]: updatedCharacter,
+            [characterId]: {
+              ...character,
+              attributes: filteredAttributes,
+              updatedAt: getTimestamp(),
+            },
           },
           error: null,
-        };
-      }),
+        }));
+      },
 
       // Add skill
-      addSkill: (characterId, skillData) => set((state) => {
-        const character = state.characters[characterId];
+      addSkill: (characterId, skillData) => {
+        const character = get().characters[characterId];
         if (!character) {
-          return { error: 'Character not found' };
+          set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+          return;
         }
 
         // Check max skills limit (simplified for test - normally would check world settings)
         if ((character.skills?.length || 0) >= 2) {
-          return { error: 'Maximum skills limit reached' };
+          set({ error: createValidationError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
+          return;
         }
 
         const skillId = generateUniqueId('skill');
@@ -331,20 +341,18 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           characterId,
         };
 
-        const updatedCharacter: Character = {
-          ...character,
-          skills: [...character.skills, newSkill],
-          updatedAt: getTimestamp(),
-        };
-
-        return {
+        set((state) => ({
           characters: {
             ...state.characters,
-            [characterId]: updatedCharacter,
+            [characterId]: {
+              ...character,
+              skills: [...character.skills, newSkill],
+              updatedAt: getTimestamp(),
+            },
           },
           error: null,
-        };
-      }),
+        }));
+      },
 
       // Path Count Optimization Methods
       cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
@@ -422,7 +430,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       setError: (error) => set(() => ({ error })),
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),
-    }),
+      };
+    },
     {
       name: 'narraitor-character-store',
       storage: createIndexedDBStorage(),
