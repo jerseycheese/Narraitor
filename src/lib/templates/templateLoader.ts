@@ -1,7 +1,6 @@
 import { WorldTemplate, templates } from './worldTemplates';
-import { useWorldStore } from '../../state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '../utils/generateId';
-import { getTimestamp } from '@/lib/utils';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
 
 /**
@@ -13,7 +12,7 @@ import { WorldAttribute, WorldSkill } from '../../types/world.types';
 export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldName?: string): string => {
   // Determine if we were passed a template ID or template object
   let template: WorldTemplate;
-  
+
   if (typeof templateOrId === 'string') {
     // Find the template by ID
     const foundTemplate = templates.find(t => t.id === templateOrId);
@@ -24,11 +23,24 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
   } else {
     template = templateOrId;
   }
-  
-  // Generate a worldId
-  const worldId = generateUniqueId('world');
-  
-  // Create world attributes from template
+
+  // Step 1: Create world shell with base data, get worldId from store
+  const { createWorld, updateWorld } = useWorldStore.getState();
+  const worldId = createWorld({
+    name: worldName || template.name,
+    description: template.description,
+    genre: template.genre,
+    attributes: [], // Will be populated in step 2
+    skills: [],     // Will be populated in step 2
+    settings: {
+      maxAttributes: 6,
+      maxSkills: 12,
+      attributePointPool: 30,
+      skillPointPool: 36
+    }
+  });
+
+  // Step 2: Build attributes and skills with the store-generated worldId
   const attributes: WorldAttribute[] = template.attributes.map(attr => ({
     id: generateUniqueId('attribute'),
     name: attr.name,
@@ -38,8 +50,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     minValue: attr.minValue,
     maxValue: attr.maxValue
   }));
-  
-  // Create world skills from template
+
   const skills: WorldSkill[] = template.skills.map(skill => ({
     id: generateUniqueId('skill'),
     name: skill.name,
@@ -47,7 +58,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     worldId,
     // Convert linkedAttributes array to attributeIds array
     // For now, just use the first attribute in the list if available
-    attributeIds: skill.linkedAttributes?.length > 0 
+    attributeIds: skill.linkedAttributes?.length > 0
       ? [attributes.find(a => a.name === skill.linkedAttributes[0])?.id].filter(Boolean) as string[]
       : undefined,
     difficulty: 'medium', // Default difficulty level
@@ -56,46 +67,9 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     maxValue: 10, // Fixed max value for MVP
     category: skill.category || 'General' // Use provided category or default to 'General'
   }));
-  
-  // Update the world store with the new world
-  useWorldStore.setState(state => {
-    // Create a copy of the existing state
-    const newState = { ...state };
-    
-    // If worlds object doesn't exist, create it
-    if (!newState.worlds) {
-      newState.worlds = {};
-    }
 
-    if (!newState.entities) {
-      newState.entities = {};
-    }
-    
-    // Add the new world to the state
-    const now = getTimestamp();
-    const world = {
-      id: worldId,
-      name: worldName || template.name,
-      description: template.description,
-      genre: template.genre,
-      attributes,
-      skills,
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 12,
-        attributePointPool: 30,
-        skillPointPool: 36
-      },
-      createdAt: now,
-      updatedAt: now
-    };
-    newState.worlds[worldId] = world;
-    newState.entities[worldId] = world;
-    
-    return newState;
-  });
+  // Step 3: Update the world with populated attributes and skills
+  updateWorld(worldId, { attributes, skills });
 
-  // Template applied successfully
-  
   return worldId;
 };
