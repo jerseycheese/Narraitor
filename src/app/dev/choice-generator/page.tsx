@@ -6,6 +6,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
 
 // Sample narrative context for testing
@@ -19,8 +20,8 @@ const createSampleNarrativeContext = (): NarrativeContext => {
       location,
     },
     timestamp: new Date(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
   });
 
   const segments = [
@@ -153,8 +154,8 @@ export default function ChoiceGeneratorTestPage() {
         location: narrativeContext.currentLocation || 'Unknown',
       },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     setNarrativeContext(prev => ({

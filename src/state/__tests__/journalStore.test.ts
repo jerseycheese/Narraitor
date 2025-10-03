@@ -1,4 +1,5 @@
 import { useJournalStore } from '../journalStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('journalStore', () => {
   beforeEach(() => {
@@ -31,7 +32,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       // Wait 5ms to ensure different timestamp
@@ -47,7 +48,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
@@ -62,7 +63,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -104,7 +105,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       const secondId = addEntry(sessionId, {
@@ -117,7 +118,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -150,7 +151,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
@@ -165,7 +166,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
@@ -180,7 +181,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       const session1Entries = getSessionEntries(session1);
@@ -210,7 +211,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
@@ -225,7 +226,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
@@ -240,7 +241,7 @@ describe('journalStore', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: [], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       // Delete middle entry

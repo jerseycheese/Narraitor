@@ -6,6 +6,7 @@
 import { DecisionRelevanceCalculator } from '../decisionRelevanceCalculator';
 import { PlayerDecision } from '@/types/personalization.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
   let calculator: DecisionRelevanceCalculator;
@@ -13,6 +14,10 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
   let mockCurrentContext: CurrentNarrativeContext;
 
   beforeEach(() => {
+    // Use fake timers for deterministic time-based testing
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     calculator = new DecisionRelevanceCalculator();
 
     mockCurrentContext = {
@@ -23,8 +28,21 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
       activeTags: ['mystery', 'social'],
       worldId: 'world-1',
       sessionId: 'session-1',
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp() // 2025-01-15T12:00:00Z
     };
+
+    // Create timestamps for test decisions
+    jest.setSystemTime(new Date('2025-01-15T11:00:00Z'));
+    const oneHourAgo = getTimestamp();
+
+    jest.setSystemTime(new Date('2025-01-08T12:00:00Z'));
+    const sevenDaysAgo = getTimestamp();
+
+    jest.setSystemTime(new Date('2025-01-14T12:00:00Z'));
+    const oneDayAgo = getTimestamp();
+
+    // Reset to "now"
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 
     // Create decisions with different characteristics for testing
     mockDecisions = [
@@ -33,7 +51,7 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
         prompt: 'The guard captain asks for help',
         choiceText: 'Offer to investigate',
         choiceType: 'helpful',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
+        timestamp: oneHourAgo,
         sessionId: 'session-1',
         worldId: 'world-1',
         context: {
@@ -47,7 +65,7 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
         prompt: 'You find a treasure chest',
         choiceText: 'Open the chest',
         choiceType: 'neutral',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 7 days ago
+        timestamp: sevenDaysAgo,
         sessionId: 'session-2',
         worldId: 'world-2',
         context: {
@@ -61,7 +79,7 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
         prompt: 'A merchant offers a deal',
         choiceText: 'Negotiate the price',
         choiceType: 'diplomatic',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+        timestamp: oneDayAgo,
         sessionId: 'session-1',
         worldId: 'world-1',
         context: {
@@ -71,6 +89,10 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
         }
       }
     ];
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('Acceptance Criterion 1: Composite relevance score between 0.0 and 1.0', () => {
@@ -86,16 +108,25 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
     });
 
     test('extreme cases still produce valid scores', () => {
-      // Future decision
+      // Future decision (1 hour ahead)
+      jest.setSystemTime(new Date('2025-01-15T13:00:00Z'));
+      const futureTimestamp = getTimestamp();
+
+      // Very old decision (1 year ago)
+      jest.setSystemTime(new Date('2024-01-15T12:00:00Z'));
+      const veryOldTimestamp = getTimestamp();
+
+      // Reset to now
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
       const futureDecision: PlayerDecision = {
         ...mockDecisions[0],
-        timestamp: new Date(Date.now() + 1000 * 60 * 60).toISOString()
+        timestamp: futureTimestamp
       };
 
-      // Very old decision
       const veryOldDecision: PlayerDecision = {
         ...mockDecisions[0],
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 365).toISOString() // 1 year ago
+        timestamp: veryOldTimestamp
       };
 
       [futureDecision, veryOldDecision].forEach(decision => {
@@ -275,11 +306,17 @@ describe('DecisionRelevanceCalculator - Acceptance Criteria', () => {
 
   describe('Integration with AI Context Requirements', () => {
     test('performance suitable for real-time AI context building', () => {
-      // Create realistic dataset size
-      const largeDecisionSet = Array.from({ length: 100 }, (_, i) => ({
+      // Create timestamps for 100 decisions spread over hours
+      const timestamps = Array.from({ length: 100 }, (_, i) => {
+        jest.setSystemTime(new Date('2025-01-15T12:00:00Z').getTime() - i * 1000 * 60 * 60);
+        return getTimestamp();
+      });
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z')); // Reset to now
+
+      const largeDecisionSet = timestamps.map((timestamp, i) => ({
         ...mockDecisions[0],
         id: `decision-${i}`,
-        timestamp: new Date(Date.now() - i * 1000 * 60 * 60).toISOString() // Spread over hours
+        timestamp
       }));
 
       const startTime = performance.now();

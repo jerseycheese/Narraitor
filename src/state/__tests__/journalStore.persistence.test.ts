@@ -1,4 +1,5 @@
 import { useJournalStore } from '../journalStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('Journal Store Persistence', () => {
   beforeEach(() => {
@@ -22,7 +23,7 @@ describe('Journal Store Persistence', () => {
       isRead: false,
       relatedEntities: [],
       metadata: { tags: ['test'], automaticEntry: false },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     // Wait to ensure different timestamps
@@ -38,7 +39,7 @@ describe('Journal Store Persistence', () => {
       isRead: false,
       relatedEntities: [],
       metadata: { tags: ['test'], automaticEntry: false },
-      updatedAt: new Date().toISOString()
+      updatedAt: getTimestamp()
     });
 
     // Verify entries were created (newest first due to chronological sorting)
@@ -77,7 +78,7 @@ describe('Journal Store Persistence', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: ['test'], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
     }).not.toThrow();
   });
@@ -97,7 +98,7 @@ describe('Journal Store Persistence', () => {
         isRead: false,
         relatedEntities: [],
         metadata: { tags: ['test'], automaticEntry: false },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
     }).toThrow('Entry content is required');
   });

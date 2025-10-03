@@ -24,6 +24,7 @@ import {
   RelevanceScoringConfig,
   DecisionRelevanceResult
 } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Default configuration for relevance scoring
@@ -97,7 +98,7 @@ export class DecisionRelevanceCalculator {
       impactScore,
       tagMatchScore,
       characterScore,
-      calculatedAt: new Date().toISOString(),
+      calculatedAt: getTimestamp(),
       metadata: {
         daysSinceDecision,
         matchedTags: this.getMatchedTags(decision, currentContext),

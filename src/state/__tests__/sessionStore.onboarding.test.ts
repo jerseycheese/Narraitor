@@ -1,4 +1,5 @@
 import { useSessionStore } from '../sessionStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the logger to avoid console output during tests
 jest.mock('@/lib/utils/logger', () => ({
@@ -53,7 +54,7 @@ describe('SessionStore - Onboarding Functionality', () => {
             id: 'session-1',
             worldId: 'world-1',
             characterId: 'char-1',
-            lastPlayed: new Date().toISOString(),
+            lastPlayed: getTimestamp(),
             narrativeCount: 5,
           }
         }
@@ -186,7 +187,7 @@ describe('SessionStore - Onboarding Functionality', () => {
             id: 'session-1',
             worldId: 'world-1', 
             characterId: 'char-1',
-            lastPlayed: new Date().toISOString(),
+            lastPlayed: getTimestamp(),
             narrativeCount: 1,
           }
         }

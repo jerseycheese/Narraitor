@@ -1,5 +1,7 @@
 // src/lib/ai/__tests__/endingGenerator.test.ts
 
+import { getTimestamp } from '@/lib/utils/timestamp';
+
 // Mock modules that have dependency issues first
 jest.mock('../../../state/sessionStore', () => ({
   useSessionStore: {
@@ -98,6 +100,17 @@ jest.mock('../../../state/journalStore');
 // The mocked modules are now available through imports
 
 describe('endingGenerator', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   const mockWorld: World = {
     id: 'world-123',
     name: 'Epic Fantasy Realm',
@@ -111,8 +124,8 @@ describe('endingGenerator', () => {
     },
     attributes: [],
     skills: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockCharacter: Character = {
@@ -148,8 +161,8 @@ describe('endingGenerator', () => {
       conditions: [],
       location: 'Dark Castle'
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockNarrativeSegments: NarrativeSegment[] = [
@@ -161,8 +174,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'castle'], mood: 'tense' },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     },
     {
       id: 'seg-2',
@@ -172,8 +185,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'boss-fight'], mood: 'action' },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   ];
 
@@ -193,14 +206,10 @@ describe('endingGenerator', () => {
         tags: ['achievement', 'dragon'], 
         automaticEntry: false 
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   ];
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe('generateEnding', () => {
     it('should generate an ending with all required fields', async () => {
@@ -324,12 +333,19 @@ describe('endingGenerator', () => {
         endingType: 'player-choice'
       };
 
+      // Set time to 1 hour ago for session start
+      jest.setSystemTime(new Date('2025-01-15T11:00:00Z'));
+      const sessionStartTime = new Date();
+
+      // Reset to "now" for the ending generation
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
       const mockContext = {
         world: mockWorld,
         character: mockCharacter,
         narrativeSegments: mockNarrativeSegments,
         journalEntries: mockJournalEntries,
-        sessionStartTime: new Date(Date.now() - 3600000) // 1 hour ago
+        sessionStartTime
       };
 
       const mockResponse = `{
@@ -449,6 +465,8 @@ describe('endingGenerator', () => {
 
   describe('retryGeneration', () => {
     it('should retry failed generation attempts', async () => {
+      // Use real timers for this test since it involves retry delays
+      jest.useRealTimers();
       const mockRequest: EndingGenerationRequest = {
         sessionId: 'session-789',
         characterId: 'char-456',

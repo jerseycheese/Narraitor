@@ -7,7 +7,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
-import { capitalize } from '@/lib/utils';
+import { capitalize, getTimestamp } from '@/lib/utils';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,8 +53,8 @@ export function EndingImageDebugSection() {
       characterLegacy: customLegacy || 'The hero will be remembered as a beacon of hope and courage. Their actions inspired others to follow in their footsteps, creating a lasting impact that would echo through generations.',
       worldImpact: customWorldImpact || 'The world was forever changed by the hero\'s actions. Peace was restored to the land, and the people could once again look toward the future with optimism.',
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       achievements: [
         'Master of Destiny: Shaped the fate of the realm through decisive actions',
         'Hero of the People: Saved countless lives through brave deeds',

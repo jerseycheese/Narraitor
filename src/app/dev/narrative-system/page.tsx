@@ -7,6 +7,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { World } from '@/types/world.types';
 // PlayerChoice import removed as it's not needed
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock world for testing - Western theme to match test plan
 const mockWorld: World = {
@@ -99,8 +100,8 @@ export default function NarrativeSystemHarness() {
         sessionId,
         worldId: mockWorld.id,
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['opening', 'scene'],
           mood: 'mysterious'
@@ -135,8 +136,8 @@ export default function NarrativeSystemHarness() {
         sessionId,
         worldId: mockWorld.id,
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['choice', 'player-action'],
           mood: 'mysterious'

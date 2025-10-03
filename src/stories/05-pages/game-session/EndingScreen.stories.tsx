@@ -7,6 +7,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof EndingScreen> = {
   title: '05-Pages/game-session/EndingScreen',
@@ -74,8 +75,8 @@ const mockCharacter = {
     capacity: 20,
     categories: []
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 };
 
 const mockWorld = {
@@ -91,8 +92,8 @@ const mockWorld = {
     attributePointPool: 27,
     skillPointPool: 20,
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
 };
 
 // Base ending for variations
@@ -114,8 +115,8 @@ Her name became synonymous with honor and courage throughout Eldoria. Young warr
 
 The alliances forged during the dark times grew stronger, uniting neighboring kingdoms in lasting peace. Eldoria became a beacon of hope for other realms struggling against their own darkness, proving that even the deepest shadows could be overcome through courage and unity.`,
   timestamp: new Date(),
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
   achievements: [
     'Dragon Slayer',
     'Savior of Eldoria', 
@@ -289,4 +290,3 @@ The realm's approach to challenges shifted from combat to collaboration. Problem
     }
   }
 };
-

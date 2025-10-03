@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { EndingScreen } from '../../../components/GameSession/EndingScreen';
 import { useNarrativeStore } from '../../../state/narrativeStore';
 import type { EndingType, EndingTone, StoryEnding } from '../../../types/narrative.types';
-import { capitalize } from '@/lib/utils';
+import { capitalize, getTimestamp } from '@/lib/utils';
 
 export default function EndingSystemTestHarness() {
   const { generateEnding, currentEnding, isGeneratingEnding, endingError, clearEnding } = useNarrativeStore();
@@ -47,8 +47,8 @@ Young warriors would train hoping to follow in their footsteps, and bards would 
 
 Trade routes reopened, alliances were strengthened, and the people looked toward the future with ${desiredTone === 'hopeful' ? 'unbridled optimism' : desiredTone === 'tragic' ? 'cautious hope despite their losses' : 'renewed confidence'}. The world had been saved, and all knew that heroes like this one would always rise when needed.`,
     timestamp: new Date(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
     achievements: [
       'Legendary Hero',
       'Realm Protector',

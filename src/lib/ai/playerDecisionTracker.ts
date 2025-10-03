@@ -26,6 +26,7 @@ import {
 } from '@/types/personalization.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { DecisionRelevanceCalculator } from './decisionRelevanceCalculator';
 import { 
   CurrentNarrativeContext, 
@@ -106,7 +107,7 @@ export class PlayerDecisionTracker {
       prompt: validatedData.prompt,
       choiceText: validatedData.choiceText,
       choiceType: validatedData.choiceType,
-      timestamp: new Date().toISOString(),
+      timestamp: getTimestamp(),
       sessionId: validatedData.sessionId,
       worldId: validatedData.worldId,
       context: validatedData.context

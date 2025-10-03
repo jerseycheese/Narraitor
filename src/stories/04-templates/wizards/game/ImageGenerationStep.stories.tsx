@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ImageGenerationStep from '@/components/WorldCreationWizard/steps/ImageGenerationStep';
 import { World } from '@/types/world.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof ImageGenerationStep> = {
   title: '04-Templates/wizards/game/ImageGenerationStep',
@@ -59,7 +60,7 @@ export const WithExistingImage: Story = {
       image: {
         type: 'ai-generated',
         url: 'https://picsum.photos/800/400?random=100',
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: 'Photorealistic landscape photograph, fantasy themed environment, featuring enchanted forests, magical atmosphere, epic fantasy vista, fantasy art inspiration, ultra high resolution, 8K quality, professional photography, cinematic composition, dramatic lighting, depth of field, wide angle lens, landscape photography, environmental storytelling, no people or characters visible, establishing shot'
       }
     },

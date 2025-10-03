@@ -5,6 +5,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof SaveIndicator> = {
   title: '01-Atoms/feedback/SaveIndicator',
@@ -62,7 +63,7 @@ export const Saving: Story = {
 export const Saved: Story = {
   args: {
     status: 'saved',
-    lastSaveTime: new Date().toISOString(),
+    lastSaveTime: getTimestamp(),
     totalSaves: 5,
   },
 };
@@ -88,7 +89,7 @@ export const Error: Story = {
 export const WithManualSave: Story = {
   args: {
     status: 'saved',
-    lastSaveTime: new Date().toISOString(),
+    lastSaveTime: getTimestamp(),
     totalSaves: 3,
     onManualSave: action('manual-save-triggered'),
   },
@@ -116,7 +117,7 @@ export const LongErrorMessage: Story = {
 export const CompactMode: Story = {
   args: {
     status: 'saved',
-    lastSaveTime: new Date().toISOString(),
+    lastSaveTime: getTimestamp(),
     totalSaves: 7,
     compact: true,
     onManualSave: action('manual-save-triggered'),

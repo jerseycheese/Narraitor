@@ -6,6 +6,7 @@ import { NarrativeSegment, Decision } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof ActiveGameSession> = {
   title: '05-Pages/game-session/ActiveGameSession',
@@ -176,8 +177,8 @@ const mockWorld: World = {
     attributePointPool: 27,
     skillPointPool: 20,
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
 };
 
 // Use a type-safe character mock that matches characterStore's internal structure
@@ -229,11 +230,11 @@ const mockCharacter: any = {
   portrait: {
     type: 'ai-generated',
     url: 'https://i.pravatar.cc/200?img=1',
-    generatedAt: new Date().toISOString(),
+    generatedAt: getTimestamp(),
     prompt: 'A brave warrior with noble bearing',
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
 };
 
 const mockSegments: NarrativeSegment[] = [
@@ -387,4 +388,3 @@ export const MajorDecision: Story = {
     },
   },
 };
-

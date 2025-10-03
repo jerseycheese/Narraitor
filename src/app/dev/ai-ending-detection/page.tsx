@@ -6,7 +6,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { EndingType } from '@/types/narrative.types';
-import { formatTime, truncate } from '@/lib/utils';
+import { formatTime, truncate, getTimestamp } from '@/lib/utils';
 
 // Test scenarios for AI ending detection
 const TEST_SCENARIOS = {
@@ -147,7 +147,7 @@ export default function AIEndingDetectionTestPage() {
       content,
       type: 'scene' as const,
       timestamp: new Date(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: getTimestamp(),
       metadata: { location: 'Test Location', tags: [] }
     };
 

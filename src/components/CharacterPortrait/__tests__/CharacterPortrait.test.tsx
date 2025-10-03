@@ -4,6 +4,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CharacterPortrait } from '../CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('CharacterPortrait', () => {
   describe('rendering states', () => {
@@ -11,7 +12,7 @@ describe('CharacterPortrait', () => {
       const portrait: CharacterPortraitType = {
         type: 'ai-generated',
         url: 'data:image/png;base64,abc123',
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: 'A brave warrior'
       };
 

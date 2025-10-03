@@ -116,6 +116,8 @@ This ensures data isolation between different worlds and prevents conflicts.
 Auto-save uses 300ms debouncing to prevent excessive localStorage writes:
 
 ```typescript
+import { getTimestamp } from '@/lib/utils';
+
 // Clear existing timeout on new data changes
 if (saveTimeoutRef.current) {
   clearTimeout(saveTimeoutRef.current);
@@ -125,7 +127,7 @@ if (saveTimeoutRef.current) {
 saveTimeoutRef.current = setTimeout(() => {
   const dataWithTimestamp = { 
     ...data, 
-    lastSaved: new Date().toISOString() 
+    lastSaved: getTimestamp() 
   };
   localStorage.setItem(saveKey, JSON.stringify(dataWithTimestamp));
   setSaveStatus('saved');

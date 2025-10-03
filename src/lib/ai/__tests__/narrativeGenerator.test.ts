@@ -2,6 +2,7 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { GeminiClient } from '../geminiClient';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -115,8 +116,8 @@ describe('NarrativeGenerator', () => {
                 tags: ['forest', 'mysterious']
               },
               timestamp: new Date(),
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
+              createdAt: getTimestamp(),
+              updatedAt: getTimestamp()
             }
           ],
           currentLocation: 'Forest Entrance'

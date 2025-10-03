@@ -2,6 +2,7 @@ import React from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { getTimestamp } from '@/lib/utils';
 
 // Shared mock data
 const mockWorlds = {
@@ -12,8 +13,8 @@ const mockWorlds = {
     genre: 'fantasy' as const,
     attributes: [],
     skills: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
   },
   'world-2': {
     id: 'world-2',
@@ -22,8 +23,8 @@ const mockWorlds = {
     genre: 'fantasy' as const,
     attributes: [],
     skills: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
   },
 };
 
@@ -55,8 +56,8 @@ const mockCharacters = {
       location: 'Starting Village',
     },
     portrait: { type: 'placeholder' as const, url: null },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
   },
   'char-2': {
     id: 'char-2',
@@ -85,8 +86,8 @@ const mockCharacters = {
       location: 'Wizard Tower',
     },
     portrait: { type: 'placeholder' as const, url: null },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
   },
 };
 

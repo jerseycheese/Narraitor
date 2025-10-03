@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
-import { capitalize } from '@/lib/utils';
+import { capitalize, getTimestamp } from '@/lib/utils';
 
 export default function DebugChoicesPage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -14,7 +14,7 @@ export default function DebugChoicesPage() {
 
   const addLog = (message: string) => {
     console.log(message);
-    setLogs(prev => [...prev, `${new Date().toISOString()}: ${message}`]);
+    setLogs(prev => [...prev, `${getTimestamp()}: ${message}`]);
   };
 
   const testChoiceGeneration = async () => {
@@ -44,8 +44,8 @@ export default function DebugChoicesPage() {
           sessionId: 'test-session',
           worldId: 'world-1',
           timestamp: new Date(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         }],
         currentTags: [],
         sessionId: 'test-session',

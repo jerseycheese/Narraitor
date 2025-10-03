@@ -23,6 +23,7 @@ import FinalizeStep from './steps/FinalizeStep';
 import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { createAIClient } from '@/lib/ai';
+import { getTimestamp } from '@/lib/utils';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
@@ -350,7 +351,7 @@ export default function WorldCreationWizard({
           name: data.name,
           genre: data.genre,
           description: data.description,
-          createdAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
           attributes: data.attributes || [],
           skills: data.skills || [],
           image: data.image,
@@ -370,7 +371,7 @@ export default function WorldCreationWizard({
           name: data.name,
           genre: data.genre,
           description: data.description,
-          createdAt: new Date().toISOString(),
+          createdAt: getTimestamp(),
           attributes: data.attributes || [],
           skills: data.skills || [],
           image: data.image,

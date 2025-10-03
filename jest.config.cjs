@@ -9,6 +9,7 @@ const config = {
   testMatch: [
     '<rootDir>/src/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/scripts/**/*.test.{js,mjs}',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',

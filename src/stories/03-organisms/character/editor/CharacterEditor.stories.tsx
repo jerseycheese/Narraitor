@@ -4,6 +4,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { LoadingState as LoadingStateComponent } from '@/components/ui/LoadingState/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/character/editor/CharacterEditor',
@@ -223,7 +224,7 @@ export const WithPortrait: Story = {
         portrait: {
           type: 'ai-generated',
           url: 'https://i.pravatar.cc/200?img=1',
-          generatedAt: new Date().toISOString(),
+          generatedAt: getTimestamp(),
           prompt: 'A legendary warrior with noble bearing'
         },
         inventory: {

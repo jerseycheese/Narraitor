@@ -8,6 +8,7 @@
  */
 
 import { useNarrativeStore } from '../../narrativeStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { PlayerDecisionTracker } from '../../../lib/ai/playerDecisionTracker';
 import { DecisionOption } from '../../../types/narrative.types';
 import { ChoiceTypePreference } from '../../../types/personalization.types';
@@ -23,6 +24,10 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
   let testTracker: PlayerDecisionTracker;
 
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     // Reset narrative store
     useNarrativeStore.setState({
       segments: {},
@@ -44,6 +49,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
 
   afterEach(() => {
     testTracker.clearDecisions();
+    jest.useRealTimers();
   });
 
   describe('Complete User Journey Integration', () => {
@@ -65,7 +71,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           location: 'Rivertown Marketplace',
           mood: 'neutral'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -78,7 +84,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           tags: ['encounter', 'merchant', 'distress'],
           location: 'Rivertown Marketplace'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -90,7 +96,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         metadata: {
           tags: ['plea', 'backstory', 'quest-hook']
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -243,7 +249,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           location: 'Temple of Forgotten Wisdom',
           mood: 'mysterious'
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -255,7 +261,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         metadata: {
           tags: ['warning', 'choice', 'consequence']
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         timestamp: new Date()
       });
 
@@ -343,10 +349,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         ] as DecisionOption[]
       });
 
-      // Record selection in narrative store (this should always work)
-      const beforeSelection = Date.now();
+      // Record selection in narrative store with deterministic timestamp
+      const expectedTime = new Date('2025-01-15T12:00:00Z');
       store.selectDecisionOption(decisionId, 'option-1', characterId);
-      const afterSelection = Date.now();
 
       // Get fresh state after selection
       const updatedState = useNarrativeStore.getState();
@@ -354,8 +359,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       expect(decision.selectedOptionId).toBe('option-1');
       expect(decision.characterId).toBe(characterId);
       expect(decision.selectedAt).toBeInstanceOf(Date);
-      expect(decision.selectedAt!.getTime()).toBeGreaterThanOrEqual(beforeSelection);
-      expect(decision.selectedAt!.getTime()).toBeLessThanOrEqual(afterSelection);
+      expect(decision.selectedAt!.getTime()).toBe(expectedTime.getTime());
 
       // Verify no errors are set
       const currentState = useNarrativeStore.getState();

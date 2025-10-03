@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/narrative/display/NarrativeHistory',
@@ -42,8 +43,8 @@ const createMockSegment = (
   sessionId: 'session-1',
   worldId: 'world-1',
   timestamp: new Date(),
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
   metadata: {
     tags: ['test'],
     mood: 'neutral'
@@ -135,4 +136,3 @@ export const MixedSegmentTypes: Story = {
     isLoading: false,
   },
 };
-

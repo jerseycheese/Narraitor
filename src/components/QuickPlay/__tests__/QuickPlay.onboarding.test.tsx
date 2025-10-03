@@ -5,6 +5,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -110,8 +111,8 @@ describe('QuickPlay - Onboarding Integration', () => {
       genre: 'fantasy' as const,
       attributes: [],
       skills: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const mockCharacter = {
@@ -122,15 +123,15 @@ describe('QuickPlay - Onboarding Integration', () => {
       attributes: {},
       skills: {},
       portrait: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const mockSavedSession = {
       id: 'session-1',
       worldId: 'world-1',
       characterId: 'char-1',
-      lastPlayed: new Date().toISOString(),
+      lastPlayed: getTimestamp(),
       narrativeCount: 3,
     };
 

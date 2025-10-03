@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
 
 /**
@@ -69,7 +69,7 @@ export const useWorldStore = create<WorldStore>()(
         }
 
         const worldId = generateUniqueId('world');
-        const now = new Date().toISOString();
+        const now = getTimestamp();
         
         // Normalize text fields for consistent storage
         const newWorld: World = {
@@ -109,7 +109,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...state.worlds[id],
           ...normalizedUpdates,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -182,7 +182,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           attributes: [...world.attributes, newAttribute],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -208,7 +208,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           attributes: updatedAttributes,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -234,7 +234,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           attributes: filteredAttributes,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -269,7 +269,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           skills: [...world.skills, newSkill],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -295,7 +295,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           skills: updatedSkills,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -321,7 +321,7 @@ export const useWorldStore = create<WorldStore>()(
         const updatedWorld: World = {
           ...world,
           skills: filteredSkills,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -346,7 +346,7 @@ export const useWorldStore = create<WorldStore>()(
             ...world.settings,
             ...settings,
           },
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -372,7 +372,7 @@ export const useWorldStore = create<WorldStore>()(
             ...currentToneSettings,
             ...toneSettings,
           } as ToneSettings,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {

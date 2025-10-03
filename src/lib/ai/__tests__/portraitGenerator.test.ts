@@ -3,6 +3,7 @@
 import { PortraitGenerator } from '../portraitGenerator';
 import { Character } from '../../../types/character.types';
 import { AIClient } from '../types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AI client
 const mockAIClient: AIClient = {
@@ -79,8 +80,8 @@ describe('PortraitGenerator', () => {
       },
       inventory: { items: [], capacity: 100, categories: [], characterId: 'char-1' },
       status: { health: 100, maxHealth: 100, conditions: [] },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     };
   });
 

@@ -185,12 +185,14 @@ The system enforces some sensible limits to keep things manageable:
 
 ### Export/Import
 ```typescript
+import { getTimestamp } from '@/lib/utils';
+
 // Export world configuration
 const exportWorld = (worldId: string) => {
   const world = worlds[worldId];
   const exportData = {
     ...world,
-    exportedAt: new Date().toISOString(),
+    exportedAt: getTimestamp(),
     version: '1.0'
   };
   downloadJSON(exportData, `${world.name}.json`);
@@ -201,7 +203,7 @@ const importWorld = (worldData: WorldExport) => {
   const worldId = createWorld({
     ...worldData,
     id: generateUniqueId('world'),
-    createdAt: new Date().toISOString()
+    createdAt: getTimestamp()
   });
   return worldId;
 };

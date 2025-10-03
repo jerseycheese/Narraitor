@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { WorldImage } from '@/types/world.types';
+import { getTimestamp } from '@/lib/utils';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
@@ -119,7 +120,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             const image: WorldImage = {
               type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
               url: imageUrl,
-              generatedAt: new Date().toISOString()
+              generatedAt: getTimestamp()
             };
             useWorldStore.getState().updateWorld(worldId, { image });
             console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);
@@ -252,7 +253,7 @@ export const TestDataGeneratorSection: React.FC = () => {
               const image: WorldImage = {
                 type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
                 url: imageUrl,
-                generatedAt: new Date().toISOString()
+                generatedAt: getTimestamp()
               };
               useWorldStore.getState().updateWorld(worldId, { image });
               console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);

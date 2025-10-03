@@ -5,6 +5,7 @@ import type {
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock fetch for API-based ending generation and restore after suite
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -212,8 +213,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -243,8 +244,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -280,8 +281,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -311,8 +312,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       useNarrativeStore.setState({
@@ -328,8 +329,8 @@ describe('narrativeStore - Ending functionality', () => {
               endingData: mockEnding
             },
             timestamp: new Date(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp()
           }
         }
       });
@@ -398,7 +399,7 @@ describe('narrativeStore - Ending functionality', () => {
           type: 'scene',
           content: 'New content',
           timestamp: new Date(),
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
           metadata: {
             tags: []
           }

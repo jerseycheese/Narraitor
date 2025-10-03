@@ -5,6 +5,7 @@ import { useCharacterStore } from '@/state/characterStore';
 
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/character/display/CharacterHeader',
@@ -241,8 +242,8 @@ export const RecentlyCreated: Story = {
       ...mockCharacter,
       name: 'New Character',
       level: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     },
     world: mockWorld,
   },

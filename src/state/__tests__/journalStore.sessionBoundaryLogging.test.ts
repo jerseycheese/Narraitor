@@ -1,4 +1,5 @@
 import { useJournalStore } from '../journalStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { useSessionStore } from '../sessionStore';
 
 describe('Journal Store - Session Boundary Logging', () => {
@@ -28,9 +29,9 @@ describe('Journal Store - Session Boundary Logging', () => {
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
-          sessionStartTime: new Date().toISOString()
+          sessionStartTime: getTimestamp()
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -58,7 +59,7 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session', 'new-adventure'],
           automaticEntry: true,
@@ -98,7 +99,7 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -116,7 +117,7 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -157,11 +158,11 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
-          sessionEndTime: new Date().toISOString()
+          sessionEndTime: getTimestamp()
           // Note: no duration or start time available
         }
       });
@@ -191,7 +192,7 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true
@@ -208,7 +209,7 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'major',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['discovery', 'artifact'],
           automaticEntry: false
@@ -248,11 +249,11 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
-          sessionStartTime: new Date().toISOString()
+          sessionStartTime: getTimestamp()
         }
       });
 
@@ -265,11 +266,11 @@ describe('Journal Store - Session Boundary Logging', () => {
         significance: 'minor',
         relatedEntities: [],
         isRead: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
-          sessionEndTime: new Date().toISOString(),
+          sessionEndTime: getTimestamp(),
           sessionDuration: 1800000 // 30 minutes
         }
       });
@@ -308,7 +309,7 @@ describe('Journal Store - Session Boundary Logging', () => {
             tags: ['system'],
             automaticEntry: true
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: getTimestamp()
         });
       }).toThrow('Entry content is required');
     });

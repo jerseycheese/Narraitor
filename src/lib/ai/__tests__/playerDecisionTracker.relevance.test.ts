@@ -5,12 +5,17 @@
 
 import { PlayerDecisionTracker } from '../playerDecisionTracker';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('PlayerDecisionTracker - Relevance Integration', () => {
   let tracker: PlayerDecisionTracker;
   let mockCurrentContext: CurrentNarrativeContext;
 
   beforeEach(() => {
+    // Use fake timers for deterministic timestamp generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
     // Create fresh tracker instance for each test
     tracker = new PlayerDecisionTracker({ storageKey: 'test_decisions' });
     tracker.clearDecisions();
@@ -23,8 +28,12 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
       activeTags: ['mystery', 'social'],
       worldId: 'world-test',
       sessionId: 'session-test',
-      timestamp: new Date().toISOString()
+      timestamp: getTimestamp()
     };
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('getRelevantDecisions', () => {
@@ -188,7 +197,7 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
         activeTags: [],
         worldId: 'world-test',
         sessionId: 'session-test',
-        timestamp: new Date().toISOString()
+        timestamp: getTimestamp()
         // location and situation are optional
       };
 
@@ -205,9 +214,7 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
     });
 
     test('handles decisions from different worlds', () => {
-      // Add some delay to ensure different timestamps
-      const now = Date.now();
-      
+      // Record same world decision at current time
       tracker.recordDecision(
         'Same world decision',
         'Same world choice',
@@ -216,9 +223,13 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
         'world-test' // Same world
       );
 
-      // Sleep briefly to ensure different timestamp
-      const decision2Timestamp = new Date(now - 1000).toISOString();
-      
+      // Set time to 1 second ago for different world decision
+      jest.setSystemTime(new Date('2025-01-15T11:59:59Z'));
+      const decision2Timestamp = getTimestamp();
+
+      // Reset to "now"
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
       // Create decision manually to control timestamp
       const differentWorldDecision = {
         id: 'decision-different-world',

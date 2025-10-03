@@ -4,7 +4,7 @@ import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -133,7 +133,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
 
         const characterId = generateUniqueId('char');
-        const now = new Date().toISOString();
+        const now = getTimestamp();
         
         // Normalize character background text
         const normalizedBackground = characterData.background ? {
@@ -184,7 +184,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         const updatedCharacter: Character = {
           ...state.characters[id],
           ...updates,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -248,7 +248,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         const updatedCharacter: Character = {
           ...character,
           attributes: [...character.attributes, newAttribute],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -274,7 +274,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         const updatedCharacter: Character = {
           ...character,
           attributes: updatedAttributes,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -300,7 +300,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         const updatedCharacter: Character = {
           ...character,
           attributes: filteredAttributes,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {
@@ -334,7 +334,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         const updatedCharacter: Character = {
           ...character,
           skills: [...character.skills, newSkill],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         return {

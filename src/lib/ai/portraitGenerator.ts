@@ -2,7 +2,7 @@
 
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
-import { capitalize, truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { capitalize, truncate, safeTrim, getNestedValue, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 interface PortraitGenerationOptions {
@@ -124,7 +124,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         return {
           type: 'ai-generated',
           url: mockPortrait,
-          generatedAt: new Date().toISOString(),
+          generatedAt: getTimestamp(),
           prompt: `Mock portrait for ${character.name} in Storybook`
         };
       }
@@ -162,7 +162,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       return {
         type: 'ai-generated',
         url: response.image,
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: response.prompt
       };
     } catch (error) {

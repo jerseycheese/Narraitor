@@ -8,6 +8,7 @@
  */
 
 import { useNarrativeStore } from '../narrativeStore';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { playerDecisionTracker } from '../../lib/ai/playerDecisionTracker';
 import { DecisionOption } from '../../types/narrative.types';
 
@@ -63,7 +64,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         type: 'scene',
         worldId: worldId,
         timestamp: new Date(),
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['travel', 'road'],
           location: 'Forest Road'
@@ -172,7 +173,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         content: 'You arrive at the bustling marketplace of Rivertown.',
         type: 'scene',
         timestamp: new Date(),
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         metadata: {
           tags: ['marketplace', 'town'],
           location: 'Rivertown Marketplace',
@@ -184,7 +185,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         content: 'A merchant approaches you with a worried expression.',
         type: 'dialogue',
         timestamp: new Date(),
-        updatedAt: new Date().toISOString(),
+        updatedAt: getTimestamp(),
         characterIds: [characterId, 'merchant-npc'],
         metadata: {
           tags: ['interaction', 'merchant'],

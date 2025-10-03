@@ -12,6 +12,7 @@ import { AIClient } from '../types';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { Character } from '@/types/character.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock dependencies
 const mockAIClient: jest.Mocked<AIClient> = {
@@ -66,8 +67,8 @@ const mockWorldWithSkills: World = {
     attributePointPool: 27,
     skillPointPool: 40
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 };
 
 // Mock character store
@@ -104,8 +105,8 @@ const mockCharacterWithSkills: Character = {
     maxHealth: 100,
     conditions: []
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 };
 
 jest.mock('@/state/worldStore', () => ({

@@ -2,6 +2,7 @@
 
 import { World, WorldImage } from '../../../types/world.types';
 import { AIClient } from '../types';
+import { getTimestamp } from '@/lib/utils';
 
 // Mock SVG data for different world themes
 const mockWorldImages: Record<string, string> = {
@@ -136,7 +137,7 @@ export class WorldImageGenerator {
     return {
       type: 'ai-generated',
       url: mockImage,
-      generatedAt: new Date().toISOString(),
+      generatedAt: getTimestamp(),
       prompt: prompt
     };
   }

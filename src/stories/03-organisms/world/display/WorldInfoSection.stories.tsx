@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorldInfoSection } from '@/components/world/WorldInfoSection';
 import { World } from '@/types/world.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/world/display/WorldInfoSection',
@@ -81,8 +82,8 @@ export const RecentlyCreated: Story = {
     world: {
       ...baseWorld,
       name: 'Brand New World',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       relationship: undefined,
     },
   },

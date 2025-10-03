@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { isStorageAvailable } from '@/utils/storageHelpers';
 import Logger from '@/lib/utils/logger';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 /**
  * Create logger instance for this store
@@ -234,7 +235,7 @@ export const useNavigationStore = create<NavigationState>()(
             ? [
                 {
                   path,
-                  timestamp: new Date().toISOString(),
+                  timestamp: getTimestamp(),
                   title,
                   params,
                 },

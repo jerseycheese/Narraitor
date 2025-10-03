@@ -2,7 +2,7 @@
 console.log('[__mocks__/worldStore.ts] Mock module loading');
 
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
-import { formatForDebug } from '@/lib/utils';
+import { formatForDebug, getTimestamp } from '@/lib/utils';
 
 interface MockWorldState {
   worlds: Record<string, World>;
@@ -46,8 +46,8 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
       skillPointPool: 20
     },
     toneSettings: worldData.toneSettings,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
   
   mockState.worlds[worldId] = newWorld;
@@ -89,7 +89,7 @@ const mockUpdateWorld = jest.fn((worldId: string, updates: Partial<World>) => {
   mockState.worlds[worldId] = {
     ...mockState.worlds[worldId],
     ...updates,
-    updatedAt: new Date().toISOString()
+    updatedAt: getTimestamp()
   };
 });
 
@@ -237,7 +237,7 @@ const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<i
       ...currentToneSettings,
       ...toneSettings
     },
-    updatedAt: new Date().toISOString()
+    updatedAt: getTimestamp()
   };
 });
 

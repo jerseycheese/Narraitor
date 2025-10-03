@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CharacterSummary from '../CharacterSummary';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Define the Character type as used in characterStore
 interface Character {
@@ -36,8 +37,8 @@ describe('CharacterSummary', () => {
     },
     worldId: 'world-1',
     level: 5,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
     portrait: {
       type: 'ai-generated',
       url: 'https://example.com/portrait.jpg'

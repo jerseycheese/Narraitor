@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof ChoiceSelector> = {
   title: '03-Organisms/narrative/controls/ChoiceSelector',
@@ -161,8 +162,8 @@ const createMockCharacter = () => ({
   background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
   inventory: { characterId: 'test-char', items: [], capacity: 20, categories: [] },
   status: { health: 100, maxHealth: 100, conditions: [] },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp()
 });
 
 // Mock world skills
@@ -187,5 +188,4 @@ export const WithSkillRequirements: Story = {
     },
   },
 };
-
 

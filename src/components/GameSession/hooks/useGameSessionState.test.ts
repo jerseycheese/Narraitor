@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameSessionState } from './useGameSessionState';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Create a complete mock of the stores
 const mockWorldStoreState = {
@@ -17,8 +18,8 @@ const mockWorldStoreState = {
         attributePointPool: 27,
         skillPointPool: 20
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   }
 };
@@ -53,8 +54,8 @@ const mockCharacterStoreState = {
         maxHealth: 100, 
         conditions: []
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   }
 };

@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
-import { generateUniqueId } from '../lib/utils';
+import { generateUniqueId, getTimestamp } from '../lib/utils';
 // IMPORTANT: Do not import AI generators directly in client code.
 // All AI calls must go through server/API routes per project guidelines.
 import { logger } from '../lib/utils/logger';
@@ -187,7 +187,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
     }
 
     const segmentId = generateUniqueId('segment');
-    const now = new Date().toISOString();
+    const now = getTimestamp();
 
     const newSegment: NarrativeSegment = {
       ...segmentData,

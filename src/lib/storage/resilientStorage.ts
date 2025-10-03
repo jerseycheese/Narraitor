@@ -8,6 +8,7 @@
 
 import { IndexedDBAdapter } from './indexedDBAdapter';
 import { handleStorageError } from '../../utils/storageHelpers';
+import { getTimestamp } from '../utils';
 
 /**
  * Storage health status enumeration
@@ -406,7 +407,7 @@ export class ResilientStorageMiddleware {
    * Update last successful sync timestamp
    */
   private updateLastSuccessfulSync(): void {
-    this.lastSuccessfulSync = new Date().toISOString();
+    this.lastSuccessfulSync = getTimestamp();
   }
 
   /**

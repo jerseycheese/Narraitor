@@ -7,6 +7,7 @@ import { createTestContext } from '@/lib/ai/contextOverride';
 import { requestLogger } from '@/lib/ai/requestLogger';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { getTimestamp } from '@/lib/utils';
 
 interface AITestingPanelProps {
   className?: string;
@@ -32,8 +33,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       attributePointPool: 20,
       skillPointPool: 20
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockCharacter = {
@@ -62,8 +63,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       conditions: [],
       location: 'Test Area'
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   const mockNarrativeContext = {

@@ -10,6 +10,7 @@ import type {
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 
@@ -92,7 +93,7 @@ export const useLoreStore = create<LoreStore>()(
 
       addFact: (key, value, category, source, worldId, sessionId, metadata) => {
         const id = generateUniqueId();
-        const now = new Date().toISOString();
+        const now = getTimestamp();
         
         const newFact: LoreFact = {
           id,
@@ -262,7 +263,7 @@ export const useLoreStore = create<LoreStore>()(
           ...updates,
           id: existingFact.id, // Preserve ID
           createdAt: existingFact.createdAt, // Preserve creation time
-          updatedAt: new Date().toISOString()
+          updatedAt: getTimestamp()
         };
 
         const history = factHistory[id] || { factId: id, versions: [] };
@@ -349,7 +350,7 @@ export const useLoreStore = create<LoreStore>()(
         const facts = get().getFacts({ worldId });
         const exportData = {
           worldId,
-          exportedAt: new Date().toISOString(),
+          exportedAt: getTimestamp(),
           facts: facts.map(fact => ({
             key: fact.key,
             value: fact.value,

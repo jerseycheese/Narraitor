@@ -5,6 +5,7 @@ import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { getTimestamp } from '@/lib/utils';
 
 export default function DecisionPointsTestPage() {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string>('');
@@ -59,8 +60,8 @@ export default function DecisionPointsTestPage() {
         tags: ['forest', 'crossroads', 'night', 'mysterious']
       },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     },
     {
       id: 'seg-2',
@@ -72,8 +73,8 @@ export default function DecisionPointsTestPage() {
         tags: ['village', 'emergency', 'guards', 'crisis']
       },
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp()
     }
   ];
 

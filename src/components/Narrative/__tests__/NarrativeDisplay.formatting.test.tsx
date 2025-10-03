@@ -4,6 +4,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('NarrativeDisplay - Formatting Integration', () => {
   const createMockSegment = (
@@ -16,8 +17,8 @@ describe('NarrativeDisplay - Formatting Integration', () => {
     sessionId: 'session-1',
     worldId: 'world-1',
     timestamp: new Date(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
     metadata: {
       characterIds: [],
       tags: [],

@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -113,7 +113,7 @@ export const useGoalStore = create<GoalStore>()(
         validateGoalData(goalData);
 
         const goalId = generateUniqueId('goal');
-        const now = new Date().toISOString();
+        const now = getTimestamp();
 
         const newGoal: NarrativeGoal = {
           ...goalData,
@@ -157,7 +157,7 @@ export const useGoalStore = create<GoalStore>()(
           throw new Error('Goal not found');
         }
 
-        const now = new Date().toISOString();
+        const now = getTimestamp();
         const updatedGoal = {
           ...existingGoal,
           ...updates,
@@ -289,7 +289,7 @@ export const useGoalStore = create<GoalStore>()(
         const updatedGoal = {
           ...goal,
           progressNotes: [...(goal.progressNotes || []), note],
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         };
 
         set((state) => ({

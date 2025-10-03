@@ -9,6 +9,7 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
+import { getTimestamp } from '@/lib/utils';
 
 interface CharacterFormData {
   name: string;
@@ -83,8 +84,8 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         },
         inventory: { items: [], capacity: 100, categories: [], characterId: 'temp' },
         status: { health: 100, maxHealth: 100, conditions: [] },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       // Use the portrait generation API route

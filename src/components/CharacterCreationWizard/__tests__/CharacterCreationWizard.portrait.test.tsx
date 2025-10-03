@@ -7,6 +7,7 @@ import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useCharacterStore } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
+import { getTimestamp } from '@/lib/utils/timestamp';
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies
@@ -95,7 +96,7 @@ describe('PortraitStep Component', () => {
         portrait: {
           type: 'ai-generated',
           url: 'data:image/png;base64,mockimage',
-          generatedAt: new Date().toISOString()
+          generatedAt: getTimestamp()
         }
       })
     });
@@ -179,8 +180,8 @@ describe('Character Creation Wizard with Portrait Integration', () => {
       attributePointPool: 20,
       skillPointPool: 20
     },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
   };
 
   beforeEach(() => {

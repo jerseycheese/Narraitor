@@ -7,6 +7,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { JournalEntry } from '@/types/journal.types';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Test Harness for Issue #278: Journal Access During Gameplay
@@ -83,8 +84,8 @@ export default function JournalAccessTestPage() {
               conditions: [],
               location: 'Test Area'
             },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp()
           }
         },
         currentCharacterId: 'test-char-1',
@@ -129,7 +130,7 @@ export default function JournalAccessTestPage() {
         isRead: false,
         relatedEntities: [{ id: 'loc-1', type: 'location', name: 'Video Store' }],
         metadata: { tags: ['opening', 'introduction', 'work'], automaticEntry: true },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       },
       {
         worldId: 'test-world-1',
@@ -145,7 +146,7 @@ export default function JournalAccessTestPage() {
           { id: 'char-3', type: 'character', name: 'Angry Customer' }
         ],
         metadata: { tags: ['dialogue', 'employee', 'customer-service'], automaticEntry: true },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       },
       {
         worldId: 'test-world-1',
@@ -167,7 +168,7 @@ export default function JournalAccessTestPage() {
           choiceText: 'Help the stranger',
           decisionPrompt: 'You encounter a suspicious person at the tavern. What do you do?'
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       },
       {
         worldId: 'test-world-1',
@@ -180,7 +181,7 @@ export default function JournalAccessTestPage() {
         isRead: false,
         relatedEntities: [{ id: 'item-1', type: 'item', name: 'Staff Picks Display' }],
         metadata: { tags: ['browsing', 'selection', 'life-decision', 'epiphany'], automaticEntry: true },
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       }
     ];
 

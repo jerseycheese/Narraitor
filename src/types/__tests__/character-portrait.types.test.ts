@@ -1,6 +1,7 @@
 // src/types/__tests__/character-portrait.types.test.ts
 
 import { Character, CharacterPortrait, PortraitGenerationStatus } from '../character.types';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('Character Portrait Types', () => {
   describe('CharacterPortrait', () => {
@@ -8,7 +9,7 @@ describe('Character Portrait Types', () => {
       const portrait: CharacterPortrait = {
         type: 'ai-generated',
         url: 'data:image/png;base64,abc123',
-        generatedAt: new Date().toISOString(),
+        generatedAt: getTimestamp(),
         prompt: 'A brave warrior with long hair'
       };
 
@@ -33,7 +34,7 @@ describe('Character Portrait Types', () => {
       const status: PortraitGenerationStatus = {
         isGenerating: true,
         error: null,
-        lastAttemptAt: new Date().toISOString()
+        lastAttemptAt: getTimestamp()
       };
 
       expect(status.isGenerating).toBe(true);
@@ -45,7 +46,7 @@ describe('Character Portrait Types', () => {
       const status: PortraitGenerationStatus = {
         isGenerating: false,
         error: 'Failed to generate portrait',
-        lastAttemptAt: new Date().toISOString()
+        lastAttemptAt: getTimestamp()
       };
 
       expect(status.isGenerating).toBe(false);
@@ -84,8 +85,8 @@ describe('Character Portrait Types', () => {
           type: 'placeholder',
           url: null
         },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp()
       };
 
       expect(character.portrait).toBeDefined();

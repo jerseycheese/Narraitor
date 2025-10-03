@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import CharacterSummary from '@/components/GameSession/CharacterSummary';
+import { getTimestamp } from '@/lib/utils';
 
 // Character type as used in characterStore
 interface Character {
@@ -51,8 +52,8 @@ const baseCharacter: Character = {
   },
   worldId: 'world-1',
   level: 3,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
   portrait: {
     type: 'ai-generated',
     url: 'https://i.pravatar.cc/200?img=1'
@@ -92,4 +93,3 @@ export const WithPlaceholderPortrait: Story = {
     }
   }
 };
-

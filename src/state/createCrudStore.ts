@@ -7,7 +7,7 @@
 
 import { StateCreator } from 'zustand';
 import { getUserFriendlyError, UserFriendlyError } from '@/lib/utils/errorUtils';
-import { generateUniqueId } from '@/lib/utils';
+import { generateUniqueId, getTimestamp } from '@/lib/utils';
 
 export interface BaseEntity {
   id: string;
@@ -89,7 +89,7 @@ export function createCrudStore<T extends BaseEntity>(
 
         // Generate ID and timestamps
         const id = generateUniqueId(idPrefix);
-        const now = new Date().toISOString();
+        const now = getTimestamp();
 
         const newEntity: T = {
           ...processedData,
@@ -141,7 +141,7 @@ export function createCrudStore<T extends BaseEntity>(
         const updatedEntity: T = {
           ...entity,
           ...processedUpdates,
-          updatedAt: new Date().toISOString(),
+          updatedAt: getTimestamp(),
         } as T;
 
         // Update state

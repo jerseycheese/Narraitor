@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
+import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('NarrativeDisplay', () => {
   it('displays narrative content appropriately', () => {
@@ -10,8 +11,8 @@ describe('NarrativeDisplay', () => {
       content: 'The ancient forest whispered secrets in the moonlight.',
       type: 'scene' as const,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         characterIds: [],
         mood: 'mysterious' as const,
@@ -31,8 +32,8 @@ describe('NarrativeDisplay', () => {
       content: '"Hello there," said the mysterious stranger.',
       type: 'dialogue' as const,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         characterIds: ['char-1'],
         mood: 'neutral' as const,
@@ -48,8 +49,8 @@ describe('NarrativeDisplay', () => {
       content: 'The hero leapt across the chasm.',
       type: 'action' as const,
       timestamp: new Date(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
       metadata: {
         characterIds: ['hero'],
         mood: 'action' as const,
