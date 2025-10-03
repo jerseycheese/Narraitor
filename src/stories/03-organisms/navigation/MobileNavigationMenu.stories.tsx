@@ -49,7 +49,9 @@ const meta: Meta<typeof MobileNavigationMenu> = {
       
       useCharacterStore.setState({
         characters: {},
+        entities: {},
         currentCharacterId: null,
+        currentEntityId: null,
         error: null,
         loading: false,
       });

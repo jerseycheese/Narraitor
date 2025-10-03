@@ -7,7 +7,7 @@
  */
 
 import { useWorldStore, WorldStore } from '../../state/worldStore';
-import { useCharacterStore } from '../../state/characterStore';
+import { useCharacterStore, CharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
@@ -136,7 +136,24 @@ export class ExportService {
       }
       
       if (validatedGameState.characterState) {
-        useCharacterStore.setState(validatedGameState.characterState);
+        const incomingCharacterState = validatedGameState.characterState as Partial<CharacterStore> & Record<string, unknown>;
+        const normalizedCharacterState: Partial<CharacterStore> = {
+          ...incomingCharacterState,
+        };
+
+        if (!normalizedCharacterState.entities && normalizedCharacterState.characters) {
+          normalizedCharacterState.entities = { ...normalizedCharacterState.characters };
+        }
+
+        if (typeof normalizedCharacterState.currentCharacterId === 'string' && !normalizedCharacterState.currentEntityId) {
+          normalizedCharacterState.currentEntityId = normalizedCharacterState.currentCharacterId;
+        }
+
+        if (typeof normalizedCharacterState.currentEntityId === 'string' && !normalizedCharacterState.currentCharacterId) {
+          normalizedCharacterState.currentCharacterId = normalizedCharacterState.currentEntityId;
+        }
+
+        useCharacterStore.setState(normalizedCharacterState);
       }
       
       if (validatedGameState.sessionState) {

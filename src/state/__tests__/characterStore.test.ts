@@ -16,7 +16,9 @@ describe('useCharacterStore', () => {
     test('should initialize with default state', () => {
       const state = useCharacterStore.getState();
       expect(state.characters).toEqual({});
+      expect(state.entities).toEqual({});
       expect(state.currentCharacterId).toBeNull();
+      expect(state.currentEntityId).toBeNull();
       expect(state.error).toBeNull();
       expect(state.loading).toBe(false);
     });
@@ -453,8 +455,13 @@ describe('useCharacterStore', () => {
 
   describe('error handling', () => {
     test('should set and clear errors', () => {
-      useCharacterStore.getState().setError('Test error');
-      expect(useCharacterStore.getState().error).toBe('Test error');
+      useCharacterStore.getState().setError({
+        title: 'Test error',
+        message: 'Details',
+        retryable: false,
+        type: 'unknown'
+      });
+      expect(useCharacterStore.getState().error?.title).toBe('Test error');
 
       useCharacterStore.getState().clearError();
       expect(useCharacterStore.getState().error).toBeNull();
@@ -501,7 +508,12 @@ describe('useCharacterStore', () => {
           categories: []
         }
       });
-      useCharacterStore.getState().setError('Some error');
+      useCharacterStore.getState().setError({
+        title: 'Some error',
+        message: 'Details',
+        retryable: false,
+        type: 'unknown'
+      });
       useCharacterStore.getState().setLoading(true);
 
       // Reset
@@ -509,7 +521,9 @@ describe('useCharacterStore', () => {
       const state = useCharacterStore.getState();
 
       expect(state.characters).toEqual({});
+      expect(state.entities).toEqual({});
       expect(state.currentCharacterId).toBeNull();
+      expect(state.currentEntityId).toBeNull();
       expect(state.error).toBeNull();
       expect(state.loading).toBe(false);
     });

@@ -109,8 +109,14 @@ export const createWizardMockState = (options: WizardMockOptions) => {
       currentWorldId: null,
       currentEntityId: null,
     });
+    const firstCharacterId = hasCharacters ? Object.keys(characters)[0] ?? null : null;
     useCharacterStore.setState({ 
-      characters 
+      characters,
+      entities: characters,
+      currentCharacterId: firstCharacterId,
+      currentEntityId: firstCharacterId,
+      error: null,
+      loading: false
     });
     useSessionStore.setState({ 
       savedSessions: {},

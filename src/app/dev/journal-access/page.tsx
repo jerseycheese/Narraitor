@@ -52,43 +52,50 @@ export default function JournalAccessTestPage() {
         savedSessions: {}
       });
       
+      const timestamp = getTimestamp();
+      const testCharacter = {
+        id: 'test-char-1',
+        name: 'Test Adventurer',
+        description: 'A brave explorer testing journal access functionality',
+        worldId: 'test-world-1',
+        level: 1,
+        isPlayer: true,
+        attributes: [],
+        skills: [],
+        background: {
+          history: 'A brave explorer testing journal access',
+          personality: 'Curious and methodical',
+          goals: ['Master the journal system'],
+          fears: ['Missing important story details'],
+          physicalDescription: 'A determined adventurer with keen eyes',
+          relationships: [],
+          isKnownFigure: false
+        },
+        inventory: {
+          characterId: 'test-char-1',
+          items: [],
+          capacity: 10,
+          categories: []
+        },
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+          location: 'Test Area'
+        },
+        createdAt: timestamp,
+        updatedAt: timestamp
+      };
+
       useCharacterStore.setState({
         characters: {
-          'test-char-1': {
-            id: 'test-char-1',
-            name: 'Test Adventurer',
-            description: 'A brave explorer testing journal access functionality',
-            worldId: 'test-world-1',
-            level: 1,
-            isPlayer: true,
-            attributes: [],
-            skills: [],
-            background: {
-              history: 'A brave explorer testing journal access',
-              personality: 'Curious and methodical',
-              goals: ['Master the journal system'],
-              fears: ['Missing important story details'],
-              physicalDescription: 'A determined adventurer with keen eyes',
-              relationships: [],
-              isKnownFigure: false
-            },
-            inventory: {
-              characterId: 'test-char-1',
-              items: [],
-              capacity: 10,
-              categories: []
-            },
-            status: {
-              health: 100,
-              maxHealth: 100,
-              conditions: [],
-              location: 'Test Area'
-            },
-            createdAt: getTimestamp(),
-            updatedAt: getTimestamp()
-          }
+          'test-char-1': testCharacter
+        },
+        entities: {
+          'test-char-1': testCharacter
         },
         currentCharacterId: 'test-char-1',
+        currentEntityId: 'test-char-1',
         error: null,
         loading: false
       });
@@ -106,7 +113,9 @@ export default function JournalAccessTestPage() {
       
       useCharacterStore.setState({
         characters: {},
+        entities: {},
         currentCharacterId: null,
+        currentEntityId: null,
         error: null,
         loading: false
       });

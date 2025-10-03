@@ -453,18 +453,23 @@ describe('Store Integration', () => {
         retryable: false,
         type: ErrorType.UNKNOWN,
       });
-      useCharacterStore.getState().setError('Character error');
+      useCharacterStore.getState().setError({
+        title: 'Character error',
+        message: 'Character error',
+        retryable: false,
+        type: ErrorType.UNKNOWN,
+      });
       useInventoryStore.getState().setError('Inventory error');
 
       // Each store should maintain its own error state
       expect(useWorldStore.getState().error?.title).toBe('World error');
-      expect(useCharacterStore.getState().error).toBe('Character error');
+      expect(useCharacterStore.getState().error?.title).toBe('Character error');
       expect(useInventoryStore.getState().error).toBe('Inventory error');
 
       // Clearing one store's error shouldn't affect others
       useWorldStore.getState().clearError();
       expect(useWorldStore.getState().error).toBeNull();
-      expect(useCharacterStore.getState().error).toBe('Character error');
+      expect(useCharacterStore.getState().error?.title).toBe('Character error');
       expect(useInventoryStore.getState().error).toBe('Inventory error');
     });
   });

@@ -76,7 +76,9 @@ const meta: Meta<typeof ActiveGameSession> = {
       
       useCharacterStore.setState({
         characters: {},
+        entities: {},
         currentCharacterId: null,
+        currentEntityId: null,
         error: null,
         loading: false,
       });
@@ -302,7 +304,11 @@ export const ActiveGameplay: Story = {
       // Set up character and narrative
       useCharacterStore.setState({
         characters: { 'char-123': mockCharacter },
+        entities: { 'char-123': mockCharacter },
         currentCharacterId: 'char-123',
+        currentEntityId: 'char-123',
+        error: null,
+        loading: false,
       });
       useSessionStore.setState({ characterId: 'char-123' });
       populateNarrativeStore(mockSegments, [mockDecision]);
@@ -330,7 +336,11 @@ export const NoChoicesAvailable: Story = {
       // Character assigned - should show journal button and custom input
       useCharacterStore.setState({
         characters: { 'char-123': mockCharacter },
+        entities: { 'char-123': mockCharacter },
         currentCharacterId: 'char-123',
+        currentEntityId: 'char-123',
+        error: null,
+        loading: false,
       });
       useSessionStore.setState({ characterId: 'char-123' });
       populateNarrativeStore(mockSegments, []); // No decisions
@@ -363,7 +373,11 @@ export const MajorDecision: Story = {
       // Set up character and major decision
       useCharacterStore.setState({
         characters: { 'char-123': mockCharacter },
+        entities: { 'char-123': mockCharacter },
         currentCharacterId: 'char-123',
+        currentEntityId: 'char-123',
+        error: null,
+        loading: false,
       });
       useSessionStore.setState({ characterId: 'char-123' });
       

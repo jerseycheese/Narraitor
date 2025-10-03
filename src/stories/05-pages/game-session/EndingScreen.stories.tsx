@@ -146,7 +146,10 @@ const withEndingState = (ending: StoryEnding) => {
   });
 
   useCharacterStore.setState({
-    characters: { 'char-123': mockCharacter }
+    characters: { 'char-123': mockCharacter },
+    entities: { 'char-123': mockCharacter },
+    currentCharacterId: 'char-123',
+    currentEntityId: 'char-123'
   });
 
   useWorldStore.setState({

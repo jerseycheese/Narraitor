@@ -36,7 +36,9 @@ const meta: Meta<typeof Navigation> = {
       
       useCharacterStore.setState({
         characters: {},
+        entities: {},
         currentCharacterId: null,
+        currentEntityId: null,
         error: null,
         loading: false,
       });
