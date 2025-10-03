@@ -117,3 +117,4 @@ narraitor-worktrees/
 
 # Serena (local tooling)
 .serena/
+build-output.log
