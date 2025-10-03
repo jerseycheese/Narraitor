@@ -45,16 +45,13 @@ const meta: Meta<typeof MobileNavigationMenu> = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      useWorldStore.setState({
-        worlds: {},
-        currentWorldId: null,
-        error: null,
-        loading: false,
-      });
+      useWorldStore.getState().reset();
       
       useCharacterStore.setState({
         characters: {},
+        entities: {},
         currentCharacterId: null,
+        currentEntityId: null,
         error: null,
         loading: false,
       });
@@ -296,4 +293,3 @@ export const WithActiveWorld: Story = {
     }
   }
 };
-

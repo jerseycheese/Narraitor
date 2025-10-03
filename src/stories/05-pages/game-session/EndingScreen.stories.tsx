@@ -146,11 +146,15 @@ const withEndingState = (ending: StoryEnding) => {
   });
 
   useCharacterStore.setState({
-    characters: { 'char-123': mockCharacter }
+    characters: { 'char-123': mockCharacter },
+    entities: { 'char-123': mockCharacter },
+    currentCharacterId: 'char-123',
+    currentEntityId: 'char-123'
   });
 
   useWorldStore.setState({
-    worlds: { 'world-456': mockWorld }
+    worlds: { 'world-456': mockWorld },
+    entities: { 'world-456': mockWorld }
   });
 
   // Mock fetch API for ending image generation

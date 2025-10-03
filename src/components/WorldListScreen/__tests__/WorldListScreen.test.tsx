@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { World } from '../../../types/world.types';
+import { UserFriendlyError } from '@/lib/utils/errorUtils';
 
 // Create mock functions at the module level
 const mockFetchWorlds = jest.fn();
@@ -61,9 +62,11 @@ jest.mock('../../DeleteConfirmationDialog/DeleteConfirmationDialog', () => {
 // Mock worldStore properly
 type MockWorldStore = {
   worlds: Record<string, World>;
+  entities: Record<string, World>;
   currentWorldId: string | null;
+  currentEntityId: string | null;
   loading: boolean;
-  error: string | null;
+  error: UserFriendlyError | null;
   fetchWorlds: jest.Mock;
   setCurrentWorld: jest.Mock;
   deleteWorld: jest.Mock;
@@ -71,7 +74,9 @@ type MockWorldStore = {
 
 let mockState: MockWorldStore = {
   worlds: {},
+  entities: {},
   currentWorldId: null,
+  currentEntityId: null,
   loading: false,
   error: null,
   fetchWorlds: mockFetchWorlds,
@@ -142,7 +147,9 @@ describe('WorldListScreen', () => {
     // Reset mock state
     mockState = {
       worlds: {},
+      entities: {},
       currentWorldId: null,
+      currentEntityId: null,
       loading: false,
       error: null,
       fetchWorlds: mockFetchWorlds,
@@ -157,7 +164,9 @@ describe('WorldListScreen', () => {
   test('shows empty message when no worlds are available', () => {
     mockGetState.mockReturnValue({
       worlds: {},
+      entities: {},
       currentWorldId: null,
+      currentEntityId: null,
       loading: false,
       error: null,
       fetchWorlds: mockFetchWorlds,
@@ -210,6 +219,7 @@ describe('WorldListScreen', () => {
     };
 
     mockState.worlds = mockWorlds;
+    mockState.entities = mockWorlds;
     mockState.loading = false;
     mockState.error = null;
 
@@ -222,6 +232,7 @@ describe('WorldListScreen', () => {
 
   test('renders empty message when no worlds are available', () => {
     mockState.worlds = {};
+    mockState.entities = {};
     mockState.loading = false;
     mockState.error = null;
 
@@ -258,7 +269,9 @@ describe('WorldListScreen', () => {
     // Set up the mock implementation
     mockGetState.mockImplementation(() => ({
       worlds: mockWorlds,
+      entities: mockWorlds,
       currentWorldId: null,
+      currentEntityId: null,
       loading: false,
       error: null,
       fetchWorlds: mockFetchWorlds,
@@ -271,10 +284,8 @@ describe('WorldListScreen', () => {
     // Simulate selecting a world
     const selectButton = screen.getByRole('button', { name: /Select/i });
     await user.click(selectButton);
-    
-    // Check setState was called
-    const mockStore = jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction;
-    expect(mockStore.setState).toHaveBeenCalled();
+
+    expect(mockSetCurrentWorld).toHaveBeenCalledWith('1');
 
     // Simulate deleting a world
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
@@ -292,7 +303,6 @@ describe('WorldListScreen', () => {
     const confirmButton = screen.getByRole('button', { name: /Confirm/i });
     await user.click(confirmButton);
     
-    // Check setState was called for deletion
-    expect(mockStore.setState).toHaveBeenCalledTimes(2);
+    expect(mockDeleteWorld).toHaveBeenCalledWith('1');
   });
 });

@@ -66,10 +66,14 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     if (!newState.worlds) {
       newState.worlds = {};
     }
+
+    if (!newState.entities) {
+      newState.entities = {};
+    }
     
     // Add the new world to the state
     const now = getTimestamp();
-    newState.worlds[worldId] = {
+    const world = {
       id: worldId,
       name: worldName || template.name,
       description: template.description,
@@ -85,6 +89,8 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
       createdAt: now,
       updatedAt: now
     };
+    newState.worlds[worldId] = world;
+    newState.entities[worldId] = world;
     
     return newState;
   });

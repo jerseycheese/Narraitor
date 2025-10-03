@@ -13,9 +13,17 @@ const createMockFn = (returnValue?: unknown) => {
 
 const mockState = {
   characters: {},
+  entities: {},
   currentCharacterId: null,
+  currentEntityId: null,
   error: null,
   loading: false,
+  create: createMockFn('char-123'),
+  update: createMockFn(),
+  delete: createMockFn(),
+  setCurrent: createMockFn(),
+  getById: createMockFn(null),
+  getAll: createMockFn([]),
   createCharacter: createMockFn('char-123'),
   updateCharacter: createMockFn(),
   deleteCharacter: createMockFn(),

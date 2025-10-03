@@ -67,12 +67,19 @@ export const createMockStoreState = (options: MockStoreOptions) => {
       // Empty state
       useWorldStore.setState({ 
         worlds: {}, 
+        entities: {},
         currentWorldId: null,
-        setCurrentWorld: (id: string) => console.log('Set world:', id),
+        currentEntityId: null,
+        setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
       useCharacterStore.setState({ 
         characters: {},
-        setCurrentCharacter: (id: string) => console.log('Set character:', id),
+        entities: {},
+        currentCharacterId: null,
+        currentEntityId: null,
+        error: null,
+        loading: false,
+        setCurrentCharacter: (id: string | null) => console.log('Set character:', id),
       });
       useSessionStore.setState({ 
         savedSessions: {},
@@ -93,12 +100,19 @@ export const createMockStoreState = (options: MockStoreOptions) => {
 
       useWorldStore.setState({ 
         worlds: { [mockWorld.id]: mockWorld },
+        entities: { [mockWorld.id]: mockWorld },
         currentWorldId: null,
-        setCurrentWorld: (id: string) => console.log('Set world:', id),
+        currentEntityId: null,
+        setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
       useCharacterStore.setState({ 
         characters: { [mockCharacter.id]: mockCharacter },
-        setCurrentCharacter: (id: string) => console.log('Set character:', id),
+        entities: { [mockCharacter.id]: mockCharacter },
+        currentCharacterId: mockCharacter.id,
+        currentEntityId: mockCharacter.id,
+        error: null,
+        loading: false,
+        setCurrentCharacter: (id: string | null) => console.log('Set character:', id),
       });
       useSessionStore.setState({ 
         savedSessions: { [mockSavedSession.id]: mockSavedSession },

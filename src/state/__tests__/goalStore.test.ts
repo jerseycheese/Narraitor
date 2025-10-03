@@ -2,12 +2,14 @@
 
 import { useGoalStore } from '../goalStore';
 import { GoalStatus, GoalPriority, GoalType } from '../../types/goal.types';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('goalStore', () => {
   beforeEach(() => {
     // Reset store state before each test
     useGoalStore.setState({
       goals: {},
+      entities: {},
       sessionGoals: {},
       activeGoalIds: [],
       error: null,
@@ -88,7 +90,7 @@ describe('goalStore', () => {
 
       const state = useGoalStore.getState();
       expect(state.goals[goalId]).toBeUndefined();
-      expect(state.sessionGoals['session-123']).not.toContain(goalId);
+      expect(state.sessionGoals['session-123']).toBeUndefined();
       expect(state.activeGoalIds).not.toContain(goalId);
     });
   });
@@ -316,9 +318,10 @@ describe('goalStore', () => {
 
   describe('Error Handling', () => {
     test('should handle invalid goal updates', () => {
-      expect(() => {
-        useGoalStore.getState().updateGoal('nonexistent-id', { title: 'New Title' });
-      }).toThrow('Goal not found');
+      useGoalStore.getState().updateGoal('nonexistent-id', { title: 'New Title' });
+      const state = useGoalStore.getState();
+      expect(state.error?.title).toBe('Goal Not Found');
+      expect(state.error?.message).toBe('The specified goal could not be found.');
     });
 
     test('should validate required fields', () => {
@@ -337,8 +340,13 @@ describe('goalStore', () => {
 
     test('should handle persistence errors gracefully', () => {
       // Simulate error by setting error state
-      useGoalStore.getState().setError('Persistence failed');
-      expect(useGoalStore.getState().error).toBe('Persistence failed');
+      useGoalStore.getState().setError({
+        title: 'Persistence failed',
+        message: 'Persistence failed',
+        retryable: false,
+        type: ErrorType.UNKNOWN
+      });
+      expect(useGoalStore.getState().error?.title).toBe('Persistence failed');
       
       // Clear error
       useGoalStore.getState().clearError();

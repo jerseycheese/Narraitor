@@ -1,25 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { 
-  LoreFact, 
-  LoreSearchOptions, 
+import type {
+  LoreFact,
+  LoreSearchOptions,
   LoreContext,
   LoreCategory,
   LoreSource,
-  StructuredLoreExtraction 
+  StructuredLoreExtraction,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
+import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { CrudStore } from './createCrudStore';
 
 /**
  * Helper function to generate normalized lore keys
  */
 function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
   const normalizedName = normalizeText(name, NORM_NAME).toLowerCase().replace(/[^a-z0-9]+/g, '_');
-  
   const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
   return `${worldId}:${category}_${truncatedName}`;
 }
@@ -45,22 +46,28 @@ interface FactHistory {
 /**
  * Lore store for tracking narrative facts
  */
-export interface LoreStore {
-  // State
+export interface LoreStore extends CrudStore<LoreFact> {
   facts: Record<EntityID, LoreFact>;
   factHistory: Record<EntityID, FactHistory>;
-  
-  // Core Operations
-  addFact: (key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, sessionId?: EntityID, metadata?: LoreFact['metadata']) => void;
+  error: UserFriendlyError | null;
+  loading: boolean;
+
+  addFact: (
+    key: string,
+    value: string,
+    category: LoreCategory,
+    source: LoreSource,
+    worldId: EntityID,
+    sessionId?: EntityID,
+    metadata?: LoreFact['metadata']
+  ) => void;
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
-  
-  // Path Count Optimization
+
   cleanupOldFacts: (worldId: EntityID, keepRecentCount?: number) => void;
   compactFactHistory: (maxVersionsPerFact?: number) => void;
   getFactsCount: (worldId?: EntityID) => number;
-  
-  // Enhanced Developer Operations
+
   updateFact: (id: EntityID, updates: Partial<LoreFact>) => void;
   deleteFact: (id: EntityID) => void;
   validateFactUniqueness: (worldId: EntityID, key: string, value: string) => boolean;
@@ -69,422 +76,514 @@ export interface LoreStore {
   exportFacts: (worldId: EntityID) => string;
   importFacts: (worldId: EntityID, jsonData: string) => void;
   getFactHistory: (id: EntityID) => LoreFact[];
-  
-  // Validation
+
   validateFact: (fact: Partial<FactValidation>) => boolean;
   validateKey: (key: string) => boolean;
-  
-  // AI Integration
+
   getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
-  
-  // Structured extraction
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
 }
 
+const getInitialState = () => ({
+  facts: {} as Record<EntityID, LoreFact>,
+  entities: {} as Record<EntityID, LoreFact>,
+  factHistory: {} as Record<EntityID, FactHistory>,
+  currentEntityId: null as EntityID | null,
+  error: null as UserFriendlyError | null,
+  loading: false,
+});
 
-/**
- * Lore store implementation
- */
+const initialState = getInitialState();
+
 export const useLoreStore = create<LoreStore>()(
   persist(
-    (set, get) => ({
-      facts: {},
-      factHistory: {},
+    (set, get) => {
+      const createLoreError = (
+        title: string,
+        message: string,
+        type: ErrorType = ErrorType.VALIDATION,
+        retryable = false
+      ): UserFriendlyError => ({
+        title,
+        message,
+        retryable,
+        type,
+      });
 
-      addFact: (key, value, category, source, worldId, sessionId, metadata) => {
-        const id = generateUniqueId();
-        const now = getTimestamp();
-        
-        const newFact: LoreFact = {
-          id,
-          key,
-          value,
-          category,
-          source,
-          worldId,
-          sessionId,
-          metadata,
-          createdAt: now,
-          updatedAt: now,
-        };
+      return {
+        ...initialState,
 
-        set((state) => ({
-          facts: { ...state.facts, [id]: newFact },
-          factHistory: { 
-            ...state.factHistory, 
-            [id]: { factId: id, versions: [newFact] } 
+        create: (factData) => {
+          const id = generateUniqueId();
+          const now = getTimestamp();
+          const newFact: LoreFact = {
+            ...factData,
+            id,
+            createdAt: now,
+            updatedAt: now,
+          };
+
+          set((state) => ({
+            facts: { ...state.facts, [id]: newFact },
+            entities: { ...state.entities, [id]: newFact },
+            factHistory: {
+              ...state.factHistory,
+              [id]: { factId: id, versions: [newFact] },
+            },
+            error: null,
+          }));
+
+          return id;
+        },
+
+        update: (id, updates) => {
+          const fact = get().facts[id];
+          if (!fact) {
+            set({ error: createLoreError('Lore Fact Not Found', 'The specified lore fact could not be found.') });
+            return;
           }
-        }));
-      },
 
-      getFacts: (options) => {
-        const { facts } = get();
-        let results = Object.values(facts);
+          const updatedFact: LoreFact = {
+            ...fact,
+            ...updates,
+            id,
+            createdAt: fact.createdAt,
+            updatedAt: getTimestamp(),
+          };
 
-        if (options?.worldId) {
-          results = results.filter(fact => fact.worldId === options.worldId);
-        }
+          const previousHistory = get().factHistory[id]?.versions ?? [];
 
-        if (options?.category) {
-          results = results.filter(fact => fact.category === options.category);
-        }
+          set((state) => ({
+            facts: { ...state.facts, [id]: updatedFact },
+            entities: { ...state.entities, [id]: updatedFact },
+            factHistory: {
+              ...state.factHistory,
+              [id]: {
+                factId: id,
+                versions: [...previousHistory, updatedFact],
+              },
+            },
+            error: null,
+          }));
+        },
 
-        if (options?.sessionId) {
-          results = results.filter(fact => fact.sessionId === options.sessionId);
-        }
+        delete: (id) => {
+          if (!get().facts[id]) {
+            return;
+          }
 
-        return results.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      },
+          set((state) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _removedFact, ...remainingFacts } = state.facts;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _removedHistory, ...remainingHistory } = state.factHistory;
+            const shouldResetCurrent = state.currentEntityId === id;
 
-      clearFacts: (worldId) => {
-        const { facts } = get();
-        const remainingFacts = Object.entries(facts)
-          .filter(([, fact]) => fact.worldId !== worldId)
-          .reduce((acc, [id, fact]) => ({ ...acc, [id]: fact }), {});
-        
-        set({ facts: remainingFacts });
-      },
+            return {
+              facts: remainingFacts,
+              entities: remainingEntities,
+              factHistory: remainingHistory,
+              currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
+              error: null,
+            };
+          });
+        },
 
-      getLoreContext: (worldId, limit = 10) => {
-        const worldFacts = get().getFacts({ worldId });
-        const recentFacts = worldFacts.slice(0, limit);
-        
-        const factStrings = recentFacts.map(fact => 
-          `${fact.category}: ${fact.key} = ${fact.value}`
-        );
+        setCurrent: (id) => {
+          if (id && !get().facts[id]) {
+            set({
+              error: createLoreError('Lore Fact Not Found', 'The specified lore fact could not be found.'),
+              currentEntityId: null,
+            });
+            return;
+          }
 
-        return {
-          facts: factStrings,
-          factCount: factStrings.length,
-        };
-      },
+          set({ currentEntityId: id ?? null, error: null });
+        },
 
-      addStructuredLore: (extraction, worldId, sessionId) => {
-        const { addFact, getFacts } = get();
-        
-        // Get existing facts to avoid duplicates
-        const existingFacts = getFacts({ worldId });
-        const existingKeys = new Set(existingFacts.map(f => f.key));
-        
-        // Add characters
-        extraction.characters.forEach(char => {
-          const key = generateLoreKey(worldId, 'character', char.name);
-          if (!existingKeys.has(key)) {
-            addFact(
-              key, 
-              char.name, 
-              'characters', 
-              'narrative', 
-              worldId, 
-              sessionId,
-              {
+        getById: (id) => get().facts[id],
+        getAll: () => Object.values(get().facts),
+
+        reset: () => set(getInitialState()),
+
+        setError: (error) => set({ error }),
+        clearError: () => set({ error: null }),
+        setLoading: (loading) => set({ loading }),
+
+        addFact: (key, value, category, source, worldId, sessionId, metadata) => {
+          if (!get().validateFact({ key, value, category, worldId })) {
+            set({ error: createLoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
+            return;
+          }
+
+          if (!get().validateKey(key)) {
+            set({
+              error: createLoreError(
+                'Invalid Lore Key',
+                'Lore keys must start with a letter and contain only letters, numbers, or underscores.'
+              ),
+            });
+            return;
+          }
+
+          if (!get().validateFactUniqueness(worldId, key, value)) {
+            set({
+              error: createLoreError(
+                'Duplicate Lore Fact',
+                'A lore fact with this key and value already exists for this world.'
+              ),
+            });
+            return;
+          }
+
+          get().create({
+            key,
+            value,
+            category,
+            source,
+            worldId,
+            sessionId,
+            metadata,
+          });
+        },
+
+        getFacts: (options) => {
+          const facts = get().facts;
+          let results = Object.values(facts);
+
+          if (options?.worldId) {
+            results = results.filter((fact) => fact.worldId === options.worldId);
+          }
+
+          if (options?.category) {
+            results = results.filter((fact) => fact.category === options.category);
+          }
+
+          if (options?.sessionId) {
+            results = results.filter((fact) => fact.sessionId === options.sessionId);
+          }
+
+          return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        },
+
+        clearFacts: (worldId) => {
+          const facts = get().facts;
+          const factHistory = get().factHistory;
+
+          const remainingFacts = Object.fromEntries(
+            Object.entries(facts).filter(([, fact]) => fact.worldId !== worldId)
+          );
+
+          const remainingHistory = Object.fromEntries(
+            Object.entries(factHistory).filter(([factId]) => factId in remainingFacts)
+          );
+
+          set((state) => ({
+            facts: remainingFacts,
+            entities: remainingFacts,
+            factHistory: remainingHistory,
+            currentEntityId:
+              state.currentEntityId && !(state.currentEntityId in remainingFacts)
+                ? null
+                : state.currentEntityId,
+            error: null,
+          }));
+        },
+
+        getLoreContext: (worldId, limit = 10) => {
+          const worldFacts = get().getFacts({ worldId });
+          const recentFacts = worldFacts.slice(0, limit);
+
+          const factStrings = recentFacts.map((fact) => `${fact.category}: ${fact.key} = ${fact.value}`);
+
+          return {
+            facts: factStrings,
+            factCount: factStrings.length,
+          };
+        },
+
+        addStructuredLore: (extraction, worldId, sessionId) => {
+          const { addFact, getFacts } = get();
+
+          const existingFacts = getFacts({ worldId });
+          const existingKeys = new Set(existingFacts.map((fact) => fact.key));
+
+          extraction.characters.forEach((char) => {
+            const key = generateLoreKey(worldId, 'character', char.name);
+            if (!existingKeys.has(key)) {
+              addFact(key, char.name, 'characters', 'narrative', worldId, sessionId, {
                 description: char.description,
                 type: char.role,
                 importance: char.importance || 'medium',
-                tags: char.tags
-              }
-            );
-          }
-        });
-        
-        // Add locations
-        extraction.locations.forEach(loc => {
-          const key = generateLoreKey(worldId, 'location', loc.name);
-          if (!existingKeys.has(key)) {
-            addFact(
-              key, 
-              loc.name, 
-              'locations', 
-              'narrative', 
-              worldId, 
-              sessionId,
-              {
+                tags: char.tags,
+              });
+            }
+          });
+
+          extraction.locations.forEach((loc) => {
+            const key = generateLoreKey(worldId, 'location', loc.name);
+            if (!existingKeys.has(key)) {
+              addFact(key, loc.name, 'locations', 'narrative', worldId, sessionId, {
                 description: loc.description,
                 type: loc.type,
                 importance: loc.importance || 'medium',
-                tags: loc.tags
-              }
-            );
-          }
-        });
-        
-        // Add events
-        extraction.events.forEach(event => {
-          const key = generateLoreKey(worldId, 'event', event.description, 30);
-          if (!existingKeys.has(key)) {
-            addFact(
-              key, 
-              event.description, 
-              'events', 
-              'narrative', 
-              worldId, 
-              sessionId,
-              {
-                description: event.significance,
-                importance: event.importance || 'medium',
-                relatedEntities: event.relatedEntities
-              }
-            );
-          }
-        });
-        
-        // Add rules
-        extraction.rules.forEach(rule => {
-          const key = generateLoreKey(worldId, 'rule', rule.rule, 30);
-          if (!existingKeys.has(key)) {
-            addFact(
-              key, 
-              rule.rule, 
-              'rules', 
-              'narrative', 
-              worldId, 
-              sessionId,
-              {
-                description: rule.context,
-                importance: rule.importance || 'medium',
-                tags: rule.tags
-              }
-            );
-          }
-        });
-      },
-
-      // Enhanced Developer Operations
-      updateFact: (id, updates) => {
-        const { facts, factHistory } = get();
-        const existingFact = facts[id];
-        
-        if (!existingFact) return;
-
-        const updatedFact = {
-          ...existingFact,
-          ...updates,
-          id: existingFact.id, // Preserve ID
-          createdAt: existingFact.createdAt, // Preserve creation time
-          updatedAt: getTimestamp()
-        };
-
-        const history = factHistory[id] || { factId: id, versions: [] };
-        history.versions.push(updatedFact);
-
-        set((state) => ({
-          facts: { ...state.facts, [id]: updatedFact },
-          factHistory: { ...state.factHistory, [id]: history }
-        }));
-      },
-
-      deleteFact: (id) => {
-        const { facts } = get();
-        if (!facts[id]) return;
-        
-        set((state) => {
-          const newFacts = { ...state.facts };
-          const newHistory = { ...state.factHistory };
-          delete newFacts[id];
-          delete newHistory[id];
-          return {
-            facts: newFacts,
-            factHistory: newHistory
-          };
-        });
-      },
-
-      validateFactUniqueness: (worldId, key, value) => {
-        const { facts } = get();
-        const worldFacts = Object.values(facts).filter(f => f.worldId === worldId);
-        
-        // Check for exact duplicate
-        const hasDuplicate = worldFacts.some(f => 
-          f.key === key && f.value === value
-        );
-        
-        return !hasDuplicate; // Return true if unique, false if duplicate
-      },
-
-      findSimilarFacts: (worldId, value) => {
-        const { facts } = get();
-        const worldFacts = Object.values(facts).filter(f => f.worldId === worldId);
-        const normalizedValue = normalizeText(value, NORM_NAME).toLowerCase();
-
-        return worldFacts.filter(fact => {
-          const normalizedFactValue = normalizeText(fact.value, NORM_NAME).toLowerCase();
-          
-          return normalizedFactValue === normalizedValue;
-        });
-      },
-
-      searchFacts: (query, options) => {
-        const { facts } = get();
-        let results = Object.values(facts);
-        
-        // Apply search options filters first
-        if (options?.worldId) {
-          results = results.filter(fact => fact.worldId === options.worldId);
-        }
-        
-        if (options?.category) {
-          results = results.filter(fact => fact.category === options.category);
-        }
-        
-        if (options?.sessionId) {
-          results = results.filter(fact => fact.sessionId === options.sessionId);
-        }
-        
-        // Apply text search
-        const normalizedQuery = query.toLowerCase();
-        results = results.filter(fact => 
-          fact.value.toLowerCase().includes(normalizedQuery) ||
-          fact.key.toLowerCase().includes(normalizedQuery) ||
-          fact.metadata?.description?.toLowerCase().includes(normalizedQuery) ||
-          fact.metadata?.tags?.some(tag => tag.toLowerCase().includes(normalizedQuery))
-        );
-        
-        return results.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      },
-
-      exportFacts: (worldId) => {
-        const facts = get().getFacts({ worldId });
-        const exportData = {
-          worldId,
-          exportedAt: getTimestamp(),
-          facts: facts.map(fact => ({
-            key: fact.key,
-            value: fact.value,
-            category: fact.category,
-            source: fact.source,
-            metadata: fact.metadata
-          }))
-        };
-        
-        return JSON.stringify(exportData, null, 2);
-      },
-
-      importFacts: (worldId, jsonData) => {
-        try {
-          const data = JSON.parse(jsonData);
-          const { addFact, validateFactUniqueness } = get();
-          
-          if (!data.facts || !Array.isArray(data.facts)) {
-            throw new Error('Invalid import data structure');
-          }
-          
-          data.facts.forEach((fact: {
-            key: string;
-            value: string;
-            category: LoreCategory;
-            source?: LoreSource;
-            metadata?: {
-              description?: string;
-              importance?: 'low' | 'medium' | 'high';
-              tags?: string[];
-              relatedEntities?: string[];
-              type?: string;
-            };
-          }) => {
-            // Check if fact already exists
-            if (validateFactUniqueness(worldId, fact.key, fact.value)) {
-              addFact(
-                fact.key,
-                fact.value,
-                fact.category,
-                fact.source || 'manual',
-                worldId,
-                undefined,
-                fact.metadata
-              );
+                tags: loc.tags,
+              });
             }
           });
-        } catch (error) {
-          // Wrap the error with additional context about the import operation
-          throw new Error(`Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
 
-      getFactHistory: (id) => {
-        const { factHistory } = get();
-        const history = factHistory[id];
-        return history ? history.versions : [];
-      },
+          extraction.events.forEach((event) => {
+            const key = generateLoreKey(worldId, 'event', event.description, 30);
+            if (!existingKeys.has(key)) {
+              addFact(key, event.description, 'events', 'narrative', worldId, sessionId, {
+                description: event.significance,
+                importance: event.importance || 'medium',
+                relatedEntities: event.relatedEntities,
+              });
+            }
+          });
 
-      validateFact: (fact) => {
-        const validCategories: LoreCategory[] = ['characters', 'locations', 'events', 'rules'];
-        
-        if (!fact.key || fact.key.trim() === '') return false;
-        if (!fact.value || fact.value.trim() === '') return false;
-        if (!fact.category || !validCategories.includes(fact.category)) return false;
-        if (!fact.worldId || fact.worldId.trim() === '') return false;
-        
-        return true;
-      },
+          extraction.rules.forEach((rule) => {
+            const key = generateLoreKey(worldId, 'rule', rule.rule, 30);
+            if (!existingKeys.has(key)) {
+              addFact(key, rule.rule, 'rules', 'narrative', worldId, sessionId, {
+                description: rule.context,
+                importance: rule.importance || 'medium',
+                tags: rule.tags,
+              });
+            }
+          });
+        },
 
-      validateKey: (key) => {
-        // Key should be alphanumeric with underscores, not starting with a number
-        const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-        return keyPattern.test(key);
-      },
+        updateFact: (id, updates) => get().update(id, updates),
+        deleteFact: (id) => get().delete(id),
 
-      // Path Count Optimization Methods
-      cleanupOldFacts: (worldId, keepRecentCount = 50) => {
-        const { facts, factHistory } = get();
-        const worldFacts = Object.entries(facts)
-          .filter(([, fact]) => fact.worldId === worldId)
-          .sort(([, a], [, b]) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        validateFactUniqueness: (worldId, key, value) => {
+          const facts = get().facts;
+          const worldFacts = Object.values(facts).filter((fact) => fact.worldId === worldId);
+          return !worldFacts.some((fact) => fact.key === key && fact.value === value);
+        },
 
-        if (worldFacts.length <= keepRecentCount) {
-          return; // No cleanup needed
-        }
+        findSimilarFacts: (worldId, value) => {
+          const facts = get().facts;
+          const worldFacts = Object.values(facts).filter((fact) => fact.worldId === worldId);
+          const normalizedValue = normalizeText(value, NORM_NAME).toLowerCase();
 
-        const factsToRemove = worldFacts.slice(keepRecentCount);
-        
-        const newFacts = { ...facts };
-        const newHistory = { ...factHistory };
+          return worldFacts.filter((fact) => {
+            const normalizedFactValue = normalizeText(fact.value, NORM_NAME).toLowerCase();
+            return normalizedFactValue === normalizedValue;
+          });
+        },
 
-        factsToRemove.forEach(([factId]) => {
-          delete newFacts[factId];
-          delete newHistory[factId];
-        });
+        searchFacts: (query, options) => {
+          const facts = get().facts;
+          const normalizedQuery = query.toLowerCase();
 
-        set({ facts: newFacts, factHistory: newHistory });
-      },
+          let results = Object.values(facts);
 
-      compactFactHistory: (maxVersionsPerFact = 3) => {
-        const { factHistory } = get();
-        const compactedHistory: Record<EntityID, FactHistory> = {};
+          if (options?.worldId) {
+            results = results.filter((fact) => fact.worldId === options.worldId);
+          }
 
-        Object.entries(factHistory).forEach(([factId, history]) => {
-          // Keep only the most recent versions
-          const recentVersions = history.versions
-            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-            .slice(0, maxVersionsPerFact);
+          if (options?.category) {
+            results = results.filter((fact) => fact.category === options.category);
+          }
 
-          compactedHistory[factId] = {
-            factId: history.factId,
-            versions: recentVersions
+          if (options?.sessionId) {
+            results = results.filter((fact) => fact.sessionId === options.sessionId);
+          }
+
+          results = results.filter((fact) =>
+            fact.value.toLowerCase().includes(normalizedQuery) ||
+            fact.key.toLowerCase().includes(normalizedQuery) ||
+            fact.metadata?.description?.toLowerCase().includes(normalizedQuery) ||
+            fact.metadata?.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))
+          );
+
+          return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        },
+
+        exportFacts: (worldId) => {
+          const facts = get().getFacts({ worldId });
+          const exportData = {
+            worldId,
+            exportedAt: getTimestamp(),
+            facts: facts.map((fact) => ({
+              key: fact.key,
+              value: fact.value,
+              category: fact.category,
+              source: fact.source,
+              metadata: fact.metadata,
+            })),
           };
-        });
 
-        set({ factHistory: compactedHistory });
-      },
+          return JSON.stringify(exportData, null, 2);
+        },
 
-      getFactsCount: (worldId) => {
-        const { facts } = get();
-        if (worldId) {
-          return Object.values(facts).filter(fact => fact.worldId === worldId).length;
-        }
-        return Object.keys(facts).length;
-      },
-    }),
+        importFacts: (worldId, jsonData) => {
+          try {
+            const data = JSON.parse(jsonData);
+            const { addFact, validateFactUniqueness } = get();
+
+            if (!data.facts || !Array.isArray(data.facts)) {
+              throw new Error('Invalid import data structure');
+            }
+
+            data.facts.forEach((fact: {
+              key: string;
+              value: string;
+              category: LoreCategory;
+              source?: LoreSource;
+              metadata?: {
+                description?: string;
+                importance?: 'low' | 'medium' | 'high';
+                tags?: string[];
+                relatedEntities?: string[];
+                type?: string;
+              };
+            }) => {
+              if (validateFactUniqueness(worldId, fact.key, fact.value)) {
+                addFact(
+                  fact.key,
+                  fact.value,
+                  fact.category,
+                  fact.source || 'manual',
+                  worldId,
+                  undefined,
+                  fact.metadata
+                );
+              }
+            });
+          } catch (error) {
+            set({
+              error: createLoreError(
+                'Lore Import Failed',
+                error instanceof Error ? error.message : 'Unknown import error occurred.',
+                ErrorType.SERVICE
+              ),
+            });
+            throw new Error(
+              `Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`
+            );
+          }
+        },
+
+        getFactHistory: (id) => {
+          const history = get().factHistory[id];
+          return history ? history.versions : [];
+        },
+
+        validateFact: (fact) => {
+          const validCategories: LoreCategory[] = ['characters', 'locations', 'events', 'rules'];
+          if (!fact.key || fact.key.trim() === '') return false;
+          if (!fact.value || fact.value.trim() === '') return false;
+          if (!fact.category || !validCategories.includes(fact.category)) return false;
+          if (!fact.worldId || fact.worldId.trim() === '') return false;
+          return true;
+        },
+
+        validateKey: (key) => {
+          if (key.includes(':')) {
+            const structuredPattern = /^[a-zA-Z0-9-]+:[a-zA-Z0-9:_-]+$/;
+            return structuredPattern.test(key);
+          }
+          const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+          return keyPattern.test(key);
+        },
+
+        cleanupOldFacts: (worldId, keepRecentCount = 50) => {
+          const facts = get().facts;
+          const factHistory = get().factHistory;
+
+          const worldFacts = Object.entries(facts)
+            .filter(([, fact]) => fact.worldId === worldId)
+            .sort(([, a], [, b]) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+          if (worldFacts.length <= keepRecentCount) {
+            return;
+          }
+
+          const factsToRemove = worldFacts.slice(keepRecentCount);
+          const idsToRemove = new Set(factsToRemove.map(([factId]) => factId));
+
+          const remainingFacts = Object.fromEntries(
+            Object.entries(facts).filter(([factId]) => !idsToRemove.has(factId))
+          );
+
+          const remainingHistory = Object.fromEntries(
+            Object.entries(factHistory).filter(([factId]) => !idsToRemove.has(factId))
+          );
+
+          set((state) => ({
+            facts: remainingFacts,
+            entities: remainingFacts,
+            factHistory: remainingHistory,
+            currentEntityId:
+              state.currentEntityId && idsToRemove.has(state.currentEntityId) ? null : state.currentEntityId,
+          }));
+        },
+
+        compactFactHistory: (maxVersionsPerFact = 3) => {
+          const factHistory = get().factHistory;
+          const compactedHistory: Record<EntityID, FactHistory> = {};
+
+          Object.entries(factHistory).forEach(([factId, history]) => {
+            const recentVersions = history.versions
+              .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+              .slice(0, maxVersionsPerFact);
+
+            compactedHistory[factId] = {
+              factId: history.factId,
+              versions: recentVersions,
+            };
+          });
+
+          set({ factHistory: compactedHistory });
+        },
+
+        getFactsCount: (worldId) => {
+          const facts = get().facts;
+          if (worldId) {
+            return Object.values(facts).filter((fact) => fact.worldId === worldId).length;
+          }
+          return Object.keys(facts).length;
+        },
+      };
+    },
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
-      partialize: (state) => ({ 
+      version: 1,
+      partialize: (state) => ({
         facts: state.facts,
-        factHistory: state.factHistory 
+        factHistory: state.factHistory,
       }),
+      migrate: (persistedState: unknown) => {
+        if (persistedState && typeof persistedState === 'object' && 'facts' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.facts && typeof state.facts === 'object') {
+            state.entities = { ...state.facts };
+          }
+          if (state.currentEntityId && !(state.entities && state.entities[state.currentEntityId])) {
+            state.currentEntityId = null;
+          }
+          if (typeof state.error === 'string') {
+            state.error = {
+              title: state.error,
+              message: state.error,
+              retryable: false,
+              type: ErrorType.UNKNOWN,
+            };
+          }
+          if (typeof state.loading !== 'boolean') {
+            state.loading = false;
+          }
+        }
+        return persistedState as LoreStore;
+      },
     }
   )
 );

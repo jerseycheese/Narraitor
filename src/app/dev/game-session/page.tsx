@@ -217,9 +217,14 @@ export default function GameSessionTestHarness() {
     
     // Only create if they don't exist
     if (!worlds[mockWorld.id]) {
+      const entities = useWorldStore.getState().entities || {};
       useWorldStore.setState({
         worlds: {
           ...worlds,
+          [mockWorld.id]: mockWorld
+        },
+        entities: {
+          ...entities,
           [mockWorld.id]: mockWorld
         }
       });
@@ -227,11 +232,20 @@ export default function GameSessionTestHarness() {
     }
     
     if (!characters[mockCharacter.id]) {
+      const characterEntities = useCharacterStore.getState().entities || {};
       useCharacterStore.setState({
         characters: {
           ...characters,
           [mockCharacter.id]: mockCharacter
-        }
+        },
+        entities: {
+          ...characterEntities,
+          [mockCharacter.id]: mockCharacter
+        },
+        currentCharacterId: mockCharacter.id,
+        currentEntityId: mockCharacter.id,
+        error: null,
+        loading: false
       });
       logger.info('Test character created');
     }

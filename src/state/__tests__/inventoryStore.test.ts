@@ -9,6 +9,7 @@ describe('useInventoryStore', () => {
     test('should initialize with default state', () => {
       const state = useInventoryStore.getState();
       expect(state.items).toEqual({});
+      expect(state.entities).toEqual({});
       expect(state.characterInventories).toEqual({});
       expect(state.error).toBeNull();
       expect(state.loading).toBe(false);
@@ -99,7 +100,8 @@ describe('useInventoryStore', () => {
     test('should handle non-existent item', () => {
       useInventoryStore.getState().updateItem('non-existent-id', { name: 'Updated' });
       const state = useInventoryStore.getState();
-      expect(state.error).toBe('Item not found');
+      expect(state.error?.title).toBe('Item Not Found');
+      expect(state.error?.message).toBe('The specified inventory item could not be found.');
     });
   });
 

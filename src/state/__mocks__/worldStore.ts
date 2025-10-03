@@ -3,20 +3,48 @@ console.log('[__mocks__/worldStore.ts] Mock module loading');
 
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { formatForDebug, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 
 interface MockWorldState {
   worlds: Record<string, World>;
+  entities: Record<string, World>;
   currentWorldId: string | null;
-  error: string | null;
+  currentEntityId: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 }
 
 // Simulated store state
 let mockState: MockWorldState = {
   worlds: {},
+  entities: {},
   currentWorldId: null,
+  currentEntityId: null,
   error: null,
   loading: false
+};
+
+const createError = (
+  message: string,
+  {
+    title = message,
+    type = ErrorType.UNKNOWN,
+    retryable = false,
+  }: { title?: string; type?: ErrorType; retryable?: boolean } = {}
+): UserFriendlyError => ({
+  title,
+  message,
+  retryable,
+  type,
+});
+
+const syncWorldToEntities = (worldId: string) => {
+  const world = mockState.worlds[worldId];
+  if (world) {
+    mockState.entities[worldId] = world;
+  } else {
+    delete mockState.entities[worldId];
+  }
 };
 
 const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
@@ -51,6 +79,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   };
   
   mockState.worlds[worldId] = newWorld;
+  syncWorldToEntities(worldId);
   console.log('[__mocks__/worldStore.ts] Created world in mock state:', mockState.worlds[worldId]);
   return worldId;
 });
@@ -75,6 +104,13 @@ interface WorldStoreActions {
   clearError: jest.Mock;
   setLoading: jest.Mock;
   getWorldById: jest.Mock;
+  // CrudStore compatibility
+  create: jest.Mock;
+  update: jest.Mock;
+  delete: jest.Mock;
+  setCurrent: jest.Mock;
+  getById: jest.Mock;
+  getAll: jest.Mock;
 }
 
 type WorldStore = MockWorldState & WorldStoreActions;
@@ -83,7 +119,7 @@ type WorldStore = MockWorldState & WorldStoreActions;
 const mockUpdateWorld = jest.fn((worldId: string, updates: Partial<World>) => {
   console.log('[__mocks__/worldStore.ts] updateWorld called:', worldId, updates);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   mockState.worlds[worldId] = {
@@ -91,35 +127,40 @@ const mockUpdateWorld = jest.fn((worldId: string, updates: Partial<World>) => {
     ...updates,
     updatedAt: getTimestamp()
   };
+  syncWorldToEntities(worldId);
 });
 
 const mockDeleteWorld = jest.fn((worldId: string) => {
   console.log('[__mocks__/worldStore.ts] deleteWorld called:', worldId);
   if (mockState.currentWorldId === worldId) {
     mockState.currentWorldId = null;
+    mockState.currentEntityId = null;
   }
   delete mockState.worlds[worldId];
+  delete mockState.entities[worldId];
 });
 
 const mockSetCurrentWorld = jest.fn((worldId: string | null) => {
   console.log('[__mocks__/worldStore.ts] setCurrentWorld called:', worldId);
   if (worldId && !mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   mockState.currentWorldId = worldId;
+  mockState.currentEntityId = worldId;
+  mockState.error = null;
 });
 
 const mockAddAttribute = jest.fn((worldId: string, attribute: Partial<WorldAttribute>) => {
   console.log('[__mocks__/worldStore.ts] addAttribute called:', worldId, attribute);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
   if (world.attributes.length >= (world.settings?.maxAttributes || 10)) {
     console.log('[__mocks__/worldStore.ts] LIMIT REACHED - setting error "Maximum attributes limit reached"');
-    mockState.error = 'Maximum attributes limit reached';
+    mockState.error = createError('Maximum attributes limit reached', { type: ErrorType.VALIDATION });
     return;
   }
   const newAttribute: WorldAttribute = {
@@ -138,7 +179,7 @@ const mockAddAttribute = jest.fn((worldId: string, attribute: Partial<WorldAttri
 const mockUpdateAttribute = jest.fn((worldId: string, attributeId: string, updates: Partial<WorldAttribute>) => {
   console.log('[__mocks__/worldStore.ts] updateAttribute called:', worldId, attributeId, updates);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
@@ -146,28 +187,30 @@ const mockUpdateAttribute = jest.fn((worldId: string, attributeId: string, updat
   if (attr) {
     Object.assign(attr, updates);
   }
+  syncWorldToEntities(worldId);
 });
 
 const mockRemoveAttribute = jest.fn((worldId: string, attributeId: string) => {
   console.log('[__mocks__/worldStore.ts] removeAttribute called:', worldId, attributeId);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
   world.attributes = world.attributes.filter((a: WorldAttribute) => a.id !== attributeId);
+  syncWorldToEntities(worldId);
 });
 
 const mockAddSkill = jest.fn((worldId: string, skill: Partial<WorldSkill>) => {
   console.log('[__mocks__/worldStore.ts] addSkill called:', worldId, skill);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
   if (world.skills.length >= (world.settings?.maxSkills || 10)) {
     console.log('[__mocks__/worldStore.ts] LIMIT REACHED - setting error "Maximum skills limit reached"');
-    mockState.error = 'Maximum skills limit reached';
+    mockState.error = createError('Maximum skills limit reached', { type: ErrorType.VALIDATION });
     return;
   }
   const newSkill: WorldSkill = {
@@ -188,7 +231,7 @@ const mockAddSkill = jest.fn((worldId: string, skill: Partial<WorldSkill>) => {
 const mockUpdateSkill = jest.fn((worldId: string, skillId: string, updates: Partial<WorldSkill>) => {
   console.log('[__mocks__/worldStore.ts] updateSkill called:', worldId, skillId, updates);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
@@ -196,34 +239,37 @@ const mockUpdateSkill = jest.fn((worldId: string, skillId: string, updates: Part
   if (skill) {
     Object.assign(skill, updates);
   }
+  syncWorldToEntities(worldId);
 });
 
 const mockRemoveSkill = jest.fn((worldId: string, skillId: string) => {
   console.log('[__mocks__/worldStore.ts] removeSkill called:', worldId, skillId);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const world = mockState.worlds[worldId];
   world.skills = world.skills.filter((s: WorldSkill) => s.id !== skillId);
+  syncWorldToEntities(worldId);
 });
 
 const mockUpdateSettings = jest.fn((worldId: string, settings: Partial<WorldSettings>) => {
   console.log('[__mocks__/worldStore.ts] updateSettings called:', worldId, settings);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   mockState.worlds[worldId].settings = {
     ...mockState.worlds[worldId].settings,
     ...settings
   };
+  syncWorldToEntities(worldId);
 });
 
 const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<import('@/types/tone-settings.types').ToneSettings>) => {
   console.log('[__mocks__/worldStore.ts] updateToneSettings called:', worldId, toneSettings);
   if (!mockState.worlds[worldId]) {
-    mockState.error = 'World not found';
+    mockState.error = createError('World not found', { type: ErrorType.VALIDATION });
     return;
   }
   const currentToneSettings = mockState.worlds[worldId].toneSettings || {
@@ -239,6 +285,7 @@ const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<i
     },
     updatedAt: getTimestamp()
   };
+  syncWorldToEntities(worldId);
 });
 
 const mockGetWorldById = jest.fn((worldId: string) => {
@@ -246,19 +293,32 @@ const mockGetWorldById = jest.fn((worldId: string) => {
   return mockState.worlds[worldId] || null;
 });
 
+const mockCreate = jest.fn((data: Partial<World>) => mockCreateWorld(data));
+const mockUpdate = jest.fn((id: string, updates: Partial<World>) => mockUpdateWorld(id, updates));
+const mockDelete = jest.fn((id: string) => mockDeleteWorld(id));
+const mockSetCurrent = jest.fn((id: string | null) => mockSetCurrentWorld(id));
+const mockGetById = jest.fn((id: string) => mockGetWorldById(id));
+const mockGetAll = jest.fn(() => Object.values(mockState.worlds));
+
 const mockReset = jest.fn(() => {
   console.log('[__mocks__/worldStore.ts] reset called');
   mockState = {
     worlds: {},
+    entities: {},
     currentWorldId: null,
+    currentEntityId: null,
     error: null,
     loading: false
   };
 });
 
-const mockSetError = jest.fn((error: string | null) => {
+const mockSetError = jest.fn((error: UserFriendlyError | string | null) => {
   console.log('[__mocks__/worldStore.ts] setError called:', error);
-  mockState.error = error;
+  if (typeof error === 'string') {
+    mockState.error = createError(error);
+  } else {
+    mockState.error = error;
+  }
 });
 
 const mockClearError = jest.fn(() => {
@@ -297,6 +357,12 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     setError: mockSetError,
     clearError: mockClearError,
     setLoading: mockSetLoading,
+    create: mockCreate,
+    update: mockUpdate,
+    delete: mockDelete,
+    setCurrent: mockSetCurrent,
+    getById: mockGetById,
+    getAll: mockGetAll,
   };
   
   // If no selector is provided, return the entire state (like useStore() with no selector)
@@ -334,6 +400,12 @@ const mockGetState = jest.fn((): WorldStore => {
     setError: mockSetError,
     clearError: mockClearError,
     setLoading: mockSetLoading,
+    create: mockCreate,
+    update: mockUpdate,
+    delete: mockDelete,
+    setCurrent: mockSetCurrent,
+    getById: mockGetById,
+    getAll: mockGetAll,
   };
   
   return state;
@@ -361,10 +433,18 @@ export const worldStore = Object.assign(mockWorldStore, {
     mockClearError.mockClear();
     mockSetLoading.mockClear();
     mockFetchWorlds.mockClear();
+    mockCreate.mockClear();
+    mockUpdate.mockClear();
+    mockDelete.mockClear();
+    mockSetCurrent.mockClear();
+    mockGetById.mockClear();
+    mockGetAll.mockClear();
     // Reset the mock state
     mockState = {
       worlds: {},
+      entities: {},
       currentWorldId: null,
+      currentEntityId: null,
       error: null,
       loading: false
     };

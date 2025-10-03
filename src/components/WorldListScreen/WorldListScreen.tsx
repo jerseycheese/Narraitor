@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/Dele
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { World } from '@/types/world.types';
+import { getUserFriendlyError, UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 
 interface WorldListScreenProps {
   _router?: {
@@ -21,7 +22,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   const [worlds, setWorlds] = useState<World[]>([]);
   const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<UserFriendlyError | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
 
@@ -32,27 +33,31 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
       setCurrentWorldId(state.currentWorldId);
       setLoading(state.loading);
       setError(state.error);
-      
-      const unsubscribe = useWorldStore.subscribe(() => {
-        const newState = useWorldStore.getState();
+
+      const unsubscribe = useWorldStore.subscribe((newState) => {
         setWorlds(Object.values(newState.worlds || {}));
         setCurrentWorldId(newState.currentWorldId);
         setLoading(newState.loading);
         setError(newState.error);
       });
-      
+
       return () => unsubscribe();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      const friendlyError = err instanceof Error
+        ? getUserFriendlyError(err)
+        : {
+            title: 'Failed to Load Worlds',
+            message: 'An unexpected error occurred while loading worlds.',
+            retryable: false,
+            type: ErrorType.UNKNOWN,
+          } satisfies UserFriendlyError;
+      setError(friendlyError);
       setLoading(false);
     }
   }, []);
 
   const handleSelectWorld = (worldId: string) => {
-    useWorldStore.setState((state) => ({
-      ...state,
-      currentWorldId: worldId
-    }));
+    useWorldStore.getState().setCurrentWorld(worldId);
   };
 
   const handleDeleteClick = (worldId: string) => {
@@ -67,15 +72,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   const handleConfirmDelete = () => {
     if (worldToDeleteId) {
-      useWorldStore.setState((state) => {
-        const newWorlds = { ...state.worlds };
-        delete newWorlds[worldToDeleteId];
-        return {
-          ...state,
-          worlds: newWorlds,
-          currentWorldId: state.currentWorldId === worldToDeleteId ? null : state.currentWorldId
-        };
-      });
+      useWorldStore.getState().deleteWorld(worldToDeleteId);
     }
     handleCloseDeleteDialog();
   };
@@ -97,9 +94,11 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     return (
       <section className="p-6" data-testid="world-list-screen-error-message">
         <SectionError
-          title="Error Loading Worlds"
-          message={error}
+          title={error.title || 'Error Loading Worlds'}
+          message={error.message}
           severity="error"
+          showRetry={Boolean(error.retryable)}
+          onRetry={error.retryable ? () => useWorldStore.getState().fetchWorlds() : undefined}
         />
       </section>
     );
