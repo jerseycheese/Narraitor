@@ -34,7 +34,7 @@ jest.mock('@/lib/utils', () => ({
 }));
 
 // Mock CollapsibleSection
-jest.mock('../../CollapsibleSection', () => ({
+jest.mock('@/components/ui/CollapsibleSection', () => ({
   CollapsibleSection: ({ title, children, ...props }: { title: string; children: React.ReactNode; [key: string]: unknown }) => (
     <div data-testid={`collapsible-${title.replace(/\s+/g, '-').toLowerCase()}`} {...props}>
       <h3>{title}</h3>
