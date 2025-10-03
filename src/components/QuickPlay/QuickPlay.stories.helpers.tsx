@@ -67,8 +67,10 @@ export const createMockStoreState = (options: MockStoreOptions) => {
       // Empty state
       useWorldStore.setState({ 
         worlds: {}, 
+        entities: {},
         currentWorldId: null,
-        setCurrentWorld: (id: string) => console.log('Set world:', id),
+        currentEntityId: null,
+        setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
       useCharacterStore.setState({ 
         characters: {},
@@ -93,8 +95,10 @@ export const createMockStoreState = (options: MockStoreOptions) => {
 
       useWorldStore.setState({ 
         worlds: { [mockWorld.id]: mockWorld },
+        entities: { [mockWorld.id]: mockWorld },
         currentWorldId: null,
-        setCurrentWorld: (id: string) => console.log('Set world:', id),
+        currentEntityId: null,
+        setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
       useCharacterStore.setState({ 
         characters: { [mockCharacter.id]: mockCharacter },

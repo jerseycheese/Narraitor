@@ -105,7 +105,9 @@ export const createWizardMockState = (options: WizardMockOptions) => {
     
     useWorldStore.setState({ 
       worlds,
-      currentWorldId: null 
+      entities: worlds,
+      currentWorldId: null,
+      currentEntityId: null,
     });
     useCharacterStore.setState({ 
       characters 

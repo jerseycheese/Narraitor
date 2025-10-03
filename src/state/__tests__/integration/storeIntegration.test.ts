@@ -1,4 +1,5 @@
 import { useWorldStore, useCharacterStore, useInventoryStore } from '../../index';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('Store Integration', () => {
   beforeEach(() => {
@@ -446,12 +447,17 @@ describe('Store Integration', () => {
   describe('error propagation', () => {
     test('should handle errors across stores independently', () => {
       // Set errors in different stores
-      useWorldStore.getState().setError('World error');
+      useWorldStore.getState().setError({
+        title: 'World error',
+        message: 'World error',
+        retryable: false,
+        type: ErrorType.UNKNOWN,
+      });
       useCharacterStore.getState().setError('Character error');
       useInventoryStore.getState().setError('Inventory error');
 
       // Each store should maintain its own error state
-      expect(useWorldStore.getState().error).toBe('World error');
+      expect(useWorldStore.getState().error?.title).toBe('World error');
       expect(useCharacterStore.getState().error).toBe('Character error');
       expect(useInventoryStore.getState().error).toBe('Inventory error');
 

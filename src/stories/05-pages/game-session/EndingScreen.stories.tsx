@@ -150,7 +150,8 @@ const withEndingState = (ending: StoryEnding) => {
   });
 
   useWorldStore.setState({
-    worlds: { 'world-456': mockWorld }
+    worlds: { 'world-456': mockWorld },
+    entities: { 'world-456': mockWorld }
   });
 
   // Mock fetch API for ending image generation

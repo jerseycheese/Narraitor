@@ -217,9 +217,14 @@ export default function GameSessionTestHarness() {
     
     // Only create if they don't exist
     if (!worlds[mockWorld.id]) {
+      const entities = useWorldStore.getState().entities || {};
       useWorldStore.setState({
         worlds: {
           ...worlds,
+          [mockWorld.id]: mockWorld
+        },
+        entities: {
+          ...entities,
           [mockWorld.id]: mockWorld
         }
       });

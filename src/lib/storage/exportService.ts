@@ -6,7 +6,7 @@
  * of imported game state to ensure data integrity.
  */
 
-import { useWorldStore } from '../../state/worldStore';
+import { useWorldStore, WorldStore } from '../../state/worldStore';
 import { useCharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
@@ -115,7 +115,24 @@ export class ExportService {
       
       // Use the underlying Zustand setState method if available
       if (validatedGameState.worldState) {
-        useWorldStore.setState(validatedGameState.worldState);
+        const incomingState = validatedGameState.worldState as Partial<WorldStore> & Record<string, unknown>;
+        const normalizedWorldState: Partial<WorldStore> = {
+          ...incomingState,
+        };
+
+        if (!normalizedWorldState.entities && normalizedWorldState.worlds) {
+          normalizedWorldState.entities = { ...normalizedWorldState.worlds };
+        }
+
+        if (normalizedWorldState.currentWorldId && !normalizedWorldState.currentEntityId) {
+          normalizedWorldState.currentEntityId = normalizedWorldState.currentWorldId;
+        }
+
+        if (normalizedWorldState.currentEntityId && !normalizedWorldState.currentWorldId) {
+          normalizedWorldState.currentWorldId = normalizedWorldState.currentEntityId;
+        }
+
+        useWorldStore.setState(normalizedWorldState);
       }
       
       if (validatedGameState.characterState) {

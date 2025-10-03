@@ -1,4 +1,5 @@
 import { useWorldStore } from '../worldStore';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('useWorldStore', () => {
   beforeEach(() => {
@@ -95,7 +96,7 @@ describe('useWorldStore', () => {
     test('should handle non-existent world', () => {
       useWorldStore.getState().updateWorld('non-existent-id', { name: 'Updated' });
       const state = useWorldStore.getState();
-      expect(state.error).toBe('World not found');
+      expect(state.error?.message).toBe('World not found');
     });
   });
 
@@ -169,7 +170,7 @@ describe('useWorldStore', () => {
     test('should handle non-existent world', () => {
       useWorldStore.getState().setCurrentWorld('non-existent-id');
       const state = useWorldStore.getState();
-      expect(state.error).toBe('World not found');
+      expect(state.error?.message).toBe('World not found');
       expect(state.currentWorldId).toBeNull();
     });
   });
@@ -243,7 +244,7 @@ describe('useWorldStore', () => {
 
       const state = useWorldStore.getState();
       expect(state.worlds[worldId].attributes).toHaveLength(2);
-      expect(state.error).toBe('Maximum attributes limit reached');
+      expect(state.error?.message).toBe('Maximum attributes limit reached');
     });
 
     test('should update attribute', () => {
@@ -351,7 +352,7 @@ describe('useWorldStore', () => {
 
       const state = useWorldStore.getState();
       expect(state.worlds[worldId].skills).toHaveLength(1);
-      expect(state.error).toBe('Maximum skills limit reached');
+      expect(state.error?.message).toBe('Maximum skills limit reached');
     });
   });
 
@@ -387,8 +388,13 @@ describe('useWorldStore', () => {
 
   describe('error handling', () => {
     test('should set and clear errors', () => {
-      useWorldStore.getState().setError('Test error');
-      expect(useWorldStore.getState().error).toBe('Test error');
+      useWorldStore.getState().setError({
+        title: 'Test error',
+        message: 'Details',
+        retryable: false,
+        type: ErrorType.UNKNOWN,
+      });
+      expect(useWorldStore.getState().error?.title).toBe('Test error');
 
       useWorldStore.getState().clearError();
       expect(useWorldStore.getState().error).toBeNull();
@@ -421,7 +427,12 @@ describe('useWorldStore', () => {
           skillPointPool: 20
         }
       });
-      useWorldStore.getState().setError('Some error');
+      useWorldStore.getState().setError({
+        title: 'Some error',
+        message: 'Details',
+        retryable: false,
+        type: ErrorType.UNKNOWN,
+      });
       useWorldStore.getState().setLoading(true);
 
       // Reset

@@ -7,7 +7,7 @@ import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
-import { createCrudStore, CrudStore } from './createCrudStore';
+import { CrudStore } from './createCrudStore';
 import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 
 /**
@@ -57,10 +57,8 @@ export const useWorldStore = create<WorldStore>()(
       return {
         // State
         worlds: {},
-        entities: {}, // Alias for CrudStore compatibility
-        get currentWorldId() {
-          return get().currentEntityId;
-        },
+        entities: {},
+        currentWorldId: null,
         currentEntityId: null,
         error: null,
         loading: false,
@@ -91,7 +89,7 @@ export const useWorldStore = create<WorldStore>()(
               [worldId]: newWorld,
             },
             entities: {
-              ...state.worlds,
+              ...state.entities,
               [worldId]: newWorld,
             },
             error: null,
@@ -128,7 +126,7 @@ export const useWorldStore = create<WorldStore>()(
               [id]: updatedWorld,
             },
             entities: {
-              ...state.worlds,
+              ...state.entities,
               [id]: updatedWorld,
             },
             error: null,
@@ -150,11 +148,15 @@ export const useWorldStore = create<WorldStore>()(
 
           set((state) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _deleted, ...remaining } = state.worlds;
+            const { [id]: _removedWorld, ...remainingWorlds } = state.worlds;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
+            const currentIsDeleted = state.currentEntityId === id || state.currentWorldId === id;
             return {
-              worlds: remaining,
-              entities: remaining,
-              currentEntityId: state.currentEntityId === id ? null : state.currentEntityId,
+              worlds: remainingWorlds,
+              entities: remainingEntities,
+              currentEntityId: currentIsDeleted ? null : state.currentEntityId,
+              currentWorldId: currentIsDeleted ? null : state.currentWorldId,
               error: null,
             };
           });
@@ -162,15 +164,19 @@ export const useWorldStore = create<WorldStore>()(
 
         setCurrent: (id) => {
           if (id && !get().worlds[id]) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found'), currentEntityId: null });
+            set({
+              error: createValidationError('World Not Found', 'The specified world could not be found'),
+              currentEntityId: null,
+              currentWorldId: null,
+            });
             return;
           }
-          set({ currentEntityId: id, error: null });
+          set({ currentEntityId: id, currentWorldId: id, error: null });
         },
 
         getById: (id) => get().worlds[id],
         getAll: () => Object.values(get().worlds),
-        reset: () => set({ worlds: {}, entities: {}, currentEntityId: null, error: null, loading: false }),
+        reset: () => set({ worlds: {}, entities: {}, currentEntityId: null, currentWorldId: null, error: null, loading: false }),
         setError: (error) => set({ error }),
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
@@ -386,7 +392,7 @@ export const useWorldStore = create<WorldStore>()(
 
         // Ensure entities matches worlds
         if (state.worlds && !state.entities) {
-          state.entities = state.worlds;
+          state.entities = { ...state.worlds };
         }
 
         // Validate persisted worlds before restoring
@@ -404,7 +410,15 @@ export const useWorldStore = create<WorldStore>()(
           }
 
           // Sync entities with worlds
-          state.entities = state.worlds;
+          state.entities = { ...state.worlds };
+
+          if (typeof state.currentWorldId === 'string' && !state.currentEntityId) {
+            state.currentEntityId = state.currentWorldId;
+          }
+
+          if (typeof state.currentEntityId === 'string' && !state.currentWorldId) {
+            state.currentWorldId = state.currentEntityId;
+          }
 
           // If any invalid worlds, backup to localStorage and set error state
           if (Object.keys(invalidWorlds).length > 0) {
