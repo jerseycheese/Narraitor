@@ -1,20 +1,11 @@
-/**
- * Inventory System - POST-MVP
- * Status: Implementation complete but not included in MVP
- * Reason: Deprioritized to focus on core narrative experience
- * Date: May 2025
- * 
- * Note: This store is fully functional and tested but will not be 
- * exposed in the UI until post-MVP. The narrative engine may still
- * reference inventory data for context.
- */
-
 import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { safeTrim, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { CrudStore } from './createCrudStore';
 
-// Simplified inventory item for MVP implementation
-interface InventoryItem {
+export interface InventoryItem {
   id: EntityID;
   characterId: EntityID;
   name: string;
@@ -23,188 +14,201 @@ interface InventoryItem {
   weight: number;
   value: number;
   equipped: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-/**
- * Inventory store interface with state and actions
- */
-interface InventoryStore {
-  // State
+export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
   characterInventories: Record<EntityID, EntityID[]>;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 
-  // Actions
-  addItem: (characterId: EntityID, item: Omit<InventoryItem, 'id' | 'characterId'>) => EntityID;
-  updateItem: (itemId: EntityID, updates: Partial<InventoryItem>) => void;
+  addItem: (characterId: EntityID, item: Omit<InventoryItem, 'id' | 'characterId' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateItem: (itemId: EntityID, updates: Partial<Omit<InventoryItem, 'id' | 'createdAt'>> & { createdAt?: string }) => void;
   removeItem: (itemId: EntityID) => void;
   transferItem: (itemId: EntityID, toCharacterId: EntityID) => void;
-  
-  // Query actions
+
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   getEquippedItems: (characterId: EntityID) => InventoryItem[];
   calculateTotalWeight: (characterId: EntityID) => number;
-  
-  // State management
-  reset: () => void;
-  setError: (error: string | null) => void;
-  clearError: () => void;
-  setLoading: (loading: boolean) => void;
 }
 
-// Initial state
-const initialState = {
-  items: {},
-  characterInventories: {},
-  error: null,
+const getInitialState = () => ({
+  items: {} as Record<EntityID, InventoryItem>,
+  entities: {} as Record<EntityID, InventoryItem>,
+  characterInventories: {} as Record<EntityID, EntityID[]>,
+  currentEntityId: null as EntityID | null,
+  error: null as UserFriendlyError | null,
   loading: false,
-};
+});
 
-// Inventory Store implementation
+const createInventoryError = (
+  title: string,
+  message: string,
+  type: ErrorType = ErrorType.VALIDATION,
+  retryable = false
+): UserFriendlyError => ({
+  title,
+  message,
+  retryable,
+  type,
+});
+
 export const useInventoryStore = create<InventoryStore>()((set, get) => ({
-  ...initialState,
+  ...getInitialState(),
 
-  // Add item
-  addItem: (characterId, itemData) => {
-    if (!itemData.name || itemData.name.trim() === '') {
+  create: (data) => {
+    if (!data.name || safeTrim(data.name) === '') {
       throw new Error('Item name is required');
     }
 
     const itemId = generateUniqueId('item');
-    
+    const now = getTimestamp();
+    const characterId = data.characterId;
+
     const newItem: InventoryItem = {
-      ...itemData,
+      ...data,
+      name: safeTrim(data.name),
       id: itemId,
-      characterId,
+      createdAt: now,
+      updatedAt: now,
     };
 
     set((state) => {
-      // Initialize character inventory if not exists
       const characterItems = state.characterInventories[characterId] || [];
-      
+
       return {
-        items: {
-          ...state.items,
-          [itemId]: newItem,
-        },
+        items: { ...state.items, [itemId]: newItem },
+        entities: { ...state.entities, [itemId]: newItem },
         characterInventories: {
           ...state.characterInventories,
           [characterId]: [...characterItems, itemId],
         },
+        error: null,
       };
     });
 
     return itemId;
   },
 
-  // Update item
-  updateItem: (itemId, updates) => set((state) => {
-    if (!state.items[itemId]) {
-      return { error: 'Item not found' };
+  update: (id, updates) => {
+    const currentItem = get().items[id];
+    if (!currentItem) {
+      set({ error: createInventoryError('Item Not Found', 'The specified inventory item could not be found.') });
+      return;
     }
 
+    const normalizedUpdates: Partial<InventoryItem> = { ...updates };
+
+    if (updates?.name) {
+      normalizedUpdates.name = safeTrim(updates.name);
+    }
+
+    const now = getTimestamp();
+    const newCharacterId = updates?.characterId ?? currentItem.characterId;
     const updatedItem: InventoryItem = {
-      ...state.items[itemId],
-      ...updates,
+      ...currentItem,
+      ...normalizedUpdates,
+      characterId: newCharacterId,
+      updatedAt: now,
     };
 
-    return {
-      items: {
-        ...state.items,
-        [itemId]: updatedItem,
-      },
-      error: null,
-    };
-  }),
+    set((state) => {
+      const nextCharacterInventories = { ...state.characterInventories };
 
-  // Remove item
-  removeItem: (itemId) => set((state) => {
-    const item = state.items[itemId];
-    if (!item) {
-      return state;
+      if (currentItem.characterId !== newCharacterId) {
+        const fromList = nextCharacterInventories[currentItem.characterId] || [];
+        nextCharacterInventories[currentItem.characterId] = fromList.filter((itemId) => itemId !== id);
+
+        const toList = nextCharacterInventories[newCharacterId] || [];
+        nextCharacterInventories[newCharacterId] = [...toList, id];
+      }
+
+      return {
+        items: { ...state.items, [id]: updatedItem },
+        entities: { ...state.entities, [id]: updatedItem },
+        characterInventories: nextCharacterInventories,
+        error: null,
+      };
+    });
+  },
+
+  delete: (id) => {
+    const currentItem = get().items[id];
+    if (!currentItem) {
+      return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [itemId]: _removedItem, ...remainingItems } = state.items;
-    
-    // Remove from character inventory
-    const characterId = item.characterId;
-    const updatedCharacterItems = state.characterInventories[characterId]?.filter(
-      (id) => id !== itemId
-    ) || [];
+    set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: _removedItem, ...remainingItems } = state.items;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: _removedEntity, ...remainingEntities } = state.entities;
 
-    return {
-      items: remainingItems,
-      characterInventories: {
+      const characterItems = state.characterInventories[currentItem.characterId] || [];
+      const updatedCharacterItems = characterItems.filter((itemId) => itemId !== id);
+
+      const updatedInventories = {
         ...state.characterInventories,
-        [characterId]: updatedCharacterItems,
-      },
-    };
-  }),
+        [currentItem.characterId]: updatedCharacterItems,
+      };
 
-  // Transfer item
-  transferItem: (itemId, toCharacterId) => set((state) => {
-    const item = state.items[itemId];
-    if (!item) {
-      return { error: 'Item not found' };
+      return {
+        items: remainingItems,
+        entities: remainingEntities,
+        characterInventories: updatedInventories,
+        currentEntityId: state.currentEntityId === id ? null : state.currentEntityId,
+        error: null,
+      };
+    });
+  },
+
+  setCurrent: (id) => {
+    if (id && !get().items[id]) {
+      set({
+        error: createInventoryError('Item Not Found', 'The specified inventory item could not be found.'),
+        currentEntityId: null,
+      });
+      return;
     }
 
-    const fromCharacterId = item.characterId;
-    
-    // Update item's character ID and unequip it
-    const updatedItem: InventoryItem = {
-      ...item,
-      characterId: toCharacterId,
-      equipped: false,
-    };
+    set({ currentEntityId: id ?? null, error: null });
+  },
 
-    // Remove from source character inventory
-    const fromCharacterItems = state.characterInventories[fromCharacterId]?.filter(
-      (id) => id !== itemId
-    ) || [];
+  getById: (id) => get().items[id],
+  getAll: () => Object.values(get().items),
 
-    // Add to target character inventory
-    const toCharacterItems = state.characterInventories[toCharacterId] || [];
+  reset: () => set(getInitialState()),
 
-    return {
-      items: {
-        ...state.items,
-        [itemId]: updatedItem,
-      },
-      characterInventories: {
-        ...state.characterInventories,
-        [fromCharacterId]: fromCharacterItems,
-        [toCharacterId]: [...toCharacterItems, itemId],
-      },
-      error: null,
-    };
-  }),
+  setError: (error) => set({ error }),
+  clearError: () => set({ error: null }),
+  setLoading: (loading) => set({ loading }),
 
-  // Get character items
+  addItem: (characterId, itemData) => get().create({ ...itemData, characterId }),
+  updateItem: (itemId, updates) => get().update(itemId, updates),
+  removeItem: (itemId) => get().delete(itemId),
+
+  transferItem: (itemId, toCharacterId) => {
+    const item = get().items[itemId];
+    if (!item) {
+      set({ error: createInventoryError('Item Not Found', 'Unable to transfer a non-existent item.') });
+      return;
+    }
+
+    get().update(itemId, { characterId: toCharacterId, equipped: false });
+  },
+
   getCharacterItems: (characterId) => {
     const state = get();
     const itemIds = state.characterInventories[characterId] || [];
-    return itemIds.map((id) => state.items[id]).filter(Boolean);
+    return itemIds.map((itemId) => state.items[itemId]).filter(Boolean);
   },
 
-  // Get equipped items
-  getEquippedItems: (characterId) => {
-    const state = get();
-    const items = state.getCharacterItems(characterId);
-    return items.filter((item) => item.equipped);
-  },
+  getEquippedItems: (characterId) => get().getCharacterItems(characterId).filter((item) => item.equipped),
 
-  // Calculate total weight
-  calculateTotalWeight: (characterId) => {
-    const state = get();
-    const items = state.getCharacterItems(characterId);
-    return items.reduce((total, item) => total + (item.weight * item.quantity), 0);
-  },
-
-  // State management actions
-  reset: () => set(() => initialState),
-  setError: (error) => set(() => ({ error })),
-  clearError: () => set(() => ({ error: null })),
-  setLoading: (loading) => set(() => ({ loading })),
+  calculateTotalWeight: (characterId) =>
+    get()
+      .getCharacterItems(characterId)
+      .reduce((total, item) => total + item.weight * item.quantity, 0),
 }));

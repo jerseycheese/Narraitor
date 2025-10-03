@@ -1,84 +1,69 @@
-/**
- * Goal Store
- *
- * Manages narrative goals with session tracking, status transitions, and mention counting.
- * Provides functionality for creating, updating, deleting, and querying goals with persistence.
- */
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 import {
   NarrativeGoal,
   GoalPriority,
   GoalExtractionRequest,
+  GoalExtractionResult,
 } from '../types/goal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { goalExtractor } from '../lib/ai/goalExtractor';
+import { CrudStore } from './createCrudStore';
 
-/**
- * Result from processing a narrative segment for goal extraction
- */
 interface ProcessSegmentResult {
   newGoalsCreated: number;
   goalsUpdated: number;
   goalsCompleted: number;
-  error?: string;
+  error?: UserFriendlyError;
 }
 
-/**
- * Goal store interface with state and actions
- */
-interface GoalStore {
-  // State
+export interface GoalStore extends CrudStore<NarrativeGoal> {
   goals: Record<EntityID, NarrativeGoal>;
-  sessionGoals: Record<EntityID, EntityID[]>; // Maps session ID to goal IDs
-  activeGoalIds: EntityID[]; // IDs of all active goals across sessions
-  error: string | null;
+  sessionGoals: Record<EntityID, EntityID[]>;
+  activeGoalIds: EntityID[];
+  error: UserFriendlyError | null;
   loading: boolean;
 
-  // Core CRUD Actions
-  createGoal: (
-    goalData: Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'>
-  ) => EntityID;
+  createGoal: (goalData: Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
   updateGoal: (goalId: EntityID, updates: Partial<NarrativeGoal>) => void;
   deleteGoal: (goalId: EntityID) => void;
 
-  // Query Actions
   getActiveGoalsBySession: (sessionId: EntityID) => NarrativeGoal[];
   getGoalsByPriority: (priority: GoalPriority) => NarrativeGoal[];
   getRecentlyMentionedGoals: (withinMs: number) => NarrativeGoal[];
 
-  // Goal Management Actions
   incrementMentionCount: (goalId: EntityID) => void;
   addProgressNote: (goalId: EntityID, note: string) => void;
   clearSessionGoals: (sessionId: EntityID) => void;
-
-  // Integration Actions
-  processSegmentForGoals: (
-    segmentId: EntityID,
-    characterId?: EntityID
-  ) => Promise<ProcessSegmentResult>;
-
-  // State Management
-  reset: () => void;
-  setError: (error: string | null) => void;
-  clearError: () => void;
-  setLoading: (loading: boolean) => void;
+  processSegmentForGoals: (segmentId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
 }
 
-// Initial state
-const initialState = {
-  goals: {},
-  sessionGoals: {},
-  activeGoalIds: [],
-  error: null,
+const getInitialState = () => ({
+  goals: {} as Record<EntityID, NarrativeGoal>,
+  entities: {} as Record<EntityID, NarrativeGoal>,
+  sessionGoals: {} as Record<EntityID, EntityID[]>,
+  activeGoalIds: [] as EntityID[],
+  currentEntityId: null as EntityID | null,
+  error: null as UserFriendlyError | null,
   loading: false,
-};
+});
 
-// Validation function for goal data
+const createGoalError = (
+  title: string,
+  message: string,
+  type: ErrorType = ErrorType.VALIDATION,
+  retryable = false
+): UserFriendlyError => ({
+  title,
+  message,
+  retryable,
+  type,
+});
+
 const validateGoalData = (data: Partial<NarrativeGoal>): void => {
   const normalizedTitle = normalizeText(data.title || '', NORM_NAME);
   if (!normalizedTitle) {
@@ -93,52 +78,45 @@ const validateGoalData = (data: Partial<NarrativeGoal>): void => {
   }
 };
 
-// Helper function to update active goal IDs
-const updateActiveGoalIds = (
-  goals: Record<EntityID, NarrativeGoal>
-): EntityID[] => {
-  return Object.values(goals)
+const updateActiveGoalIds = (goals: Record<EntityID, NarrativeGoal>): EntityID[] =>
+  Object.values(goals)
     .filter((goal) => goal.status === 'active')
     .map((goal) => goal.id);
-};
 
-// Goal Store implementation with persistence
 export const useGoalStore = create<GoalStore>()(
   persist(
     (set, get) => ({
-      ...initialState,
+      ...getInitialState(),
 
-      // Create goal
-      createGoal: (goalData) => {
+      create: (goalData) => {
         validateGoalData(goalData);
 
         const goalId = generateUniqueId('goal');
         const now = getTimestamp();
 
+        const normalizedTitle = normalizeText(goalData.title, NORM_NAME);
+        const normalizedDescription = normalizeText(goalData.description, NORM_DESC);
+
         const newGoal: NarrativeGoal = {
           ...goalData,
-          title: normalizeText(goalData.title, NORM_NAME),
-          description: normalizeText(goalData.description, NORM_DESC),
           id: goalId,
+          title: normalizedTitle,
+          description: normalizedDescription,
+          mentionCount: goalData.mentionCount ?? 0,
           createdAt: now,
           updatedAt: now,
-          mentionCount: goalData.mentionCount || 0,
         };
 
         set((state) => {
-          // Initialize session goals if not exists
-          const sessionGoals = state.sessionGoals[goalData.sessionId] || [];
-
-          const updatedGoals = {
-            ...state.goals,
-            [goalId]: newGoal,
-          };
+          const sessionGoals = state.sessionGoals[newGoal.sessionId] || [];
+          const updatedGoals = { ...state.goals, [goalId]: newGoal };
 
           return {
             goals: updatedGoals,
+            entities: { ...state.entities, [goalId]: newGoal },
             sessionGoals: {
               ...state.sessionGoals,
-              [goalData.sessionId]: [...sessionGoals, goalId],
+              [newGoal.sessionId]: [...sessionGoals, goalId],
             },
             activeGoalIds: updateActiveGoalIds(updatedGoals),
             error: null,
@@ -148,225 +126,201 @@ export const useGoalStore = create<GoalStore>()(
         return goalId;
       },
 
-      // Update goal
-      updateGoal: (goalId, updates) => {
-        const state = get();
-        const existingGoal = state.goals[goalId];
-
+      update: (goalId, updates) => {
+        const existingGoal = get().goals[goalId];
         if (!existingGoal) {
-          throw new Error('Goal not found');
+          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          return;
+        }
+
+        const normalizedUpdates: Partial<NarrativeGoal> = { ...updates };
+
+        if (updates.title) {
+          normalizedUpdates.title = normalizeText(updates.title, NORM_NAME);
+        }
+
+        if (updates.description) {
+          normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
         }
 
         const now = getTimestamp();
-        const updatedGoal = {
+        const previousStatus = existingGoal.status;
+        const previousSessionId = existingGoal.sessionId;
+        const nextSessionId = updates.sessionId ?? previousSessionId;
+
+        const updatedGoal: NarrativeGoal = {
           ...existingGoal,
-          ...updates,
+          ...normalizedUpdates,
+          sessionId: nextSessionId,
           updatedAt: now,
         };
 
-        // Handle status transitions
-        if (updates.status && updates.status !== existingGoal.status) {
-          if (
-            updates.status === 'completed' ||
-            updates.status === 'abandoned'
-          ) {
-            updatedGoal.completedAt = new Date();
+        if (updates.status && updates.status !== previousStatus) {
+          if (updates.status === 'completed' || updates.status === 'abandoned') {
+            updatedGoal.completedAt = new Date(now);
+            updatedGoal.completionMethod = updates.status === 'completed' ? 'achieved' : 'abandoned';
           }
         }
 
         set((state) => {
-          const updatedGoals = {
-            ...state.goals,
-            [goalId]: updatedGoal,
-          };
+          const updatedGoals = { ...state.goals, [goalId]: updatedGoal };
+          const nextEntities = { ...state.entities, [goalId]: updatedGoal };
+          const nextSessionGoals = { ...state.sessionGoals };
+
+          if (previousSessionId !== nextSessionId) {
+            const previousList = nextSessionGoals[previousSessionId] || [];
+            nextSessionGoals[previousSessionId] = previousList.filter((id) => id !== goalId);
+
+            const nextList = nextSessionGoals[nextSessionId] || [];
+            nextSessionGoals[nextSessionId] = [...nextList, goalId];
+          }
 
           return {
             goals: updatedGoals,
+            entities: nextEntities,
+            sessionGoals: nextSessionGoals,
             activeGoalIds: updateActiveGoalIds(updatedGoals),
             error: null,
           };
         });
       },
 
-      // Delete goal
-      deleteGoal: (goalId) => {
-        const state = get();
-        const goal = state.goals[goalId];
-
-        if (!goal) {
-          return; // Silent fail for delete
+      delete: (goalId) => {
+        const existingGoal = get().goals[goalId];
+        if (!existingGoal) {
+          return;
         }
 
         set((state) => {
-          // Remove from goals
-          const remainingGoals = { ...state.goals };
-          delete remainingGoals[goalId];
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [goalId]: _removedGoal, ...remainingGoals } = state.goals;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [goalId]: _removedEntity, ...remainingEntities } = state.entities;
 
-          // Remove from session goals
-          const sessionId = goal.sessionId;
-          const updatedSessionGoals =
-            state.sessionGoals[sessionId]?.filter((id) => id !== goalId) || [];
+          const sessionGoals = state.sessionGoals[existingGoal.sessionId] || [];
+          const updatedSessionGoals = sessionGoals.filter((id) => id !== goalId);
+
+          const nextSessionGoals = {
+            ...state.sessionGoals,
+            [existingGoal.sessionId]: updatedSessionGoals,
+          };
+
+          if (nextSessionGoals[existingGoal.sessionId].length === 0) {
+            delete nextSessionGoals[existingGoal.sessionId];
+          }
 
           return {
             goals: remainingGoals,
-            sessionGoals: {
-              ...state.sessionGoals,
-              [sessionId]: updatedSessionGoals,
-            },
+            entities: remainingEntities,
+            sessionGoals: nextSessionGoals,
             activeGoalIds: updateActiveGoalIds(remainingGoals),
+            currentEntityId: state.currentEntityId === goalId ? null : state.currentEntityId,
             error: null,
           };
         });
       },
 
-      // Get active goals by session
+      setCurrent: (id) => {
+        if (id && !get().goals[id]) {
+          set({
+            error: createGoalError('Goal Not Found', 'The specified goal could not be found.'),
+            currentEntityId: null,
+          });
+          return;
+        }
+
+        set({ currentEntityId: id ?? null, error: null });
+      },
+
+      getById: (id) => get().goals[id],
+      getAll: () => Object.values(get().goals),
+
+      reset: () => set(getInitialState()),
+
+      setError: (error) => set({ error }),
+      clearError: () => set({ error: null }),
+      setLoading: (loading) => set({ loading }),
+
+      createGoal: (goalData) => get().create(goalData),
+      updateGoal: (goalId, updates) => get().update(goalId, updates),
+      deleteGoal: (goalId) => get().delete(goalId),
+
       getActiveGoalsBySession: (sessionId) => {
         const state = get();
         const goalIds = state.sessionGoals[sessionId] || [];
         return goalIds
           .map((id) => state.goals[id])
-          .filter((goal) => goal && goal.status === 'active');
+          .filter((goal): goal is NarrativeGoal => Boolean(goal && goal.status === 'active'));
       },
 
-      // Get goals by priority
-      getGoalsByPriority: (priority) => {
-        const state = get();
-        return Object.values(state.goals).filter(
-          (goal) => goal.priority === priority
-        );
-      },
+      getGoalsByPriority: (priority) =>
+        Object.values(get().goals).filter((goal) => goal.priority === priority),
 
-      // Get recently mentioned goals
       getRecentlyMentionedGoals: (withinMs) => {
-        const state = get();
-        const cutoffTime = new Date(Date.now() - withinMs);
-
-        return Object.values(state.goals).filter((goal) => {
+        const cutoffTime = Date.now() - withinMs;
+        return Object.values(get().goals).filter((goal) => {
           if (!goal.lastMentionedAt) return false;
-          const mentionTime =
-            goal.lastMentionedAt instanceof Date
-              ? goal.lastMentionedAt
-              : new Date(goal.lastMentionedAt);
+          const mentionTime = goal.lastMentionedAt instanceof Date ? goal.lastMentionedAt.getTime() : new Date(goal.lastMentionedAt).getTime();
           return mentionTime >= cutoffTime;
         });
       },
 
-      // Increment mention count
+
       incrementMentionCount: (goalId) => {
-        const state = get();
-        const goal = state.goals[goalId];
-
+        const goal = get().goals[goalId];
         if (!goal) {
-          throw new Error('Goal not found');
+          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          return;
         }
 
-        const now = new Date();
-        const updatedGoal = {
-          ...goal,
+        get().update(goalId, {
           mentionCount: goal.mentionCount + 1,
-          lastMentionedAt: now,
-          updatedAt: now.toISOString(),
-        };
-
-        set((state) => ({
-          goals: {
-            ...state.goals,
-            [goalId]: updatedGoal,
-          },
-          error: null,
-        }));
-      },
-
-      // Add progress note
-      addProgressNote: (goalId, note) => {
-        const state = get();
-        const goal = state.goals[goalId];
-
-        if (!goal) {
-          throw new Error('Goal not found');
-        }
-
-        const updatedGoal = {
-          ...goal,
-          progressNotes: [...(goal.progressNotes || []), note],
-          updatedAt: getTimestamp(),
-        };
-
-        set((state) => ({
-          goals: {
-            ...state.goals,
-            [goalId]: updatedGoal,
-          },
-          error: null,
-        }));
-      },
-
-      // Clear session goals
-      clearSessionGoals: (sessionId) => {
-        const state = get();
-        const goalIdsToRemove = state.sessionGoals[sessionId] || [];
-
-        if (goalIdsToRemove.length === 0) return;
-
-        set((state) => {
-          // Remove goals from the goals record
-          const updatedGoals = { ...state.goals };
-          goalIdsToRemove.forEach((id) => {
-            delete updatedGoals[id];
-          });
-
-          // Remove session from sessionGoals
-          const remainingSessionGoals = { ...state.sessionGoals };
-          delete remainingSessionGoals[sessionId];
-
-          return {
-            goals: updatedGoals,
-            sessionGoals: remainingSessionGoals,
-            activeGoalIds: updateActiveGoalIds(updatedGoals),
-            error: null,
-          };
+          lastMentionedAt: new Date(),
         });
       },
 
-      // Process narrative segment for goal extraction and updates
+      addProgressNote: (goalId, note) => {
+        const goal = get().goals[goalId];
+        if (!goal) {
+          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          return;
+        }
+
+        const notes = goal.progressNotes ? [...goal.progressNotes, note] : [note];
+        get().update(goalId, { progressNotes: notes });
+      },
+
+      clearSessionGoals: (sessionId) => {
+        const goalIds = get().sessionGoals[sessionId] || [];
+        goalIds.forEach((goalId) => get().delete(goalId));
+      },
+
       processSegmentForGoals: async (segmentId, characterId) => {
+        set({ loading: true, error: null });
         try {
-          // Get narrative segment from narrativeStore
           const { useNarrativeStore } = await import('./narrativeStore');
           const narrativeState = useNarrativeStore.getState();
           const segment = narrativeState.segments[segmentId];
 
           if (!segment) {
-            return {
-              newGoalsCreated: 0,
-              goalsUpdated: 0,
-              goalsCompleted: 0,
-              error: 'Narrative segment not found',
-            };
+            const error = createGoalError('Segment Not Found', 'Narrative segment not found for goal processing.', ErrorType.SERVICE, true);
+            return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error };
           }
 
-          const goalState = get();
-          const sessionId = Object.keys(narrativeState.sessionSegments).find(
-            (sessionId) =>
-              narrativeState.sessionSegments[sessionId]?.includes(segmentId)
+          const sessionId = Object.keys(narrativeState.sessionSegments).find((session) =>
+            narrativeState.sessionSegments[session]?.includes(segmentId)
           );
 
           if (!sessionId) {
-            return {
-              newGoalsCreated: 0,
-              goalsUpdated: 0,
-              goalsCompleted: 0,
-              error: 'Session ID not found for segment',
-            };
+            const error = createGoalError('Session Not Found', 'No session could be determined for the provided segment.', ErrorType.SERVICE, true);
+            return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error };
           }
 
-          // Get existing goals for context
-          const existingGoals =
-            goalState.sessionGoals[sessionId]
-              ?.map((id) => goalState.goals[id])
-              .filter(Boolean) || [];
+          const goalState = get();
+          const existingGoals = goalState.sessionGoals[sessionId]
+            ?.map((id) => goalState.goals[id])
+            .filter((goal): goal is NarrativeGoal => Boolean(goal)) || [];
 
-          // Prepare extraction request
           const extractionRequest: GoalExtractionRequest = {
             content: segment.content,
             sessionId,
@@ -376,63 +330,49 @@ export const useGoalStore = create<GoalStore>()(
             existingGoals,
           };
 
-          // Extract goals using AI
-          const extractionResult =
+          const extractionResult: GoalExtractionResult =
             await goalExtractor.extractGoalsFromNarrative(extractionRequest);
 
           let newGoalsCreated = 0;
           let goalsUpdated = 0;
           let goalsCompleted = 0;
 
-          // Create new goals
-          for (const newGoalData of extractionResult.newGoals) {
+          for (const newGoal of extractionResult.newGoals) {
             try {
-              validateGoalData(newGoalData);
-              const goalId = get().createGoal(newGoalData);
-              if (goalId) {
-                newGoalsCreated++;
-              }
+              validateGoalData(newGoal);
+              get().createGoal(newGoal);
+              newGoalsCreated++;
             } catch {
-              // Continue processing other goals
+              // ignore invalid goal
             }
           }
 
-          // Update existing goals
           for (const goalUpdate of extractionResult.updatedGoals) {
-            try {
-              const existingGoal = goalState.goals[goalUpdate.goalId];
-              if (existingGoal) {
-                get().updateGoal(goalUpdate.goalId, goalUpdate.updates);
-                goalsUpdated++;
-              }
-            } catch {
-              // Continue processing other goals
-            }
+            get().updateGoal(goalUpdate.goalId, goalUpdate.updates);
+            goalsUpdated++;
           }
 
-          // Handle completed goals
-          goalsCompleted = extractionResult.completedGoals.length;
+          extractionResult.completedGoals.forEach((goalId) => {
+            const goal = get().goals[goalId];
+            if (goal) {
+              get().updateGoal(goalId, { status: 'completed', completionSegmentId: segmentId });
+              goalsCompleted++;
+            }
+          });
 
-          return {
-            newGoalsCreated,
-            goalsUpdated,
-            goalsCompleted,
-          };
-        } catch {
-          return {
-            newGoalsCreated: 0,
-            goalsUpdated: 0,
-            goalsCompleted: 0,
-            error: 'Failed to process segment for goals',
-          };
+          return { newGoalsCreated, goalsUpdated, goalsCompleted };
+        } catch (error) {
+          const friendlyError = createGoalError(
+            'Goal Processing Failed',
+            error instanceof Error ? error.message : 'Failed to process goals for the segment.',
+            ErrorType.SERVICE,
+            true
+          );
+          return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error: friendlyError };
+        } finally {
+          set({ loading: false });
         }
       },
-
-      // State management actions
-      reset: () => set(() => initialState),
-      setError: (error) => set(() => ({ error })),
-      clearError: () => set(() => ({ error: null })),
-      setLoading: (loading) => set(() => ({ loading })),
     }),
     {
       name: 'narraitor-goal-store',
@@ -443,6 +383,22 @@ export const useGoalStore = create<GoalStore>()(
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
+      migrate: (persistedState: unknown) => {
+        if (persistedState && typeof persistedState === 'object' && 'goals' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.goals && typeof state.goals === 'object') {
+            state.entities = { ...state.goals };
+          }
+          if (typeof state.error === 'string') {
+            state.error = createGoalError(state.error, state.error, ErrorType.UNKNOWN);
+          }
+          if (typeof state.loading !== 'boolean') {
+            state.loading = false;
+          }
+        }
+        return persistedState as GoalStore;
+      },
     }
   )
 );
