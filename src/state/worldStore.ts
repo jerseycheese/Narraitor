@@ -8,7 +8,7 @@ import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.type
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
 import { CrudStore } from './createCrudStore';
-import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 
 /**
  * World store interface with state and actions
@@ -46,14 +46,6 @@ export interface WorldStore extends CrudStore<World> {
 export const useWorldStore = create<WorldStore>()(
   persist(
     (set, get) => {
-      // Helper to create UserFriendlyError
-      const createValidationError = (title: string, message: string): UserFriendlyError => ({
-        title,
-        message,
-        retryable: false,
-        type: ErrorType.VALIDATION,
-      });
-
       return {
         // State
         worlds: {},
@@ -101,7 +93,7 @@ export const useWorldStore = create<WorldStore>()(
         update: (id, updates) => {
           const world = get().worlds[id];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -165,7 +157,7 @@ export const useWorldStore = create<WorldStore>()(
         setCurrent: (id) => {
           if (id && !get().worlds[id]) {
             set({
-              error: createValidationError('World Not Found', 'The specified world could not be found'),
+              error: createStoreError('World Not Found', 'The specified world could not be found'),
               currentEntityId: null,
               currentWorldId: null,
             });
@@ -191,12 +183,12 @@ export const useWorldStore = create<WorldStore>()(
         addAttribute: (worldId, attributeData) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
           if ((world.attributes?.length || 0) >= (world.settings?.maxAttributes || 0)) {
-            set({ error: createValidationError('Maximum Attributes Reached', 'This world has reached its maximum number of attributes') });
+            set({ error: createStoreError('Maximum Attributes Reached', 'This world has reached its maximum number of attributes') });
             return;
           }
 
@@ -219,7 +211,7 @@ export const useWorldStore = create<WorldStore>()(
         updateAttribute: (worldId, attributeId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -237,7 +229,7 @@ export const useWorldStore = create<WorldStore>()(
         removeAttribute: (worldId, attributeId) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -255,12 +247,12 @@ export const useWorldStore = create<WorldStore>()(
         addSkill: (worldId, skillData) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
           if ((world.skills?.length || 0) >= (world.settings?.maxSkills || 0)) {
-            set({ error: createValidationError('Maximum Skills Reached', 'This world has reached its maximum number of skills') });
+            set({ error: createStoreError('Maximum Skills Reached', 'This world has reached its maximum number of skills') });
             return;
           }
 
@@ -283,7 +275,7 @@ export const useWorldStore = create<WorldStore>()(
         updateSkill: (worldId, skillId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -301,7 +293,7 @@ export const useWorldStore = create<WorldStore>()(
         removeSkill: (worldId, skillId) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -319,7 +311,7 @@ export const useWorldStore = create<WorldStore>()(
         updateSettings: (worldId, settings) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 
@@ -336,7 +328,7 @@ export const useWorldStore = create<WorldStore>()(
         updateToneSettings: (worldId, toneSettings) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createValidationError('World Not Found', 'The specified world could not be found') });
+            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
             return;
           }
 

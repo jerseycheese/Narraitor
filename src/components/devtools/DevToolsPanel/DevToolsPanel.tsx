@@ -5,7 +5,7 @@ import { useDevTools } from '../DevToolsContext';
 import { StateSection, StateInspectorSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { AIMonitoringSection } from '../AIMonitoringSection';
-import { CollapsibleSection } from '../CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';

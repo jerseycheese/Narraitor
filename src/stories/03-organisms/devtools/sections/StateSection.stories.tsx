@@ -1,6 +1,6 @@
 import type { StoryObj } from '@storybook/react';
 import React from 'react';
-import { CollapsibleSection } from '@/components/devtools/CollapsibleSection/CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { JsonViewer } from '@/components/devtools/JsonViewer/JsonViewer';
 
 /**

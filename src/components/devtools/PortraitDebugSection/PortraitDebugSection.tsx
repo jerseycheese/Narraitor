@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai';
 import { useCharacterStore, type Character as StoreCharacter } from '@/state/characterStore';

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { X } from 'lucide-react';
 import { stateInspector, type StateSnapshot, type PathInfo } from '@/lib/utils/stateInspector';
 import { formatForDebug, getValueTypeInfo } from '@/lib/utils';
-import { CollapsibleSection } from '../CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

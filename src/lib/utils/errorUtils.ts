@@ -122,3 +122,38 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
 export function userFriendlyErrorMessage(error: Error): string {
   return getUserFriendlyError(error).message;
 }
+
+/**
+ * Creates a standardized UserFriendlyError for store operations
+ *
+ * Used across all Zustand stores for consistent error handling.
+ * Consolidates duplicate error factory functions from individual stores.
+ *
+ * @param title - Short error title (e.g., "World Not Found")
+ * @param message - Detailed error message for user
+ * @param type - Error type category (defaults to VALIDATION)
+ * @param retryable - Whether the operation can be retried (defaults to false)
+ * @returns UserFriendlyError object
+ *
+ * @example
+ * ```ts
+ * // In a store
+ * if (!entity) {
+ *   set({ error: createStoreError('Entity Not Found', 'The specified entity could not be found') });
+ *   return;
+ * }
+ * ```
+ */
+export function createStoreError(
+  title: string,
+  message: string,
+  type: ErrorType = ErrorType.VALIDATION,
+  retryable = false
+): UserFriendlyError {
+  return {
+    title,
+    message,
+    retryable,
+    type,
+  };
+}

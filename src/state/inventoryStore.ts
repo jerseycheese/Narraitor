@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { safeTrim, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 
 export interface InventoryItem {
@@ -41,18 +41,6 @@ const getInitialState = () => ({
   currentEntityId: null as EntityID | null,
   error: null as UserFriendlyError | null,
   loading: false,
-});
-
-const createInventoryError = (
-  title: string,
-  message: string,
-  type: ErrorType = ErrorType.VALIDATION,
-  retryable = false
-): UserFriendlyError => ({
-  title,
-  message,
-  retryable,
-  type,
 });
 
 export const useInventoryStore = create<InventoryStore>()((set, get) => ({
@@ -95,7 +83,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   update: (id, updates) => {
     const currentItem = get().items[id];
     if (!currentItem) {
-      set({ error: createInventoryError('Item Not Found', 'The specified inventory item could not be found.') });
+      set({ error: createStoreError('Item Not Found', 'The specified inventory item could not be found.') });
       return;
     }
 
@@ -167,7 +155,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   setCurrent: (id) => {
     if (id && !get().items[id]) {
       set({
-        error: createInventoryError('Item Not Found', 'The specified inventory item could not be found.'),
+        error: createStoreError('Item Not Found', 'The specified inventory item could not be found.'),
         currentEntityId: null,
       });
       return;
@@ -192,7 +180,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   transferItem: (itemId, toCharacterId) => {
     const item = get().items[itemId];
     if (!item) {
-      set({ error: createInventoryError('Item Not Found', 'Unable to transfer a non-existent item.') });
+      set({ error: createStoreError('Item Not Found', 'Unable to transfer a non-existent item.') });
       return;
     }
 

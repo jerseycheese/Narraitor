@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';

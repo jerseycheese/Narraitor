@@ -13,6 +13,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 
 
 /**
@@ -22,7 +23,7 @@ interface JournalStore {
   // State
   entries: Record<EntityID, JournalEntry>;
   sessionEntries: Record<EntityID, EntityID[]>;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 
   // Actions
@@ -41,7 +42,7 @@ interface JournalStore {
   
   // State management
   reset: () => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -99,7 +100,7 @@ export const useJournalStore = create<JournalStore>()(
   // Update entry
   updateEntry: (entryId, updates) => set((state) => {
     if (!state.entries[entryId]) {
-      return { error: 'Entry not found' };
+      return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
     }
 
     const updatedEntry: JournalEntry = {
@@ -144,7 +145,7 @@ export const useJournalStore = create<JournalStore>()(
   // Mark as read
   markAsRead: (entryId) => set((state) => {
     if (!state.entries[entryId]) {
-      return { error: 'Entry not found' };
+      return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
     }
 
     const updatedEntry: JournalEntry = {

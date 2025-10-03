@@ -1,0 +1,29 @@
+
+> narraitor@0.1.0 build
+> next build && npm run build-storybook && cp -r storybook-static public/
+
+   ▲ Next.js 15.3.1
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+warn - The utility `card` contains an invalid theme value and was not generated.
+ ✓ Compiled successfully in 4.0s
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/utils/testUtils.ts:91:22
+Type error: Argument of type 'string | null' is not assignable to parameter of type 'UserFriendlyError | null'.
+  Type 'string' is not assignable to type 'UserFriendlyError'.
+
+[0m [90m 89 |[39m     [0m
+[0m [90m 90 |[39m     [36mif[39m ([32m'setError'[39m [36min[39m store) {[0m
+[0m[31m[1m>[22m[39m[90m 91 |[39m       store[33m.[39msetError(error)[33m;[39m[0m
+[0m [90m    |[39m                      [31m[1m^[22m[39m[0m
+[0m [90m 92 |[39m     }[0m
+[0m [90m 93 |[39m     [0m
+[0m [90m 94 |[39m     debugLog([32m`Set error state to: ${error}`[39m)[33m;[39m[0m
+Next.js build worker exited with code: 1 and signal: null

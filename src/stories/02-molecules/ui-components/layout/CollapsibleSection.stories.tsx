@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
 const meta: Meta<typeof CollapsibleSection> = {
   title: '02-Molecules/ui-components/layout/CollapsibleSection',
