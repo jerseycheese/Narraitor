@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // App Router is enabled by default in Next.js 13+
-  // No specific configuration needed for basic App Router usage
-  
+  // React strict mode for development warnings
+  reactStrictMode: true,
+
   // ESLint and TypeScript checks are enabled
   eslint: {
     ignoreDuringBuilds: false,
@@ -11,10 +11,27 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  
-  // Enable development indicators to help catch errors during testing
-  // devIndicators: false, // Disabled to allow error visibility during tests
-  
+
+  // Hide development indicators for clean screenshots
+  devIndicators: false,
+
+  // Redirects for old dev paths
+  async redirects() {
+    return [
+      // Redirect old dev paths to new ones
+      {
+        source: '/app/dev',
+        destination: '/dev',
+        permanent: true,
+      },
+      {
+        source: '/app/dev/:path*',
+        destination: '/dev/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // Configure external image domains
   images: {
     remotePatterns: [
@@ -26,11 +43,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
-  // Optional: You can add experimental features if needed
-  // experimental: {
-  //   serverActions: true,
-  // },
+
+  // Webpack configuration
+  webpack: (config) => {
+    // Add path resolver fallback for client-side builds
+    config.resolve.fallback = { fs: false, path: false };
+    return config;
+  },
 };
 
 export default nextConfig;
