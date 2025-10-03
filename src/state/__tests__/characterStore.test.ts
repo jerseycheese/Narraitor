@@ -153,7 +153,11 @@ describe('useCharacterStore', () => {
     test('should handle non-existent character', () => {
       useCharacterStore.getState().updateCharacter('non-existent-id', { name: 'Updated' });
       const state = useCharacterStore.getState();
-      expect(state.error).toBe('Character not found');
+      expect(state.error).toMatchObject({
+        title: 'Character Not Found',
+        message: 'The specified character could not be found',
+        type: 'validation'
+      });
     });
   });
 
@@ -269,7 +273,11 @@ describe('useCharacterStore', () => {
     test('should handle non-existent character', () => {
       useCharacterStore.getState().setCurrentCharacter('non-existent-id');
       const state = useCharacterStore.getState();
-      expect(state.error).toBe('Character not found');
+      expect(state.error).toMatchObject({
+        title: 'Character Not Found',
+        message: 'The specified character could not be found',
+        type: 'validation'
+      });
       expect(state.currentCharacterId).toBeNull();
     });
   });
@@ -435,7 +443,11 @@ describe('useCharacterStore', () => {
 
       const state = useCharacterStore.getState();
       expect(state.characters[characterId].skills).toHaveLength(maxSkills);
-      expect(state.error).toBe('Maximum skills limit reached');
+      expect(state.error).toMatchObject({
+        title: 'Maximum Skills Reached',
+        message: 'This character has reached its maximum number of skills',
+        type: 'validation'
+      });
     });
   });
 
