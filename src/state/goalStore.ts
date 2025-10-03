@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -50,18 +50,6 @@ const getInitialState = () => ({
   currentEntityId: null as EntityID | null,
   error: null as UserFriendlyError | null,
   loading: false,
-});
-
-const createGoalError = (
-  title: string,
-  message: string,
-  type: ErrorType = ErrorType.VALIDATION,
-  retryable = false
-): UserFriendlyError => ({
-  title,
-  message,
-  retryable,
-  type,
 });
 
 const validateGoalData = (data: Partial<NarrativeGoal>): void => {
@@ -129,7 +117,7 @@ export const useGoalStore = create<GoalStore>()(
       update: (goalId, updates) => {
         const existingGoal = get().goals[goalId];
         if (!existingGoal) {
-          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
           return;
         }
 
@@ -223,7 +211,7 @@ export const useGoalStore = create<GoalStore>()(
       setCurrent: (id) => {
         if (id && !get().goals[id]) {
           set({
-            error: createGoalError('Goal Not Found', 'The specified goal could not be found.'),
+            error: createStoreError('Goal Not Found', 'The specified goal could not be found.'),
             currentEntityId: null,
           });
           return;
@@ -269,7 +257,7 @@ export const useGoalStore = create<GoalStore>()(
       incrementMentionCount: (goalId) => {
         const goal = get().goals[goalId];
         if (!goal) {
-          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
           return;
         }
 
@@ -282,7 +270,7 @@ export const useGoalStore = create<GoalStore>()(
       addProgressNote: (goalId, note) => {
         const goal = get().goals[goalId];
         if (!goal) {
-          set({ error: createGoalError('Goal Not Found', 'The specified goal could not be found.') });
+          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
           return;
         }
 
@@ -303,7 +291,7 @@ export const useGoalStore = create<GoalStore>()(
           const segment = narrativeState.segments[segmentId];
 
           if (!segment) {
-            const error = createGoalError('Segment Not Found', 'Narrative segment not found for goal processing.', ErrorType.SERVICE, true);
+            const error = createStoreError('Segment Not Found', 'Narrative segment not found for goal processing.', ErrorType.SERVICE, true);
             return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error };
           }
 
@@ -312,7 +300,7 @@ export const useGoalStore = create<GoalStore>()(
           );
 
           if (!sessionId) {
-            const error = createGoalError('Session Not Found', 'No session could be determined for the provided segment.', ErrorType.SERVICE, true);
+            const error = createStoreError('Session Not Found', 'No session could be determined for the provided segment.', ErrorType.SERVICE, true);
             return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error };
           }
 
@@ -362,7 +350,7 @@ export const useGoalStore = create<GoalStore>()(
 
           return { newGoalsCreated, goalsUpdated, goalsCompleted };
         } catch (error) {
-          const friendlyError = createGoalError(
+          const friendlyError = createStoreError(
             'Goal Processing Failed',
             error instanceof Error ? error.message : 'Failed to process goals for the segment.',
             ErrorType.SERVICE,
@@ -391,7 +379,7 @@ export const useGoalStore = create<GoalStore>()(
             state.entities = { ...state.goals };
           }
           if (typeof state.error === 'string') {
-            state.error = createGoalError(state.error, state.error, ErrorType.UNKNOWN);
+            state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
           }
           if (typeof state.loading !== 'boolean') {
             state.loading = false;

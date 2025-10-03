@@ -1,4 +1,5 @@
 import { useCharacterStore } from '../characterStore';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
@@ -459,7 +460,7 @@ describe('useCharacterStore', () => {
         title: 'Test error',
         message: 'Details',
         retryable: false,
-        type: 'unknown'
+        type: ErrorType.UNKNOWN
       });
       expect(useCharacterStore.getState().error?.title).toBe('Test error');
 
@@ -512,7 +513,7 @@ describe('useCharacterStore', () => {
         title: 'Some error',
         message: 'Details',
         retryable: false,
-        type: 'unknown'
+        type: ErrorType.UNKNOWN
       });
       useCharacterStore.getState().setLoading(true);
 

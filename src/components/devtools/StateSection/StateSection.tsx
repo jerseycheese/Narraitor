@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { CollapsibleSection } from '../CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 
 // Import all stores

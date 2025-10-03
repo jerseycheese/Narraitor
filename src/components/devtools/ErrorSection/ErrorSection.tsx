@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { CollapsibleSection } from '../CollapsibleSection';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
 /**
  * Component for displaying and managing runtime errors in DevTools

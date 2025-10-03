@@ -1,4 +1,5 @@
 import { useInventoryStore } from '../inventoryStore';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('useInventoryStore', () => {
   beforeEach(() => {
@@ -310,8 +311,9 @@ describe('useInventoryStore', () => {
 
   describe('error handling', () => {
     test('should set and clear errors', () => {
-      useInventoryStore.getState().setError('Test error');
-      expect(useInventoryStore.getState().error).toBe('Test error');
+      const testError = { title: 'Test Error', message: 'Test error message', retryable: false, type: ErrorType.VALIDATION };
+      useInventoryStore.getState().setError(testError);
+      expect(useInventoryStore.getState().error).toEqual(testError);
 
       useInventoryStore.getState().clearError();
       expect(useInventoryStore.getState().error).toBeNull();
@@ -340,7 +342,7 @@ describe('useInventoryStore', () => {
         value: 10,
         equipped: false
       });
-      useInventoryStore.getState().setError('Some error');
+      useInventoryStore.getState().setError({ title: 'Error', message: 'Some error', retryable: false, type: ErrorType.VALIDATION });
       useInventoryStore.getState().setLoading(true);
 
       // Reset

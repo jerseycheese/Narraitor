@@ -13,7 +13,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
-import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 
 /**
@@ -98,18 +98,6 @@ const initialState = getInitialState();
 export const useLoreStore = create<LoreStore>()(
   persist(
     (set, get) => {
-      const createLoreError = (
-        title: string,
-        message: string,
-        type: ErrorType = ErrorType.VALIDATION,
-        retryable = false
-      ): UserFriendlyError => ({
-        title,
-        message,
-        retryable,
-        type,
-      });
-
       return {
         ...initialState,
 
@@ -139,7 +127,7 @@ export const useLoreStore = create<LoreStore>()(
         update: (id, updates) => {
           const fact = get().facts[id];
           if (!fact) {
-            set({ error: createLoreError('Lore Fact Not Found', 'The specified lore fact could not be found.') });
+            set({ error: createStoreError('Lore Fact Not Found', 'The specified lore fact could not be found.') });
             return;
           }
 
@@ -194,7 +182,7 @@ export const useLoreStore = create<LoreStore>()(
         setCurrent: (id) => {
           if (id && !get().facts[id]) {
             set({
-              error: createLoreError('Lore Fact Not Found', 'The specified lore fact could not be found.'),
+              error: createStoreError('Lore Fact Not Found', 'The specified lore fact could not be found.'),
               currentEntityId: null,
             });
             return;
@@ -214,13 +202,13 @@ export const useLoreStore = create<LoreStore>()(
 
         addFact: (key, value, category, source, worldId, sessionId, metadata) => {
           if (!get().validateFact({ key, value, category, worldId })) {
-            set({ error: createLoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
+            set({ error: createStoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
             return;
           }
 
           if (!get().validateKey(key)) {
             set({
-              error: createLoreError(
+              error: createStoreError(
                 'Invalid Lore Key',
                 'Lore keys must start with a letter and contain only letters, numbers, or underscores.'
               ),
@@ -230,7 +218,7 @@ export const useLoreStore = create<LoreStore>()(
 
           if (!get().validateFactUniqueness(worldId, key, value)) {
             set({
-              error: createLoreError(
+              error: createStoreError(
                 'Duplicate Lore Fact',
                 'A lore fact with this key and value already exists for this world.'
               ),
@@ -458,7 +446,7 @@ export const useLoreStore = create<LoreStore>()(
             });
           } catch (error) {
             set({
-              error: createLoreError(
+              error: createStoreError(
                 'Lore Import Failed',
                 error instanceof Error ? error.message : 'Unknown import error occurred.',
                 ErrorType.SERVICE

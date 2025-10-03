@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 
 // Simplified character types for MVP implementation
@@ -126,14 +126,6 @@ const getInitialState = () => ({
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
   persist(
     (set, get) => {
-      // Helper to create validation errors
-      const createValidationError = (title: string, message: string): UserFriendlyError => ({
-        title,
-        message,
-        retryable: false,
-        type: ErrorType.VALIDATION,
-      });
-
       return {
         characters: {},
         entities: {},
@@ -205,7 +197,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         update: (id, updates) => {
           const character = get().characters[id];
           if (!character) {
-            set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
 
@@ -284,7 +276,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         setCurrent: (id) => {
           if (id && !get().characters[id]) {
             set({
-              error: createValidationError('Character Not Found', 'The specified character could not be found'),
+              error: createStoreError('Character Not Found', 'The specified character could not be found'),
               currentCharacterId: null,
               currentEntityId: null,
             });
@@ -318,7 +310,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         addAttribute: (characterId, attributeData) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
 
@@ -337,7 +329,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         updateAttribute: (characterId, attributeId, updates) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
 
@@ -353,7 +345,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         removeAttribute: (characterId, attributeId) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
 
@@ -370,12 +362,12 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         addSkill: (characterId, skillData) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createValidationError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
 
           if ((character.skills?.length || 0) >= 2) {
-            set({ error: createValidationError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
+            set({ error: createStoreError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
             return;
           }
 
