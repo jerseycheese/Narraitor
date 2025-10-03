@@ -1,6 +1,5 @@
 import { applyWorldTemplate } from '../templateLoader';
 import { templates } from '../worldTemplates';
-import { useWorldStore } from '@/state/worldStore';
 
 // Mock the generateUniqueId function
 jest.mock('../../utils/generateId', () => ({
