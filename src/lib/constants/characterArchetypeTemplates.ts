@@ -471,9 +471,17 @@ export const PHYSICAL_DESCRIPTION_TEMPLATES: Record<string, string[]> = {
   'Sheriff': ['sturdy', 'commanding', 'reliable', 'authoritative'],
   'Cowboy': ['rugged', 'sun-weathered', 'tough', 'hardy'],
   'Knight': ['noble', 'armored', 'imposing', 'chivalrous'],
-  'Merchant': ['well-dressed', 'prosperous', 'keen-eyed', 'travelled'],
-  'Blacksmith': ['muscular', 'scarred', 'strong', 'capable'],
-  'Investigator': ['intense', 'haunted', 'perceptive', 'driven'],
-  'Survivor': ['scarred', 'wary', 'hardened', 'resilient'],
-  'Occultist': ['mysterious', 'pale', 'intense', 'otherworldly']
+  'Merchant': ['well-dressed', 'prosperous', 'traveled', 'shrewd'],
+  'Investigator': ['intense', 'focused', 'determined', 'haunted'],
+  'Survivor': ['scarred', 'resilient', 'alert', 'battle-worn'],
+  'Occultist': ['mysterious', 'pale', 'otherworldly', 'secretive'],
+  'Private Detective': ['sharp', 'perceptive', 'streetwise', 'experienced'],
+  'Forensic Expert': ['precise', 'analytical', 'methodical', 'scientific'],
+  'Reporter': ['energetic', 'inquisitive', 'persistent', 'well-informed'],
+  'Hacker': ['cyber-enhanced', 'tech-savvy', 'wired', 'digital'],
+  'Street Samurai': ['enhanced', 'cybernetic', 'deadly', 'precise'],
+  'Corporate Agent': ['polished', 'professional', 'ambitious', 'calculating'],
+  'Balanced': ['average', 'well-proportioned', 'approachable', 'steady'],
+  'Specialist': ['focused', 'intense', 'precise', 'dedicated'],
+  'Versatile': ['adaptable', 'dynamic', 'expressive', 'changeable']
 };
