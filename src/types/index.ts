@@ -82,10 +82,9 @@ export type {
 } from './runtime-error.types';
 
 // Export validation functions and remaining type guards
-export { 
+export {
   validateWorld,
-  validateCharacter,
-  isInventoryItem, 
-  isNarrativeSegment, 
-  isJournalEntry 
+  isInventoryItem,
+  isNarrativeSegment,
+  isJournalEntry
 } from './type-guards';

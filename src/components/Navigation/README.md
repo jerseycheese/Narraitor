@@ -143,8 +143,6 @@ npm run storybook
 # Navigate to Components > Navigation > Navigation
 ```
 
-### Test Harness
-Visit `/dev/navigation-loading` to test navigation loading states.
 
 ## Related Components
 - [NavigationLoadingProvider](../shared/NavigationLoadingProvider.md)

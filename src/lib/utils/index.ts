@@ -88,22 +88,6 @@ export type { SelectOptionWithDescription } from './enumHelpers';
 export { createFormUpdater, createFieldProps } from './formHelpers';
 export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';
 
-// Skill-related utilities
-export { 
-  buildCharacterSkillContext, 
-  getCharacterSkillInfo, 
-  hasActiveSkills 
-} from './characterSkillContextBuilder';
-export type { SkillContextOptions } from './characterSkillContextBuilder';
-
-export {
-  shouldAcknowledgeSkillUsage,
-  extractSkillUsageFromContext,
-  extractCustomActionFromContext,
-  generateSkillAcknowledgmentTags,
-  getSkillAcknowledgmentMood
-} from './skillAcknowledgmentHelper';
-export type { SkillUsageData, CustomActionData } from './skillAcknowledgmentHelper';
 
 // Object access utilities
 export {
@@ -129,40 +113,6 @@ export {
   getValueTypeInfo
 } from './formatters';
 
-// === PERFORMANCE UTILITIES ===
-
-/** 
- * Performance measurement utilities for development debugging
- * Lightweight timing, monitoring, and reporting with zero production impact
- * @see performanceUtils.ts for detailed usage examples
- */
-export {
-  PerformanceTimer,
-  measureTime,
-  measureAsync,
-  createPerformanceGroup,
-  generatePerformanceReport,
-  getGlobalPerformanceReport,
-  clearGlobalMeasurements,
-  formatDuration,
-  logPerformanceReport,
-  monitorCriticalPath,
-  createCriticalPathMonitor,
-  createAsyncCriticalPathMonitor,
-  trackPerformanceMetrics,
-  getBatchMetrics,
-  clearBatchMetrics,
-  generateBatchReport
-} from './performanceUtils';
-
-// === RESPONSE EXTRACTION UTILITIES ===
-
-/** 
- * Response information extraction utilities for developer tools and debugging
- * Extract structured data from AI-generated responses with error handling
- * @see responseExtractor.ts for detailed usage examples
- */
-export { ResponseExtractor } from './responseExtractor';
 
 /** 
  * Narrative parsing utilities for AI response content processing
@@ -172,11 +122,3 @@ export { ResponseExtractor } from './responseExtractor';
 export { parseNarrativeContent, parseNarrativeContentWithMetadata } from './narrativeParser';
 export type { NarrativeParseResult } from './narrativeParser';
 
-/** Type definitions for performance measurement */
-export type {
-  PerformanceMeasurement,
-  PerformanceReport,
-  PerformanceOptions,
-  CriticalPathOptions,
-  BatchMetrics
-} from './performanceUtils';

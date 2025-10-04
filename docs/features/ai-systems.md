@@ -263,8 +263,7 @@ All the mock configuration persists across browser sessions, so you can set up y
 ### Manual Testing
 There are several dev routes set up for testing different AI features:
 
-- `/dev/ai-ending-detection` - Test ending detection scenarios
-- `/dev/world-creation-wizard` - Test AI world suggestions  
+- `/dev/world-creation-wizard` - Test AI world suggestions
 - `/dev/game-session` - Test narrative and choice generation
 - `/dev/devtools-test` - Test AI mocking functionality
 
