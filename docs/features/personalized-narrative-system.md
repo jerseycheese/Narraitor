@@ -2,24 +2,24 @@
 
 ## Why This Matters
 
-Ever notice how some players love getting into long conversations with NPCs while others just want to stab things and move on? Or how some people want every tiny detail described while others prefer to get straight to the action? 
+Ever notice how some players love getting into long conversations with NPCs while others just want to stab things and move on? Or how some people want every tiny detail described while others prefer to get straight to the action?
 
-This system watches how players actually play and adapts the storytelling to match their style. If you're the type who always chooses diplomatic solutions, the AI will start generating more conversation-heavy scenarios. If you prefer action, you'll get more opportunities for combat and adventure. It's like having a DM who actually pays attention to what you enjoy.
+This system watches how players actually play and adapts the storytelling to match their style. Instead of manually calculating complex patterns, we send raw decision data to Gemini and let the LLM do what it's good at - recognizing patterns and adapting narratives.
 
 ## The Two Main Pieces
 
-### PersonalizationEngine - The Brain
-This is where the magic happens. The engine looks at all the choices a player has made and figures out what kind of experience they're probably looking for.
+### PersonalizationEngine - The Data Formatter
+This component takes player choices and formats them for the LLM to analyze.
 
 The key things it does:
-- **Analyzes player behavior** to detect personality traits (are they aggressive? diplomatic? cautious?)
-- **Creates personalized context** that gets fed to the AI
-- **Generates narrative enhancement** - basically instructions for the AI about how to tell the story for this specific player
+- **Aggregates basic choice data** (what types of choices are most common)
+- **Creates personalized context** with raw decision history
+- **Generates narrative enhancement** - simple instructions that include the actual decision data for Gemini to analyze
 
-What makes it smart:
-- **Dynamic preference detection** - it figures out if you like action, dialogue, or exploration without you having to set preferences
+What makes it work:
+- **Sends raw data to LLM** - lets Gemini infer patterns instead of pre-calculating them
 - **Bulletproof input handling** - validates and sanitizes everything so malicious input can't break things
-- **Graceful degradation** - if the fancy AI analysis fails, it falls back to simpler pattern matching
+- **Simple aggregation** - tracks choice type counts but leaves pattern inference to the AI
 
 ### PlayerDecisionTracker - The Memory
 This component remembers everything you do and organizes it in ways that are useful for personalization.
@@ -34,30 +34,34 @@ Built-in protection:
 - **Storage limits** so the system doesn't eat all your disk space
 - **Smart filtering** to get just the decisions that matter for analysis
 
-## How It Figures Out What You Like
+## How It Works
 
-### Reading Your Play Style
-The system is pretty good at detecting what kind of player you are just by watching your choices:
+### LLM-Based Pattern Recognition
+Instead of manually calculating complex heuristics, the system sends your raw decision history to Gemini and lets the AI figure out your preferences. This approach:
 
-- **Action Junkie**: If more than 40% of your choices are aggressive or chaotic, you obviously like things fast-paced
-- **People Person**: More than 40% diplomatic or helpful choices? You're here for the character interactions
-- **The Thinker**: More than 30% stealthy or cautious choices means you like to plan and strategize
-- **Conversation Lover**: If 30% of your choices happen in dialogue contexts, you want to talk things out
-- **Explorer**: The default for everyone else - you like a mix of everything
+- **Reduces code complexity**: No need for dozens of threshold checks and pattern matching algorithms
+- **Adapts naturally**: LLMs are good at recognizing patterns in human behavior
+- **Stays flexible**: Adding new decision types or genres doesn't require rewriting detection logic
 
-### Detail Preferences
-It also figures out how much description you actually want:
+### What Gets Sent to the LLM
+The PersonalizationEngine formats your recent decisions into a simple structure:
 
-- **Detail Oriented**: If most of your choices (>60%) happen in rich contexts with location, situation, and character details, you want the full cinematic experience
-- **Moderate**: You want some detail but not overwhelming amounts (30-60% rich contexts)
-- **Get to the Point**: Less than 30% rich contexts means you prefer streamlined storytelling
+- **Decision text**: What you actually chose
+- **Decision type**: Category (diplomatic, aggressive, stealthy, etc.)
+- **Context**: Where you were and who was present
+- **Active goals**: What your character is trying to achieve
 
-### Action vs. Talk
-The system tracks whether you prefer doing things or talking about things:
+Example of what Gemini sees:
+```
+RECENT PLAYER DECISIONS:
+• Help the stranger at the tavern (with: Innkeeper, Guard) [helpful]
+• Sneak past the guards at the city gates [stealthy]
+• Confront the merchant about the stolen goods (with: Merchant) [aggressive]
 
-- **Action Focus**: Your action choices outnumber dialogue choices by more than 20%
-- **Dialogue Focus**: You choose talking over doing by more than 20% 
-- **Balanced**: You like a good mix of both
+Based on these decisions, adapt the narrative to match the player's style and reference past choices where relevant.
+```
+
+The AI uses this to tailor narrative descriptions, dialogue, and choice presentations to match how you actually play.
 
 ## Security Features
 
@@ -85,7 +89,7 @@ const sanitizeString = (str: string) => {
 
 ## Usage Examples
 
-### Basic Personalization
+### Basic Usage
 ```typescript
 const engine = new PersonalizationEngine();
 const tracker = new PlayerDecisionTracker();
@@ -107,23 +111,24 @@ const context = engine.createPersonalizedContext(
   decisions
 );
 
-// Generate narrative enhancement
+// Generate narrative enhancement (formatted for LLM)
 const enhancement = engine.generateNarrativeEnhancement(context);
+// Returns formatted string with recent decisions for Gemini to analyze
 ```
 
-### Decision Pattern Analysis
+### Simple Pattern Tracking
 ```typescript
 const tracker = new PlayerDecisionTracker();
 
-// Analyze player behavior patterns
+// Basic choice pattern aggregation
 const patterns = tracker.analyzeChoicePatterns();
 console.log(patterns.dominantChoiceTypes); // ['diplomatic', 'helpful']
-console.log(patterns.patternStrength); // 75 (strong pattern)
+console.log(patterns.patternStrength); // 75
 
-// Get behavior analysis
+// Lightweight behavior analysis (for UI display)
 const analysis = engine.analyzePlayerBehavior(character, world, decisions);
 console.log(analysis.detectedTraits); // ['diplomatic', 'empathetic', 'logical']
-console.log(analysis.preferences.narrativeStyle); // 'character-driven'
+console.log(analysis.preferences.preferredChoiceTypes); // ['diplomatic', 'helpful']
 ```
 
 ## Integration Points
@@ -150,39 +155,39 @@ const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
 
 ## Performance Characteristics
 
-### Complexity
-- Decision analysis: O(n) where n = number of decisions
-- Pattern detection: O(n) for statistical analysis
-- Memory usage: Constant overhead with configurable limits
+### Simplicity Benefits
+- Decision aggregation: O(n) where n = number of decisions
+- No complex pattern algorithms: Pattern inference happens in the LLM, not in client code
+- Memory usage: Minimal overhead with basic counting
 
 ### Storage Limits
 - Maximum decisions per session: 50 (configurable)
 - Maximum total decisions: 500 (configurable)
 - Automatic cleanup of old decisions
 
-### Optimization Features
+### Efficiency Features
 - Efficient filtering for session/world-specific decisions
-- Lazy loading of decision history
-- Sanitization with length limits to prevent memory issues
+- Only sends last 5-10 decisions to LLM (not entire history)
+- Input sanitization prevents memory bloat
 
 ## Testing Coverage
 
 ### Test Categories
-1. **Core Functionality Tests** (7 tests)
-   - Narrative enhancement generation
-   - Dynamic style inference
+1. **Core Functionality Tests**
+   - Narrative enhancement formatting
+   - Decision data structuring for LLM
    - Input sanitization
-   - Player behavior analysis
+   - Basic behavior aggregation
 
-2. **Decision Tracking Tests** (12 tests)
+2. **Decision Tracking Tests**
    - Decision recording and retrieval
-   - Pattern analysis algorithms
+   - Simple pattern counting
    - Input validation and sanitization
    - Edge case handling
 
-3. **Integration Tests** (2 tests)
+3. **Integration Tests**
    - Engine-tracker integration
-   - Decision pattern influence verification
+   - Decision formatting verification
 
 ### Security Testing
 - XSS prevention validation
@@ -201,19 +206,19 @@ interface DecisionTrackerConfig {
 }
 ```
 
-### Personalization Thresholds
-All thresholds are configurable in the engine implementation:
-- Style detection percentages (40% for action/social, 30% for stealth)
-- Detail level thresholds (60% detailed, 30% moderate)
-- Content focus difference threshold (20%)
+### Personalization Settings
+The engine uses minimal configuration:
+- Recent decision limit: 5-10 decisions sent to LLM
+- Trait detection: Top 3 most common traits from choice type mapping
+- Confidence scaling: Based on decision count (decisions * 15, max 85)
 
 ## Future Enhancements
 
-### Planned Improvements
-1. **Temporal Weighting**: Recent decisions have more influence
-2. **Cross-Session Learning**: Learn preferences across multiple games
-3. **Advanced Pattern Recognition**: ML-based preference detection
-4. **Multi-Character Analysis**: Track preferences per character type
+### Potential Improvements
+1. **Temporal Weighting**: Recent decisions have more influence on LLM context
+2. **Cross-Session Learning**: Aggregate preferences across multiple playthroughs
+3. **Genre-Specific Context**: Include genre-specific decision patterns in LLM prompt
+4. **Dynamic Confidence**: Adjust LLM instructions based on decision history depth
 
 ### Storage Abstraction
 Currently uses client-side storage; planned abstractions for:
@@ -226,13 +231,13 @@ Currently uses client-side storage; planned abstractions for:
 ### PersonalizationEngine Methods
 
 #### `analyzePlayerBehavior(character, world, decisions, relationships?, goals?): PersonalizationAnalysis`
-Analyzes player behavior patterns to detect traits and preferences.
+Performs basic aggregation of player decisions and detects top 3 personality traits.
 
 #### `createPersonalizedContext(character, world, decisions, relationships?, goals?, narrativeHistory?): PersonalizedNarrativeContext`
-Creates comprehensive personalized context for narrative generation.
+Creates structured context object containing recent decisions and basic preferences.
 
 #### `generateNarrativeEnhancement(context): string`
-Generates narrative enhancement text based on personalized context.
+Formats decision history into LLM-ready text with instructions for pattern inference.
 
 ### PlayerDecisionTracker Methods
 
@@ -240,7 +245,7 @@ Generates narrative enhancement text based on personalized context.
 Records a player decision with full validation and sanitization.
 
 #### `analyzeChoicePatterns(decisions?): ChoicePatternAnalysis`
-Analyzes decision patterns to identify behavioral trends.
+Simple aggregation of choice types to identify most common patterns.
 
 #### `getSessionDecisions(sessionId): PlayerDecision[]`
 Retrieves all decisions for a specific session.
@@ -264,19 +269,20 @@ Retrieves recent decisions within specified time frame.
 **Problem**: Storage limits exceeded
 **Solution**: Adjust `maxTotalDecisions` configuration or implement decision cleanup
 
-**Problem**: Pattern strength too low
-**Solution**: Ensure sufficient decision history (>10 decisions for reliable patterns)
+**Problem**: Not enough context for LLM
+**Solution**: Ensure at least 5-10 decisions exist before expecting personalized narratives
 
 ### Debug Helpers
 ```typescript
 // Check decision recording
 console.log(tracker.getRecentDecisions(1));
 
-// Verify pattern analysis
+// Verify pattern aggregation
 const analysis = tracker.analyzeChoicePatterns();
-console.log('Pattern strength:', analysis.patternStrength);
+console.log('Dominant types:', analysis.dominantChoiceTypes);
 
-// Test personalization context
+// Test LLM enhancement formatting
 const context = engine.createPersonalizedContext(character, world, decisions);
-console.log('Detected traits:', context.character.personality);
+const enhancement = engine.generateNarrativeEnhancement(context);
+console.log('LLM context:', enhancement);
 ```
