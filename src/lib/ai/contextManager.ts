@@ -1,5 +1,4 @@
 import { EndingGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
-import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { JournalEntry } from '@/types/journal.types';
 import { useCharacterStore } from '@/state/characterStore';
@@ -8,11 +7,13 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 
+type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
+
 export interface EndingContext {
   world: World;
-  character: Character;
+  character: StoreCharacter;
   narrativeSegments: NarrativeSegment[];
-  journalEntries?: JournalEntry[];
+  journalEntries: JournalEntry[];
   sessionStartTime?: Date;
 }
 
@@ -47,7 +48,7 @@ export async function buildEndingContext(
     ? Object.values(journalState.entries).filter(
         entry => entry.sessionId === request.sessionId
       )
-    : undefined;
+    : [];
 
   const session = useSessionStore.getState().savedSessions[request.sessionId];
   const sessionStartTime = session?.lastPlayed
@@ -56,7 +57,7 @@ export async function buildEndingContext(
 
   return {
     world,
-    character: character as unknown as Character,
+    character,
     narrativeSegments,
     journalEntries,
     sessionStartTime,

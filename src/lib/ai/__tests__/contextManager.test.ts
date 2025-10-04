@@ -1,12 +1,7 @@
 import { buildEndingContext } from '../contextManager';
-import {
-  createMockWorld,
-  createMockCharacter,
-  createMockNarrativeSegment,
-  createMockJournalEntry,
-  createMockSession,
-} from '@/lib/test-utils/testDataFactory';
+import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry, createMockSession } from '@/lib/test-utils/testDataFactory';
 import type { EndingGenerationRequest } from '@/types/narrative.types';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: { getState: jest.fn() },
@@ -54,7 +49,41 @@ describe('buildEndingContext', () => {
 
   it('pulls world and character from the stores when not provided in the request', async () => {
     const world = createMockWorld({ id: request.worldId });
-    const character = createMockCharacter({ id: request.characterId });
+    const character: StoreCharacter = {
+      id: request.characterId,
+      name: 'Test Character',
+      description: 'A test character from the store',
+      worldId: request.worldId,
+      level: 1,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Some backstory',
+        personality: 'Curious',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: true,
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+        location: undefined,
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 10,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    };
 
     mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
     mockCharacterStoreGetState.mockReturnValue({
@@ -74,7 +103,41 @@ describe('buildEndingContext', () => {
 
   it('sorts session segments chronologically and filters by session', async () => {
     const world = createMockWorld({ id: request.worldId });
-    const character = createMockCharacter({ id: request.characterId });
+    const character = {
+      id: request.characterId,
+      name: 'Chrono Knight',
+      description: 'Keeps track of time',
+      worldId: request.worldId,
+      level: 3,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Time traveler',
+        personality: 'Precise',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: false,
+      status: {
+        health: 80,
+        maxHealth: 100,
+        conditions: [],
+        location: 'Clocktower',
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 20,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    } as StoreCharacter;
     const older = createMockNarrativeSegment({
       id: 'seg-1',
       sessionId: request.sessionId,
@@ -114,7 +177,41 @@ describe('buildEndingContext', () => {
 
   it('includes journal entries and session start time when available', async () => {
     const world = createMockWorld({ id: request.worldId });
-    const character = createMockCharacter({ id: request.characterId });
+    const character = {
+      id: request.characterId,
+      name: 'Journal Keeper',
+      description: 'Records everything',
+      worldId: request.worldId,
+      level: 5,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Chronicler of events',
+        personality: 'Observant',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: true,
+      status: {
+        health: 90,
+        maxHealth: 120,
+        conditions: [],
+        location: 'Library',
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 30,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    } as StoreCharacter;
     const matchingEntry = createMockJournalEntry({
       id: 'journal-1',
       sessionId: request.sessionId,

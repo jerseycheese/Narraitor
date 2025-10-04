@@ -33,13 +33,13 @@ jest.mock('../defaultGeminiClient', () => ({
   createDefaultGeminiClient: () => mockGeminiClient
 }));
 const mockBuildEndingContext = buildEndingContext as jest.Mock;
-import type { 
+import type {
   EndingGenerationRequest,
-  NarrativeSegment 
+  NarrativeSegment
 } from '../../../types/narrative.types';
-import type { Character } from '../../../types/character.types';
 import type { World } from '../../../types/world.types';
 import type { JournalEntry } from '../../../types/journal.types';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 import { PromptType } from '../../promptTemplates/types';
 
 // Mock logger first - need to handle both named and default exports
@@ -127,20 +127,14 @@ describe('endingGenerator', () => {
     updatedAt: getTimestamp()
   };
 
-  const mockCharacter: Character = {
+  const mockCharacter: StoreCharacter = {
     id: 'char-456',
     name: 'Aria Stormblade',
     worldId: 'world-123',
     description: 'A seasoned warrior with a noble heart',
-    attributes: [
-      { attributeId: 'attr-strength', value: 18 },
-      { attributeId: 'attr-dexterity', value: 14 },
-      { attributeId: 'attr-intelligence', value: 10 }
-    ],
-    skills: [
-      { skillId: 'skill-combat', level: 85, experience: 2500, isActive: true },
-      { skillId: 'skill-leadership', level: 60, experience: 1800, isActive: true }
-    ],
+    level: 10,
+    attributes: [],
+    skills: [],
     background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
@@ -154,12 +148,14 @@ describe('endingGenerator', () => {
       capacity: 100,
       categories: []
     },
+    isPlayer: true,
     status: {
       health: 100,
       maxHealth: 100,
       conditions: [],
       location: 'Dark Castle'
     },
+    portrait: undefined,
     createdAt: getTimestamp(),
     updatedAt: getTimestamp()
   };
