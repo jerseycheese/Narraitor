@@ -56,10 +56,9 @@ export async function buildEndingContext(
 
   return {
     world,
-    character: character as Character,
+    character: character as unknown as Character,
     narrativeSegments,
     journalEntries,
     sessionStartTime,
   };
 }
-
