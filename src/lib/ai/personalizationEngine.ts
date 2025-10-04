@@ -1,5 +1,5 @@
 /**
- * PersonalizationEngine - KISS AI-Driven Narrative Personalization
+ * PersonalizationEngine - AI-Driven Narrative Personalization
  *
  * Simplified approach: Send raw decision history to Gemini and let the LLM
  * infer patterns instead of manually calculating heuristics.
@@ -54,7 +54,7 @@ const CHOICE_TO_TRAIT_MAP: Record<ChoiceTypePreference, PersonalityTrait[]> = {
 };
 
 /**
- * KISS PersonalizationEngine - Let the LLM do the heavy lifting
+ * PersonalizationEngine - Let the LLM do the heavy lifting
  */
 export class PersonalizationEngine {
   /**
@@ -136,7 +136,7 @@ export class PersonalizationEngine {
   }
 
   /**
-   * KISS Approach: Generate narrative enhancement by sending structured data to LLM
+   * Generate narrative enhancement by sending structured data to LLM
    * Instead of manually building complex instructions, we let Gemini analyze patterns
    */
   generateNarrativeEnhancement(context: PersonalizedNarrativeContext): string {

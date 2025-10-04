@@ -129,7 +129,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
         []
       );
 
-      // KISS: We aggregate choice types but don't infer complex narrative styles
+      // We aggregate choice types but don't infer complex narrative styles
       expect(analysis.preferences.preferredChoiceTypes).toContain('aggressive');
       expect(analysis.detectedTraits).toContain('direct');
     });

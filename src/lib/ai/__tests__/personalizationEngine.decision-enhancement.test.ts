@@ -1,7 +1,7 @@
 /**
  * Tests for PersonalizationEngine Decision Enhancement
  *
- * Tests the KISS approach: provide raw decision data to the LLM and let it infer patterns,
+ * Tests the simplified approach: provide raw decision data to the LLM and let it infer patterns,
  * rather than manually generating complex consequence instructions.
  */
 
@@ -9,7 +9,7 @@ import { PersonalizationEngine } from '../personalizationEngine';
 import { PlayerDecision, PersonalizedNarrativeContext } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
-describe('PersonalizationEngine - KISS Decision Enhancement', () => {
+describe('PersonalizationEngine - Decision Enhancement', () => {
   let personalizationEngine: PersonalizationEngine;
   let pastDecisions: PlayerDecision[];
 
