@@ -1,7 +1,7 @@
 // src/lib/ai/endingGenerator.ts
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
-import { contextManager } from './contextManager';
+import { buildEndingContext } from './contextManager';
 import { promptTemplateManager } from '../promptTemplates/promptTemplateManager';
 import { endingTemplate, prepareEndingTemplateVariables } from '../promptTemplates/templates/endingTemplates';
 import { logger } from '../utils/logger';
@@ -11,17 +11,7 @@ import type {
   EndingTone,
   NarrativeSegment
 } from '../../types/narrative.types';
-import type { Character } from '../../types/character.types';
-import type { World } from '../../types/world.types';
 import type { JournalEntry } from '../../types/journal.types';
-
-export interface EndingContext {
-  world: World;
-  character: Character;
-  narrativeSegments: NarrativeSegment[];
-  journalEntries?: JournalEntry[];
-  sessionStartTime?: Date;
-}
 
 class EndingGenerator {
   private maxRetries = 2;
@@ -32,7 +22,7 @@ class EndingGenerator {
       logger.debug('Generating story ending', { request });
 
       // Build context for ending generation
-      const context = await contextManager.buildEndingContext(request);
+      const context = await buildEndingContext(request);
       
       // Prepare template variables
       const recentNarrative = this.extractRecentNarrative(context.narrativeSegments);

@@ -21,7 +21,7 @@ jest.mock('../../../state/journalStore', () => ({
 }));
 
 import { endingGenerator } from '../endingGenerator';
-import { contextManager } from '../contextManager';
+import { buildEndingContext } from '../contextManager';
 import { promptTemplateManager } from '../../promptTemplates/promptTemplateManager';
 
 // Mock createDefaultGeminiClient to return our mocked client
@@ -32,6 +32,7 @@ const mockGeminiClient = {
 jest.mock('../defaultGeminiClient', () => ({
   createDefaultGeminiClient: () => mockGeminiClient
 }));
+const mockBuildEndingContext = buildEndingContext as jest.Mock;
 import type { 
   EndingGenerationRequest,
   NarrativeSegment 
@@ -82,9 +83,7 @@ jest.mock('../geminiClient', () => ({
 }));
 
 jest.mock('../contextManager', () => ({
-  contextManager: {
-    buildEndingContext: jest.fn()
-  }
+  buildEndingContext: jest.fn()
 }));
 
 jest.mock('../../promptTemplates/promptTemplateManager', () => ({
@@ -237,10 +236,9 @@ describe('endingGenerator', () => {
       }`;
 
       // Set up the mocks with clear return values
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
-      mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+      mockBuildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ 
         id: 'test-template',
         type: PromptType.NARRATIVE,
@@ -259,7 +257,7 @@ describe('endingGenerator', () => {
         achievements: expect.arrayContaining(['Dragon Slayer'])
       });
 
-      expect(mockContextManager.buildEndingContext).toHaveBeenCalledWith(mockRequest);
+      expect(mockBuildEndingContext).toHaveBeenCalledWith(mockRequest);
       expect(mockPromptTemplateManager.getTemplate).toHaveBeenCalledWith('ending');
       expect(mockGeminiClient.generateContent).toHaveBeenCalled();
     });
@@ -288,10 +286,9 @@ describe('endingGenerator', () => {
         "achievements": ["Pyrrhic Victory", "The Sacrifice"]
       }`;
 
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
-      mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+      mockBuildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
@@ -314,9 +311,7 @@ describe('endingGenerator', () => {
         endingType: 'session-limit'
       };
 
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
-      
-      mockContextManager.buildEndingContext.mockRejectedValue(
+      mockBuildEndingContext.mockRejectedValue(
         new Error('Failed to build context')
       );
 
@@ -356,9 +351,8 @@ describe('endingGenerator', () => {
         "achievements": ["Quick Victory"]
       }`;
 
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+      mockBuildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
@@ -389,10 +383,9 @@ describe('endingGenerator', () => {
         journalEntries: []
       };
 
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
-      mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+      mockBuildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
@@ -438,10 +431,9 @@ describe('endingGenerator', () => {
           journalEntries: []
         };
 
-        const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
         const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
         
-        mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+        mockBuildEndingContext.mockResolvedValue(mockContext);
         mockPromptTemplateManager.getTemplate.mockReturnValue({
           id: 'test-template',
           type: PromptType.NARRATIVE,
@@ -481,10 +473,9 @@ describe('endingGenerator', () => {
         journalEntries: []
       };
 
-      const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
-      mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
+      mockBuildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
