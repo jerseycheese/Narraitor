@@ -91,8 +91,8 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           preferredChoiceTypes: ['helpful', 'diplomatic'],
           narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'dialogue',
-          confidenceLevel: 90,
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
           lastUpdated: getTimestamp()
         },
         narrativeHistory: {
@@ -201,8 +201,8 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           preferredChoiceTypes: ['helpful'],
           narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'balanced',
-          confidenceLevel: 85,
+          contentFocus: 'action',
+          confidenceLevel: 80,
           lastUpdated: getTimestamp()
         },
         narrativeHistory: {
@@ -410,8 +410,8 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
           preferredChoiceTypes: ['helpful'],
           narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'balanced',
-          confidenceLevel: 85,
+          contentFocus: 'action',
+          confidenceLevel: 80,
           lastUpdated: getTimestamp()
         },
         narrativeHistory: {
