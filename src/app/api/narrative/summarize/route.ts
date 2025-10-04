@@ -3,7 +3,17 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const { content, type, location, instructions, decisionWeight } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    const { content, type, location, instructions, decisionWeight } = body;
 
     if (!content) {
       return NextResponse.json(
