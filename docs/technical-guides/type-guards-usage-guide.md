@@ -8,10 +8,10 @@ The challenge was that we kept getting runtime errors from invalid data - APIs r
 
 The type guards system provides two approaches:
 
-**Type Guards** - Fast boolean checks that narrow TypeScript types (`isWorld`, `isCharacter`)
-**ValidationResult API** - Detailed validation with specific error messages (`validateWorld`, `validateCharacter`)
+**Type Guards** - Fast boolean checks that narrow TypeScript types (`isWorld`)
+**ValidationResult API** - Detailed validation with specific error messages (`validateWorld`)
 
-Both approaches support partial validation, which is perfect for form inputs where not all fields are filled yet.
+World validation supports partial validation, which is perfect for form inputs where not all fields are filled yet.
 
 ## Core Type Guards
 
@@ -36,25 +36,6 @@ if (!result.valid) {
 }
 ```
 
-### Character Validation
-
-```typescript
-import { isCharacter, validateCharacter } from '@/types/type-guards';
-
-// Validate complete character data
-const character = getCharacterFromAPI();
-if (isCharacter(character)) {
-  // Safe to use character properties
-  updateCharacterDisplay(character);
-}
-
-// Form validation with detailed errors
-const formData = getCharacterFormData();
-const validation = validateCharacter(formData);
-if (!validation.valid) {
-  displayFormErrors(validation.errors);
-}
-```
 
 ## Partial Validation
 
@@ -121,40 +102,6 @@ const attrResult = validateWorldAttribute({
 // attrResult.errors: ["Property baseValue must be less than or equal to maxValue"]
 ```
 
-### Character Components
-
-```typescript
-import { 
-  isCharacterStatus,
-  validateCharacterStatus,
-  isCharacterRelationship 
-} from '@/types/type-guards';
-
-// Character status with health validation
-const status = {
-  health: 75,
-  maxHealth: 100,
-  conditions: ['blessed', 'well-rested'],
-  location: 'Castle Courtyard'
-};
-
-if (isCharacterStatus(status)) {
-  const healthPercent = (status.health / status.maxHealth) * 100;
-  updateHealthBar(healthPercent);
-}
-
-// Relationship validation with strength range checking
-const relationship = {
-  characterId: 'npc-mentor',
-  type: 'ally',
-  strength: 75, // Must be -100 to 100
-  description: 'My trusted mentor'
-};
-
-if (isCharacterRelationship(relationship)) {
-  displayRelationship(relationship);
-}
-```
 
 ## Error Handling Patterns
 
@@ -250,21 +197,12 @@ if (!result.valid) {
 
 ### Core Objects
 - `isWorld` / `validateWorld`
-- `isCharacter` / `validateCharacter`
 
 ### World Components
-- `isWorldAttribute` / `validateWorldAttribute`
-- `isWorldSkill` / `validateWorldSkill`
-- `isWorldSettings` / `validateWorldSettings`
-- `isWorldImage` / `validateWorldImage`
-
-### Character Components
-- `isCharacterAttribute` / `validateCharacterAttribute`
-- `isCharacterSkill` / `validateCharacterSkill`
-- `isCharacterBackground` / `validateCharacterBackground`
-- `isCharacterStatus` / `validateCharacterStatus`
-- `isCharacterRelationship` / `validateCharacterRelationship`
-- `isCharacterPortrait` / `validateCharacterPortrait`
+- `validateWorldAttribute`
+- `validateWorldSkill`
+- `validateWorldSettings`
+- `validateWorldImage`
 
 ### Other Domain Objects
 - `isInventoryItem`

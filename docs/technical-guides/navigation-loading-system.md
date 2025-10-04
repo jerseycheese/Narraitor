@@ -172,8 +172,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-### Testing Page
-Visit `/dev/navigation-loading` to test all loading states and scenarios. This is super helpful for debugging timing issues.
 
 ## Migration Guide
 
