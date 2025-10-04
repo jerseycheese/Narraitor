@@ -1,120 +1,274 @@
-import { NarrativeContextManager } from '../contextManager';
-import { getTimestamp } from '@/lib/utils/timestamp';
+import { buildEndingContext } from '../contextManager';
+import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry, createMockSession } from '@/lib/test-utils/testDataFactory';
+import type { EndingGenerationRequest } from '@/types/narrative.types';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 
-describe('NarrativeContextManager', () => {
-  let contextManager: NarrativeContextManager;
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: { getState: jest.fn() },
+}));
+
+jest.mock('@/state/characterStore', () => ({
+  useCharacterStore: { getState: jest.fn() },
+}));
+
+jest.mock('@/state/narrativeStore', () => ({
+  useNarrativeStore: { getState: jest.fn() },
+}));
+
+jest.mock('@/state/journalStore', () => ({
+  useJournalStore: { getState: jest.fn() },
+}));
+
+jest.mock('@/state/sessionStore', () => ({
+  useSessionStore: { getState: jest.fn() },
+}));
+
+const { useWorldStore } = jest.requireMock('@/state/worldStore');
+const { useCharacterStore } = jest.requireMock('@/state/characterStore');
+const { useNarrativeStore } = jest.requireMock('@/state/narrativeStore');
+const { useJournalStore } = jest.requireMock('@/state/journalStore');
+const { useSessionStore } = jest.requireMock('@/state/sessionStore');
+
+const mockWorldStoreGetState = useWorldStore.getState as jest.Mock;
+const mockCharacterStoreGetState = useCharacterStore.getState as jest.Mock;
+const mockNarrativeStoreGetState = useNarrativeStore.getState as jest.Mock;
+const mockJournalStoreGetState = useJournalStore.getState as jest.Mock;
+const mockSessionStoreGetState = useSessionStore.getState as jest.Mock;
+
+describe('buildEndingContext', () => {
+  const request: EndingGenerationRequest = {
+    sessionId: 'session-1',
+    characterId: 'character-1',
+    worldId: 'world-1',
+    endingType: 'triumphant',
+  };
 
   beforeEach(() => {
-    contextManager = new NarrativeContextManager();
+    jest.clearAllMocks();
   });
 
-  describe('addSegment', () => {
-    it('adds a narrative segment to the context', () => {
-      const segment = {
-        id: 'seg-1',
-        content: 'The forest was dark and mysterious.',
-        type: 'scene' as const,
-        metadata: {
-          characterIds: ['char-1'],
-          location: 'Dark Forest',
-          mood: 'mysterious' as const,
-          tags: ['forest', 'mystery']
-        },
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp(),
-      };
+  it('pulls world and character from the stores when not provided in the request', async () => {
+    const world = createMockWorld({ id: request.worldId });
+    const character: StoreCharacter = {
+      id: request.characterId,
+      name: 'Test Character',
+      description: 'A test character from the store',
+      worldId: request.worldId,
+      level: 1,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Some backstory',
+        personality: 'Curious',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: true,
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+        location: undefined,
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 10,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    };
 
-      contextManager.addSegment(segment);
-      const optimizedContext = contextManager.getOptimizedContext(1000);
-
-      expect(optimizedContext).toContain('The forest was dark and mysterious');
+    mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
+    mockCharacterStoreGetState.mockReturnValue({
+      characters: { [character.id]: character },
     });
+    mockNarrativeStoreGetState.mockReturnValue({ segments: {} });
+    mockJournalStoreGetState.mockReturnValue({ entries: {} });
+    mockSessionStoreGetState.mockReturnValue({ savedSessions: {} });
 
-    it('maintains recent segments for context continuity', () => {
-      const segments = [
-        {
-          id: 'seg-1',
-          content: 'First segment content.',
-          type: 'scene' as const,
-          metadata: { characterIds: [], tags: [] },
-          timestamp: new Date(),
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp(),
-        },
-        {
-          id: 'seg-2',
-          content: 'Second segment content.',
-          type: 'dialogue' as const,
-          metadata: { characterIds: [], tags: [] },
-          timestamp: new Date(),
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp(),
-        }
-      ];
+    const context = await buildEndingContext(request);
 
-      segments.forEach(seg => contextManager.addSegment(seg));
-      const optimizedContext = contextManager.getOptimizedContext(1000);
-
-      expect(optimizedContext).toContain('First segment');
-      expect(optimizedContext).toContain('Second segment');
-    });
+    expect(context.world).toEqual(world);
+    expect(context.character).toEqual(character);
+    expect(context.narrativeSegments).toHaveLength(0);
+    expect(context.journalEntries).toEqual([]);
   });
 
-
-  describe('getPrioritizedElements', () => {
-    it('returns elements sorted by priority', () => {
-      const segments = [
-        {
-          id: 'seg-1',
-          content: 'Important plot point.',
-          type: 'scene' as const,
-          metadata: {
-            characterIds: ['main-char'],
-            tags: ['plot-critical']
-          },
-          timestamp: new Date(),
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp(),
-        },
-        {
-          id: 'seg-2',
-          content: 'Minor detail.',
-          type: 'scene' as const,
-          metadata: {
-            characterIds: [],
-            tags: ['detail']
-          },
-          timestamp: new Date(),
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp(),
-        }
-      ];
-
-      segments.forEach(seg => contextManager.addSegment(seg));
-      const prioritized = contextManager.getPrioritizedElements();
-
-      expect(prioritized[0].content).toContain('Important plot point');
-      expect(prioritized[0].priority).toBeGreaterThan(prioritized[1].priority);
+  it('sorts session segments chronologically and filters by session', async () => {
+    const world = createMockWorld({ id: request.worldId });
+    const character = {
+      id: request.characterId,
+      name: 'Chrono Knight',
+      description: 'Keeps track of time',
+      worldId: request.worldId,
+      level: 3,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Time traveler',
+        personality: 'Precise',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: false,
+      status: {
+        health: 80,
+        maxHealth: 100,
+        conditions: [],
+        location: 'Clocktower',
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 20,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    } as StoreCharacter;
+    const older = createMockNarrativeSegment({
+      id: 'seg-1',
+      sessionId: request.sessionId,
+      timestamp: new Date('2024-01-01T10:00:00Z'),
+      content: 'older',
     });
+    const newer = createMockNarrativeSegment({
+      id: 'seg-2',
+      sessionId: request.sessionId,
+      timestamp: new Date('2024-01-01T11:00:00Z'),
+      content: 'newer',
+    });
+    const otherSession = createMockNarrativeSegment({
+      id: 'seg-3',
+      sessionId: 'session-2',
+      timestamp: new Date('2024-01-01T09:00:00Z'),
+    });
+
+    mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
+    mockCharacterStoreGetState.mockReturnValue({
+      characters: { [character.id]: character },
+    });
+    mockNarrativeStoreGetState.mockReturnValue({
+      segments: {
+        [older.id]: older,
+        [newer.id]: newer,
+        [otherSession.id]: otherSession,
+      },
+    });
+    mockJournalStoreGetState.mockReturnValue({ entries: {} });
+    mockSessionStoreGetState.mockReturnValue({ savedSessions: {} });
+
+    const context = await buildEndingContext(request);
+
+    expect(context.narrativeSegments).toEqual([older, newer]);
   });
 
-  describe('clear', () => {
-    it('removes all context', () => {
-      contextManager.addSegment({
-        id: 'seg-1',
-        content: 'Some content',
-        type: 'scene' as const,
-        metadata: { characterIds: [], tags: [] },
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp(),
-      });
-
-      contextManager.clear();
-      const optimizedContext = contextManager.getOptimizedContext(1000);
-
-      expect(optimizedContext).toBe('');
+  it('includes journal entries and session start time when available', async () => {
+    const world = createMockWorld({ id: request.worldId });
+    const character = {
+      id: request.characterId,
+      name: 'Journal Keeper',
+      description: 'Records everything',
+      worldId: request.worldId,
+      level: 5,
+      attributes: [],
+      skills: [],
+      background: {
+        history: 'Chronicler of events',
+        personality: 'Observant',
+        goals: [],
+        fears: [],
+        relationships: [],
+        physicalDescription: undefined,
+        isKnownFigure: false,
+        knownFigureType: undefined,
+      },
+      isPlayer: true,
+      status: {
+        health: 90,
+        maxHealth: 120,
+        conditions: [],
+        location: 'Library',
+      },
+      inventory: {
+        characterId: request.characterId,
+        items: [],
+        capacity: 30,
+        categories: [],
+      },
+      portrait: undefined,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    } as StoreCharacter;
+    const matchingEntry = createMockJournalEntry({
+      id: 'journal-1',
+      sessionId: request.sessionId,
     });
+    const otherEntry = createMockJournalEntry({
+      id: 'journal-2',
+      sessionId: 'session-2',
+    });
+    const session = createMockSession({
+      id: request.sessionId,
+      lastPlayed: '2024-01-01T09:30:00Z',
+    });
+
+    mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
+    mockCharacterStoreGetState.mockReturnValue({
+      characters: { [character.id]: character },
+    });
+    mockNarrativeStoreGetState.mockReturnValue({ segments: {} });
+    mockJournalStoreGetState.mockReturnValue({
+      entries: {
+        [matchingEntry.id]: matchingEntry,
+        [otherEntry.id]: otherEntry,
+      },
+    });
+    mockSessionStoreGetState.mockReturnValue({
+      savedSessions: { [session.id]: session },
+    });
+
+    const context = await buildEndingContext(request);
+
+    expect(context.journalEntries).toEqual([matchingEntry]);
+    expect(context.sessionStartTime).toEqual(new Date(session.lastPlayed!));
+  });
+
+  it('throws when the world cannot be resolved', async () => {
+    mockWorldStoreGetState.mockReturnValue({ worlds: {} });
+    mockCharacterStoreGetState.mockReturnValue({ characters: {} });
+    mockNarrativeStoreGetState.mockReturnValue({ segments: {} });
+    mockJournalStoreGetState.mockReturnValue({ entries: {} });
+    mockSessionStoreGetState.mockReturnValue({ savedSessions: {} });
+
+    await expect(buildEndingContext(request)).rejects.toThrow(
+      `World not found: ${request.worldId}`
+    );
+  });
+
+  it('throws when the character cannot be resolved', async () => {
+    const world = createMockWorld({ id: request.worldId });
+
+    mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
+    mockCharacterStoreGetState.mockReturnValue({ characters: {} });
+    mockNarrativeStoreGetState.mockReturnValue({ segments: {} });
+    mockJournalStoreGetState.mockReturnValue({ entries: {} });
+    mockSessionStoreGetState.mockReturnValue({ savedSessions: {} });
+
+    await expect(buildEndingContext(request)).rejects.toThrow(
+      `Character not found: ${request.characterId}`
+    );
   });
 });
