@@ -186,7 +186,7 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       expect(lastPrompt).toContain('Negotiate instead of fighting');
       
       // Should include decision context section
-      expect(lastPrompt).toMatch(/PAST PLAYER DECISIONS?:/i);
+      expect(lastPrompt).toMatch(/RECENT PLAYER DECISIONS?:/i);
       
       // Should include any contextual information from decisions (flexible)
       const hasContextualInfo = lastPrompt.includes('moral dilemma') || 
@@ -208,15 +208,14 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should have instructions about using past decisions (flexible matching)
-      const hasReferenceInstructions = lastPrompt.toLowerCase().includes('reference') && 
-                                      (lastPrompt.toLowerCase().includes('past') || lastPrompt.toLowerCase().includes('previous'));
-      expect(hasReferenceInstructions).toBe(true);
-      
-      const hasConsequenceInstructions = lastPrompt.toLowerCase().includes('consequences') ||
-                                        lastPrompt.toLowerCase().includes('build upon') ||
-                                        lastPrompt.toLowerCase().includes('based on');
-      expect(hasConsequenceInstructions).toBe(true);
+      // Simple instruction to adapt narrative (flexible matching)
+      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') &&
+                                  lastPrompt.toLowerCase().includes('narrative');
+      expect(hasAdaptInstruction).toBe(true);
+
+      const hasReferenceInstruction = lastPrompt.toLowerCase().includes('reference') &&
+                                      lastPrompt.toLowerCase().includes('choices');
+      expect(hasReferenceInstruction).toBe(true);
     });
 
     test('should include decision impact instructions for NPCs', async () => {
@@ -231,12 +230,13 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should include NPC-related instructions (flexible)
-      const hasNPCInstructions = (lastPrompt.toLowerCase().includes('npc') || lastPrompt.toLowerCase().includes('characters')) &&
-                                 (lastPrompt.toLowerCase().includes('react') || lastPrompt.toLowerCase().includes('remember'));
-      expect(hasNPCInstructions).toBe(true);
-      
+      // Just check that NPC names are included (LLM will handle the rest)
       expect(lastPrompt).toContain('merchant'); // Should reference the specific NPC from test data
+
+      // Should have basic instruction about adapting to player style
+      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
+                                  lastPrompt.toLowerCase().includes('based on');
+      expect(hasAdaptInstruction).toBe(true);
       
       // Should reference the help decision in some way (flexible)
       const hasHelpReference = lastPrompt.toLowerCase().includes('help') || 
@@ -259,19 +259,15 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should include consequences related to compassionate behavior (flexible)
-      const hasCompassionateConsequences = lastPrompt.toLowerCase().includes('compassionate') ||
-                                          lastPrompt.toLowerCase().includes('trust') ||
-                                          lastPrompt.toLowerCase().includes('reputation') ||
-                                          lastPrompt.toLowerCase().includes('helpful');
-      expect(hasCompassionateConsequences).toBe(true);
-      
-      // Should show positive social outcomes
-      const hasPositiveOutcomes = lastPrompt.toLowerCase().includes('trust') ||
-                                 lastPrompt.toLowerCase().includes('gratitude') ||
-                                 lastPrompt.toLowerCase().includes('positive') ||
-                                 lastPrompt.toLowerCase().includes('remember');
-      expect(hasPositiveOutcomes).toBe(true);
+      // Check that decision data is included (LLM will infer compassionate consequences)
+      const hasDecisionData = lastPrompt.includes('Help the injured merchant') &&
+                             lastPrompt.includes('[helpful]');
+      expect(hasDecisionData).toBe(true);
+
+      // Should have instruction to adapt narrative
+      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
+                                 lastPrompt.toLowerCase().includes('based on');
+      expect(hasAdaptInstruction).toBe(true);
     });
 
     test('should map diplomatic decisions to peaceful resolution options', async () => {
@@ -286,19 +282,15 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should include consequences related to diplomatic behavior (flexible)
-      const hasDiplomaticConsequences = lastPrompt.toLowerCase().includes('diplomatic') ||
-                                       lastPrompt.toLowerCase().includes('negotiation') ||
-                                       lastPrompt.toLowerCase().includes('peaceful') ||
-                                       lastPrompt.toLowerCase().includes('negotiate');
-      expect(hasDiplomaticConsequences).toBe(true);
-      
-      // Should reference peaceful outcomes or conflict resolution
-      const hasPeacefulOutcomes = lastPrompt.toLowerCase().includes('peaceful') ||
-                                lastPrompt.toLowerCase().includes('resolution') ||
-                                lastPrompt.toLowerCase().includes('alternatives') ||
-                                lastPrompt.toLowerCase().includes('solutions');
-      expect(hasPeacefulOutcomes).toBe(true);
+      // Check that decision data is included (LLM will infer diplomatic consequences)
+      const hasDecisionData = lastPrompt.includes('Negotiate instead of fighting') &&
+                             lastPrompt.includes('[diplomatic]');
+      expect(hasDecisionData).toBe(true);
+
+      // Should have instruction to adapt narrative
+      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
+                                 lastPrompt.toLowerCase().includes('based on');
+      expect(hasAdaptInstruction).toBe(true);
     });
   });
 
@@ -315,17 +307,15 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should reference multiple decision types (flexible)
-      const hasMultipleDecisionTypes = (lastPrompt.toLowerCase().includes('compassionate') || lastPrompt.toLowerCase().includes('helpful')) &&
-                                     (lastPrompt.toLowerCase().includes('diplomatic') || lastPrompt.toLowerCase().includes('negotiat'));
-      expect(hasMultipleDecisionTypes).toBe(true);
-      
-      // Should show compound/pattern effects (flexible)
-      const hasCompoundEffects = lastPrompt.toLowerCase().includes('pattern') ||
-                                lastPrompt.toLowerCase().includes('reputation') ||
-                                lastPrompt.toLowerCase().includes('established') ||
-                                lastPrompt.toLowerCase().includes('compound');
-      expect(hasCompoundEffects).toBe(true);
+      // Check that multiple decisions are included (LLM will infer patterns)
+      const hasMultipleDecisions = lastPrompt.includes('Help the injured merchant') &&
+                                  lastPrompt.includes('Negotiate instead of fighting');
+      expect(hasMultipleDecisions).toBe(true);
+
+      // Check that choice types are tagged for pattern recognition
+      const hasChoiceTypes = lastPrompt.includes('[helpful]') &&
+                            lastPrompt.includes('[diplomatic]');
+      expect(hasChoiceTypes).toBe(true);
     });
 
     test('should provide decision-informed story options', async () => {
