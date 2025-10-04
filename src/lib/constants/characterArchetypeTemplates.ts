@@ -1,5 +1,12 @@
-// Character archetype templates for quick-start character creation
-// Extracted from characterArchetypes.ts to separate data from logic
+/**
+ * Character archetype templates for quick-start character creation
+ *
+ * This file defines genre-specific character archetypes used in the character
+ * creation process. Each archetype includes attribute preferences, skill sets,
+ * personality traits, and thematic elements appropriate to the genre.
+ *
+ * These templates are consumed by characterArchetypes.ts generator functions.
+ */
 
 import { GenreValue } from './genres';
 
