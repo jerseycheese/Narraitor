@@ -64,11 +64,11 @@ describe('characterArchetypes', () => {
       expect(templates.map(t => t.name)).toEqual(['Detective', 'Athlete', 'Scholar']);
     });
 
-    test('returns generic archetypes for unknown genre', () => {
+    test('returns fantasy archetypes as fallback for unknown genre', () => {
       const templates = getArchetypeTemplatesForGenre('unknown' as GenreValue);
-      
+
       expect(templates).toHaveLength(3);
-      expect(templates.map(t => t.name)).toEqual(['Balanced', 'Specialist', 'Versatile']);
+      expect(templates.map(t => t.name)).toEqual(['Warrior', 'Mage', 'Scout']);
     });
   });
 
