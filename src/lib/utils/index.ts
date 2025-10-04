@@ -96,16 +96,6 @@ export {
   getNestedPaths
 } from './objectAccess';
 
-// State inspection utilities (development only)
-export { StateInspector, stateInspector } from './stateInspector';
-export type { 
-  StateSnapshot, 
-  StateMetadata, 
-  PathInfo, 
-  WatchCallback, 
-  WatchSubscription 
-} from './stateInspector';
-
 // Enhanced serialization and debugging utilities
 export {
   sanitizeForSerialization,
