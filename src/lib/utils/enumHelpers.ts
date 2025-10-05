@@ -34,18 +34,6 @@ function formatLabel(key: string): string {
 }
 
 /**
- * Creates a type-safe enum checker
- */
-export function createEnumChecker<T extends Record<string, unknown>>(
-  enumObject: T
-): (value: unknown) => value is T[keyof T] {
-  const validValues = Object.values(enumObject);
-  return (value: unknown): value is T[keyof T] => {
-    return validValues.includes(value as T[keyof T]);
-  };
-}
-
-/**
  * Gets all valid values from an enum-like object
  */
 export function getEnumValues<T extends Record<string, unknown>>(

@@ -32,10 +32,6 @@ export default function DevPage() {
       { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
       { href: '/dev/template-selector', label: 'Template Selector', color: 'cyan' },
     ],
-    'Development Tools': [
-      { href: '/dev/devtools-test', label: 'DevTools Panel', color: 'gray' },
-      { href: '/dev/ai-testing', label: 'AI Testing Panel', color: 'gray' },
-    ],
   };
 
   const colorClasses = {

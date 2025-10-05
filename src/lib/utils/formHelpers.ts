@@ -51,17 +51,3 @@ export function createFormUpdater<T>(
     }
   };
 }
-
-/**
- * Creates a type-safe form field props generator
- */
-export function createFieldProps<T, K extends keyof T>(
-  state: T,
-  updateField: (field: K, value: T[K]) => void,
-  field: K
-) {
-  return {
-    value: state[field],
-    onChange: (value: T[K]) => updateField(field, value),
-  };
-}

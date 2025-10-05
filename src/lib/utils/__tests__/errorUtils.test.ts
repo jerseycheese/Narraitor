@@ -1,8 +1,7 @@
-import { 
-  isRetryableError, 
-  getUserFriendlyError, 
-  userFriendlyErrorMessage,
-  ErrorType 
+import {
+  isRetryableError,
+  getUserFriendlyError,
+  ErrorType
 } from '../errorUtils';
 
 describe('errorUtils', () => {
@@ -61,16 +60,6 @@ describe('errorUtils', () => {
       
       expect(result.title).toBe('Something Went Wrong');
       expect(result.actionLabel).toBe('Try Again');
-    });
-  });
-
-  describe('userFriendlyErrorMessage', () => {
-    it('should return just the message text', () => {
-      const error = new Error('Network error');
-      const message = userFriendlyErrorMessage(error);
-      
-      expect(typeof message).toBe('string');
-      expect(message.length).toBeGreaterThan(0);
     });
   });
 });

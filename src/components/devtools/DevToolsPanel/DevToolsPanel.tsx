@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
 import { StateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
-import { AIMonitoringSection } from '../AIMonitoringSection';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
@@ -178,11 +177,10 @@ export const DevToolsPanel = () => {
             {/* Right Column: AI Tools, Test Data & Content Generation */}
             <div className="space-y-4">
               {/* AI Tools Group - only show if any child sections are visible */}
-              {(isSectionVisible(SectionId.AI_TESTING) || 
-                isSectionVisible(SectionId.AI_MONITORING) ||
+              {(isSectionVisible(SectionId.AI_TESTING) ||
                 isSectionVisible(SectionId.AI_MOCKING) ||
-                isSectionVisible(SectionId.CONSISTENCY_VALIDATION) || 
-                isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
+                isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
+                isSectionVisible(SectionId.TEXT_NORMALIZATION) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
                 <div className="bg-white p-4 rounded-lg border border-gray-300 shadow-sm">
                   <h3 className="text-lg font-semibold mb-3 text-gray-900 border-b border-gray-300 pb-2">
@@ -194,13 +192,7 @@ export const DevToolsPanel = () => {
                         <AITestingPanel />
                       </CollapsibleSection>
                     )}
-                    
-                    {isSectionVisible(SectionId.AI_MONITORING) && (
-                      <CollapsibleSection title="AI Service Monitoring" initialCollapsed={true}>
-                        <AIMonitoringSection />
-                      </CollapsibleSection>
-                    )}
-                    
+
                     {isSectionVisible(SectionId.AI_MOCKING) && (
                       <CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
                         <AIMockingSection />
