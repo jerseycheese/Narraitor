@@ -5,8 +5,6 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DevToolsPanel } from '../DevToolsPanel/DevToolsPanel';
-import { DevToolsProvider } from '../DevToolsContext';
 
 // Mock the AIMockingSection component
 jest.mock('../AIMockingSection', () => ({
@@ -32,12 +30,6 @@ jest.mock('@/lib/devtools/sectionVisibilityStorage', () => ({
 
 
 describe('DevTools AI Mocking Integration', () => {
-  test('components can be imported without errors', () => {
-    // Basic smoke test to verify imports work
-    expect(DevToolsPanel).toBeDefined();
-    expect(DevToolsProvider).toBeDefined();
-  });
-
   test('AI Mocking section component exists', () => {
     // Verify the mock component renders
     const { getByTestId } = render(

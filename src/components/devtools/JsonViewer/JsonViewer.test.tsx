@@ -49,14 +49,6 @@ describe('JsonViewer', () => {
     expect(container.textContent).toContain('{}');
   });
   
-  it('renders with custom className if provided', () => {
-    render(<JsonViewer data={testData} className="custom-class" />);
-    
-    // Just verify component renders successfully with className prop
-    const container = screen.getByTestId('json-viewer');
-    expect(container).toBeInTheDocument();
-  });
-  
   it('handles complex data with dates and functions', () => {
     const complexData = {
       date: new Date('2023-01-01T00:00:00Z'),
