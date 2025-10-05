@@ -62,10 +62,9 @@ export type {
 } from './textNormalization';
 
 // Error handling utilities
-export { 
-  isRetryableError, 
-  getUserFriendlyError, 
-  userFriendlyErrorMessage
+export {
+  isRetryableError,
+  getUserFriendlyError
 } from './errorUtils';
 export type { UserFriendlyError } from './errorUtils';
 
@@ -83,9 +82,9 @@ export { debounce, throttle, useDebounce } from './debounce';
 export type { DebouncedFunction } from './debounce';
 
 // Tone settings utilities
-export { descriptionsToSelectOptions, createEnumChecker, getEnumValues, isValidEnumValue } from './enumHelpers';
+export { descriptionsToSelectOptions, getEnumValues, isValidEnumValue } from './enumHelpers';
 export type { SelectOptionWithDescription } from './enumHelpers';
-export { createFormUpdater, createFieldProps } from './formHelpers';
+export { createFormUpdater } from './formHelpers';
 export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';
 
 

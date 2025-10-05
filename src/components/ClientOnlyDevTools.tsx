@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DevMockState } from '@/components/devtools/DevMockState';
 import { DevToolsPanel } from '@/components/devtools';
 
 /**
@@ -26,10 +25,5 @@ export function ClientOnlyDevTools() {
     return null;
   }
 
-  return (
-    <>
-      <DevMockState />
-      <DevToolsPanel />
-    </>
-  );
+  return <DevToolsPanel />;
 }

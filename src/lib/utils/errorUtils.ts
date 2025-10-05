@@ -117,13 +117,6 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
 }
 
 /**
- * Simple function that returns just the user-friendly message text
- */
-export function userFriendlyErrorMessage(error: Error): string {
-  return getUserFriendlyError(error).message;
-}
-
-/**
  * Creates a standardized UserFriendlyError for store operations
  *
  * Used across all Zustand stores for consistent error handling.
