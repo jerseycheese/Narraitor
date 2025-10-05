@@ -5,8 +5,6 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DevToolsPanel } from '../DevToolsPanel/DevToolsPanel';
-import { DevToolsProvider } from '../DevToolsContext';
 
 // Mock the AIMockingSection component
 jest.mock('../AIMockingSection', () => ({
