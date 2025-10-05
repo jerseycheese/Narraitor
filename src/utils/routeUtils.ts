@@ -1,96 +1,10 @@
 /**
- * Parsed route segment interface
- */
-interface RouteSegment {
-  path: string;
-  param?: string;
-  value?: string;
-}
-
-/**
- * Parsed route result
- */
-export interface ParsedRoute {
-  segments: RouteSegment[];
-}
-
-/**
- * Breadcrumb segment interface (matches test expectations)
+ * Breadcrumb segment interface
  */
 export interface BreadcrumbSegment {
   label: string;
   href: string;
   isCurrentPage: boolean;
-}
-
-/**
- * Parse a route path into segments
- * @param pathname The route pathname to parse
- * @returns Parsed route with segments
- */
-export function parseRoute(pathname: string): ParsedRoute {
-  // Remove leading slash and split by /
-  const parts = pathname.split('/').filter(Boolean);
-  
-  if (parts.length === 0) {
-    return { segments: [] };
-  }
-  
-  const segments: RouteSegment[] = [];
-  
-  // Special handling for known patterns
-  if (parts[0] === 'worlds' && parts[1] && parts[1] !== 'create') {
-    // /worlds/123 pattern (consolidated route)
-    segments.push({
-      path: 'worlds',
-      param: undefined,
-      value: undefined
-    });
-    segments.push({
-      path: parts[1],
-      param: 'id',
-      value: parts[1]
-    });
-    // Continue processing remaining parts
-    for (let i = 2; i < parts.length; i++) {
-      segments.push({
-        path: parts[i],
-        param: undefined,
-        value: undefined
-      });
-    }
-  } else if (parts[0] === 'characters' && parts[1] && parts[1] !== 'create') {
-    // /characters/char-456 pattern
-    segments.push({
-      path: 'characters',
-      param: undefined,
-      value: undefined
-    });
-    segments.push({
-      path: parts[1],
-      param: 'id',
-      value: parts[1]
-    });
-    // Continue processing remaining parts
-    for (let i = 2; i < parts.length; i++) {
-      segments.push({
-        path: parts[i],
-        param: undefined,
-        value: undefined
-      });
-    }
-  } else {
-    // Default handling
-    for (const part of parts) {
-      segments.push({
-        path: part,
-        param: undefined,
-        value: undefined
-      });
-    }
-  }
-  
-  return { segments };
 }
 
 /**

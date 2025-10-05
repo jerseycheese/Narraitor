@@ -10,7 +10,6 @@ import { validators, validateField } from '@/components/shared/wizard/utils/vali
 import { GENRES } from '@/lib/constants/genres';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
-import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 
@@ -303,7 +302,7 @@ export function GuidedFirstTimeExperience() {
               id="world-name"
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
+              placeholder="E.g., Neo-Tokyo..."
               value={wizard.state.data.name}
               onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
             />

@@ -82,10 +82,10 @@ export { debounce, throttle, useDebounce } from './debounce';
 export type { DebouncedFunction } from './debounce';
 
 // Tone settings utilities
-export { descriptionsToSelectOptions, getEnumValues, isValidEnumValue } from './enumHelpers';
+export { descriptionsToSelectOptions } from './enumHelpers';
 export type { SelectOptionWithDescription } from './enumHelpers';
 export { createFormUpdater } from './formHelpers';
-export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';
+export { validateToneSettings } from './toneSettingsValidation';
 
 
 // Object access utilities

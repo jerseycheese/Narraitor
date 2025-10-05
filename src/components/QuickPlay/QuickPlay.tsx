@@ -14,7 +14,11 @@ import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 import { Globe, Users, Play } from 'lucide-react';
-import '@/utils/debugHelpers';
+
+// Load debug helpers only in development
+if (process.env.NODE_ENV === 'development') {
+  import('@/utils/debugHelpers');
+}
 
 export function QuickPlay() {
   const router = useRouter();
