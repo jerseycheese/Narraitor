@@ -78,24 +78,21 @@ describe('GuidedFirstTimeExperience', () => {
     it('progresses through the experience steps', async () => {
       const user = userEvent.setup();
       render(<GuidedFirstTimeExperience />);
-      
-      // Look for next/continue button
+
       const nextButton = screen.queryByText(/next/i) || screen.queryByText(/continue/i) || screen.queryByText(/get started/i);
-      
+
+      expect(nextButton).toBeInTheDocument();
       if (nextButton) {
         await user.click(nextButton);
-        // Should progress to next step (implementation dependent)
-        expect(nextButton).toBeInTheDocument();
       }
     });
 
     it('completes the onboarding flow', async () => {
       const user = userEvent.setup();
       render(<GuidedFirstTimeExperience />);
-      
-      // Look for completion trigger (finish, complete, done button)
+
       const completeButton = screen.queryByText(/finish/i) || screen.queryByText(/complete/i) || screen.queryByText(/done/i);
-      
+
       if (completeButton) {
         await user.click(completeButton);
         expect(mockSessionStore.completeOnboarding).toHaveBeenCalled();
@@ -107,10 +104,9 @@ describe('GuidedFirstTimeExperience', () => {
     it('creates world during guided experience when requested', async () => {
       const user = userEvent.setup();
       render(<GuidedFirstTimeExperience />);
-      
-      // Look for world creation trigger
+
       const createWorldButton = screen.queryByText(/create world/i) || screen.queryByText(/new world/i);
-      
+
       if (createWorldButton) {
         await user.click(createWorldButton);
         expect(mockWorldStore.createWorld).toHaveBeenCalled();

@@ -33,9 +33,9 @@ describe('Type Validation Integration', () => {
         description: 'A test world'
       };
 
-      // Should allow partial validation during world creation
       const result = validateWorld(partialWorld, true);
-      expect(result).toBeDefined();
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
     });
   });
 });

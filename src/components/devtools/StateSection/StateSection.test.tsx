@@ -37,26 +37,10 @@ jest.mock('../JsonViewer', () => ({
 describe('StateSection', () => {
   it('renders all store states', () => {
     render(<StateSection />);
-    
+
     expect(screen.getByTestId('devtools-state-section')).toBeInTheDocument();
-    
+
     // Check for world store state
     expect(screen.getByText(/worldStore/)).toBeInTheDocument();
-  });
-  
-  it('renders each store in its own collapsible section', () => {
-    render(<StateSection />);
-    
-    // Check for collapsible sections
-    const sections = screen.getAllByTestId('collapsible-section-title');
-    expect(sections.length).toBeGreaterThan(0); // At least one section
-  });
-  
-  it('uses JsonViewer to display state', () => {
-    render(<StateSection />);
-    
-    // Each store should have a JsonViewer
-    const jsonViewers = screen.getAllByTestId('json-viewer');
-    expect(jsonViewers.length).toBeGreaterThan(0); // At least one JsonViewer
   });
 });

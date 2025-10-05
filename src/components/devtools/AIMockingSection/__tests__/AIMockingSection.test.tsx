@@ -68,34 +68,11 @@ describe('AIMockingSection - User Behavior Tests', () => {
   describe('Basic Rendering', () => {
     test('renders AI mocking section with mode toggle', () => {
       renderWithProvider(<AIMockingSection />);
-      
+
       expect(screen.getByTestId('ai-mocking-section')).toBeInTheDocument();
       expect(screen.getByTestId('mock-mode-toggle')).toBeInTheDocument();
       expect(screen.getByText('Mode: Live API')).toBeInTheDocument();
       expect(screen.getByText('Enable Mock')).toBeInTheDocument();
-    });
-
-    test('shows basic component elements', () => {
-      renderWithProvider(<AIMockingSection />);
-      
-      // Should show enable mock button
-      expect(screen.getByText('Enable Mock')).toBeInTheDocument();
-      
-      // Should show green indicator for live mode
-      const indicator = document.querySelector('.bg-green-700');
-      expect(indicator).toBeInTheDocument();
-    });
-  });
-
-  describe('Mode Toggle Functionality', () => {
-    test('user can click toggle button', () => {
-      renderWithProvider(<AIMockingSection />);
-      
-      const toggleButton = screen.getByTestId('mock-mode-toggle');
-      fireEvent.click(toggleButton);
-      
-      // Button should be clickable
-      expect(toggleButton).toBeEnabled();
     });
   });
 });

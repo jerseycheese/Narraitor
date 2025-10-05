@@ -86,24 +86,14 @@ describe('Toast Component', () => {
   });
 
   test('renders correct variant styles', () => {
-    const { rerender } = render(
-      <Toast title="Success Toast" variant="success" />
-    );
-    
-    let toast = screen.getByRole('alert');
-    expect(toast).toHaveAttribute('data-variant', 'success');
-    
-    rerender(<Toast title="Error Toast" variant="error" />);
-    toast = screen.getByRole('alert');
-    expect(toast).toHaveAttribute('data-variant', 'error');
-    
-    rerender(<Toast title="Warning Toast" variant="warning" />);
-    toast = screen.getByRole('alert');
-    expect(toast).toHaveAttribute('data-variant', 'warning');
-    
-    rerender(<Toast title="Info Toast" variant="info" />);
-    toast = screen.getByRole('alert');
-    expect(toast).toHaveAttribute('data-variant', 'info');
+    const variants = ['success', 'error', 'warning', 'info'] as const;
+
+    variants.forEach(variant => {
+      const { unmount } = render(<Toast title={`${variant} toast`} variant={variant} />);
+      const toast = screen.getByRole('alert');
+      expect(toast).toHaveAttribute('data-variant', variant);
+      unmount();
+    });
   });
 
   test('announces to screen readers with correct aria attributes', () => {

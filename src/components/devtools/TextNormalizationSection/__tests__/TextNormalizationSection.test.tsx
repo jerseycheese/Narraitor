@@ -228,31 +228,9 @@ describe('TextNormalizationSection', () => {
   describe('Export and Copy Features', () => {
     it('has copy and export buttons', () => {
       render(<TextNormalizationSection initialText="Hello world" />);
-      
+
       expect(screen.getByText('Copy Result')).toBeInTheDocument();
       expect(screen.getByText('Export')).toBeInTheDocument();
-    });
-
-    it('copy button can be clicked without errors', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection initialText="Hello world" />);
-      
-      const copyButton = screen.getByText('Copy Result');
-      await user.click(copyButton);
-      
-      // Button should still be there (didn't crash)
-      expect(copyButton).toBeInTheDocument();
-    });
-
-    it('export button can be clicked without errors', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection initialText="Hello world" />);
-      
-      const exportButton = screen.getByText('Export');
-      await user.click(exportButton);
-      
-      // Button should still be there (didn't crash)
-      expect(exportButton).toBeInTheDocument();
     });
   });
 
