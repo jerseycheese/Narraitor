@@ -12,11 +12,10 @@ const STORAGE_KEY = 'narraitor-devtools-section-visibility';
  */
 export enum DevToolsSection {
   STATE_SECTION = 'stateSection',
-  STATE_INSPECTOR = 'stateInspectorSection',
+  TEST_DATA_GENERATOR = 'testDataGenerator',
   AI_TESTING = 'aiTestingPanel',
   AI_MONITORING = 'aiMonitoring',
   AI_MOCKING = 'aiMocking',
-  TEST_DATA_GENERATOR = 'testDataGenerator',
   PORTRAIT_DEBUG = 'portraitDebug',
   ENDING_IMAGE_DEBUG = 'endingImageDebug',
   CONSISTENCY_VALIDATION = 'consistencyValidation',
@@ -36,10 +35,9 @@ export type SectionVisibility = Partial<Record<DevToolsSection, boolean>>;
  */
 export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.STATE_SECTION]: true,
-  [DevToolsSection.STATE_INSPECTOR]: true,
+  [DevToolsSection.TEST_DATA_GENERATOR]: true,
   [DevToolsSection.AI_TESTING]: true,
   [DevToolsSection.AI_MONITORING]: true,
-  [DevToolsSection.TEST_DATA_GENERATOR]: true,
   [DevToolsSection.PORTRAIT_DEBUG]: true,
   [DevToolsSection.ENDING_IMAGE_DEBUG]: true,
   [DevToolsSection.CONSISTENCY_VALIDATION]: true,

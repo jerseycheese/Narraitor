@@ -11,9 +11,8 @@ import { Check } from 'lucide-react';
  */
 const SECTION_INFO = {
   [DevToolsSection.STATE_SECTION]: 'State Section',
-  [DevToolsSection.STATE_INSPECTOR]: 'State Inspector',
-  [DevToolsSection.AI_TESTING]: 'AI Testing Panel',
   [DevToolsSection.TEST_DATA_GENERATOR]: 'Test Data Generator',
+  [DevToolsSection.AI_TESTING]: 'AI Testing Panel',
   [DevToolsSection.PORTRAIT_DEBUG]: 'Portrait Debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'Consistency Validation',
@@ -26,9 +25,8 @@ const SECTION_INFO = {
  */
 const SECTION_TEST_IDS = {
   [DevToolsSection.STATE_SECTION]: 'toggle-state-section',
-  [DevToolsSection.STATE_INSPECTOR]: 'toggle-state-inspector',
-  [DevToolsSection.AI_TESTING]: 'toggle-ai-testing',
   [DevToolsSection.TEST_DATA_GENERATOR]: 'toggle-test-data-generator',
+  [DevToolsSection.AI_TESTING]: 'toggle-ai-testing',
   [DevToolsSection.PORTRAIT_DEBUG]: 'toggle-portrait-debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',

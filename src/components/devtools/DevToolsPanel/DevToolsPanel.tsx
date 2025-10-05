@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
-import { StateSection, StateInspectorSection } from '../StateSection';
+import { StateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { AIMonitoringSection } from '../AIMonitoringSection';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
@@ -18,6 +17,7 @@ import { DevToolsSection } from '../shared/DevToolsSection';
 import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
+import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -153,17 +153,12 @@ export const DevToolsPanel = () => {
             {/* Left Column: State Management & Error Tracking */}
             <div className="space-y-4">
               {/* State Management Group - only show if any child sections are visible */}
-              {(isSectionVisible(SectionId.STATE_SECTION) || isSectionVisible(SectionId.STATE_INSPECTOR)) && (
+              {isSectionVisible(SectionId.STATE_SECTION) && (
                 <div className="bg-white p-4 rounded-lg border border-gray-300 shadow-sm">
                   <h3 className="text-lg font-semibold mb-3 text-gray-900 border-b border-gray-300 pb-2">
                     State Management
                   </h3>
-                  {isSectionVisible(SectionId.STATE_SECTION) && (
-                    <StateSection defaultCollapsed={true} />
-                  )}
-                  {isSectionVisible(SectionId.STATE_INSPECTOR) && (
-                    <StateInspectorSection defaultCollapsed={true} />
-                  )}
+                  <StateSection defaultCollapsed={true} />
                 </div>
               )}
 
@@ -232,8 +227,7 @@ export const DevToolsPanel = () => {
                   </div>
                 </div>
               )}
-              
-              {/* Test Data Group - only show if child section is visible */}
+
               {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
                 <div className="bg-white p-4 rounded-lg border border-gray-300 shadow-sm">
                   <h3 className="text-lg font-semibold mb-3 text-gray-900 border-b border-gray-300 pb-2">
