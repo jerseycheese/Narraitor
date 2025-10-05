@@ -53,33 +53,3 @@ export function validateToneSettings(toneSettings: Partial<ToneSettings>): Valid
     errors
   };
 }
-
-/**
- * Validates if tone settings are compatible with world theme
- */
-export function validateToneSettingsCompatibility(
-  toneSettings: ToneSettings,
-  worldTheme: string
-): ValidationResult {
-  const errors: string[] = [];
-
-  // Check for incompatible combinations
-  const theme = worldTheme.toLowerCase();
-  
-  if (theme === 'horror' && toneSettings.contentRating === 'G') {
-    errors.push('Horror themes typically require higher content ratings');
-  }
-  
-  if (theme === 'children' && ['R', 'NC-17'].includes(toneSettings.contentRating)) {
-    errors.push('Children\'s themes should use family-friendly content ratings');
-  }
-  
-  if (toneSettings.narrativeStyle === 'humorous' && ['horror', 'drama'].includes(theme)) {
-    // This is a warning, not an error - allow but note potential mismatch
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
-}

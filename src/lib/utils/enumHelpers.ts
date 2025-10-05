@@ -32,22 +32,3 @@ export function descriptionsToSelectOptions(
 function formatLabel(key: string): string {
   return titleCase(key.replace(/-/g, ' '));
 }
-
-/**
- * Gets all valid values from an enum-like object
- */
-export function getEnumValues<T extends Record<string, unknown>>(
-  enumObject: T
-): T[keyof T][] {
-  return Object.values(enumObject) as T[keyof T][];
-}
-
-/**
- * Type guard for string literal types
- */
-export function isValidEnumValue<T extends string>(
-  value: unknown,
-  validValues: readonly T[]
-): value is T {
-  return typeof value === 'string' && (validValues as readonly string[]).includes(value);
-}
