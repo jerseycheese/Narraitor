@@ -9,7 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
-import { generateUniqueId, truncate, safeTrim, getNestedValue, getTimestamp } from '@/lib/utils';
+import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { StoryEndingDialog } from '@/components/StoryEndingDialog';
@@ -400,7 +400,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           cleanContent = parsed.content;
         }
         if (parsed.metadata?.location && !actualLocation) {
-          actualLocation = getNestedValue(parsed, 'metadata.location');
+          actualLocation = parsed?.metadata?.location;
           // Update segment metadata if it wasn't already set by the generator
           segment.metadata = { ...segment.metadata, ...parsed.metadata };
         }

@@ -22,7 +22,7 @@ import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { CharacterGoal } from '@/types/personalization.types';
-import { safeTrim, getNestedValue } from '@/lib/utils';
+import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 
 export class NarrativeGenerator {
@@ -529,13 +529,13 @@ export class NarrativeGenerator {
           }
           if (parsed.metadata) {
             extractedMetadata = {
-              location: getNestedValue(parsed, 'metadata.location'),
-              mood: this.validateMood(getNestedValue(parsed, 'metadata.mood')),
-              tags: Array.isArray(getNestedValue(parsed, 'metadata.tags'))
-                ? getNestedValue(parsed, 'metadata.tags')
+              location: parsed?.metadata?.location,
+              mood: this.validateMood(parsed?.metadata?.mood),
+              tags: Array.isArray(parsed?.metadata?.tags)
+                ? parsed?.metadata?.tags
                 : [],
-              characterIds: Array.isArray(getNestedValue(parsed, 'metadata.characterIds'))
-                ? getNestedValue(parsed, 'metadata.characterIds')
+              characterIds: Array.isArray(parsed?.metadata?.characterIds)
+                ? parsed?.metadata?.characterIds
                 : [],
             };
           }

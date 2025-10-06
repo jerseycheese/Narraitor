@@ -10,7 +10,7 @@ import {
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
-import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -93,22 +93,22 @@ export function CharacterCard({
           </h3>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm text-gray-500">Level {character.level || 1}</span>
-            {getNestedValue(character, 'background.isKnownFigure') !== undefined && (
+            {character?.background?.isKnownFigure !== undefined && (
               <Badge
-                icon={getNestedValue(character, 'background.isKnownFigure') ? 
-                  <Star className="w-3 h-3 text-white" aria-hidden="true" /> : 
+                icon={character?.background?.isKnownFigure ?
+                  <Star className="w-3 h-3 text-white" aria-hidden="true" /> :
                   <Plus className="w-3 h-3 text-white" aria-hidden="true" />
                 }
-                variant={getNestedValue(character, 'background.isKnownFigure') ? 'warning-static' : 'default-static'}
+                variant={character?.background?.isKnownFigure ? 'warning-static' : 'default-static'}
               >
-                {getNestedValue(character, 'background.isKnownFigure') ? 'Known Figure' : 'Original'}
+                {character?.background?.isKnownFigure ? 'Known Figure' : 'Original'}
               </Badge>
             )}
           </div>
           <p className="text-gray-700 text-sm leading-snug">
             {(() => {
-              const text = (getNestedValue(character, 'background.history') || 
-                          getNestedValue(character, 'background.personality') || 
+              const text = (character?.background?.history ||
+                          character?.background?.personality ||
                           'No description provided') as string;
               const sentences = text.split(/[.!?]+/);
               let result = '';

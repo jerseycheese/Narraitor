@@ -88,13 +88,6 @@ export { createFormUpdater } from './formHelpers';
 export { validateToneSettings } from './toneSettingsValidation';
 
 
-// Object access utilities
-export {
-  getNestedValue,
-  hasNestedProperty,
-  getNestedPaths
-} from './objectAccess';
-
 // Enhanced serialization and debugging utilities
 export {
   sanitizeForSerialization,

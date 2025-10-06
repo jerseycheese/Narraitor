@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserFriendlyError } from '@/lib/utils/errorUtils';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
-import { getNestedValue } from '@/lib/utils';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/types/type-guards';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const characterType = getNestedValue(body, 'characterType');
-    const existingNames = getNestedValue(body, 'existingNames');
-    const suggestedName = getNestedValue(body, 'suggestedName');
-    const worldData = getNestedValue(body, 'world');
+    const characterType = body?.characterType;
+    const existingNames = body?.existingNames;
+    const suggestedName = body?.suggestedName;
+    const worldData = body?.world;
     
     if (!worldData) {
       const validationError = getUserFriendlyError(new Error('400 bad request: world data is required'));

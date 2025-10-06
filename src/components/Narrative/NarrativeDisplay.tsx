@@ -3,7 +3,7 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { parseNarrativeContent, getNestedValue } from '@/lib/utils';
+import { parseNarrativeContent } from '@/lib/utils';
 
 
 interface NarrativeDisplayProps {
@@ -174,7 +174,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         {segment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              {getNestedValue(segment, 'metadata.location')}
+              {segment?.metadata?.location}
             </p>
           </div>
         )}
