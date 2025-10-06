@@ -17,19 +17,6 @@ export const formatSessionDuration = (ms: number): string => {
 };
 
 /**
- * Gets system event icon for journal display
- * @param type Journal entry type
- * @returns Text indicator for the event type
- */
-export const getSystemEventIcon = (type: string): string => {
-  switch (type) {
-    case 'session_start': return '[START]';
-    case 'session_end': return '[END]';
-    default: return '[SYS]';
-  }
-};
-
-/**
  * Calculates the next session number based on existing journal entries with session context
  * @param journalEntries Array of journal entries to check for session numbers
  * @returns Next sequential session number
