@@ -108,29 +108,11 @@ function validateAndParseDate(date: Date | string): Date | null {
 }
 
 /**
- * Formats a date to show relative time (e.g., "2 hours ago", "yesterday")
- * 
- * Provides intelligent time formatting that scales from minutes to days,
- * with special handling for "yesterday", "tomorrow", and "just now".
- * For dates more than a week away, falls back to standard date formatting.
- * 
+ * Formats a date to show relative time (e.g., "2 hours ago", "yesterday").
+ * Falls back to standard date format for dates more than a week away.
+ *
  * @param date - Date object or ISO string to format
  * @returns Human-readable relative time string
- * 
- * @example
- * ```typescript
- * import { formatRelativeTime } from '@/lib/utils';
- * 
- * formatRelativeTime(new Date(Date.now() - 5 * 60 * 1000)); // "5 minutes ago"
- * formatRelativeTime(new Date(Date.now() - 24 * 60 * 60 * 1000)); // "yesterday"
- * formatRelativeTime(new Date(Date.now() + 2 * 60 * 60 * 1000)); // "in 2 hours"
- * formatRelativeTime('2024-01-15T10:00:00Z'); // Works with ISO strings
- * formatRelativeTime('invalid-date'); // "Invalid date"
- * ```
- * 
- * @performance Efficient for frequent updates - uses simple math operations
- * @see {@link formatDate} for absolute date formatting
- * @see {@link formatDateTime} for combined date and time formatting
  */
 export function formatRelativeTime(date: Date | string): string {
   try {
@@ -321,38 +303,13 @@ export function formatDateTime(date: Date | string, options: DateTimeFormatOptio
 // === STRING FORMATTING ===
 
 /**
- * Truncates text at a specified length with ellipsis
- * 
- * Intelligently truncates text by preferring word boundaries when possible.
- * This prevents breaking words in the middle, creating more readable truncated text.
- * If no good word boundary exists, falls back to character-level truncation.
- * 
+ * Truncates text at a specified length with ellipsis.
+ * Prefers word boundaries when possible, falls back to character-level truncation.
+ *
  * @param text - Text to truncate
  * @param maxLength - Maximum length of the text portion (ellipsis is added on top)
  * @param suffix - Suffix to append (defaults to '...')
  * @returns Truncated text with suffix
- * 
- * @example
- * ```typescript
- * import { truncate } from '@/lib/utils';
- * 
- * // Word boundary truncation
- * truncate('Hello world from TypeScript', 11); // "Hello world..."
- * 
- * // Character truncation when no word boundary
- * truncate('Supercalifragilisticexpialidocious', 10); // "Supercalif..."
- * 
- * // Custom suffix
- * truncate('Long text here', 8, '…'); // "Long tex…"
- * 
- * // Edge cases
- * truncate('', 10); // ""
- * truncate('Short', 10); // "Short"
- * truncate('Text', 0); // "..."
- * ```
- * 
- * @performance Optimized for readability over performance - suitable for UI display
- * @see {@link safeTrim} for safe string trimming
  */
 export function truncate(text: string, maxLength: number, suffix: string = '...'): string {
   if (!text) return '';
@@ -695,43 +652,12 @@ export function formatCompactNumber(value: number): string {
 // =============================================================================
 
 /**
- * Safely serializes objects for JSON storage, handling functions, dates, and circular references
- * 
- * Provides comprehensive serialization with intelligent handling of complex JavaScript types.
- * Designed for debugging, state inspection, and data persistence scenarios where standard
- * JSON.stringify would fail or produce unwanted results.
- * 
+ * Safely serializes objects for JSON storage, handling functions, dates, and circular references.
+ * Uses a WeakSet to detect circular references during traversal.
+ *
  * @param obj - Object to serialize
- * @param options - Optional configuration for serialization behavior
+ * @param options - Optional configuration (maxDepth, functionHandler)
  * @returns Serializable version of the object
- * 
- * @example
- * ```typescript
- * import { sanitizeForSerialization } from '@/lib/utils';
- * 
- * const complexObject = {
- *   name: 'Example',
- *   date: new Date(),
- *   func: () => 'hello',
- *   circular: null as any
- * };
- * complexObject.circular = complexObject;
- * 
- * const serialized = sanitizeForSerialization(complexObject);
- * // {
- * //   name: 'Example',
- * //   date: '2024-01-15T10:00:00.000Z',
- * //   func: '[Function]',
- * //   circular: '[Circular Reference]'
- * // }
- * 
- * // Safe to use with JSON.stringify
- * const json = JSON.stringify(serialized);
- * ```
- * 
- * @note This function handles circular references by maintaining a WeakSet during traversal
- * @see {@link formatForDebug} for debug-specific formatting
- * @since Enhanced with StateInspector patterns for better development tooling
  */
 export function sanitizeForSerialization(obj: unknown, options?: {
   /** Maximum depth to traverse (prevents infinite recursion) */
@@ -792,35 +718,11 @@ export function sanitizeForSerialization(obj: unknown, options?: {
 }
 
 /**
- * Formats complex objects for debugging and development purposes
- * 
- * Provides human-readable formatting specifically designed for debugging scenarios.
- * Combines serialization safety with enhanced readability for development tools,
- * error reporting, and state inspection interfaces.
- * 
+ * Formats complex objects for debugging with circular reference handling and string truncation.
+ *
  * @param obj - Object to format for debugging
- * @param options - Configuration for debug formatting
+ * @param options - Configuration (compact, indent, maxStringLength)
  * @returns Debug-friendly string representation
- * 
- * @example
- * ```typescript
- * import { formatForDebug } from '@/lib/utils';
- * 
- * const debugObj = {
- *   user: { id: 1, name: 'John' },
- *   settings: { theme: 'dark', notifications: true },
- *   metadata: { created: new Date(), version: '1.0.0' }
- * };
- * 
- * // Compact formatting for logs
- * console.log(formatForDebug(debugObj, { compact: true }));
- * 
- * // Pretty formatting for development tools
- * console.log(formatForDebug(debugObj, { indent: 2 }));
- * ```
- * 
- * @note Designed to work seamlessly with DevTools and state inspection utilities
- * @see {@link sanitizeForSerialization} for safe serialization without formatting
  */
 export function formatForDebug(obj: unknown, options?: {
   /** Compact single-line format */
@@ -868,71 +770,3 @@ export function formatForDebug(obj: unknown, options?: {
   }
 }
 
-/**
- * Gets detailed type information about a value, useful for debugging and introspection
- * 
- * Provides enhanced type detection beyond standard JavaScript typeof operator.
- * Particularly useful for development tools, state inspection, and debugging scenarios
- * where understanding the exact nature of values is critical.
- * 
- * @param value - Value to analyze
- * @returns Detailed type information object
- * 
- * @example
- * ```typescript
- * import { getValueTypeInfo } from '@/lib/utils';
- * 
- * getValueTypeInfo(null);           // { type: 'null', constructor: null, isArray: false }
- * getValueTypeInfo([1, 2, 3]);      // { type: 'array', constructor: 'Array', isArray: true }
- * getValueTypeInfo(new Date());     // { type: 'date', constructor: 'Date', isArray: false }
- * getValueTypeInfo(() => {});       // { type: 'function', constructor: 'Function', isArray: false }
- * getValueTypeInfo({});             // { type: 'object', constructor: 'Object', isArray: false }
- * ```
- * 
- * @note Used internally by StateInspector for hierarchical state navigation
- * @see {@link formatForDebug} for comprehensive object debugging
- */
-export function getValueTypeInfo(value: unknown): {
-  type: string;
-  constructor: string | null;
-  isArray: boolean;
-  hasChildren: boolean;
-} {
-  if (value === null) {
-    return { type: 'null', constructor: null, isArray: false, hasChildren: false };
-  }
-  
-  if (value === undefined) {
-    return { type: 'undefined', constructor: null, isArray: false, hasChildren: false };
-  }
-  
-  if (Array.isArray(value)) {
-    return { 
-      type: 'array', 
-      constructor: 'Array', 
-      isArray: true, 
-      hasChildren: value.length > 0 
-    };
-  }
-  
-  if (value instanceof Date) {
-    return { type: 'date', constructor: 'Date', isArray: false, hasChildren: false };
-  }
-  
-  if (typeof value === 'function') {
-    return { type: 'function', constructor: 'Function', isArray: false, hasChildren: false };
-  }
-  
-  if (typeof value === 'object') {
-    const constructor = value.constructor?.name || 'Object';
-    const hasChildren = Object.keys(value as Record<string, unknown>).length > 0;
-    return { type: 'object', constructor, isArray: false, hasChildren };
-  }
-  
-  return { 
-    type: typeof value, 
-    constructor: null, 
-    isArray: false, 
-    hasChildren: false 
-  };
-}

@@ -98,8 +98,7 @@ export {
 // Enhanced serialization and debugging utilities
 export {
   sanitizeForSerialization,
-  formatForDebug,
-  getValueTypeInfo
+  formatForDebug
 } from './formatters';
 
 
