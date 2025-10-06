@@ -2,7 +2,7 @@
 
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
-import { capitalize, truncate, safeTrim, getNestedValue, getTimestamp } from '@/lib/utils';
+import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 interface PortraitGenerationOptions {
@@ -256,7 +256,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
             // Use detected figureName if available, otherwise try to extract from history
             if (options.detection?.figureName) {
               subject.push(`from ${options.detection?.figureName}`);
-            } else if (getNestedValue(character, 'background.history')) {
+            } else if (character?.background?.history) {
               // More flexible regex patterns to extract game names
               let gameName = null;
               
@@ -296,7 +296,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           context.push(`official character look`);
           
           // Add specific details if present
-          if (hasSpecificDetails && getNestedValue(character, 'background.physicalDescription')) {
+          if (hasSpecificDetails && character?.background?.physicalDescription) {
             if (specificClothing) {
               context.push(`wearing ${specificClothing}`);
             }
@@ -572,7 +572,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       const enhancements: { physicalDescription?: string; personality?: string; history?: string } = {};
       
       // Generate or enhance physical description
-      if (!getNestedValue(character, 'background.physicalDescription') || safeTrim(getNestedValue(character, 'background.physicalDescription')).length === 0) {
+      if (!character?.background?.physicalDescription || safeTrim(character?.background?.physicalDescription ?? '').length === 0) {
         // No user input - generate from scratch
         const prompt = `Provide an accurate physical description of ${character.name} (the ${contextHint}) in 30-35 words. 
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
@@ -595,7 +595,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         enhancements.physicalDescription = description.replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${getNestedValue(character, 'background.physicalDescription')}"
+        const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${character?.background?.physicalDescription}"
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
         Keep the user's description but add missing details like specific hair length/style/color, facial features, or typical clothing if not specified.
         Maximum 40 words. Answer with just the enhanced description, no extra text.`;
@@ -605,7 +605,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       }
       
       // Generate or enhance personality
-      if (!getNestedValue(character, 'background.personality') || safeTrim(getNestedValue(character, 'background.personality')).length === 0) {
+      if (!character?.background?.personality || safeTrim(character?.background?.personality ?? '').length === 0) {
         // No user input - generate from scratch
         const prompt = `Describe ${character.name}'s (the ${contextHint}) personality in 15 words or less. 
         Focus on their key character traits. 
@@ -615,7 +615,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         enhancements.personality = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.personality')}"
+        const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${character?.background?.personality}"
         Keep the user's description but add accurate character traits if missing or expand on provided traits.
         Maximum 20 words. Answer with just the enhanced description, no extra text.`;
         
@@ -624,7 +624,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       }
       
       // Generate or enhance history
-      if (!getNestedValue(character, 'background.history') || safeTrim(getNestedValue(character, 'background.history')).length === 0) {
+      if (!character?.background?.history || safeTrim(character?.background?.history ?? '').length === 0) {
         // No user input - generate from scratch
         const prompt = `Provide a one-sentence background for ${character.name} (the ${contextHint}). 
         ${detection.figureType === 'videogame' ? 'MUST include the specific video game title they are from (e.g., "from Red Dead Redemption 2", "from The Legend of Zelda", etc.).' : ''}
@@ -635,7 +635,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         enhancements.history = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.history')}"
+        const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${character?.background?.history}"
         ${detection.figureType === 'videogame' ? 'Add the specific video game title if missing.' : ''}
         ${detection.figureType === 'fictional' ? 'Add the specific movie or TV show title if missing.' : ''}
         Keep the user's content but add missing context or details. One sentence maximum. Answer with just the enhanced background, no extra text.`;
@@ -649,9 +649,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         ...character,
         background: {
           ...character.background,
-          physicalDescription: getNestedValue(character, 'background.physicalDescription') || enhancements.physicalDescription || '',
-          personality: getNestedValue(character, 'background.personality') || enhancements.personality || '',
-          history: getNestedValue(character, 'background.history') || enhancements.history || ''
+          physicalDescription: character?.background?.physicalDescription || enhancements.physicalDescription || '',
+          personality: character?.background?.personality || enhancements.personality || '',
+          history: character?.background?.history || enhancements.history || ''
         }
       };
     } catch (error) {

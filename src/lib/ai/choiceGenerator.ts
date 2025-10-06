@@ -7,7 +7,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
-import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 /**
@@ -59,7 +59,7 @@ export class ChoiceGenerator {
       const response = await this.aiClient.generateContent(prompt);
       
       
-      if (!getNestedValue(response, 'content') || safeTrim(getNestedValue(response, 'content', '')) === '') {
+      if (!response?.content || safeTrim(response?.content ?? '') === '') {
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
