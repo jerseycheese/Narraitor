@@ -214,36 +214,25 @@ export default function GameSessionTestHarness() {
   const createTestWorld = React.useCallback(() => {
     const worlds = useWorldStore.getState().worlds || {};
     const characters = useCharacterStore.getState().characters || {};
-    
+
     // Only create if they don't exist
     if (!worlds[mockWorld.id]) {
-      const entities = useWorldStore.getState().entities || {};
       useWorldStore.setState({
         worlds: {
           ...worlds,
-          [mockWorld.id]: mockWorld
-        },
-        entities: {
-          ...entities,
           [mockWorld.id]: mockWorld
         }
       });
       logger.info('Test world created');
     }
-    
+
     if (!characters[mockCharacter.id]) {
-      const characterEntities = useCharacterStore.getState().entities || {};
       useCharacterStore.setState({
         characters: {
           ...characters,
           [mockCharacter.id]: mockCharacter
         },
-        entities: {
-          ...characterEntities,
-          [mockCharacter.id]: mockCharacter
-        },
         currentCharacterId: mockCharacter.id,
-        currentEntityId: mockCharacter.id,
         error: null,
         loading: false
       });

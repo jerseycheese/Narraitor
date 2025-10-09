@@ -91,11 +91,7 @@ export default function JournalAccessTestPage() {
         characters: {
           'test-char-1': testCharacter
         },
-        entities: {
-          'test-char-1': testCharacter
-        },
         currentCharacterId: 'test-char-1',
-        currentEntityId: 'test-char-1',
         error: null,
         loading: false
       });
@@ -110,12 +106,10 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         savedSessions: {}
       });
-      
+
       useCharacterStore.setState({
         characters: {},
-        entities: {},
         currentCharacterId: null,
-        currentEntityId: null,
         error: null,
         loading: false
       });
