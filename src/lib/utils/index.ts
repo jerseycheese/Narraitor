@@ -78,7 +78,7 @@ export {
 } from './validationUtils';
 
 // Debounce utilities
-export { debounce, throttle, useDebounce } from './debounce';
+export { debounce } from './debounce';
 export type { DebouncedFunction } from './debounce';
 
 // Tone settings utilities

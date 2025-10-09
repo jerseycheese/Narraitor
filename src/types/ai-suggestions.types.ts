@@ -27,15 +27,3 @@ export interface SkillSuggestion extends AISuggestionBase {
   originalDescription?: string;
   originalDifficulty?: SkillDifficulty;
 }
-
-export interface WorldAnalysisResult {
-  attributes: AttributeSuggestion[];
-  skills: SkillSuggestion[];
-}
-
-export interface AISuggestionsState {
-  loading: boolean;
-  error?: string;
-  attributes: AttributeSuggestion[];
-  skills: SkillSuggestion[];
-}

@@ -3,8 +3,6 @@
  * Prevents excessive function calls by delaying execution
  */
 
-import React from 'react';
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DebouncedFunction<T extends (...args: any[]) => any> = {
   (...args: Parameters<T>): Promise<ReturnType<T>>;
@@ -95,58 +93,4 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 
   return debouncedFn;
-}
-
-/**
- * Simple throttle function - limits function calls to once per interval
- * @param func The function to throttle
- * @param interval The minimum interval between calls in milliseconds
- * @returns A throttled function
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  interval: number
-): (...args: Parameters<T>) => void {
-  let lastCallTime = 0;
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  return (...args: Parameters<T>) => {
-    const now = Date.now();
-    const timeSinceLastCall = now - lastCallTime;
-
-    if (timeSinceLastCall >= interval) {
-      // Execute immediately
-      lastCallTime = now;
-      func(...args);
-    } else {
-      // Schedule for later
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      timeoutId = setTimeout(() => {
-        lastCallTime = Date.now();
-        func(...args);
-      }, interval - timeSinceLastCall);
-    }
-  };
-}
-
-/**
- * Hook-compatible debounce for React components
- * @param callback The callback to debounce
- * @param delay The delay in milliseconds
- * @param deps Dependency array for the callback
- * @returns A stable debounced callback
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useDebounce<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number,
-  deps: React.DependencyList = []
-): DebouncedFunction<T> {
-  return React.useMemo(() => {
-    return debounce(callback, delay);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [delay, callback, ...deps]);
 }
