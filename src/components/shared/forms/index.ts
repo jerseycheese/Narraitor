@@ -31,50 +31,6 @@ export interface FormFieldProps {
   helpText?: string;
 }
 
-/**
- * Hook for common form field logic
- */
-export function useFormField(
-  initialValue: string | number = '',
-  validator?: (value: string | number) => string | undefined
-) {
-  const [value, setValue] = useState(initialValue);
-  const [error, setError] = useState<string | undefined>();
-  const [touched, setTouched] = useState(false);
-
-  const handleChange = (newValue: string | number) => {
-    setValue(newValue);
-    if (touched && validator) {
-      setError(validator(newValue));
-    }
-  };
-
-  const handleBlur = () => {
-    setTouched(true);
-    if (validator) {
-      setError(validator(value));
-    }
-  };
-
-  const reset = () => {
-    setValue(initialValue);
-    setError(undefined);
-    setTouched(false);
-  };
-
-  return {
-    value,
-    error: touched ? error : undefined,
-    onChange: handleChange,
-    onBlur: handleBlur,
-    reset,
-    isValid: !error,
-    isTouched: touched,
-  };
-}
-
-// Import React for the hook
-import { useState } from 'react';
 
 /**
  * Common validators for form fields

@@ -44,6 +44,22 @@ This log tracks code that currently has no live references. Each entry lists the
   - Evidence: `rg "StorageStatus" -n src/app src/components --glob '!src/components/shared/StorageStatus.tsx'` produces no results.
   - Notes: The resilient storage middleware updates status, but nothing renders it. Either wire it into settings/devtools or remove it.
 
+- **World card action bar `WorldCardActions`** (`src/components/WorldCardActions/WorldCardActions.tsx`)
+  - Evidence: `rg "WorldCardActions" -n --glob '!src/stories/**/*' --glob '!src/components/WorldCardActions/WorldCardActions.tsx'` returns no runtime usage.
+  - Notes: The world list relies on `WorldCard` + `CardActionGroup`; this separate action strip survives only in stories/tests.
+
+- **Shared form hook `useFormField`** (`src/components/shared/forms/index.ts`)
+  - Evidence: `rg "useFormField" -n --glob '!src/components/shared/forms/index.ts'` has no hits.
+  - Notes: All form implementations manage their own local state; this helper never shipped.
+
+- **Legacy world API wrappers** (`src/lib/api/worldApi.ts` — `worldApi.generateCharacter`, `worldApi.generatePortrait`, `WorldApiError`, `enhancedWorldApi`, `isGeneratedWorldData`, `isWorldImageResponse`)
+  - Evidence: targeted ripgrep queries like `rg "worldApi\.generateCharacter" -n` and `rg "WorldApiError" -n --glob '!src/lib/api/worldApi.ts'` return nothing.
+  - Notes: The client only calls `worldApi.generateWorld`/`generateWorldImage`; these extras were never wired up once the wizard moved to direct store writes.
+
+- **AI response post-processor `ResponseFormatter`** (`src/lib/ai/responseFormatter.ts`)
+  - Evidence: apart from the re-export in `src/lib/ai/index.ts`, `rg "ResponseFormatter" -n --glob '!src/lib/ai/responseFormatter.ts' --glob '!src/lib/ai/__mocks__/responseFormatter.ts'` finds no imports.
+  - Notes: Narrative rendering now handles formatting inline, so this class (and its mock) can go.
+
 ## Runtime-Unused (only referenced in tests/docs)
 
 These items do not affect the production bundle today but have unit tests or documentation. Removing them requires pruning their tests/stories too.
@@ -63,6 +79,10 @@ These items do not affect the production bundle today but have unit tests or doc
 - **Toast hook `useToast`** (`src/components/ui/toast/toaster.tsx`)
   - Evidence: `rg "useToast(" -n src/app src/components` yields no results beyond the hook implementation and docs.
   - Notes: We already mount `ToastProvider`/`Toaster` in `app/layout.tsx`, but no component triggers notifications. Either add a first consumer or remove the hook/docs for now.
+
+- **Portrait-generation client wrapper** (`src/lib/ai/portraitGenerationClient.ts`)
+  - Evidence: outside of tests and the factory definition, `rg "PortraitGenerationClient" -n --glob '!src/lib/ai/portraitGenerationClient.ts' --glob '!src/lib/ai/clientFactory.ts' --glob '!src/lib/ai/__tests__/*'` is empty. All `createAIClient()` callers live in `use client` components, so the branch that instantiates this class is never hit in production.
+  - Notes: If server-side portrait generation ever needs this, we should move the call there; otherwise prune the class and simplify the factory tests.
 
 ## Tooling Notes
 
