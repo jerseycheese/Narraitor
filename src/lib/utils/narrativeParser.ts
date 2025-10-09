@@ -1,15 +1,6 @@
 import { safeTrim } from './index';
 
 /**
- * Result of parsing narrative content with metadata
- */
-export interface NarrativeParseResult {
-  content: string;
-  wasJson: boolean;
-  parseStrategy: 'direct' | 'codeblock' | 'regex' | 'fallback';
-}
-
-/**
  * Parse narrative content from AI responses with multiple fallback strategies
  * Handles JSON code blocks, malformed JSON, and control character sanitization
  * 
@@ -135,61 +126,4 @@ export function parseNarrativeContent(content: string): string {
   }
   
   return content;
-}
-
-/**
- * Enhanced version of parseNarrativeContent that returns parsing metadata
- * Useful for debugging and understanding how content was processed
- * 
- * @param content - Raw content from AI response
- * @returns Parsed result with metadata about the parsing strategy used
- */
-export function parseNarrativeContentWithMetadata(content: string): NarrativeParseResult {
-  // Track original content for comparison
-  const originalContent = content;
-  
-  // Skip parsing if content is empty or not a string
-  if (!content || typeof content !== 'string') {
-    return {
-      content: content || '',
-      wasJson: false,
-      parseStrategy: 'direct'
-    };
-  }
-  
-  // Handle short metadata content
-  if (safeTrim(content).length < 20 && (content.includes('scene') || content.includes('Starting Location'))) {
-    return {
-      content: 'The story is beginning... (Content generation in progress)',
-      wasJson: false,
-      parseStrategy: 'fallback'
-    };
-  }
-  
-  // Handle JSON code blocks
-  if (safeTrim(content).startsWith('```json')) {
-    const parsedContent = parseNarrativeContent(content);
-    return {
-      content: parsedContent,
-      wasJson: true,
-      parseStrategy: parsedContent !== originalContent ? 'codeblock' : 'fallback'
-    };
-  }
-  
-  // Handle raw JSON
-  if (safeTrim(content).startsWith('{') && safeTrim(content).endsWith('}')) {
-    const parsedContent = parseNarrativeContent(content);
-    return {
-      content: parsedContent,
-      wasJson: true,
-      parseStrategy: parsedContent !== originalContent ? 'regex' : 'fallback'
-    };
-  }
-  
-  // Direct content (no JSON processing needed)
-  return {
-    content: content,
-    wasJson: false,
-    parseStrategy: 'direct'
-  };
 }

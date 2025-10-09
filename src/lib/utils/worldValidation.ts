@@ -4,7 +4,7 @@ import { GENRES } from '@/lib/constants/genres';
 /**
  * Validates world name with uniqueness check
  */
-export function validateWorldName(value: string, existingNames: string[] = []): string | null {
+function validateWorldName(value: string, existingNames: string[] = []): string | null {
   // First check if it's a non-empty string
   const requiredError = validators.required(value, 'World name');
   if (requiredError) return requiredError;
@@ -31,7 +31,7 @@ export function validateWorldName(value: string, existingNames: string[] = []): 
 /**
  * Validates genre selection
  */
-export function validateGenre(value: string): string | null {
+function validateGenre(value: string): string | null {
   const requiredError = validators.required(value, 'Genre');
   if (requiredError) return requiredError;
 
@@ -47,7 +47,7 @@ export function validateGenre(value: string): string | null {
 /**
  * Validates description/concept field
  */
-export function validateDescription(value: string, fieldName: string = 'Description'): string | null {
+function validateDescription(value: string, fieldName: string = 'Description'): string | null {
   const requiredError = validators.required(value, fieldName);
   if (requiredError) return requiredError;
 
@@ -65,7 +65,7 @@ export function validateDescription(value: string, fieldName: string = 'Descript
 /**
  * Validates world reference when relationship is specified
  */
-export function validateWorldReference(
+function validateWorldReference(
   relationship?: string, 
   reference?: string
 ): string | null {
@@ -86,19 +86,6 @@ export function validateWorldReference(
   }
 
   return null;
-}
-
-/**
- * Validates suggested world name (optional field)
- */
-export function validateSuggestedName(value: string, existingNames: string[] = []): string | null {
-  // If empty, it's valid (optional field)
-  if (!value?.trim()) {
-    return null;
-  }
-
-  // If provided, use same validation as required world name
-  return validateWorldName(value, existingNames);
 }
 
 /**
@@ -147,15 +134,3 @@ export function validateWorldCreationData(
     errors,
   };
 }
-
-/**
- * Validation rules object for easier integration
- */
-export const worldValidators = {
-  name: validateWorldName,
-  genre: validateGenre,
-  description: validateDescription,
-  worldReference: validateWorldReference,
-  suggestedName: validateSuggestedName,
-  complete: validateWorldCreationData,
-};

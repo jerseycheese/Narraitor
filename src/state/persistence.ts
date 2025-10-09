@@ -5,7 +5,6 @@
 
 import { PersistStorage } from 'zustand/middleware';
 import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
-import { isStorageAvailable } from '../utils/storageHelpers';
 
 /**
  * Single resilient storage promise with lazy initialization pattern.
@@ -91,25 +90,9 @@ export const persistConfig = {
 };
 
 /**
- * Check if persistence is available and get storage status
- */
-export const checkPersistenceAvailable = async (): Promise<boolean> => {
-  return await isStorageAvailable();
-};
-
-/**
  * Get the current resilient storage instance for status monitoring
  */
 export const getResilientStorageInstance = async (): Promise<ResilientStorageMiddleware> => {
   return await getResilientStorage();
 };
 
-/**
- * Debug storage contents (for console debugging)
- */
-export const debugStorage = {
-  async inspectKey(key: string): Promise<string | null> {
-    const storage = await getResilientStorage();
-    return await storage.getItem(key);
-  }
-};

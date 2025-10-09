@@ -14,15 +14,6 @@ export interface CharacterPortrait {
 }
 
 /**
- * Portrait generation status tracking
- */
-export interface PortraitGenerationStatus {
-  isGenerating: boolean;
-  error: string | null;
-  lastAttemptAt?: string;
-}
-
-/**
  * Represents a character in the game
  */
 export interface Character extends NamedEntity, TimestampedEntity {

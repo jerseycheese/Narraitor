@@ -29,11 +29,3 @@ export interface TimestampedEntity {
   updatedAt: ISODateString;
 }
 
-/**
- * Result type for operations
- */
-export interface OperationResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}

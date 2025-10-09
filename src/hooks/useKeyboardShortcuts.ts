@@ -58,18 +58,3 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled: boo
 
   return { shortcuts };
 }
-
-/**
- * Hook specifically for journal shortcuts
- */
-export function useJournalShortcuts(onOpenJournal: () => void, enabled: boolean = true) {
-  const shortcuts: KeyboardShortcut[] = [
-    {
-      key: 'j',
-      action: onOpenJournal,
-      description: 'Open journal'
-    }
-  ];
-
-  return useKeyboardShortcuts(shortcuts, enabled);
-}
