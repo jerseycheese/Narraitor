@@ -2,7 +2,7 @@
 
 import { GoogleGenAI } from '@google/genai';
 import { AIResponse, AIServiceConfig, AIClient } from './types';
-import { isRetryableError } from './errors';
+import { isRetryableError } from '@/lib/utils/errorUtils';
 import { getGenerationConfig, getSafetySettings } from './config';
 
 /**
