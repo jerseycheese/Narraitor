@@ -92,11 +92,6 @@ export function normalizeGenre(value: string): string {
 }
 
 /**
- * Genres commonly used for AI image generation
- */
-export const AI_SUPPORTED_GENRES = GENRES.map(genre => genre.value);
-
-/**
  * Default genre for new worlds
  */
 export const DEFAULT_GENRE: GenreValue = 'fantasy';

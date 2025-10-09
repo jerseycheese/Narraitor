@@ -1,4 +1,4 @@
-import { formatRelativeTime, safeTrim } from '@/lib/utils';
+import { safeTrim } from '@/lib/utils';
 
 /**
  * Options for formatting AI-generated text
@@ -196,12 +196,3 @@ function formatItalics(text: string): string {
   return text.replace(italicsPattern, '<em>$1</em>');
 }
 
-/**
- * Formats a date to show relative time (e.g., "2 hours ago", "3 days ago")
- * @param dateString - ISO date string to format
- * @returns Human-readable relative time string
- * @deprecated Use formatRelativeTime from @/lib/utils instead
- */
-export function formatDistanceToNow(dateString: string): string {
-  return formatRelativeTime(dateString);
-}

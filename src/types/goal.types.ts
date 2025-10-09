@@ -89,14 +89,3 @@ export interface GoalContext {
   contextText: string;
   tokenCount: number;
 }
-
-/**
- * Configuration for goal extraction and management
- */
-export interface GoalConfig {
-  maxActiveGoals: number;
-  maxContextTokens: number;
-  minConfidenceThreshold: number;
-  priorityWeights: Record<GoalPriority, number>;
-  statusTransitions: Record<GoalStatus, GoalStatus[]>;
-}

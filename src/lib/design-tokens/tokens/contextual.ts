@@ -54,30 +54,5 @@ export const loreCategories = {
   },
 } as const
 
-// Portrait generation theme colors (used in AI generation)
-export const portraitThemes = {
-  warm: {
-    primary: primitiveColors.amber[700], // #b45309
-    secondary: primitiveColors.amber[500], // #f59e0b
-    accent: primitiveColors.amber[200], // #fde68a
-  },
-  cool: {
-    primary: primitiveColors.blue[700],
-    secondary: primitiveColors.blue[500],
-    accent: primitiveColors.blue[300],
-  },
-  neutral: {
-    primary: primitiveColors.gray[700],
-    secondary: primitiveColors.gray[500],
-    accent: primitiveColors.gray[300],
-  },
-  vibrant: {
-    primary: primitiveColors.red[700], // #b91c1c
-    secondary: primitiveColors.amber[500], // #f59e0b
-    accent: primitiveColors.red[500], // Using red instead of violet
-  },
-} as const
-
 export type EndingTones = typeof endingTones
 export type LoreCategories = typeof loreCategories
-export type PortraitThemes = typeof portraitThemes
