@@ -5,7 +5,6 @@ import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
-import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { logger } from '@/lib/utils/logger';

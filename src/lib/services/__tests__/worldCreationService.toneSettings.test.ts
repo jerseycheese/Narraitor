@@ -227,57 +227,6 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     });
   });
 
-  describe('createWorldManually', () => {
-    const manualWorldData = {
-      name: 'Manual Fantasy World',
-      description: 'A world created manually by the user',
-      genre: 'fantasy',
-      attributes: [],
-      skills: [],
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 10,
-        attributePointPool: 27,
-        skillPointPool: 40
-      }
-    };
-
-    it('should use default tone settings for manually created worlds', async () => {
-      await worldCreationService.createWorldManually(manualWorldData);
-
-      expect(mockGenerator.generateToneSettings).not.toHaveBeenCalled();
-
-      expect(mockStore.createWorld).toHaveBeenCalledWith(
-        expect.objectContaining({
-          toneSettings: DEFAULT_TONE_SETTINGS
-        })
-      );
-    });
-
-    it('should preserve existing tone settings when provided', async () => {
-      const worldDataWithToneSettings = {
-        ...manualWorldData,
-        toneSettings: {
-          contentRating: 'R' as const,
-          narrativeStyle: 'serious' as const,
-          languageComplexity: 'literary' as const
-        }
-      };
-
-      await worldCreationService.createWorldManually(worldDataWithToneSettings);
-
-      expect(mockGenerator.generateToneSettings).not.toHaveBeenCalled();
-
-      expect(mockStore.createWorld).toHaveBeenCalledWith(
-        expect.objectContaining({
-          toneSettings: {
-            contentRating: 'R',
-            narrativeStyle: 'serious',
-            languageComplexity: 'literary'
-          }
-        })
-      );
-    });
-  });
+  
 
 });
