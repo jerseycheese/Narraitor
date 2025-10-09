@@ -4,7 +4,6 @@
 export * from './types';
 export * from './config';
 
-export { AIPromptProcessor } from './aiPromptProcessor';
 export { GeminiClient } from './geminiClient';
 export { ResponseFormatter } from './responseFormatter';
 export { PortraitGenerator } from './portraitGenerator';
