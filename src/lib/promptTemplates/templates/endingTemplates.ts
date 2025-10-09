@@ -2,16 +2,7 @@
 
 import type { PromptTemplate } from '../types';
 import { PromptType } from '../types';
-import type { EndingType, EndingTone } from '../../../types/narrative.types';
-
-// Tone descriptions for reference (currently unused but may be needed for future enhancements)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const toneDescriptions: Record<EndingTone, string> = {
-  triumphant: 'victorious and celebratory, emphasizing achievements and success',
-  mysterious: 'enigmatic and open-ended, leaving questions unanswered',
-  tragic: 'sorrowful and melancholic, focusing on loss and sacrifice',
-  hopeful: 'optimistic and forward-looking, emphasizing new beginnings'
-};
+import type { EndingType } from '../../../types/narrative.types';
 
 const endingTypeDescriptions: Record<EndingType, string> = {
   'player-choice': 'The player has chosen to end their story here',

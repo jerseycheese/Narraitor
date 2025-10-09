@@ -297,23 +297,6 @@ export class PromptContextManager {
   }
 
   /**
-   * Builds a formatted markdown section for recent events.
-   *
-   * Creates a consistent format for the events section with a header
-   * and bullet points for each event, making the context more readable
-   * and structured for the AI model.
-   *
-   * @param events - Array of recent event strings to format
-   * @returns Formatted markdown string with events as bullet points
-   * @private
-   */
-  private buildEventsSection(events: string[]): string {
-    const lines = ['## Recent Events:'];
-    events.forEach(event => lines.push(`- ${event}`));
-    return lines.join('\n');
-  }
-
-  /**
    * Combines prioritized context elements into a formatted context string.
    *
    * This method organizes elements by type (world, character, event, situation)
