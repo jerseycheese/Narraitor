@@ -1,1 +1,0 @@
-export { CharacterList } from './CharacterList';

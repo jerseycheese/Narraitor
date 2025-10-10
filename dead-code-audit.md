@@ -88,10 +88,10 @@ Verification (2025-10-10): Imports from `@/lib/design-tokens` power logging, Sto
 - CharacterCard (index export) - **VERIFIED: Actually used**
 - CharacterCreationWizard (index export) - **VERIFIED: Actually used**
 - CharacterEditor (index export) - **VERIFIED: Actually used**
-- CharacterList (index export) - **NEEDS CHECK**
-- CharacterPortrait (index export) - **NEEDS CHECK**
-- ConfirmationDialog - **NEEDS CHECK**
-- DeleteConfirmationDialog - **NEEDS CHECK**
+- CharacterList (index export) - ✅ Removed 2025-10-10 (component deleted; no runtime references)
+- CharacterPortrait (index export) - ✅ Verified in use (Character Wizard, Card UI, QuickPlay)
+- ConfirmationDialog - ✅ Verified in use (GameSession + WorldCreation flows)
+- DeleteConfirmationDialog - ✅ Verified in use (Character + World deletion flows)
 
 ### Hook Exports
 
@@ -100,14 +100,16 @@ Verification (2025-10-10): Imports from `@/lib/design-tokens` power logging, Sto
 Flagged as unused but need verification:
 - `useCharacterCreationAutoSave` - **VERIFIED: Used in CharacterCreationWizard**
 - `useNavigationFlow` - **VERIFIED: Used**
-- `useNavigationLoading` - **NEEDS CHECK**
+- `useNavigationLoading` - ✅ Verified in use (internal NavigationLoadingProvider dependency)
 - `usePointPoolManager` - **VERIFIED: Used**
 - `useWizardState` - **VERIFIED: Used**
 - `useAutoSave` - **VERIFIED: Used**
 
 ### Type Exports from src/types/index.ts
 
-**Many type exports flagged as unused - need verification:**
+**2025-10-10 status:** ts-prune flags the barrel because consumers import the types directly from their source modules (`../types/*.types`). The barrel stays for future SDK alignment; deeper cleanup would require coordinating a project-wide import strategy. No removals in this pass.
+
+**Remaining exports to revisit if we slim or delete the barrel entirely:**
 - EntityID, ISODateString, TimestampedEntity, NamedEntity
 - WorldAttribute, WorldSkill, WorldSettings
 - CharacterAttribute, CharacterSkill, CharacterBackground, etc.
