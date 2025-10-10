@@ -13,7 +13,8 @@ The system is pretty straightforward. You create templates with `{{variable}}` p
 Here's a basic example:
 
 ```typescript
-import { PromptTemplateManager, PromptType } from '../lib/promptTemplates';
+import { PromptTemplateManager } from '@/lib/promptTemplates/promptTemplateManager';
+import { PromptType } from '@/lib/promptTemplates/types';
 
 const manager = new PromptTemplateManager();
 

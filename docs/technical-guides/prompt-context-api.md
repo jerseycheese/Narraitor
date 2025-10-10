@@ -15,7 +15,7 @@ The AI needs to understand your world and character to generate good stories, bu
 Takes your world and character data and formats it into clean, structured markdown that AI models can understand easily.
 
 ```typescript
-import { ContextBuilder } from '@/lib/promptContext';
+import { ContextBuilder } from '@/lib/promptContext/contextBuilder';
 
 const builder = new ContextBuilder();
 const worldContext = builder.buildWorldContext(worldData);
@@ -32,7 +32,7 @@ const combinedContext = builder.buildCombinedContext(worldData, characterData);
 When you have more information than the AI can handle, this decides what to keep and what to drop. It uses importance weights to make smart choices.
 
 ```typescript
-import { ContextPrioritizer } from '@/lib/promptContext';
+import { ContextPrioritizer } from '@/lib/promptContext/contextPrioritizer';
 
 // Default weights
 const prioritizer = new ContextPrioritizer();
@@ -65,7 +65,7 @@ const prioritized = prioritizer.prioritize(contextElements, tokenLimit);
 The main class you'll use - it brings together the builder and prioritizer to create the final context for AI prompts.
 
 ```typescript
-import { PromptContextManager } from '@/lib/promptContext';
+import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
 
 const manager = new PromptContextManager();
 
@@ -117,7 +117,8 @@ const result = await manager.generateContext({
 
 ### Template Integration
 ```typescript
-import { PromptTemplateManager, PromptContextManager } from '@/lib/promptContext';
+import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
+import { PromptTemplateManager } from '@/lib/promptTemplates/promptTemplateManager';
 
 const templateManager = new PromptTemplateManager();
 const contextManager = new PromptContextManager();
@@ -171,7 +172,7 @@ A wise and powerful wizard
 Estimates token count using simplified approach (1 token ≈ 4 characters).
 
 ```typescript
-import { estimateTokenCount } from '@/lib/promptContext';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 const text = "This is a sample text to estimate token count.";
 const tokenCount = estimateTokenCount(text);

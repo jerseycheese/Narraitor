@@ -19,7 +19,7 @@ The system has three main components that work together:
 ## Basic Usage
 
 ```typescript
-import { PromptContextManager } from '@/lib/promptContext';
+import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
 
 const manager = new PromptContextManager();
 
@@ -38,6 +38,8 @@ const context = manager.generateContext({
 If you need more control, you can use the components directly:
 
 ```typescript
+import { ContextBuilder } from '@/lib/promptContext/contextBuilder';
+
 const builder = new ContextBuilder();
 
 // Format just world data
@@ -53,6 +55,8 @@ const combined = builder.buildCombinedContext(worldData, characterData);
 For prioritization with custom weights:
 
 ```typescript
+import { ContextPrioritizer } from '@/lib/promptContext/contextPrioritizer';
+
 const prioritizer = new ContextPrioritizer({
   'character.attributes': 5,    // High priority
   'world.description': 2        // Lower priority
@@ -124,7 +128,8 @@ So you can have templates that include `{{context}}` placeholders, and this modu
 The system includes token management to ensure generated context fits within AI service limits:
 
 ```typescript
-import { PromptContextManager, estimateTokenCount } from '@/lib/promptContext';
+import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 // Estimate tokens for any text
 const text = "This is a sample text to estimate token count.";

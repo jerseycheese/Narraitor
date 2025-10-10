@@ -20,7 +20,7 @@ The system has a few key components:
 
 **`GeminiClient`** - The server-side client that actually talks to Google's API. This only runs on the server where the API keys are safe.
 
-**`AIPromptProcessor`** - Handles prompt template processing and manages the AI requests.
+**`NarrativeGenerator`** - Handles prompt template processing and manages the AI requests.
 
 **`ResponseFormatter`** - Takes the raw AI response and formats it with dialogue formatting, italics, etc.
 
@@ -31,7 +31,7 @@ Plus configuration utilities and comprehensive error handling with retry logic.
 For client-side components (which is most of the time):
 
 ```typescript
-import { ClientGeminiClient } from '@/lib/ai';
+import { ClientGeminiClient } from '@/lib/ai/clientGeminiClient';
 
 const client = new ClientGeminiClient();
 const response = await client.generateContent('Tell me a story');
@@ -41,7 +41,8 @@ console.log(response.content);
 For server-side code (API routes, etc.):
 
 ```typescript
-import { GeminiClient, getAIConfig } from '@/lib/ai';
+import { GeminiClient } from '@/lib/ai/geminiClient';
+import { getAIConfig } from '@/lib/ai/config';
 
 const config = getAIConfig(); // Reads GEMINI_API_KEY from env
 const client = new GeminiClient(config);
@@ -54,23 +55,13 @@ console.log(response.content);
 The real power comes when you combine this with the prompt template system:
 
 ```typescript
-import { AIPromptProcessor, getAIConfig } from '@/lib/ai';
-import { PromptTemplateManager } from '@/lib/promptTemplates';
+import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
-const templateManager = new PromptTemplateManager();
-const processor = new AIPromptProcessor({
-  templateManager,
-  config: getAIConfig()
-});
+const generator = new NarrativeGenerator(createDefaultGeminiClient());
 
-const response = await processor.processAndSend('narrative-intro', {
-  characterName: 'Hero',
-  location: 'Castle'
-});
-
-// You get both raw and formatted content
-console.log(response.content);          // Raw AI response
-console.log(response.formattedContent); // Formatted with dialogue and italics
+const initialScene = await generator.generateInitialScene('world-123', []);
+console.log(initialScene.content);
 ```
 
 ## Secure API Routes

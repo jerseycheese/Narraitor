@@ -136,46 +136,15 @@ These test files don't have 1:1 source file matches because they test specific *
 
 ### src/lib/ai/index.ts
 
-Potentially unused exports (need verification):
-- `GeminiClient`
-- `PortraitGenerator`
-- `WorldImageGenerator`
-- `createAIClient`
-- `generateCharacter`
-- `generateWorld`
-- `AIServiceConfig`
-- `AIServiceError`
-- `AIResponse`
-- `GenerationConfig`
-- `SafetySetting`
-- `ProcessedPrompt`
-- `AIConfig`
-- `AIPromptProcessorOptions`
-- `AIImageResponse`
-- `AIClient`
-- `getAIConfig`
-- `getGenerationConfig`
-- `getSafetySettings`
-- `getDefaultConfig`
+2025-10-10 cleanup: The entrypoint now only re-exports `createAIClient`, which is the sole consumer import. All other re-exports were removed (direct modules already imported where needed). README updated to reflect direct import paths.
 
 ### src/lib/promptContext/index.ts
 
-Flagged exports:
-- `ContextBuilder`
-- `ContextPrioritizer`
-- `PromptContextManager`
-- `WorldContext`
-- `AttributeDefinition`
-- `SkillDefinition`
-- `CharacterContext`
-- (and more...)
+2025-10-10 cleanup: Removed the barrel file entirely. Docs now import `ContextBuilder`, `ContextPrioritizer`, `PromptContextManager`, and helpers from their concrete modules. No runtime code referenced the index.
 
 ### src/lib/promptTemplates/index.ts
 
-Flagged exports:
-- `PromptType`
-- `PromptVariable`
-- (need to check more)
+2025-10-10 cleanup: Removed the barrel file. Documentation now imports `PromptTemplateManager` and related types directly from their source modules. No runtime imports relied on the index.
 
 ---
 
