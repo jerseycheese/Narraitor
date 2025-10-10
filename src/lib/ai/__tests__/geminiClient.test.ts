@@ -3,20 +3,29 @@
 import { GeminiClient } from '../geminiClient';
 import { AIServiceConfig } from '../types';
 
-// Mock the module before importing
-jest.mock('@google/genai');
+const mockGenerateContent = jest.fn();
 
-// Import after mocking - disable ESLint for this line only
- 
+jest.mock('@google/genai', () => {
+  const GoogleGenAI = jest.fn().mockImplementation(() => ({
+    models: {
+      generateContent: mockGenerateContent,
+    },
+  }));
+  return { GoogleGenAI };
+});
+
 const { GoogleGenAI } = require('@google/genai');
 
+const networkError = new Error('network error');
+
 describe('GeminiClient', () => {
+  jest.useFakeTimers();
   let client: GeminiClient;
   let config: AIServiceConfig;
-  let mockGenerateContent: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGenerateContent.mockReset();
     
     config = {
       apiKey: 'test-api-key',
@@ -36,16 +45,6 @@ describe('GeminiClient', () => {
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
       ]
     };
-
-    // Set up mock generate content function
-    mockGenerateContent = jest.fn();
-
-    // Configure GoogleGenAI mock
-    GoogleGenAI.mockImplementation(() => ({
-      models: {
-        generateContent: mockGenerateContent
-      }
-    }));
   });
 
   describe('constructor', () => {
@@ -87,7 +86,6 @@ describe('GeminiClient', () => {
 
     test('should retry on transient errors', async () => {
       // Simulate two failures followed by success - use network error message
-      const networkError = new Error('network error');
       const mockSDKResponse = {
         text: 'Generated after retry',
         result: {
@@ -101,7 +99,12 @@ describe('GeminiClient', () => {
         .mockResolvedValueOnce(mockSDKResponse);
 
       client = new GeminiClient(config);
-      const result = await client.generateContent('Test prompt');
+      const promise = client.generateContent('Test prompt');
+
+      // Advance timers to trigger retries
+      await jest.runAllTimersAsync();
+
+      const result = await promise;
 
       expect(mockGenerateContent).toHaveBeenCalledTimes(3);
       expect(result.content).toBe('Generated after retry');
@@ -109,17 +112,19 @@ describe('GeminiClient', () => {
 
     test('should throw after max retries', async () => {
       // Use error that will be detected as retryable
-      const networkError = new Error('network error');
       mockGenerateContent.mockRejectedValue(networkError);
 
       client = new GeminiClient(config);
-      
-      await expect(client.generateContent('Test prompt'))
-        .rejects
-        .toThrow('network error');
-      
+
+      const promise = client.generateContent('Test prompt');
+      const expectation = expect(promise).rejects.toThrow('network error');
+
+      await jest.runAllTimersAsync();
+
+      await expectation;
+
       expect(mockGenerateContent).toHaveBeenCalledTimes(3);
-    }, 10000); // Increased timeout to 10 seconds
+    });
 
     test('should not retry non-retryable errors', async () => {
       const authError = new Error('Invalid API key');

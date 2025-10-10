@@ -1,7 +1,6 @@
 // src/lib/ai/clientFactory.ts
 
 import { AIClient, AIServiceConfig } from './types';
-import { PortraitGenerationClient } from './portraitGenerationClient';
 import { getDefaultConfig } from './config';
 import { mockStateManager } from '../devtools/mockStateManager';
 import { MockScenarios } from './__mocks__/mockScenarios';
@@ -90,11 +89,6 @@ export function createAIClient(config?: Partial<AIServiceConfig>): AIClient {
   // In browser environment without API key, use browser-safe mock
   if (typeof window !== 'undefined' && (!fullConfig.apiKey || fullConfig.apiKey === 'MOCK_API_KEY')) {
     return new BrowserMockClient();
-  }
-
-  // Use real client when API key is available (server-side)
-  if (fullConfig.apiKey && fullConfig.apiKey !== 'MOCK_API_KEY') {
-    return new PortraitGenerationClient(fullConfig);
   }
 
   // Fallback to browser-safe mock

@@ -5,7 +5,6 @@ import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
-import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { logger } from '@/lib/utils/logger';
@@ -136,44 +135,9 @@ export const worldCreationService = {
     };
   },
 
-  /**
-   * Create a world manually (without AI generation)
-   */
-  async createWorldManually(worldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'>): Promise<CreateWorldResult> {
-    const { createWorld } = useWorldStore.getState();
+  
 
-    // Ensure default values
-    const completeWorldData = {
-      ...worldData,
-      attributes: worldData.attributes || [],
-      skills: worldData.skills || [],
-      settings: worldData.settings || {
-        maxAttributes: 6,
-        maxSkills: 12,
-        attributePointPool: 27,
-        skillPointPool: 40,
-      },
-      toneSettings: worldData.toneSettings || DEFAULT_TONE_SETTINGS,
-    };
-
-    const worldId = createWorld(completeWorldData);
-
-    const { worlds } = useWorldStore.getState();
-    const world = worlds[worldId];
-
-    return {
-      worldId,
-      world,
-    };
-  },
-
-  /**
-   * Set a world as the current active world
-   */
-  setAsCurrentWorld(worldId: string): void {
-    const { setCurrentWorld } = useWorldStore.getState();
-    setCurrentWorld(worldId);
-  },
+  
 
   /**
    * Generate world image in the background
@@ -204,102 +168,6 @@ export const worldCreationService = {
     }
   },
 
-  /**
-   * Clone an existing world with modifications
-   */
-  async cloneWorld(
-    sourceWorldId: string,
-    modifications: {
-      name: string;
-      description?: string;
-      genre?: string;
-    }
-  ): Promise<CreateWorldResult> {
-    const { worlds } = useWorldStore.getState();
-    const sourceWorld = worlds[sourceWorldId];
-
-    if (!sourceWorld) {
-      throw new Error('Source world not found');
-    }
-
-    // Create new world data based on source
-    const newWorldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
-      ...sourceWorld,
-      name: modifications.name,
-      description: modifications.description || sourceWorld.description,
-      genre: modifications.genre || sourceWorld.genre,
-      // Clone attributes and skills with new IDs
-      attributes: sourceWorld.attributes.map(attr => ({
-        ...attr,
-        id: generateUniqueId('attribute'),
-      })),
-      skills: sourceWorld.skills.map(skill => ({
-        ...skill,
-        id: generateUniqueId('skill'),
-      })),
-    };
-
-    return this.createWorldManually(newWorldData);
-  },
-
-  /**
-   * Validate world data before creation
-   */
-  validateWorldData(worldData: Partial<World>): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
-    const normalizedName = normalizeText(worldData.name || '', NORM_NAME);
-    if (!normalizedName) {
-      errors.push('World name is required');
-    }
-
-    const normalizedGenre = normalizeText(worldData.genre || '', NORM_NAME);
-    if (!normalizedGenre) {
-      errors.push('Genre is required');
-    }
-
-    const normalizedDescription = normalizeText(worldData.description || '', NORM_DESC);
-    if (!normalizedDescription) {
-      errors.push('Description is required');
-    }
-
-    // Validate attributes
-    if (worldData.attributes) {
-      worldData.attributes.forEach((attr, index) => {
-        const normalizedAttrName = normalizeText(attr.name || '', NORM_NAME);
-        if (!normalizedAttrName) {
-          errors.push(`Attribute ${index + 1} name is required`);
-        }
-      });
-    }
-
-    // Validate skills
-    if (worldData.skills) {
-      worldData.skills.forEach((skill, index) => {
-        const normalizedSkillName = normalizeText(skill.name || '', NORM_NAME);
-        if (!normalizedSkillName) {
-          errors.push(`Skill ${index + 1} name is required`);
-        }
-      });
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  },
+  
 };
 
-/**
- * Hook for easier integration with React components
- */
-export function useWorldCreation() {
-  return {
-    createFromGeneration: worldCreationService.createWorldFromGeneration,
-    createManually: worldCreationService.createWorldManually,
-    setAsCurrent: worldCreationService.setAsCurrentWorld,
-    generateImageBackground: worldCreationService.generateWorldImageBackground,
-    cloneWorld: worldCreationService.cloneWorld,
-    validateData: worldCreationService.validateWorldData,
-  };
-}

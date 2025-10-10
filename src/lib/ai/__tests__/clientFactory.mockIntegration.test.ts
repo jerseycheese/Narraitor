@@ -29,22 +29,6 @@ jest.mock('../../devtools/mockStateManager', () => {
   };
 });
 
-// Mock the actual AI client
-const mockLiveClient = {
-  generateContent: jest.fn().mockResolvedValue({
-    content: 'Real API response',
-    finishReason: 'STOP',
-    promptTokens: 10,
-    completionTokens: 20
-  }),
-  generateImage: jest.fn(),
-  isAvailable: jest.fn().mockResolvedValue(true)
-};
-
-jest.mock('../portraitGenerationClient', () => ({
-  PortraitGenerationClient: jest.fn(() => mockLiveClient)
-}));
-
 describe('Client Factory Mock Integration', () => {
   const originalEnv = process.env.NODE_ENV;
   const originalWindow = global.window;
