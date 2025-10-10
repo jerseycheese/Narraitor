@@ -201,16 +201,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 };
 
 // Preset loading states for common use cases
-export const LoadingSpinner: React.FC<Omit<LoadingStateProps, 'variant'>> = (props) => (
-  <LoadingState variant="spinner" {...props} />
-);
-
 export const LoadingSkeleton: React.FC<Omit<LoadingStateProps, 'variant'>> = (props) => (
   <LoadingState variant="skeleton" {...props} />
-);
-
-export const LoadingDots: React.FC<Omit<LoadingStateProps, 'variant'>> = (props) => (
-  <LoadingState variant="dots" {...props} />
 );
 
 export const LoadingPulse: React.FC<Omit<LoadingStateProps, 'variant'>> = (props) => (
