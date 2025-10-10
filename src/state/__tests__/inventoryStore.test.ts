@@ -117,6 +117,7 @@ describe('useInventoryStore', () => {
       };
 
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         useInventoryStore.getState().createItem(invalidItemData as any);
       }).toThrow('Stackable property is required');
     });
@@ -639,6 +640,7 @@ describe('useInventoryStore', () => {
   describe('reset', () => {
     test('should reset store to initial state', () => {
       // Add some data
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const itemId = useInventoryStore.getState().addItem('char-1', {
         name: 'Test Item',
         description: 'Item for reset test',

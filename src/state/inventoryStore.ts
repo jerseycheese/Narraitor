@@ -220,12 +220,13 @@ export const useInventoryStore = create<InventoryStore>()(
             const existingItem = state.items[existingItemId];
             const newQuantity = existingItem.quantity + (itemData.quantity ?? 1);
 
-            // Check max stack limit
-            if (itemData.maxStack && newQuantity > itemData.maxStack) {
+            // Check max stack limit - use existing item's maxStack or fall back to itemData
+            const maxStack = existingItem.maxStack ?? itemData.maxStack;
+            if (maxStack && newQuantity > maxStack) {
               set({
                 error: createStoreError(
                   'Stack Limit Exceeded',
-                  `Cannot add more items. Maximum stack size is ${itemData.maxStack}.`,
+                  `Cannot add more items. Maximum stack size is ${maxStack}.`,
                   ErrorType.VALIDATION
                 ),
               });
@@ -340,8 +341,15 @@ export const useInventoryStore = create<InventoryStore>()(
       version: 1,
       partialize: (state) => ({
         items: state.items,
+        entities: state.entities,
         characterInventories: state.characterInventories,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Ensure entities is always in sync with items after hydration
+        if (state && state.items) {
+          state.entities = { ...state.items };
+        }
+      },
       migrate: (persistedState: unknown) => {
         if (persistedState && typeof persistedState === 'object' && 'items' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
