@@ -162,16 +162,16 @@ These test files don't have 1:1 source file matches because they test specific *
 4. ✅ Run tests to verify
 
 ### Phase 2: Dead Export Cleanup
-1. Remove unused exports from design-tokens/index.ts
-2. Remove unused exports from lib/ai/index.ts
-3. Remove createGeminiClient from goalExtractor.ts
-4. Run full test suite
+1. ✅ Verify design-tokens/index.ts re-exports (kept; active consumption documented)
+2. ✅ Collapse lib/ai/index.ts to active exports only
+3. ✅ Remove createGeminiClient from goalExtractor.ts
+4. ✅ Run full test suite (2025-10-10 `npm test`)
 
 ### Phase 3: Deep Verification
-1. Manually verify each "medium confidence" item
-2. Use grep/ripgrep to confirm no usage
-3. Remove verified dead exports
-4. Update documentation
+1. ✅ Manually verify each "medium confidence" item (CharacterList removed; others documented)
+2. ✅ Use grep/ripgrep to confirm no usage (see branch audit notes)
+3. ✅ Remove verified dead exports (CharacterList, AI barrels, etc.)
+4. ✅ Update documentation (dead-code-audit.md, guides, READMEs)
 
 ### Phase 4: Final Cleanup
 1. Run ts-prune again to measure reduction
