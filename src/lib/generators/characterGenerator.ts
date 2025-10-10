@@ -39,17 +39,6 @@ export interface CharacterGenerationOptions {
 }
 
 /**
- * Unified character generation function
- */
-export async function generateCharacter(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
-  if (options.method === 'template') {
-    return generateFromTemplate(options);
-  } else {
-    return generateWithAI(options);
-  }
-}
-
-/**
  * Generate character from predefined templates
  */
 function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {

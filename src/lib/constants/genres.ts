@@ -49,13 +49,6 @@ export function getGenreLabel(value: string): string {
 }
 
 /**
- * Check if a genre value is valid
- */
-export function isValidGenre(value: string): value is GenreValue {
-  return GENRES.some(genre => genre.value === value);
-}
-
-/**
  * Legacy genre mappings for backward compatibility with old theme naming
  */
 export const LEGACY_GENRE_MAPPING: Record<string, string> = {
@@ -90,11 +83,6 @@ export function normalizeGenre(value: string): string {
   // Convert to lowercase and replace spaces with hyphens
   return value.toLowerCase().replace(/\s+/g, '-');
 }
-
-/**
- * Default genre for new worlds
- */
-export const DEFAULT_GENRE: GenreValue = 'fantasy';
 
 /**
  * Genres available for mixing in the Genre Mixer

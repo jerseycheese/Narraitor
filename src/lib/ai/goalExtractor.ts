@@ -515,8 +515,3 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
 
 // Export singleton instance
 export const goalExtractor = new GoalExtractor();
-
-// Export createGeminiClient function for mocking compatibility
-export function createGeminiClient() {
-  return createDefaultGeminiClient();
-}
