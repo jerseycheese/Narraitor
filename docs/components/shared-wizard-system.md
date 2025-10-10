@@ -73,18 +73,6 @@ Provides consistent step header and content area styling.
 ### WizardFormSection
 Form section wrapper with optional title and description.
 
-### CollapsibleCard
-Expandable card for organizing content.
-
-```typescript
-interface CollapsibleCardProps {
-  title: string;
-  children: React.ReactNode;
-  defaultExpanded?: boolean;
-  className?: string;
-}
-```
-
 ### ToggleButton
 Boolean toggle switch component.
 
@@ -97,7 +85,7 @@ interface ToggleButtonProps {
 }
 ```
 
-## Hooks
+## Hooks & Utilities
 
 ### useWizardState
 Primary state management hook.
@@ -115,14 +103,13 @@ interface UseWizardStateOptions<T> {
 **Features:**
 - Step navigation with bounds checking
 - Data persistence to sessionStorage
-- Validation integration
+- Optional per-step validation via `validation` config
 - Async completion handling
 
-### useWizardValidation
-Step-by-step validation logic.
-
-### useWizardAI
-AI integration for generating suggestions with debouncing.
+### Validation helpers
+Located in `utils/validation.ts`:
+- `createWizardValidator` – composable builder for per-step validation rules
+- `validateFields` / `validateField` – reusable field validation helpers
 
 ## Styling System
 

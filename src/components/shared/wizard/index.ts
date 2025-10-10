@@ -18,16 +18,11 @@ export {
 // Export UI components
 export { ToggleButton } from './components/ToggleButton';
 export type { ToggleButtonProps } from './components/ToggleButton';
-export { CollapsibleCard } from './components/CollapsibleCard';
-export type { CollapsibleCardProps } from './components/CollapsibleCard';
 
 // Export AI components
-export { AISuggestions } from './components/AISuggestions';
-export type { AISuggestion, AISuggestionsProps } from './components/AISuggestions';
 
 // Export hooks
 export { useWizardState } from './hooks/useWizardState';
-export { useWizardAI, useWorldDescriptionAI } from './hooks/useWizardAI';
 
 // Export types
 export * from './types/steps';

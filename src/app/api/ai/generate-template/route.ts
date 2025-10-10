@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TemplateGenerator } from '@/lib/ai/templateGenerator';
 import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
-import { geminiClient } from '@/lib/ai/geminiClient';
+import { GeminiClient } from '@/lib/ai/geminiClient';
+import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import Logger from '@/lib/utils/logger';
 
 
@@ -54,7 +55,16 @@ export async function POST(request: NextRequest) {
     };
 
     // Generate the template using the secure server-side client with timeout
-    const templateGenerator = new TemplateGenerator(geminiClient);
+    const aiConfig = getAIConfig();
+    const client = new GeminiClient({
+      apiKey: aiConfig.geminiApiKey,
+      modelName: aiConfig.modelName,
+      maxRetries: aiConfig.maxRetries,
+      timeout: aiConfig.timeout,
+      generationConfig: getGenerationConfig(),
+      safetySettings: getSafetySettings()
+    });
+    const templateGenerator = new TemplateGenerator(client);
     
     // Add timeout wrapper to prevent hanging requests
     const timeoutPromise = new Promise((_, reject) => 

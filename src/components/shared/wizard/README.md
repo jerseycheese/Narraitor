@@ -49,13 +49,11 @@ function MyWizard() {
 
 ### Form Components
 - **WizardFormSection** - Form section with proper heading hierarchy
-- **CollapsibleCard** - Expandable content sections (great for optional settings)
 - **ToggleButton** - Styled toggle switches that actually look good
 
-### Hooks That Do The Heavy Lifting
+- ### Hooks & Utilities
 - **useWizardState** - Complete state management (saves you from prop drilling hell)
-- **useWizardValidation** - Step validation logic
-- **useWizardAI** - AI suggestion integration (for the fancy stuff)
+- **Validation helpers** - `createWizardValidator`, `validateFields`, and friends for building per-step rules
 
 ## Why Use This Instead of Rolling Your Own
 

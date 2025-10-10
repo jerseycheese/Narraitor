@@ -28,61 +28,25 @@ This log tracks code that currently has no live references. Each entry lists the
   - Evidence: `rg "useWorldTypeSelection" -n` returns only the hook definition and a README snippet; no components import it.
   - Notes: World type selection now relies on `WorldTypeSelector` utilities directly.
 
-- **Prompt helpers `CustomPromptSection` / `PromptOverrideSection`** (`src/components/shared/CustomPromptSection.tsx`)
-  - Evidence: `rg "CustomPromptSection" -n` shows only the file itself and a self-referential render; there are no usages elsewhere.
-  - Notes: The image customization flows use other UI; these sections can be removed or migrated into a live consumer before keeping them.
+- **Shared wizard suggestions view `AISuggestions`** (`src/components/shared/wizard/components/AISuggestions.tsx`)
+  - Status: ✅ Removed on October 9, 2025 (see PR #740).
+  - Follow-up: Ensure no new barrel exports reintroduce the component.
 
-- **Card action helper `MakeActiveButton`** (`src/components/shared/cards/MakeActiveButton.tsx`)
-  - Evidence: `rg "MakeActiveButton" -n` finds only the component file and README examples.
-  - Notes: All places that swap active entities use `CardActionGroup` instead, leaving this component unused.
+- **Shared wizard shell `CollapsibleCard`** (`src/components/shared/wizard/components/CollapsibleCard.tsx`)
+  - Status: ✅ Removed on October 9, 2025.
+  - Follow-up: References scrubbed from wizard docs; keep an eye on any future need.
 
-- **UI `AccessButton`** (`src/components/ui/AccessButton/AccessButton.tsx`)
-  - Evidence: `rg "AccessButton" -n` only returns the component file; there are no stories or consumers.
-  - Notes: Consider deleting or integrating it where small secondary buttons are still hard-coded.
-
-- **Storage health widget `StorageStatus`** (`src/components/shared/StorageStatus.tsx`)
-  - Evidence: `rg "StorageStatus" -n src/app src/components --glob '!src/components/shared/StorageStatus.tsx'` produces no results.
-  - Notes: The resilient storage middleware updates status, but nothing renders it. Either wire it into settings/devtools or remove it.
-
-- **World card action bar `WorldCardActions`** (`src/components/WorldCardActions/WorldCardActions.tsx`)
-  - Evidence: `rg "WorldCardActions" -n --glob '!src/stories/**/*' --glob '!src/components/WorldCardActions/WorldCardActions.tsx'` returns no runtime usage.
-  - Notes: The world list relies on `WorldCard` + `CardActionGroup`; this separate action strip survives only in stories/tests.
+- **Wizard AI helper hooks** (`src/components/shared/wizard/hooks/useWizardAI.ts`)
+  - Status: ✅ Removed on October 9, 2025.
+  - Follow-up: All wizard AI flows now rely on purpose-built hooks.
 
 - **Shared form hook `useFormField`** (`src/components/shared/forms/index.ts`)
-  - Evidence: `rg "useFormField" -n --glob '!src/components/shared/forms/index.ts'` has no hits.
-  - Notes: All form implementations manage their own local state; this helper never shipped.
-
-- **Legacy world API wrappers** (`src/lib/api/worldApi.ts` — `worldApi.generateCharacter`, `worldApi.generatePortrait`, `WorldApiError`, `enhancedWorldApi`, `isGeneratedWorldData`, `isWorldImageResponse`)
-  - Evidence: targeted ripgrep queries like `rg "worldApi\.generateCharacter" -n` and `rg "WorldApiError" -n --glob '!src/lib/api/worldApi.ts'` return nothing.
-  - Notes: The client only calls `worldApi.generateWorld`/`generateWorldImage`; these extras were never wired up once the wizard moved to direct store writes.
-
-- **AI response post-processor `ResponseFormatter`** (`src/lib/ai/responseFormatter.ts`)
-  - Evidence: apart from the re-export in `src/lib/ai/index.ts`, `rg "ResponseFormatter" -n --glob '!src/lib/ai/responseFormatter.ts' --glob '!src/lib/ai/__mocks__/responseFormatter.ts'` finds no imports.
-  - Notes: Narrative rendering now handles formatting inline, so this class (and its mock) can go.
+  - Status: ✅ Removed on October 9, 2025.
+  - Follow-up: No action; maintainers confirmed per-component form logic suffices.
 
 ## Runtime-Unused (only referenced in tests/docs)
 
-These items do not affect the production bundle today but have unit tests or documentation. Removing them requires pruning their tests/stories too.
-
-- **AI prompt pipeline class `AIPromptProcessor`** (`src/lib/ai/aiPromptProcessor.ts`)
-  - Evidence: `rg "AIPromptProcessor" -n src/app src/components` returns nothing; usages are limited to `src/lib/ai/__tests__` and README examples.
-  - Notes: If no roadmap depends on this abstraction, consider removing the class and its tests to reduce maintenance.
-
-- **Devtools component `CustomActionProcessor`** (`src/components/shared/CustomActionProcessor/CustomActionProcessor.tsx`)
-  - Evidence: `rg "CustomActionProcessor" -n src/app src/components --glob '!src/components/shared/CustomActionProcessor*'` finds no live imports; only stories/tests exercise it.
-  - Notes: Keep only if a devtools embedding is imminent; otherwise delete along with its snapshot tests.
-
-- **World creation entry point `createWorldManually`** (`src/lib/services/worldCreationService.ts:142-244`)
-  - Evidence: `rg "createWorldManually" -n src/app src/components` shows no runtime usage; only service unit tests and the unused hook invoke it.
-  - Notes: The wizened flow writes directly to the store, so this service method can be retired alongside the hook/tests if we do not plan a headless API entry.
-
-- **Toast hook `useToast`** (`src/components/ui/toast/toaster.tsx`)
-  - Evidence: `rg "useToast(" -n src/app src/components` yields no results beyond the hook implementation and docs.
-  - Notes: We already mount `ToastProvider`/`Toaster` in `app/layout.tsx`, but no component triggers notifications. Either add a first consumer or remove the hook/docs for now.
-
-- **Portrait-generation client wrapper** (`src/lib/ai/portraitGenerationClient.ts`)
-  - Evidence: outside of tests and the factory definition, `rg "PortraitGenerationClient" -n --glob '!src/lib/ai/portraitGenerationClient.ts' --glob '!src/lib/ai/clientFactory.ts' --glob '!src/lib/ai/__tests__/*'` is empty. All `createAIClient()` callers live in `use client` components, so the branch that instantiates this class is never hit in production.
-  - Notes: If server-side portrait generation ever needs this, we should move the call there; otherwise prune the class and simplify the factory tests.
+No remaining items. Re-run `rg` sweeps before each cleanup wave to catch new candidates early.
 
 ## Tooling Notes
 
