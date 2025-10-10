@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldEditor from '@/components/WorldEditor';
+import WorldEditor from '@/components/WorldEditor/WorldEditor';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';

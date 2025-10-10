@@ -27,11 +27,7 @@ export {
   truncate,
   capitalize,
   titleCase,
-  sentenceCase,
-  safeTrim,
-  formatNumber,
-  formatPercentage,
-  formatCompactNumber
+  safeTrim
 } from './formatters';
 
 /** Type definitions for formatting options */

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldCreationWizard from '@/components/WorldCreationWizard';
+import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof WorldCreationWizard> = {
