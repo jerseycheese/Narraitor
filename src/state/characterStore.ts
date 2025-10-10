@@ -82,6 +82,7 @@ export interface CharacterStore extends CrudStore<Character> {
   currentCharacterId: EntityID | null;
   error: UserFriendlyError | null;
   loading: boolean;
+  syncDerivedState: () => void;
 
   // Actions
   createCharacter: (character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
@@ -299,6 +300,39 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
+        syncDerivedState: () => {
+          set((state) => {
+            const characters =
+              state.characters && typeof state.characters === 'object' ? state.characters : {};
+
+            const hasCharacters = Object.keys(characters).length > 0;
+
+            const isValidCharacterId = (id: EntityID | null | undefined) =>
+              Boolean(id && characters[id]);
+
+            const validCurrentCharacterId = isValidCharacterId(state.currentCharacterId)
+              ? state.currentCharacterId
+              : null;
+
+            const validCurrentEntityId = isValidCharacterId(state.currentEntityId)
+              ? state.currentEntityId
+              : null;
+
+            const fallbackId = validCurrentCharacterId ?? validCurrentEntityId ?? null;
+
+            const nextCurrentCharacterId = validCurrentCharacterId ?? fallbackId;
+            const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
+
+            return {
+              characters: hasCharacters ? characters : {},
+              entities: { ...characters },
+              currentCharacterId: hasCharacters ? nextCurrentCharacterId : null,
+              currentEntityId: hasCharacters ? nextCurrentEntityId : null,
+              error: state.error ?? null,
+              loading: state.loading ?? false,
+            };
+          });
+        },
 
         // Domain-specific aliases
         createCharacter: (characterData) => get().create(characterData),
@@ -467,6 +501,13 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       name: 'narraitor-character-store',
       storage: createIndexedDBStorage(),
       version: 1,
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('[CharacterStore] Failed to rehydrate state', error);
+          return;
+        }
+        state?.syncDerivedState?.();
+      },
       // Migration strategy for future schema updates
       // Current implementation is minimal for MVP but will need expansion
       // for handling complex migrations in future versions:
