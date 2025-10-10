@@ -149,12 +149,3 @@ export function setSectionVisibility(newVisibility: SectionVisibility): SectionV
   saveSectionVisibility(mergedVisibility);
   return mergedVisibility;
 }
-
-/**
- * Reset all sections to default visibility
- */
-export function resetSectionVisibility(): SectionVisibility {
-  const defaultVisibility = { ...DEFAULT_SECTION_VISIBILITY };
-  saveSectionVisibility(defaultVisibility);
-  return defaultVisibility;
-}

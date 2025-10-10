@@ -94,14 +94,3 @@ export function createAIClient(config?: Partial<AIServiceConfig>): AIClient {
   // Fallback to browser-safe mock
   return new BrowserMockClient();
 }
-
-/**
- * Check if development mock mode is active
- */
-export function isDevMockModeActive(): boolean {
-  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') {
-    return false;
-  }
-  
-  return mockStateManager.getConfiguration().isEnabled;
-}

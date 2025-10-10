@@ -46,12 +46,3 @@ export const SKILL_LEVEL_DESCRIPTIONS: SkillLevelDescription[] = [
     description: 'Complete mastery at professional level'
   },
 ];
-
-/**
- * Get the skill level description for a given value
- * @param value The numeric skill value (1-5)
- * @returns The corresponding skill level description or undefined if not found
- */
-export const getSkillLevelDescription = (value: number): SkillLevelDescription | undefined => {
-  return SKILL_LEVEL_DESCRIPTIONS.find(level => level.value === value);
-};
