@@ -12,4 +12,5 @@ export { aiContextStore, useAiContextStore } from './aiContextStore';
 export { useLoreStore } from './loreStore';
 export { useNavigationStore } from './navigationStore';
 export { useGoalStore } from './goalStore';
+export { useInventoryStore } from './inventoryStore';
 export { persistConfig } from './persistence';

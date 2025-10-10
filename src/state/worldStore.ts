@@ -20,6 +20,7 @@ export interface WorldStore extends CrudStore<World> {
   deleteWorld: (id: EntityID) => void;
   setCurrentWorld: (id: EntityID | null) => void;
   fetchWorlds: () => Promise<void>;
+  syncDerivedState: () => void;
 
   // Rename for domain clarity
   worlds: Record<EntityID, World>;
@@ -172,6 +173,38 @@ export const useWorldStore = create<WorldStore>()(
         setError: (error) => set({ error }),
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
+        syncDerivedState: () => {
+          set((state) => {
+            const worlds =
+              state.worlds && typeof state.worlds === 'object' ? state.worlds : {};
+
+            const hasWorlds = Object.keys(worlds).length > 0;
+
+            const isValidWorldId = (id: EntityID | null | undefined) => Boolean(id && worlds[id]);
+
+            const validCurrentWorldId = isValidWorldId(state.currentWorldId)
+              ? state.currentWorldId
+              : null;
+
+            const validCurrentEntityId = isValidWorldId(state.currentEntityId)
+              ? state.currentEntityId
+              : null;
+
+            const fallbackId = validCurrentWorldId ?? validCurrentEntityId ?? null;
+
+            const nextCurrentWorldId = validCurrentWorldId ?? fallbackId;
+            const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
+
+            return {
+              worlds: hasWorlds ? worlds : {},
+              entities: { ...worlds },
+              currentWorldId: hasWorlds ? nextCurrentWorldId : null,
+              currentEntityId: hasWorlds ? nextCurrentEntityId : null,
+              error: state.error ?? null,
+              loading: state.loading ?? false,
+            };
+          });
+        },
 
         // Domain-specific method aliases
         createWorld: (worldData) => get().create(worldData),
@@ -367,6 +400,13 @@ export const useWorldStore = create<WorldStore>()(
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
       version: 1,
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('[WorldStore] Failed to rehydrate state', error);
+          return;
+        }
+        state?.syncDerivedState?.();
+      },
       // Migration strategy for future schema updates
       // Current implementation is minimal for MVP but will need expansion
       // for handling complex migrations in future versions:
