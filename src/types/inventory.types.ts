@@ -18,6 +18,8 @@ export interface Inventory {
 export interface InventoryItem extends NamedEntity {
   categoryId: EntityID;
   quantity: number;
+  stackable: boolean; // Whether this item type can stack
+  maxStack?: number; // Optional maximum stack size
 }
 
 /**
