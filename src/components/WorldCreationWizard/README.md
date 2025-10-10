@@ -15,7 +15,7 @@ This is the multi-step wizard that guides users through creating custom worlds. 
 ## Usage
 
 ```tsx
-import WorldCreationWizard from '@/components/WorldCreationWizard';
+import WorldCreationWizard from './WorldCreationWizard';
 
 // Basic usage
 <WorldCreationWizard />
@@ -82,7 +82,6 @@ The wizard includes comprehensive test coverage:
 - Unit tests for each step component
 - Integration tests for the full wizard flow
 - Storybook stories for visual testing
-- Test utilities in `worldCreationWizard.test-helpers.ts`
 
 ### Running Tests
 
@@ -100,7 +99,6 @@ npm run storybook
 src/components/WorldCreationWizard/
 ├── WorldCreationWizard.tsx          # Main wizard component
 ├── WorldCreationWizard.stories.tsx  # Storybook stories
-├── index.ts                         # Module exports
 ├── steps/
 │   ├── BasicInfoStep.tsx           # Step 1: Basic information
 │   ├── DescriptionStep.tsx         # Step 2: Detailed description
