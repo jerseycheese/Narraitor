@@ -7,7 +7,7 @@ import { InventoryItem } from '@/types/inventory.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
-import { getCategoryMetadata } from '@/lib/inventory/categories';
+import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 
 interface InventoryListProps {
@@ -45,8 +45,10 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     return acc;
   }, {} as Record<StandardInventoryCategory, InventoryItem[]>);
 
-  // Get categories that have items (sorted alphabetically for consistency)
-  const populatedCategories = Object.keys(itemsByCategory).sort() as StandardInventoryCategory[];
+  // Get categories that have items (in canonical order from STANDARD_CATEGORIES)
+  const populatedCategories = STANDARD_CATEGORIES.filter(
+    (category) => itemsByCategory[category]?.length > 0
+  );
 
   // Empty state when no items
   if (items.length === 0) {
