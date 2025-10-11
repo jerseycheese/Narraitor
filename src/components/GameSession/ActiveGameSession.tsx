@@ -22,6 +22,7 @@ import { useJournalStore } from '@/state/journalStore';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { InventoryList } from '@/components/inventory/InventoryList';
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
@@ -846,6 +847,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <div className="mt-6">
           <CharacterSummary character={character} />
         </div>
+      )}
+
+      {/* Inventory Display */}
+      {characterId && (
+        <section
+          className="mt-6"
+          role="region"
+          aria-label="Character inventory"
+        >
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Inventory</h2>
+          <InventoryList characterId={characterId} />
+        </section>
       )}
 
       {/* Autosave indicator anchored under the main content */}

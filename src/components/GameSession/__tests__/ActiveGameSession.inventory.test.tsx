@@ -1,5 +1,5 @@
 /**
- * Integration tests for Inventory Display in ActiveGameSession (Issue #307)
+ * Integration tests for Inventory Display in ActiveGameSession
  *
  * Validates the 5 acceptance criteria:
  * 1. The inventory UI displays a complete list of items associated with the character
@@ -33,7 +33,7 @@ const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSes
 const mockUseNarrativeStore = useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>;
 const mockUseCharacterStore = useCharacterStore as jest.MockedFunction<typeof useCharacterStore>;
 
-describe('ActiveGameSession - Inventory Integration (Issue #307)', () => {
+describe('ActiveGameSession - Inventory Integration', () => {
   const mockWorldId = 'world-123';
   const mockSessionId = 'session-456';
   const mockCharacterId = 'char-789';
