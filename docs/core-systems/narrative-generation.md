@@ -105,20 +105,13 @@ The narrative generation system respects user-defined tone settings for consiste
 
 ### Inventory Integration
 
-The narrative system has access to character inventory data and can naturally reference items when contextually appropriate:
+The narrative generator can reference items from the character's inventory when it makes sense for the story. The system doesn't force item mentions into every paragraph - instead, it provides context about what the player is carrying and lets the AI naturally weave that into the narrative when appropriate.
 
-1. **Smart Item Prioritization**: Items are ranked by narrative significance:
-   - Quest items and equipment score highest
-   - Recently acquired items (within 24-72 hours) get priority
-   - Unique items preferred over common ones
-   - Items with detailed descriptions considered more significant
-2. **Limited Context**: Top 8 most significant items included to avoid overwhelming prompts
-3. **Natural References**: AI instructed to only mention items when contextually relevant, not forced
-4. **Variation**: AI encouraged to vary references to prevent repetition
-5. **Integration Points**: Inventory context added to:
-   - Initial scene generation
-   - Ongoing narrative segments
-   - Skill acknowledgment narratives
+The prioritization algorithm ranks items by narrative significance. Quest items and equipment score highest since they're most likely to matter in the story. Recently acquired items (picked up in the last 24-72 hours) get a priority boost because they're fresh and relevant. Unique items are preferred over common ones, and items with detailed descriptions are considered more significant than generic ones.
+
+To avoid overwhelming the AI prompt with too much inventory data, the system limits context to the top 8 most significant items. This gives the AI enough to work with without cluttering the prompt. The AI is explicitly instructed to only mention items when they're contextually relevant and to vary how it references them to prevent repetition.
+
+Inventory context gets added to initial scene generation (so the AI knows what you start with), ongoing narrative segments (for natural references during the story), and skill acknowledgment narratives (so the AI can reference tools or items you're using).
 
 ### Narrative Perspective
 
