@@ -7,6 +7,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useInventoryStore } from '@/state/inventoryStore';
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils';
 
@@ -333,7 +334,66 @@ export default function GameSessionTestHarness() {
           End Session
         </button>
         
-        <button 
+        <button
+          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Add test items to inventory
+            logger.info('Adding test items to inventory');
+            const inventoryStore = useInventoryStore.getState();
+
+            // Clear existing inventory first
+            inventoryStore.clearCharacterInventory(mockCharacter.id);
+
+            // Add various test items across categories
+            inventoryStore.addItem(mockCharacter.id, {
+              name: 'Steel Sword',
+              description: 'A well-crafted blade',
+              categoryId: 'equipment',
+              quantity: 1,
+              stackable: false,
+            });
+
+            inventoryStore.addItem(mockCharacter.id, {
+              name: 'Health Potions',
+              description: 'Restores 50 HP',
+              categoryId: 'consumables',
+              quantity: 5,
+              stackable: true,
+              maxStack: 10,
+            });
+
+            inventoryStore.addItem(mockCharacter.id, {
+              name: 'Gold Coins',
+              description: 'Currency',
+              categoryId: 'valuables',
+              quantity: 150,
+              stackable: true,
+              maxStack: 999,
+            });
+
+            inventoryStore.addItem(mockCharacter.id, {
+              name: 'Ancient Map',
+              description: 'Shows hidden locations',
+              categoryId: 'documents',
+              quantity: 1,
+              stackable: false,
+            });
+
+            inventoryStore.addItem(mockCharacter.id, {
+              name: 'Magic Ring',
+              description: 'Quest item - glows faintly',
+              categoryId: 'quest-items',
+              quantity: 1,
+              stackable: false,
+            });
+
+            logger.info('✅ Test inventory items added');
+          }}
+        >
+          Add Test Inventory Items
+        </button>
+
+        <button
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4 ml-2"
           onClick={() => {
             // Reset all session state to break infinite loops
