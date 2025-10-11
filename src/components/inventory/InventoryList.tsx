@@ -62,34 +62,50 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
       {populatedCategories.map((categoryId) => {
         const categoryItems = itemsByCategory[categoryId];
         const metadata = getCategoryMetadata(categoryId);
         const categoryName = metadata?.name || categoryId;
+        const categoryDescription = metadata?.description;
 
         return (
-          <div key={categoryId} className="category-group">
+          <section
+            key={categoryId}
+            className="category-group"
+            aria-labelledby={`category-${categoryId}`}
+          >
             {/* Category Header with visual separation */}
-            <div className="mb-4 border-b border-gray-200 pb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div className="mb-4 border-b border-border pb-2">
+              <h3
+                id={`category-${categoryId}`}
+                className="text-lg font-semibold text-foreground"
+              >
                 {categoryName}
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'}
+                {categoryDescription && (
+                  <span className="sr-only"> - {categoryDescription}</span>
+                )}
               </p>
             </div>
 
             {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              role="list"
+              aria-label={`${categoryName} items`}
+            >
               {categoryItems.map((item) => (
                 <Card
                   key={item.id}
-                  className="p-4 border border-gray-200 hover:border-gray-300 transition-colors inventory-item"
+                  className="p-4 border border-border hover:border-border/80 transition-colors inventory-item"
+                  role="listitem"
                 >
                   {/* Item Header: Name and Quantity */}
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-gray-900 flex-1 item-name">
+                    <h4 className="font-medium text-foreground flex-1 item-name">
                       {item.name}
                     </h4>
                     {item.stackable && (
@@ -97,6 +113,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         variant="secondary"
                         size="sm"
                         className="ml-2 item-quantity"
+                        aria-label={`Quantity: ${item.quantity}`}
                       >
                         ×{item.quantity}
                       </Badge>
@@ -105,18 +122,23 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
                   {/* Item Description */}
                   {item.description && (
-                    <p className="text-sm text-gray-600 mb-3 item-description">
+                    <p className="text-sm text-muted-foreground mb-3 item-description">
                       {item.description}
                     </p>
                   )}
 
                   {/* Item Metadata Footer */}
                   <div className="flex items-center gap-2 text-xs">
-                    <Badge variant="outline" size="sm" className="item-category">
+                    <Badge
+                      variant="outline"
+                      size="sm"
+                      className="item-category"
+                      aria-label={`Category: ${categoryName}`}
+                    >
                       {categoryName}
                     </Badge>
                     {item.stackable && item.maxStack && (
-                      <span className="text-gray-500">
+                      <span className="text-muted-foreground" aria-label={`Maximum stack size: ${item.maxStack}`}>
                         Max: {item.maxStack}
                       </span>
                     )}
@@ -124,7 +146,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                 </Card>
               ))}
             </div>
-          </div>
+          </section>
         );
       })}
     </div>
