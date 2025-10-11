@@ -173,9 +173,9 @@ describe('InventoryList Component', () => {
 
       render(<InventoryList characterId={mockCharacterId} />);
 
-      // Verify category headings are present
-      expect(screen.getByText('Equipment')).toBeInTheDocument();
-      expect(screen.getByText('Consumables')).toBeInTheDocument();
+      // Verify category headings are present (use heading role to find headings specifically)
+      expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Consumables' })).toBeInTheDocument();
     });
 
     test('displays all standard category headings when items exist in those categories', () => {
@@ -258,14 +258,14 @@ describe('InventoryList Component', () => {
 
       render(<InventoryList characterId={mockCharacterId} />);
 
-      // Verify all category headings are displayed
-      expect(screen.getByText('Equipment')).toBeInTheDocument();
-      expect(screen.getByText('Valuables')).toBeInTheDocument();
-      expect(screen.getByText('Consumables')).toBeInTheDocument();
-      expect(screen.getByText('Documents')).toBeInTheDocument();
-      expect(screen.getByText('Personal')).toBeInTheDocument();
-      expect(screen.getByText('Quest Items')).toBeInTheDocument();
-      expect(screen.getByText('Miscellaneous')).toBeInTheDocument();
+      // Verify all category headings are displayed (use heading role)
+      expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Valuables' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Consumables' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Documents' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Personal' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Quest Items' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Miscellaneous' })).toBeInTheDocument();
     });
 
     test('only shows categories that contain items', () => {
@@ -288,13 +288,13 @@ describe('InventoryList Component', () => {
 
       render(<InventoryList characterId={mockCharacterId} />);
 
-      // Should show Equipment category
-      expect(screen.getByText('Equipment')).toBeInTheDocument();
+      // Should show Equipment category (use heading role)
+      expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument();
 
-      // Should NOT show empty categories
-      expect(screen.queryByText('Consumables')).not.toBeInTheDocument();
-      expect(screen.queryByText('Valuables')).not.toBeInTheDocument();
-      expect(screen.queryByText('Documents')).not.toBeInTheDocument();
+      // Should NOT show empty categories (use heading role for specificity)
+      expect(screen.queryByRole('heading', { name: 'Consumables' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Valuables' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Documents' })).not.toBeInTheDocument();
     });
 
     test('items appear under the correct category heading', () => {
@@ -327,9 +327,13 @@ describe('InventoryList Component', () => {
 
       render(<InventoryList characterId={mockCharacterId} />);
 
-      // Find category sections
-      const equipmentSection = screen.getByText('Equipment').closest('div');
-      const consumablesSection = screen.getByText('Consumables').closest('div');
+      // Find category sections using heading role to get the specific heading element
+      const equipmentHeading = screen.getByRole('heading', { name: 'Equipment' });
+      const consumablesHeading = screen.getByRole('heading', { name: 'Consumables' });
+
+      // Get the parent category group div
+      const equipmentSection = equipmentHeading.closest('.category-group');
+      const consumablesSection = consumablesHeading.closest('.category-group');
 
       // Verify items are in correct sections
       expect(within(equipmentSection!).getByText('Sword')).toBeInTheDocument();
@@ -405,8 +409,8 @@ describe('InventoryList Component', () => {
 
       render(<InventoryList characterId={mockCharacterId} />);
 
-      // Category should be visible via heading
-      expect(screen.getByText('Documents')).toBeInTheDocument();
+      // Category should be visible via heading (use heading role)
+      expect(screen.getByRole('heading', { name: 'Documents' })).toBeInTheDocument();
       expect(screen.getByText('Ancient Scroll')).toBeInTheDocument();
     });
 
