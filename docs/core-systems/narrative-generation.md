@@ -94,11 +94,16 @@ Different moments in the story need different approaches, so we have specialized
 
 ### Tone Settings System
 
-The narrative generator respects user-defined tone settings to keep the content consistent with what you want. Content ratings range from G to NC-17 with appropriate filtering for each level - the system actually enforces these ratings instead of just suggesting them to the AI. Narrative style options include nine different approaches (serious, humorous, dramatic, mysterious, action-packed, and more), so a noir detective story can feel genuinely different from a lighthearted fantasy adventure.
+The narrative generator respects user-defined tone settings to keep the content consistent with what you want. The system actually enforces these settings instead of just suggesting them to the AI, which matters for maintaining consistent story quality.
 
-Language complexity control offers four levels from simple to literary, which affects vocabulary choices and sentence structure. This matters because a story aimed at younger readers needs different phrasing than one written for adults. You can also add custom instructions for any specific tone requirements the standard options don't cover.
+Key settings include:
 
-The system integrates with AI safety settings by adjusting safety thresholds based on the content rating - stricter filtering for G-rated content, more permissive for mature ratings. Debug logging is available for verifying that tone settings are actually being applied to the prompts.
+- **Content Rating**: G to NC-17 with appropriate filtering - stricter for G-rated content, more permissive for mature ratings
+- **Narrative Style**: Nine options (serious, humorous, dramatic, mysterious, action-packed, etc.) so a noir detective story feels genuinely different from a lighthearted fantasy adventure
+- **Language Complexity**: Four levels from simple to literary, affecting vocabulary and sentence structure - matters because stories for younger readers need different phrasing than adult content
+- **Custom Instructions**: Additional tone requirements that the standard options don't cover
+- **AI Safety Integration**: Dynamically adjusts safety thresholds based on content rating
+- **Debug Logging**: Available for verifying tone settings are actually being applied to prompts
 
 ### Inventory Integration
 
@@ -122,9 +127,16 @@ Component lifecycle management prevents state updates after a component unmounts
 
 ## Error Handling
 
-The narrative system handles several types of errors that can come up during generation. AI service errors happen when the AI service fails to generate content - maybe it's overloaded or having issues. JSON parsing errors occur when the AI response format is unexpected, which happens more often than you'd think since AI responses can be inconsistent. Network errors are straightforward communication failures, and session-related errors show up when there are issues with session management or data retrieval.
+The narrative system handles several types of errors that can come up during generation. When errors occur, the system displays appropriate messages to users instead of showing raw error text or crashing, and attempts recovery when possible.
 
-When errors occur, the system displays appropriate messages to users instead of showing raw error text or crashing. Recovery is attempted when possible - for example, retrying failed requests or falling back to default content if the AI is unavailable.
+Error types handled:
+
+- **AI Service Errors**: When the AI service fails to generate content - maybe overloaded or having issues
+- **JSON Parsing Errors**: AI response format is unexpected, which happens more often than you'd think since AI responses can be inconsistent
+- **Network Errors**: Straightforward communication failures between client and server
+- **Session-Related Errors**: Issues with session management or data retrieval from stores
+
+Recovery strategies include retrying failed requests with exponential backoff and falling back to default content if the AI is unavailable.
 
 ## Testing
 
@@ -134,7 +146,11 @@ The system includes a test harness at `/dev/narrative-system` for manual testing
 
 ### Automated Testing
 
-Unit tests cover the key components. The `narrativeGenerator.test.ts` file tests core generation functionality including prompt building and response parsing. `NarrativeController.test.tsx` verifies the controller component's behavior around state management and lifecycle, while `NarrativeDisplay.test.tsx` ensures the display component renders narrative segments correctly.
+Unit tests cover the key components:
+
+- **narrativeGenerator.test.ts**: Core generation functionality including prompt building and response parsing
+- **NarrativeController.test.tsx**: Controller component behavior around state management and lifecycle
+- **NarrativeDisplay.test.tsx**: Display component rendering of narrative segments
 
 ## Future Enhancements
 
