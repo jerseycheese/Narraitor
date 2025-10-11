@@ -40,7 +40,7 @@ export const Default: Story = {
         // Equipment
         addItem(characterId, {
           name: 'Steel Sword',
-          description: 'A well-balanced blade',
+          description: 'Forged blade with a leather-wrapped hilt, showing signs of recent use and careful maintenance',
           categoryId: 'equipment',
           quantity: 1,
           stackable: false,
@@ -48,7 +48,7 @@ export const Default: Story = {
 
         addItem(characterId, {
           name: 'Leather Armor',
-          description: 'Light but protective',
+          description: 'Worn vest of hardened leather with reinforced shoulder guards, offering protection without restricting movement',
           categoryId: 'equipment',
           quantity: 1,
           stackable: false,
@@ -57,7 +57,7 @@ export const Default: Story = {
         // Consumables
         addItem(characterId, {
           name: 'Health Potion',
-          description: 'Restores 50 HP',
+          description: 'Small glass vial containing a thick crimson liquid that glows faintly in the dark',
           categoryId: 'consumables',
           quantity: 5,
           stackable: true,
@@ -66,7 +66,7 @@ export const Default: Story = {
 
         addItem(characterId, {
           name: 'Mana Potion',
-          description: 'Restores 30 MP',
+          description: 'Blue crystalline liquid that swirls on its own, humming with arcane power',
           categoryId: 'consumables',
           quantity: 3,
           stackable: true,
@@ -76,7 +76,7 @@ export const Default: Story = {
         // Valuables
         addItem(characterId, {
           name: 'Gold Coins',
-          description: 'Common currency',
+          description: 'Standard currency stamped with the kingdom\'s seal - a dragon wreathed in flames',
           categoryId: 'valuables',
           quantity: 150,
           stackable: true,
@@ -84,8 +84,8 @@ export const Default: Story = {
         });
 
         addItem(characterId, {
-          name: 'Gemstone',
-          description: 'A precious ruby',
+          name: 'Ancient Ruby',
+          description: 'Deep red gemstone the size of a walnut, with an inner fire that seems to pulse in rhythm with your heartbeat',
           categoryId: 'valuables',
           quantity: 1,
           stackable: false,
@@ -94,7 +94,7 @@ export const Default: Story = {
         // Documents
         addItem(characterId, {
           name: 'Map Fragment',
-          description: 'Part of an ancient map',
+          description: 'Torn parchment showing coastal landmarks and an X marked in faded ink, with notes in a language you don\'t recognize',
           categoryId: 'documents',
           quantity: 1,
           stackable: false,
@@ -102,8 +102,8 @@ export const Default: Story = {
 
         // Quest Items
         addItem(characterId, {
-          name: 'Crystal Shard',
-          description: 'Glowing with magical energy',
+          name: 'Resonance Crystal',
+          description: 'Translucent shard that vibrates softly and glows brighter when pointed toward the northern mountains',
           categoryId: 'quest-items',
           quantity: 1,
           stackable: false,
@@ -141,24 +141,24 @@ export const SingleCategory: Story = {
         const characterId = 'char-story-single';
 
         addItem(characterId, {
-          name: 'Sword',
-          description: 'A basic sword',
+          name: 'Longsword',
+          description: 'Standard issue military blade with a crossguard bearing the royal insignia',
           categoryId: 'equipment',
           quantity: 1,
           stackable: false,
         });
 
         addItem(characterId, {
-          name: 'Shield',
-          description: 'A basic shield',
+          name: 'Oak Shield',
+          description: 'Round wooden shield reinforced with iron bands, slightly scorched on one side from recent battle',
           categoryId: 'equipment',
           quantity: 1,
           stackable: false,
         });
 
         addItem(characterId, {
-          name: 'Helmet',
-          description: 'Iron helmet',
+          name: 'Iron Helmet',
+          description: 'Simple but effective helmet with a nasal guard, dented but serviceable',
           categoryId: 'equipment',
           quantity: 1,
           stackable: false,
@@ -187,8 +187,8 @@ export const MixedStackable: Story = {
 
         // Non-stackable
         addItem(characterId, {
-          name: 'Unique Artifact',
-          description: 'One of a kind',
+          name: 'Sigil of the Lost Order',
+          description: 'Medallion bearing an unfamiliar symbol that grows warm when danger approaches, apparently unique in all the realms',
           categoryId: 'quest-items',
           quantity: 1,
           stackable: false,
@@ -196,8 +196,8 @@ export const MixedStackable: Story = {
 
         // Stackable with low quantity
         addItem(characterId, {
-          name: 'Arrows',
-          description: 'Wooden arrows',
+          name: 'Broadhead Arrows',
+          description: 'Fletched arrows with steel tips designed for hunting large game',
           categoryId: 'equipment',
           quantity: 15,
           stackable: true,
@@ -206,8 +206,8 @@ export const MixedStackable: Story = {
 
         // Stackable with high quantity
         addItem(characterId, {
-          name: 'Rations',
-          description: 'Travel food',
+          name: 'Trail Rations',
+          description: 'Dried meat, hardtack, and preserved fruit wrapped in waxed cloth, enough to last several weeks',
           categoryId: 'consumables',
           quantity: 47,
           stackable: true,
@@ -235,13 +235,56 @@ export const AllCategories: Story = {
       React.useEffect(() => {
         const characterId = 'char-story-all';
 
-        addItem(characterId, { name: 'Sword', description: 'Equipment item', categoryId: 'equipment', quantity: 1, stackable: false });
-        addItem(characterId, { name: 'Gold', description: 'Valuable item', categoryId: 'valuables', quantity: 100, stackable: true, maxStack: 999 });
-        addItem(characterId, { name: 'Potion', description: 'Consumable item', categoryId: 'consumables', quantity: 5, stackable: true });
-        addItem(characterId, { name: 'Letter', description: 'Document item', categoryId: 'documents', quantity: 1, stackable: false });
-        addItem(characterId, { name: 'Cloak', description: 'Personal item', categoryId: 'personal', quantity: 1, stackable: false });
-        addItem(characterId, { name: 'Key', description: 'Quest item', categoryId: 'quest-items', quantity: 1, stackable: false });
-        addItem(characterId, { name: 'Rock', description: 'Misc item', categoryId: 'miscellaneous', quantity: 1, stackable: false });
+        addItem(characterId, {
+          name: 'Elven Bow',
+          description: 'Gracefully curved bow of ash wood, impossibly light yet powerful',
+          categoryId: 'equipment',
+          quantity: 1,
+          stackable: false
+        });
+        addItem(characterId, {
+          name: 'Silver Pieces',
+          description: 'Coins of varying ages and kingdoms, accepted throughout the land',
+          categoryId: 'valuables',
+          quantity: 100,
+          stackable: true,
+          maxStack: 999
+        });
+        addItem(characterId, {
+          name: 'Antidote Vials',
+          description: 'Clear liquid that neutralizes most common poisons when consumed quickly',
+          categoryId: 'consumables',
+          quantity: 5,
+          stackable: true
+        });
+        addItem(characterId, {
+          name: 'Sealed Letter',
+          description: 'Unopened correspondence bearing a wax seal you don\'t recognize',
+          categoryId: 'documents',
+          quantity: 1,
+          stackable: false
+        });
+        addItem(characterId, {
+          name: 'Weathered Cloak',
+          description: 'Travel-stained cloak that\'s kept you warm through countless nights under the stars',
+          categoryId: 'personal',
+          quantity: 1,
+          stackable: false
+        });
+        addItem(characterId, {
+          name: 'Ornate Key',
+          description: 'Heavy brass key with intricate teeth, clearly meant for something important',
+          categoryId: 'quest-items',
+          quantity: 1,
+          stackable: false
+        });
+        addItem(characterId, {
+          name: 'Smooth Stone',
+          description: 'Ordinary river stone worn smooth by water, you\'ve carried it since childhood for luck',
+          categoryId: 'miscellaneous',
+          quantity: 1,
+          stackable: false
+        });
       }, []);
 
       return <Story />;
