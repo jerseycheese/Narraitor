@@ -240,32 +240,88 @@ export default function GameSessionTestHarness() {
       logger.info('Test character created');
     }
   }, [logger]);
+
+  // Add test inventory items to simulate starting inventory
+  const addTestInventoryItems = React.useCallback(() => {
+    const inventoryStore = useInventoryStore.getState();
+
+    // Clear existing inventory first
+    inventoryStore.clearCharacterInventory(mockCharacter.id);
+
+    // Add various test items across categories
+    inventoryStore.addItem(mockCharacter.id, {
+      name: 'Steel Sword',
+      description: 'A well-crafted blade',
+      categoryId: 'equipment',
+      quantity: 1,
+      stackable: false,
+    });
+
+    inventoryStore.addItem(mockCharacter.id, {
+      name: 'Health Potions',
+      description: 'Restores 50 HP',
+      categoryId: 'consumables',
+      quantity: 5,
+      stackable: true,
+      maxStack: 10,
+    });
+
+    inventoryStore.addItem(mockCharacter.id, {
+      name: 'Gold Coins',
+      description: 'Currency',
+      categoryId: 'valuables',
+      quantity: 150,
+      stackable: true,
+      maxStack: 999,
+    });
+
+    inventoryStore.addItem(mockCharacter.id, {
+      name: 'Ancient Map',
+      description: 'Shows hidden locations',
+      categoryId: 'documents',
+      quantity: 1,
+      stackable: false,
+    });
+
+    inventoryStore.addItem(mockCharacter.id, {
+      name: 'Magic Ring',
+      description: 'Quest item - glows faintly',
+      categoryId: 'quest-items',
+      quantity: 1,
+      stackable: false,
+    });
+
+    logger.info('Test inventory items added');
+  }, [logger]);
   
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
     // Set client state
     setIsClient(true);
-    
+
     // Create test world only once on initial mount
     createTestWorld();
-    
+
+    // Add test inventory items to simulate starting inventory
+    addTestInventoryItems();
+
     // Don't auto-start sessions - let the GameSession component handle it
     // This prevents conflicts between test harness and component initialization
     logger.info('Test harness ready - GameSession component will handle session initialization');
-    
+
     // Get initial state
     setCurrentState({...useSessionStore.getState()});
-    
+
     // Setup state display refreshing
     const intervalId = setInterval(() => {
       setCurrentState({...useSessionStore.getState()});
     }, 1000);
-    
+
     return () => {
       // Clean up
       clearInterval(intervalId);
     };
-  }, [createTestWorld, logger]);
+  }, [createTestWorld, addTestInventoryItems, logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');
@@ -306,8 +362,8 @@ export default function GameSessionTestHarness() {
           Ensure Test World & Character Exist
         </button>
         
-        <button 
-          className="px-4 py-2 bg-amber-2000 text-white rounded mb-4 ml-2"
+        <button
+          className="px-4 py-2 bg-amber-500 text-white rounded mb-4 ml-2"
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
@@ -322,8 +378,8 @@ export default function GameSessionTestHarness() {
         >
           Start Session
         </button>
-        
-        <button 
+
+        <button
           className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
           onClick={() => {
             // End current session only
@@ -332,65 +388,6 @@ export default function GameSessionTestHarness() {
           }}
         >
           End Session
-        </button>
-        
-        <button
-          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
-          onClick={() => {
-            // Add test items to inventory
-            logger.info('Adding test items to inventory');
-            const inventoryStore = useInventoryStore.getState();
-
-            // Clear existing inventory first
-            inventoryStore.clearCharacterInventory(mockCharacter.id);
-
-            // Add various test items across categories
-            inventoryStore.addItem(mockCharacter.id, {
-              name: 'Steel Sword',
-              description: 'A well-crafted blade',
-              categoryId: 'equipment',
-              quantity: 1,
-              stackable: false,
-            });
-
-            inventoryStore.addItem(mockCharacter.id, {
-              name: 'Health Potions',
-              description: 'Restores 50 HP',
-              categoryId: 'consumables',
-              quantity: 5,
-              stackable: true,
-              maxStack: 10,
-            });
-
-            inventoryStore.addItem(mockCharacter.id, {
-              name: 'Gold Coins',
-              description: 'Currency',
-              categoryId: 'valuables',
-              quantity: 150,
-              stackable: true,
-              maxStack: 999,
-            });
-
-            inventoryStore.addItem(mockCharacter.id, {
-              name: 'Ancient Map',
-              description: 'Shows hidden locations',
-              categoryId: 'documents',
-              quantity: 1,
-              stackable: false,
-            });
-
-            inventoryStore.addItem(mockCharacter.id, {
-              name: 'Magic Ring',
-              description: 'Quest item - glows faintly',
-              categoryId: 'quest-items',
-              quantity: 1,
-              stackable: false,
-            });
-
-            logger.info('✅ Test inventory items added');
-          }}
-        >
-          Add Test Inventory Items
         </button>
 
         <button
