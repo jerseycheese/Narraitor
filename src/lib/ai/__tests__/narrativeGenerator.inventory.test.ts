@@ -85,6 +85,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         },
       });
 
+      // Verify items were added
+      const items = useInventoryStore.getState().getCharacterItems(characterId);
+      expect(items.length).toBeGreaterThan(0);
+
       // Generate narrative
       await generator.generateSegment({
         worldId,
@@ -108,7 +112,7 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         .calls[0][0] as string;
 
       // Check that inventory context is included in the prompt
-      expect(generatedPrompt).toContain('inventory');
+      expect(generatedPrompt).toContain('CHARACTER INVENTORY');
       expect(generatedPrompt).toContain('Magic Sword');
     });
 
@@ -325,7 +329,7 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       const generatedPrompt = (mockGeminiClient.generateContent as jest.Mock).mock
         .calls[0][0] as string;
 
-      expect(generatedPrompt).toContain('inventory');
+      expect(generatedPrompt).toContain('CHARACTER INVENTORY');
       expect(generatedPrompt).toContain('Adventure Pack');
     });
 
