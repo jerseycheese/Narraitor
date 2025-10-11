@@ -1,0 +1,159 @@
+import { GeminiClient } from '@/lib/ai/geminiClient';
+import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
+import { STANDARD_CATEGORIES } from '@/lib/inventory/categories';
+import { truncate } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
+import type { StandardInventoryCategory } from '@/types/inventory.types';
+
+type CategorizationSource = 'ai' | 'fallback';
+
+export interface InventoryCategorizationResult {
+  categoryId: StandardInventoryCategory;
+  confidence: number;
+  rationale?: string;
+  model?: string;
+  source: CategorizationSource;
+}
+
+interface CategorizeInventoryItemInput {
+  name: string;
+  description?: string;
+  context?: Record<string, unknown>;
+}
+
+interface AIResponseShape {
+  category: StandardInventoryCategory;
+  confidence?: number;
+  rationale?: string;
+}
+
+const fallbacks: Array<{ keywords: RegExp; category: StandardInventoryCategory }> = [
+  { keywords: /(sword|blade|shield|armor|bow|staff|weapon|gear)/i, category: 'equipment' },
+  { keywords: /(potion|elixir|herb|salve|scroll|kit|tonic)/i, category: 'consumables' },
+  { keywords: /(coin|gem|jewel|treasure|gold|ruby|emerald)/i, category: 'valuables' },
+  { keywords: /(map|tome|scroll|letter|parchment|document|notes)/i, category: 'documents' },
+  { keywords: /(cloak|ring|amulet|clothing|personal|locket)/i, category: 'personal' },
+  { keywords: /(artifact|relic|quest|sigil|key|crystal)/i, category: 'quest-items' },
+];
+
+function determineFallbackCategory(name: string, description?: string): InventoryCategorizationResult {
+  const text = `${name} ${description ?? ''}`;
+  for (const { keywords, category } of fallbacks) {
+    if (keywords.test(text)) {
+      return {
+        categoryId: category,
+        confidence: 0.55,
+        rationale: 'Keyword-based fallback categorization',
+        source: 'fallback',
+      };
+    }
+  }
+
+  return {
+    categoryId: 'miscellaneous',
+    confidence: 0.4,
+    rationale: 'Default fallback categorization',
+    source: 'fallback',
+  };
+}
+
+function parseAIResponse(raw: string): AIResponseShape | null {
+  try {
+    return JSON.parse(raw) as AIResponseShape;
+  } catch (error) {
+    logger.debug('InventoryCategorizer', 'Initial AI JSON parse failed', {
+      error,
+      preview: truncate(raw, 150),
+    });
+
+    const match = raw.match(/```json\s*([\s\S]*?)```/i);
+    if (match) {
+      try {
+        return JSON.parse(match[1]) as AIResponseShape;
+      } catch (blockError) {
+        logger.debug('InventoryCategorizer', 'Failed to parse AI code block', {
+          error: blockError,
+          preview: truncate(match[1], 150),
+        });
+        return null;
+      }
+    }
+
+    const jsonLike = raw.match(/\{[\s\S]*\}/);
+    if (jsonLike) {
+      try {
+        return JSON.parse(jsonLike[0]) as AIResponseShape;
+      } catch (fallbackError) {
+        logger.debug('InventoryCategorizer', 'Failed to parse AI JSON fallback', {
+          error: fallbackError,
+          preview: truncate(jsonLike[0], 150),
+        });
+        return null;
+      }
+    }
+
+    return null;
+  }
+}
+
+export async function categorizeInventoryItem(
+  input: CategorizeInventoryItemInput
+): Promise<InventoryCategorizationResult> {
+  const config = getAIConfig();
+  const baseLogContext = {
+    name: input.name,
+    description: truncate(input.description ?? '', 100),
+  };
+
+  if (!config.geminiApiKey) {
+    logger.warn('InventoryCategorizer', 'No GEMINI_API_KEY configured, using fallback categorization', baseLogContext);
+    return determineFallbackCategory(input.name, input.description);
+  }
+
+  try {
+    const client = new GeminiClient({
+      apiKey: config.geminiApiKey,
+      modelName: config.modelName,
+      maxRetries: config.maxRetries,
+      timeout: config.timeout,
+      generationConfig: getGenerationConfig(),
+      safetySettings: getSafetySettings(),
+    });
+
+    const prompt = `You are an expert inventory categorizer for a narrative RPG.
+Choose exactly one category from the following list and respond with JSON only.
+Categories: ${STANDARD_CATEGORIES.join(', ')}.
+
+Return JSON in the shape: {"category":"equipment","confidence":0.9,"rationale":"Reason"}
+- confidence must be between 0 and 1.
+- Pick the category that best fits based on the item name and description.
+- Do not include any additional explanation outside JSON.
+
+Item Name: ${input.name}
+Item Description: ${input.description ?? 'n/a'}
+Additional Context: ${input.context ? JSON.stringify(input.context) : 'none'}
+`;
+
+    const response = await client.generateContent(prompt);
+    const parsed = parseAIResponse(response.content);
+
+    if (!parsed || !STANDARD_CATEGORIES.includes(parsed.category)) {
+      logger.warn('InventoryCategorizer', 'AI response invalid, using fallback', {
+        ...baseLogContext,
+        raw: truncate(response.content, 200),
+      });
+      return determineFallbackCategory(input.name, input.description);
+    }
+
+    return {
+      categoryId: parsed.category,
+      confidence: Math.min(Math.max(parsed.confidence ?? 0.8, 0), 1),
+      rationale: parsed.rationale,
+      model: config.modelName,
+      source: 'ai',
+    };
+  } catch (error) {
+    logger.error('InventoryCategorizer', 'AI categorization failed', error);
+    return determineFallbackCategory(input.name, input.description);
+  }
+}

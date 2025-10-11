@@ -17,7 +17,11 @@ export type {
   Inventory,
   InventoryItem,
   InventoryCategory,
-  StandardInventoryCategory
+  StandardInventoryCategory,
+  InventoryAcquisitionRecord,
+  InventoryAcquisitionMethod,
+  InventoryItemCategorization,
+  InventoryCategorizationSource
 } from './inventory.types';
 export type { 
   NarrativeSegment, 

@@ -158,19 +158,44 @@ type JournalFilter = {
 ## Inventory Types
 
 ```typescript
-interface InventoryItem extends NamedEntity {
-  characterId: EntityID;
-  type: 'weapon' | 'armor' | 'consumable' | 'misc';
+type InventoryAcquisitionMethod =
+  | 'loot'
+  | 'quest'
+  | 'purchase'
+  | 'craft'
+  | 'reward'
+  | 'gift'
+  | 'manual'
+  | 'unknown';
+
+interface InventoryAcquisitionRecord {
+  acquiredAt: ISODateString;
+  method: InventoryAcquisitionMethod;
   quantity: number;
-  effects?: ItemEffect[];
-  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  description?: string;
+  sourceId?: EntityID;
+  sessionId?: EntityID;
+  recordedBy?: EntityID;
 }
 
-interface ItemEffect {
-  type: 'attribute-bonus' | 'skill-bonus' | 'special';
-  target: string;
-  value: number;
-  duration?: 'permanent' | 'temporary' | 'combat';
+type InventoryCategorizationSource = 'ai' | 'manual' | 'system' | 'fallback';
+
+interface InventoryItemCategorization {
+  categoryId: StandardInventoryCategory;
+  source: InventoryCategorizationSource;
+  classifiedAt: ISODateString;
+  confidence?: number;
+  model?: string;
+  rationale?: string;
+}
+
+interface InventoryItem extends NamedEntity, TimestampedEntity {
+  categoryId: StandardInventoryCategory;
+  quantity: number;
+  stackable: boolean;
+  maxStack?: number;
+  acquisitionHistory: InventoryAcquisitionRecord[];
+  categorization: InventoryItemCategorization;
 }
 ```
 
