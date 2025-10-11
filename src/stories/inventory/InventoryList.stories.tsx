@@ -31,14 +31,14 @@ export const Default: Story = {
   },
   decorators: [
     (Story) => {
-      const { addItem, removeAllItems } = useInventoryStore();
+      const { addItem, clearCharacterInventory } = useInventoryStore();
 
       // Populate inventory with sample items
       React.useEffect(() => {
         const characterId = 'char-story-1';
 
         // Clear any existing items first
-        removeAllItems(characterId);
+        clearCharacterInventory(characterId);
 
         // Equipment
         addItem(characterId, {
@@ -111,7 +111,7 @@ export const Default: Story = {
           quantity: 1,
           stackable: false,
         });
-      }, [addItem, removeAllItems]);
+      }, [addItem, clearCharacterInventory]);
 
       return <Story />;
     },
@@ -138,13 +138,13 @@ export const SingleCategory: Story = {
   },
   decorators: [
     (Story) => {
-      const { addItem, removeAllItems } = useInventoryStore();
+      const { addItem, clearCharacterInventory } = useInventoryStore();
 
       React.useEffect(() => {
         const characterId = 'char-story-single';
 
         // Clear any existing items first
-        removeAllItems(characterId);
+        clearCharacterInventory(characterId);
 
         addItem(characterId, {
           name: 'Longsword',
@@ -169,7 +169,7 @@ export const SingleCategory: Story = {
           quantity: 1,
           stackable: false,
         });
-      }, [addItem, removeAllItems]);
+      }, [addItem, clearCharacterInventory]);
 
       return <Story />;
     },
@@ -186,13 +186,13 @@ export const MixedStackable: Story = {
   },
   decorators: [
     (Story) => {
-      const { addItem, removeAllItems } = useInventoryStore();
+      const { addItem, clearCharacterInventory } = useInventoryStore();
 
       React.useEffect(() => {
         const characterId = 'char-story-mixed';
 
         // Clear any existing items first
-        removeAllItems(characterId);
+        clearCharacterInventory(characterId);
 
         // Non-stackable
         addItem(characterId, {
@@ -222,7 +222,7 @@ export const MixedStackable: Story = {
           stackable: true,
           maxStack: 99,
         });
-      }, [addItem, removeAllItems]);
+      }, [addItem, clearCharacterInventory]);
 
       return <Story />;
     },
@@ -239,13 +239,13 @@ export const AllCategories: Story = {
   },
   decorators: [
     (Story) => {
-      const { addItem, removeAllItems } = useInventoryStore();
+      const { addItem, clearCharacterInventory } = useInventoryStore();
 
       React.useEffect(() => {
         const characterId = 'char-story-all';
 
         // Clear any existing items first
-        removeAllItems(characterId);
+        clearCharacterInventory(characterId);
 
         addItem(characterId, {
           name: 'Elven Bow',
@@ -297,7 +297,7 @@ export const AllCategories: Story = {
           quantity: 1,
           stackable: false
         });
-      }, [addItem, removeAllItems]);
+      }, [addItem, clearCharacterInventory]);
 
       return <Story />;
     },
