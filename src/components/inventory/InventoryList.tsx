@@ -110,7 +110,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     </h4>
                     {item.stackable && (
                       <Badge
-                        variant="secondary"
+                        variant="secondary-static"
                         size="sm"
                         className="ml-2 item-quantity"
                         aria-label={`Quantity: ${item.quantity}`}
@@ -132,7 +132,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     <Badge
                       variant="outline"
                       size="sm"
-                      className="item-category"
+                      className="item-category hover:bg-white"
                       aria-label={`Category: ${categoryName}`}
                     >
                       {categoryName}
