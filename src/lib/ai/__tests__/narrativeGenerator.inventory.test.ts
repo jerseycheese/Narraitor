@@ -57,14 +57,15 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         description: 'A powerful enchanted blade',
         stackable: false,
         categorization: {
-          categoryId: 'weapons',
+          categoryId: 'equipment',
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'found',
-          source: 'treasure chest',
+          method: 'loot',
+          description: 'Found in treasure chest',
           acquiredAt: new Date().toISOString(),
+          quantity: 1,
         },
       });
 
@@ -79,9 +80,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'purchased',
-          source: 'village shop',
+          method: 'purchase',
+          description: 'Bought at village shop',
           acquiredAt: new Date().toISOString(),
+          quantity: 3,
         },
       });
 
@@ -152,13 +154,14 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         name: 'Sword',
         stackable: false,
         categorization: {
-          categoryId: 'weapons',
+          categoryId: 'equipment',
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'found',
+          method: 'loot',
           acquiredAt: new Date().toISOString(),
+          quantity: 1,
         },
       });
 
@@ -166,13 +169,14 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         name: 'Staff',
         stackable: false,
         categorization: {
-          categoryId: 'weapons',
+          categoryId: 'equipment',
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'found',
+          method: 'loot',
           acquiredAt: new Date().toISOString(),
+          quantity: 1,
         },
       });
 
@@ -213,9 +217,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'quest-reward',
-          source: 'ancient temple',
+          method: 'quest',
+          description: 'Reward from ancient temple quest',
           acquiredAt: new Date().toISOString(),
+          quantity: 1,
         },
       });
 
@@ -230,8 +235,9 @@ describe('NarrativeGenerator - Inventory Integration', () => {
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'looted',
+          method: 'loot',
           acquiredAt: new Date().toISOString(),
+          quantity: 10,
         },
       });
 
@@ -271,8 +277,9 @@ describe('NarrativeGenerator - Inventory Integration', () => {
             classifiedAt: new Date().toISOString(),
           },
           acquisition: {
-            method: 'found',
+            method: 'loot',
             acquiredAt: new Date().toISOString(),
+            quantity: 1,
           },
         });
       }
@@ -316,8 +323,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
           classifiedAt: new Date().toISOString(),
         },
         acquisition: {
-          method: 'starting-equipment',
+          method: 'manual',
+          description: 'Starting equipment',
           acquiredAt: new Date().toISOString(),
+          quantity: 1,
         },
       });
     });
