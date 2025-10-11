@@ -23,10 +23,6 @@ describe('Standard Inventory Categories', () => {
 
       expect(STANDARD_CATEGORIES).toEqual(expectedCategories);
     });
-
-    test('should have exactly 7 categories', () => {
-      expect(STANDARD_CATEGORIES).toHaveLength(7);
-    });
   });
 
   describe('isValidCategory', () => {
