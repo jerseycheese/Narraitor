@@ -7,13 +7,13 @@ import type { StandardInventoryCategory } from '@/types/inventory.types';
  * Use this for iteration, validation, or displaying category options.
  */
 export const STANDARD_CATEGORIES: StandardInventoryCategory[] = [
-  'weapons',
-  'armor',
+  'equipment',
+  'valuables',
   'consumables',
-  'tools',
-  'treasure',
+  'documents',
+  'personal',
   'quest-items',
-  'materials',
+  'miscellaneous',
 ];
 
 /**
@@ -28,33 +28,33 @@ export interface CategoryMetadata {
  * Metadata mapping for all standard categories.
  */
 const CATEGORY_METADATA: Record<StandardInventoryCategory, CategoryMetadata> = {
-  weapons: {
-    name: 'Weapons',
-    description: 'Swords, bows, staffs, and other combat items',
+  equipment: {
+    name: 'Equipment',
+    description: 'Items used for tasks or carried regularly (tools, devices, gear)',
   },
-  armor: {
-    name: 'Armor',
-    description: 'Helmets, shields, chest pieces, and protective gear',
+  valuables: {
+    name: 'Valuables',
+    description: 'Currency, treasures, collectibles of monetary or sentimental value',
   },
   consumables: {
     name: 'Consumables',
-    description: 'Potions, food, scrolls that are used up',
+    description: 'Single-use items that are depleted when used (food, medicine, fuel)',
   },
-  tools: {
-    name: 'Tools',
-    description: 'Keys, lockpicks, rope, and utility items',
+  documents: {
+    name: 'Documents',
+    description: 'Written materials, data, maps, records, correspondence',
   },
-  treasure: {
-    name: 'Treasure',
-    description: 'Gems, coins, valuable collectibles',
+  personal: {
+    name: 'Personal',
+    description: 'Clothing, accessories, personal effects, mementos',
   },
   'quest-items': {
     name: 'Quest Items',
-    description: 'Story-critical items that cannot be discarded',
+    description: 'Story-critical items that drive narrative forward',
   },
-  materials: {
-    name: 'Materials',
-    description: 'Crafting components, raw resources',
+  miscellaneous: {
+    name: 'Miscellaneous',
+    description: 'Items that don\'t fit other categories',
   },
 };
 
@@ -66,7 +66,7 @@ const CATEGORY_METADATA: Record<StandardInventoryCategory, CategoryMetadata> = {
  *
  * @example
  * ```typescript
- * isValidCategory('weapons'); // true
+ * isValidCategory('equipment'); // true
  * isValidCategory('invalid'); // false
  * ```
  */
@@ -85,9 +85,9 @@ export function isValidCategory(value: string): value is StandardInventoryCatego
  *
  * @example
  * ```typescript
- * const metadata = getCategoryMetadata('weapons');
- * console.log(metadata.name); // "Weapons"
- * console.log(metadata.description); // "Swords, bows, staffs, and other combat items"
+ * const metadata = getCategoryMetadata('equipment');
+ * console.log(metadata.name); // "Equipment"
+ * console.log(metadata.description); // "Items used for tasks or carried regularly (tools, devices, gear)"
  * ```
  */
 export function getCategoryMetadata(

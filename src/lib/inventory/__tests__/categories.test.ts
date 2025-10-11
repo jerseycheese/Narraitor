@@ -12,13 +12,13 @@ describe('Standard Inventory Categories', () => {
   describe('STANDARD_CATEGORIES constant', () => {
     test('should contain all standard category types', () => {
       const expectedCategories: StandardInventoryCategory[] = [
-        'weapons',
-        'armor',
+        'equipment',
+        'valuables',
         'consumables',
-        'tools',
-        'treasure',
+        'documents',
+        'personal',
         'quest-items',
-        'materials',
+        'miscellaneous',
       ];
 
       expect(STANDARD_CATEGORIES).toEqual(expectedCategories);
@@ -31,15 +31,15 @@ describe('Standard Inventory Categories', () => {
 
   describe('isValidCategory', () => {
     test('should return true for valid category', () => {
-      expect(isValidCategory('weapons')).toBe(true);
-      expect(isValidCategory('armor')).toBe(true);
+      expect(isValidCategory('equipment')).toBe(true);
+      expect(isValidCategory('valuables')).toBe(true);
       expect(isValidCategory('consumables')).toBe(true);
     });
 
     test('should return false for invalid category', () => {
       expect(isValidCategory('invalid-category')).toBe(false);
       expect(isValidCategory('')).toBe(false);
-      expect(isValidCategory('WEAPONS')).toBe(false); // case-sensitive
+      expect(isValidCategory('EQUIPMENT')).toBe(false); // case-sensitive
     });
 
     test('should return false for null or undefined', () => {
@@ -49,11 +49,11 @@ describe('Standard Inventory Categories', () => {
   });
 
   describe('getCategoryMetadata', () => {
-    test('should return metadata for weapons category', () => {
-      const metadata = getCategoryMetadata('weapons');
+    test('should return metadata for equipment category', () => {
+      const metadata = getCategoryMetadata('equipment');
 
       expect(metadata).toMatchObject({
-        name: 'Weapons',
+        name: 'Equipment',
         description: expect.any(String),
       });
       expect(metadata.description.length).toBeGreaterThan(0);

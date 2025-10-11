@@ -3,26 +3,26 @@
 import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
 
 /**
- * Standard inventory category types for common game items.
+ * Standard inventory category types for organizing items in any narrative genre.
  * Following the proven pattern from lore categorization (issue #183).
  *
- * Categories:
- * - weapons: Swords, bows, staffs, and other combat items
- * - armor: Helmets, shields, chest pieces, and protective gear
- * - consumables: Potions, food, scrolls that are used up
- * - tools: Keys, lockpicks, rope, and utility items
- * - treasure: Gems, coins, valuable collectibles
- * - quest-items: Story-critical items that cannot be discarded
- * - materials: Crafting components, raw resources
+ * Genre-agnostic categories that work across fantasy, sci-fi, modern, historical, etc.:
+ * - equipment: Items used for tasks or carried regularly (tools, devices, gear)
+ * - valuables: Currency, treasures, collectibles of monetary or sentimental value
+ * - consumables: Single-use items that are depleted when used (food, medicine, fuel)
+ * - documents: Written materials, data, maps, records, correspondence
+ * - personal: Clothing, accessories, personal effects, mementos
+ * - quest-items: Story-critical items that drive narrative forward
+ * - miscellaneous: Items that don't fit other categories
  */
 export type StandardInventoryCategory =
-  | 'weapons'
-  | 'armor'
+  | 'equipment'
+  | 'valuables'
   | 'consumables'
-  | 'tools'
-  | 'treasure'
+  | 'documents'
+  | 'personal'
   | 'quest-items'
-  | 'materials';
+  | 'miscellaneous';
 
 /**
  * Represents a character's inventory

@@ -82,6 +82,7 @@ public/storybook
 .env.development
 .env.test
 .env.production
+project-config.json
 
 # Temp files
 .temp
@@ -114,6 +115,7 @@ AGENTS.local.md
 
 # Worktrees
 narraitor-worktrees/
+worktrees/
 
 # Serena (local tooling)
 .serena/
