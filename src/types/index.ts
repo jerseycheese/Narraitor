@@ -13,10 +13,11 @@ export type {
   CharacterRelationship,
   CharacterStatus
 } from './character.types';
-export type { 
+export type {
   Inventory,
   InventoryItem,
-  InventoryCategory
+  InventoryCategory,
+  StandardInventoryCategory
 } from './inventory.types';
 export type { 
   NarrativeSegment, 

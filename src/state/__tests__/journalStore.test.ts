@@ -9,7 +9,6 @@ describe('journalStore', () => {
 
   it('initializes with default state', () => {
     const state = useJournalStore.getState();
-    expect(state).toBeDefined();
     expect(state.entries).toEqual({});
     expect(state.sessionEntries).toEqual({});
     expect(state.error).toBeNull();

@@ -239,10 +239,11 @@ export function createMockInventoryItem(overrides: Partial<InventoryItem> = {}):
     description: 'A test item for unit testing',
     categoryId: 'cat-equipment',
     quantity: 1,
-    stackable: false,
     createdAt: DEFAULT_TIMESTAMP,
     updatedAt: DEFAULT_TIMESTAMP,
     ...overrides,
+    // Ensure stackable always has a value (required field)
+    stackable: overrides.stackable ?? false,
   };
 }
 
