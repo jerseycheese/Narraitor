@@ -2,9 +2,9 @@
 title: "Narrative Generation System"
 type: architecture
 category: narrative
-tags: [narrative, ai, generation]
+tags: [narrative, ai, generation, inventory]
 created: 2025-05-20
-updated: 2025-06-08
+updated: 2025-10-11
 ---
 
 # Narrative Generation System
@@ -102,6 +102,23 @@ The narrative generation system respects user-defined tone settings for consiste
 4. **Custom Instructions**: Additional user-defined tone requirements
 5. **AI Safety Integration**: Dynamic safety thresholds based on content rating
 6. **Debug Logging**: Comprehensive logging for tone settings verification
+
+### Inventory Integration
+
+The narrative system has access to character inventory data and can naturally reference items when contextually appropriate:
+
+1. **Smart Item Prioritization**: Items are ranked by narrative significance:
+   - Quest items and equipment score highest
+   - Recently acquired items (within 24-72 hours) get priority
+   - Unique items preferred over common ones
+   - Items with detailed descriptions considered more significant
+2. **Limited Context**: Top 8 most significant items included to avoid overwhelming prompts
+3. **Natural References**: AI instructed to only mention items when contextually relevant, not forced
+4. **Variation**: AI encouraged to vary references to prevent repetition
+5. **Integration Points**: Inventory context added to:
+   - Initial scene generation
+   - Ongoing narrative segments
+   - Skill acknowledgment narratives
 
 ### Narrative Perspective
 
