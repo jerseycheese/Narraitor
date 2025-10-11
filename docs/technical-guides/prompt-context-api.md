@@ -199,6 +199,31 @@ const result = await manager.generateContext({
 // }
 ```
 
+### buildInventoryContext(items: InventoryItem[], options?: InventoryContextOptions): InventoryContextResult
+
+Formats inventory data into an optimized markdown block that highlights narratively relevant items while respecting token limits.
+
+```typescript
+import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
+
+const { context } = buildInventoryContext(characterInventoryItems, {
+  equippedItemIds: ['item-sword'],
+  tokenLimit: 160,
+});
+
+/* Produces:
+## Inventory Summary
+- [Equipped] Sword of Dawn (equipment, qty 1, acquired via quest on 2025-06-01) — Radiant blade that channels sunlight.
+- Healing Potion (consumables, qty 3, acquired via purchase on 2025-06-02) — Restores moderate health.
++ 2 more items not shown to stay within token limits.
+*/
+```
+
+**Key features:**
+- Prioritizes equipped items, quest artifacts, recent acquisitions, and unique gear.
+- Includes acquisition metadata so prompts capture when/where items entered play.
+- Automatically limits output (default 180 tokens, max 8 items) and appends a summary when truncating.
+
 ## Error Handling
 
 The system is designed to fail gracefully:
