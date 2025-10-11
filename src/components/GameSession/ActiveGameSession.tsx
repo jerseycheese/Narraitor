@@ -851,11 +851,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Inventory Display */}
       {characterId && (
-        <section
-          className="mt-6"
-          role="region"
-          aria-label="Character inventory"
-        >
+        <section className="mt-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Inventory</h2>
           <InventoryList characterId={characterId} />
         </section>

@@ -302,8 +302,28 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
 
-    // Add test inventory items to simulate starting inventory
-    addTestInventoryItems();
+    // Add test inventory items after persistence hydrates so test data is consistent
+    const inventoryPersist = (useInventoryStore as unknown as {
+      persist?: {
+        hasHydrated?: () => boolean;
+        onFinishHydration?: (callback: () => void) => () => void;
+      };
+    }).persist;
+    let unsubscribeHydration: (() => void) | undefined;
+
+    const seedInventoryOnce = () => {
+      unsubscribeHydration?.();
+      unsubscribeHydration = undefined;
+      addTestInventoryItems();
+    };
+
+    if (inventoryPersist?.hasHydrated?.()) {
+      seedInventoryOnce();
+    } else if (inventoryPersist?.onFinishHydration) {
+      unsubscribeHydration = inventoryPersist.onFinishHydration(seedInventoryOnce);
+    } else {
+      seedInventoryOnce();
+    }
 
     // Don't auto-start sessions - let the GameSession component handle it
     // This prevents conflicts between test harness and component initialization
@@ -320,6 +340,7 @@ export default function GameSessionTestHarness() {
     return () => {
       // Clean up
       clearInterval(intervalId);
+      unsubscribeHydration?.();
     };
   }, [createTestWorld, addTestInventoryItems, logger]);
   
