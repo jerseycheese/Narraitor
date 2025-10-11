@@ -1,6 +1,6 @@
 // src/types/inventory.types.ts
 
-import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
+import { EntityID, NamedEntity, TimestampedEntity, ISODateString } from './common.types';
 
 /**
  * Standard inventory category types for organizing items in any narrative genre.
@@ -37,11 +37,44 @@ export interface Inventory {
 /**
  * Represents an item in the inventory (simplified for MVP)
  */
-export interface InventoryItem extends NamedEntity, TimestampedEntity {
-  categoryId: EntityID;
+export type InventoryAcquisitionMethod =
+  | 'loot'
+  | 'quest'
+  | 'purchase'
+  | 'craft'
+  | 'reward'
+  | 'gift'
+  | 'manual'
+  | 'unknown';
+
+export interface InventoryAcquisitionRecord {
+  acquiredAt: ISODateString;
+  method: InventoryAcquisitionMethod;
   quantity: number;
-  stackable: boolean; // Whether this item type can stack
-  maxStack?: number; // Optional maximum stack size
+  description?: string;
+  sourceId?: EntityID;
+  sessionId?: EntityID;
+  recordedBy?: EntityID;
+}
+
+export type InventoryCategorizationSource = 'ai' | 'manual' | 'system' | 'fallback';
+
+export interface InventoryItemCategorization {
+  categoryId: StandardInventoryCategory;
+  source: InventoryCategorizationSource;
+  classifiedAt: ISODateString;
+  confidence?: number;
+  model?: string;
+  rationale?: string;
+}
+
+export interface InventoryItem extends NamedEntity, TimestampedEntity {
+  categoryId: StandardInventoryCategory;
+  quantity: number;
+  stackable: boolean;
+  maxStack?: number;
+  acquisitionHistory: InventoryAcquisitionRecord[];
+  categorization: InventoryItemCategorization;
 }
 
 /**

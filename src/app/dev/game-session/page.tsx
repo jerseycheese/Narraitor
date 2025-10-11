@@ -9,6 +9,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import Logger from '@/lib/utils/logger';
+import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { getTimestamp } from '@/lib/utils';
 
 // Mock world
@@ -249,46 +250,64 @@ export default function GameSessionTestHarness() {
     inventoryStore.clearCharacterInventory(mockCharacter.id);
 
     // Add various test items across categories
+    const createAcquisition = (quantity: number = 1) => ({
+      acquiredAt: new Date().toISOString(),
+      method: 'manual' as const,
+      quantity,
+    });
+
+    const createCategorization = (categoryId: StandardInventoryCategory) => ({
+      categoryId,
+      source: 'system' as const,
+      classifiedAt: new Date().toISOString(),
+      confidence: 0.9,
+    });
+
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Steel Sword',
       description: 'A well-crafted blade',
-      categoryId: 'equipment',
       quantity: 1,
       stackable: false,
+      categorization: createCategorization('equipment'),
+      acquisition: createAcquisition(1),
     });
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Health Potions',
       description: 'Restores 50 HP',
-      categoryId: 'consumables',
       quantity: 5,
       stackable: true,
       maxStack: 10,
+      categorization: createCategorization('consumables'),
+      acquisition: createAcquisition(5),
     });
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Gold Coins',
       description: 'Currency',
-      categoryId: 'valuables',
       quantity: 150,
       stackable: true,
       maxStack: 999,
+      categorization: createCategorization('valuables'),
+      acquisition: createAcquisition(150),
     });
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Ancient Map',
       description: 'Shows hidden locations',
-      categoryId: 'documents',
       quantity: 1,
       stackable: false,
+      categorization: createCategorization('documents'),
+      acquisition: createAcquisition(1),
     });
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Magic Ring',
       description: 'Quest item - glows faintly',
-      categoryId: 'quest-items',
       quantity: 1,
       stackable: false,
+      categorization: createCategorization('quest-items'),
+      acquisition: createAcquisition(1),
     });
 
     logger.info('Test inventory items added');

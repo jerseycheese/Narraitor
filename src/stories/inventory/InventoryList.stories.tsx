@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
+import type { StandardInventoryCategory } from '@/types/inventory.types';
+import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: 'Inventory/InventoryList',
@@ -21,285 +23,156 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Default state showing a well-stocked inventory with items across multiple categories.
- * Demonstrates category grouping, quantity display, and responsive grid layout.
- */
+const createCategorization = (categoryId: StandardInventoryCategory, timestamp: string) => ({
+  categoryId,
+  source: 'system' as const,
+  classifiedAt: timestamp,
+  confidence: 0.92,
+});
+
+const createAcquisition = (quantity: number, timestamp: string) => ({
+  acquiredAt: timestamp,
+  method: 'manual' as const,
+  quantity,
+});
+
 export const Default: Story = {
   args: {
-    characterId: 'char-story-1',
+    characterId: 'char-story-default',
   },
   decorators: [
-    (Story) => {
+    (StoryComponent) => {
       const { addItem, clearCharacterInventory } = useInventoryStore();
 
-      // Populate inventory with sample items
       React.useEffect(() => {
-        const characterId = 'char-story-1';
+        const characterId = 'char-story-default';
+        const timestamp = getTimestamp();
 
-        // Clear any existing items first
         clearCharacterInventory(characterId);
 
-        // Equipment
-        addItem(characterId, {
+        const seed = (
+          categoryId: StandardInventoryCategory,
+          item: Omit<Parameters<typeof addItem>[1], 'categorization' | 'acquisition'>,
+          quantity = item.quantity ?? 1
+        ) =>
+          addItem(characterId, {
+            ...item,
+            categorization: createCategorization(categoryId, timestamp),
+            acquisition: createAcquisition(quantity, timestamp),
+          });
+
+        seed('equipment', {
           name: 'Steel Sword',
-          description: 'Forged blade with a leather-wrapped hilt, showing signs of recent use and careful maintenance',
-          categoryId: 'equipment',
-          quantity: 1,
+          description: 'Forged blade with a balanced edge and leather-wrapped hilt',
           stackable: false,
+          quantity: 1,
         });
 
-        addItem(characterId, {
+        seed('equipment', {
           name: 'Leather Armor',
-          description: 'Worn vest of hardened leather with reinforced shoulder guards, offering protection without restricting movement',
-          categoryId: 'equipment',
-          quantity: 1,
+          description: 'Reinforced cuirass with articulated pauldrons',
           stackable: false,
+          quantity: 1,
         });
 
-        // Consumables
-        addItem(characterId, {
+        seed('consumables', {
           name: 'Health Potion',
-          description: 'Small glass vial containing a thick crimson liquid that glows faintly in the dark',
-          categoryId: 'consumables',
-          quantity: 5,
+          description: 'Ruby liquid that radiates a faint warmth',
           stackable: true,
-          maxStack: 99,
-        });
+          quantity: 4,
+          maxStack: 25,
+        }, 4);
 
-        addItem(characterId, {
-          name: 'Mana Potion',
-          description: 'Blue crystalline liquid that swirls on its own, humming with arcane power',
-          categoryId: 'consumables',
-          quantity: 3,
+        seed('consumables', {
+          name: 'Mana Draught',
+          description: 'Cool blue elixir infused with arcane sigils',
           stackable: true,
-          maxStack: 99,
-        });
+          quantity: 2,
+          maxStack: 25,
+        }, 2);
 
-        // Valuables
-        addItem(characterId, {
+        seed('valuables', {
           name: 'Gold Coins',
-          description: 'Standard currency stamped with the kingdom\'s seal - a dragon wreathed in flames',
-          categoryId: 'valuables',
-          quantity: 150,
+          description: 'Stamped currency bearing the royal griffin',
           stackable: true,
+          quantity: 150,
           maxStack: 999,
-        });
+        }, 150);
 
-        addItem(characterId, {
-          name: 'Ancient Ruby',
-          description: 'Deep red gemstone the size of a walnut, with an inner fire that seems to pulse in rhythm with your heartbeat',
-          categoryId: 'valuables',
-          quantity: 1,
+        seed('documents', {
+          name: 'Guild Charter',
+          description: 'Sealed parchment outlining membership rights',
           stackable: false,
-        });
-
-        // Documents
-        addItem(characterId, {
-          name: 'Map Fragment',
-          description: 'Torn parchment showing coastal landmarks and an X marked in faded ink, with notes in a language you don\'t recognize',
-          categoryId: 'documents',
           quantity: 1,
-          stackable: false,
         });
 
-        // Quest Items
-        addItem(characterId, {
+        seed('quest-items', {
           name: 'Resonance Crystal',
-          description: 'Translucent shard that vibrates softly and glows brighter when pointed toward the northern mountains',
-          categoryId: 'quest-items',
-          quantity: 1,
+          description: 'Hums softly when aligned with northern ley lines',
           stackable: false,
+          quantity: 1,
         });
       }, [addItem, clearCharacterInventory]);
 
-      return <Story />;
+      return <StoryComponent />;
     },
   ],
 };
 
-/**
- * Empty state when character has no items in inventory.
- * Shows appropriate empty state message.
- */
 export const Empty: Story = {
   args: {
     characterId: 'char-story-empty',
   },
 };
 
-/**
- * Single category with multiple items.
- * Demonstrates how items are organized within one category.
- */
 export const SingleCategory: Story = {
   args: {
     characterId: 'char-story-single',
   },
   decorators: [
-    (Story) => {
+    (StoryComponent) => {
       const { addItem, clearCharacterInventory } = useInventoryStore();
 
       React.useEffect(() => {
         const characterId = 'char-story-single';
+        const timestamp = getTimestamp();
 
-        // Clear any existing items first
         clearCharacterInventory(characterId);
 
-        addItem(characterId, {
+        const seed = (
+          item: Omit<Parameters<typeof addItem>[1], 'categorization' | 'acquisition'>,
+          quantity = item.quantity ?? 1
+        ) =>
+          addItem(characterId, {
+            ...item,
+            categorization: createCategorization('equipment', timestamp),
+            acquisition: createAcquisition(quantity, timestamp),
+          });
+
+        seed({
           name: 'Longsword',
-          description: 'Standard issue military blade with a crossguard bearing the royal insignia',
-          categoryId: 'equipment',
-          quantity: 1,
+          description: 'Military blade with ceremonial engravings',
           stackable: false,
+          quantity: 1,
         });
 
-        addItem(characterId, {
+        seed({
           name: 'Oak Shield',
-          description: 'Round wooden shield reinforced with iron bands, slightly scorched on one side from recent battle',
-          categoryId: 'equipment',
-          quantity: 1,
+          description: 'Iron-rimmed shield hardened by many battles',
           stackable: false,
+          quantity: 1,
         });
 
-        addItem(characterId, {
-          name: 'Iron Helmet',
-          description: 'Simple but effective helmet with a nasal guard, dented but serviceable',
-          categoryId: 'equipment',
-          quantity: 1,
-          stackable: false,
-        });
+        seed({
+          name: 'Throwing Knives',
+          description: 'Set of balanced blades stored in a leather bandolier',
+          stackable: true,
+          quantity: 12,
+          maxStack: 24,
+        }, 12);
       }, [addItem, clearCharacterInventory]);
 
-      return <Story />;
-    },
-  ],
-};
-
-/**
- * Mix of stackable and non-stackable items.
- * Shows quantity badges on stackable items and their max stack limits.
- */
-export const MixedStackable: Story = {
-  args: {
-    characterId: 'char-story-mixed',
-  },
-  decorators: [
-    (Story) => {
-      const { addItem, clearCharacterInventory } = useInventoryStore();
-
-      React.useEffect(() => {
-        const characterId = 'char-story-mixed';
-
-        // Clear any existing items first
-        clearCharacterInventory(characterId);
-
-        // Non-stackable
-        addItem(characterId, {
-          name: 'Sigil of the Lost Order',
-          description: 'Medallion bearing an unfamiliar symbol that grows warm when danger approaches, apparently unique in all the realms',
-          categoryId: 'quest-items',
-          quantity: 1,
-          stackable: false,
-        });
-
-        // Stackable with low quantity
-        addItem(characterId, {
-          name: 'Broadhead Arrows',
-          description: 'Fletched arrows with steel tips designed for hunting large game',
-          categoryId: 'equipment',
-          quantity: 15,
-          stackable: true,
-          maxStack: 50,
-        });
-
-        // Stackable with high quantity
-        addItem(characterId, {
-          name: 'Trail Rations',
-          description: 'Dried meat, hardtack, and preserved fruit wrapped in waxed cloth, enough to last several weeks',
-          categoryId: 'consumables',
-          quantity: 47,
-          stackable: true,
-          maxStack: 99,
-        });
-      }, [addItem, clearCharacterInventory]);
-
-      return <Story />;
-    },
-  ],
-};
-
-/**
- * All seven standard categories populated.
- * Comprehensive view showing every category type.
- */
-export const AllCategories: Story = {
-  args: {
-    characterId: 'char-story-all',
-  },
-  decorators: [
-    (Story) => {
-      const { addItem, clearCharacterInventory } = useInventoryStore();
-
-      React.useEffect(() => {
-        const characterId = 'char-story-all';
-
-        // Clear any existing items first
-        clearCharacterInventory(characterId);
-
-        addItem(characterId, {
-          name: 'Elven Bow',
-          description: 'Gracefully curved bow of ash wood, impossibly light yet powerful',
-          categoryId: 'equipment',
-          quantity: 1,
-          stackable: false
-        });
-        addItem(characterId, {
-          name: 'Silver Pieces',
-          description: 'Coins of varying ages and kingdoms, accepted throughout the land',
-          categoryId: 'valuables',
-          quantity: 100,
-          stackable: true,
-          maxStack: 999
-        });
-        addItem(characterId, {
-          name: 'Antidote Vials',
-          description: 'Clear liquid that neutralizes most common poisons when consumed quickly',
-          categoryId: 'consumables',
-          quantity: 5,
-          stackable: true
-        });
-        addItem(characterId, {
-          name: 'Sealed Letter',
-          description: 'Unopened correspondence bearing a wax seal you don\'t recognize',
-          categoryId: 'documents',
-          quantity: 1,
-          stackable: false
-        });
-        addItem(characterId, {
-          name: 'Weathered Cloak',
-          description: 'Travel-stained cloak that\'s kept you warm through countless nights under the stars',
-          categoryId: 'personal',
-          quantity: 1,
-          stackable: false
-        });
-        addItem(characterId, {
-          name: 'Ornate Key',
-          description: 'Heavy brass key with intricate teeth, clearly meant for something important',
-          categoryId: 'quest-items',
-          quantity: 1,
-          stackable: false
-        });
-        addItem(characterId, {
-          name: 'Smooth Stone',
-          description: 'Ordinary river stone worn smooth by water, you\'ve carried it since childhood for luck',
-          categoryId: 'miscellaneous',
-          quantity: 1,
-          stackable: false
-        });
-      }, [addItem, clearCharacterInventory]);
-
-      return <Story />;
+      return <StoryComponent />;
     },
   ],
 };

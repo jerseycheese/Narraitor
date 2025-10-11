@@ -343,14 +343,20 @@ export function isWorld(obj: unknown): obj is World {
 }
 
 export function isInventoryItem(obj: unknown): obj is InventoryItem {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'name' in obj &&
-    'categoryId' in obj &&
-    'quantity' in obj &&
-    typeof (obj as any).quantity === 'number';
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const candidate = obj as Partial<InventoryItem>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.name === 'string' &&
+    typeof candidate.categoryId === 'string' &&
+    typeof candidate.quantity === 'number' &&
+    Array.isArray(candidate.acquisitionHistory) &&
+    candidate.categorization !== undefined &&
+    typeof candidate.categorization === 'object'
+  );
 }
 
 export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {

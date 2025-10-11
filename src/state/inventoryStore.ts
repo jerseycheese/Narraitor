@@ -2,11 +2,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
-import { InventoryItem } from '../types/inventory.types';
+import {
+  InventoryItem,
+  InventoryItemCategorization,
+  InventoryAcquisitionRecord,
+} from '@/types/inventory.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { CrudStore } from './createCrudStore';
+import { isValidCategory } from '@/lib/inventory/categories';
 
 export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
@@ -15,12 +20,12 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   loading: boolean;
 
   // Core CRUD operations
-  createItem: (itemData: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  createItem: (itemData: InventoryItemCreatePayload) => EntityID;
   updateItem: (itemId: EntityID, updates: Partial<InventoryItem>) => void;
   deleteItem: (itemId: EntityID) => void;
 
   // Inventory-specific operations
-  addItem: (characterId: EntityID, itemData: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  addItem: (characterId: EntityID, itemData: InventoryItemAddPayload) => EntityID;
   removeItem: (characterId: EntityID, itemId: EntityID, quantity?: number) => void;
   updateItemQuantity: (itemId: EntityID, quantity: number) => void;
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
@@ -33,8 +38,24 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   setLoading: (loading: boolean) => void;
 }
 
+export interface InventoryItemCreatePayload {
+  name: string;
+  description?: string;
+  quantity?: number;
+  stackable: boolean;
+  maxStack?: number;
+  categorization: InventoryItemCategorization;
+  acquisition: InventoryAcquisitionRecord;
+}
+
+export type InventoryItemAddPayload = Omit<InventoryItemCreatePayload, 'categorization'> & {
+  categorization?: InventoryItemCategorization;
+};
+
 const getInitialState = () => ({
   items: {} as Record<EntityID, InventoryItem>,
+  // `entities` mirrors `items` so stores sharing the CrudStore interface keep IndexedDB migrations intact.
+  // See migrate() below where we recompute entities after persistence rehydration.
   entities: {} as Record<EntityID, InventoryItem>,
   characterInventories: {} as Record<EntityID, EntityID[]>,
   currentEntityId: null as EntityID | null,
@@ -42,22 +63,36 @@ const getInitialState = () => ({
   loading: false,
 });
 
-const validateItemData = (data: Partial<InventoryItem>): void => {
+const validateNewItemData = (data: InventoryItemCreatePayload): void => {
   const normalizedName = normalizeText(data.name || '', NORM_NAME);
   if (!normalizedName) {
     throw new Error('Item name is required');
   }
 
-  if (data.quantity !== undefined && data.quantity <= 0) {
+  const quantity = data.quantity ?? data.acquisition.quantity ?? 1;
+  if (quantity <= 0) {
     throw new Error('Item quantity must be greater than zero');
   }
 
-  if (!data.categoryId) {
-    throw new Error('Category ID is required');
+  if (!data.stackable && quantity > 1) {
+    throw new Error('Non-stackable items cannot have quantity greater than one');
   }
 
-  if (data.stackable === undefined) {
-    throw new Error('Stackable property is required');
+  if (!data.categorization) {
+    throw new Error('Categorization metadata is required');
+  }
+
+  if (!isValidCategory(data.categorization.categoryId)) {
+    throw new Error('Categorization must resolve to a standard inventory category');
+  }
+
+  if (!data.acquisition) {
+    throw new Error('Acquisition metadata is required');
+  }
+
+  const acquisitionQuantity = data.acquisition.quantity ?? quantity;
+  if (acquisitionQuantity <= 0) {
+    throw new Error('Acquisition quantity must be greater than zero');
   }
 
   if (data.maxStack !== undefined && data.maxStack <= 0) {
@@ -71,8 +106,6 @@ export const useInventoryStore = create<InventoryStore>()(
       ...getInitialState(),
 
       create: (itemData) => {
-        validateItemData(itemData);
-
         const itemId = generateUniqueId('item');
         const now = getTimestamp();
 
@@ -84,7 +117,6 @@ export const useInventoryStore = create<InventoryStore>()(
           id: itemId,
           name: normalizedName,
           description: normalizedDescription,
-          quantity: itemData.quantity ?? 1,
           createdAt: now,
           updatedAt: now,
         };
@@ -101,11 +133,17 @@ export const useInventoryStore = create<InventoryStore>()(
       update: (itemId, updates) => {
         const existingItem = get().items[itemId];
         if (!existingItem) {
-          set({ error: createStoreError('Item Not Found', 'The specified item could not be found.', ErrorType.VALIDATION) });
+          set({
+            error: createStoreError(
+              'Item Not Found',
+              'The specified item could not be found.',
+              ErrorType.VALIDATION
+            ),
+          });
           return;
         }
 
-        const normalizedUpdates: Partial<InventoryItem> = { ...updates };
+        const normalizedUpdates: Partial<InventoryItem> = {};
 
         if (updates.name) {
           normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
@@ -115,9 +153,86 @@ export const useInventoryStore = create<InventoryStore>()(
           normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
         }
 
-        if (updates.quantity !== undefined && updates.quantity < 0) {
-          set({ error: createStoreError('Invalid Quantity', 'Item quantity cannot be negative.', ErrorType.VALIDATION) });
+        if (updates.maxStack !== undefined && updates.maxStack <= 0) {
+          set({
+            error: createStoreError(
+              'Invalid Max Stack',
+              'Max stack size must be greater than zero.',
+              ErrorType.VALIDATION
+            ),
+          });
           return;
+        } else if (updates.maxStack !== undefined) {
+          normalizedUpdates.maxStack = updates.maxStack;
+        }
+
+        if (updates.quantity !== undefined) {
+          if (updates.quantity < 0) {
+            set({
+              error: createStoreError(
+                'Invalid Quantity',
+                'Item quantity cannot be negative.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          const maxStack = updates.maxStack ?? existingItem.maxStack;
+          if (maxStack && updates.quantity > maxStack) {
+            set({
+              error: createStoreError(
+                'Stack Limit Exceeded',
+                `Quantity cannot exceed maximum stack size of ${maxStack}.`,
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          normalizedUpdates.quantity = updates.quantity;
+        }
+
+        if (updates.categorization) {
+          if (!isValidCategory(updates.categorization.categoryId)) {
+            set({
+              error: createStoreError(
+                'Invalid Category',
+                'Categorization must use a standard inventory category.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          normalizedUpdates.categorization = {
+            ...existingItem.categorization,
+            ...updates.categorization,
+            classifiedAt: updates.categorization.classifiedAt ?? getTimestamp(),
+          };
+          normalizedUpdates.categoryId = normalizedUpdates.categorization.categoryId;
+        } else if (updates.categoryId) {
+          if (!isValidCategory(updates.categoryId)) {
+            set({
+              error: createStoreError(
+                'Invalid Category',
+                'Categorization must use a standard inventory category.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+          normalizedUpdates.categoryId = updates.categoryId;
+          normalizedUpdates.categorization = {
+            ...existingItem.categorization,
+            categoryId: updates.categoryId,
+            classifiedAt: getTimestamp(),
+            source: 'manual',
+          };
+        }
+
+        if (updates.acquisitionHistory) {
+          normalizedUpdates.acquisitionHistory = updates.acquisitionHistory;
         }
 
         const now = getTimestamp();
@@ -188,40 +303,101 @@ export const useInventoryStore = create<InventoryStore>()(
       clearError: () => set({ error: null }),
       setLoading: (loading) => set({ loading }),
 
-      createItem: (itemData) => get().create(itemData),
+      createItem: (itemData) => {
+        try {
+          validateNewItemData(itemData);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Invalid item data';
+          set({
+            error: createStoreError('Validation Error', errorMessage, ErrorType.VALIDATION),
+          });
+          return '';
+        }
+
+        const now = getTimestamp();
+        const acquisitionRecord: InventoryAcquisitionRecord = {
+          ...itemData.acquisition,
+          acquiredAt: itemData.acquisition.acquiredAt ?? now,
+          quantity: itemData.acquisition.quantity ?? itemData.quantity ?? 1,
+        };
+
+        const categorization: InventoryItemCategorization = {
+          ...itemData.categorization,
+          classifiedAt: itemData.categorization.classifiedAt ?? now,
+        };
+
+        const itemDraft: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'> = {
+          name: itemData.name,
+          description: itemData.description ?? '',
+          quantity: itemData.quantity ?? acquisitionRecord.quantity,
+          stackable: itemData.stackable,
+          maxStack: itemData.maxStack,
+          categoryId: categorization.categoryId,
+          acquisitionHistory: [acquisitionRecord],
+          categorization,
+        };
+
+        return get().create(itemDraft);
+      },
       updateItem: (itemId, updates) => get().update(itemId, updates),
       deleteItem: (itemId) => get().delete(itemId),
 
       addItem: (characterId, itemData) => {
-        try {
-          validateItemData(itemData);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Invalid item data';
-          set({ error: createStoreError('Validation Error', errorMessage, ErrorType.VALIDATION) });
+        const acquisition = itemData.acquisition;
+
+        if (!acquisition) {
+          set({
+            error: createStoreError(
+              'Acquisition Missing',
+              'Unable to add item without acquisition metadata.',
+              ErrorType.VALIDATION
+            ),
+          });
           return '';
         }
 
+        const now = getTimestamp();
+        const quantityToAdd =
+          itemData.quantity ?? acquisition.quantity ?? 1;
+
+        if (quantityToAdd <= 0) {
+          set({
+            error: createStoreError(
+              'Invalid Quantity',
+              'Item quantity must be greater than zero.',
+              ErrorType.VALIDATION
+            ),
+          });
+          return '';
+        }
+
+        const normalizedName = normalizeText(itemData.name, NORM_NAME);
         const state = get();
         const characterItems = state.characterInventories[characterId] || [];
 
-        // Check if item is stackable and if a similar item already exists
         if (itemData.stackable) {
           const existingItemId = characterItems.find((id) => {
             const item = state.items[id];
-            return (
-              item &&
-              item.name === normalizeText(itemData.name, NORM_NAME) &&
-              item.categoryId === itemData.categoryId &&
-              item.stackable
-            );
+            if (!item) {
+              return false;
+            }
+
+            if (item.name !== normalizedName) {
+              return false;
+            }
+
+            if (itemData.categorization && item.categoryId !== itemData.categorization.categoryId) {
+              return false;
+            }
+
+            return true;
           });
 
           if (existingItemId) {
             const existingItem = state.items[existingItemId];
-            const newQuantity = existingItem.quantity + (itemData.quantity ?? 1);
-
-            // Check max stack limit - use existing item's maxStack or fall back to itemData
             const maxStack = existingItem.maxStack ?? itemData.maxStack;
+            const newQuantity = existingItem.quantity + quantityToAdd;
+
             if (maxStack && newQuantity > maxStack) {
               set({
                 error: createStoreError(
@@ -233,19 +409,106 @@ export const useInventoryStore = create<InventoryStore>()(
               return existingItemId;
             }
 
-            get().update(existingItemId, { quantity: newQuantity });
+            const acquisitionRecord: InventoryAcquisitionRecord = {
+              ...acquisition,
+              acquiredAt: acquisition.acquiredAt ?? now,
+              quantity: acquisition.quantity ?? quantityToAdd,
+            };
+
+            set((currentState) => {
+              const targetItem = currentState.items[existingItemId];
+              if (!targetItem) {
+                return currentState;
+              }
+
+              const nextCategorization = itemData.categorization
+                ? {
+                    ...targetItem.categorization,
+                    ...itemData.categorization,
+                    classifiedAt: itemData.categorization.classifiedAt ?? now,
+                  }
+                : targetItem.categorization;
+
+              const nextItem: InventoryItem = {
+                ...targetItem,
+                quantity: newQuantity,
+                maxStack: maxStack ?? targetItem.maxStack,
+                updatedAt: now,
+                acquisitionHistory: [...targetItem.acquisitionHistory, acquisitionRecord],
+                categorization: nextCategorization,
+                categoryId: nextCategorization.categoryId,
+              };
+
+              return {
+                items: { ...currentState.items, [existingItemId]: nextItem },
+                entities: { ...currentState.entities, [existingItemId]: nextItem },
+                error: null,
+              };
+            });
+
             return existingItemId;
           }
         }
 
-        // Create new item
-        const itemId = get().create(itemData);
+        if (!itemData.categorization) {
+          set({
+            error: createStoreError(
+              'Categorization Missing',
+              'Unable to add new item without categorization metadata.',
+              ErrorType.VALIDATION
+            ),
+          });
+          return '';
+        }
 
-        // Add to character inventory
-        set((state) => ({
+        const newItemPayload: InventoryItemCreatePayload = {
+          name: itemData.name,
+          description: itemData.description,
+          stackable: itemData.stackable,
+          maxStack: itemData.maxStack,
+          quantity: quantityToAdd,
+          categorization: itemData.categorization,
+          acquisition,
+        };
+
+        try {
+          validateNewItemData(newItemPayload);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Invalid item data';
+          set({
+            error: createStoreError('Validation Error', errorMessage, ErrorType.VALIDATION),
+          });
+          return '';
+        }
+
+        const acquisitionRecord: InventoryAcquisitionRecord = {
+          ...acquisition,
+          acquiredAt: acquisition.acquiredAt ?? now,
+          quantity: acquisition.quantity ?? quantityToAdd,
+        };
+
+        const categorization: InventoryItemCategorization = {
+          ...itemData.categorization,
+          classifiedAt: itemData.categorization.classifiedAt ?? now,
+        };
+
+        const itemDraft: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'> = {
+          name: newItemPayload.name,
+          description: newItemPayload.description ?? '',
+          stackable: newItemPayload.stackable,
+          maxStack: newItemPayload.maxStack,
+          quantity: quantityToAdd,
+          categoryId: categorization.categoryId,
+          acquisitionHistory: [acquisitionRecord],
+          categorization,
+        };
+
+        const itemId = get().create(itemDraft);
+
+        set((currentState) => ({
           characterInventories: {
-            ...state.characterInventories,
-            [characterId]: [...(state.characterInventories[characterId] || []), itemId],
+            ...currentState.characterInventories,
+            [characterId]: [...(currentState.characterInventories[characterId] || []), itemId],
           },
         }));
 

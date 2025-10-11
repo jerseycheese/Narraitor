@@ -110,9 +110,9 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
       items: [],
       capacity: 10,
       categories: [
-        { id: 'cat-equipment', name: 'Equipment', description: 'Weapons, armor, and gear', sortOrder: 0 },
-        { id: 'cat-consumables', name: 'Consumables', description: 'Potions and single-use items', sortOrder: 1 },
-        { id: 'cat-quest', name: 'Quest Items', description: 'Important story items', sortOrder: 2 }
+        { id: 'equipment', name: 'Equipment', description: 'Weapons, armor, and gear', sortOrder: 0 },
+        { id: 'consumables', name: 'Consumables', description: 'Potions and single-use items', sortOrder: 1 },
+        { id: 'quest-items', name: 'Quest Items', description: 'Important story items', sortOrder: 2 }
       ],
     },
     status: {
@@ -233,19 +233,34 @@ export function createMockJournalEntry(overrides: Partial<JournalEntry> = {}): J
  * Creates a mock InventoryItem object
  */
 export function createMockInventoryItem(overrides: Partial<InventoryItem> = {}): InventoryItem {
+  const categoryId = overrides.categoryId ?? 'equipment';
+  const quantity = overrides.quantity ?? 1;
+
   return {
-    id: overrides.id || generateUniqueId('item'),
-    name: 'Test Item',
-    description: 'A test item for unit testing',
-    categoryId: 'cat-equipment',
-    quantity: 1,
-    createdAt: DEFAULT_TIMESTAMP,
-    updatedAt: DEFAULT_TIMESTAMP,
-    ...overrides,
-    // Ensure stackable always has a value (required field)
+    id: overrides.id ?? generateUniqueId('item'),
+    name: overrides.name ?? 'Test Item',
+    description: overrides.description ?? 'A test item for unit testing',
+    categoryId,
+    quantity,
     stackable: overrides.stackable ?? false,
+    maxStack: overrides.maxStack,
+    acquisitionHistory:
+      overrides.acquisitionHistory ?? [
+        {
+          acquiredAt: DEFAULT_TIMESTAMP,
+          method: 'manual',
+          quantity,
+        },
+      ],
+    categorization:
+      overrides.categorization ?? {
+        categoryId,
+        source: 'manual',
+        classifiedAt: DEFAULT_TIMESTAMP,
+        confidence: 0.9,
+      },
+    createdAt: overrides.createdAt ?? DEFAULT_TIMESTAMP,
+    updatedAt: overrides.updatedAt ?? DEFAULT_TIMESTAMP,
   };
 }
-
-
 

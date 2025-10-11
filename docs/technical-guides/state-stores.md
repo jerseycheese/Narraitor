@@ -98,10 +98,10 @@ const itemId = generateUniqueId('item');
 - Simplified skill limit for MVP (hardcoded to 2)
 
 ### Inventory Store
-- Tracks items per character
-- Supports item transfers between characters
-- Calculates inventory weight
-- Manages equipped state
+- Tracks items per character with acquisition history
+- Performs automatic stack merging with max-stack enforcement
+- Stores AI/manual categorization metadata per item
+- Provides helpers for programmatic additions via `addItemToInventory`
 
 ### Narrative Store
 - Associates segments with sessions
