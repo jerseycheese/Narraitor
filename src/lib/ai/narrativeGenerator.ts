@@ -3,6 +3,7 @@ import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateMa
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
 import {
   Decision,
   NarrativeContext,
@@ -248,6 +249,129 @@ export class NarrativeGenerator {
     }
   }
 
+  /**
+   * Enhances a prompt with character inventory context
+   * Includes narratively significant items to help AI reference them naturally
+   */
+  private enhancePromptWithInventory(
+    prompt: string,
+    characterIds: string[]
+  ): string {
+    try {
+      if (!characterIds || characterIds.length === 0) {
+        return prompt;
+      }
+
+      const characterId = characterIds[0]; // Focus on player character
+      const { getCharacterItems } = useInventoryStore.getState();
+      const items = getCharacterItems(characterId);
+
+      if (!items || items.length === 0) {
+        return prompt;
+      }
+
+      // Prioritize items by narrative significance
+      const prioritizedItems = this.prioritizeInventoryItems(items);
+
+      // Limit to top 8 most significant items to avoid overwhelming the AI
+      const significantItems = prioritizedItems.slice(0, 8);
+
+      if (significantItems.length === 0) {
+        return prompt;
+      }
+
+      // Format inventory context for AI
+      const inventoryContext = significantItems
+        .map((item) => {
+          const categoryLabel = item.categoryId || 'miscellaneous';
+          const quantityInfo = item.quantity > 1 ? ` (x${item.quantity})` : '';
+          const descriptionInfo = item.description
+            ? ` - ${item.description}`
+            : '';
+          return `- ${item.name}${quantityInfo} [${categoryLabel}]${descriptionInfo}`;
+        })
+        .join('\n');
+
+      const enhancedPrompt = `${prompt}\n\nCHARACTER INVENTORY:
+${inventoryContext}
+
+When generating narrative, you may naturally reference these items if contextually appropriate. Do not force mentions - only include them when they would realistically matter to the situation. Vary your references to avoid repetition.`;
+
+      return enhancedPrompt;
+    } catch {
+      // If anything fails, return original prompt
+      return prompt;
+    }
+  }
+
+  /**
+   * Prioritize inventory items by narrative significance
+   * Considers category importance, recency, and uniqueness
+   */
+  private prioritizeInventoryItems(
+    items: Array<{
+      id: string;
+      name: string;
+      categoryId?: string;
+      quantity: number;
+      description?: string;
+      acquisitionHistory?: Array<{ acquiredAt: string }>;
+    }>
+  ): typeof items {
+    // Category significance scores (higher = more significant)
+    const categoryScores: Record<string, number> = {
+      'quest-items': 10,
+      weapons: 8,
+      armor: 8,
+      equipment: 7,
+      'magical-items': 9,
+      tools: 6,
+      consumables: 4,
+      'currency-valuables': 5,
+      miscellaneous: 2,
+      crafting: 3,
+    };
+
+    return items
+      .map((item) => {
+        let score = 0;
+
+        // Category significance
+        const categoryScore = categoryScores[item.categoryId || ''] || 1;
+        score += categoryScore * 10;
+
+        // Recency bonus - recently acquired items are more relevant
+        if (item.acquisitionHistory && item.acquisitionHistory.length > 0) {
+          const lastAcquired =
+            item.acquisitionHistory[item.acquisitionHistory.length - 1];
+          const acquisitionDate = new Date(lastAcquired.acquiredAt);
+          const hoursSinceAcquisition =
+            (Date.now() - acquisitionDate.getTime()) / (1000 * 60 * 60);
+
+          // Boost score for items acquired in last 24 hours
+          if (hoursSinceAcquisition < 24) {
+            score += 20;
+          } else if (hoursSinceAcquisition < 72) {
+            score += 10;
+          }
+        }
+
+        // Unique items (quantity 1, non-stackable) are often more narratively significant
+        if (item.quantity === 1) {
+          score += 5;
+        }
+
+        // Items with detailed descriptions are likely more significant
+        if (item.description && item.description.length > 20) {
+          score += 5;
+        }
+
+        return { item, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map(({ item }) => item);
+  }
+
   async generateSegment(
     request: NarrativeGenerationRequest
   ): Promise<NarrativeGenerationResult> {
@@ -260,7 +384,7 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
 
-      // Add tone settings, lore context, goal context, and personalization to prompt
+      // Add tone settings, lore context, goal context, personalization, and inventory to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
         world
@@ -273,9 +397,13 @@ export class NarrativeGenerator {
         loreEnhancedPrompt,
         request.sessionId
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
+      const personalizedPrompt = this.enhancePromptWithPersonalization(
         goalEnhancedPrompt,
         request.worldId,
+        request.characterIds || []
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+        personalizedPrompt,
         request.characterIds || []
       );
 
@@ -343,7 +471,7 @@ export class NarrativeGenerator {
 
       const prompt = template(context);
 
-      // Add tone settings, lore context, and personalization to initial scene
+      // Add tone settings, lore context, personalization, and inventory to initial scene
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
         world
@@ -352,9 +480,13 @@ export class NarrativeGenerator {
         toneEnhancedPrompt,
         worldId
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
+      const personalizedPrompt = this.enhancePromptWithPersonalization(
         loreEnhancedPrompt,
         worldId,
+        characterIds
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+        personalizedPrompt,
         characterIds
       );
 
@@ -762,9 +894,13 @@ export class NarrativeGenerator {
         prompt,
         world
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithLore(
+      const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+        loreEnhancedPrompt,
+        characterIds
       );
 
       const response =

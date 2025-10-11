@@ -1,8 +1,8 @@
 ---
 title: AI Systems
-tags: [ai, narrative, world-creation, choices]
+tags: [ai, narrative, world-creation, choices, inventory]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2025-10-11
 ---
 
 # AI Systems
@@ -50,6 +50,12 @@ const client = new GeminiClient({
 ```
 
 ## Narrative Generation
+
+### Inventory Integration
+
+The narrative generator has access to character inventory and can naturally reference items in the story. The system prioritizes narratively significant items (quest items, equipment, recently acquired items) and includes the top 8 in the AI context. The AI is instructed to only mention items when contextually appropriate - no forced references - and to vary how it uses them to avoid repetition.
+
+This means if you just picked up a magic sword, the AI might naturally reference it when generating combat scenarios, but won't awkwardly shoehorn it into every paragraph.
 
 ### Skill-Aware Narrative
 

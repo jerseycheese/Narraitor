@@ -2,9 +2,9 @@
 title: "Narrative Generation System"
 type: architecture
 category: narrative
-tags: [narrative, ai, generation]
+tags: [narrative, ai, generation, inventory]
 created: 2025-05-20
-updated: 2025-06-08
+updated: 2025-10-11
 ---
 
 # Narrative Generation System
@@ -94,70 +94,66 @@ Different moments in the story need different approaches, so we have specialized
 
 ### Tone Settings System
 
-The narrative generation system respects user-defined tone settings for consistent content:
+The narrative generator respects user-defined tone settings to keep the content consistent with what you want. The system actually enforces these settings instead of just suggesting them to the AI, which matters for maintaining consistent story quality.
 
-1. **Content Rating Enforcement**: Supports G, PG, PG-13, R, and NC-17 ratings with appropriate content filtering
-2. **Narrative Style Options**: Nine styles including serious, humorous, dramatic, mysterious, action-packed, and more
-3. **Language Complexity Control**: Four levels from simple to literary with specific vocabulary and sentence structure guidance
-4. **Custom Instructions**: Additional user-defined tone requirements
-5. **AI Safety Integration**: Dynamic safety thresholds based on content rating
-6. **Debug Logging**: Comprehensive logging for tone settings verification
+Key settings include:
+
+- **Content Rating**: G to NC-17 with appropriate filtering - stricter for G-rated content, more permissive for mature ratings
+- **Narrative Style**: Nine options (serious, humorous, dramatic, mysterious, action-packed, etc.) so a noir detective story feels genuinely different from a lighthearted fantasy adventure
+- **Language Complexity**: Four levels from simple to literary, affecting vocabulary and sentence structure - matters because stories for younger readers need different phrasing than adult content
+- **Custom Instructions**: Additional tone requirements that the standard options don't cover
+- **AI Safety Integration**: Dynamically adjusts safety thresholds based on content rating
+- **Debug Logging**: Available for verifying tone settings are actually being applied to prompts
+
+### Inventory Integration
+
+The narrative generator can reference items from the character's inventory when it makes sense for the story. The system doesn't force item mentions into every paragraph - instead, it provides context about what the player is carrying and lets the AI naturally weave that into the narrative when appropriate.
+
+The prioritization algorithm ranks items by narrative significance. Quest items and equipment score highest since they're most likely to matter in the story. Recently acquired items (picked up in the last 24-72 hours) get a priority boost because they're fresh and relevant. Unique items are preferred over common ones, and items with detailed descriptions are considered more significant than generic ones.
+
+To avoid overwhelming the AI prompt with too much inventory data, the system limits context to the top 8 most significant items. This gives the AI enough to work with without cluttering the prompt. The AI is explicitly instructed to only mention items when they're contextually relevant and to vary how it references them to prevent repetition.
+
+Inventory context gets added to initial scene generation (so the AI knows what you start with), ongoing narrative segments (for natural references during the story), and skill acknowledgment narratives (so the AI can reference tools or items you're using).
 
 ### Narrative Perspective
 
-The narrative system consistently uses **second-person perspective** ("you") to create an immersive experience:
-
-1. **Player as Character**: The AI understands that the player IS the named character
-2. **Perspective Rules**: All narration uses "you" instead of the character name
-3. **Character Names in Dialogue**: Character names only appear when NPCs address the player
-4. **Immersive Storytelling**: Creates a direct, personal connection to the narrative
+The narrative system consistently uses second-person perspective ("you") to create an immersive experience. The AI understands that the player IS the named character, so all narration uses "you" instead of the character name. Character names only appear when NPCs are addressing the player in dialogue, which creates a direct, personal connection to the story instead of reading about someone else's adventure.
 
 ### Deduplication and Error Prevention
 
-The system includes several safeguards:
+The system includes several safeguards to prevent common issues. Initial scene deduplication ensures you don't get multiple opening scenes generated for the same session - it happened during early testing and was confusing. Choice tracking prevents the same choice from triggering multiple narrative generations, which could happen if a player clicked quickly or if the UI re-rendered.
 
-1. **Initial Scene Deduplication**: Prevents multiple initial scenes from being generated
-2. **Choice Tracking**: Prevents the same choice from triggering multiple generations
-3. **Component Lifecycle Management**: Prevents state updates after component unmount
-4. **Error Recovery**: Handles AI service failures gracefully
-5. **JSON Parsing Fallbacks**: Handles different AI response formats
+Component lifecycle management prevents state updates after a component unmounts, which React will complain about loudly. Error recovery handles AI service failures gracefully instead of crashing, and JSON parsing includes fallbacks for different response formats since the AI doesn't always return perfectly structured JSON.
 
 ## Error Handling
 
-The narrative system handles several types of errors:
+The narrative system handles several types of errors that can come up during generation. When errors occur, the system displays appropriate messages to users instead of showing raw error text or crashing, and attempts recovery when possible.
 
-1. **AI Service Errors**: When the AI service fails to generate content
-2. **JSON Parsing Errors**: When the AI response format is unexpected
-3. **Network Errors**: When communication with the AI service fails
-4. **Session-Related Errors**: When there are issues with session management
+Error types handled:
 
-Errors are displayed to users with appropriate messages, and the system attempts to recover when possible.
+- **AI Service Errors**: When the AI service fails to generate content - maybe overloaded or having issues
+- **JSON Parsing Errors**: AI response format is unexpected, which happens more often than you'd think since AI responses can be inconsistent
+- **Network Errors**: Straightforward communication failures between client and server
+- **Session-Related Errors**: Issues with session management or data retrieval from stores
+
+Recovery strategies include retrying failed requests with exponential backoff and falling back to default content if the AI is unavailable.
 
 ## Testing
 
 ### Manual Testing
 
-The system includes a test harness at `/dev/narrative-system` for manual testing:
-
-1. Generate initial narrative for different world themes
-2. Make player choices to test narrative continuity
-3. Create new sessions to test initialization
-4. Test error handling by creating edge case scenarios
+The system includes a test harness at `/dev/narrative-system` for manual testing. You can generate initial narrative for different world themes to see how genre adaptation works, make player choices to verify narrative continuity, create new sessions to test initialization, and deliberately create edge case scenarios to test error handling. It's useful for catching issues that automated tests miss, particularly around the AI's actual output quality.
 
 ### Automated Testing
 
-Unit tests are available for key components:
+Unit tests cover the key components:
 
-1. `narrativeGenerator.test.ts`: Tests core generation functionality
-2. `NarrativeController.test.tsx`: Tests controller component behavior
-3. `NarrativeDisplay.test.tsx`: Tests display component rendering
+- **narrativeGenerator.test.ts**: Core generation functionality including prompt building and response parsing
+- **NarrativeController.test.tsx**: Controller component behavior around state management and lifecycle
+- **NarrativeDisplay.test.tsx**: Display component rendering of narrative segments
 
 ## Future Enhancements
 
-Potential areas for future development:
+There are several areas where the narrative system could be extended. Enhanced context management would allow more sophisticated tracking for longer narratives - right now the context window is pretty limited. Better character integration would improve how player and NPC characters interact in the narrative, making relationships and character development feel more natural.
 
-1. **Enhanced Context Management**: More sophisticated context tracking for longer narratives
-2. **Character Integration**: Better integration of player and NPC characters into narrative
-3. **Memory Mechanisms**: Long-term narrative memory for persistent game worlds
-4. **Branching Storylines**: More complex narrative branching based on player choices
-5. **Customizable Narrative Style**: Allow players to select preferred narrative styles
+Long-term narrative memory for persistent game worlds would be useful for players who want to continue stories across multiple sessions. More complex branching storylines based on player choices could create more meaningful consequences for decisions. Allowing players to select their preferred narrative style (beyond just tone settings) would let them customize the storytelling experience even further.
