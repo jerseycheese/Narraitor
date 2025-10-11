@@ -13,6 +13,7 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
+import type { InventoryStore } from '@/state/inventoryStore';
 
 // Mock the inventory store
 jest.mock('@/state/inventoryStore', () => ({
@@ -20,6 +21,9 @@ jest.mock('@/state/inventoryStore', () => ({
 }));
 
 const mockUseInventoryStore = useInventoryStore as jest.MockedFunction<typeof useInventoryStore>;
+
+// Type for partial mock store
+type MockInventoryStore = Pick<InventoryStore, 'getCharacterItems'>;
 
 describe('InventoryList Component', () => {
   const mockCharacterId = 'char-123';
@@ -66,7 +70,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -92,7 +96,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -119,7 +123,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -165,7 +169,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -250,7 +254,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -280,7 +284,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -319,7 +323,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -350,7 +354,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -374,7 +378,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -397,7 +401,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -432,7 +436,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue(mockItems),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -449,7 +453,7 @@ describe('InventoryList Component', () => {
     test('shows appropriate message when inventory is empty', () => {
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue([]),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -459,7 +463,7 @@ describe('InventoryList Component', () => {
     test('does not display category headings when inventory is empty', () => {
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn().mockReturnValue([]),
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -475,7 +479,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as MockInventoryStore);
 
       const { rerender } = render(<InventoryList characterId={mockCharacterId} />);
 
@@ -523,7 +527,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as MockInventoryStore);
 
       const { rerender } = render(<InventoryList characterId={mockCharacterId} />);
 
@@ -559,7 +563,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as MockInventoryStore);
 
       const { rerender } = render(<InventoryList characterId={mockCharacterId} />);
 
@@ -591,7 +595,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as MockInventoryStore);
 
       render(<InventoryList characterId={mockCharacterId} />);
 
@@ -603,7 +607,7 @@ describe('InventoryList Component', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as MockInventoryStore);
 
       const { rerender } = render(<InventoryList characterId="char-123" />);
       expect(mockGetCharacterItems).toHaveBeenCalledWith('char-123');
