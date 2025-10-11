@@ -548,6 +548,12 @@ export const useLoreStore = create<LoreStore>()(
         facts: state.facts,
         factHistory: state.factHistory,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Ensure entities is always in sync with facts after hydration
+        if (state && state.facts) {
+          state.entities = { ...state.facts };
+        }
+      },
       migrate: (persistedState: unknown) => {
         if (persistedState && typeof persistedState === 'object' && 'facts' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -371,6 +371,12 @@ export const useGoalStore = create<GoalStore>()(
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Ensure entities is always in sync with goals after hydration
+        if (state && state.goals) {
+          state.entities = { ...state.goals };
+        }
+      },
       migrate: (persistedState: unknown) => {
         if (persistedState && typeof persistedState === 'object' && 'goals' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
