@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -63,11 +63,11 @@ describe('ActiveGameSession - Inventory Integration', () => {
       id: mockSessionId,
       worldId: mockWorldId,
       status: 'active',
-    } as any);
+    } as ReturnType<typeof useSessionStore>);
 
     mockUseCharacterStore.mockReturnValue({
       characters: { [mockCharacterId]: mockCharacter },
-    } as any);
+    } as ReturnType<typeof useCharacterStore>);
 
     mockUseNarrativeStore.mockReturnValue({
       sessionSegments: {
@@ -94,7 +94,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
       isSessionEnded: jest.fn(() => false),
       currentEnding: null,
       isGeneratingEnding: false,
-    } as any);
+    } as ReturnType<typeof useNarrativeStore>);
   });
 
   describe('AC1: Complete list of items displayed', () => {
@@ -124,7 +124,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn(() => mockItems),
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       render(
         <ActiveGameSession
@@ -159,7 +159,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn(() => mockItems),
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       render(
         <ActiveGameSession
@@ -205,7 +205,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn(() => mockItems),
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       render(
         <ActiveGameSession
@@ -240,7 +240,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn(() => mockItems),
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       render(
         <ActiveGameSession
@@ -277,7 +277,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
 
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: mockGetCharacterItems,
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       const { rerender } = render(
         <ActiveGameSession
@@ -328,7 +328,7 @@ describe('ActiveGameSession - Inventory Integration', () => {
     test('shows empty state when character has no items', () => {
       mockUseInventoryStore.mockReturnValue({
         getCharacterItems: jest.fn(() => []),
-      } as any);
+      } as ReturnType<typeof useInventoryStore>);
 
       render(
         <ActiveGameSession
