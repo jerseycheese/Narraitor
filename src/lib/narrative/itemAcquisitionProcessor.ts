@@ -47,7 +47,7 @@ export async function processAcquiredItems(
           ...aiCategorization,
           classifiedAt: now,
         };
-      } catch (error) {
+      } catch {
         // Fallback to miscellaneous if AI categorization fails
         categorization = {
           categoryId: 'miscellaneous',
