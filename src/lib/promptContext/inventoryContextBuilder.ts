@@ -171,6 +171,11 @@ export function buildInventoryContext(
   const header = '## Inventory Summary';
   const resultLines: string[] = [];
   const includedIds: string[] = [];
+
+  // Reserve space for the truncation summary line upfront (max reasonable length)
+  const maxSummaryTokens = estimateTokenCount('+ 999 more items not shown to stay within token limits.');
+  const effectiveLimit = tokenLimit - maxSummaryTokens;
+
   let tokenCount = estimateTokenCount(header);
   let truncatedCount = 0;
 
@@ -186,16 +191,17 @@ export function buildInventoryContext(
     const line = formatInventoryLine(item, isEquipped);
     const lineTokens = estimateTokenCount(line);
 
+    // Check against effective limit (which already accounts for summary line)
     if (
       resultLines.length > 0 &&
-      tokenCount + lineTokens > tokenLimit
+      tokenCount + lineTokens > effectiveLimit
     ) {
       truncatedCount = sortedItems.length - includedIds.length;
       break;
     }
 
     // Always include at least one item, even if it exceeds the limit slightly
-    if (resultLines.length === 0 && tokenCount + lineTokens > tokenLimit) {
+    if (resultLines.length === 0 && tokenCount + lineTokens > effectiveLimit) {
       truncatedCount = sortedItems.length - 1;
     }
 
@@ -214,23 +220,10 @@ export function buildInventoryContext(
   }
 
   if (truncatedCount > 0) {
-    const summaryLine = `+ ${truncatedCount} more items not shown to stay within token limits.`;
-    const summaryTokens = estimateTokenCount(summaryLine);
-
-    while (
-      resultLines.length > 0 &&
-      tokenCount + summaryTokens > tokenLimit
-    ) {
-      const removedLine = resultLines.pop() as string;
-      tokenCount -= estimateTokenCount(removedLine);
-      const removedId = includedIds.pop();
-      if (removedId) {
-        truncatedCount += 1;
-      }
-    }
-
-    resultLines.push(summaryLine);
-    tokenCount += summaryTokens;
+    const actualSummary = `+ ${truncatedCount} more items not shown to stay within token limits.`;
+    const actualSummaryTokens = estimateTokenCount(actualSummary);
+    resultLines.push(actualSummary);
+    tokenCount += actualSummaryTokens;
   }
 
   const context = `${header}\n${resultLines.join('\n')}`;

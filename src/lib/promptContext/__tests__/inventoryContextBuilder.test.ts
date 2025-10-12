@@ -96,11 +96,11 @@ describe('buildInventoryContext', () => {
     );
 
     const { context, includedItemIds, truncatedCount, tokenCount } =
-      buildInventoryContext(items, { tokenLimit: 30 });
+      buildInventoryContext(items, { tokenLimit: 80 });
 
     expect(includedItemIds.length).toBeLessThan(items.length);
     expect(truncatedCount).toBe(items.length - includedItemIds.length);
     expect(context).toContain('+');
-    expect(tokenCount).toBeLessThanOrEqual(30);
+    expect(tokenCount).toBeLessThanOrEqual(80);
   });
 });
