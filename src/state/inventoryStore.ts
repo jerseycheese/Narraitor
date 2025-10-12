@@ -493,7 +493,7 @@ export const useInventoryStore = create<InventoryStore>()(
             if (acquisition.sessionId) {
               const updatedItem = get().items[existingItemId];
               if (updatedItem) {
-                createJournalEntryForAcquisition(updatedItem, acquisition.sessionId, characterId);
+                void createJournalEntryForAcquisition(updatedItem, acquisition.sessionId, characterId);
               }
             }
 
@@ -567,7 +567,7 @@ export const useInventoryStore = create<InventoryStore>()(
         if (acquisition.sessionId) {
           const newItem = get().items[itemId];
           if (newItem) {
-            createJournalEntryForAcquisition(newItem, acquisition.sessionId, characterId);
+            void createJournalEntryForAcquisition(newItem, acquisition.sessionId, characterId);
           }
         }
 
