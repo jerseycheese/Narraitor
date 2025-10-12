@@ -9,7 +9,6 @@ import type { EntityID } from '@/types/common.types';
 describe('inventoryStore journal integration', () => {
   const characterId: EntityID = 'char-123';
   const sessionId: EntityID = 'session-456';
-  const worldId: EntityID = 'world-789';
 
   beforeEach(() => {
     const { result: inventoryResult } = renderHook(() => useInventoryStore());
