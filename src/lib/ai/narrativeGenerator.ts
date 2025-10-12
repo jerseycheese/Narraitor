@@ -429,7 +429,8 @@ The items will be automatically added to the character's inventory with proper c
 
   async generateInitialScene(
     worldId: string,
-    characterIds: string[]
+    characterIds: string[],
+    sessionId?: string
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -461,7 +462,7 @@ The items will be automatically added to the character's inventory with proper c
 
       const prompt = template(context);
 
-      // Add tone settings, lore context, personalization, and inventory to initial scene
+      // Add tone settings, lore context, personalization, inventory, and item acquisition instructions to initial scene
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
         world
@@ -475,9 +476,12 @@ The items will be automatically added to the character's inventory with proper c
         worldId,
         characterIds
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+      const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
         characterIds
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
+        inventoryEnhancedPrompt
       );
 
       const response =
@@ -495,13 +499,28 @@ The items will be automatically added to the character's inventory with proper c
           // Import lore store dynamically to avoid circular dependency
           const { useLoreStore } = await import('@/state/loreStore');
           const { addStructuredLore } = useLoreStore.getState();
-          addStructuredLore(structuredLore, worldId);
+          addStructuredLore(structuredLore, worldId, sessionId);
         } catch {
           // Failed to extract lore - continue without it
         }
       }
 
-      return this.formatResponse(response, 'scene');
+      const result = this.formatResponse(response, 'scene');
+
+      // Process any acquired items from the initial scene
+      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+        const characterId = characterIds[0];
+        if (characterId && sessionId) {
+          // Process items asynchronously - don't block narrative generation
+          void processAcquiredItems(
+            result.metadata.itemsAcquired,
+            characterId,
+            sessionId
+          );
+        }
+      }
+
+      return result;
     } catch {
       throw new Error('Failed to generate initial scene');
     }
@@ -906,15 +925,34 @@ The items will be automatically added to the character's inventory with proper c
         toneEnhancedPrompt,
         worldId
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+      const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         loreEnhancedPrompt,
         characterIds
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
+        inventoryEnhancedPrompt
       );
 
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      return this.formatResponse(response, 'scene');
+      const result = this.formatResponse(response, 'scene');
+
+      // Process any acquired items from skill acknowledgment
+      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+        const characterId = characterIds[0];
+        const sessionId = narrativeContext.sessionId;
+        if (characterId && sessionId) {
+          // Process items asynchronously - don't block narrative generation
+          void processAcquiredItems(
+            result.metadata.itemsAcquired,
+            characterId,
+            sessionId
+          );
+        }
+      }
+
+      return result;
     } catch {
       throw new Error('Failed to generate skill acknowledgment narrative');
     }

@@ -252,5 +252,46 @@ describe('itemAcquisitionProcessor', () => {
       // Both additions should have been attempted
       expect(mockAddItem).toHaveBeenCalledTimes(2);
     });
+
+    it('splits multi-quantity equipment into individual items', async () => {
+      const itemMetadata: AcquiredItemMetadata = {
+        name: 'Iron Dagger',
+        description: 'A basic dagger',
+        quantity: 3,
+        acquisitionMethod: 'loot',
+      };
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'equipment',
+        source: 'ai',
+        confidence: 0.9,
+      });
+
+      await processAcquiredItems(
+        [itemMetadata],
+        'character-123',
+        'session-456'
+      );
+
+      // Should be called 3 times - once for each dagger
+      expect(mockAddItem).toHaveBeenCalledTimes(3);
+
+      // Each call should be for a single item
+      expect(mockAddItem).toHaveBeenNthCalledWith(1, 'character-123', expect.objectContaining({
+        name: 'Iron Dagger',
+        quantity: 1,
+        stackable: false,
+      }));
+      expect(mockAddItem).toHaveBeenNthCalledWith(2, 'character-123', expect.objectContaining({
+        name: 'Iron Dagger',
+        quantity: 1,
+        stackable: false,
+      }));
+      expect(mockAddItem).toHaveBeenNthCalledWith(3, 'character-123', expect.objectContaining({
+        name: 'Iron Dagger',
+        quantity: 1,
+        stackable: false,
+      }));
+    });
   });
 });

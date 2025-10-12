@@ -60,22 +60,43 @@ export async function processAcquiredItems(
 
       // Determine if item is stackable based on category
       const stackable = isStackableCategory(categorization.categoryId);
+      const quantity = item.quantity || 1;
 
-      // Add item to inventory using existing store method
-      // This automatically handles journal integration via existing logic
-      inventoryStore.addItem(characterId, {
-        name: item.name,
-        description: item.description,
-        quantity: item.quantity || 1,
-        stackable,
-        categorization,
-        acquisition: {
-          method: item.acquisitionMethod || 'unknown',
-          quantity: item.quantity || 1,
-          sessionId,
-          acquiredAt: now,
-        },
-      });
+      // Handle non-stackable equipment with quantity > 1
+      // Split into individual items to satisfy inventory store validation
+      if (!stackable && quantity > 1) {
+        // Add each equipment item separately
+        for (let i = 0; i < quantity; i++) {
+          inventoryStore.addItem(characterId, {
+            name: item.name,
+            description: item.description,
+            quantity: 1,
+            stackable: false,
+            categorization,
+            acquisition: {
+              method: item.acquisitionMethod || 'unknown',
+              quantity: 1,
+              sessionId,
+              acquiredAt: now,
+            },
+          });
+        }
+      } else {
+        // Add item normally for stackable items or single equipment
+        inventoryStore.addItem(characterId, {
+          name: item.name,
+          description: item.description,
+          quantity,
+          stackable,
+          categorization,
+          acquisition: {
+            method: item.acquisitionMethod || 'unknown',
+            quantity,
+            sessionId,
+            acquiredAt: now,
+          },
+        });
+      }
     } catch (err) {
       // Log error but continue processing remaining items
       console.error(`Failed to add item "${item.name}" to inventory:`, err);
