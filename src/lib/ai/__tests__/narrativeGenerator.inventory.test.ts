@@ -304,8 +304,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         .calls[0][0] as string;
 
       // Count how many items are mentioned (should be limited, not all 20)
-      const inventorySection = generatedPrompt.split('## Inventory Summary')[1] || '';
-      const itemLines = inventorySection
+      // Extract only the inventory list, excluding the item acquisition instructions
+      const fullInventorySection = generatedPrompt.split('## Inventory Summary')[1] || '';
+      const inventoryListOnly = fullInventorySection.split('ITEM ACQUISITION INSTRUCTIONS')[0] || fullInventorySection;
+      const itemLines = inventoryListOnly
         .split('\n')
         .map((line) => line.trim())
         .filter((line) => line.startsWith('- ') && !line.startsWith('+ '));
@@ -316,7 +318,7 @@ describe('NarrativeGenerator - Inventory Integration', () => {
 
       // When truncated, should show summary of omitted items
       if (itemLines.length < 20) {
-        expect(inventorySection).toContain('more items');
+        expect(inventoryListOnly).toContain('more items');
       }
     });
   });
