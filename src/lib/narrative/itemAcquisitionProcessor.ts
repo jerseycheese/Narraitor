@@ -38,10 +38,10 @@ export async function processAcquiredItems(
       let categorization: InventoryItemCategorization;
 
       try {
-        const aiCategorization = await categorizeInventoryItemClient(
-          item.name,
-          item.description || ''
-        );
+        const aiCategorization = await categorizeInventoryItemClient({
+          name: item.name,
+          description: item.description || '',
+        });
 
         categorization = {
           ...aiCategorization,
