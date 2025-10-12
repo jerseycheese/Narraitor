@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import ChoiceSelector from '../ChoiceSelector';
 import { Decision, DecisionRequirement } from '@/types/narrative.types';
-import { InventoryItem } from '@/types/inventory.types';
 
 // Mock the character store to provide inventory data
 jest.mock('@/state/characterStore', () => ({
