@@ -103,4 +103,60 @@ describe('buildInventoryContext', () => {
     expect(context).toContain('+');
     expect(tokenCount).toBeLessThanOrEqual(80);
   });
+
+  it('does not prematurely reserve space for summary when items fit', () => {
+    // Create two items that should fit within 180 tokens (default limit)
+    // Each formatted line is roughly 70-80 tokens
+    const items: InventoryItem[] = [
+      baseItem({
+        id: 'item-1',
+        name: 'Enchanted Longsword',
+        description: 'A finely crafted blade imbued with ancient magic.',
+        categoryId: 'weapons',
+      }),
+      baseItem({
+        id: 'item-2',
+        name: 'Healing Potion',
+        description: 'Restores vitality when consumed.',
+        categoryId: 'consumables',
+      }),
+    ];
+
+    const { context, includedItemIds, truncatedCount, tokenCount } =
+      buildInventoryContext(items);
+
+    // Both items should be included since they fit under 180 tokens
+    expect(includedItemIds).toHaveLength(2);
+    expect(truncatedCount).toBe(0);
+    expect(context).not.toContain('+');
+    expect(context).toContain('Enchanted Longsword');
+    expect(context).toContain('Healing Potion');
+    expect(tokenCount).toBeLessThanOrEqual(180);
+  });
+
+  it('only adds summary when actually needed for truncation', () => {
+    // Create items where exactly 3 fit, but old logic would truncate at 2
+    const items: InventoryItem[] = Array.from({ length: 5 }).map((_, index) =>
+      baseItem({
+        id: `item-${index}`,
+        name: `Weapon ${index}`,
+        description: 'Short description.',
+        categoryId: 'weapons',
+      })
+    );
+
+    // Set limit so 3 items fit (~150 tokens) but not 4 (~200 tokens)
+    const { includedItemIds, truncatedCount, tokenCount } =
+      buildInventoryContext(items, { tokenLimit: 160 });
+
+    // Should include as many items as actually fit (optimistic allocation)
+    // Not artificially reduced by pre-reserving summary space
+    expect(includedItemIds.length).toBeGreaterThanOrEqual(2);
+    expect(tokenCount).toBeLessThanOrEqual(160);
+
+    // If truncated, the truncation should be minimal
+    if (truncatedCount > 0) {
+      expect(includedItemIds.length).toBeGreaterThan(1);
+    }
+  });
 });

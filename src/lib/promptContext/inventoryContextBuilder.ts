@@ -172,13 +172,10 @@ export function buildInventoryContext(
   const resultLines: string[] = [];
   const includedIds: string[] = [];
 
-  // Reserve space for the truncation summary line upfront (max reasonable length)
-  const maxSummaryTokens = estimateTokenCount('+ 999 more items not shown to stay within token limits.');
-  const effectiveLimit = tokenLimit - maxSummaryTokens;
-
   let tokenCount = estimateTokenCount(header);
   let truncatedCount = 0;
 
+  // Optimistically add items until we hit token limit or max items
   for (let index = 0; index < sortedItems.length; index += 1) {
     const item = sortedItems[index];
 
@@ -191,20 +188,56 @@ export function buildInventoryContext(
     const line = formatInventoryLine(item, isEquipped);
     const lineTokens = estimateTokenCount(line);
 
-    // Check against effective limit (which already accounts for summary line)
-    if (
-      resultLines.length > 0 &&
-      tokenCount + lineTokens > effectiveLimit
-    ) {
+    // Try adding the item optimistically
+    const wouldExceedLimit = tokenCount + lineTokens > tokenLimit;
+
+    // Always include at least one item, even if it exceeds limit slightly
+    if (resultLines.length === 0) {
+      resultLines.push(line);
+      includedIds.push(item.id);
+      tokenCount += lineTokens;
+      if (wouldExceedLimit && sortedItems.length > 1) {
+        truncatedCount = sortedItems.length - 1;
+        break;
+      }
+      continue;
+    }
+
+    // For subsequent items, check if adding would exceed limit
+    if (wouldExceedLimit) {
+      // We need to truncate - figure out how many items remain
       truncatedCount = sortedItems.length - includedIds.length;
+
+      // Build the summary line
+      const summaryLine = `+ ${truncatedCount} more items not shown to stay within token limits.`;
+      const summaryTokens = estimateTokenCount(summaryLine);
+
+      // Check if summary fits with current items
+      if (tokenCount + summaryTokens <= tokenLimit) {
+        // Summary fits - we're done
+        resultLines.push(summaryLine);
+        tokenCount += summaryTokens;
+        break;
+      }
+
+      // Summary doesn't fit - remove items from end until it does
+      while (resultLines.length > 1 && tokenCount + summaryTokens > tokenLimit) {
+        const removedLine = resultLines.pop()!;
+        includedIds.pop(); // Keep arrays in sync
+        const removedTokens = estimateTokenCount(removedLine);
+        tokenCount -= removedTokens;
+        truncatedCount += 1;
+      }
+
+      // Update summary with new count and add it
+      const finalSummary = `+ ${truncatedCount} more items not shown to stay within token limits.`;
+      const finalSummaryTokens = estimateTokenCount(finalSummary);
+      resultLines.push(finalSummary);
+      tokenCount += finalSummaryTokens;
       break;
     }
 
-    // Always include at least one item, even if it exceeds the limit slightly
-    if (resultLines.length === 0 && tokenCount + lineTokens > effectiveLimit) {
-      truncatedCount = sortedItems.length - 1;
-    }
-
+    // Item fits without exceeding limit - add it
     resultLines.push(line);
     includedIds.push(item.id);
     tokenCount += lineTokens;
@@ -217,13 +250,6 @@ export function buildInventoryContext(
       includedItemIds: [],
       truncatedCount: sortedItems.length,
     };
-  }
-
-  if (truncatedCount > 0) {
-    const actualSummary = `+ ${truncatedCount} more items not shown to stay within token limits.`;
-    const actualSummaryTokens = estimateTokenCount(actualSummary);
-    resultLines.push(actualSummary);
-    tokenCount += actualSummaryTokens;
   }
 
   const context = `${header}\n${resultLines.join('\n')}`;
