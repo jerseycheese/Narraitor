@@ -267,10 +267,11 @@ describe('NarrativeGenerator - Inventory Integration', () => {
     });
 
     it('should limit inventory mentions to prevent overwhelming the AI', async () => {
-      // Add many items
+      // Add many items with longer descriptions to exceed token limit
       for (let i = 0; i < 20; i++) {
         useInventoryStore.getState().addItem(characterId, {
           name: `Item ${i}`,
+          description: `This is a detailed description for item ${i} that adds significant token usage to ensure truncation happens`,
           stackable: true,
           categorization: {
             categoryId: 'miscellaneous',
@@ -307,10 +308,16 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       const itemLines = inventorySection
         .split('\n')
         .map((line) => line.trim())
-        .filter((line) => line.startsWith('- '));
+        .filter((line) => line.startsWith('- ') && !line.startsWith('+ '));
 
+      // Should not include all 20 items - either limited by max items (8) or token limit
+      expect(itemLines.length).toBeLessThan(20);
       expect(itemLines.length).toBeLessThanOrEqual(8);
-      expect(inventorySection).toContain('more items');
+
+      // When truncated, should show summary of omitted items
+      if (itemLines.length < 20) {
+        expect(inventorySection).toContain('more items');
+      }
     });
   });
 
