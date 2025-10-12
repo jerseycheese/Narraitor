@@ -27,6 +27,8 @@ import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuild
 import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
+import type { AcquiredItemMetadata } from '@/types/narrative.types';
+import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -598,12 +600,7 @@ The items will be automatically added to the character's inventory with proper c
         | 'neutral';
       tags?: string[];
       characterIds?: string[];
-      itemsAcquired?: Array<{
-        name: string;
-        description?: string;
-        quantity?: number;
-        acquisitionMethod?: string;
-      }>;
+      itemsAcquired?: AcquiredItemMetadata[];
     } = {};
 
     // Try to parse JSON response if present
@@ -664,7 +661,20 @@ The items will be automatically added to the character's inventory with proper c
                 ? parsed?.metadata?.characterIds
                 : [],
               itemsAcquired: Array.isArray(parsed?.metadata?.itemsAcquired)
-                ? parsed?.metadata?.itemsAcquired
+                ? parsed?.metadata?.itemsAcquired.map((item: unknown) => {
+                    const rawItem = item as {
+                      name: string;
+                      description?: string;
+                      quantity?: number;
+                      acquisitionMethod?: string;
+                    };
+                    return {
+                      name: rawItem.name,
+                      description: rawItem.description,
+                      quantity: rawItem.quantity,
+                      acquisitionMethod: rawItem.acquisitionMethod as InventoryAcquisitionMethod,
+                    };
+                  })
                 : undefined,
             };
           }
