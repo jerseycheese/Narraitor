@@ -5,30 +5,42 @@ import '@testing-library/jest-dom';
 import ChoiceSelector from '../ChoiceSelector';
 import { Decision, DecisionRequirement } from '@/types/narrative.types';
 
-// Mock the character store to provide inventory data
-jest.mock('@/state/characterStore', () => ({
-  useCharacterStore: jest.fn(() => ({
-    getCurrentCharacter: jest.fn(() => ({
-      id: 'char-1',
-      inventory: {
-        items: [
-          {
-            id: 'item-lockpick',
-            name: 'Lockpick',
-            quantity: 1,
-          },
-          {
-            id: 'item-potion',
-            name: 'Healing Potion',
-            quantity: 3,
-          },
-        ],
-      },
-    })),
-  })),
-}));
-
 describe('ChoiceSelector - Inventory Requirements', () => {
+  const mockInventoryItems = [
+    {
+      id: 'item-lockpick',
+      name: 'Lockpick',
+      description: '',
+      quantity: 1,
+      stackable: false,
+      categoryId: 'equipment',
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'equipment',
+        source: 'manual' as const,
+        classifiedAt: new Date().toISOString(),
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'item-potion',
+      name: 'Healing Potion',
+      description: '',
+      quantity: 3,
+      stackable: true,
+      categoryId: 'consumables',
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'consumables',
+        source: 'manual' as const,
+        classifiedAt: new Date().toISOString(),
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
   const createMockDecision = (
     options: Array<{
       id: string;
@@ -66,7 +78,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     const lockpickOption = screen.getByText('Pick the lock');
     expect(lockpickOption).not.toHaveAttribute('disabled');
@@ -93,10 +105,11 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     const magicKeyOption = screen.getByText('Use the magic key');
-    expect(magicKeyOption).toHaveAttribute('disabled');
+    const button = screen.getByTestId('choice-option-opt-1');
+    expect(button).toHaveAttribute('disabled');
   });
 
   it('should disable option when character has insufficient quantity', () => {
@@ -116,7 +129,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     const bribeOption = screen.getByText('Bribe with 10 gold coins');
     expect(bribeOption).toHaveAttribute('disabled');
@@ -139,7 +152,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
 
     // Should show indicator that item is missing
     expect(screen.getByText(/Magic Key/i)).toBeInTheDocument();
@@ -163,7 +176,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
 
     // Should show current quantity vs required
     expect(screen.getByText(/Healing Potion/i)).toBeInTheDocument();
@@ -193,7 +206,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     // Should be enabled because character has both items in required quantities
     const craftOption = screen.getByText('Craft a healing salve');
@@ -223,7 +236,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     // Should be disabled because character lacks Magic Scroll
     const ritualOption = screen.getByText('Perform complex ritual');
@@ -247,7 +260,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     const magicKeyOption = screen.getByText('Use the magic key');
 
@@ -274,12 +287,12 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
-    const magicKeyOption = screen.getByText('Use the magic key');
+    const magicKeyButton = screen.getByTestId('choice-option-opt-1');
 
     // Should have visual indicator of being disabled
-    expect(magicKeyOption).toHaveClass('opacity-50');
-    expect(magicKeyOption).toHaveClass('cursor-not-allowed');
+    expect(magicKeyButton).toHaveClass('opacity-50');
+    expect(magicKeyButton).toHaveClass('cursor-not-allowed');
   });
 });
