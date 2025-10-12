@@ -76,9 +76,9 @@ export async function processAcquiredItems(
           acquiredAt: now,
         },
       });
-    } catch (error) {
+    } catch (err) {
       // Log error but continue processing remaining items
-      console.error(`Failed to add item "${item.name}" to inventory:`, error);
+      console.error(`Failed to add item "${item.name}" to inventory:`, err);
     }
   }
 }
