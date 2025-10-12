@@ -23,7 +23,7 @@ export interface JournalEntry extends TimestampedEntity {
 /**
  * Types of journal entries
  */
-export type JournalEntryType = 
+export type JournalEntryType =
   | 'character_event'
   | 'world_event'
   | 'relationship_change'
@@ -33,7 +33,8 @@ export type JournalEntryType =
   | 'dialogue'
   | 'decision'
   | 'session_start'
-  | 'session_end';
+  | 'session_end'
+  | 'item_acquisition';
 
 /**
  * Represents an entity related to a journal entry
