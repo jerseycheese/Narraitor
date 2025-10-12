@@ -12,6 +12,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { CrudStore } from './createCrudStore';
 import { isValidCategory } from '@/lib/inventory/categories';
+import { createAcquisitionJournalEntry } from '@/lib/inventory/journalIntegration';
 
 export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
@@ -97,6 +98,48 @@ const validateNewItemData = (data: InventoryItemCreatePayload): void => {
 
   if (data.maxStack !== undefined && data.maxStack <= 0) {
     throw new Error('Max stack size must be greater than zero');
+  }
+};
+
+/**
+ * Creates a journal entry for an item acquisition.
+ * Requires sessionId to be present in the acquisition record.
+ * Gets worldId from the session store.
+ */
+const createJournalEntryForAcquisition = async (
+  item: InventoryItem,
+  sessionId: EntityID,
+  characterId: EntityID
+): Promise<void> => {
+  try {
+    // Dynamically import stores to avoid circular dependencies
+    const { useJournalStore } = await import('./journalStore');
+    const { useSessionStore } = await import('./sessionStore');
+
+    const sessionStore = useSessionStore.getState();
+    const journalStore = useJournalStore.getState();
+
+    // Get worldId from session store
+    const worldId = sessionStore.worldId;
+
+    if (!worldId) {
+      // No worldId available - skip journal entry creation
+      return;
+    }
+
+    // Create journal entry using the helper
+    const journalEntry = createAcquisitionJournalEntry(
+      item,
+      sessionId,
+      worldId,
+      characterId
+    );
+
+    // Add entry to journal store
+    journalStore.addEntry(sessionId, journalEntry);
+  } catch (error) {
+    // Silently fail journal entry creation - don't block inventory operations
+    console.warn('Failed to create journal entry for item acquisition:', error);
   }
 };
 
@@ -446,6 +489,14 @@ export const useInventoryStore = create<InventoryStore>()(
               };
             });
 
+            // Create journal entry for stacked item acquisition if sessionId provided
+            if (acquisition.sessionId) {
+              const updatedItem = get().items[existingItemId];
+              if (updatedItem) {
+                createJournalEntryForAcquisition(updatedItem, acquisition.sessionId, characterId);
+              }
+            }
+
             return existingItemId;
           }
         }
@@ -511,6 +562,14 @@ export const useInventoryStore = create<InventoryStore>()(
             [characterId]: [...(currentState.characterInventories[characterId] || []), itemId],
           },
         }));
+
+        // Create journal entry for new item acquisition if sessionId provided
+        if (acquisition.sessionId) {
+          const newItem = get().items[itemId];
+          if (newItem) {
+            createJournalEntryForAcquisition(newItem, acquisition.sessionId, characterId);
+          }
+        }
 
         return itemId;
       },
