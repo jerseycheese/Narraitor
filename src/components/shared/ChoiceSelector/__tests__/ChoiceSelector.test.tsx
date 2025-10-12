@@ -162,20 +162,37 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText('Intimidation')).toBeInTheDocument();
     });
 
-    it('allows selection of any skill-based choice (no client-side gating)', async () => {
+    it('disables options when character lacks required skills', async () => {
       const user = userEvent.setup();
+      // Character with low skills that don't meet requirements
+      const characterSkills = [
+        { id: 'skill-1', characterId: 'char-1', worldSkillId: 'stealth-skill', name: 'Stealth', level: 2, category: 'Physical' },
+        { id: 'skill-2', characterId: 'char-1', worldSkillId: 'intimidation-skill', name: 'Intimidation', level: 3, category: 'Social' },
+      ];
+
       render(
         <ChoiceSelector
           decision={decisionWithSkillRequirements}
           onSelect={mockOnSelect}
           worldSkills={mockWorldSkills}
+          characterSkills={characterSkills}
+          inventoryItems={[]}
         />
       );
       expandSuggestions();
 
-      // Should be able to select any option regardless of requirements
+      // Options with unmet requirements should be disabled
+      const sneakOption = screen.getByText('Sneak past').closest('button');
+      const intimidateOption = screen.getByText('Intimidate the guard').closest('button');
+      const directOption = screen.getByText('Walk directly').closest('button');
+
+      expect(sneakOption).toBeDisabled();
+      expect(intimidateOption).toBeDisabled();
+      expect(directOption).not.toBeDisabled(); // No requirements
+
+      // Should not trigger onSelect when clicking disabled options
       await user.click(screen.getByText('Sneak past'));
-      expect(mockOnSelect).toHaveBeenCalledWith('stealth-opt');
+      expect(mockOnSelect).not.toHaveBeenCalled();
     });
   });
 
