@@ -179,6 +179,8 @@ export interface NarrativeGenerationResult {
       action: string;
       implicitSkills?: string[];
     };
+    // Item acquisition metadata
+    itemsAcquired?: AcquiredItemMetadata[];
   };
   choices?: Array<{
     text: string;
