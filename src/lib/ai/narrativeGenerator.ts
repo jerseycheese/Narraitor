@@ -23,6 +23,7 @@ import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { CharacterGoal } from '@/types/personalization.types';
+import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 
@@ -270,106 +271,42 @@ export class NarrativeGenerator {
         return prompt;
       }
 
-      // Prioritize items by narrative significance
-      const prioritizedItems = this.prioritizeInventoryItems(items);
+      const equippedItemIds = this.getEquippedItemIds(characterIds);
+      const { context: inventorySection } = buildInventoryContext(items, {
+        equippedItemIds,
+      });
 
-      // Limit to top 8 most significant items to avoid overwhelming the AI
-      const significantItems = prioritizedItems.slice(0, 8);
-
-      if (significantItems.length === 0) {
+      if (!inventorySection) {
         return prompt;
       }
 
-      // Format inventory context for AI
-      const inventoryContext = significantItems
-        .map((item) => {
-          const categoryLabel = item.categoryId || 'miscellaneous';
-          const quantityInfo = item.quantity > 1 ? ` (x${item.quantity})` : '';
-          const descriptionInfo = item.description
-            ? ` - ${item.description}`
-            : '';
-          return `- ${item.name}${quantityInfo} [${categoryLabel}]${descriptionInfo}`;
-        })
-        .join('\n');
+      const guidance =
+        'When generating narrative, naturally reference these items only if they matter to the current situation. Avoid forced mentions or repetitive callbacks.';
 
-      const enhancedPrompt = `${prompt}\n\nCHARACTER INVENTORY:
-${inventoryContext}
-
-When generating narrative, you may naturally reference these items if contextually appropriate. Do not force mentions - only include them when they would realistically matter to the situation. Vary your references to avoid repetition.`;
-
-      return enhancedPrompt;
+      return `${prompt}\n\n${inventorySection}\n\n${guidance}`;
     } catch {
       // If anything fails, return original prompt
       return prompt;
     }
   }
 
-  /**
-   * Prioritize inventory items by narrative significance
-   * Considers category importance, recency, and uniqueness
-   */
-  private prioritizeInventoryItems(
-    items: Array<{
-      id: string;
-      name: string;
-      categoryId?: string;
-      quantity: number;
-      description?: string;
-      acquisitionHistory?: Array<{ acquiredAt: string }>;
-    }>
-  ): typeof items {
-    // Category significance scores (higher = more significant)
-    const categoryScores: Record<string, number> = {
-      'quest-items': 10,
-      weapons: 8,
-      armor: 8,
-      equipment: 7,
-      'magical-items': 9,
-      tools: 6,
-      consumables: 4,
-      'currency-valuables': 5,
-      miscellaneous: 2,
-      crafting: 3,
-    };
+  private getEquippedItemIds(characterIds: string[] | undefined): string[] {
+    if (!characterIds || characterIds.length === 0) {
+      return [];
+    }
 
-    return items
-      .map((item) => {
-        let score = 0;
+    try {
+      const { characters } = useCharacterStore.getState();
+      const playerCharacter = characters[characterIds[0]];
+      const inventoryItems =
+        (playerCharacter?.inventory?.items as Array<{ id: string; equipped?: boolean }>) ?? [];
 
-        // Category significance
-        const categoryScore = categoryScores[item.categoryId || ''] || 1;
-        score += categoryScore * 10;
-
-        // Recency bonus - recently acquired items are more relevant
-        if (item.acquisitionHistory && item.acquisitionHistory.length > 0) {
-          const lastAcquired =
-            item.acquisitionHistory[item.acquisitionHistory.length - 1];
-          const acquisitionDate = new Date(lastAcquired.acquiredAt);
-          const hoursSinceAcquisition =
-            (Date.now() - acquisitionDate.getTime()) / (1000 * 60 * 60);
-
-          // Boost score for items acquired in last 24 hours
-          if (hoursSinceAcquisition < 24) {
-            score += 20;
-          } else if (hoursSinceAcquisition < 72) {
-            score += 10;
-          }
-        }
-
-        // Unique items (quantity 1, non-stackable) are often more narratively significant
-        if (item.quantity === 1) {
-          score += 5;
-        }
-
-        // Items with detailed descriptions are likely more significant
-        if (item.description && item.description.length > 20) {
-          score += 5;
-        }
-
-        return { item, score };
-      })
-      .sort((a, b) => b.score - a.score)
-      .map(({ item }) => item);
+      return inventoryItems
+        .filter((item) => item?.equipped)
+        .map((item) => item.id);
+    } catch {
+      return [];
+    }
   }
 
   async generateSegment(

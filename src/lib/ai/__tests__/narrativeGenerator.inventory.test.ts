@@ -113,9 +113,10 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       const generatedPrompt = (mockGeminiClient.generateContent as jest.Mock).mock
         .calls[0][0] as string;
 
-      // Check that inventory context is included in the prompt
-      expect(generatedPrompt).toContain('CHARACTER INVENTORY');
-      expect(generatedPrompt).toContain('Magic Sword');
+      // Check that inventory context is included in the prompt with metadata
+      expect(generatedPrompt).toContain('## Inventory Summary');
+      expect(generatedPrompt).toContain('Magic Sword (equipment, qty 1, acquired via loot');
+      expect(generatedPrompt).toContain('A powerful enchanted blade');
     });
 
     it('should handle empty inventory gracefully', async () => {
@@ -302,11 +303,14 @@ describe('NarrativeGenerator - Inventory Integration', () => {
         .calls[0][0] as string;
 
       // Count how many items are mentioned (should be limited, not all 20)
-      const inventorySection = generatedPrompt.match(/INVENTORY:[\s\S]*?(?=\n\n|$)/);
-      if (inventorySection) {
-        const itemCount = (inventorySection[0].match(/Item \d+/g) || []).length;
-        expect(itemCount).toBeLessThanOrEqual(10); // Reasonable limit
-      }
+      const inventorySection = generatedPrompt.split('## Inventory Summary')[1] || '';
+      const itemLines = inventorySection
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith('- '));
+
+      expect(itemLines.length).toBeLessThanOrEqual(8);
+      expect(inventorySection).toContain('more items');
     });
   });
 
@@ -338,7 +342,7 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       const generatedPrompt = (mockGeminiClient.generateContent as jest.Mock).mock
         .calls[0][0] as string;
 
-      expect(generatedPrompt).toContain('CHARACTER INVENTORY');
+      expect(generatedPrompt).toContain('## Inventory Summary');
       expect(generatedPrompt).toContain('Adventure Pack');
     });
 
