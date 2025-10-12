@@ -7,6 +7,15 @@ import { useJournalStore } from '../journalStore';
 import { useSessionStore } from '../sessionStore';
 import type { EntityID } from '@/types/common.types';
 
+// Mock console.warn to avoid noisy test output from journal creation warnings
+const originalWarn = console.warn;
+beforeEach(() => {
+  console.warn = jest.fn();
+});
+afterEach(() => {
+  console.warn = originalWarn;
+});
+
 describe('inventoryStore journal integration', () => {
   const characterId: EntityID = 'char-123';
   const sessionId: EntityID = 'session-456';
@@ -15,15 +24,16 @@ describe('inventoryStore journal integration', () => {
   beforeEach(() => {
     const { result: inventoryResult } = renderHook(() => useInventoryStore());
     const { result: journalResult } = renderHook(() => useJournalStore());
-    const { result: sessionResult } = renderHook(() => useSessionStore());
     act(() => {
       inventoryResult.current.reset();
       journalResult.current.reset();
-      // Set up session store with worldId
-      sessionResult.current.setSessionId(sessionId);
-      sessionResult.current.setCharacterId(characterId);
-      // @ts-expect-error - accessing internal state for test setup
-      sessionResult.current.worldId = worldId;
+      // Set up session store with worldId directly via setState
+      useSessionStore.setState({
+        id: sessionId,
+        worldId,
+        characterId,
+        status: 'active',
+      });
     });
   });
 
