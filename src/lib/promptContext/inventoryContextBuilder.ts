@@ -223,7 +223,7 @@ export function buildInventoryContext(
       // Summary doesn't fit - remove items from end until it does
       while (resultLines.length > 1 && tokenCount + summaryTokens > tokenLimit) {
         const removedLine = resultLines.pop()!;
-        const removedId = includedIds.pop()!;
+        includedIds.pop(); // Keep arrays in sync
         const removedTokens = estimateTokenCount(removedLine);
         tokenCount -= removedTokens;
         truncatedCount += 1;
