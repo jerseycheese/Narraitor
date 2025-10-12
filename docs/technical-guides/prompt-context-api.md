@@ -201,7 +201,7 @@ const result = await manager.generateContext({
 
 ### buildInventoryContext(items: InventoryItem[], options?: InventoryContextOptions): InventoryContextResult
 
-Formats inventory data into an optimized markdown block that highlights narratively relevant items while respecting token limits.
+Takes a character's inventory and formats it for AI prompts. The system prioritizes items that matter to the story - equipped gear, quest artifacts, recently acquired items - and keeps the output within token limits so it doesn't overwhelm the AI with mundane junk.
 
 ```typescript
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
@@ -219,10 +219,9 @@ const { context } = buildInventoryContext(characterInventoryItems, {
 */
 ```
 
-**Key features:**
-- Prioritizes equipped items, quest artifacts, recent acquisitions, and unique gear.
-- Includes acquisition metadata so prompts capture when/where items entered play.
-- Automatically limits output (default 180 tokens, max 8 items) and appends a summary when truncating.
+The builder sorts items by importance: equipped status first, then category priority (quest items beat consumables), then recency of acquisition. Each line includes metadata about when and how the item was acquired, which helps the AI reference items naturally in narrative.
+
+Defaults to 180 tokens and 8 items max. When it needs to truncate, it appends a summary line and removes lower-priority items to fit that summary within the token budget.
 
 ## Error Handling
 
