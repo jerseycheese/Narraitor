@@ -26,6 +26,7 @@ import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
+import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -290,6 +291,38 @@ export class NarrativeGenerator {
     }
   }
 
+  /**
+   * Enhances a prompt with item acquisition instructions for the AI
+   * Instructs the AI to return structured item data when describing acquisition
+   */
+  private enhancePromptWithItemAcquisitionInstructions(prompt: string): string {
+    const acquisitionInstructions = `
+
+ITEM ACQUISITION INSTRUCTIONS:
+When your narrative describes the character finding, receiving, or acquiring items, include them in the metadata.itemsAcquired array in your JSON response.
+
+Each acquired item should include:
+- name: The item's name (required)
+- description: Brief description of the item (optional but recommended)
+- quantity: Number of items acquired (default: 1)
+- acquisitionMethod: How the item was acquired - one of: "loot", "quest", "purchase", "craft", "reward", "gift", "manual", "unknown"
+
+Examples:
+- Character finds a sword: Include {name: "Ancient Sword", description: "A blade from ages past", quantity: 1, acquisitionMethod: "loot"}
+- Character buys 3 potions: Include {name: "Healing Potion", description: "Restores health", quantity: 3, acquisitionMethod: "purchase"}
+- Character receives a key as reward: Include {name: "Iron Key", description: "Opens the eastern gate", quantity: 1, acquisitionMethod: "reward"}
+
+Important:
+- Only include items the character ACTUALLY ACQUIRES (not items they see or consider)
+- Be specific with item names and descriptions
+- Use appropriate acquisitionMethod for the narrative context
+- If narrative mentions "some supplies" or is vague, still include with best guess at name/description
+
+The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
+
+    return prompt + acquisitionInstructions;
+  }
+
   private getEquippedItemIds(characterIds: string[] | undefined): string[] {
     if (!characterIds || characterIds.length === 0) {
       return [];
@@ -321,7 +354,7 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
 
-      // Add tone settings, lore context, goal context, personalization, and inventory to prompt
+      // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
         world
@@ -339,9 +372,12 @@ export class NarrativeGenerator {
         request.worldId,
         request.characterIds || []
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithInventory(
+      const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
         request.characterIds || []
+      );
+      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
+        inventoryEnhancedPrompt
       );
 
       const response =
@@ -365,10 +401,25 @@ export class NarrativeGenerator {
         }
       }
 
-      return this.formatResponse(
+      const result = this.formatResponse(
         response,
         request.generationParameters?.segmentType || 'scene'
       );
+
+      // Process any acquired items from the narrative
+      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+        const characterId = request.characterIds?.[0];
+        if (characterId && request.sessionId) {
+          // Process items asynchronously - don't block narrative generation
+          void processAcquiredItems(
+            result.metadata.itemsAcquired,
+            characterId,
+            request.sessionId
+          );
+        }
+      }
+
+      return result;
     } catch {
       throw new Error('Failed to generate narrative segment');
     }
@@ -547,6 +598,12 @@ export class NarrativeGenerator {
         | 'neutral';
       tags?: string[];
       characterIds?: string[];
+      itemsAcquired?: Array<{
+        name: string;
+        description?: string;
+        quantity?: number;
+        acquisitionMethod?: string;
+      }>;
     } = {};
 
     // Try to parse JSON response if present
@@ -606,6 +663,9 @@ export class NarrativeGenerator {
               characterIds: Array.isArray(parsed?.metadata?.characterIds)
                 ? parsed?.metadata?.characterIds
                 : [],
+              itemsAcquired: Array.isArray(parsed?.metadata?.itemsAcquired)
+                ? parsed?.metadata?.itemsAcquired
+                : undefined,
             };
           }
         }
@@ -683,6 +743,7 @@ export class NarrativeGenerator {
           this.getWorldGenre() || 'fantasy',
           'narrative',
         ],
+        itemsAcquired: extractedMetadata.itemsAcquired,
       },
       tokenUsage:
         response.tokenUsage && typeof response.tokenUsage === 'object'

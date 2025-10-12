@@ -3,6 +3,7 @@
 import { EntityID, TimestampedEntity } from './common.types';
 import { World } from './world.types';
 import { Character } from '../state/characterStore';
+import { InventoryAcquisitionMethod } from './inventory.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -85,6 +86,16 @@ export interface Consequence {
 }
 
 /**
+ * Represents an item acquired during narrative generation
+ */
+export interface AcquiredItemMetadata {
+  name: string;
+  description?: string;
+  quantity?: number;
+  acquisitionMethod?: InventoryAcquisitionMethod;
+}
+
+/**
  * Metadata for narrative segments (simplified for MVP)
  */
 export interface NarrativeMetadata {
@@ -96,6 +107,8 @@ export interface NarrativeMetadata {
   endingId?: string;
   endingData?: StoryEnding;
   tone?: EndingTone;
+  // Item acquisition metadata
+  itemsAcquired?: AcquiredItemMetadata[];
 }
 
 /**
