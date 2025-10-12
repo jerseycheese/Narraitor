@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Scale, Flame, ChevronRight } from 'lucide-react';
-import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
+import {
+  Decision,
+  ChoiceAlignment,
+  DecisionWeight,
+  DecisionRequirement,
+  DecisionItemRequirementGroup,
+  DecisionItemRequirements,
+  RequirementLogic,
+} from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Badge } from '@/components/ui/badge';
@@ -118,6 +126,71 @@ const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   }
 };
 
+const DEFAULT_REQUIREMENT_LOGIC: RequirementLogic = 'all';
+
+const isDecisionItemRequirementGroup = (
+  value: unknown
+): value is DecisionItemRequirementGroup => {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      'requirements' in value &&
+      Array.isArray((value as DecisionItemRequirementGroup).requirements)
+  );
+};
+
+const ensureItemRequirementGroup = (
+  requirements: DecisionRequirement[] | undefined,
+  logic?: RequirementLogic
+): DecisionItemRequirementGroup | null => {
+  const filtered = (requirements || []).filter((req) => req.type === 'item');
+  if (filtered.length === 0) {
+    return null;
+  }
+
+  return {
+    logic: logic ?? DEFAULT_REQUIREMENT_LOGIC,
+    requirements: filtered,
+  };
+};
+
+const getNormalizedItemRequirementGroups = (
+  requiredItems: DecisionItemRequirements | undefined,
+  fallbackRequirements: DecisionRequirement[] | undefined
+): DecisionItemRequirementGroup[] => {
+  if (!requiredItems) {
+    const fallbackGroup = ensureItemRequirementGroup(fallbackRequirements);
+    return fallbackGroup ? [fallbackGroup] : [];
+  }
+
+  if (Array.isArray(requiredItems)) {
+    if (requiredItems.length === 0) {
+      return [];
+    }
+
+    const first = requiredItems[0] as DecisionRequirement | DecisionItemRequirementGroup;
+    if (isDecisionItemRequirementGroup(first)) {
+      return (requiredItems as DecisionItemRequirementGroup[])
+        .map((group) => ensureItemRequirementGroup(group.requirements, group.logic))
+        .filter((group): group is DecisionItemRequirementGroup => Boolean(group));
+    }
+
+    const fallbackGroup = ensureItemRequirementGroup(requiredItems as DecisionRequirement[]);
+    return fallbackGroup ? [fallbackGroup] : [];
+  }
+
+  if (isDecisionItemRequirementGroup(requiredItems)) {
+    const group = ensureItemRequirementGroup(
+      requiredItems.requirements,
+      requiredItems.logic
+    );
+    return group ? [group] : [];
+  }
+
+  const fallbackGroup = ensureItemRequirementGroup(fallbackRequirements);
+  return fallbackGroup ? [fallbackGroup] : [];
+};
+
 /**
  * Unified choice selector component that handles both simple choices and complex decisions
  */
@@ -163,17 +236,22 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     isSelected?: boolean;
     alignment?: ChoiceAlignment;
     isDisabledByRequirements?: boolean;
+    disabledReason?: string;
     skillRequirements?: Array<{
       requirement: DecisionRequirement;
       skillName?: string;
       met: boolean;
     }>;
-    itemRequirements?: Array<{
-      requirement: DecisionRequirement;
-      itemName: string;
+    itemRequirementGroups?: Array<{
+      logic: RequirementLogic;
       met: boolean;
-      current: number;
-      required: number;
+      requirements: Array<{
+        requirement: DecisionRequirement;
+        itemName: string;
+        met: boolean;
+        current: number;
+        required: number;
+      }>;
     }>;
   }> = isDecisionMode
     ? (decision.options || []).map(opt => {
@@ -189,23 +267,71 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           };
         }) || [];
 
-        // Process item requirements
-        const itemRequirements = opt.requirements?.filter(req => req.type === 'item').map(req => {
-          const evaluation = evaluateRequirement(req, mockCharacter);
+        // Process item requirements (normalized groups)
+        const normalizedGroups = getNormalizedItemRequirementGroups(
+          opt.requiredItems,
+          opt.requirements
+        );
+        const itemRequirementGroups = normalizedGroups.map(group => {
+          const logic: RequirementLogic = group.logic ?? DEFAULT_REQUIREMENT_LOGIC;
+          const evaluatedRequirements = group.requirements.map(req => {
+            const evaluation = evaluateRequirement(req, mockCharacter);
+
+            return {
+              requirement: req,
+              itemName: evaluation.itemName || req.targetId,
+              met: evaluation.success,
+              current: evaluation.current,
+              required: typeof evaluation.required === 'number' ? evaluation.required : 0
+            };
+          });
+
+          const groupMet = logic === 'any'
+            ? evaluatedRequirements.some(req => req.met)
+            : evaluatedRequirements.every(req => req.met);
 
           return {
-            requirement: req,
-            itemName: evaluation.itemName || req.targetId,
-            met: evaluation.success,
-            current: evaluation.current,
-            required: typeof evaluation.required === 'number' ? evaluation.required : 0
+            logic,
+            met: groupMet,
+            requirements: evaluatedRequirements
           };
-        }) || [];
+        });
 
-        // Option is disabled if ANY requirement is not met (AND logic)
-        const allRequirementsMet =
-          skillRequirements.every(r => r.met) &&
-          itemRequirements.every(r => r.met);
+        const allSkillRequirementsMet = skillRequirements.every(r => r.met);
+        const allItemGroupsMet =
+          itemRequirementGroups.length === 0 ||
+          itemRequirementGroups.every(group => group.met);
+
+        const disabledReasonParts: string[] = [];
+        if (!allSkillRequirementsMet) {
+          const missingSkills = skillRequirements
+            .filter(req => !req.met)
+            .map(req => req.skillName || 'Required skill');
+          if (missingSkills.length > 0) {
+            disabledReasonParts.push(`Skills: ${missingSkills.join(', ')}`);
+          }
+        }
+
+        if (!allItemGroupsMet) {
+          const missingItems = itemRequirementGroups
+            .filter(group => !group.met)
+            .flatMap(group =>
+              group.requirements.map(req => {
+                if (req.met) {
+                  return null;
+                }
+                const requiredAmount = req.required > 0 ? `${req.current}/${req.required}` : `${req.current}`;
+                return `${req.itemName}${req.required > 0 ? ` (${requiredAmount})` : ''}`;
+              }).filter((value): value is string => Boolean(value))
+            );
+          if (missingItems.length > 0) {
+            disabledReasonParts.push(`Items: ${missingItems.join(', ')}`);
+          }
+        }
+
+        const disabledReason = disabledReasonParts.length > 0
+          ? `Requires ${disabledReasonParts.join(' | ')}`
+          : undefined;
 
         return {
           id: opt.id,
@@ -213,9 +339,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           hint: opt.hint,
           isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
           alignment: opt.alignment,
-          isDisabledByRequirements: !allRequirementsMet,
+          isDisabledByRequirements: !(allSkillRequirementsMet && allItemGroupsMet),
+          disabledReason,
           skillRequirements,
-          itemRequirements
+          itemRequirementGroups
         };
       })
     : (choices || []).map(choice => ({
@@ -224,8 +351,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         isSelected: choice.isSelected || choice.id === selectedOptionId,
         alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
         isDisabledByRequirements: false,
+        disabledReason: undefined,
         skillRequirements: [],
-        itemRequirements: []
+        itemRequirementGroups: []
       }));
 
   // Use normalized options without custom input option
@@ -368,6 +496,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   key={option.id}
                   data-testid={`choice-option-${option.id}`}
                   variant="ghost"
+                  title={isOptionDisabled ? option.disabledReason : undefined}
+                  data-disabled-reason={isOptionDisabled ? option.disabledReason : undefined}
                   className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
                     option.isSelected
                       ? 'bg-blue-100 border-blue-500 font-bold'
@@ -404,23 +534,32 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                       })}
                     </div>
                   )}
-                  {option.itemRequirements && option.itemRequirements.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {option.itemRequirements.map((itemReq, index) => {
-                        const label = itemReq.met
-                          ? itemReq.itemName
-                          : `${itemReq.itemName} (${itemReq.current}/${itemReq.required})`;
-                        const variant = itemReq.met ? 'default' : 'destructive';
+                  {option.itemRequirementGroups && option.itemRequirementGroups.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {option.itemRequirementGroups.map((group, groupIndex) => (
+                        <div key={`${option.id}-item-group-${groupIndex}`}>
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {group.logic === 'any' ? 'Requires any of:' : 'Requires all:'}
+                          </p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {group.requirements.map((itemReq, reqIndex) => {
+                              const label = itemReq.met
+                                ? itemReq.itemName
+                                : `${itemReq.itemName} (${itemReq.current}/${itemReq.required})`;
 
-                        return (
-                          <Badge
-                            key={`${option.id}-item-${index}`}
-                            variant={variant}
-                          >
-                            {label} {!itemReq.met && '- missing'}
-                          </Badge>
-                        );
-                      })}
+                              return (
+                                <Badge
+                                  key={`${option.id}-item-${groupIndex}-${reqIndex}`}
+                                  variant={itemReq.met ? 'success' : 'destructive'}
+                                >
+                                  {label}
+                                  {!itemReq.met && <span className="sr-only"> - missing</span>}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </Button>

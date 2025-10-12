@@ -6,6 +6,8 @@ This handles player choice selection in all its forms - from simple "go left or 
 
 **Multiple choice types** - Works with simple choice lists ("Go north", "Go south") and complex decision objects with hints and requirements.
 
+**Inventory-aware gating** - Surfaces required items and disables locked choices with clear feedback about missing gear.
+
 **Custom player input** - Optional text area where players can type their own creative responses instead of picking from suggested options.
 
 **Smart visual hierarchy** - Custom input gets prominent placement at the top, suggested choices appear below with less visual weight.
@@ -98,6 +100,13 @@ const decision = {
 | `customInputPlaceholder` | `string` | `'Type your custom response...'` | Placeholder text |
 | `maxCustomLength` | `number` | `250` | Maximum character limit |
 
+### Requirement Context Props
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `worldSkills` | `WorldSkill[]` | `[]` | Skill definitions used to label and interpret skill-based requirements. |
+| `characterSkills` | `CharacterSkill[]` | `[]` | Player character skills used to evaluate skill requirements. |
+| `inventoryItems` | `InventoryItem[]` | `[]` | Inventory snapshot used to evaluate item requirements and quantities. |
+
 ## Types
 
 ### SimpleChoice
@@ -123,9 +132,12 @@ interface DecisionOption {
   text: string;
   hint?: string;
   requirements?: DecisionRequirement[];
+  requiredItems?: DecisionItemRequirements;
   isCustomInput?: boolean;  // Added for custom input support
   customText?: string;      // Added for custom input support
 }
+
+`DecisionItemRequirements` supports straightforward arrays (defaults to "all" logic) or grouped objects where you can specify `logic: 'any' | 'all'` for more complex inventory gating.
 ```
 
 ## Visual Design

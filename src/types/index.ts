@@ -28,6 +28,9 @@ export type {
   Decision, 
   DecisionOption, 
   DecisionRequirement, 
+  DecisionItemRequirementGroup,
+  DecisionItemRequirements,
+  RequirementLogic,
   Consequence, 
   NarrativeMetadata 
 } from './narrative.types';
