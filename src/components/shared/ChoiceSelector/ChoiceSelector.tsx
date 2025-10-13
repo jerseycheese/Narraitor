@@ -221,7 +221,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   const isDecisionMode = !!decision;
 
   // Create character object for requirement evaluation
-  const mockCharacter = {
+  const requirementEvaluationContext = {
     skills: characterSkills,
     inventory: {
       items: inventoryItems
@@ -258,7 +258,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         // Process skill requirements
         const skillRequirements = opt.requirements?.filter(req => req.type === 'skill').map(req => {
           const skillData = resolveSkillData(req.targetId, worldSkills);
-          const evaluation = evaluateRequirement(req, mockCharacter);
+          const evaluation = evaluateRequirement(req, requirementEvaluationContext);
 
           return {
             requirement: req,
@@ -275,7 +275,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         const itemRequirementGroups = normalizedGroups.map(group => {
           const logic: RequirementLogic = group.logic ?? DEFAULT_REQUIREMENT_LOGIC;
           const evaluatedRequirements = group.requirements.map(req => {
-            const evaluation = evaluateRequirement(req, mockCharacter);
+          const evaluation = evaluateRequirement(req, requirementEvaluationContext);
 
             return {
               requirement: req,
