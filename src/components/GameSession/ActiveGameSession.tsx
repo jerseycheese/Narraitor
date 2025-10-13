@@ -23,7 +23,7 @@ import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { InventoryList } from '@/components/inventory/InventoryList';
-import { useInventoryStore, type InventoryStore } from '@/state/inventoryStore';
+import { useInventoryStore } from '@/state/inventoryStore';
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
@@ -97,11 +97,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     ? Object.values(testCharacters || {}).find((char: Character) => char.worldId === worldId)
     : storeCharacter;
   
-  const selectInventoryItems = React.useCallback(
-    (state: InventoryStore) => (characterId ? state.getCharacterItems(characterId) : []),
-    [characterId]
+  const getInventoryItems = useInventoryStore((state) => state.getCharacterItems);
+  const inventoryItems = React.useMemo(
+    () => (characterId ? getInventoryItems(characterId) : []),
+    [characterId, getInventoryItems]
   );
-  const inventoryItems = useInventoryStore(selectInventoryItems);
   const characterSkills = character?.skills ?? [];
   
   // Get narrative store for ending functionality
