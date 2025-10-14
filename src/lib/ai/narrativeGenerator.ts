@@ -604,6 +604,16 @@ The items will be automatically added to the character's inventory with proper c
     };
   }
 
+  /**
+   * Formats AI response into structured narrative result
+   *
+   * Changed to async to support AI-based item extraction fallback when the
+   * narrative generation doesn't include itemsAcquired metadata. This ensures
+   * inventory-gated decisions have reliable data by calling Gemini to extract
+   * structured item acquisitions from the narrative text.
+   *
+   * @see extractItemsFromNarrative for the fallback extraction logic
+   */
   private async formatResponse(
     response: { content?: string; tokenUsage?: number },
     segmentType: string
