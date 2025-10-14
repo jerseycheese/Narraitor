@@ -178,227 +178,452 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
       await narrativeGenerator.generateSegment(request);
 
-      // Verify that the AI prompt includes specific decision context
-      const lastPrompt = mockAiClient.getLastPrompt();
+            // Verify that the AI prompt includes specific decision context
+
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Should mention specific past choices by name
+
+            expect(narrativePrompt).toContain('Help the injured merchant');
+
+            expect(narrativePrompt).toContain('Negotiate instead of fighting');
+
+            
+
+            // Should include decision context section
+
+            expect(narrativePrompt).toMatch(/RECENT PLAYER DECISIONS?:/i);
+
+            
+
+            // Should include any contextual information from decisions (flexible)
+
+            const hasContextualInfo = narrativePrompt.includes('moral dilemma') || 
+
+                                     narrativePrompt.includes('merchant') || 
+
+                                     narrativePrompt.includes('compassionate') ||
+
+                                     narrativePrompt.includes('diplomatic');
+
+            expect(hasContextualInfo).toBe(true);
+
+          });
+
       
-      // Should mention specific past choices by name
-      expect(lastPrompt).toContain('Help the injured merchant');
-      expect(lastPrompt).toContain('Negotiate instead of fighting');
+
+          test('should instruct AI to reference past decisions in narrative', async () => {
+
+            // ACCEPTANCE CRITERIA: AI must be explicitly instructed to use past decisions
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
       
-      // Should include decision context section
-      expect(lastPrompt).toMatch(/RECENT PLAYER DECISIONS?:/i);
+
+            await narrativeGenerator.generateSegment(request);
+
       
-      // Should include any contextual information from decisions (flexible)
-      const hasContextualInfo = lastPrompt.includes('moral dilemma') || 
-                               lastPrompt.includes('merchant') || 
-                               lastPrompt.includes('compassionate') ||
-                               lastPrompt.includes('diplomatic');
-      expect(hasContextualInfo).toBe(true);
-    });
 
-    test('should instruct AI to reference past decisions in narrative', async () => {
-      // ACCEPTANCE CRITERIA: AI must be explicitly instructed to use past decisions
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
+            const narrativePrompt = mockAiClient.getPrompts()[0];
 
-      await narrativeGenerator.generateSegment(request);
+            
 
-      const lastPrompt = mockAiClient.getLastPrompt();
+            // Simple instruction to adapt narrative (flexible matching)
+
+            const hasAdaptInstruction = narrativePrompt.toLowerCase().includes('adapt') &&
+
+                                        narrativePrompt.toLowerCase().includes('narrative');
+
+            expect(hasAdaptInstruction).toBe(true);
+
       
-      // Simple instruction to adapt narrative (flexible matching)
-      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') &&
-                                  lastPrompt.toLowerCase().includes('narrative');
-      expect(hasAdaptInstruction).toBe(true);
 
-      const hasReferenceInstruction = lastPrompt.toLowerCase().includes('reference') &&
-                                      lastPrompt.toLowerCase().includes('choices');
-      expect(hasReferenceInstruction).toBe(true);
-    });
+            const hasReferenceInstruction = narrativePrompt.toLowerCase().includes('reference') &&
 
-    test('should include decision impact instructions for NPCs', async () => {
-      // ACCEPTANCE CRITERIA: NPCs should react based on past player interactions
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1', 
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
+                                            narrativePrompt.toLowerCase().includes('choices');
 
-      await narrativeGenerator.generateSegment(request);
+            expect(hasReferenceInstruction).toBe(true);
 
-      const lastPrompt = mockAiClient.getLastPrompt();
+          });
+
       
-      // Just check that NPC names are included (LLM will handle the rest)
-      expect(lastPrompt).toContain('merchant'); // Should reference the specific NPC from test data
 
-      // Should have basic instruction about adapting to player style
-      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
-                                  lastPrompt.toLowerCase().includes('based on');
-      expect(hasAdaptInstruction).toBe(true);
+          test('should include decision impact instructions for NPCs', async () => {
+
+            // ACCEPTANCE CRITERIA: NPCs should react based on past player interactions
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1', 
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
       
-      // Should reference the help decision in some way (flexible)
-      const hasHelpReference = lastPrompt.toLowerCase().includes('help') || 
-                              lastPrompt.toLowerCase().includes('assist') ||
-                              lastPrompt.toLowerCase().includes('merchant'); // NPC name implies the help context
-      expect(hasHelpReference).toBe(true);
-    });
-  });
 
-  describe('Decision Consequence Mapping', () => {
-    test('should map compassionate decisions to trust-building consequences', async () => {
-      // ACCEPTANCE CRITERIA: Compassionate choices should build trust and reputation
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'], 
-        sessionId: 'session-1'
-      };
+            await narrativeGenerator.generateSegment(request);
 
-      await narrativeGenerator.generateSegment(request);
-
-      const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Check that decision data is included (LLM will infer compassionate consequences)
-      const hasDecisionData = lastPrompt.includes('Help the injured merchant') &&
-                             lastPrompt.includes('[helpful]');
-      expect(hasDecisionData).toBe(true);
 
-      // Should have instruction to adapt narrative
-      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
-                                 lastPrompt.toLowerCase().includes('based on');
-      expect(hasAdaptInstruction).toBe(true);
-    });
+            const narrativePrompt = mockAiClient.getPrompts()[0];
 
-    test('should map diplomatic decisions to peaceful resolution options', async () => {
-      // ACCEPTANCE CRITERIA: Diplomatic choices should create peaceful alternatives
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
+            
 
-      await narrativeGenerator.generateSegment(request);
+            // Just check that NPC names are included (LLM will handle the rest)
 
-      const lastPrompt = mockAiClient.getLastPrompt();
+            expect(narrativePrompt).toContain('merchant'); // Should reference the specific NPC from test data
+
       
-      // Check that decision data is included (LLM will infer diplomatic consequences)
-      const hasDecisionData = lastPrompt.includes('Negotiate instead of fighting') &&
-                             lastPrompt.includes('[diplomatic]');
-      expect(hasDecisionData).toBe(true);
 
-      // Should have instruction to adapt narrative
-      const hasAdaptInstruction = lastPrompt.toLowerCase().includes('adapt') ||
-                                 lastPrompt.toLowerCase().includes('based on');
-      expect(hasAdaptInstruction).toBe(true);
-    });
-  });
+            // Should have basic instruction about adapting to player style
 
-  describe('Long-term Consequence Building', () => {
-    test('should create narrative threads that span multiple decisions', async () => {
-      // ACCEPTANCE CRITERIA: Multiple related decisions should build coherent consequences
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
+            const hasAdaptInstruction = narrativePrompt.toLowerCase().includes('adapt') ||
 
-      await narrativeGenerator.generateSegment(request);
+                                        narrativePrompt.toLowerCase().includes('based on');
 
-      const lastPrompt = mockAiClient.getLastPrompt();
+            expect(hasAdaptInstruction).toBe(true);
+
+            
+
+            // Should reference the help decision in some way (flexible)
+
+            const hasHelpReference = narrativePrompt.toLowerCase().includes('help') || 
+
+                                    narrativePrompt.toLowerCase().includes('assist') ||
+
+                                    narrativePrompt.toLowerCase().includes('merchant'); // NPC name implies the help context
+
+            expect(hasHelpReference).toBe(true);
+
+          });
+
+        });
+
       
-      // Check that multiple decisions are included (LLM will infer patterns)
-      const hasMultipleDecisions = lastPrompt.includes('Help the injured merchant') &&
-                                  lastPrompt.includes('Negotiate instead of fighting');
-      expect(hasMultipleDecisions).toBe(true);
 
-      // Check that choice types are tagged for pattern recognition
-      const hasChoiceTypes = lastPrompt.includes('[helpful]') &&
-                            lastPrompt.includes('[diplomatic]');
-      expect(hasChoiceTypes).toBe(true);
-    });
+        describe('Decision Consequence Mapping', () => {
 
-    test('should provide decision-informed story options', async () => {
-      // ACCEPTANCE CRITERIA: Narrative should suggest options that reflect past decision patterns
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
+          test('should map compassionate decisions to trust-building consequences', async () => {
 
-      await narrativeGenerator.generateSegment(request);
+            // ACCEPTANCE CRITERIA: Compassionate choices should build trust and reputation
 
-      const lastPrompt = mockAiClient.getLastPrompt();
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'], 
+
+              sessionId: 'session-1'
+
+            };
+
       
-      // Should include guidance about choice options that reflect past patterns
-      const hasChoiceGuidance = lastPrompt.toLowerCase().includes('choice') ||
-                               lastPrompt.toLowerCase().includes('options') ||
-                               lastPrompt.toLowerCase().includes('decision') ||
-                               lastPrompt.toLowerCase().includes('consequences');
-      expect(hasChoiceGuidance).toBe(true);
+
+            await narrativeGenerator.generateSegment(request);
+
       
-      // Should reference past decision types that could inform future choices
-      const hasDecisionTypeReferences = lastPrompt.toLowerCase().includes('compassionate') ||
-                                       lastPrompt.toLowerCase().includes('diplomatic') ||
-                                       lastPrompt.toLowerCase().includes('reputation') ||
-                                       lastPrompt.toLowerCase().includes('trust');
-      expect(hasDecisionTypeReferences).toBe(true);
-    });
-  });
 
-  describe('Error Handling and Edge Cases', () => {
-    test('should handle empty decision history gracefully', async () => {
-      // When no past decisions exist, should not break
-      mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue([]);
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Check that decision data is included (LLM will infer compassionate consequences)
+
+            const hasDecisionData = narrativePrompt.includes('Help the injured merchant') &&
+
+                                   narrativePrompt.includes('[helpful]');
+
+            expect(hasDecisionData).toBe(true);
+
       
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
 
-      await expect(narrativeGenerator.generateSegment(request)).resolves.toBeDefined();
-    });
+            // Should have instruction to adapt narrative
 
-    test('should limit decision history to prevent prompt overflow', async () => {
-      // Create many past decisions with deterministic timestamps
-      const manyDecisions = Array.from({ length: 20 }, (_, i) => {
-        // Set time to i seconds ago
-        const timeAgo = new Date('2025-01-15T12:00:00Z');
-        timeAgo.setSeconds(timeAgo.getSeconds() - i);
-        jest.setSystemTime(timeAgo);
-        const timestamp = getTimestamp();
+            const hasAdaptInstruction = narrativePrompt.toLowerCase().includes('adapt') ||
 
-        return {
-          id: `decision-${i}`,
-          prompt: `What will you do next? (Decision ${i})`,
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          choiceText: `Choice ${i}`,
-          choiceType: 'neutral' as const,
-          timestamp,
-          context: { situation: 'generic' }
-        };
+                                       narrativePrompt.toLowerCase().includes('based on');
+
+            expect(hasAdaptInstruction).toBe(true);
+
+          });
+
+      
+
+          test('should map diplomatic decisions to peaceful resolution options', async () => {
+
+            // ACCEPTANCE CRITERIA: Diplomatic choices should create peaceful alternatives
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
+      
+
+            await narrativeGenerator.generateSegment(request);
+
+      
+
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Check that decision data is included (LLM will infer diplomatic consequences)
+
+            const hasDecisionData = narrativePrompt.includes('Negotiate instead of fighting') &&
+
+                                   narrativePrompt.includes('[diplomatic]');
+
+            expect(hasDecisionData).toBe(true);
+
+      
+
+            // Should have instruction to adapt narrative
+
+            const hasAdaptInstruction = narrativePrompt.toLowerCase().includes('adapt') ||
+
+                                       narrativePrompt.toLowerCase().includes('based on');
+
+            expect(hasAdaptInstruction).toBe(true);
+
+          });
+
+        });
+
+      
+
+        describe('Long-term Consequence Building', () => {
+
+          test('should create narrative threads that span multiple decisions', async () => {
+
+            // ACCEPTANCE CRITERIA: Multiple related decisions should build coherent consequences
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
+      
+
+            await narrativeGenerator.generateSegment(request);
+
+      
+
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Check that multiple decisions are included (LLM will infer patterns)
+
+            const hasMultipleDecisions = narrativePrompt.includes('Help the injured merchant') &&
+
+                                        narrativePrompt.includes('Negotiate instead of fighting');
+
+            expect(hasMultipleDecisions).toBe(true);
+
+      
+
+            // Check that choice types are tagged for pattern recognition
+
+            const hasChoiceTypes = narrativePrompt.includes('[helpful]') &&
+
+                                  narrativePrompt.includes('[diplomatic]');
+
+            expect(hasChoiceTypes).toBe(true);
+
+          });
+
+      
+
+          test('should provide decision-informed story options', async () => {
+
+            // ACCEPTANCE CRITERIA: Narrative should suggest options that reflect past decision patterns
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
+      
+
+            await narrativeGenerator.generateSegment(request);
+
+      
+
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Should include guidance about choice options that reflect past patterns
+
+            const hasChoiceGuidance = narrativePrompt.toLowerCase().includes('choice') ||
+
+                                     narrativePrompt.toLowerCase().includes('options') ||
+
+                                     narrativePrompt.toLowerCase().includes('decision') ||
+
+                                     narrativePrompt.toLowerCase().includes('consequences');
+
+            expect(hasChoiceGuidance).toBe(true);
+
+            
+
+            // Should reference past decision types that could inform future choices
+
+            const hasDecisionTypeReferences = narrativePrompt.toLowerCase().includes('compassionate') ||
+
+                                             narrativePrompt.toLowerCase().includes('diplomatic') ||
+
+                                             narrativePrompt.toLowerCase().includes('reputation') ||
+
+                                             narrativePrompt.toLowerCase().includes('trust');
+
+            expect(hasDecisionTypeReferences).toBe(true);
+
+          });
+
+        });
+
+      
+
+        describe('Error Handling and Edge Cases', () => {
+
+          test('should handle empty decision history gracefully', async () => {
+
+            // When no past decisions exist, should not break
+
+            mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue([]);
+
+            
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
+      
+
+            await expect(narrativeGenerator.generateSegment(request)).resolves.toBeDefined();
+
+          });
+
+      
+
+          test('should limit decision history to prevent prompt overflow', async () => {
+
+            // Create many past decisions with deterministic timestamps
+
+            const manyDecisions = Array.from({ length: 20 }, (_, i) => {
+
+              // Set time to i seconds ago
+
+              const timeAgo = new Date('2025-01-15T12:00:00Z');
+
+              timeAgo.setSeconds(timeAgo.getSeconds() - i);
+
+              jest.setSystemTime(timeAgo);
+
+              const timestamp = getTimestamp();
+
+      
+
+              return {
+
+                id: `decision-${i}`,
+
+                prompt: `What will you do next? (Decision ${i})`,
+
+                sessionId: 'session-1',
+
+                worldId: 'world-1',
+
+                choiceText: `Choice ${i}`,
+
+                choiceType: 'neutral' as const,
+
+                timestamp,
+
+                context: { situation: 'generic' }
+
+              };
+
+            });
+
+      
+
+            // Reset to "now"
+
+            jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+      
+
+            mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(manyDecisions);
+
+      
+
+            const request: NarrativeGenerationRequest = {
+
+              worldId: 'world-1',
+
+              characterIds: ['char-1'],
+
+              sessionId: 'session-1'
+
+            };
+
+      
+
+            await narrativeGenerator.generateSegment(request);
+
+      
+
+            const narrativePrompt = mockAiClient.getPrompts()[0];
+
+            
+
+            // Should include decisions but not overwhelm the prompt
+
+            const decisionMatches = narrativePrompt.match(/Choice \d+/g) || [];
+
+            expect(decisionMatches.length).toBeLessThanOrEqual(10); // Reasonable limit
+
+          });
+
+        });
+
       });
 
-      // Reset to "now"
-      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
-
-      mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(manyDecisions);
-
-      const request: NarrativeGenerationRequest = {
-        worldId: 'world-1',
-        characterIds: ['char-1'],
-        sessionId: 'session-1'
-      };
-
-      await narrativeGenerator.generateSegment(request);
-
-      const lastPrompt = mockAiClient.getLastPrompt();
       
-      // Should include decisions but not overwhelm the prompt
-      const decisionMatches = lastPrompt.match(/Choice \d+/g) || [];
-      expect(decisionMatches.length).toBeLessThanOrEqual(10); // Reasonable limit
-    });
-  });
-});

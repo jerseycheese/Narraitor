@@ -2,21 +2,17 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { useWorldStore } from '@/state/worldStore';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { EntityID } from '@/types/common.types';
-import { AIClient } from '../types';
-
-// Mock AI client
-const mockAIClient = {
-  generateContent: jest.fn()
-};
+import { MockAIClient } from '../../__mocks__/mockAiClient';
 
 describe('NarrativeGenerator Tone Settings Integration', () => {
   let generator: NarrativeGenerator;
+  let mockAiClient: MockAIClient;
   let worldId: EntityID;
 
   beforeEach(() => {
     useWorldStore.getState().reset();
-    mockAIClient.generateContent.mockClear();
-    generator = new NarrativeGenerator(mockAIClient as unknown as AIClient);
+    mockAiClient = new MockAIClient();
+    generator = new NarrativeGenerator(mockAiClient);
 
     // Create a world with tone settings
     const toneSettings: ToneSettings = {
@@ -43,9 +39,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
   });
 
   test('should include tone settings in narrative generation prompt', async () => {
-    mockAIClient.generateContent.mockResolvedValue({
+    mockAiClient.setMockResponse({
       content: 'Generated narrative content',
-      tokenUsage: 100
     });
 
     await generator.generateSegment({
@@ -57,25 +52,18 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       }
     });
 
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('PG-13 CONTENT GUIDELINES')
-    );
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('DRAMATIC NARRATIVE STYLE')
-    );
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('ADVANCED LANGUAGE COMPLEXITY')
-    );
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Focus on character development and emotional depth')
-    );
+    const narrativePrompt = mockAiClient.getPrompts()[0];
+
+    expect(narrativePrompt).toContain('PG-13 CONTENT GUIDELINES');
+    expect(narrativePrompt).toContain('DRAMATIC NARRATIVE STYLE');
+    expect(narrativePrompt).toContain('ADVANCED LANGUAGE COMPLEXITY');
+    expect(narrativePrompt).toContain('Focus on character development and emotional depth');
   });
 
   test('should respect content rating in generated content validation', async () => {
     const explicitContent = 'This contains explicit violence and mature themes...';
-    mockAIClient.generateContent.mockResolvedValue({
+    mockAiClient.setMockResponse({
       content: explicitContent,
-      tokenUsage: 100
     });
 
     const result = await generator.generateSegment({
@@ -90,9 +78,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
   });
 
   test('should maintain consistent tone across multiple generations', async () => {
-    mockAIClient.generateContent.mockResolvedValue({
+    mockAiClient.setMockResponse({
       content: 'Consistent dramatic narrative',
-      tokenUsage: 100
     });
 
     // Generate multiple segments
@@ -108,12 +95,15 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       characterIds: ['test-character']
     });
 
-    // Both calls should include the same tone settings
-    expect(mockAIClient.generateContent).toHaveBeenCalledTimes(2);
-    mockAIClient.generateContent.mock.calls.forEach(call => {
-      expect(call[0]).toContain('dramatic');
-      expect(call[0]).toContain('PG-13');
-    });
+    const prompts = mockAiClient.getPrompts();
+    // 2 for narrative, 2 for item extraction
+    expect(prompts).toHaveLength(4);
+
+    // Check the narrative generation prompts (1st and 3rd calls)
+    expect(prompts[0]).toContain('dramatic');
+    expect(prompts[0]).toContain('PG-13');
+    expect(prompts[2]).toContain('dramatic');
+    expect(prompts[2]).toContain('PG-13');
   });
 
   test('should handle missing tone settings gracefully', async () => {
@@ -132,9 +122,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       }
     });
 
-    mockAIClient.generateContent.mockResolvedValue({
+    mockAiClient.setMockResponse({
       content: 'Default narrative content',
-      tokenUsage: 100
     });
 
     await generator.generateSegment({
@@ -143,28 +132,23 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       characterIds: ['test-character']
     });
 
+    const narrativePrompt = mockAiClient.getPrompts()[0];
+
     // Should use default tone settings with detailed guidance
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('PG-RATED CONTENT GUIDELINES')
-    );
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('BALANCED NARRATIVE STYLE')
-    );
+    expect(narrativePrompt).toContain('PG-RATED CONTENT GUIDELINES');
+    expect(narrativePrompt).toContain('BALANCED NARRATIVE STYLE');
   });
 
   test('should apply tone settings to initial scene generation', async () => {
-    mockAIClient.generateContent.mockResolvedValue({
+    mockAiClient.setMockResponse({
       content: 'Initial scene with dramatic tone',
-      tokenUsage: 100
     });
 
     await generator.generateInitialScene(worldId, ['test-character']);
 
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('DRAMATIC NARRATIVE STYLE')
-    );
-    expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('PG-13 CONTENT GUIDELINES')
-    );
+    const narrativePrompt = mockAiClient.getPrompts()[0];
+
+    expect(narrativePrompt).toContain('DRAMATIC NARRATIVE STYLE');
+    expect(narrativePrompt).toContain('PG-13 CONTENT GUIDELINES');
   });
 });
