@@ -20,6 +20,8 @@ describe('itemAcquisitionProcessor', () => {
     jest.clearAllMocks();
     mockGetState.mockReturnValue({
       addItem: mockAddItem,
+      getCharacterItems: jest.fn().mockReturnValue([]),
+      updateItemQuantity: jest.fn(),
     });
     (useInventoryStore as unknown as jest.Mock).mockReturnValue({});
     (useInventoryStore as unknown as { getState: jest.Mock }).getState = mockGetState;

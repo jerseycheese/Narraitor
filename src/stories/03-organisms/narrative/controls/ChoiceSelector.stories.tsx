@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+import type { InventoryItem } from '@/types/inventory.types';
 import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof ChoiceSelector> = {
@@ -173,11 +174,99 @@ const createMockWorldSkills = () => [
   { id: 'magic', name: 'Magic', description: '', worldId: 'test-world', difficulty: 'hard', baseValue: 1, minValue: 1, maxValue: 10 }
 ];
 
+const createItemRequirementDecision = (): Decision => ({
+  id: 'item-requirement-decision',
+  prompt: 'The ancient vault resists entry unless you have the right tools. What will you do?',
+  options: [
+    {
+      id: 'option-pick',
+      text: 'Delicately pick the rune-etched lock',
+      hint: 'Requires fine tools',
+      requiredItems: [{ type: 'item', targetId: 'Lockpick', operator: 'gte', value: 1 }],
+    },
+    {
+      id: 'option-brew',
+      text: 'Brew a restorative salve for the wounded scout',
+      hint: 'Needs multiple potions',
+      requiredItems: [{ type: 'item', targetId: 'Healing Potion', operator: 'gte', value: 3 }],
+    },
+    {
+      id: 'option-ward',
+      text: 'Break the ward with a resonant talisman',
+      hint: 'Either an arcane focus or a gifted key works',
+      requiredItems: {
+        logic: 'any',
+        requirements: [
+          { type: 'item', targetId: 'Arcane Focus', operator: 'gte', value: 1 },
+          { type: 'item', targetId: 'Magic Key', operator: 'gte', value: 1 },
+        ],
+      },
+    },
+  ],
+  decisionWeight: 'major',
+  contextSummary: 'Foreign wards and injured allies make every choice matter.',
+});
+
+const createMockInventoryItems = (): InventoryItem[] => {
+  const now = new Date().toISOString();
+  return [
+    {
+      id: 'item-lockpick',
+      name: 'Lockpick',
+      description: 'Slim iron picks for delicate mechanisms.',
+      quantity: 1,
+      stackable: false,
+      categoryId: 'equipment',
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'equipment',
+        source: 'manual',
+        classifiedAt: now,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'item-potion',
+      name: 'Healing Potion',
+      description: 'Restores vitality when consumed.',
+      quantity: 3,
+      stackable: true,
+      categoryId: 'consumables',
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'consumables',
+        source: 'manual',
+        classifiedAt: now,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'item-fetish',
+      name: 'Arcane Focus',
+      description: 'Attuned crystal that channels ward-breaking resonance.',
+      quantity: 1,
+      stackable: false,
+      categoryId: 'quest-items',
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'quest-items',
+        source: 'manual',
+        classifiedAt: now,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+};
+
 export const WithSkillRequirements: Story = {
   args: {
     decision: createSkillRequirementDecision(),
-    character: createMockCharacter(),
+    characterSkills: createMockCharacter().skills,
     worldSkills: createMockWorldSkills(),
+    inventoryItems: [],
     showHints: true,
   },
   parameters: {
@@ -189,3 +278,20 @@ export const WithSkillRequirements: Story = {
   },
 };
 
+export const WithItemRequirements: Story = {
+  args: {
+    decision: createItemRequirementDecision(),
+    characterSkills: createMockCharacter().skills,
+    worldSkills: createMockWorldSkills(),
+    inventoryItems: createMockInventoryItems(),
+    showHints: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates inventory-gated choices. The character carries lockpicks, potions, and an arcane focus, so two options unlock while the missing magic key keeps the ward option highlighted as unavailable.',
+      },
+    },
+  },
+};

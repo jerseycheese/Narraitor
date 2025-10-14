@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Scale, Flame, ChevronRight } from 'lucide-react';
-import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
+import { ChevronRight } from 'lucide-react';
+import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
-import { Badge } from '@/components/ui/badge';
+import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { safeTrim } from '@/lib/utils';
+import { normalizeDecisionOptions, normalizeSimpleChoices } from './optionNormalizer';
+import { SkillRequirementBadges, ItemRequirementBadges } from './RequirementBadges';
+import { getAlignmentIcon, getAlignmentClasses, getDecisionWeightStyling } from './choiceStyling';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -37,75 +39,18 @@ interface ChoiceSelectorProps {
   customInputPlaceholder?: string;
   maxCustomLength?: number;
 
-  // Skill requirement props
+  // Requirement evaluation props
   worldSkills?: WorldSkill[];
+  characterSkills?: Array<{
+    id: string;
+    characterId: string;
+    worldSkillId?: string;
+    name: string;
+    level: number;
+    category?: string;
+  }>;
+  inventoryItems?: InventoryItem[];
 }
-
-/**
- * Get icon for choice alignment
- */
-const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
-  switch (alignment) {
-    case 'lawful':
-      return <Scale className="w-4 h-4" aria-hidden="true" />; // Scales of justice for lawful
-    case 'chaotic':
-      return <Flame className="w-4 h-4" aria-hidden="true" />; // Fire for chaotic/unpredictable
-    case 'neutral':
-    default:
-      return null; // No icon for neutral
-  }
-};
-
-/**
- * Get CSS classes for alignment-based styling
- */
-const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
-  const baseClasses = {
-    lawful: 'bg-blue-50 border-blue-300',
-    chaotic: 'bg-red-200 border-red-300',
-    neutral: 'bg-white border-gray-200'
-  };
-  
-  const hoverClasses = {
-    lawful: 'hover:bg-blue-100',
-    chaotic: 'hover:bg-red-100', 
-    neutral: 'hover:bg-gray-100'
-  };
-  
-  const alignmentKey = alignment || 'neutral';
-  const base = baseClasses[alignmentKey];
-  const hover = isDisabled ? '' : hoverClasses[alignmentKey];
-  
-  return `${base} ${hover}`;
-};
-
-/**
- * Get styling for decision weight using border thickness and strategic colors
- * Critical decisions use bright red, while choice alignments use muted red
- */
-const getDecisionWeightStyling = (weight?: DecisionWeight) => {
-  switch (weight) {
-    case 'critical':
-      return {
-        container: 'border-4 border-red-500 bg-red-200/50 shadow-lg shadow-red-200',
-        dot: 'bg-red-500',
-        label: 'text-red-700'
-      };
-    case 'major':
-      return {
-        container: 'border-2 border-amber-500 bg-amber-50/60 shadow-md shadow-amber-200',
-        dot: 'bg-amber-500',
-        label: 'text-amber-700'
-      };
-    case 'minor':
-    default:
-      return {
-        container: 'border-0 bg-gray-100/5',
-        dot: 'bg-gray-700',
-        label: 'text-gray-900'
-      };
-  }
-};
 
 /**
  * Unified choice selector component that handles both simple choices and complex decisions
@@ -123,6 +68,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   customInputPlaceholder = 'Type your custom response...',
   maxCustomLength = 250,
   worldSkills = [],
+  characterSkills = [],
+  inventoryItems = [],
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -133,45 +80,19 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
   // Determine what data we're working with
   const isDecisionMode = !!decision;
-  
+
+  // Create character object for requirement evaluation
+  const requirementEvaluationContext = {
+    skills: characterSkills,
+    inventory: {
+      items: inventoryItems
+    }
+  };
+
   // Normalize the data into a common format
-  const normalizedOptions: Array<{
-    id: string;
-    text: string;
-    hint?: string;
-    isSelected?: boolean;
-    alignment?: ChoiceAlignment;
-    skillRequirements?: Array<{
-      requirement: DecisionRequirement;
-      skillName?: string;
-    }>;
-  }> = isDecisionMode
-    ? (decision.options || []).map(opt => {
-        const skillRequirements = opt.requirements?.filter(req => req.type === 'skill').map(req => {
-          const skillData = resolveSkillData(req.targetId, worldSkills);
-
-          return {
-            requirement: req,
-            skillName: skillData?.name || 'Unknown Skill'
-          };
-        }) || [];
-
-        return {
-          id: opt.id,
-          text: opt.text,
-          hint: opt.hint,
-          isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
-          alignment: opt.alignment,
-          skillRequirements
-        };
-      })
-    : (choices || []).map(choice => ({
-        id: choice.id,
-        text: choice.text,
-        isSelected: choice.isSelected || choice.id === selectedOptionId,
-        alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
-        skillRequirements: []
-      }));
+  const normalizedOptions = isDecisionMode
+    ? normalizeDecisionOptions(decision, selectedOptionId, worldSkills, requirementEvaluationContext)
+    : normalizeSimpleChoices(choices || [], selectedOptionId);
 
   // Use normalized options without custom input option
   const allOptions = normalizedOptions;
@@ -187,7 +108,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   }, [enableCustomInput]);
 
   // Handle option selection
-  const handleOptionSelect = useCallback((optionId: string) => {
+  const handleOptionSelect = useCallback((optionId: string, isDisabledByReqs: boolean) => {
+    // Don't allow selection if option is disabled by requirements
+    if (isDisabledByReqs) {
+      return;
+    }
     setSelectedOptionId(optionId);
     onSelect(optionId);
   }, [onSelect]);
@@ -301,49 +226,47 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             role="radiogroup" 
             aria-labelledby="choices-heading"
           >
-            {allOptions.map((option) => (
-              <Button
-                key={option.id}
-                data-testid={`choice-option-${option.id}`}
-                variant="ghost"
-                className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
-                  option.isSelected
-                    ? 'bg-blue-100 border-blue-500 font-bold'
-                    : getAlignmentClasses(option.alignment, isDisabled)
-                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                onClick={() => handleOptionSelect(option.id)}
-                disabled={isDisabled}
-                aria-checked={option.isSelected}
-                role="radio"
-              >
-                <div className="flex items-start gap-2">
-                  {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
-                  {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                    <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
-                  )}
-                  <span className="flex-1">{option.text}</span>
-                </div>
-                {showHints && option.hint && (
-                  <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
-                )}
-                {option.skillRequirements && option.skillRequirements.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {option.skillRequirements.map((skillReq, index) => {
-                      const label = `${skillReq.skillName}`;
+            {allOptions.map((option) => {
+              const isOptionDisabled = isDisabled || (option.isDisabledByRequirements ?? false);
 
-                      return (
-                        <Badge
-                          key={`${option.id}-skill-${index}`}
-                          variant="skill-requirement"
-                        >
-                          {label}
-                        </Badge>
-                      );
-                    })}
+              return (
+                <Button
+                  key={option.id}
+                  data-testid={`choice-option-${option.id}`}
+                  variant="ghost"
+                  title={isOptionDisabled ? option.disabledReason : undefined}
+                  data-disabled-reason={isOptionDisabled ? option.disabledReason : undefined}
+                  className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
+                    option.isSelected
+                      ? 'bg-blue-100 border-blue-500 font-bold'
+                      : getAlignmentClasses(option.alignment, isOptionDisabled)
+                  } ${isOptionDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  onClick={() => handleOptionSelect(option.id, option.isDisabledByRequirements ?? false)}
+                  disabled={isOptionDisabled}
+                  aria-checked={option.isSelected}
+                  role="radio"
+                >
+                  <div className="flex items-start gap-2">
+                    {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
+                    {!option.isSelected && getAlignmentIcon(option.alignment) && (
+                      <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
+                    )}
+                    <span className="flex-1">{option.text}</span>
                   </div>
-                )}
-              </Button>
-            ))}
+                  {showHints && option.hint && (
+                    <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
+                  )}
+                  <SkillRequirementBadges
+                    requirements={option.skillRequirements || []}
+                    optionId={option.id}
+                  />
+                  <ItemRequirementBadges
+                    groups={option.itemRequirementGroups || []}
+                    optionId={option.id}
+                  />
+                </Button>
+              );
+            })}
           </div>
         </CollapsibleSection>
       )}

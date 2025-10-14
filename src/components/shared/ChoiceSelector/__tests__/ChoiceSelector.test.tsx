@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+import { InventoryItem } from '@/types/inventory.types';
 
 
 describe('ChoiceSelector', () => {
@@ -54,6 +55,20 @@ describe('ChoiceSelector', () => {
     ],
   };
 
+  const combinedRequirementDecision: Decision = {
+    id: 'decision-3',
+    prompt: 'Slip past the lock without raising alarms',
+    options: [
+      {
+        id: 'combined-opt',
+        text: 'Use stealth and a lockpick to bypass the door',
+        requirements: [{ type: 'skill', targetId: 'stealth-skill', operator: 'gte', value: 5 }],
+        requiredItems: [{ type: 'item', targetId: 'Lockpick', operator: 'gte', value: 1 }],
+      },
+      { id: 'fallback-opt', text: 'Knock and hope someone answers' },
+    ],
+  };
+
   const mockWorldSkills = [
     {
       id: 'stealth-skill',
@@ -78,6 +93,35 @@ describe('ChoiceSelector', () => {
       difficulty: 'medium' as const,
     },
   ];
+
+  const createInventoryItem = (
+    name: string,
+    quantity: number,
+    options: { stackable?: boolean; categoryId?: InventoryItem['categoryId'] } = {}
+  ): InventoryItem => {
+    const now = new Date().toISOString();
+    const {
+      stackable = quantity > 1,
+      categoryId = 'equipment',
+    } = options;
+
+    return {
+      id: `item-${name.toLowerCase().replace(/\s+/g, '-')}`,
+      name,
+      description: '',
+      quantity,
+      stackable,
+      categoryId,
+      acquisitionHistory: [],
+      categorization: {
+        categoryId,
+        source: 'manual',
+        classifiedAt: now,
+      },
+      createdAt: now,
+      updatedAt: now,
+    };
+  };
 
   describe('Basic Choice Selection', () => {
     it('displays all choices and handles selection', async () => {
@@ -162,20 +206,107 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText('Intimidation')).toBeInTheDocument();
     });
 
-    it('allows selection of any skill-based choice (no client-side gating)', async () => {
+    it('disables options when character lacks required skills', async () => {
       const user = userEvent.setup();
+      // Character with low skills that don't meet requirements
+      const characterSkills = [
+        { id: 'skill-1', characterId: 'char-1', worldSkillId: 'stealth-skill', name: 'Stealth', level: 2, category: 'Physical' },
+        { id: 'skill-2', characterId: 'char-1', worldSkillId: 'intimidation-skill', name: 'Intimidation', level: 3, category: 'Social' },
+      ];
+
       render(
         <ChoiceSelector
           decision={decisionWithSkillRequirements}
           onSelect={mockOnSelect}
           worldSkills={mockWorldSkills}
+          characterSkills={characterSkills}
+          inventoryItems={[]}
         />
       );
       expandSuggestions();
 
-      // Should be able to select any option regardless of requirements
+      // Options with unmet requirements should be disabled
+      const sneakOption = screen.getByText('Sneak past').closest('button');
+      const intimidateOption = screen.getByText('Intimidate the guard').closest('button');
+      const directOption = screen.getByText('Walk directly').closest('button');
+
+      expect(sneakOption).toBeDisabled();
+      expect(intimidateOption).toBeDisabled();
+      expect(directOption).not.toBeDisabled(); // No requirements
+
+      // Should not trigger onSelect when clicking disabled options
       await user.click(screen.getByText('Sneak past'));
-      expect(mockOnSelect).toHaveBeenCalledWith('stealth-opt');
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Skill and Item Requirement Interplay', () => {
+    const proficientSkills = [
+      {
+        id: 'skill-1',
+        characterId: 'char-1',
+        worldSkillId: 'stealth-skill',
+        name: 'Stealth',
+        level: 6,
+        category: 'Physical',
+      },
+    ];
+
+    const insufficientSkills = [
+      {
+        id: 'skill-1',
+        characterId: 'char-1',
+        worldSkillId: 'stealth-skill',
+        name: 'Stealth',
+        level: 2,
+        category: 'Physical',
+      },
+    ];
+
+    const renderCombinedOption = (
+      skills: typeof proficientSkills,
+      items: InventoryItem[]
+    ) => {
+      render(
+        <ChoiceSelector
+          decision={combinedRequirementDecision}
+          onSelect={mockOnSelect}
+          worldSkills={mockWorldSkills}
+          characterSkills={skills}
+          inventoryItems={items}
+        />
+      );
+      expandSuggestions();
+      return screen.getByTestId('choice-option-combined-opt');
+    };
+
+    it('disables when skill requirement is met but item requirement is missing', () => {
+      const button = renderCombinedOption(proficientSkills, []);
+      expect(button).toBeDisabled();
+      expect(button?.getAttribute('data-disabled-reason')).toMatch(/Items/i);
+    });
+
+    it('disables when item requirement is met but skill requirement is missing', () => {
+      const button = renderCombinedOption(insufficientSkills, [
+        createInventoryItem('Lockpick', 1, { stackable: false }),
+      ]);
+      expect(button).toBeDisabled();
+      expect(button?.getAttribute('data-disabled-reason')).toMatch(/Skills/i);
+    });
+
+    it('disables when both requirements are unmet', () => {
+      const button = renderCombinedOption([], []);
+      expect(button).toBeDisabled();
+      const reason = button?.getAttribute('data-disabled-reason') ?? '';
+      expect(reason).toMatch(/Skills/i);
+      expect(reason).toMatch(/Items/i);
+    });
+
+    it('enables when both requirements are satisfied', () => {
+      const button = renderCombinedOption(proficientSkills, [
+        createInventoryItem('Lockpick', 1, { stackable: false }),
+      ]);
+      expect(button).not.toBeDisabled();
     });
   });
 

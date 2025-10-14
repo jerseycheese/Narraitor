@@ -52,10 +52,35 @@ export type ChoiceAlignment = 'lawful' | 'chaotic' | 'neutral';
 /**
  * Represents an option within a decision
  */
+export type RequirementLogic = 'all' | 'any';
+
+export interface DecisionItemRequirementGroup {
+  /**
+   * Logical evaluation for contained requirements.
+   * 'all' requires every item, 'any' requires at least one.
+   * Defaults to 'all' when omitted.
+   */
+  logic?: RequirementLogic;
+  /**
+   * Underlying DecisionRequirement entries with type 'item'.
+   */
+  requirements: DecisionRequirement[];
+}
+
+export type DecisionItemRequirements =
+  | DecisionRequirement[]
+  | DecisionItemRequirementGroup
+  | DecisionItemRequirementGroup[];
+
 export interface DecisionOption {
   id: EntityID;
   text: string;
   requirements?: DecisionRequirement[];
+  /**
+   * Inventory-based gating requirements.
+   * Supports simple arrays (defaults to 'all') or grouped logic blocks.
+   */
+  requiredItems?: DecisionItemRequirements;
   hint?: string;
   // Custom input support
   isCustomInput?: boolean;
@@ -93,6 +118,11 @@ export interface AcquiredItemMetadata {
   description?: string;
   quantity?: number;
   acquisitionMethod?: InventoryAcquisitionMethod;
+  /**
+   * Indicates that this metadata refines the most recently acquired item
+   * rather than representing a completely new pickup.
+   */
+  refinesPrevious?: boolean;
 }
 
 /**

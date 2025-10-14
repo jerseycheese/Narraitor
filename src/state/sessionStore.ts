@@ -18,6 +18,7 @@ let journalStoreModule: typeof import('./journalStore') | null = null;
 let worldStoreModule: typeof import('./worldStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
 let narrativeStoreModule: typeof import('./narrativeStore') | null = null;
+let inventoryStoreModule: typeof import('./inventoryStore') | null = null;
 
 /**
  * Initial state for the session store
@@ -124,6 +125,39 @@ export const useSessionStore = create<SessionStore>()(
         logger.debug('🧹 Cleared global ending state for new session:', sessionId);
       } catch (error) {
         logger.warn('Failed to clear narrative data:', error);
+      }
+    }
+    if (force) {
+      try {
+        if (!inventoryStoreModule) {
+          inventoryStoreModule = await import('./inventoryStore');
+        }
+        const { useInventoryStore } = inventoryStoreModule;
+        const clearInventory = () => {
+          try {
+            useInventoryStore.getState().clearCharacterInventory(characterId);
+            logger.debug('🧹 Cleared inventory for character due to forced fresh session:', characterId);
+          } catch (clearError) {
+            logger.warn('Failed to clear inventory for fresh session (during hydration callback):', clearError);
+          }
+        };
+
+        const persistApi = (useInventoryStore as unknown as {
+          persist?: {
+            hasHydrated?: () => boolean;
+            onFinishHydration?: (callback: () => void) => () => void;
+          };
+        }).persist;
+
+        if (persistApi?.hasHydrated?.()) {
+          clearInventory();
+        } else if (persistApi?.onFinishHydration) {
+          persistApi.onFinishHydration(clearInventory);
+        } else {
+          clearInventory();
+        }
+      } catch (error) {
+        logger.warn('Failed to clear inventory for fresh session:', error);
       }
     }
     
