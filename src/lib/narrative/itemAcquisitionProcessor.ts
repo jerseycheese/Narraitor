@@ -2,7 +2,7 @@
 
 import { useInventoryStore } from '@/state/inventoryStore';
 import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp, titleCase } from '@/lib/utils';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItemCategorization } from '@/types/inventory.types';
@@ -127,16 +127,15 @@ function isStackableCategory(categoryId: string): boolean {
   return categoryId !== 'equipment';
 }
 
+/**
+ * Normalizes item names to title case for consistency
+ * Uses the project's standard titleCase utility from @/lib/utils
+ */
 function normalizeItemName(rawName: string): string {
   const trimmed = (rawName || '').trim();
   if (!trimmed) {
     return 'Unnamed Item';
   }
 
-  return trimmed
-    .toLowerCase()
-    .split(' ')
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  return titleCase(trimmed);
 }
