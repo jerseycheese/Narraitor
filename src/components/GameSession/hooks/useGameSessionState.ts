@@ -237,7 +237,8 @@ export const useGameSessionState = ({
     const currentStoreState = useSessionStore.getState();
     
     // If store already has an active session that matches our requirements, don't initialize
-    if (currentStoreState.status === 'active' && 
+    if (!disableAutoResume &&
+        currentStoreState.status === 'active' && 
         currentStoreState.worldId === worldId && 
         currentStoreState.characterId === sessionCharacterId) {
       logger.debug('[useGameSessionState] Store already has active session for this world/character, skipping initialization');

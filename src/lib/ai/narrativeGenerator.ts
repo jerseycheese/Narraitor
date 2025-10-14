@@ -301,7 +301,7 @@ export class NarrativeGenerator {
     const acquisitionInstructions = `
 
 ITEM ACQUISITION INSTRUCTIONS:
-When your narrative describes the character finding, receiving, or acquiring items, include them in the metadata.itemsAcquired array in your JSON response.
+When your narrative describes the character finding, receiving, crafting, or otherwise newly obtaining an item, include it in the metadata.itemsAcquired array in your JSON response. Do not list objects the character already possessed earlier in the scene. If the text merely clarifies or renames an item the character already had in hand, update the description but do not add a duplicate entry.
 
 Each acquired item should include:
 - name: The item's name (required)
@@ -315,10 +315,11 @@ Examples:
 - Character receives a key as reward: Include {name: "Iron Key", description: "Opens the eastern gate", quantity: 1, acquisitionMethod: "reward"}
 
 Important:
-- Only include items the character ACTUALLY ACQUIRES (not items they see or consider)
+- Only include items the character ACTUALLY ACQUIRES during this segment (not items they merely see, remember, or were already carrying)
+- Avoid duplicate entries for the same object; use the description to capture clarifications or additional detail
 - Be specific with item names and descriptions
-- Use appropriate acquisitionMethod for the narrative context
-- If narrative mentions "some supplies" or is vague, still include with best guess at name/description
+- Use an appropriate acquisitionMethod for the narrative context
+- If the narrative mentions vague supplies, still include the best concrete description you can infer
 
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
 
@@ -403,7 +404,7 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
-      const result = this.formatResponse(
+      const result = await this.formatResponse(
         response,
         request.generationParameters?.segmentType || 'scene'
       );
@@ -505,7 +506,7 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
-      const result = this.formatResponse(response, 'scene');
+      const result = await this.formatResponse(response, 'scene');
 
       // Process any acquired items from the initial scene
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
@@ -603,10 +604,10 @@ The items will be automatically added to the character's inventory with proper c
     };
   }
 
-  private formatResponse(
+  private async formatResponse(
     response: { content?: string; tokenUsage?: number },
     segmentType: string
-  ): NarrativeGenerationResult {
+  ): Promise<NarrativeGenerationResult> {
     let actualContent = response.content || '';
     let extractedMetadata: {
       location?: string;
@@ -754,6 +755,16 @@ The items will be automatically added to the character's inventory with proper c
     const fallbackMood = this.getMoodForGenre(this.getWorldGenre());
     const fallbackLocation = this.getLocationForGenre(this.getWorldGenre());
 
+    if (
+      !extractedMetadata.itemsAcquired ||
+      extractedMetadata.itemsAcquired.length === 0
+    ) {
+      const aiExtractedItems = await this.extractItemsFromNarrative(actualContent);
+      if (aiExtractedItems.length > 0) {
+        extractedMetadata.itemsAcquired = aiExtractedItems;
+      }
+    }
+
     // Normalize the content for consistent formatting
     const normalizedContent = normalizeText(actualContent, NORM_DESC);
 
@@ -785,6 +796,72 @@ The items will be automatically added to the character's inventory with proper c
               }
             : undefined,
     };
+  }
+
+  private async extractItemsFromNarrative(
+    content: string
+  ): Promise<AcquiredItemMetadata[]> {
+    const prompt = `
+You are a structured-data extraction assistant.
+
+Analyze the following narrative passage and list tangible objects the protagonist now possesses because of the events described. Only include items that the character physically acquires or adds to their inventory. Ignore objects that are merely observed, remembered, or immediately discarded.
+
+Return a strict JSON object with the following shape:
+{
+  "items": [
+    {
+      "name": string,                // Concise item name
+      "description": string,         // Optional 1–2 sentence description (omit if unnecessary)
+      "quantity": number,            // Default to 1 if not specified
+      "acquisitionMethod": "loot" | "quest" | "purchase" | "craft" | "reward" | "gift" | "manual" | "unknown"
+    }
+  ]
+}
+
+If the character does not acquire anything, return {"items": []}.
+
+Narrative:
+"""
+${content}
+"""
+`.trim();
+
+    try {
+      const response = await this.geminiClient.generateContent(prompt);
+      const raw = response.content ?? '';
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        return [];
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]) as {
+        items?: Array<{
+          name?: string;
+          description?: string;
+          quantity?: number;
+          acquisitionMethod?: InventoryAcquisitionMethod;
+        }>;
+      };
+
+      if (!Array.isArray(parsed.items) || parsed.items.length === 0) {
+        return [];
+      }
+
+      return parsed.items
+        .filter((item): item is Required<typeof item> => Boolean(item?.name))
+        .map((item) => ({
+          name: item.name!.trim(),
+          description: item.description ? safeTrim(item.description) : undefined,
+          quantity:
+            typeof item.quantity === 'number' && !Number.isNaN(item.quantity)
+              ? item.quantity
+              : 1,
+          acquisitionMethod: item.acquisitionMethod || 'unknown',
+        }))
+        .filter((item) => item.name.length > 0);
+    } catch {
+      return [];
+    }
   }
 
   // Helper methods for mock generation
@@ -936,7 +1013,7 @@ The items will be automatically added to the character's inventory with proper c
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      const result = this.formatResponse(response, 'scene');
+      const result = await this.formatResponse(response, 'scene');
 
       // Process any acquired items from skill acknowledgment
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {

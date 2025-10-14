@@ -34,6 +34,13 @@ export async function processAcquiredItems(
 
   for (const item of items) {
     try {
+      const normalizedName = normalizeItemName(item.name);
+      const existingItems = inventoryStore.getCharacterItems(characterId);
+      const existingMatch = existingItems.find(
+        (existing) =>
+          existing && normalizeItemName(existing.name).toLowerCase() === normalizedName.toLowerCase()
+      );
+
       // Use AI to categorize the item
       let categorization: InventoryItemCategorization;
 
@@ -68,7 +75,7 @@ export async function processAcquiredItems(
         // Add each equipment item separately
         for (let i = 0; i < quantity; i++) {
           inventoryStore.addItem(characterId, {
-            name: item.name,
+            name: normalizedName,
             description: item.description,
             quantity: 1,
             stackable: false,
@@ -82,9 +89,15 @@ export async function processAcquiredItems(
           });
         }
       } else {
+        if (stackable && existingMatch) {
+          const newQuantity = (existingMatch.quantity || 0) + quantity;
+          inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
+          continue;
+        }
+
         // Add item normally for stackable items or single equipment
         inventoryStore.addItem(characterId, {
-          name: item.name,
+          name: normalizedName,
           description: item.description,
           quantity,
           stackable,
@@ -112,4 +125,18 @@ function isStackableCategory(categoryId: string): boolean {
   // Equipment items are typically not stackable (each is unique)
   // All other categories typically allow stacking
   return categoryId !== 'equipment';
+}
+
+function normalizeItemName(rawName: string): string {
+  const trimmed = (rawName || '').trim();
+  if (!trimmed) {
+    return 'Unnamed Item';
+  }
+
+  return trimmed
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }

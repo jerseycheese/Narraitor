@@ -118,6 +118,11 @@ export interface AcquiredItemMetadata {
   description?: string;
   quantity?: number;
   acquisitionMethod?: InventoryAcquisitionMethod;
+  /**
+   * Indicates that this metadata refines the most recently acquired item
+   * rather than representing a completely new pickup.
+   */
+  refinesPrevious?: boolean;
 }
 
 /**
