@@ -522,6 +522,24 @@ test.describe('Game Session Visual Tests', () => {
 
     console.log('📏 Multi-segment height debug:', heightDebug);
 
+    // Temporarily remove height constraints to show all segments in fullPage screenshot
+    await page.evaluate(() => {
+      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
+      if (storyColumn) {
+        const element = storyColumn as HTMLElement;
+        element.style.maxHeight = 'none';
+        element.style.overflow = 'visible';
+        console.log('✅ Removed height constraints for fullPage screenshot');
+      }
+      const fadeOverlay = document.querySelector('.absolute.top-0.left-0.right-0.h-8.pointer-events-none.z-10.bg-gradient-to-b.from-background.to-transparent');
+      if (fadeOverlay) {
+        (fadeOverlay as HTMLElement).style.display = 'none';
+        console.log('✅ Hid fade overlay for fullPage screenshot');
+      }
+    });
+
+    await page.waitForTimeout(200); // Wait for layout to adjust
+
     await hideDynamicContent(page);
 
     // Take screenshot showing multiple segments with height constraints and expanded actions
