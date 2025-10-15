@@ -102,19 +102,14 @@ The application includes these template themes:
 The game session interface follows specific guidelines:
 
 ### Narrative Display
-The approach to displaying narrative content is all about readability and immersion. The text needs to be easy on the eyes for long reading sessions, and the formatting should enhance the storytelling, not distract from it.
+Narrative text needs to be readable for long sessions without straining the eyes. The formatting should enhance the story, not get in the way.
 
-- **Typography**: The typography needs to be clear and legible, with options for users to adjust the size to their comfort.
-- **Spacing**: Paragraphs should have enough space between them to be distinct, but not so much that it breaks the flow of reading.
-- **Dialogue**: Speech should be clearly distinguished from descriptive text, whether through indentation, italics, or other thematic styling.
-- **Theming**: The overall presentation should adapt to the world's theme, but the core readability principles must always be maintained.
+Typography stays clear and legible, with options for users to adjust size to their comfort. Paragraphs get enough space between them to feel distinct without breaking the flow of reading. Speech gets distinguished from descriptive text through indentation, italics, or other thematic styling depending on the world. The overall presentation adapts to the world's theme, but readability comes first.
 
 #### Text Formatting Guidelines
-To keep the narrative content consistent and accessible, the system follows a few key rules for text presentation.
+The formatting approach keeps things consistent and accessible. Paragraphs are separated by double line breaks in the source text, which translates to vertical spacing of at least `1.5rem`. Maximum width is constrained to `56rem` (896px) to keep line lengths comfortable.
 
-- **Paragraphs**: Paragraphs are separated by a double line break in the source text, which translates to a vertical spacing of at least `1.5rem`. The maximum width is constrained to `56rem` (896px) to ensure comfortable line lengths.
-- **Emphasis**: The system uses semantic HTML tags for emphasis. Italic text is wrapped in `<em>` tags, and bold text is wrapped in `<strong>` tags. This ensures that screen readers and other assistive technologies can correctly interpret the meaning.
-- **Accessibility**: All formatted text is designed to meet WCAG 2.1 AA contrast standards, and it remains readable at 200% zoom.
+For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>` tags. This ensures screen readers and assistive tech can interpret the meaning correctly. All formatted text meets WCAG 2.1 AA contrast standards and stays readable at 200% zoom.
 
 ### Decision Selection
 - Clear, distinguishable options
