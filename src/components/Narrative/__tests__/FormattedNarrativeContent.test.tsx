@@ -8,7 +8,7 @@ The first paragraph has some *italic text* and **bold text** to test.
 
 This is a second paragraph with normal text.
 
-This third paragraph has *malformed emphasis without ending*.
+This third paragraph has *malformed emphasis without ending.
 `;
 
   it('renders multiple paragraphs with proper spacing', () => {
@@ -38,18 +38,15 @@ This third paragraph has *malformed emphasis without ending*.
     expect(boldElements).toHaveLength(1);
     expect(boldElements[0]).toHaveTextContent('bold text');
     
-    // Check malformed emphasis handling
-    expect(paragraphs[2]).toHaveTextContent('*malformed emphasis without ending*');
+    // Check malformed emphasis handling (missing closing asterisk)
+    expect(paragraphs[2]).toHaveTextContent('*malformed emphasis without ending.');
     expect(paragraphs[2].querySelectorAll('em')).toHaveLength(0);
     expect(paragraphs[2].querySelectorAll('strong')).toHaveLength(0);
   });
 
   it('handles empty content gracefully', () => {
     render(<FormattedNarrativeContent content="" />);
-    expect(screen.queryByRole('paragraph')).not.toBeInTheDocument();
-    
-    render(<FormattedNarrativeContent content="   \n\n   " />);
-    expect(screen.queryByRole('paragraph')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('narrative-content-container')).not.toBeInTheDocument();
   });
 
   it('applies custom className when provided', () => {

@@ -102,11 +102,19 @@ The application includes these template themes:
 The game session interface follows specific guidelines:
 
 ### Narrative Display
-- Clear typography with adjustable size
-- Proper paragraph spacing for readability
-- Distinguished speech vs. description text
-- Thematic styling based on world selection
-- Text formatting appropriate to narrative content
+The approach to displaying narrative content is all about readability and immersion. The text needs to be easy on the eyes for long reading sessions, and the formatting should enhance the storytelling, not distract from it.
+
+- **Typography**: The typography needs to be clear and legible, with options for users to adjust the size to their comfort.
+- **Spacing**: Paragraphs should have enough space between them to be distinct, but not so much that it breaks the flow of reading.
+- **Dialogue**: Speech should be clearly distinguished from descriptive text, whether through indentation, italics, or other thematic styling.
+- **Theming**: The overall presentation should adapt to the world's theme, but the core readability principles must always be maintained.
+
+#### Text Formatting Guidelines
+To keep the narrative content consistent and accessible, the system follows a few key rules for text presentation.
+
+- **Paragraphs**: Paragraphs are separated by a double line break in the source text, which translates to a vertical spacing of at least `1.5rem`. The maximum width is constrained to `56rem` (896px) to ensure comfortable line lengths.
+- **Emphasis**: The system uses semantic HTML tags for emphasis. Italic text is wrapped in `<em>` tags, and bold text is wrapped in `<strong>` tags. This ensures that screen readers and other assistive technologies can correctly interpret the meaning.
+- **Accessibility**: All formatted text is designed to meet WCAG 2.1 AA contrast standards, and it remains readable at 200% zoom.
 
 ### Decision Selection
 - Clear, distinguishable options

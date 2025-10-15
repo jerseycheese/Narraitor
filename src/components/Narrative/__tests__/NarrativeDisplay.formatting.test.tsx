@@ -96,8 +96,8 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       // HTML emphasis formatting creates em tags
       const container = document.querySelector('.narrative-content');
       expect(container).toBeInTheDocument();
-      expect(container?.innerHTML).toContain('<em>ancient</em>');
-      expect(container?.innerHTML).toContain('<em>mysterious</em>');
+      expect(container?.innerHTML).toContain('<em class="text-primary">ancient</em>');
+      expect(container?.innerHTML).toContain('<em class="text-primary">mysterious</em>');
     });
 
     it('should format action sequences for dramatic effect', () => {
@@ -111,7 +111,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       expect(screen.getByText('The sword clashed against the shield.')).toBeInTheDocument();
       
       const container = document.querySelector('.narrative-content');
-      expect(container?.innerHTML).toContain('<em>Victory</em>');
+      expect(container?.innerHTML).toContain('<em class="text-primary">Victory</em>');
     });
   });
 
@@ -126,7 +126,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       expect(container).toBeInTheDocument();
       
       // All formatting should work together: emphasis, dialogue quotes, and paragraphs
-      expect(container?.innerHTML).toContain('<em>bustling</em>');
+      expect(container?.innerHTML).toContain('<em class="text-primary">bustling</em>');
       expect(container?.innerHTML).toContain('What can I get you?');
       expect(container?.innerHTML).toContain('"Just some information."');
       expect(screen.getByText('The conversation continued late into the night.')).toBeInTheDocument();
@@ -179,7 +179,7 @@ This was only the beginning of their quest.`;
       expect(screen.getByText('This was only the beginning of their quest.')).toBeInTheDocument();
       
       const container = document.querySelector('.narrative-content');
-      expect(container?.innerHTML).toContain('<em>whispers</em>');
+      expect(container?.innerHTML).toContain('<em class="text-primary">whispers</em>');
     });
 
     it('should handle whitespace normalization while preserving story structure', () => {
