@@ -372,9 +372,22 @@ test.describe('Game Session Visual Tests', () => {
       console.log('✅ Removed duplicate textarea inside collapsible section');
     });
 
+    // Temporarily remove height constraints to show all segments in fullPage screenshot
+    await page.evaluate(() => {
+      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
+      if (storyColumn) {
+        const element = storyColumn as HTMLElement;
+        element.style.maxHeight = 'none';
+        element.style.overflow = 'visible';
+        console.log('✅ Removed height constraints for fullPage screenshot');
+      }
+    });
+
+    await page.waitForTimeout(200); // Wait for layout to adjust
+
     await hideDynamicContent(page);
-    
-    // Take screenshot of game session page - now testing real components with height constraints and fade effects
+
+    // Take screenshot of game session page - fullPage will now capture all segments
     await expect(page).toHaveScreenshot('game-session.png', {
       fullPage: true,
       threshold: 0.3  // Higher threshold for initial update to capture component changes
