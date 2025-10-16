@@ -30,7 +30,6 @@ describe('Item Usage Service', () => {
     useCharacterStore.getState().reset();
     useWorldStore.getState().reset();
     useJournalStore.getState().reset();
-    useSessionStore.getState().reset();
 
     // Create test world
     worldId = useWorldStore.getState().create({
@@ -49,8 +48,11 @@ describe('Item Usage Service', () => {
       skills: [],
     });
 
-    // Create session
-    sessionId = useSessionStore.getState().createSession(worldId, characterId);
+    // Create session ID and set up session state
+    sessionId = `session-${worldId}-${characterId}-${Date.now()}`;
+    useSessionStore.getState().setSessionId(sessionId);
+    useSessionStore.getState().setCharacterId(characterId);
+    useSessionStore.setState({ worldId });
   });
 
   describe('isNarrativelySignificant', () => {

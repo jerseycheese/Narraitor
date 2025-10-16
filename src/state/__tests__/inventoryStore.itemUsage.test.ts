@@ -128,7 +128,7 @@ describe('InventoryStore - Item Usage', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
-      expect(result.error?.type).toBe('VALIDATION');
+      expect(result.error?.type).toBe('validation');
     });
 
     it('should return error when character does not own the item', () => {
