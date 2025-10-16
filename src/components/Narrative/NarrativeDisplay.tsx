@@ -117,40 +117,14 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getFormattingOptions = (type: string): FormattingOptions => {
     switch (type) {
       case 'dialogue':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'text'
-        };
-      case 'action':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: false,
-          paragraphSpacing: 'single',
-          outputFormat: 'text'
-        };
+        return { formatDialogue: true };
       case 'scene':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          paragraphSpacing: 'double',
-          outputFormat: 'text'
-        };
+        return { formatDialogue: true, paragraphSpacing: 'double' };
       case 'transition':
-        return {
-          preserveLineBreaks: true,
-          formatDialogue: false,
-          paragraphSpacing: 'single',
-          outputFormat: 'text'
-        };
+        return { preserveLineBreaks: true };
+      case 'action':
       default:
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'text'
-        };
+        return {}; // Use all defaults
     }
   };
 
