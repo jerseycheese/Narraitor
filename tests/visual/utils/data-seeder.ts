@@ -451,7 +451,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
+      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The *Arasaka building* looms ahead, its security algorithms pulsing like a **digital heartbeat**.',
     type: 'scene' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
@@ -469,7 +469,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
+      '"Nice deck," a voice says from the shadows. "*Arasaka custom job, looks like.*" The fixer steps into the dim light, **chrome eyes gleaming**.',
     type: 'dialogue' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
@@ -524,16 +524,17 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     sessionId: 'session-cyberpunk-ghost',
     content:
       'Elevator shafts and stairwells offer different advantages. The elevator requires a keycard hack but offers direct access. The emergency stairs avoid most sensors but mean a long climb. Your cybernetic legs can handle it, but time is running short.',
-    type: 'choice' as const,
+    type: 'action' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
       mood: 'tactical',
       location: 'Arasaka building lobby',
       timeOfDay: 'night',
+      tags: [],
     },
-    timestamp: new Date('2024-01-01T02:02:00.000Z'),
-    createdAt: '2024-01-01T02:02:00.000Z',
-    updatedAt: '2024-01-01T02:02:00.000Z',
+    timestamp: new Date('2024-01-01T02:02:30.000Z'),
+    createdAt: '2024-01-01T02:02:30.000Z',
+    updatedAt: '2024-01-01T02:02:30.000Z',
   },
   {
     id: 'segment-cyberpunk-6',
