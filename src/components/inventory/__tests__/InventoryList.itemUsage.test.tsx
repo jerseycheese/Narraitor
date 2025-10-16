@@ -8,6 +8,10 @@ import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { processItemUsage } from '@/lib/inventory/itemUsageService';
+
+// Mock the item usage service
+jest.mock('@/lib/inventory/itemUsageService');
 
 describe('InventoryList - Item Usage', () => {
   let worldId: string;
@@ -91,8 +95,21 @@ describe('InventoryList - Item Usage', () => {
   });
 
   describe('Item usage interaction', () => {
+    beforeEach(() => {
+      // Reset mock before each test
+      jest.clearAllMocks();
+    });
+
     it('should trigger useItem when Use button is clicked', async () => {
       const user = userEvent.setup();
+
+      // Mock successful item usage
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+        // Call the real store method to update inventory
+        const result = useInventoryStore.getState().useItem(charId, itemId);
+        return result;
+      });
 
       // Add consumable item
       useInventoryStore.getState().addItem(characterId, {
@@ -128,6 +145,13 @@ describe('InventoryList - Item Usage', () => {
     it('should show loading state while item is being used', async () => {
       const user = userEvent.setup();
 
+      // Mock with longer delay to catch loading state
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return useInventoryStore.getState().useItem(charId, itemId);
+      });
+
       useInventoryStore.getState().addItem(characterId, {
         name: 'Scroll',
         stackable: false,
@@ -147,15 +171,24 @@ describe('InventoryList - Item Usage', () => {
 
       const useButton = screen.getByRole('button', { name: /use/i });
 
-      // Click and immediately check for loading state
-      await user.click(useButton);
+      // Click and check for loading state
+      user.click(useButton);
 
-      // Button should show loading or be disabled during usage
-      expect(useButton).toBeDisabled();
+      // Button should show loading state during usage
+      await waitFor(() => {
+        expect(useButton).toBeDisabled();
+        expect(useButton).toHaveTextContent('Using...');
+      });
     });
 
     it('should remove item from list when last consumable is used', async () => {
       const user = userEvent.setup();
+
+      // Mock to call the real store method
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+        return useInventoryStore.getState().useItem(charId, itemId);
+      });
 
       useInventoryStore.getState().addItem(characterId, {
         name: 'Magic Berry',
@@ -190,8 +223,24 @@ describe('InventoryList - Item Usage', () => {
   });
 
   describe('Usage feedback', () => {
+    beforeEach(() => {
+      // Reset mock before each test
+      jest.clearAllMocks();
+    });
+
     it('should display success feedback after item is used', async () => {
       const user = userEvent.setup();
+
+      // Mock successful item usage with immediate response
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      mockProcessItemUsage.mockResolvedValueOnce({
+        success: true,
+        narrative: 'The energy drink revitalizes you',
+        itemName: 'Energy Drink',
+        categoryId: 'consumables',
+        wasConsumed: true,
+        remainingQuantity: 0,
+      });
 
       useInventoryStore.getState().addItem(characterId, {
         name: 'Energy Drink',
@@ -214,21 +263,28 @@ describe('InventoryList - Item Usage', () => {
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
 
-      // Should show success message or visual indicator
-      // Using flexible matcher since exact message format may vary
+      // Should show success message with the narrative
       await waitFor(() => {
-        expect(
-          screen.queryByText(/used|success|effect/i) ||
-          document.querySelector('[role="status"]')
-        ).toBeTruthy();
-      }, { timeout: 3000 });
+        expect(screen.getByText('The energy drink revitalizes you')).toBeInTheDocument();
+        expect(screen.getByRole('status')).toBeInTheDocument();
+      });
     });
 
     it('should display error feedback when usage fails', async () => {
       const user = userEvent.setup();
 
-      // Create item but then manually delete it to simulate error condition
-      const itemId = useInventoryStore.getState().addItem(characterId, {
+      // Mock failed item usage with immediate error response
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      mockProcessItemUsage.mockResolvedValueOnce({
+        success: false,
+        error: {
+          type: 'validation',
+          title: 'Item Not Found',
+          message: 'The specified item could not be found.',
+        },
+      });
+
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Cursed Amulet',
         stackable: false,
         categorization: {
@@ -245,18 +301,13 @@ describe('InventoryList - Item Usage', () => {
 
       render(<InventoryList characterId={characterId} />);
 
-      // Delete item to cause error
-      useInventoryStore.getState().deleteItem(itemId);
-
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
 
       // Should show error message
       await waitFor(() => {
-        expect(
-          screen.queryByText(/error|failed|cannot/i) ||
-          document.querySelector('[role="alert"]')
-        ).toBeTruthy();
+        expect(screen.getByText('The specified item could not be found.')).toBeInTheDocument();
+        expect(screen.getByRole('alert')).toBeInTheDocument();
       });
     });
   });

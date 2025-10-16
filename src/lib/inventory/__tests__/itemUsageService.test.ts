@@ -270,7 +270,7 @@ describe('Item Usage Service', () => {
       await processItemUsage(characterId, itemId, sessionId);
 
       // Verify journal entry was created
-      const journalEntries = useJournalStore.getState().getEntriesBySession(sessionId);
+      const journalEntries = useJournalStore.getState().getSessionEntries(sessionId);
       const usageEntry = journalEntries.find(entry =>
         entry.title.includes('Telescope') || entry.content.includes('Telescope')
       );
@@ -297,11 +297,11 @@ describe('Item Usage Service', () => {
         },
       });
 
-      const journalCountBefore = useJournalStore.getState().getEntriesBySession(sessionId).length;
+      const journalCountBefore = useJournalStore.getState().getSessionEntries(sessionId).length;
 
       await processItemUsage(characterId, itemId, sessionId);
 
-      const journalCountAfter = useJournalStore.getState().getEntriesBySession(sessionId).length;
+      const journalCountAfter = useJournalStore.getState().getSessionEntries(sessionId).length;
 
       // Journal entry count should not increase for insignificant items
       expect(journalCountAfter).toBe(journalCountBefore);
