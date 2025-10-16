@@ -230,10 +230,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         
         // Check if we already have segments for this session
         const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-        const hasInitialScene = existingSegments.some(seg => 
-          seg.type === 'scene' && 
-          (seg.metadata?.location === 'Starting Location' || 
-           seg.metadata?.location === 'Frontier Town')
+        // Check for 'intro' tag which is more stable than checking specific location strings
+        const hasInitialScene = existingSegments.some(seg =>
+          seg.metadata?.tags?.includes('intro')
         );
         
         // Check for existing decisions in the store

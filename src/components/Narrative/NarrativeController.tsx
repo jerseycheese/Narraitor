@@ -464,9 +464,10 @@ Respond with JSON format:
     const existingSegments = getSessionSegments(sessionId);
     setSegments(existingSegments);
 
-    // Check if we already have an initial scene - more precise than just checking if any segments exist
+    // Check if we already have an initial scene by looking for the 'intro' tag
+    // This is more stable than checking for a specific location string
     const hasInitialScene = existingSegments.some(segment =>
-      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
+      segment.metadata?.tags?.includes('intro')
     );
 
     // Critical: mark initial generation as completed if we already have an initial scene

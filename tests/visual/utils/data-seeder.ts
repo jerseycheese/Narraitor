@@ -456,9 +456,9 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
       mood: 'tense',
-      location: 'Neo-Tokyo streets',
+      location: 'Starting Location',
       timeOfDay: 'night',
-      tags: [],
+      tags: ['intro'],
     },
     timestamp: new Date('2024-01-01T02:00:00.000Z'),
     createdAt: '2024-01-01T02:00:00.000Z',
