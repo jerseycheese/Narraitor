@@ -131,7 +131,6 @@ export async function processItemUsage(
         const journalEntry = createItemUsageJournalEntry(
           item,
           narrative,
-          sessionId,
           worldId,
           characterId
         );

@@ -12,12 +12,10 @@ import type { EntityID } from '@/types/common.types';
 export function createItemUsageJournalEntry(
   item: InventoryItem,
   narrative: string,
-  sessionId: EntityID,
   worldId: EntityID,
   characterId: EntityID
-): Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'> {
+): Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt' | 'updatedAt'> {
   return {
-    sessionId,
     worldId,
     characterId,
     type: 'item-usage',
