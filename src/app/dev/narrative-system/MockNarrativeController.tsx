@@ -35,9 +35,9 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
     console.log(`[MockNarrativeController] Found ${existingSegments.length} existing segments`);
     
-    // Check for initial scenes to avoid duplication
-    const hasInitialScene = existingSegments.some(segment => 
-      segment.type === 'scene' && segment.metadata?.location === 'Frontier Town'
+    // Check for initial scenes to avoid duplication using 'intro' or 'opening' tags
+    const hasInitialScene = existingSegments.some(segment =>
+      segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
     );
     
     console.log(`[MockNarrativeController] Has initial scene: ${hasInitialScene}`);
@@ -108,13 +108,13 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
       
-      // Check for existing initial scene before adding
+      // Check for existing initial scene before adding using tags
       if (isInitial) {
         const checkSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-        const hasExistingInitialScene = checkSegments.some(segment => 
-          segment.type === 'scene' && segment.metadata?.location === 'Frontier Town'
+        const hasExistingInitialScene = checkSegments.some(segment =>
+          segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
         );
-        
+
         if (hasExistingInitialScene) {
           console.log('[MockNarrativeController] Detected existing initial scene, skipping store update');
           return; // Skip adding a duplicate
@@ -167,34 +167,34 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     }
   }, [choiceId, lastChoiceId, generateNarrative]);
 
-  // Deduplicate segments before rendering
+  // Deduplicate segments before rendering using tag-based detection
   const deduplicatedSegments = useMemo(() => {
-    // First, identify duplicate initial scenes
-    const initialScenes = segments.filter(
-      segment => segment.type === 'scene' && segment.metadata?.location === 'Frontier Town'
+    // First, identify duplicate initial scenes by checking for intro/opening tags
+    const initialScenes = segments.filter(segment =>
+      segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
     );
-    
+
     if (initialScenes.length > 1) {
       console.log(`[MockNarrativeController] Found ${initialScenes.length} initial scenes, deduplicating`);
-      
+
       // Sort by timestamp (newest first)
-      initialScenes.sort((a, b) => 
+      initialScenes.sort((a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
-      
+
       // Keep only the newest initial scene
       const keepScene = initialScenes[0];
       console.log(`[MockNarrativeController] Keeping initial scene ID: ${keepScene.id}`);
-      
+
       // Filter out all other initial scenes
-      const filteredSegments = segments.filter(segment => 
-        segment.id === keepScene.id || 
-        !(segment.type === 'scene' && segment.metadata?.location === 'Frontier Town')
+      const filteredSegments = segments.filter(segment =>
+        segment.id === keepScene.id ||
+        !segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
       );
-      
+
       return filteredSegments;
     }
-    
+
     return segments;
   }, [segments]);
   
