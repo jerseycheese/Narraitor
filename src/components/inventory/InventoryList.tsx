@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
-import { useItemWithEffects } from '@/lib/inventory/itemUsageService';
+import { processItemUsage } from '@/lib/inventory/itemUsageService';
 
 interface InventoryListProps {
   characterId: EntityID;
@@ -45,7 +45,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     setFeedback(null);
 
     try {
-      const result = await useItemWithEffects(characterId, itemId);
+      const result = await processItemUsage(characterId, itemId);
 
       if (result.success) {
         setFeedback({

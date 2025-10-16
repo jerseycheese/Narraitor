@@ -73,7 +73,7 @@ Response should be plain text only, no JSON or formatting.`;
  * Uses an item with full effects: inventory changes, narrative generation,
  * and journal entries for significant items.
  */
-export async function useItemWithEffects(
+export async function processItemUsage(
   characterId: EntityID,
   itemId: EntityID,
   sessionId?: EntityID

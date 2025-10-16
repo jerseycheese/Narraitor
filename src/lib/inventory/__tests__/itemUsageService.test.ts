@@ -1,7 +1,7 @@
 // Test item usage service
 // Verifies narrative generation and journal integration for item usage
 
-import { useItemWithEffects, generateItemUsageNarrative, isNarrativelySignificant } from '../itemUsageService';
+import { processItemUsage, generateItemUsageNarrative, isNarrativelySignificant } from '../itemUsageService';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -221,7 +221,7 @@ describe('Item Usage Service', () => {
     });
   });
 
-  describe('useItemWithEffects', () => {
+  describe('processItemUsage', () => {
     it('should use item and generate narrative for significant items', async () => {
       // Add quest item
       const itemId = useInventoryStore.getState().addItem(characterId, {
@@ -240,7 +240,7 @@ describe('Item Usage Service', () => {
         },
       });
 
-      const result = await useItemWithEffects(characterId, itemId, sessionId);
+      const result = await processItemUsage(characterId, itemId, sessionId);
 
       expect(result.success).toBe(true);
       expect(result.narrative).toBeTruthy();
@@ -265,7 +265,7 @@ describe('Item Usage Service', () => {
         },
       });
 
-      await useItemWithEffects(characterId, itemId, sessionId);
+      await processItemUsage(characterId, itemId, sessionId);
 
       // Verify journal entry was created
       const journalEntries = useJournalStore.getState().getEntriesBySession(sessionId);
@@ -297,7 +297,7 @@ describe('Item Usage Service', () => {
 
       const journalCountBefore = useJournalStore.getState().getEntriesBySession(sessionId).length;
 
-      await useItemWithEffects(characterId, itemId, sessionId);
+      await processItemUsage(characterId, itemId, sessionId);
 
       const journalCountAfter = useJournalStore.getState().getEntriesBySession(sessionId).length;
 

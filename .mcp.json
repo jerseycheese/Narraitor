@@ -9,6 +9,9 @@
     },
     "playwright": {
       "command": "./scripts/mcp-playwright.sh"
+    },
+    "zen": {
+      "command": "/Users/jackhaas/Projects/zen-mcp-server/zen-mcp-server"
     }
   }
 }
