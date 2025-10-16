@@ -6,7 +6,6 @@ import { safeTrim } from '@/lib/utils';
 export interface FormattingOptions {
   preserveLineBreaks?: boolean;
   formatDialogue?: boolean;
-  enableItalics?: boolean;
   paragraphSpacing?: 'single' | 'double';
   outputFormat?: 'text' | 'html';
 }
@@ -33,18 +32,13 @@ export function formatAIResponse(
   // Apply formatting in the correct order for predictable results
   // 1. First normalize whitespace (but preserve paragraph breaks)
   formatted = normalizeWhitespace(formatted);
-  
+
   // 2. Format dialogue if enabled (before paragraph wrapping to avoid HTML interference)
   if (options.formatDialogue) {
     formatted = formatDialogue(formatted);
   }
-  
-  // 3. Format italics if enabled (before paragraph wrapping to avoid HTML interference)
-  if (options.enableItalics) {
-    formatted = formatItalics(formatted);
-  }
-  
-  // 4. Format paragraphs (last step to avoid interfering with content formatting)
+
+  // 3. Format paragraphs (last step to avoid interfering with content formatting)
   formatted = formatParagraphs(formatted, options.preserveLineBreaks, options.paragraphSpacing, outputFormat);
 
   return formatted;
@@ -182,17 +176,5 @@ function formatDialogue(text: string): string {
   });
   
   return formatted;
-}
-
-/**
- * Formats italics using asterisks
- * @param text - Text containing asterisk-wrapped emphasis
- * @returns Text with HTML emphasis tags
- */
-function formatItalics(text: string): string {
-  // Pattern to match text between asterisks - only complete pairs
-  const italicsPattern = /\*([^*\n]+)\*/g;
-  
-  return text.replace(italicsPattern, '<em>$1</em>');
 }
 

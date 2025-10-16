@@ -120,7 +120,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           preserveLineBreaks: false,
           formatDialogue: true,
-          enableItalics: false,
           paragraphSpacing: 'single',
           outputFormat: 'text'
         };
@@ -128,7 +127,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           preserveLineBreaks: false,
           formatDialogue: false,
-          enableItalics: false,
           paragraphSpacing: 'single',
           outputFormat: 'text'
         };
@@ -136,7 +134,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           preserveLineBreaks: false,
           formatDialogue: true,
-          enableItalics: false,
           paragraphSpacing: 'double',
           outputFormat: 'text'
         };
@@ -144,7 +141,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           preserveLineBreaks: true,
           formatDialogue: false,
-          enableItalics: false,
           paragraphSpacing: 'single',
           outputFormat: 'text'
         };
@@ -152,7 +148,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           preserveLineBreaks: false,
           formatDialogue: true,
-          enableItalics: false,
           paragraphSpacing: 'single',
           outputFormat: 'text'
         };

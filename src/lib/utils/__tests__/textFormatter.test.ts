@@ -95,41 +95,6 @@ describe('formatAIResponse', () => {
     });
   });
 
-  describe('Italics formatting', () => {
-    test('should format asterisk-wrapped text as italics', () => {
-      const input = 'This is *emphasized* text.';
-      const expected = 'This is <em>emphasized</em> text.';
-      const options: FormattingOptions = { enableItalics: true };
-      expect(formatAIResponse(input, options)).toBe(expected);
-    });
-
-    test('should handle multiple italics instances', () => {
-      const input = 'Both *this* and *that* are emphasized.';
-      const expected = 'Both <em>this</em> and <em>that</em> are emphasized.';
-      const options: FormattingOptions = { enableItalics: true };
-      expect(formatAIResponse(input, options)).toBe(expected);
-    });
-
-    test('should not process italics when disabled', () => {
-      const input = 'This is *emphasized* text.';
-      expect(formatAIResponse(input)).toBe(input);
-    });
-
-    test('should handle edge case of asterisk at sentence boundaries', () => {
-      const input = '*Emphasized* at start. At end *emphasized*.';
-      const expected = '<em>Emphasized</em> at start. At end <em>emphasized</em>.';
-      const options: FormattingOptions = { enableItalics: true };
-      expect(formatAIResponse(input, options)).toBe(expected);
-    });
-
-    test('should not process unmatched asterisks', () => {
-      const input = 'Ending with italics*';
-      const expected = 'Ending with italics*';
-      const options: FormattingOptions = { enableItalics: true };
-      expect(formatAIResponse(input, options)).toBe(expected);
-    });
-  });
-
   describe('Whitespace normalization', () => {
     test('should trim leading and trailing whitespace', () => {
       const input = '  Text with spaces  ';
@@ -151,22 +116,20 @@ describe('formatAIResponse', () => {
   });
 
   describe('Combined formatting options', () => {
-    test('should apply all formatting options together', () => {
-      const input = 'She said, This is *important*!\n\nThe next paragraph.';
-      const expected = 'She said, "This is <em>important</em>!"\n\nThe next paragraph.';
+    test('should apply dialogue formatting with paragraphs', () => {
+      const input = 'She said, This is important!\n\nThe next paragraph.';
+      const expected = 'She said, "This is important!"\n\nThe next paragraph.';
       const options: FormattingOptions = {
-        formatDialogue: true,
-        enableItalics: true
+        formatDialogue: true
       };
       expect(formatAIResponse(input, options)).toBe(expected);
     });
 
     test('should handle complex mixed content', () => {
-      const input = '  First paragraph.\n\n\nHe said, Look at *that*!  \n\nFinal paragraph.  ';
-      const expected = 'First paragraph.\n\nHe said, "Look at <em>that</em>!"\n\nFinal paragraph.';
+      const input = '  First paragraph.\n\n\nHe said, Look at that!  \n\nFinal paragraph.  ';
+      const expected = 'First paragraph.\n\nHe said, "Look at that!"\n\nFinal paragraph.';
       const options: FormattingOptions = {
-        formatDialogue: true,
-        enableItalics: true
+        formatDialogue: true
       };
       expect(formatAIResponse(input, options)).toBe(expected);
     });
