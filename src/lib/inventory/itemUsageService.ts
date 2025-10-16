@@ -2,7 +2,7 @@
 
 import type { InventoryItem, ItemUsageResult, StandardInventoryCategory } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
-import { defaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { createItemUsageJournalEntry } from './itemUsageJournalIntegration';
@@ -59,10 +59,11 @@ Generate a brief (1-3 sentences) narrative description of what happens when the 
 
 Response should be plain text only, no JSON or formatting.`;
 
-    const response = await defaultGeminiClient.generateContent(prompt);
+    const geminiClient = createDefaultGeminiClient();
+    const response = await geminiClient.generateContent(prompt);
 
     return response.content || `You use the ${item.name}.`;
-  } catch (error) {
+  } catch {
     // Fallback narrative if AI generation fails
     return `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
   }

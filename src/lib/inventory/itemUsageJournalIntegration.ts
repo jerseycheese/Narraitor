@@ -4,7 +4,6 @@
 import type { InventoryItem } from '@/types/inventory.types';
 import type { JournalEntry } from '@/types/journal.types';
 import type { EntityID } from '@/types/common.types';
-import { getTimestamp } from '@/lib/utils';
 
 /**
  * Creates a journal entry for item usage

@@ -61,7 +61,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
           message: result.error?.message || 'Failed to use item',
         });
       }
-    } catch (error) {
+    } catch {
       setFeedback({
         type: 'error',
         message: 'An unexpected error occurred',
