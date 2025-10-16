@@ -6,6 +6,7 @@ import {
   InventoryItem,
   InventoryItemCategorization,
   InventoryAcquisitionRecord,
+  ItemUsageResult,
 } from '@/types/inventory.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
@@ -31,6 +32,7 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   updateItemQuantity: (itemId: EntityID, quantity: number) => void;
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   clearCharacterInventory: (characterId: EntityID) => void;
+  useItem: (characterId: EntityID, itemId: EntityID) => ItemUsageResult;
 
   // State management
   reset: () => void;
@@ -655,6 +657,91 @@ export const useInventoryStore = create<InventoryStore>()(
       clearCharacterInventory: (characterId) => {
         const itemIds = get().characterInventories[characterId] || [];
         itemIds.forEach((itemId) => get().delete(itemId));
+      },
+
+      useItem: (characterId, itemId) => {
+        const state = get();
+        const item = state.items[itemId];
+
+        // Validate item exists
+        if (!item) {
+          const error = createStoreError(
+            'Item Not Found',
+            'The specified item could not be found.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Validate character owns this item
+        const characterItems = state.characterInventories[characterId] || [];
+        if (!characterItems.includes(itemId)) {
+          const error = createStoreError(
+            'Item Not Available',
+            'This item is not in your inventory.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Validate item has quantity > 0
+        if (item.quantity <= 0) {
+          const error = createStoreError(
+            'Item Not Available',
+            'This item is no longer available.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Determine if item is consumable (reduces quantity)
+        const isConsumable = item.categoryId === 'consumables';
+        const wasConsumed = isConsumable;
+        let remainingQuantity = item.quantity;
+
+        if (isConsumable) {
+          if (item.quantity === 1) {
+            // Remove the entire item
+            get().delete(itemId);
+            remainingQuantity = 0;
+          } else {
+            // Reduce quantity by 1
+            get().update(itemId, { quantity: item.quantity - 1 });
+            remainingQuantity = item.quantity - 1;
+          }
+        }
+
+        return {
+          success: true,
+          itemName: item.name,
+          categoryId: item.categoryId,
+          wasConsumed,
+          remainingQuantity,
+        };
       },
     }),
     {

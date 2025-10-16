@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { EntityID } from '@/types/common.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
+import { useItemWithEffects } from '@/lib/inventory/itemUsageService';
 
 interface InventoryListProps {
   characterId: EntityID;
@@ -31,9 +33,43 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   className = '',
 }) => {
   const { getCharacterItems } = useInventoryStore();
+  const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Get all items for this character
   const items = getCharacterItems(characterId);
+
+  // Handle item usage
+  const handleUseItem = async (itemId: EntityID, itemName: string) => {
+    setUsingItemId(itemId);
+    setFeedback(null);
+
+    try {
+      const result = await useItemWithEffects(characterId, itemId);
+
+      if (result.success) {
+        setFeedback({
+          type: 'success',
+          message: result.narrative || `Used ${itemName}`,
+        });
+
+        // Clear feedback after 3 seconds
+        setTimeout(() => setFeedback(null), 3000);
+      } else {
+        setFeedback({
+          type: 'error',
+          message: result.error?.message || 'Failed to use item',
+        });
+      }
+    } catch (error) {
+      setFeedback({
+        type: 'error',
+        message: 'An unexpected error occurred',
+      });
+    } finally {
+      setUsingItemId(null);
+    }
+  };
 
   // Group items by category
   const itemsByCategory = items.reduce((acc, item) => {
@@ -65,6 +101,20 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
+      {/* Feedback message */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-lg ${
+            feedback.type === 'success'
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}
+          role={feedback.type === 'error' ? 'alert' : 'status'}
+        >
+          {feedback.message}
+        </div>
+      )}
+
       {populatedCategories.map((categoryId) => {
         const categoryItems = itemsByCategory[categoryId];
         const metadata = getCategoryMetadata(categoryId);
@@ -130,20 +180,31 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                   )}
 
                   {/* Item Metadata Footer */}
-                  <div className="flex items-center gap-2 text-xs">
-                    <Badge
+                  <div className="flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        size="sm"
+                        className="item-category hover:bg-white"
+                        aria-label={`Category: ${categoryName}`}
+                      >
+                        {categoryName}
+                      </Badge>
+                      {item.stackable && item.maxStack && (
+                        <span className="text-muted-foreground" aria-label={`Maximum stack size: ${item.maxStack}`}>
+                          Max: {item.maxStack}
+                        </span>
+                      )}
+                    </div>
+                    <Button
                       variant="outline"
                       size="sm"
-                      className="item-category hover:bg-white"
-                      aria-label={`Category: ${categoryName}`}
+                      onClick={() => handleUseItem(item.id, item.name)}
+                      disabled={usingItemId === item.id || item.quantity <= 0}
+                      className="ml-auto"
                     >
-                      {categoryName}
-                    </Badge>
-                    {item.stackable && item.maxStack && (
-                      <span className="text-muted-foreground" aria-label={`Maximum stack size: ${item.maxStack}`}>
-                        Max: {item.maxStack}
-                      </span>
-                    )}
+                      {usingItemId === item.id ? 'Using...' : 'Use'}
+                    </Button>
                   </div>
                 </Card>
               ))}

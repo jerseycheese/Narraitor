@@ -85,3 +85,32 @@ export interface InventoryCategory extends NamedEntity {
   sortOrder: number;
   parentCategoryId?: EntityID;
 }
+
+/**
+ * Result of using an item
+ */
+export interface ItemUsageResult {
+  success: boolean;
+  itemName?: string;
+  categoryId?: StandardInventoryCategory;
+  wasConsumed?: boolean;
+  remainingQuantity?: number;
+  narrative?: string;
+  error?: {
+    type: string;
+    title: string;
+    message: string;
+  };
+}
+
+/**
+ * Context for item usage
+ */
+export interface ItemUsageContext {
+  characterId: EntityID;
+  itemId: EntityID;
+  sessionId?: EntityID;
+  worldId?: EntityID;
+  currentLocation?: string;
+  currentSituation?: string;
+}
