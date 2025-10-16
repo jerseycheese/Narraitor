@@ -44,6 +44,11 @@ Generate a narrative segment that:
 5. Engages the reader and moves the story forward
 6. Uses varied sensory descriptions (primarily visual, auditory, tactile)
 7. Avoids repetitive olfactory descriptions unless essential to the scene
+8. Adds emphasis for dramatic effect using markdown formatting:
+   - Use *single asterisks* around important phrases, atmospheric details, or notable objects
+   - Use **double asterisks** around critical moments, intense emotions, or dramatic revelations
+   - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact
+   - Example: "The *Arasaka building* looms ahead, its security pulsing like a **digital heartbeat**"
 
 Response Format:
 {
