@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Card } from '@/components/ui/card';
@@ -33,6 +34,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   className = '',
 }) => {
   const { getCharacterItems } = useInventoryStore();
+  const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -45,7 +47,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     setFeedback(null);
 
     try {
-      const result = await processItemUsage(characterId, itemId);
+      const result = await processItemUsage(characterId, itemId, sessionId || undefined);
 
       if (result.success) {
         setFeedback({

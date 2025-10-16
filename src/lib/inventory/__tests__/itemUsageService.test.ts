@@ -11,12 +11,12 @@ import type { InventoryItem } from '@/types/inventory.types';
 
 // Mock AI client
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
-  defaultGeminiClient: {
+  createDefaultGeminiClient: jest.fn(() => ({
     generateContent: jest.fn().mockResolvedValue({
       content: 'The potion courses through your veins, restoring your vitality.',
       tokenUsage: 50,
     }),
-  },
+  })),
 }));
 
 describe('Item Usage Service', () => {
@@ -189,10 +189,12 @@ describe('Item Usage Service', () => {
 
     it('should handle AI generation failures gracefully', async () => {
       // Mock failure
-      const { defaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-      (defaultGeminiClient.generateContent as jest.Mock).mockRejectedValueOnce(
-        new Error('AI service unavailable')
-      );
+      const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+      (createDefaultGeminiClient as jest.Mock).mockReturnValueOnce({
+        generateContent: jest.fn().mockRejectedValueOnce(
+          new Error('AI service unavailable')
+        ),
+      });
 
       const item: InventoryItem = {
         id: 'item-6',
