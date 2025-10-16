@@ -14,6 +14,9 @@ test.describe('Item Usage Journal Integration', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
+    // Navigate to the play page first (required for localStorage access)
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+
     // Seed inventory with a significant item (quest item) and active session
     await page.evaluate(() => {
       const sessionId = 'session-cyberpunk-ghost';
@@ -115,9 +118,6 @@ test.describe('Item Usage Journal Integration', () => {
       };
       localStorage.setItem('narraitor-journal-store', JSON.stringify(journalStore));
     });
-
-    // Navigate to the play page
-    await page.goto('/worlds/world-cyberpunk-2077/play');
 
     // Wait for page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
