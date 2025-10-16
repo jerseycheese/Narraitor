@@ -4,6 +4,7 @@
 import type { InventoryItem } from '@/types/inventory.types';
 import type { JournalEntry } from '@/types/journal.types';
 import type { EntityID } from '@/types/common.types';
+import { getTimestamp } from '@/lib/utils';
 
 /**
  * Creates a journal entry for item usage
@@ -14,7 +15,7 @@ export function createItemUsageJournalEntry(
   narrative: string,
   worldId: EntityID,
   characterId: EntityID
-): Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt' | 'updatedAt'> {
+): Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> {
   return {
     worldId,
     characterId,
@@ -23,6 +24,7 @@ export function createItemUsageJournalEntry(
     content: narrative,
     significance: 'minor',
     isRead: false,
+    updatedAt: getTimestamp(),
     relatedEntities: [
       {
         type: 'item',
