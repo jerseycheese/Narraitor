@@ -445,18 +445,20 @@ export const SAMPLE_GAME_SESSIONS = [
 ];
 
 export const SAMPLE_NARRATIVE_SEGMENTS = [
+  // Comprehensive cyberpunk segments for visual testing
   {
     id: 'segment-cyberpunk-1',
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat. Your contact\'s message burns in your memory: "The data is on floor 47. Get in, get it, get out. Trust no one."',
+      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
     type: 'scene' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
       mood: 'tense',
       location: 'Neo-Tokyo streets',
       timeOfDay: 'night',
+      tags: [],
     },
     timestamp: new Date('2024-01-01T02:00:00.000Z'),
     createdAt: '2024-01-01T02:00:00.000Z',
@@ -467,13 +469,14 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns. You have two routes to reach floor 47.',
-    type: 'action' as const,
+      '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
+    type: 'dialogue' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
-      mood: 'focused',
-      location: 'Arasaka building interior',
+      mood: 'mysterious',
+      location: 'Neo-Tokyo alley',
       timeOfDay: 'night',
+      tags: [],
     },
     timestamp: new Date('2024-01-01T02:01:00.000Z'),
     createdAt: '2024-01-01T02:01:00.000Z',
@@ -481,6 +484,42 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
   },
   {
     id: 'segment-cyberpunk-3',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content:
+      'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+    type: 'action' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'action',
+      location: 'Arasaka building interior',
+      timeOfDay: 'night',
+      tags: [],
+    },
+    timestamp: new Date('2024-01-01T02:02:00.000Z'),
+    createdAt: '2024-01-01T02:02:00.000Z',
+    updatedAt: '2024-01-01T02:02:00.000Z',
+  },
+  {
+    id: 'segment-cyberpunk-4',
+    worldId: 'world-cyberpunk-2077',
+    sessionId: 'session-cyberpunk-ghost',
+    content:
+      'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
+    type: 'transition' as const,
+    characterIds: ['char-cyberpunk-hacker'],
+    metadata: {
+      mood: 'neutral',
+      location: 'Arasaka building',
+      timeOfDay: 'night',
+      tags: [],
+    },
+    timestamp: new Date('2024-01-01T02:03:00.000Z'),
+    createdAt: '2024-01-01T02:03:00.000Z',
+    updatedAt: '2024-01-01T02:03:00.000Z',
+  },
+  {
+    id: 'segment-cyberpunk-5',
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
@@ -497,24 +536,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     updatedAt: '2024-01-01T02:02:00.000Z',
   },
   {
-    id: 'segment-cyberpunk-4',
-    worldId: 'world-cyberpunk-2077',
-    sessionId: 'session-cyberpunk-ghost',
-    content:
-      'The elevator hums to life as your stolen keycard grants access to the restricted floors. Floor numbers flash by: 20... 30... 40... The corporate executives and their secrets await just seven floors above.',
-    type: 'action' as const,
-    characterIds: ['char-cyberpunk-hacker'],
-    metadata: {
-      mood: 'escalating',
-      location: 'Arasaka elevator',
-      timeOfDay: 'night',
-    },
-    timestamp: new Date('2024-01-01T02:03:00.000Z'),
-    createdAt: '2024-01-01T02:03:00.000Z',
-    updatedAt: '2024-01-01T02:03:00.000Z',
-  },
-  {
-    id: 'segment-cyberpunk-5',
+    id: 'segment-cyberpunk-6',
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
