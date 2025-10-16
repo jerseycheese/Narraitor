@@ -87,31 +87,43 @@ describe('NarrativeDisplay - Formatting Integration', () => {
   });
 
   describe('Text emphasis and formatting', () => {
-    it('should handle emphasized text for important story elements', () => {
+    it('should render emphasized text with semantic HTML', () => {
       const rawContent = 'The *ancient* artifact glowed with *mysterious* power.';
       const segment = createMockSegment(rawContent);
-      
+
       render(<NarrativeDisplay segment={segment} />);
-      
-      // HTML emphasis formatting creates em tags
-      const container = document.querySelector('.narrative-content');
-      expect(container).toBeInTheDocument();
-      expect(container?.innerHTML).toContain('<em>ancient</em>');
-      expect(container?.innerHTML).toContain('<em>mysterious</em>');
+
+      // Verify emphasized words are rendered as em elements
+      const emphasizedWords = screen.getAllByText(/ancient|mysterious/);
+      emphasizedWords.forEach(word => {
+        expect(word.tagName).toBe('EM');
+      });
     });
 
-    it('should format action sequences for dramatic effect', () => {
+    it('should emphasize text in action sequences', () => {
       const rawContent = 'He leaped forward!\n\nThe sword clashed against the shield.\n\n*Victory* was within reach.';
       const segment = createMockSegment(rawContent, 'action');
-      
+
       render(<NarrativeDisplay segment={segment} />);
-      
-      // Action segments format emphasis and organize paragraphs
+
+      // Action segments organize paragraphs
       expect(screen.getByText('He leaped forward!')).toBeInTheDocument();
       expect(screen.getByText('The sword clashed against the shield.')).toBeInTheDocument();
-      
-      const container = document.querySelector('.narrative-content');
-      expect(container?.innerHTML).toContain('<em>Victory</em>');
+
+      // Verify emphasis is rendered
+      const victoryText = screen.getByText('Victory');
+      expect(victoryText.tagName).toBe('EM');
+    });
+
+    it('should render bold emphasis with strong tags', () => {
+      const rawContent = 'The enemy approaches with **unstoppable force**!';
+      const segment = createMockSegment(rawContent, 'action');
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      // Verify bold text is rendered as strong element
+      const boldText = screen.getByText('unstoppable force');
+      expect(boldText.tagName).toBe('STRONG');
     });
   });
 
@@ -119,16 +131,15 @@ describe('NarrativeDisplay - Formatting Integration', () => {
     it('should handle mixed content with dialogue, paragraphs, and emphasis', () => {
       const rawContent = 'The tavern was *bustling* with activity.\n\nThe bartender said, What can I get you? The traveler replied, Just some information.\n\nThe conversation continued late into the night.';
       const segment = createMockSegment(rawContent);
-      
+
       render(<NarrativeDisplay segment={segment} />);
-      
-      const container = document.querySelector('.narrative-content');
-      expect(container).toBeInTheDocument();
-      
+
       // All formatting should work together: emphasis, dialogue quotes, and paragraphs
-      expect(container?.innerHTML).toContain('<em>bustling</em>');
-      expect(container?.innerHTML).toContain('What can I get you?');
-      expect(container?.innerHTML).toContain('"Just some information."');
+      const emphasizedWord = screen.getByText('bustling');
+      expect(emphasizedWord.tagName).toBe('EM');
+
+      expect(screen.getByText(/What can I get you\?/)).toBeInTheDocument();
+      expect(screen.getByText(/"Just some information\."/)).toBeInTheDocument();
       expect(screen.getByText('The conversation continued late into the night.')).toBeInTheDocument();
     });
 
@@ -168,18 +179,19 @@ The librarian said, Welcome to the Archive of Ages. Here you will find the knowl
 They walked deeper into the stacks. The *whispers* of ancient wisdom echoed around them.
 
 This was only the beginning of their quest.`;
-      
+
       const segment = createMockSegment(longContent);
-      
+
       render(<NarrativeDisplay segment={segment} />);
-      
+
       // Long content should be organized into clear paragraphs with proper formatting
       expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.')).toBeInTheDocument();
       expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\./)).toBeInTheDocument();
       expect(screen.getByText('This was only the beginning of their quest.')).toBeInTheDocument();
-      
-      const container = document.querySelector('.narrative-content');
-      expect(container?.innerHTML).toContain('<em>whispers</em>');
+
+      // Verify emphasis is rendered
+      const emphasizedWord = screen.getByText('whispers');
+      expect(emphasizedWord.tagName).toBe('EM');
     });
 
     it('should handle whitespace normalization while preserving story structure', () => {

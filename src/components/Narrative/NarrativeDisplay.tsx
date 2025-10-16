@@ -4,6 +4,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { parseNarrativeContent } from '@/lib/utils';
+import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 
 
 interface NarrativeDisplayProps {
@@ -116,45 +117,14 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getFormattingOptions = (type: string): FormattingOptions => {
     switch (type) {
       case 'dialogue':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          enableItalics: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'html'
-        };
-      case 'action':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: false,
-          enableItalics: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'html'
-        };
+        return { formatDialogue: true };
       case 'scene':
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          enableItalics: true,
-          paragraphSpacing: 'double',
-          outputFormat: 'html'
-        };
+        return { formatDialogue: true, paragraphSpacing: 'double' };
       case 'transition':
-        return {
-          preserveLineBreaks: true,
-          formatDialogue: false,
-          enableItalics: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'html'
-        };
+        return { preserveLineBreaks: true };
+      case 'action':
       default:
-        return {
-          preserveLineBreaks: false,
-          formatDialogue: true,
-          enableItalics: true,
-          paragraphSpacing: 'single',
-          outputFormat: 'html'
-        };
+        return {}; // Use all defaults
     }
   };
 
@@ -167,9 +137,9 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
-        <div 
+        <FormattedNarrativeContent 
+          content={formattedContent}
           className={`text-lg narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
-          dangerouslySetInnerHTML={{ __html: formattedContent }}
         />
         {segment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">

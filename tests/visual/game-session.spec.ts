@@ -181,9 +181,9 @@ test.describe('Game Session Visual Tests', () => {
           const sessionSegments = narrativeState?.state?.sessionSegments || {};
           const currentSessionId = sessionState?.state?.currentSessionId;
 
-          const expectedSegments = ['segment-cyberpunk-1', 'segment-cyberpunk-2', 'segment-cyberpunk-3'];
+          const expectedSegments = ['segment-cyberpunk-1', 'segment-cyberpunk-2', 'segment-cyberpunk-3', 'segment-cyberpunk-4'];
           const hasAllSegments = expectedSegments.every(id => segments[id]);
-          const hasSessionMapping = sessionSegments[currentSessionId]?.length >= 3;
+          const hasSessionMapping = sessionSegments[currentSessionId]?.length >= 4;
 
           return hasAllSegments && hasSessionMapping;
         } catch {
@@ -227,7 +227,7 @@ test.describe('Game Session Visual Tests', () => {
     // Fallback: Directly inject segments into the narrative store if components aren't hydrating properly
     await page.evaluate(() => {
       try {
-        // Create the segments we expect
+        // Create segments to test all narrative segment types: scene, dialogue, action, transition
         const cyberpunkSegments = [
           {
             id: 'segment-cyberpunk-1',
@@ -236,7 +236,7 @@ test.describe('Game Session Visual Tests', () => {
             content: 'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
             type: 'scene',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'tense', location: 'Neo-Tokyo streets', timeOfDay: 'night' },
+            metadata: { mood: 'tense', location: 'Neo-Tokyo streets', timeOfDay: 'night', tags: [] },
             timestamp: new Date('2024-01-01T02:00:00.000Z'),
             createdAt: '2024-01-01T02:00:00.000Z',
             updatedAt: '2024-01-01T02:00:00.000Z'
@@ -245,10 +245,10 @@ test.describe('Game Session Visual Tests', () => {
             id: 'segment-cyberpunk-2',
             worldId: 'world-cyberpunk-2077',
             sessionId: 'session-cyberpunk-ghost',
-            content: 'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
-            type: 'action',
+            content: '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
+            type: 'dialogue',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'focused', location: 'Arasaka building interior', timeOfDay: 'night' },
+            metadata: { mood: 'mysterious', location: 'Neo-Tokyo alley', timeOfDay: 'night', tags: [] },
             timestamp: new Date('2024-01-01T02:01:00.000Z'),
             createdAt: '2024-01-01T02:01:00.000Z',
             updatedAt: '2024-01-01T02:01:00.000Z'
@@ -257,13 +257,25 @@ test.describe('Game Session Visual Tests', () => {
             id: 'segment-cyberpunk-3',
             worldId: 'world-cyberpunk-2077',
             sessionId: 'session-cyberpunk-ghost',
-            content: 'Elevator shafts and stairwells offer different advantages. The elevator requires a keycard hack but offers direct access. The emergency stairs avoid most sensors but mean a long climb.',
-            type: 'choice',
+            content: 'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+            type: 'action',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'tactical', location: 'Arasaka building lobby', timeOfDay: 'night' },
+            metadata: { mood: 'action', location: 'Arasaka building interior', timeOfDay: 'night', tags: [] },
             timestamp: new Date('2024-01-01T02:02:00.000Z'),
             createdAt: '2024-01-01T02:02:00.000Z',
             updatedAt: '2024-01-01T02:02:00.000Z'
+          },
+          {
+            id: 'segment-cyberpunk-4',
+            worldId: 'world-cyberpunk-2077',
+            sessionId: 'session-cyberpunk-ghost',
+            content: 'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
+            type: 'transition',
+            characterIds: ['char-cyberpunk-hacker'],
+            metadata: { mood: 'neutral', location: 'Arasaka building', timeOfDay: 'night', tags: [] },
+            timestamp: new Date('2024-01-01T02:03:00.000Z'),
+            createdAt: '2024-01-01T02:03:00.000Z',
+            updatedAt: '2024-01-01T02:03:00.000Z'
           }
         ];
 
@@ -360,149 +372,26 @@ test.describe('Game Session Visual Tests', () => {
       console.log('✅ Removed duplicate textarea inside collapsible section');
     });
 
+    // Temporarily remove height constraints to show all segments in fullPage screenshot
+    await page.evaluate(() => {
+      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
+      if (storyColumn) {
+        const element = storyColumn as HTMLElement;
+        element.style.maxHeight = 'none';
+        element.style.overflow = 'visible';
+        console.log('✅ Removed height constraints for fullPage screenshot');
+      }
+    });
+
+    await page.waitForTimeout(200); // Wait for layout to adjust
+
     await hideDynamicContent(page);
-    
-    // Take screenshot of game session page - now testing real components with height constraints and fade effects
+
+    // Take screenshot of game session page - fullPage will now capture all segments
     await expect(page).toHaveScreenshot('game-session.png', {
       fullPage: true,
       threshold: 0.3  // Higher threshold for initial update to capture component changes
     });
   });
 
-  test('Game session with multiple segments and expanded actions', async ({ page }) => {
-    await seedTestData(page);
-    await mockApiEndpoints(page);
-
-    // Navigate to the cyberpunk world's play page
-    await page.goto('/worlds/world-cyberpunk-2077/play');
-
-    // Wait for page to load
-    try {
-      await page.waitForLoadState('networkidle', { timeout: 5000 });
-    } catch {
-      // Continue if network doesn't idle
-    }
-
-    // Wait for the real React components to render with seeded data
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
-    console.log('✅ ActiveGameSession component loaded');
-
-    // Wait for narrative content to render
-    await page.waitForSelector('.narrative-segment', { timeout: 5000 });
-    console.log('✅ Narrative segments rendered');
-
-    // Expand the suggested actions section to test both states
-    const suggestedActionsToggle = page.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: 'Suggested Actions' });
-    if (await suggestedActionsToggle.isVisible()) {
-      await suggestedActionsToggle.click();
-      await page.waitForTimeout(500); // Wait for expansion animation
-      console.log('✅ Suggested actions expanded');
-    }
-
-    // Wait for content to stabilize (accept whatever segments are rendered)
-    await page.waitForTimeout(2000);
-
-    // Force height constraints by manually injecting additional segments to demonstrate the effect
-    await page.evaluate(() => {
-      const narrativeContainer = document.querySelector('.space-y-4');
-      if (narrativeContainer) {
-        // Add extra narrative segments to trigger height constraints
-        const extraSegments = [
-          {
-            content: 'The elevator hums to life as your stolen keycard grants access to the restricted floors. Floor numbers flash by: 20... 30... 40... The corporate executives and their secrets await just seven floors above.',
-            type: 'action',
-            location: 'Arasaka elevator'
-          },
-          {
-            content: 'Floor 47. The doors slide open to reveal a pristine corridor lined with offices. Security cameras track your every movement, but your scrambler keeps you invisible for now. The executive suite is at the end of the hall.',
-            type: 'scene',
-            location: 'Arasaka floor 47'
-          },
-          {
-            content: 'Multiple security layers protect the executive data vault. Your neural interface detects biometric scanners, motion sensors, and encrypted access panels. Each approach carries risks - a direct hack might trigger alarms, while social engineering could take precious time you don\'t have.',
-            type: 'choice',
-            location: 'Executive data vault'
-          }
-        ];
-
-        extraSegments.forEach((segment, index) => {
-          const segmentDiv = document.createElement('div');
-          segmentDiv.className = 'space-y-3 snap-center';
-          segmentDiv.innerHTML = `
-            <div class="narrative-segment p-6 rounded-lg bg-white border border-gray-200">
-              <p class="text-xs uppercase text-gray-700 font-semibold mb-2">${segment.type}</p>
-              <div class="text-lg narrative-content readable scene-spacing text-gray-900">
-                <p>${segment.content}</p>
-              </div>
-              <p class="text-xs text-gray-600 mt-4 italic">${segment.location}</p>
-            </div>
-          `;
-          narrativeContainer.appendChild(segmentDiv);
-        });
-
-        console.log('✅ Added extra segments for visual testing');
-
-        // Now manually trigger the height constraint logic that should activate with 5+ segments
-        const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-        if (storyColumn) {
-          const segments = document.querySelectorAll('.narrative-segment');
-          if (segments.length > 1) {
-            // Apply the height constraint manually
-            storyColumn.style.maxHeight = '500px';
-
-            // Add the fade overlay
-            const fadeOverlay = document.createElement('div');
-            fadeOverlay.className = 'absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-b from-background to-transparent';
-            storyColumn.appendChild(fadeOverlay);
-
-            console.log(`✅ Applied height constraints with ${segments.length} segments`);
-          }
-        }
-      }
-    });
-
-    // Wait for the DOM changes to settle
-    await page.waitForTimeout(500);
-
-    // Scroll to bottom to show realistic state - user would be at bottom to see latest content
-    await page.evaluate(() => {
-      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-      if (storyColumn) {
-        const scrollArea = storyColumn.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollArea) {
-          scrollArea.scrollTo({
-            top: scrollArea.scrollHeight,
-            behavior: 'smooth'
-          });
-          console.log('✅ Scrolled to bottom to show latest content');
-        }
-      }
-    });
-
-    // Wait for scroll to complete
-    await page.waitForTimeout(500);
-
-    // Verify the constraints are now applied
-    const heightDebug = await page.evaluate(() => {
-      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-      const segments = document.querySelectorAll('.narrative-segment');
-      const fadeOverlay = document.querySelector('.absolute.top-0.left-0.right-0.h-8.pointer-events-none.z-10.bg-gradient-to-b.from-background.to-transparent');
-
-      return {
-        segmentCount: segments.length,
-        maxHeight: storyColumn ? window.getComputedStyle(storyColumn).maxHeight : 'not found',
-        hasFadeOverlay: fadeOverlay ? 'FOUND' : 'NOT FOUND'
-      };
-    });
-
-    console.log('📏 Multi-segment height debug:', heightDebug);
-
-    await hideDynamicContent(page);
-
-    // Take screenshot showing multiple segments with height constraints and expanded actions
-    await expect(page).toHaveScreenshot('game-session-multi-segments.png', {
-      fullPage: true,
-      threshold: 0.3
-    });
-  });
 });

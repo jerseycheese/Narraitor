@@ -5,7 +5,6 @@ import { formatAIResponse, FormattingOptions } from '../textFormatter';
 describe('Text Formatter - Storytelling Features (Issue #231)', () => {
   const storytellingOptions: FormattingOptions = {
     formatDialogue: true,
-    enableItalics: true,
     preserveLineBreaks: false,
     outputFormat: 'html'
   };
@@ -29,24 +28,13 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
       expect(result.match(/"/g)).toHaveLength(4);
     });
 
-    it('should emphasize important story elements through formatting', () => {
-      const input = `The *ancient* artifact glowed with *mysterious* power.`;
-      const result = formatAIResponse(input, storytellingOptions);
-      
-      expect(result).toBe('<p>The <em>ancient</em> artifact glowed with <em>mysterious</em> power.</p>');
-      // Verify emphasis tags are properly applied
-      expect(result.match(/<em>/g)).toHaveLength(2);
-      expect(result.match(/<\/em>/g)).toHaveLength(2);
-    });
-
     it('should organize mixed content for visual storytelling flow', () => {
-      const input = `The tavern was *bustling* with activity.\n\nThe bartender said, What can I get you?\n\nThe atmosphere was tense.`;
+      const input = `The tavern was bustling with activity.\n\nThe bartender said, Hello there.\n\nThe atmosphere was tense.`;
       const result = formatAIResponse(input, storytellingOptions);
-      
-      expect(result).toBe('<p>The tavern was <em>bustling</em> with activity.</p>\n<p>The bartender said, What can I get you?</p>\n<p>The atmosphere was tense.</p>');
+
+      expect(result).toBe('<p>The tavern was bustling with activity.</p>\n<p>The bartender said, "Hello there."</p>\n<p>The atmosphere was tense.</p>');
       // Verify all formatting is applied consistently
-      expect(result).toContain('<em>bustling</em>');
-      expect(result).toContain('What can I get you?');
+      expect(result).toContain('"Hello there."');
       expect(result.match(/<p>/g)).toHaveLength(3);
     });
   });
@@ -102,19 +90,18 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
     });
 
     it('should organize long narrative content for easy reading', () => {
-      const longNarrative = `The ancient castle loomed before them. Its towers reached toward the storm clouds gathering overhead.\n\nThe drawbridge creaked as it lowered. The guard called out, State your business!\n\nThe leader stepped forward. She declared, We seek audience with the *Dark Lord*.\n\nA chill wind swept across the courtyard. Their fate would soon be decided.`;
-      
+      const longNarrative = `The ancient castle loomed before them. Its towers reached toward the storm clouds gathering overhead.\n\nThe drawbridge creaked as it lowered. The guard said, State your business!\n\nThe leader stepped forward. She declared, We seek audience with the Dark Lord.\n\nA chill wind swept across the courtyard. Their fate would soon be decided.`;
+
       const result = formatAIResponse(longNarrative, storytellingOptions);
-      
+
       expect(result).toContain('The ancient castle loomed before them.');
-      expect(result).toContain('State your business!');
-      expect(result).toContain('She declared, "We seek audience with the <em>Dark Lord</em>."');
+      expect(result).toContain('The guard said, "State your business!"');
+      expect(result).toContain('She declared, "We seek audience with the Dark Lord."');
       expect(result).toContain('Their fate would soon be decided.');
-      
+
       // Verify all formatting works together
       expect(result.match(/<p>/g)).toHaveLength(4);
-      expect(result.match(/"/g)).toHaveLength(2);
-      expect(result.match(/<em>/g)).toHaveLength(1);
+      expect(result.match(/"/g)).toHaveLength(4);
     });
   });
 
@@ -135,14 +122,13 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
     });
 
     it('should maintain storytelling quality with complex nested content', () => {
-      const complexContent = `The *mysterious* stranger approached.\n\nHe said, I bring news from the *distant* kingdom. The situation is dire.\n\nShe replied, Tell me everything you know.\n\nThe fate of the realm hung in the balance.`;
-      
+      const complexContent = `The mysterious stranger approached.\n\nHe said, I bring news from the distant kingdom. The situation is dire.\n\nShe replied, Tell me everything you know.\n\nThe fate of the realm hung in the balance.`;
+
       const result = formatAIResponse(complexContent, storytellingOptions);
-      
-      expect(result).toBe('<p>The <em>mysterious</em> stranger approached.</p>\n<p>He said, "I bring news from the <em>distant</em> kingdom." The situation is dire.</p>\n<p>She replied, "Tell me everything you know."</p>\n<p>The fate of the realm hung in the balance.</p>');
-      
+
+      expect(result).toBe('<p>The mysterious stranger approached.</p>\n<p>He said, "I bring news from the distant kingdom." The situation is dire.</p>\n<p>She replied, "Tell me everything you know."</p>\n<p>The fate of the realm hung in the balance.</p>');
+
       // Verify all formatting features work together seamlessly
-      expect(result.match(/<em>/g)).toHaveLength(2);
       expect(result.match(/"/g)).toHaveLength(4);
       expect(result.match(/<p>/g)).toHaveLength(4);
     });
@@ -165,17 +151,8 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
     it('should handle malformed dialogue gracefully', () => {
       const malformedDialogue = 'He said without ending punctuation';
       const result = formatAIResponse(malformedDialogue, storytellingOptions);
-      
-      expect(result).toBe('<p>He said without ending punctuation</p>');
-    });
 
-    it('should handle unmatched emphasis markers', () => {
-      const unmatchedEmphasis = 'This has *unmatched emphasis';
-      const result = formatAIResponse(unmatchedEmphasis, storytellingOptions);
-      
-      expect(result).toBe('<p>This has *unmatched emphasis</p>');
-      // Should not process incomplete emphasis
-      expect(result).not.toContain('<em>');
+      expect(result).toBe('<p>He said without ending punctuation</p>');
     });
   });
 });
