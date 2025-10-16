@@ -19,7 +19,7 @@ export function createItemUsageJournalEntry(
   return {
     worldId,
     characterId,
-    type: 'item-usage',
+    type: 'item_usage',
     title: `Used ${item.name}`,
     content: narrative,
     significance: 'minor',
