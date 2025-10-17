@@ -5,7 +5,7 @@
 // Re-export all types from their respective files
 export type { EntityID, ISODateString, TimestampedEntity, NamedEntity } from './common.types';
 export type { World, WorldAttribute, WorldSkill, WorldSettings } from './world.types';
-export type { 
+export type {
   Character,
   CharacterAttribute,
   CharacterSkill,
@@ -13,6 +13,7 @@ export type {
   CharacterRelationship,
   CharacterStatus
 } from './character.types';
+export type { NPC } from './npc.types';
 export type {
   Inventory,
   InventoryItem,

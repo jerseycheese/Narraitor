@@ -11,14 +11,15 @@ State management in Narraitor follows domain-driven design - each major feature 
 
 ## Store Overview
 
-**7 Domain Stores:**
+**8 Domain Stores:**
 1. **World Store** - Game worlds, attributes, and configuration settings
-2. **Character Store** - Player and NPC characters with their stats  
-3. **Inventory Store** - Character items and equipment management
-4. **Narrative Store** - Story segments and narrative progression
-5. **Journal Store** - Journal entries and quest tracking
-6. **Session Store** - Active game sessions linking worlds and characters
-7. **AI Context Store** - Context management for AI prompt generation
+2. **Character Store** - Player characters with their stats
+3. **NPC Store** - Non-player characters scoped to game worlds
+4. **Inventory Store** - Character items and equipment management
+5. **Narrative Store** - Story segments and narrative progression
+6. **Journal Store** - Journal entries and quest tracking
+7. **Session Store** - Active game sessions linking worlds and characters
+8. **AI Context Store** - Context management for AI prompt generation
 
 ## Common Patterns
 
@@ -96,6 +97,13 @@ const itemId = generateUniqueId('item');
 - Links characters to specific worlds
 - Manages character attributes and skills
 - Simplified skill limit for MVP (hardcoded to 2)
+
+### NPC Store
+- Links NPCs to specific worlds via worldId
+- Manages NPC basic information (name, description, avatarUrl)
+- Provides world-scoped queries with getNPCsByWorld
+- Maintains world-to-NPC mappings for efficient retrieval
+- Foundation for future NPC features (avatars, autonomous behavior)
 
 ### Inventory Store
 - Tracks items per character with acquisition history
