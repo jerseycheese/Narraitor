@@ -66,6 +66,54 @@ const getInitialState = () => ({
   loading: false,
 });
 
+type LegacyInventoryShape =
+  | EntityID[]
+  | { items?: unknown }
+  | null
+  | undefined;
+
+const normalizeInventoryValue = (
+  value: LegacyInventoryShape
+): {
+  ids: EntityID[];
+  needsUpdate: boolean;
+  shouldDelete: boolean;
+} => {
+  if (Array.isArray(value)) {
+    const filtered = value.filter(
+      (id): id is EntityID => typeof id === 'string' && id.length > 0
+    );
+    const needsUpdate = filtered.length !== value.length;
+    return {
+      ids: filtered,
+      needsUpdate,
+      shouldDelete: false,
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    return {
+      ids: [],
+      needsUpdate: true,
+      shouldDelete: true,
+    };
+  }
+
+  if (value == null) {
+    return {
+      ids: [],
+      needsUpdate: value !== undefined,
+      shouldDelete: true,
+    };
+  }
+
+  return {
+    ids: [],
+    needsUpdate: true,
+    shouldDelete: true,
+  };
+};
+
 const validateNewItemData = (data: InventoryItemCreatePayload): void => {
   const normalizedName = normalizeText(data.name || '', NORM_NAME);
   if (!normalizedName) {
@@ -147,8 +195,32 @@ const createJournalEntryForAcquisition = async (
 
 export const useInventoryStore = create<InventoryStore>()(
   persist(
-    (set, get) => ({
-      ...getInitialState(),
+    (set, get) => {
+      const ensureCharacterInventory = (characterId: EntityID, snapshot = get()): EntityID[] => {
+        const raw = snapshot.characterInventories[characterId];
+        const { ids, needsUpdate, shouldDelete } = normalizeInventoryValue(raw as LegacyInventoryShape);
+
+        if (needsUpdate) {
+          set((state) => {
+            const nextInventories = { ...state.characterInventories };
+            if (shouldDelete) {
+              delete nextInventories[characterId];
+            } else {
+              nextInventories[characterId] = ids;
+            }
+            return { characterInventories: nextInventories };
+          });
+        }
+
+        if (shouldDelete) {
+          return [];
+        }
+
+        return ids;
+      };
+
+      return {
+        ...getInitialState(),
 
       create: (itemData) => {
         const itemId = generateUniqueId('item');
@@ -418,7 +490,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
         const normalizedName = normalizeText(itemData.name, NORM_NAME);
         const state = get();
-        const characterItems = state.characterInventories[characterId] || [];
+        const characterItems = ensureCharacterInventory(characterId, state);
 
         if (itemData.stackable) {
           const existingItemId = characterItems.find((id) => {
@@ -561,7 +633,7 @@ export const useInventoryStore = create<InventoryStore>()(
         set((currentState) => ({
           characterInventories: {
             ...currentState.characterInventories,
-            [characterId]: [...(currentState.characterInventories[characterId] || []), itemId],
+            [characterId]: [...characterItems, itemId],
           },
         }));
 
@@ -585,7 +657,7 @@ export const useInventoryStore = create<InventoryStore>()(
           return;
         }
 
-        const characterItems = state.characterInventories[characterId] || [];
+        const characterItems = ensureCharacterInventory(characterId, state);
         if (!characterItems.includes(itemId)) {
           set({
             error: createStoreError(
@@ -648,14 +720,14 @@ export const useInventoryStore = create<InventoryStore>()(
 
       getCharacterItems: (characterId) => {
         const state = get();
-        const itemIds = state.characterInventories[characterId] || [];
+        const itemIds = ensureCharacterInventory(characterId, state);
         return itemIds
           .map((id) => state.items[id])
           .filter((item): item is InventoryItem => Boolean(item));
       },
 
       clearCharacterInventory: (characterId) => {
-        const itemIds = get().characterInventories[characterId] || [];
+        const itemIds = ensureCharacterInventory(characterId);
         itemIds.forEach((itemId) => get().delete(itemId));
       },
 
@@ -682,7 +754,7 @@ export const useInventoryStore = create<InventoryStore>()(
         }
 
         // Validate character owns this item
-        const characterItems = state.characterInventories[characterId] || [];
+        const characterItems = ensureCharacterInventory(characterId, state);
         if (!characterItems.includes(itemId)) {
           const error = createStoreError(
             'Item Not Available',
@@ -743,7 +815,8 @@ export const useInventoryStore = create<InventoryStore>()(
           remainingQuantity,
         };
       },
-    }),
+    };
+  },
     {
       name: 'narraitor-inventory-store',
       storage: createIndexedDBStorage(),
