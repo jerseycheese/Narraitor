@@ -42,7 +42,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const items = getCharacterItems(characterId);
 
   // Handle item usage
-  const handleUseItem = async (itemId: EntityID, itemName: string) => {
+  const handleUseItem = async (itemId: EntityID) => {
     setUsingItemId(itemId);
     setErrorFeedback(null);
 
@@ -185,7 +185,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleUseItem(item.id, item.name)}
+                      onClick={() => handleUseItem(item.id)}
                       disabled={usingItemId === item.id || item.quantity <= 0}
                       className="ml-auto"
                     >

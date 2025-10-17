@@ -6,7 +6,6 @@ export const actionTemplate = (context: any) => { // eslint-disable-line @typesc
     worldName,
     genre,
     tone,
-    playerCharacterName,
     narrativeContext,
     characterSkillContext,
     enhancedCharacterContext,

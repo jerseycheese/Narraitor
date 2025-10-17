@@ -88,6 +88,21 @@ export async function generateItemUsageNarrative(
       itemSituationLines.push('The item remains in the character’s possession after the action.');
     }
 
+    const situationLines = [...itemSituationLines];
+    if (item.description) {
+      situationLines.push(`The item is known for: ${item.description}.`);
+    }
+    situationLines.push(`Category context: ${item.categoryId}.`);
+
+    const includedTopics = [
+      `item:${item.name}`,
+      `category:${item.categoryId}`,
+      'item-usage-effect',
+    ];
+    if (item.description) {
+      includedTopics.push(`item-detail:${item.description}`);
+    }
+
     return await generator.generateSegment({
       worldId,
       sessionId,
@@ -101,11 +116,7 @@ export async function generateItemUsageNarrative(
         recentSegments,
         currentTags,
         currentLocation: lastSegment?.metadata?.location,
-        currentSituation: itemSituationLines
-          .concat(item.description ? `The item is known for: ${item.description}.` : null)
-          .concat(`Category context: ${item.categoryId}.`)
-          .filter(Boolean)
-          .join(' '),
+        currentSituation: situationLines.join(' '),
         importantEntities: [
           {
             id: item.id,
@@ -117,16 +128,11 @@ export async function generateItemUsageNarrative(
       generationParameters: {
         segmentType: 'action',
         desiredLength: 'short',
-        includedTopics: [
-          `item:${item.name}`,
-          `category:${item.categoryId}`,
-          'item-usage-effect',
-          item.description ? `item-detail:${item.description}` : undefined,
-        ].filter(Boolean),
+        includedTopics,
         disableItemAcquisitionProcessing: true,
       },
     });
-  } catch (error) {
+  } catch {
     // Fallback narrative if AI generation fails or context unavailable
     const previousQuantity = usageDetails.previousQuantity ?? item.quantity;
     const remainingQuantity =
@@ -273,7 +279,20 @@ export async function processItemUsage(
         journalStore.addEntry(resolvedSessionId, journalEntry);
       }
     } catch {
-      narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
+      const previousQuantity = usageResult.previousQuantity ?? item.quantity;
+      const remainingQuantity =
+        usageResult.remainingQuantity ??
+        (usageResult.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
+
+      if (usageResult.wasConsumed) {
+        if (remainingQuantity > 0) {
+          narrative = `You use one of the ${item.name}, leaving ${remainingQuantity} remaining.`;
+        } else {
+          narrative = `You use the last of the ${item.name}.`;
+        }
+      } else {
+        narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
+      }
     }
   } else {
     const previousQuantity = usageResult.previousQuantity ?? item.quantity;
