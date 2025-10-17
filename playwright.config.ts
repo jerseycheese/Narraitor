@@ -17,8 +17,8 @@ export default defineConfig({
   expect: {
     // Visual comparison settings
     toHaveScreenshot: {
-      // Reduced tolerance for faster comparison
-      maxDiffPixels: 1000,
+      // Allow up to 10k pixels difference to handle font rendering variations
+      maxDiffPixels: 10000,
       // Slightly tighter threshold for better accuracy
       threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
