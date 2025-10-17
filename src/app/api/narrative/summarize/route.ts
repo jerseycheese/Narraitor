@@ -110,7 +110,9 @@ EXAMPLES:
   "significance": "minor"
 }
 
-Response (JSON only):`;
+Response (JSON only):
+Return ONLY a single JSON object that matches the schema above.
+Do not include any explanatory text, code fences, markdown, or additional prose.`;
 
     const response = await geminiClient.generateContent(prompt);
     
@@ -130,6 +132,15 @@ Response (JSON only):`;
         jsonContent = jsonContent.replace(/```json\s*/, '').replace(/\s*```/, '');
       } else if (jsonContent.includes('```')) {
         jsonContent = jsonContent.replace(/```\s*/, '').replace(/\s*```/, '');
+      }
+
+      const firstBrace = jsonContent.indexOf('{');
+      const lastBrace = jsonContent.lastIndexOf('}');
+      if (firstBrace > 0) {
+        jsonContent = jsonContent.slice(firstBrace);
+      }
+      if (lastBrace >= 0 && lastBrace < jsonContent.length - 1) {
+        jsonContent = jsonContent.slice(0, lastBrace + 1);
       }
       
       const parsed = JSON.parse(jsonContent);

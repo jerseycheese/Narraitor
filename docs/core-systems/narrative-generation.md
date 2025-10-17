@@ -115,6 +115,20 @@ To avoid overwhelming the AI prompt with too much inventory data, the system lim
 
 Inventory context gets added to initial scene generation (so the AI knows what you start with), ongoing narrative segments (for natural references during the story), and skill acknowledgment narratives (so the AI can reference tools or items you're using).
 
+### Item Usage Integration
+
+When players use items during gameplay, the system generates dedicated narrative segments describing what happens. This creates a direct narrative response to item usage that feels immediate and contextual rather than just updating inventory numbers.
+
+The item usage flow works through the narrative generator with specific instructions. The AI gets told to describe the physical action of using the item, show sensory details, and demonstrate how it affects the current situation. The generator also receives context about whether the item was consumed and how many remain if it's stackable.
+
+For stackable items with multiple units, the AI naturally incorporates remaining quantity into the narrative. Use one healing potion from a stack of five and the narrative might say "You down one of your healing potions, the familiar warmth spreading through your body. Four more vials clink reassuringly in your pack." Use the last one and it emphasizes scarcity: "You uncork your final healing potion, knowing this is all you have left."
+
+The system creates these narratives as "action" type segments with `item-usage` tags, which helps track item usage moments in the narrative history. Significant items (quest items, equipment, documents, valuables) also generate journal entries so players have a permanent record of important usage moments.
+
+When AI generation fails or context is unavailable, the system falls back to simple descriptive text that still communicates what happened. This ensures players always get feedback about item usage even if the fancy AI-generated narrative isn't available.
+
+The narrative generation respects all the usual context - world tone settings, current location, recent story events - so item usage feels integrated into the ongoing story rather than disconnected game mechanic text.
+
 ### Narrative Perspective
 
 The narrative system consistently uses second-person perspective ("you") to create an immersive experience. The AI understands that the player IS the named character, so all narration uses "you" instead of the character name. Character names only appear when NPCs are addressing the player in dialogue, which creates a direct, personal connection to the story instead of reading about someone else's adventure.

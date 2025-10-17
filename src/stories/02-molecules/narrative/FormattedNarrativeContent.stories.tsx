@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { FormattedNarrativeContent } from '../../../components/Narrative/FormattedNarrativeContent';
 
 const meta: Meta<typeof FormattedNarrativeContent> = {
-  title: 'Components/Narrative/FormattedNarrativeContent',
+  title: '02-Molecules/narrative/FormattedNarrativeContent',
   component: FormattedNarrativeContent,
   tags: ['autodocs'],
   argTypes: {

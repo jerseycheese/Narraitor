@@ -26,6 +26,15 @@ jest.mock('@/state/worldStore', () => ({
   }
 }));
 
+// Mock the inventory store to avoid persistence during tests
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn().mockReturnValue({
+      getCharacterItems: () => []
+    })
+  }
+}));
+
 // Mock narrativeTemplateManager
 jest.mock('@/lib/promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {

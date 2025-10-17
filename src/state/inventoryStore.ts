@@ -6,6 +6,7 @@ import {
   InventoryItem,
   InventoryItemCategorization,
   InventoryAcquisitionRecord,
+  ItemUsageResult,
 } from '@/types/inventory.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
@@ -31,6 +32,7 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   updateItemQuantity: (itemId: EntityID, quantity: number) => void;
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   clearCharacterInventory: (characterId: EntityID) => void;
+  useItem: (characterId: EntityID, itemId: EntityID) => ItemUsageResult;
 
   // State management
   reset: () => void;
@@ -63,6 +65,54 @@ const getInitialState = () => ({
   error: null as UserFriendlyError | null,
   loading: false,
 });
+
+type LegacyInventoryShape =
+  | EntityID[]
+  | { items?: unknown }
+  | null
+  | undefined;
+
+const normalizeInventoryValue = (
+  value: LegacyInventoryShape
+): {
+  ids: EntityID[];
+  needsUpdate: boolean;
+  shouldDelete: boolean;
+} => {
+  if (Array.isArray(value)) {
+    const filtered = value.filter(
+      (id): id is EntityID => typeof id === 'string' && id.length > 0
+    );
+    const needsUpdate = filtered.length !== value.length;
+    return {
+      ids: filtered,
+      needsUpdate,
+      shouldDelete: false,
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    return {
+      ids: [],
+      needsUpdate: true,
+      shouldDelete: true,
+    };
+  }
+
+  if (value == null) {
+    return {
+      ids: [],
+      needsUpdate: value !== undefined,
+      shouldDelete: true,
+    };
+  }
+
+  return {
+    ids: [],
+    needsUpdate: true,
+    shouldDelete: true,
+  };
+};
 
 const validateNewItemData = (data: InventoryItemCreatePayload): void => {
   const normalizedName = normalizeText(data.name || '', NORM_NAME);
@@ -145,8 +195,32 @@ const createJournalEntryForAcquisition = async (
 
 export const useInventoryStore = create<InventoryStore>()(
   persist(
-    (set, get) => ({
-      ...getInitialState(),
+    (set, get) => {
+      const ensureCharacterInventory = (characterId: EntityID, snapshot = get()): EntityID[] => {
+        const raw = snapshot.characterInventories[characterId];
+        const { ids, needsUpdate, shouldDelete } = normalizeInventoryValue(raw as LegacyInventoryShape);
+
+        if (needsUpdate) {
+          set((state) => {
+            const nextInventories = { ...state.characterInventories };
+            if (shouldDelete) {
+              delete nextInventories[characterId];
+            } else {
+              nextInventories[characterId] = ids;
+            }
+            return { characterInventories: nextInventories };
+          });
+        }
+
+        if (shouldDelete) {
+          return [];
+        }
+
+        return ids;
+      };
+
+      return {
+        ...getInitialState(),
 
       create: (itemData) => {
         const itemId = generateUniqueId('item');
@@ -416,7 +490,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
         const normalizedName = normalizeText(itemData.name, NORM_NAME);
         const state = get();
-        const characterItems = state.characterInventories[characterId] || [];
+        const characterItems = ensureCharacterInventory(characterId, state);
 
         if (itemData.stackable) {
           const existingItemId = characterItems.find((id) => {
@@ -559,7 +633,7 @@ export const useInventoryStore = create<InventoryStore>()(
         set((currentState) => ({
           characterInventories: {
             ...currentState.characterInventories,
-            [characterId]: [...(currentState.characterInventories[characterId] || []), itemId],
+            [characterId]: [...characterItems, itemId],
           },
         }));
 
@@ -583,7 +657,7 @@ export const useInventoryStore = create<InventoryStore>()(
           return;
         }
 
-        const characterItems = state.characterInventories[characterId] || [];
+        const characterItems = ensureCharacterInventory(characterId, state);
         if (!characterItems.includes(itemId)) {
           set({
             error: createStoreError(
@@ -646,17 +720,109 @@ export const useInventoryStore = create<InventoryStore>()(
 
       getCharacterItems: (characterId) => {
         const state = get();
-        const itemIds = state.characterInventories[characterId] || [];
+        const itemIds = ensureCharacterInventory(characterId, state);
         return itemIds
           .map((id) => state.items[id])
           .filter((item): item is InventoryItem => Boolean(item));
       },
 
       clearCharacterInventory: (characterId) => {
-        const itemIds = get().characterInventories[characterId] || [];
+        const itemIds = ensureCharacterInventory(characterId);
         itemIds.forEach((itemId) => get().delete(itemId));
       },
-    }),
+
+      useItem: (characterId, itemId) => {
+        const state = get();
+        const item = state.items[itemId];
+
+        // Validate item exists
+        if (!item) {
+          const error = createStoreError(
+            'Item Not Found',
+            'The specified item could not be found.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Validate character owns this item
+        const characterItems = ensureCharacterInventory(characterId, state);
+        if (!characterItems.includes(itemId)) {
+          const error = createStoreError(
+            'Item Not Available',
+            'This item is not in your inventory.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Validate item has quantity > 0
+        if (item.quantity <= 0) {
+          const error = createStoreError(
+            'Item Not Available',
+            'This item is no longer available.',
+            ErrorType.VALIDATION
+          );
+          set({ error });
+          return {
+            success: false,
+            error: {
+              type: error.type,
+              title: error.title,
+              message: error.message,
+            },
+          };
+        }
+
+        // Determine if item usage should consume quantity.
+        // Items explicitly categorized as consumables always consume.
+        // Additionally, stackable items are treated as consumables so quantities decrement on use.
+        const shouldConsume = item.categoryId === 'consumables' || item.stackable;
+        let wasConsumed = false;
+        let remainingQuantity = item.quantity;
+
+        const previousQuantity = item.quantity;
+
+        if (shouldConsume) {
+          wasConsumed = true;
+          if (item.quantity === 1) {
+            // Remove the entire item
+            get().delete(itemId);
+            remainingQuantity = 0;
+          } else {
+            // Reduce quantity by 1
+            get().update(itemId, { quantity: item.quantity - 1 });
+            remainingQuantity = item.quantity - 1;
+          }
+        }
+
+        return {
+          success: true,
+          itemName: item.name,
+          categoryId: item.categoryId,
+          wasConsumed,
+          remainingQuantity,
+          previousQuantity,
+        };
+      },
+    };
+  },
     {
       name: 'narraitor-inventory-store',
       storage: createIndexedDBStorage(),

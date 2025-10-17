@@ -252,6 +252,81 @@ There are a few dev routes set up for testing these mechanics. `/dev/game-sessio
 
 When testing, try out different decision weights (minor, major, critical), all three alignment types in various situations, different attribute configurations, and how these systems work together.
 
+## Item Usage System
+
+Item usage ties inventory items into the narrative flow. When a player uses an item, the system handles inventory updates, generates appropriate narrative describing what happens, and creates journal entries for significant moments.
+
+The significance categorization matters because not every item usage deserves AI-generated narrative and a journal entry. Quest items, equipment, documents, and valuables get the full treatment - narrative generation, journal entries, the whole package. Consumables and miscellaneous items just get basic inventory updates. This prevents journal spam from using health potions while keeping important story moments tracked.
+
+### How It Works
+
+When a player uses an item, the system:
+
+1. Updates inventory counts (decrements stackable items or marks equipment as used)
+2. Generates narrative describing the usage through the AI
+3. Creates a journal entry for significant items only
+4. Tracks remaining quantities in the narrative so players know what they have left
+
+The AI understands context around stackable items. If you use one health potion from a stack of five, the narrative will mention you still have four left. Use your last potion and it'll emphasize that you're out. This keeps players informed about their resources through the story itself instead of requiring constant inventory checking.
+
+### API Usage
+
+```typescript
+import { processItemUsage } from '@/lib/inventory/itemUsageService';
+
+// Use an item during gameplay
+const result = await processItemUsage(
+  characterId,
+  itemId,
+  sessionId // optional - uses current session if not provided
+);
+
+// Check the result
+if (result.success) {
+  console.log(result.narrative); // AI-generated description
+  console.log(result.segmentId); // Narrative segment ID
+  console.log(result.remainingQuantity); // How many left
+} else {
+  console.error(result.error.message);
+}
+```
+
+### Types
+
+```typescript
+interface ItemUsageResult {
+  success: boolean;
+  wasConsumed?: boolean;
+  remainingQuantity?: number;
+  previousQuantity?: number;
+  narrative?: string;
+  segmentId?: EntityID;
+  error?: UserFriendlyError;
+}
+```
+
+### Narrative Context
+
+The AI gets specific instructions about item usage to generate contextual narratives. For stackable items, it knows to mention remaining quantities naturally. For the last item in a stack, it emphasizes the supply is exhausted. For non-consumable equipment, it focuses on the action itself.
+
+The system also respects the world's tone settings and current narrative context, so using a health potion in a gritty noir story feels different from using one in a lighthearted fantasy adventure.
+
+### Journal Integration
+
+Significant items (quest items, equipment, documents, valuables) automatically create journal entries when used. The entry includes:
+
+- Title: "Used [Item Name]"
+- Content: The AI-generated narrative
+- Type: 'item_usage'
+- Tags: item-usage, category tag
+- Related entities: Links to the item
+
+This creates a permanent record of important item usage moments that players can reference later. Common consumables don't create journal entries to avoid clutter.
+
+### Testing & Development
+
+The item usage system is fully tested through the inventory store tests and integration tests. The test harness at `/dev/game-session` lets you test item usage in context, though most of the time you'll be testing through the actual game session UI where players use items naturally during play.
+
 ## Best Practices
 
 Let the AI determine decision weights rather than hardcoding them - it's better at judging what actually matters in the moment. Make sure all three alignments are viable options, not just chaotic being "the fun one." Set meaningful attribute defaults that make sense for your world's power level. Keep visual distinctions clear between different mechanics so players aren't confused. Always allow custom input alongside generated choices - player agency matters more than perfect AI suggestions.
