@@ -6,7 +6,7 @@ import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { getTimestamp } from '@/lib/utils';
 
 const meta = {
-  title: '03-Organisms/Inventory/InventoryList',
+  title: '03-Organisms/inventory/InventoryList',
   component: InventoryList,
   parameters: {
     layout: 'padded',
