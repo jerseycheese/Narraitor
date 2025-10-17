@@ -228,7 +228,7 @@ describe('InventoryList - Item Usage', () => {
       jest.clearAllMocks();
     });
 
-    it('should display success feedback after item is used', async () => {
+    it('should not display inline success feedback after item is used', async () => {
       const user = userEvent.setup();
 
       // Mock successful item usage with immediate response
@@ -263,11 +263,13 @@ describe('InventoryList - Item Usage', () => {
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
 
-      // Should show success message with the narrative
       await waitFor(() => {
-        expect(screen.getByText('The energy drink revitalizes you')).toBeInTheDocument();
-        expect(screen.getByRole('status')).toBeInTheDocument();
+        expect(processItemUsage).toHaveBeenCalled();
       });
+
+      // No inline success feedback should be rendered
+      expect(screen.queryByText('The energy drink revitalizes you')).toBeNull();
+      expect(screen.queryByRole('status')).toBeNull();
     });
 
     it('should display error feedback when usage fails', async () => {

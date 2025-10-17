@@ -95,7 +95,9 @@ export interface ItemUsageResult {
   categoryId?: StandardInventoryCategory;
   wasConsumed?: boolean;
   remainingQuantity?: number;
+  previousQuantity?: number;
   narrative?: string;
+  segmentId?: EntityID;
   error?: {
     type: string;
     title: string;

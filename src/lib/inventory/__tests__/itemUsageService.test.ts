@@ -8,6 +8,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 import type { InventoryItem } from '@/types/inventory.types';
+import { useNarrativeStore } from '@/state/narrativeStore';
 
 // Mock AI client
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
@@ -30,6 +31,7 @@ describe('Item Usage Service', () => {
     useCharacterStore.getState().reset();
     useWorldStore.getState().reset();
     useJournalStore.getState().reset();
+    useNarrativeStore.getState().reset();
 
     // Create test world
     worldId = useWorldStore.getState().create({
@@ -180,11 +182,15 @@ describe('Item Usage Service', () => {
         updatedAt: new Date().toISOString(),
       };
 
-      const narrative = await generateItemUsageNarrative(item, characterId, worldId);
+      const narrative = await generateItemUsageNarrative(item, characterId, worldId, sessionId, {
+        wasConsumed: false,
+        remainingQuantity: item.quantity,
+        previousQuantity: item.quantity,
+      });
 
-      expect(narrative).toBeTruthy();
-      expect(typeof narrative).toBe('string');
-      expect(narrative.length).toBeGreaterThan(0);
+      expect(narrative.content).toBeTruthy();
+      expect(typeof narrative.content).toBe('string');
+      expect(narrative.content.length).toBeGreaterThan(0);
     });
 
     it('should handle AI generation failures gracefully', async () => {
@@ -217,11 +223,15 @@ describe('Item Usage Service', () => {
         updatedAt: new Date().toISOString(),
       };
 
-      const narrative = await generateItemUsageNarrative(item, characterId, worldId);
+      const narrative = await generateItemUsageNarrative(item, characterId, worldId, sessionId, {
+        wasConsumed: true,
+        remainingQuantity: 0,
+        previousQuantity: 1,
+      });
 
       // Should return fallback narrative
-      expect(narrative).toBeTruthy();
-      expect(narrative).toContain(item.name);
+      expect(narrative.content).toBeTruthy();
+      expect(narrative.content).toContain(item.name);
     });
   });
 
@@ -249,6 +259,13 @@ describe('Item Usage Service', () => {
       expect(result.success).toBe(true);
       expect(result.narrative).toBeTruthy();
       expect(typeof result.narrative).toBe('string');
+      expect(result.segmentId).toBeTruthy();
+      expect(result.previousQuantity).toBe(1);
+
+      const segments = useNarrativeStore.getState().getSessionSegments(sessionId);
+      const segment = segments.find((seg) => seg.id === result.segmentId);
+      expect(segment).toBeDefined();
+      expect(segment?.metadata.tags).toEqual(expect.arrayContaining(['item-usage']));
     });
 
     it('should create journal entry for significant item usage', async () => {
@@ -269,7 +286,9 @@ describe('Item Usage Service', () => {
         },
       });
 
-      await processItemUsage(characterId, itemId, sessionId);
+      const result = await processItemUsage(characterId, itemId, sessionId);
+      expect(result.segmentId).toBeTruthy();
+      expect(result.previousQuantity).toBe(1);
 
       // Verify journal entry was created
       const journalEntries = useJournalStore.getState().getSessionEntries(sessionId);
@@ -301,12 +320,15 @@ describe('Item Usage Service', () => {
 
       const journalCountBefore = useJournalStore.getState().getSessionEntries(sessionId).length;
 
-      await processItemUsage(characterId, itemId, sessionId);
+      const result = await processItemUsage(characterId, itemId, sessionId);
 
       const journalCountAfter = useJournalStore.getState().getSessionEntries(sessionId).length;
 
       // Journal entry count should not increase for insignificant items
       expect(journalCountAfter).toBe(journalCountBefore);
+      expect(result.segmentId).toBeTruthy();
+      expect(result.narrative).toBeTruthy();
+      expect(result.previousQuantity).toBe(5);
     });
   });
 });

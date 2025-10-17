@@ -11,6 +11,13 @@ import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplat
 jest.mock('../loreContextHelper');
 jest.mock('@/state/worldStore');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn().mockReturnValue({
+      getCharacterItems: () => []
+    })
+  }
+}));
 
 const mockWorld = {
   id: 'world-123',

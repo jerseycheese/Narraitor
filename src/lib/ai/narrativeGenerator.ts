@@ -301,7 +301,7 @@ export class NarrativeGenerator {
     const acquisitionInstructions = `
 
 ITEM ACQUISITION INSTRUCTIONS:
-When your narrative describes the character finding, receiving, crafting, or otherwise newly obtaining an item, include it in the metadata.itemsAcquired array in your JSON response. Do not list objects the character already possessed earlier in the scene. If the text merely clarifies or renames an item the character already had in hand, update the description but do not add a duplicate entry.
+Only include entries in metadata.itemsAcquired when the player character ends the scene with a new, portable item in their ongoing possession (something they could realistically carry to the next location). Merely noticing, interacting with, or temporarily using environmental objects or stage dressing does NOT count as acquisition. If the character sets an object back down, leaves it behind, or otherwise does not keep it, do not add it. Likewise, if the narrative merely clarifies or renames an item the character already had, update the prose, not the metadata.
 
 Each acquired item should include:
 - name: The item's name (required)
@@ -315,7 +315,7 @@ Examples:
 - Character receives a key as reward: Include {name: "Iron Key", description: "Opens the eastern gate", quantity: 1, acquisitionMethod: "reward"}
 
 Important:
-- Only include items the character ACTUALLY ACQUIRES during this segment (not items they merely see, remember, or were already carrying)
+- Only include items the character ACTUALLY ACQUIRES AND KEEPS during this segment (not items they merely see, borrow momentarily, use as environmental tools, or were already carrying)
 - Avoid duplicate entries for the same object; use the description to capture clarifications or additional detail
 - Be specific with item names and descriptions
 - Use an appropriate acquisitionMethod for the narrative context
@@ -410,7 +410,11 @@ The items will be automatically added to the character's inventory with proper c
       );
 
       // Process any acquired items from the narrative
-      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+      if (
+        !request.generationParameters?.disableItemAcquisitionProcessing &&
+        result.metadata.itemsAcquired &&
+        result.metadata.itemsAcquired.length > 0
+      ) {
         const characterId = request.characterIds?.[0];
         if (characterId && request.sessionId) {
           // Process items asynchronously - don't block narrative generation

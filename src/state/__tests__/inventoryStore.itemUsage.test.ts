@@ -58,6 +58,7 @@ describe('InventoryStore - Item Usage', () => {
 
       // Verify quantity reduced
       expect(result.success).toBe(true);
+      expect(result.previousQuantity).toBe(3);
       const item = useInventoryStore.getState().items[itemId];
       expect(item.quantity).toBe(2);
     });
@@ -116,9 +117,41 @@ describe('InventoryStore - Item Usage', () => {
 
       // Verify quantity unchanged
       expect(result.success).toBe(true);
+      expect(result.previousQuantity).toBe(1);
       const item = useInventoryStore.getState().items[itemId];
       expect(item).toBeDefined();
       expect(item.quantity).toBe(1);
+    });
+
+    it('should consume stackable items even if not categorized as consumables', () => {
+      // Add stackable miscellaneous item (e.g., throwing stones)
+      const itemId = useInventoryStore.getState().addItem(characterId, {
+        name: 'Grey Stone',
+        description: 'Smooth stone with faint light',
+        stackable: true,
+        quantity: 5,
+        categorization: {
+          categoryId: 'miscellaneous',
+          source: 'manual',
+          classifiedAt: new Date().toISOString(),
+        },
+        acquisition: {
+          method: 'loot',
+          acquiredAt: new Date().toISOString(),
+          quantity: 5,
+        },
+      });
+
+      const result = useInventoryStore.getState().useItem(characterId, itemId);
+
+      expect(result.success).toBe(true);
+      expect(result.wasConsumed).toBe(true);
+      expect(result.remainingQuantity).toBe(4);
+      expect(result.previousQuantity).toBe(5);
+
+      const item = useInventoryStore.getState().items[itemId];
+      expect(item).toBeDefined();
+      expect(item?.quantity).toBe(4);
     });
   });
 
@@ -219,6 +252,7 @@ describe('InventoryStore - Item Usage', () => {
       expect(result.categoryId).toBe('consumables');
       expect(result.wasConsumed).toBe(true);
       expect(result.remainingQuantity).toBe(1);
+      expect(result.previousQuantity).toBe(2);
     });
   });
 });

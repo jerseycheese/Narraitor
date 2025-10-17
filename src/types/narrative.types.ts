@@ -183,6 +183,12 @@ export interface GenerationParameters {
   segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
   includedTopics?: string[];
   excludedTopics?: string[];
+  /**
+   * When true, skips the post-processing step that turns AI metadata.itemsAcquired
+   * into actual inventory entries. Useful for narrative beats that reference
+   * existing items (e.g., item usage) where no new pickups should be recorded.
+   */
+  disableItemAcquisitionProcessing?: boolean;
 }
 
 /**

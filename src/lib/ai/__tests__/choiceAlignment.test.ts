@@ -7,6 +7,13 @@ import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the store
 jest.mock('@/state/worldStore');
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn().mockReturnValue({
+      getCharacterItems: () => []
+    })
+  }
+}));
 
 describe('ChoiceGenerator - Alignment System', () => {
   let choiceGenerator: ChoiceGenerator;

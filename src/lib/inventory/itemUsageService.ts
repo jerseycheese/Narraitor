@@ -6,6 +6,15 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { createItemUsageJournalEntry } from './itemUsageJournalIntegration';
+import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import type { NarrativeGenerationResult } from '@/types/narrative.types';
+import { safeTrim } from '@/lib/utils';
+
+interface ItemUsageNarrativeDetails {
+  wasConsumed?: boolean;
+  remainingQuantity?: number;
+  previousQuantity?: number;
+}
 
 /**
  * Determines if an item's usage is narratively significant enough to warrant
@@ -32,40 +41,119 @@ export function isNarrativelySignificant(item: InventoryItem): boolean {
 export async function generateItemUsageNarrative(
   item: InventoryItem,
   characterId: EntityID,
-  worldId: EntityID
-): Promise<string> {
-  try {
-    // Get world and character context
-    const world = useWorldStore.getState().worlds[worldId];
-    const character = useCharacterStore.getState().characters[characterId];
+  worldId: EntityID,
+  sessionId: EntityID,
+  usageDetails: ItemUsageNarrativeDetails
+): Promise<NarrativeGenerationResult> {
+  // Get world and character context up front to keep error handling consistent
+  const world = useWorldStore.getState().worlds[worldId];
+  const character = useCharacterStore.getState().characters[characterId];
 
-    if (!world || !character) {
-      throw new Error('World or character not found');
+  if (!world || !character) {
+    throw new Error('World or character not found');
+  }
+
+  try {
+    const { useNarrativeStore } = await import('@/state/narrativeStore');
+    const narrativeStore = useNarrativeStore.getState();
+    const previousSegments = narrativeStore.getSessionSegments(sessionId);
+    const recentSegments = previousSegments.slice(-5);
+    const lastSegment = previousSegments[previousSegments.length - 1];
+    const currentTags = [
+      ...(lastSegment?.metadata?.tags || []),
+      'item-usage',
+      `item-${item.categoryId}`,
+    ];
+
+    const generator = new NarrativeGenerator(createDefaultGeminiClient());
+
+    const itemSituationLines = [
+      `The player immediately uses the item "${item.name}".`,
+      'Describe the precise motion of using it and the sensory details that follow.',
+      'Show the item altering the current stakes or environment right away.',
+      'Avoid simply repeating the inventory description; translate it into lived action.'
+    ];
+
+    if (usageDetails.wasConsumed && typeof usageDetails.previousQuantity === 'number') {
+      const previousQuantity = usageDetails.previousQuantity;
+      const remainingQuantity = usageDetails.remainingQuantity ?? Math.max(previousQuantity - 1, 0);
+      if (previousQuantity > 1 && remainingQuantity > 0) {
+        itemSituationLines.push(
+          `Only one unit is used in this moment. Make it clear the character still has ${remainingQuantity} remaining for future scenes.`
+        );
+      } else if (remainingQuantity === 0) {
+        itemSituationLines.push('This was the final unit of the item. Emphasize that the supply is now exhausted.');
+      }
+    } else if (!usageDetails.wasConsumed) {
+      itemSituationLines.push('The item remains in the character’s possession after the action.');
     }
 
-    // Build prompt for AI
-    const prompt = `You are a narrative game master for "${world.name}", a ${world.genre} world.
+    return await generator.generateSegment({
+      worldId,
+      sessionId,
+      characterIds: [characterId],
+      narrativeContext: {
+        worldId,
+        sessionId,
+        currentSceneId: `item-usage-${item.id}`,
+        characterIds: [characterId],
+        previousSegments,
+        recentSegments,
+        currentTags,
+        currentLocation: lastSegment?.metadata?.location,
+        currentSituation: itemSituationLines
+          .concat(item.description ? `The item is known for: ${item.description}.` : null)
+          .concat(`Category context: ${item.categoryId}.`)
+          .filter(Boolean)
+          .join(' '),
+        importantEntities: [
+          {
+            id: item.id,
+            type: 'item',
+            name: item.name,
+          },
+        ],
+      },
+      generationParameters: {
+        segmentType: 'action',
+        desiredLength: 'short',
+        includedTopics: [
+          `item:${item.name}`,
+          `category:${item.categoryId}`,
+          'item-usage-effect',
+          item.description ? `item-detail:${item.description}` : undefined,
+        ].filter(Boolean),
+        disableItemAcquisitionProcessing: true,
+      },
+    });
+  } catch (error) {
+    // Fallback narrative if AI generation fails or context unavailable
+    const previousQuantity = usageDetails.previousQuantity ?? item.quantity;
+    const remainingQuantity =
+      usageDetails.remainingQuantity ??
+      (usageDetails.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
+    const narrativeParts: string[] = [
+      `You use ${previousQuantity === 1 ? 'the' : 'one of the'} ${item.name}${item.description ? `. ${item.description}` : '.'}`,
+    ];
 
-The character "${character.name}" is using the item "${item.name}".
-Item description: ${item.description || 'No description provided'}
-Item category: ${item.categoryId}
+    if (usageDetails.wasConsumed) {
+      if (remainingQuantity > 0) {
+        narrativeParts.push(`You still have ${remainingQuantity} ${remainingQuantity === 1 ? 'remaining' : 'remaining pieces'} to draw upon.`);
+      } else {
+        narrativeParts.push('That was the last of this item.');
+      }
+    } else {
+      narrativeParts.push('The item remains firmly in your grasp as the moment passes.');
+    }
 
-Generate a brief (1-3 sentences) narrative description of what happens when the character uses this item. The description should:
-- Be appropriate for the ${world.genre} genre
-- Match the tone and style of ${world.name}
-- Describe immediate effects or sensations
-- Be written in second person ("You feel..." or "The item...")
-- NOT include game mechanics or numbers
-
-Response should be plain text only, no JSON or formatting.`;
-
-    const geminiClient = createDefaultGeminiClient();
-    const response = await geminiClient.generateContent(prompt);
-
-    return response.content || `You use the ${item.name}.`;
-  } catch {
-    // Fallback narrative if AI generation fails
-    return `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
+    return {
+      content: narrativeParts.map((part) => safeTrim(part)).join(' '),
+      segmentType: 'action',
+      metadata: {
+        characterIds: [characterId],
+        tags: ['item-usage', item.categoryId],
+      },
+    };
   }
 }
 
@@ -117,32 +205,93 @@ export async function processItemUsage(
     return usageResult;
   }
 
-  // Generate narrative for significant items
-  let narrative: string | undefined;
-  if (isNarrativelySignificant(item)) {
-    const sessionStore = useSessionStore.getState();
-    const worldId = sessionStore.worldId;
+  const sessionStore = useSessionStore.getState();
+  const worldId = sessionStore.worldId;
+  const resolvedSessionId = sessionId ?? sessionStore.id;
 
-    if (worldId) {
-      narrative = await generateItemUsageNarrative(item, characterId, worldId);
+  let narrative: string | undefined;
+  let segmentId: EntityID | undefined;
+
+  if (worldId && resolvedSessionId) {
+    try {
+      const generation = await generateItemUsageNarrative(
+        item,
+        characterId,
+        worldId,
+        resolvedSessionId,
+        {
+          wasConsumed: usageResult.wasConsumed,
+          remainingQuantity: usageResult.remainingQuantity,
+          previousQuantity: usageResult.previousQuantity,
+        }
+      );
+
+      narrative = generation.content;
+      if (!narrative || !narrative.trim()) {
+        narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
+      }
+
+      const { useNarrativeStore } = await import('@/state/narrativeStore');
+      const narrativeStore = useNarrativeStore.getState();
+      const now = new Date();
+
+      const baseTags = new Set<string>(['item-usage', item.categoryId]);
+      generation.metadata?.tags?.forEach((tag) => {
+        if (tag) {
+          baseTags.add(tag);
+        }
+      });
+
+      const metadataCharacterIds =
+        generation.metadata?.characterIds?.length
+          ? generation.metadata.characterIds
+          : [characterId];
+
+      segmentId = narrativeStore.addSegment(resolvedSessionId, {
+        content: generation.content,
+        type: generation.segmentType,
+        characterIds: metadataCharacterIds,
+        metadata: {
+          ...generation.metadata,
+          tags: Array.from(baseTags),
+          characterIds: metadataCharacterIds,
+        },
+        timestamp: now,
+        updatedAt: now.toISOString(),
+      });
 
       // Create journal entry for significant usage
-      if (sessionId) {
+      if (isNarrativelySignificant(item)) {
         const journalEntry = createItemUsageJournalEntry(
           item,
-          narrative,
+          generation.content,
           worldId,
           characterId
         );
 
         const journalStore = useJournalStore.getState();
-        journalStore.addEntry(sessionId, journalEntry);
+        journalStore.addEntry(resolvedSessionId, journalEntry);
       }
+    } catch {
+      narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
+    }
+  } else {
+    const previousQuantity = usageResult.previousQuantity ?? item.quantity;
+    const remainingQuantity = usageResult.remainingQuantity ?? (usageResult.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
+    if (usageResult.wasConsumed) {
+      if (remainingQuantity > 0) {
+        narrative = `You use one of the ${item.name}, leaving ${remainingQuantity} remaining.`;
+      } else {
+        narrative = `You use the last of the ${item.name}.`;
+      }
+    } else {
+      narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
     }
   }
 
   return {
     ...usageResult,
     narrative,
+    segmentId,
   };
 }

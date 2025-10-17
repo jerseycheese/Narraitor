@@ -36,7 +36,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const { getCharacterItems } = useInventoryStore();
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
 
   // Get all items for this character
   const items = getCharacterItems(characterId);
@@ -44,30 +44,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   // Handle item usage
   const handleUseItem = async (itemId: EntityID, itemName: string) => {
     setUsingItemId(itemId);
-    setFeedback(null);
+    setErrorFeedback(null);
 
     try {
       const result = await processItemUsage(characterId, itemId, sessionId || undefined);
 
       if (result.success) {
-        setFeedback({
-          type: 'success',
-          message: result.narrative || `Used ${itemName}`,
-        });
-
-        // Clear feedback after 3 seconds
-        setTimeout(() => setFeedback(null), 3000);
+        // Success path handled via narrative segment entry; no inline feedback needed.
       } else {
-        setFeedback({
-          type: 'error',
-          message: result.error?.message || 'Failed to use item',
-        });
+        setErrorFeedback(result.error?.message || 'Failed to use item');
       }
     } catch {
-      setFeedback({
-        type: 'error',
-        message: 'An unexpected error occurred',
-      });
+      setErrorFeedback('An unexpected error occurred');
     } finally {
       setUsingItemId(null);
     }
@@ -104,16 +92,12 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   return (
     <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
       {/* Feedback message */}
-      {feedback && (
+      {errorFeedback && (
         <div
-          className={`p-4 rounded-lg ${
-            feedback.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-          role={feedback.type === 'error' ? 'alert' : 'status'}
+          className="p-4 rounded-lg bg-red-50 text-red-800 border border-red-200"
+          role="alert"
         >
-          {feedback.message}
+          {errorFeedback}
         </div>
       )}
 

@@ -9,6 +9,8 @@ import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 
 /**
  * Parameters for choice generation
@@ -48,9 +50,12 @@ export class ChoiceGenerator {
       
       console.log('🔄 Generating choices - Step 4: Generating base prompt');
       const basePrompt = template(context);
+
+      console.log('🔄 Generating choices - Step 4b: Enhancing with inventory context');
+      const inventoryAwarePrompt = this.enhancePromptWithInventory(basePrompt, characterIds);
       
       console.log('🔄 Generating choices - Step 5: Enhancing with lore');
-      const loreEnhancedPrompt = this.enhancePromptWithLore(basePrompt, worldId);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId);
       
       console.log('🔄 Generating choices - Step 6: Enhancing with tone settings');
       const prompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
@@ -472,6 +477,42 @@ CHOICE GENERATION FOCUS:
 
 
     return prompt + detailedInstructions + choiceSpecificGuidance;
+  }
+
+  private enhancePromptWithInventory(prompt: string, characterIds: string[]): string {
+    try {
+      if (!characterIds || characterIds.length === 0) {
+        return prompt;
+      }
+
+      const characterId = characterIds[0];
+      const { getCharacterItems } = useInventoryStore.getState();
+      const items = getCharacterItems(characterId);
+
+      if (!items || items.length === 0) {
+        return prompt;
+      }
+
+      const { context: inventorySection } = buildInventoryContext(items);
+
+      if (!inventorySection) {
+        return prompt;
+      }
+
+      const guidance = `
+
+PLAYER INVENTORY CONTEXT:
+${inventorySection}
+
+CHOICE DESIGN RULES:
+- The player ALREADY possesses the items listed above.
+- Do NOT create options that suggest picking up or rediscovering these items.
+- You may reference these items as tools or resources, but focus choices on new actions that move the narrative forward.`;
+
+      return `${prompt}${guidance}`;
+    } catch {
+      return prompt;
+    }
   }
 
 

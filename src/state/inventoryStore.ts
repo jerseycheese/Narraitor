@@ -790,12 +790,17 @@ export const useInventoryStore = create<InventoryStore>()(
           };
         }
 
-        // Determine if item is consumable (reduces quantity)
-        const isConsumable = item.categoryId === 'consumables';
-        const wasConsumed = isConsumable;
+        // Determine if item usage should consume quantity.
+        // Items explicitly categorized as consumables always consume.
+        // Additionally, stackable items are treated as consumables so quantities decrement on use.
+        const shouldConsume = item.categoryId === 'consumables' || item.stackable;
+        let wasConsumed = false;
         let remainingQuantity = item.quantity;
 
-        if (isConsumable) {
+        const previousQuantity = item.quantity;
+
+        if (shouldConsume) {
+          wasConsumed = true;
           if (item.quantity === 1) {
             // Remove the entire item
             get().delete(itemId);
@@ -813,6 +818,7 @@ export const useInventoryStore = create<InventoryStore>()(
           categoryId: item.categoryId,
           wasConsumed,
           remainingQuantity,
+          previousQuantity,
         };
       },
     };
