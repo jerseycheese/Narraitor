@@ -102,6 +102,8 @@ const itemId = generateUniqueId('item');
 - Performs automatic stack merging with max-stack enforcement
 - Stores AI/manual categorization metadata per item
 - Provides helpers for programmatic additions via `addItemToInventory`
+- Handles item usage through `useItem()` method with consumption logic
+- Returns usage results including narrative content and remaining quantities
 
 ### Narrative Store
 - Associates segments with sessions
@@ -109,9 +111,11 @@ const itemId = generateUniqueId('item');
 - Provides session-specific queries
 
 ### Journal Store
-- Filters entries by type
+- Filters entries by type (including 'item_usage' for item usage events)
 - Tracks read/unread state
 - Supports session-specific entries
+- Creates automatic entries for significant item usage moments
+- Links entries to related items through relatedEntities
 
 ### Session Store
 - Creates sessions linking world and character
