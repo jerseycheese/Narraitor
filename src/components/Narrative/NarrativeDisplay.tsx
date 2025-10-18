@@ -5,8 +5,25 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
+import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { useNPCStore } from '@/state/npcStore';
 
+const deriveFallbackName = (id: string): string => {
+  if (!id) {
+    return 'Unknown NPC';
+  }
+
+  const cleaned = id
+    .replace(/^npc[-_]?/i, '')
+    .replace(/[-_]/g, ' ')
+    .trim();
+
+  if (cleaned) {
+    return `NPC ${cleaned}`;
+  }
+
+  return 'Unknown NPC';
+};
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -50,6 +67,8 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   if (!segment) {
     return null;
   }
+
+  const isDialogue = segment.type === 'dialogue';
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -137,29 +156,87 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const parsedContent = parseNarrativeContent(segment.content);
   const formattedContent = formatAIResponse(parsedContent, formattingOptions);
 
-  // Get speaker information for dialogue segments
-  const speaker = segment.type === 'dialogue' && segment.metadata?.speakerId
-    ? getById(segment.metadata.speakerId)
+  const speakerId = segment.metadata?.speakerId;
+  const speakerRecord = speakerId ? getById(speakerId) : null;
+  const speakerName = speakerId
+    ? (speakerRecord?.name ?? deriveFallbackName(speakerId))
     : null;
+
+  const participantDetails = React.useMemo(() => {
+    const ids = new Set<string>();
+
+    segment.metadata?.characterIds?.forEach((id) => {
+      if (id) {
+        ids.add(id);
+      }
+    });
+
+    segment.characterIds?.forEach((id) => {
+      if (id) {
+        ids.add(id);
+      }
+    });
+
+    if (speakerId) {
+      ids.add(speakerId);
+    }
+
+    return Array.from(ids)
+      .filter((id) => !(isDialogue && speakerId && id === speakerId))
+      .map((id) => {
+        const npc = getById(id);
+        return {
+          id,
+          name: npc?.name ?? deriveFallbackName(id),
+          avatarUrl: npc?.avatarUrl,
+        };
+      });
+  }, [segment, getById, speakerId, isDialogue]);
 
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
 
-        {speaker && (
-          <div className="flex items-center gap-2 mb-3">
-            {speaker.avatarUrl && (
-              // Use regular img for arbitrary URLs to avoid Next.js domain restrictions
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={speaker.avatarUrl}
-                alt={speaker.name}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            )}
+        {participantDetails.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Characters Present
+            </p>
+            <div
+              className="mt-2 flex flex-wrap gap-2"
+              role="list"
+              aria-label="Characters present in this scene"
+            >
+              {participantDetails.map((participant) => (
+                <div
+                  key={participant.id}
+                  className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
+                  role="listitem"
+                >
+                  <NarrativeCharacterAvatar
+                    name={participant.name}
+                    avatarUrl={participant.avatarUrl}
+                    size="sm"
+                  />
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {participant.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isDialogue && speakerId && speakerName && (
+          <div className="mb-3 flex items-center gap-2">
+            <NarrativeCharacterAvatar
+              name={speakerName}
+              avatarUrl={speakerRecord?.avatarUrl}
+              size="sm"
+            />
             <span className="text-sm font-semibold text-blue-700">
-              {speaker.name}
+              {speakerName}
             </span>
           </div>
         )}

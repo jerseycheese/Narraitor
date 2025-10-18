@@ -3,8 +3,24 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { useNPCStore } from '@/state/npcStore';
+
+jest.mock('@/state/npcStore');
+
+const mockUseNPCStore = useNPCStore as jest.MockedFunction<typeof useNPCStore>;
 
 describe('NarrativeDisplay', () => {
+  beforeEach(() => {
+    const defaultState = {
+      npcs: {},
+      getById: () => undefined,
+    };
+
+    mockUseNPCStore.mockImplementation((selector?: (state: typeof defaultState) => unknown) =>
+      selector ? selector(defaultState) : defaultState
+    );
+  });
+
   it('displays narrative content appropriately', () => {
     const segment = {
       id: 'seg-1',
@@ -24,6 +40,55 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={segment} />);
 
     expect(screen.getByText(/ancient forest whispered secrets/)).toBeInTheDocument();
+  });
+
+  it('renders character avatars for metadata characterIds', () => {
+    const now = getTimestamp();
+    const npcState = {
+      npcs: {
+        'npc-1': {
+          id: 'npc-1',
+          name: 'Eldria Sunshadow',
+          worldId: 'world-1',
+          avatarUrl: 'https://example.com/eldria.png',
+          createdAt: now,
+          updatedAt: now,
+        },
+        'npc-2': {
+          id: 'npc-2',
+          name: 'Borin Ironfist',
+          worldId: 'world-1',
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      getById: (id: string) => (id in npcState.npcs ? npcState.npcs[id as keyof typeof npcState.npcs] : undefined),
+    };
+
+    mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>
+      selector ? selector(npcState) : npcState
+    );
+
+    const segment = {
+      id: 'seg-characters',
+      content: 'Eldria and Borin planned their next move.',
+      type: 'scene' as const,
+      timestamp: new Date(),
+      createdAt: now,
+      updatedAt: now,
+      metadata: {
+        characterIds: ['npc-1', 'npc-2'],
+        tags: ['strategy'],
+      },
+    };
+
+    render(<NarrativeDisplay segment={segment} />);
+
+    expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
+    expect(screen.getByText('Eldria Sunshadow')).toBeInTheDocument();
+    expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
+    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
   });
 
   it('renders different segment types with appropriate styling', () => {

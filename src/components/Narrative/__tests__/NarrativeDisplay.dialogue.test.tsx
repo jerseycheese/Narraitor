@@ -11,6 +11,14 @@ const mockUseNPCStore = useNPCStore as jest.MockedFunction<typeof useNPCStore>;
 describe('NarrativeDisplay - Dialogue with Speaker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
+      const defaultState = {
+        npcs: {},
+        getById: () => undefined,
+      };
+
+      return selector ? selector(defaultState) : defaultState;
+    });
   });
 
   it('displays speaker name for dialogue segment with speakerId', () => {
@@ -58,8 +66,9 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
 
-    expect(screen.getByText('Gandalf')).toBeInTheDocument();
+    expect(screen.getAllByText('Gandalf')[0]).toBeInTheDocument();
     expect(screen.getByText('You shall not pass!')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Gandalf' })).toBeInTheDocument();
   });
 
   it('displays avatar if NPC has avatarUrl', () => {
@@ -108,7 +117,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
 
-    const avatar = screen.getByRole('img', { name: /aragorn/i });
+    const avatar = screen.getByAltText(/aragorn/i);
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveAttribute('src', 'https://example.com/aragorn.jpg');
   });
