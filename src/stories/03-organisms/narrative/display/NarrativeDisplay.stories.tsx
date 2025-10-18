@@ -152,63 +152,69 @@ Their quest would require both courage and wisdom to succeed.`,
 
 // NPC Dialogue Stories - Issue #770
 
-// Dialogue with speaker and avatar
-export const DialogueWithSpeakerAndAvatar: Story = {
-  render: () => {
-    const store = useNPCStore.getState();
+// Component wrapper for dialogue stories
+const DialogueWithGandalf = () => {
+  const store = useNPCStore.getState();
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 
-    useEffect(() => {
-      store.reset();
-      const npcId = store.createNPC({
-        name: 'Gandalf',
-        description: 'A wise wizard',
-        worldId: 'test-world',
-        avatarUrl: 'https://i.pravatar.cc/150?img=68',
-      });
+  useEffect(() => {
+    store.reset();
+    const npcId = store.createNPC({
+      name: 'Gandalf',
+      description: 'A wise wizard',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=68',
+    });
 
-      // Update segment with correct NPC ID after creation
-      segment.metadata.speakerId = npcId;
-    }, []);
-
-    const segment = createMockSegment(
+    setSegment(createMockSegment(
       'You shall not pass! This foe is beyond any of you. Run!',
       'dialogue',
       {
         tags: ['dialogue', 'dramatic'],
+        speakerId: npcId,
       }
-    );
+    ));
+  }, [store]);
 
-    return <NarrativeDisplay segment={segment} />;
-  },
+  return <NarrativeDisplay segment={segment} />;
 };
 
-// Dialogue with speaker but no avatar
-export const DialogueWithSpeakerNoAvatar: Story = {
-  render: () => {
-    const store = useNPCStore.getState();
+// Dialogue with speaker and avatar
+export const DialogueWithSpeakerAndAvatar: Story = {
+  render: () => <DialogueWithGandalf />,
+  args: {},
+};
 
-    useEffect(() => {
-      store.reset();
-      const npcId = store.createNPC({
-        name: 'Frodo',
-        description: 'A brave hobbit',
-        worldId: 'test-world',
-      });
+// Component wrapper for Frodo dialogue
+const DialogueWithFrodo = () => {
+  const store = useNPCStore.getState();
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 
-      // Update segment with correct NPC ID after creation
-      segment.metadata.speakerId = npcId;
-    }, []);
+  useEffect(() => {
+    store.reset();
+    const npcId = store.createNPC({
+      name: 'Frodo',
+      description: 'A brave hobbit',
+      worldId: 'test-world',
+    });
 
-    const segment = createMockSegment(
+    setSegment(createMockSegment(
       'I wish it need not have happened in my time. So do all who live to see such times.',
       'dialogue',
       {
         tags: ['dialogue', 'contemplative'],
+        speakerId: npcId,
       }
-    );
+    ));
+  }, [store]);
 
-    return <NarrativeDisplay segment={segment} />;
-  },
+  return <NarrativeDisplay segment={segment} />;
+};
+
+// Dialogue with speaker but no avatar
+export const DialogueWithSpeakerNoAvatar: Story = {
+  render: () => <DialogueWithFrodo />,
+  args: {},
 };
 
 // Dialogue without speaker info (anonymous)
@@ -224,63 +230,65 @@ export const DialogueWithoutSpeaker: Story = {
   },
 };
 
-// Multiple NPCs in sequence
-export const MultipleNPCDialogue: Story = {
-  render: () => {
-    const store = useNPCStore.getState();
-    const [npcIds, setNpcIds] = React.useState<Record<string, string>>({});
+// Component wrapper for multiple NPCs
+const MultipleNPCs = () => {
+  const store = useNPCStore.getState();
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
 
-    useEffect(() => {
-      store.reset();
+  useEffect(() => {
+    store.reset();
 
-      const elrondId = store.createNPC({
-        name: 'Elrond',
-        description: 'Lord of Rivendell',
-        worldId: 'test-world',
-        avatarUrl: 'https://i.pravatar.cc/150?img=33',
-      });
+    const elrondId = store.createNPC({
+      name: 'Elrond',
+      description: 'Lord of Rivendell',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=33',
+    });
 
-      const boromirId = store.createNPC({
-        name: 'Boromir',
-        description: 'Son of Gondor',
-        worldId: 'test-world',
-        avatarUrl: 'https://i.pravatar.cc/150?img=12',
-      });
+    const boromirId = store.createNPC({
+      name: 'Boromir',
+      description: 'Son of Gondor',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=12',
+    });
 
-      const frodoId = store.createNPC({
-        name: 'Frodo',
-        description: 'Ring bearer',
-        worldId: 'test-world',
-        avatarUrl: 'https://i.pravatar.cc/150?img=8',
-      });
+    const frodoId = store.createNPC({
+      name: 'Frodo',
+      description: 'Ring bearer',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=8',
+    });
 
-      setNpcIds({ elrond: elrondId, boromir: boromirId, frodo: frodoId });
-    }, []);
-
-    const segments = [
+    setSegments([
       createMockSegment(
         'The Council of Elrond has been called. We must decide what to do with the Ring.',
         'dialogue',
-        { tags: ['dialogue'], speakerId: npcIds.elrond }
+        { tags: ['dialogue'], speakerId: elrondId }
       ),
       createMockSegment(
         'One does not simply walk into Mordor. Its black gates are guarded by more than just Orcs.',
         'dialogue',
-        { tags: ['dialogue'], speakerId: npcIds.boromir }
+        { tags: ['dialogue'], speakerId: boromirId }
       ),
       createMockSegment(
         'I will take it! I will take the Ring to Mordor, though I do not know the way.',
         'dialogue',
-        { tags: ['dialogue'], speakerId: npcIds.frodo }
+        { tags: ['dialogue'], speakerId: frodoId }
       ),
-    ];
+    ]);
+  }, [store]);
 
-    return (
-      <div className="space-y-4">
-        {segments.map((segment, index) => (
-          <NarrativeDisplay key={index} segment={segment} />
-        ))}
-      </div>
-    );
-  },
+  return (
+    <div className="space-y-4">
+      {segments.map((segment, index) => (
+        <NarrativeDisplay key={index} segment={segment} />
+      ))}
+    </div>
+  );
+};
+
+// Multiple NPCs in sequence
+export const MultipleNPCDialogue: Story = {
+  render: () => <MultipleNPCs />,
+  args: {},
 };

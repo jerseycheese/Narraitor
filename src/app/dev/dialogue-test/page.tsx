@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { useNPCStore } from '@/state/npcStore';
 import { NarrativeSegment } from '@/types/narrative.types';
@@ -46,7 +47,7 @@ export default function DialogueTestPage() {
       aragorn: aragornId,
       frodo: frodoId,
     });
-  }, []);
+  }, [createNPC, reset]);
 
   if (!mounted) {
     return <div className="p-8">Loading...</div>;
@@ -141,10 +142,12 @@ export default function DialogueTestPage() {
             {allNPCs.map((npc) => (
               <div key={npc.id} className="p-2 bg-gray-50 rounded flex items-center gap-2">
                 {npc.avatarUrl && (
-                  <img
+                  <Image
                     src={npc.avatarUrl}
                     alt={npc.name}
-                    className="w-8 h-8 rounded-full"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
                   />
                 )}
                 <div>
