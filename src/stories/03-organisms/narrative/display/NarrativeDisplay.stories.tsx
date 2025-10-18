@@ -154,11 +154,10 @@ Their quest would require both courage and wisdom to succeed.`,
 
 // Component wrapper for dialogue stories
 const DialogueWithGandalf = () => {
-  const store = useNPCStore.getState();
   const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 
   useEffect(() => {
-    store.reset();
+    const store = useNPCStore.getState();
     const npcId = store.createNPC({
       name: 'Gandalf',
       description: 'A wise wizard',
@@ -174,7 +173,7 @@ const DialogueWithGandalf = () => {
         speakerId: npcId,
       }
     ));
-  }, [store]);
+  }, []);
 
   return <NarrativeDisplay segment={segment} />;
 };
@@ -187,11 +186,10 @@ export const DialogueWithSpeakerAndAvatar: Story = {
 
 // Component wrapper for Frodo dialogue
 const DialogueWithFrodo = () => {
-  const store = useNPCStore.getState();
   const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 
   useEffect(() => {
-    store.reset();
+    const store = useNPCStore.getState();
     const npcId = store.createNPC({
       name: 'Frodo',
       description: 'A brave hobbit',
@@ -206,7 +204,7 @@ const DialogueWithFrodo = () => {
         speakerId: npcId,
       }
     ));
-  }, [store]);
+  }, []);
 
   return <NarrativeDisplay segment={segment} />;
 };
@@ -232,11 +230,10 @@ export const DialogueWithoutSpeaker: Story = {
 
 // Component wrapper for multiple NPCs
 const MultipleNPCs = () => {
-  const store = useNPCStore.getState();
   const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
 
   useEffect(() => {
-    store.reset();
+    const store = useNPCStore.getState();
 
     const elrondId = store.createNPC({
       name: 'Elrond',
@@ -276,7 +273,7 @@ const MultipleNPCs = () => {
         { tags: ['dialogue'], speakerId: frodoId }
       ),
     ]);
-  }, [store]);
+  }, []);
 
   return (
     <div className="space-y-4">
