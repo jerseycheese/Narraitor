@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import React, { useEffect } from 'react';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
+import { useNPCStore } from '@/state/npcStore';
 
 // Updated stories aligned with actual app usage patterns
 
@@ -145,5 +147,151 @@ Their quest would require both courage and wisdom to succeed.`,
         tags: ['dialogue', 'exploration', 'mystery'],
       }
     ),
+  },
+};
+
+// NPC Dialogue Stories
+
+// Component wrapper for dialogue stories
+const DialogueWithGandalf = () => {
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
+
+  useEffect(() => {
+    const store = useNPCStore.getState();
+    const npcId = store.createNPC({
+      name: 'Gandalf',
+      description: 'A wise wizard',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=68',
+    });
+
+    setSegment(createMockSegment(
+      'You shall not pass! This foe is beyond any of you. Run!',
+      'dialogue',
+      {
+        tags: ['dialogue', 'dramatic'],
+        speakerId: npcId,
+      }
+    ));
+  }, []);
+
+  return <NarrativeDisplay segment={segment} />;
+};
+
+// Dialogue with speaker and avatar
+export const DialogueWithSpeakerAndAvatar: Story = {
+  render: () => <DialogueWithGandalf />,
+  args: {
+    segment: null,
+  },
+};
+
+// Component wrapper for Frodo dialogue
+const DialogueWithFrodo = () => {
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
+
+  useEffect(() => {
+    const store = useNPCStore.getState();
+    const npcId = store.createNPC({
+      name: 'Frodo',
+      description: 'A brave hobbit',
+      worldId: 'test-world',
+    });
+
+    setSegment(createMockSegment(
+      'I wish it need not have happened in my time. So do all who live to see such times.',
+      'dialogue',
+      {
+        tags: ['dialogue', 'contemplative'],
+        speakerId: npcId,
+      }
+    ));
+  }, []);
+
+  return <NarrativeDisplay segment={segment} />;
+};
+
+// Dialogue with speaker but no avatar
+export const DialogueWithSpeakerNoAvatar: Story = {
+  render: () => <DialogueWithFrodo />,
+  args: {
+    segment: null,
+  },
+};
+
+// Dialogue without speaker info (anonymous)
+export const DialogueWithoutSpeaker: Story = {
+  args: {
+    segment: createMockSegment(
+      'A mysterious voice echoes from the shadows, its source unknown...',
+      'dialogue',
+      {
+        tags: ['dialogue', 'mysterious'],
+      }
+    ),
+  },
+};
+
+// Component wrapper for multiple NPCs
+const MultipleNPCs = () => {
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
+
+  useEffect(() => {
+    const store = useNPCStore.getState();
+
+    const elrondId = store.createNPC({
+      name: 'Elrond',
+      description: 'Lord of Rivendell',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=33',
+    });
+
+    const boromirId = store.createNPC({
+      name: 'Boromir',
+      description: 'Son of Gondor',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=12',
+    });
+
+    const frodoId = store.createNPC({
+      name: 'Frodo',
+      description: 'Ring bearer',
+      worldId: 'test-world',
+      avatarUrl: 'https://i.pravatar.cc/150?img=8',
+    });
+
+    setSegments([
+      createMockSegment(
+        'The Council of Elrond has been called. We must decide what to do with the Ring.',
+        'dialogue',
+        { tags: ['dialogue'], speakerId: elrondId }
+      ),
+      createMockSegment(
+        'One does not simply walk into Mordor. Its black gates are guarded by more than just Orcs.',
+        'dialogue',
+        { tags: ['dialogue'], speakerId: boromirId }
+      ),
+      createMockSegment(
+        'I will take it! I will take the Ring to Mordor, though I do not know the way.',
+        'dialogue',
+        { tags: ['dialogue'], speakerId: frodoId }
+      ),
+    ]);
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {segments.map((segment, index) => (
+        <NarrativeDisplay key={index} segment={segment} />
+      ))}
+    </div>
+  );
+};
+
+// Multiple NPCs in sequence
+export const MultipleNPCDialogue: Story = {
+  render: () => <MultipleNPCs />,
+  args: {
+    segment: null,
   },
 };
