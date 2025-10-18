@@ -93,12 +93,27 @@ export const useNPCStore = create<NPCStore>()(
 
         const normalizedUpdates: Partial<NPC> = { ...updates };
 
-        if (updates.name) {
-          normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
+        if (updates.name !== undefined) {
+          const normalizedName = normalizeText(updates.name, NORM_NAME);
+          if (!normalizedName) {
+            set({ error: createStoreError('Invalid Name', 'NPC name cannot be empty.', ErrorType.VALIDATION) });
+            return;
+          }
+          normalizedUpdates.name = normalizedName;
         }
 
-        if (updates.description) {
-          normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
+        if (updates.description !== undefined) {
+          const normalizedDescription = normalizeText(updates.description, NORM_DESC);
+          if (!normalizedDescription) {
+            set({ error: createStoreError('Invalid Description', 'NPC description cannot be empty.', ErrorType.VALIDATION) });
+            return;
+          }
+          normalizedUpdates.description = normalizedDescription;
+        }
+
+        if (updates.worldId !== undefined && !updates.worldId) {
+          set({ error: createStoreError('Invalid World ID', 'World ID is required.', ErrorType.VALIDATION) });
+          return;
         }
 
         const now = getTimestamp();

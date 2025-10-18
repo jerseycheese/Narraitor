@@ -5,6 +5,7 @@
 
 export { useWorldStore } from './worldStore';
 export { useCharacterStore } from './characterStore';
+export { useNPCStore } from './npcStore';
 export { useNarrativeStore } from './narrativeStore';
 export { useJournalStore } from './journalStore';
 export { useSessionStore } from './sessionStore';

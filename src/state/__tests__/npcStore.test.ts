@@ -273,6 +273,63 @@ describe('npcStore', () => {
       }).toThrow();
     });
 
+    test('should reject updates with empty name after normalization', () => {
+      const npcData = {
+        worldId: 'world-123',
+        name: 'Test NPC',
+        description: 'Test description',
+      };
+
+      const npcId = useNPCStore.getState().createNPC(npcData);
+
+      // Try to update with whitespace-only name
+      useNPCStore.getState().updateNPC(npcId, { name: '   ' });
+
+      const state = useNPCStore.getState();
+      expect(state.error?.title).toBe('Invalid Name');
+      expect(state.error?.message).toBe('NPC name cannot be empty.');
+      // NPC should not be updated
+      expect(state.npcs[npcId].name).toBe('Test NPC');
+    });
+
+    test('should reject updates with empty description after normalization', () => {
+      const npcData = {
+        worldId: 'world-123',
+        name: 'Test NPC',
+        description: 'Test description',
+      };
+
+      const npcId = useNPCStore.getState().createNPC(npcData);
+
+      // Try to update with whitespace-only description
+      useNPCStore.getState().updateNPC(npcId, { description: '   ' });
+
+      const state = useNPCStore.getState();
+      expect(state.error?.title).toBe('Invalid Description');
+      expect(state.error?.message).toBe('NPC description cannot be empty.');
+      // NPC should not be updated
+      expect(state.npcs[npcId].description).toBe('Test description');
+    });
+
+    test('should reject updates with empty worldId', () => {
+      const npcData = {
+        worldId: 'world-123',
+        name: 'Test NPC',
+        description: 'Test description',
+      };
+
+      const npcId = useNPCStore.getState().createNPC(npcData);
+
+      // Try to update with empty worldId
+      useNPCStore.getState().updateNPC(npcId, { worldId: '' });
+
+      const state = useNPCStore.getState();
+      expect(state.error?.title).toBe('Invalid World ID');
+      expect(state.error?.message).toBe('World ID is required.');
+      // NPC should not be updated
+      expect(state.npcs[npcId].worldId).toBe('world-123');
+    });
+
     test('should handle persistence errors gracefully', () => {
       // Simulate error by setting error state
       useNPCStore.getState().setError({
