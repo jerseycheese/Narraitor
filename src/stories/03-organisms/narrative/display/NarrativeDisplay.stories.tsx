@@ -181,7 +181,9 @@ const DialogueWithGandalf = () => {
 // Dialogue with speaker and avatar
 export const DialogueWithSpeakerAndAvatar: Story = {
   render: () => <DialogueWithGandalf />,
-  args: {},
+  args: {
+    segment: null,
+  },
 };
 
 // Component wrapper for Frodo dialogue
@@ -212,7 +214,9 @@ const DialogueWithFrodo = () => {
 // Dialogue with speaker but no avatar
 export const DialogueWithSpeakerNoAvatar: Story = {
   render: () => <DialogueWithFrodo />,
-  args: {},
+  args: {
+    segment: null,
+  },
 };
 
 // Dialogue without speaker info (anonymous)
@@ -287,5 +291,7 @@ const MultipleNPCs = () => {
 // Multiple NPCs in sequence
 export const MultipleNPCDialogue: Story = {
   render: () => <MultipleNPCs />,
-  args: {},
+  args: {
+    segment: null,
+  },
 };
