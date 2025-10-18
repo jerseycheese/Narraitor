@@ -24,36 +24,23 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       } : undefined
     );
 
-    mockUseNPCStore.mockReturnValue({
-      npcs: {
-        'npc-1': {
-          id: 'npc-1',
-          name: 'Gandalf',
-          worldId: 'world-1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-      getById: mockGetById,
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      getAll: jest.fn(),
-      setCurrent: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-      createNPC: jest.fn(),
-      updateNPC: jest.fn(),
-      deleteNPC: jest.fn(),
-      getNPCsByWorld: jest.fn(),
-      clearWorldNPCs: jest.fn(),
-      entities: {},
-      currentEntityId: null,
-      error: null,
-      loading: false,
-      worldNpcs: {},
+    // Mock the selector pattern - return the function directly
+    mockUseNPCStore.mockImplementation((selector: any) => {
+      if (selector) {
+        return selector({
+          npcs: {
+            'npc-1': {
+              id: 'npc-1',
+              name: 'Gandalf',
+              worldId: 'world-1',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          },
+          getById: mockGetById,
+        });
+      }
+      return mockGetById;
     });
 
     const dialogueSegment: NarrativeSegment = {
@@ -87,37 +74,23 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       } : undefined
     );
 
-    mockUseNPCStore.mockReturnValue({
-      npcs: {
-        'npc-2': {
-          id: 'npc-2',
-          name: 'Aragorn',
-          worldId: 'world-1',
-          avatarUrl: 'https://example.com/aragorn.jpg',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-      getById: mockGetById,
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      getAll: jest.fn(),
-      setCurrent: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-      createNPC: jest.fn(),
-      updateNPC: jest.fn(),
-      deleteNPC: jest.fn(),
-      getNPCsByWorld: jest.fn(),
-      clearWorldNPCs: jest.fn(),
-      entities: {},
-      currentEntityId: null,
-      error: null,
-      loading: false,
-      worldNpcs: {},
+    mockUseNPCStore.mockImplementation((selector: any) => {
+      if (selector) {
+        return selector({
+          npcs: {
+            'npc-2': {
+              id: 'npc-2',
+              name: 'Aragorn',
+              worldId: 'world-1',
+              avatarUrl: 'https://example.com/aragorn.jpg',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          },
+          getById: mockGetById,
+        });
+      }
+      return mockGetById;
     });
 
     const dialogueSegment: NarrativeSegment = {
@@ -137,7 +110,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
 
     const avatar = screen.getByRole('img', { name: /aragorn/i });
     expect(avatar).toBeInTheDocument();
-    expect(avatar).toHaveAttribute('src', expect.stringContaining('aragorn.jpg'));
+    expect(avatar).toHaveAttribute('src', 'https://example.com/aragorn.jpg');
   });
 
   it('renders dialogue without speaker when speakerId is not provided', () => {
@@ -160,28 +133,16 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
   });
 
   it('handles missing NPC gracefully when speakerId does not match', () => {
-    mockUseNPCStore.mockReturnValue({
-      npcs: {},
-      getById: jest.fn(() => undefined),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      getAll: jest.fn(),
-      setCurrent: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-      createNPC: jest.fn(),
-      updateNPC: jest.fn(),
-      deleteNPC: jest.fn(),
-      getNPCsByWorld: jest.fn(),
-      clearWorldNPCs: jest.fn(),
-      entities: {},
-      currentEntityId: null,
-      error: null,
-      loading: false,
-      worldNpcs: {},
+    const mockGetById = jest.fn(() => undefined);
+
+    mockUseNPCStore.mockImplementation((selector: any) => {
+      if (selector) {
+        return selector({
+          npcs: {},
+          getById: mockGetById,
+        });
+      }
+      return mockGetById;
     });
 
     const dialogueSegment: NarrativeSegment = {

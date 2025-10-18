@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -22,7 +21,8 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   error,
   onRetry
 }) => {
-  const { getById } = useNPCStore();
+  // Use selector to avoid subscribing to entire store
+  const getById = useNPCStore((state) => state.getById);
 
   if (isLoading) {
     return (
@@ -150,12 +150,12 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         {speaker && (
           <div className="flex items-center gap-2 mb-3">
             {speaker.avatarUrl && (
-              <Image
+              // Use regular img for arbitrary URLs to avoid Next.js domain restrictions
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={speaker.avatarUrl}
                 alt={speaker.name}
-                width={24}
-                height={24}
-                className="rounded-full object-cover"
+                className="w-6 h-6 rounded-full object-cover"
               />
             )}
             <span className="text-sm font-semibold text-blue-700">
