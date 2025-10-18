@@ -133,6 +133,8 @@ export interface NarrativeMetadata {
   tags: string[];
   location?: string;
   characterIds?: EntityID[];
+  // Dialogue-specific metadata
+  speakerId?: EntityID;
   // Ending-specific metadata
   endingId?: string;
   endingData?: StoryEnding;

@@ -1,10 +1,12 @@
 import React from 'react';
+import Image from 'next/image';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
+import { useNPCStore } from '@/state/npcStore';
 
 
 interface NarrativeDisplayProps {
@@ -20,6 +22,8 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   error,
   onRetry
 }) => {
+  const { getById } = useNPCStore();
+
   if (isLoading) {
     return (
       <div className="p-8 snap-center">
@@ -133,11 +137,34 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const parsedContent = parseNarrativeContent(segment.content);
   const formattedContent = formatAIResponse(parsedContent, formattingOptions);
 
+  // Get speaker information for dialogue segments
+  const speaker = segment.type === 'dialogue' && segment.metadata?.speakerId
+    ? getById(segment.metadata.speakerId)
+    : null;
+
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
-        <FormattedNarrativeContent 
+
+        {speaker && (
+          <div className="flex items-center gap-2 mb-3">
+            {speaker.avatarUrl && (
+              <Image
+                src={speaker.avatarUrl}
+                alt={speaker.name}
+                width={24}
+                height={24}
+                className="rounded-full object-cover"
+              />
+            )}
+            <span className="text-sm font-semibold text-blue-700">
+              {speaker.name}
+            </span>
+          </div>
+        )}
+
+        <FormattedNarrativeContent
           content={formattedContent}
           className={`text-lg narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
         />
