@@ -25,7 +25,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
     );
 
     // Mock the selector pattern - return the function directly
-    mockUseNPCStore.mockImplementation((selector: any) => {
+    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
       if (selector) {
         return selector({
           npcs: {
@@ -74,7 +74,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       } : undefined
     );
 
-    mockUseNPCStore.mockImplementation((selector: any) => {
+    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
       if (selector) {
         return selector({
           npcs: {
@@ -135,7 +135,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
   it('handles missing NPC gracefully when speakerId does not match', () => {
     const mockGetById = jest.fn(() => undefined);
 
-    mockUseNPCStore.mockImplementation((selector: any) => {
+    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
       if (selector) {
         return selector({
           npcs: {},
