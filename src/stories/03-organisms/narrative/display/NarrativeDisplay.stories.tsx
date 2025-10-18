@@ -150,7 +150,7 @@ Their quest would require both courage and wisdom to succeed.`,
   },
 };
 
-// NPC Dialogue Stories - Issue #770
+// NPC Dialogue Stories
 
 // Component wrapper for dialogue stories
 const DialogueWithGandalf = () => {
