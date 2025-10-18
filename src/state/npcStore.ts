@@ -1,0 +1,256 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
+import { NPC } from '../types/npc.types';
+import { EntityID } from '../types/common.types';
+import { generateUniqueId } from '../lib/utils/generateId';
+import { createIndexedDBStorage } from './persistence';
+import { CrudStore } from './createCrudStore';
+
+export interface NPCStore extends CrudStore<NPC> {
+  npcs: Record<EntityID, NPC>;
+  worldNpcs: Record<EntityID, EntityID[]>;
+
+  createNPC: (npcData: Omit<NPC, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateNPC: (npcId: EntityID, updates: Partial<NPC>) => void;
+  deleteNPC: (npcId: EntityID) => void;
+
+  getNPCsByWorld: (worldId: EntityID) => NPC[];
+  clearWorldNPCs: (worldId: EntityID) => void;
+}
+
+const getInitialState = () => ({
+  npcs: {} as Record<EntityID, NPC>,
+  entities: {} as Record<EntityID, NPC>,
+  worldNpcs: {} as Record<EntityID, EntityID[]>,
+  currentEntityId: null as EntityID | null,
+  error: null as UserFriendlyError | null,
+  loading: false,
+});
+
+const validateNPCData = (data: Partial<NPC>): void => {
+  const normalizedName = normalizeText(data.name || '', NORM_NAME);
+  if (!normalizedName) {
+    throw new Error('NPC name is required');
+  }
+  if (!data.worldId) {
+    throw new Error('World ID is required');
+  }
+  const normalizedDescription = normalizeText(data.description || '', NORM_DESC);
+  if (!normalizedDescription) {
+    throw new Error('NPC description is required');
+  }
+};
+
+export const useNPCStore = create<NPCStore>()(
+  persist(
+    (set, get) => ({
+      ...getInitialState(),
+
+      create: (npcData) => {
+        validateNPCData(npcData);
+
+        const npcId = generateUniqueId('npc');
+        const now = getTimestamp();
+
+        const normalizedName = normalizeText(npcData.name, NORM_NAME);
+        const normalizedDescription = normalizeText(npcData.description, NORM_DESC);
+
+        const newNPC: NPC = {
+          ...npcData,
+          id: npcId,
+          name: normalizedName,
+          description: normalizedDescription,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        set((state) => {
+          const worldNpcs = state.worldNpcs[newNPC.worldId] || [];
+          const updatedNpcs = { ...state.npcs, [npcId]: newNPC };
+
+          return {
+            npcs: updatedNpcs,
+            entities: { ...state.entities, [npcId]: newNPC },
+            worldNpcs: {
+              ...state.worldNpcs,
+              [newNPC.worldId]: [...worldNpcs, npcId],
+            },
+            error: null,
+          };
+        });
+
+        return npcId;
+      },
+
+      update: (npcId, updates) => {
+        const existingNPC = get().npcs[npcId];
+        if (!existingNPC) {
+          set({ error: createStoreError('NPC Not Found', 'The specified NPC could not be found.') });
+          return;
+        }
+
+        const normalizedUpdates: Partial<NPC> = { ...updates };
+
+        if (updates.name !== undefined) {
+          const normalizedName = normalizeText(updates.name, NORM_NAME);
+          if (!normalizedName) {
+            set({ error: createStoreError('Invalid Name', 'NPC name cannot be empty.', ErrorType.VALIDATION) });
+            return;
+          }
+          normalizedUpdates.name = normalizedName;
+        }
+
+        if (updates.description !== undefined) {
+          const normalizedDescription = normalizeText(updates.description, NORM_DESC);
+          if (!normalizedDescription) {
+            set({ error: createStoreError('Invalid Description', 'NPC description cannot be empty.', ErrorType.VALIDATION) });
+            return;
+          }
+          normalizedUpdates.description = normalizedDescription;
+        }
+
+        if (updates.worldId !== undefined && !updates.worldId) {
+          set({ error: createStoreError('Invalid World ID', 'World ID is required.', ErrorType.VALIDATION) });
+          return;
+        }
+
+        const now = getTimestamp();
+        const previousWorldId = existingNPC.worldId;
+        const nextWorldId = updates.worldId ?? previousWorldId;
+
+        const updatedNPC: NPC = {
+          ...existingNPC,
+          ...normalizedUpdates,
+          worldId: nextWorldId,
+          updatedAt: now,
+        };
+
+        set((state) => {
+          const updatedNpcs = { ...state.npcs, [npcId]: updatedNPC };
+          const nextEntities = { ...state.entities, [npcId]: updatedNPC };
+          const nextWorldNpcs = { ...state.worldNpcs };
+
+          if (previousWorldId !== nextWorldId) {
+            const previousList = nextWorldNpcs[previousWorldId] || [];
+            nextWorldNpcs[previousWorldId] = previousList.filter((id) => id !== npcId);
+
+            const nextList = nextWorldNpcs[nextWorldId] || [];
+            nextWorldNpcs[nextWorldId] = [...nextList, npcId];
+          }
+
+          return {
+            npcs: updatedNpcs,
+            entities: nextEntities,
+            worldNpcs: nextWorldNpcs,
+            error: null,
+          };
+        });
+      },
+
+      delete: (npcId) => {
+        const existingNPC = get().npcs[npcId];
+        if (!existingNPC) {
+          return;
+        }
+
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [npcId]: _removedNPC, ...remainingNpcs } = state.npcs;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [npcId]: _removedEntity, ...remainingEntities } = state.entities;
+
+          const worldNpcs = state.worldNpcs[existingNPC.worldId] || [];
+          const updatedWorldNpcs = worldNpcs.filter((id) => id !== npcId);
+
+          const nextWorldNpcs = {
+            ...state.worldNpcs,
+            [existingNPC.worldId]: updatedWorldNpcs,
+          };
+
+          if (nextWorldNpcs[existingNPC.worldId].length === 0) {
+            delete nextWorldNpcs[existingNPC.worldId];
+          }
+
+          return {
+            npcs: remainingNpcs,
+            entities: remainingEntities,
+            worldNpcs: nextWorldNpcs,
+            currentEntityId: state.currentEntityId === npcId ? null : state.currentEntityId,
+            error: null,
+          };
+        });
+      },
+
+      setCurrent: (id) => {
+        if (id && !get().npcs[id]) {
+          set({
+            error: createStoreError('NPC Not Found', 'The specified NPC could not be found.'),
+            currentEntityId: null,
+          });
+          return;
+        }
+
+        set({ currentEntityId: id ?? null, error: null });
+      },
+
+      getById: (id) => get().npcs[id],
+      getAll: () => Object.values(get().npcs),
+
+      reset: () => set(getInitialState()),
+
+      setError: (error) => set({ error }),
+      clearError: () => set({ error: null }),
+      setLoading: (loading) => set({ loading }),
+
+      createNPC: (npcData) => get().create(npcData),
+      updateNPC: (npcId, updates) => get().update(npcId, updates),
+      deleteNPC: (npcId) => get().delete(npcId),
+
+      getNPCsByWorld: (worldId) => {
+        const state = get();
+        const npcIds = state.worldNpcs[worldId] || [];
+        return npcIds
+          .map((id) => state.npcs[id])
+          .filter((npc): npc is NPC => Boolean(npc));
+      },
+
+      clearWorldNPCs: (worldId) => {
+        const npcIds = get().worldNpcs[worldId] || [];
+        npcIds.forEach((npcId) => get().delete(npcId));
+      },
+    }),
+    {
+      name: 'narraitor-npc-store',
+      storage: createIndexedDBStorage(),
+      version: 1,
+      partialize: (state) => ({
+        npcs: state.npcs,
+        worldNpcs: state.worldNpcs,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Ensure entities is always in sync with npcs after hydration
+        if (state && state.npcs) {
+          state.entities = { ...state.npcs };
+        }
+      },
+      migrate: (persistedState: unknown) => {
+        if (persistedState && typeof persistedState === 'object' && 'npcs' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.npcs && typeof state.npcs === 'object') {
+            state.entities = { ...state.npcs };
+          }
+          if (typeof state.error === 'string') {
+            state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
+          }
+          if (typeof state.loading !== 'boolean') {
+            state.loading = false;
+          }
+        }
+        return persistedState as NPCStore;
+      },
+    }
+  )
+);
