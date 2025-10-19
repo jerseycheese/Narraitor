@@ -898,10 +898,19 @@ The items will be automatically added to the character's inventory with proper c
       extractedMetadata.characters.forEach((character) => {
         if (!character?.id) return;
         const tokenRegex = new RegExp(`\\[${escapeRegExp(character.id)}\\]`, 'g');
-        if (tokenRegex.test(normalizedContent)) {
-          const replacement = safeTrim(character.name) || character.id;
-          normalizedContent = normalizedContent.replace(tokenRegex, replacement);
-        }
+        const displayName = safeTrim(character.name) || character.id;
+        const firstToken = displayName.split(/[\s,]+/)[0]?.toLowerCase();
+
+        normalizedContent = normalizedContent.replace(tokenRegex, (match, offset, fullString) => {
+          if (firstToken) {
+            const preceding = fullString.slice(0, offset).trimEnd();
+            const lastWordMatch = preceding.match(/([A-Za-z'\-]+)$/);
+            if (lastWordMatch && lastWordMatch[1].toLowerCase() === firstToken) {
+              return '';
+            }
+          }
+          return displayName;
+        });
       });
     }
 
