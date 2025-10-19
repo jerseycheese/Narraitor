@@ -51,25 +51,21 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Access character and world stores for skill evaluation
   const characters = useCharacterStore(state => state.characters);
   const worlds = useWorldStore(state => state.worlds);
-  const worldNpcIds = useNPCStore(
+  const npcRoster = useNPCStore(
     useCallback(
-      (state) => state.worldNpcs[worldId] ?? [],
+      (state) => {
+        const ids = state.worldNpcs[worldId] ?? [];
+        if (!ids || ids.length === 0) {
+          return [];
+        }
+        return ids
+          .map((id) => state.npcs[id])
+          .filter((npc): npc is NonNullable<typeof state.npcs[string]> => Boolean(npc));
+      },
       [worldId]
     ),
     shallow
   );
-
-  const npcsById = useNPCStore((state) => state.npcs, shallow);
-
-  const npcRoster = useMemo(() => {
-    if (!worldNpcIds || worldNpcIds.length === 0) {
-      return [];
-    }
-
-    return worldNpcIds
-      .map((id) => npcsById[id])
-      .filter((npc): npc is NonNullable<typeof npcsById[string]> => Boolean(npc));
-  }, [worldNpcIds, npcsById]);
 
   // Track if we've already generated a narrative for this session
   const [sessionKey, setSessionKey] = useState('');
