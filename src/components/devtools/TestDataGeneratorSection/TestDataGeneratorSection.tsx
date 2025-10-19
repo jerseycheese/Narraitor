@@ -8,6 +8,7 @@ import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { WorldImage } from '@/types/world.types';
 import { getTimestamp } from '@/lib/utils';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
@@ -95,6 +96,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       };
       
       const worldId = createWorld(worldDataForStore);
+      await ensureWorldNpcRoster(worldId);
       console.log(`Test world "${testWorldData.name}" created with ID: ${worldId}`);
       
       // Set the newly created world as the active world
@@ -225,6 +227,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         };
         
         const worldId = createWorld(worldDataForStore);
+        await ensureWorldNpcRoster(worldId);
         createdWorlds.push({ id: worldId, name: testWorldData.name });
         console.log(`Created test world: ${testWorldData.name}`);
         

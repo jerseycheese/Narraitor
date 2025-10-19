@@ -5,6 +5,7 @@ import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
 import { useWorldStore } from '@/state/useWorldStore';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import type { EntityID } from '@/types';
 
 export default function LoreViewerTestPage() {
@@ -34,6 +35,7 @@ export default function LoreViewerTestPage() {
           skillPointPool: 50
         }
       });
+      void ensureWorldNpcRoster(newWorldId);
       setWorldId(newWorldId);
     }
   }, [worlds, createWorld]);

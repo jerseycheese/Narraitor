@@ -7,6 +7,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 // Move mock data outside component to prevent re-creation
 const MOCK_CHARACTER_DATA = {
@@ -193,6 +194,7 @@ export default function EndingScreenTestPage() {
   // Initialize stores with mock data
   useEffect(() => {
     const worldId = createWorld(MOCK_WORLD_DATA);
+    void ensureWorldNpcRoster(worldId);
     const characterData = { ...MOCK_CHARACTER_DATA, worldId };
     characterData.inventory.characterId = ''; // Will be set by createCharacter
     const characterId = createCharacter(characterData);

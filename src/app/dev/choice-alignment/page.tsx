@@ -8,6 +8,7 @@ import { Decision, NarrativeContext } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 export default function ChoiceAlignmentTestPage() {
   const [decision, setDecision] = useState<Decision | null>(null);
@@ -35,6 +36,8 @@ export default function ChoiceAlignmentTestPage() {
         }
       });
       
+      void ensureWorldNpcRoster(newWorldId);
+
       // Verify the world was created and stored
       const storedWorld = useWorldStore.getState().worlds[newWorldId];
       if (storedWorld) {

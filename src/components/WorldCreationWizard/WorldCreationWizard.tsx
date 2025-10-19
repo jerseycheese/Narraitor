@@ -28,6 +28,7 @@ import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { truncate } from '@/lib/utils';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 // Efficient deep comparison for arrays of objects
 const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
@@ -358,7 +359,9 @@ export default function WorldCreationWizard({
         });
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
-      
+
+      void ensureWorldNpcRoster(worldId);
+
       // Move to quick start step instead of completing
       wizard.goNext();
     } catch {

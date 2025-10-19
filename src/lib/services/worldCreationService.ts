@@ -317,3 +317,11 @@ export const worldCreationService = {
     });
   },
 };
+
+export const ensureWorldNpcRoster = async (worldId: string): Promise<void> => {
+  if (!worldId) return;
+  const { worlds } = useWorldStore.getState();
+  const world = worlds[worldId];
+  if (!world) return;
+  await worldCreationService.generateWorldNpcRoster(world);
+};
