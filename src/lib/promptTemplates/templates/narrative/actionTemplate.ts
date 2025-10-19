@@ -9,6 +9,7 @@ export const actionTemplate = (context: any) => { // eslint-disable-line @typesc
     narrativeContext,
     characterSkillContext,
     enhancedCharacterContext,
+    npcRoster = [],
   } = context;
 
   const recentSegments = narrativeContext?.recentSegments || [];
@@ -20,6 +21,13 @@ export const actionTemplate = (context: any) => { // eslint-disable-line @typesc
   const itemEntity = narrativeContext?.importantEntities?.find(
     (entity: { type?: string }) => entity.type === 'item'
   );
+
+  const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
+    ? `
+NPC ROSTER (Reference IDs for metadata.characterIds):
+${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
+`
+    : '';
 
   return `Continue the ${genre} narrative for "${worldName}" by writing a short action beat about the player using a specific item.
 
@@ -42,11 +50,20 @@ CRITICAL REQUIREMENTS:
 - Avoid game mechanics, inventory jargon, or UI references.
 - 2 to 4 sentences max; keep the beat tight and focused on the moment.
 
+${formattedRoster}
+
+NPC METADATA RULES:
+- Use NPC names in prose, but list their IDs in metadata.characterIds if they appear or speak during this beat.
+- If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
+- If no NPCs are involved, set metadata.characterIds to [].
+
 Response Format:
 {
   "content": "The action beat goes here...",
   "type": "action",
   "metadata": {
+    "characterIds": [],
+    "speakerId": "npc-id-if-applicable",
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["item-usage", "action-beat"]

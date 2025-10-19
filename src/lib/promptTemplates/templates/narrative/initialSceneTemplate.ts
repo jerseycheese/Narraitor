@@ -10,7 +10,8 @@ export const initialSceneTemplate = (context: any) => { // eslint-disable-line @
     characterIds,
     playerCharacterName,
     playerCharacterBackground,
-    enhancedCharacterContext
+    enhancedCharacterContext,
+    npcRoster = []
   } = context;
 
   return `You are creating the opening scene for a ${genre} story world called "${worldName}".
@@ -22,6 +23,15 @@ ${playerCharacterName ? `Player Character: ${playerCharacterName} (THE PLAYER - 
 ${playerCharacterBackground ? `Player Background: ${JSON.stringify(playerCharacterBackground)}` : ''}
 ${enhancedCharacterContext ? enhancedCharacterContext : ''}
 ${characterIds?.length > 1 ? `Other Characters: ${characterIds.slice(1).join(', ')}` : ''}
+
+${Array.isArray(npcRoster) && npcRoster.length > 0 ? `NPC ROSTER (Reference IDs for metadata.characterIds):
+${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
+
+NPC METADATA RULES:
+- Use NPC names naturally in the narrative.
+- For any NPC who appears or speaks in this opening scene, include their ID (from the roster above) in metadata.characterIds.
+- If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
+- If no NPCs appear yet, set metadata.characterIds to [].` : ''}
 
 Create an engaging opening scene that:
 1. Introduces the world and its atmosphere
@@ -67,6 +77,8 @@ Response Format (CRITICAL - must be valid JSON):
   "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 4-6 complete sentences that tell an engaging story, NOT just metadata or short phrases",
   "type": "scene",
   "metadata": {
+    "characterIds": [],
+    "speakerId": "npc-id-if-someone-speaks",
     "mood": "mysterious",
     "location": "Starting location",
     "tags": ["opening", "introduction"]

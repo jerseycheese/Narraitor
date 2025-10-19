@@ -541,6 +541,7 @@ Respond with JSON format:
         id: segmentId,
         content: result.content,
         type: result.segmentType,
+        characterIds: result.metadata.characterIds || [],
         metadata: result.metadata,
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId
@@ -586,7 +587,9 @@ Respond with JSON format:
           id: segmentId,
           content: 'The adventure begins. You find yourself at the edge of a new journey. What will you do next?',
           type: 'scene',
+          characterIds: [],
           metadata: {
+            characterIds: [],
             location: 'Starting Location',
             tags: ['intro', 'fallback']
           },
@@ -602,7 +605,7 @@ Respond with JSON format:
         addSegment(sessionId, {
           content: fallbackSegment.content,
           type: fallbackSegment.type,
-          characterIds: [],
+          characterIds: fallbackSegment.characterIds || [],
           metadata: fallbackSegment.metadata,
           updatedAt: fallbackSegment.updatedAt,
           timestamp: fallbackSegment.timestamp
@@ -769,6 +772,7 @@ Respond with JSON format:
         id: segmentId,
         content: result.content,
         type: result.segmentType,
+        characterIds: result.metadata.characterIds || [],
         metadata: result.metadata,
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId

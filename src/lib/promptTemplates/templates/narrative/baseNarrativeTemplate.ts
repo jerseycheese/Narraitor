@@ -9,7 +9,8 @@ export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line 
     attributes,
     narrativeContext,
     generationParameters,
-    toneSettings
+    toneSettings,
+    npcRoster = []
   } = context;
   
   // Tone settings are handled by the AI system prompt enhancement
@@ -22,6 +23,19 @@ export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line 
     long: '3-4 paragraphs'
   };
   const lengthDescription = lengthGuide[length] || lengthGuide.medium;
+
+  const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
+    ? `
+NPC ROSTER (Reference IDs for metadata.characterIds):
+${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
+
+NPC METADATA RULES:
+- Mention NPCs by name in the prose, but capture their IDs from this roster in metadata.characterIds when they appear or speak.
+- If a single NPC directly addresses the player, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
+- If no NPCs are present, set metadata.characterIds to [].
+- Never invent new IDs—only use the ones supplied here or previously established in metadata.
+`
+    : '';
 
   return `You are a narrative generator for a ${genre} story world called "${worldName}".
 
@@ -50,11 +64,15 @@ Generate a narrative segment that:
    - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact
    - Example: "The *Arasaka building* looms ahead, its security pulsing like a **digital heartbeat**"
 
+${formattedRoster}
+
 Response Format:
 {
   "content": "The narrative text goes here...",
   "type": "scene",
   "metadata": {
+    "characterIds": [],
+    "speakerId": "npc-id-if-applicable",
     "mood": "mysterious",
     "location": "Current location name",
     "tags": ["relevant", "tags"]

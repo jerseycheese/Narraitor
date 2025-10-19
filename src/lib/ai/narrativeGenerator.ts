@@ -4,6 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import {
   Decision,
   NarrativeContext,
@@ -187,6 +188,34 @@ export class NarrativeGenerator {
       createdAt: String(char.createdAt || ''),
       updatedAt: String(char.updatedAt || ''),
     };
+  }
+
+  /**
+   * Build a roster of NPCs for the given world so the AI can reference
+   * consistent identifiers when populating metadata.characterIds.
+   */
+  private buildNpcRoster(worldId: string): Array<{
+    id: string;
+    name: string;
+    description?: string;
+    avatarUrl?: string;
+  }> {
+    try {
+      const npcState = useNPCStore.getState();
+      if (!npcState || typeof npcState.getNPCsByWorld !== 'function') {
+        return [];
+      }
+
+      const npcs = npcState.getNPCsByWorld(worldId) || [];
+      return npcs.map((npc) => ({
+        id: npc.id,
+        name: npc.name,
+        description: npc.description || undefined,
+        avatarUrl: npc.avatarUrl || undefined,
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /**
@@ -453,6 +482,8 @@ The items will be automatically added to the character's inventory with proper c
 
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
 
+      const npcRoster = this.buildNpcRoster(world.id);
+
       const context = {
         worldName: world.name,
         worldDescription: world.description,
@@ -463,6 +494,7 @@ The items will be automatically added to the character's inventory with proper c
         playerCharacterName: playerCharacter?.name,
         playerCharacterBackground: playerCharacter?.background,
         toneSettings: toneSettings,
+        npcRoster,
       };
 
       const prompt = template(context);
@@ -578,6 +610,35 @@ The items will be automatically added to the character's inventory with proper c
       : null;
 
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    const npcRoster = this.buildNpcRoster(world.id);
+
+    const existingImportant =
+      request.narrativeContext?.importantEntities || [];
+    const rosterEntities = npcRoster.map((npc) => ({
+      id: npc.id,
+      type: 'npc',
+      name: npc.name,
+      description: npc.description,
+      avatarUrl: npc.avatarUrl,
+    }));
+
+    const combinedImportant = [
+      ...existingImportant,
+      ...rosterEntities.filter(
+        (entity) =>
+          !existingImportant.some(
+            (existing) =>
+              existing.id === entity.id && existing.type === entity.type
+          )
+      ),
+    ];
+
+    const narrativeContextWithRoster = request.narrativeContext
+      ? {
+          ...request.narrativeContext,
+          importantEntities: combinedImportant,
+        }
+      : undefined;
 
     // Build character skill context for AI
     // NOTE: We intentionally DO NOT provide skill levels to the AI
@@ -594,9 +655,10 @@ The items will be automatically added to the character's inventory with proper c
       playerCharacterName: playerCharacter?.name,
       playerCharacterBackground: playerCharacter?.background,
       sessionId: request.sessionId,
-      narrativeContext: request.narrativeContext,
+      narrativeContext: narrativeContextWithRoster,
       generationParameters: request.generationParameters,
       toneSettings: toneSettings,
+      npcRoster,
       // Enhanced skill context for narrative generation
       characterSkillContext,
       worldSkills:
@@ -634,6 +696,7 @@ The items will be automatically added to the character's inventory with proper c
         | 'neutral';
       tags?: string[];
       characterIds?: string[];
+      speakerId?: string;
       itemsAcquired?: AcquiredItemMetadata[];
     } = {};
 
@@ -694,6 +757,9 @@ The items will be automatically added to the character's inventory with proper c
               characterIds: Array.isArray(parsed?.metadata?.characterIds)
                 ? parsed?.metadata?.characterIds
                 : [],
+              speakerId: typeof parsed?.metadata?.speakerId === 'string'
+                ? parsed?.metadata?.speakerId
+                : undefined,
               itemsAcquired: Array.isArray(parsed?.metadata?.itemsAcquired)
                 ? parsed?.metadata?.itemsAcquired.map((item: unknown) => {
                     const rawItem = item as {
@@ -752,6 +818,13 @@ The items will be automatically added to the character's inventory with proper c
             extractedMetadata.location = locationMatch[1].replace(/\\"/g, '"');
           }
 
+          const speakerMatch = actualContent.match(
+            /"speakerId"\s*:\s*"((?:[^"\\]|\\.)*)"/
+          );
+          if (speakerMatch && speakerMatch[1]) {
+            extractedMetadata.speakerId = speakerMatch[1].replace(/\\"/g, '"');
+          }
+
           // Try to extract mood
           const moodMatch = actualContent.match(
             /"mood"\s*:\s*"((?:[^"\\]|\\.)*)"/
@@ -791,6 +864,7 @@ The items will be automatically added to the character's inventory with proper c
         | 'transition',
       metadata: {
         characterIds: extractedMetadata.characterIds || [],
+        speakerId: extractedMetadata.speakerId,
         location: extractedMetadata.location || fallbackLocation,
         mood: extractedMetadata.mood || fallbackMood,
         tags: extractedMetadata.tags || [

@@ -173,6 +173,9 @@ export interface NarrativeContext {
     id: EntityID;
     type: string;
     name: string;
+    description?: string;
+    avatarUrl?: string | null;
+    role?: string;
   }>;
 }
 
@@ -201,6 +204,7 @@ export interface NarrativeGenerationResult {
   segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
   metadata: {
     characterIds: EntityID[];
+    speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
