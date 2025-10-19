@@ -56,6 +56,8 @@ NPC METADATA RULES:
 - Use NPC names in prose, but list their IDs in metadata.characterIds if they appear or speak during this beat.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs are involved, set metadata.characterIds to [].
+- When creating a new NPC, append them to metadata.characters with a slug-style id and concise description so future segments can reference them consistently.
+- Prefer pulling speaking characters from the roster when possible; avoid inventing new NPC identities unless there is no roster member who fits.
 
 Response Format:
 {
@@ -64,6 +66,15 @@ Response Format:
   "metadata": {
     "characterIds": [],
     "speakerId": "npc-id-if-applicable",
+    "characters": [
+      {
+        "id": "npc-id-if-applicable",
+        "name": "NPC Name",
+        "description": "Short description",
+        "role": "Role or relationship",
+        "avatarPrompt": "Visual prompt for consistent portrait"
+      }
+    ],
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["item-usage", "action-beat"]

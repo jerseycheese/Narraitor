@@ -49,6 +49,15 @@ Response Format:
   "metadata": {
     "characterIds": [],
     "speakerId": "npc-id-if-applicable",
+    "characters": [
+      {
+        "id": "npc-id-if-applicable",
+        "name": "NPC Name",
+        "description": "Short description",
+        "role": "Role or relationship",
+        "avatarPrompt": "Visual prompt describing their look"
+      }
+    ],
     "mood": "appropriate mood",
     ${newLocation ? `"location": "${newLocation}",` : ''}
     "tags": ["transition"]

@@ -11,6 +11,7 @@ import {
   NarrativeGenerationRequest,
   NarrativeGenerationResult,
   NarrativeSegment,
+  GeneratedCharacterMetadata,
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -30,6 +31,7 @@ import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
+import { NPC } from '@/types/npc.types';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -455,6 +457,8 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
+      this.syncNpcMetadata(request.worldId, result.metadata.characters);
+
       return result;
     } catch {
       throw new Error('Failed to generate narrative segment');
@@ -557,6 +561,8 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
+      this.syncNpcMetadata(worldId, result.metadata.characters);
+
       return result;
     } catch {
       throw new Error('Failed to generate initial scene');
@@ -582,7 +588,9 @@ The items will be automatically added to the character's inventory with proper c
     const prompt = template(context);
     const response = await this.geminiClient.generateContent(prompt);
 
-    return this.formatResponse(response, 'transition');
+    const result = await this.formatResponse(response, 'transition');
+    this.syncNpcMetadata(to.worldId, result.metadata.characters);
+    return result;
   }
 
   private getWorld(worldId: string): World {
@@ -698,6 +706,7 @@ The items will be automatically added to the character's inventory with proper c
       characterIds?: string[];
       speakerId?: string;
       itemsAcquired?: AcquiredItemMetadata[];
+      characters?: GeneratedCharacterMetadata[];
     } = {};
 
     // Try to parse JSON response if present
@@ -776,6 +785,33 @@ The items will be automatically added to the character's inventory with proper c
                     };
                   })
                 : undefined,
+              characters: Array.isArray(parsed?.metadata?.characters)
+                ? parsed.metadata.characters
+                    .map((character: unknown) => {
+                      const raw = character as {
+                        id?: string;
+                        name?: string;
+                        description?: string;
+                        role?: string;
+                        avatarPrompt?: string;
+                        avatarUrl?: string;
+                      };
+                      const id = raw?.id ? safeTrim(String(raw.id)) : '';
+                      const name = raw?.name ? safeTrim(String(raw.name)) : '';
+                      if (!id || !name) {
+                        return null;
+                      }
+                      return {
+                        id,
+                        name,
+                        description: raw?.description ? safeTrim(String(raw.description)) : undefined,
+                        role: raw?.role ? safeTrim(String(raw.role)) : undefined,
+                        avatarPrompt: raw?.avatarPrompt ? safeTrim(String(raw.avatarPrompt)) : undefined,
+                        avatarUrl: raw?.avatarUrl ? safeTrim(String(raw.avatarUrl)) : undefined,
+                      } as GeneratedCharacterMetadata;
+                    })
+                    .filter((value): value is GeneratedCharacterMetadata => Boolean(value))
+                : undefined,
             };
           }
         }
@@ -832,6 +868,8 @@ The items will be automatically added to the character's inventory with proper c
           if (moodMatch && moodMatch[1]) {
             extractedMetadata.mood = this.validateMood(moodMatch[1]);
           }
+
+          // metadata.characters not extracted in fallback path
         } catch {
           // Fallback extraction failed - use default content
         }
@@ -855,6 +893,11 @@ The items will be automatically added to the character's inventory with proper c
     // Normalize the content for consistent formatting
     const normalizedContent = normalizeText(actualContent, NORM_DESC);
 
+    const characterIds =
+      extractedMetadata.characterIds && extractedMetadata.characterIds.length > 0
+        ? extractedMetadata.characterIds
+        : extractedMetadata.characters?.map((character) => character.id) || [];
+
     return {
       content: normalizedContent,
       segmentType: segmentType as
@@ -863,7 +906,7 @@ The items will be automatically added to the character's inventory with proper c
         | 'action'
         | 'transition',
       metadata: {
-        characterIds: extractedMetadata.characterIds || [],
+        characterIds,
         speakerId: extractedMetadata.speakerId,
         location: extractedMetadata.location || fallbackLocation,
         mood: extractedMetadata.mood || fallbackMood,
@@ -872,6 +915,7 @@ The items will be automatically added to the character's inventory with proper c
           'narrative',
         ],
         itemsAcquired: extractedMetadata.itemsAcquired,
+        characters: extractedMetadata.characters,
       },
       tokenUsage:
         response.tokenUsage && typeof response.tokenUsage === 'object'
@@ -991,6 +1035,91 @@ ${content}
           | 'action'
           | 'emotional')
       : undefined;
+  }
+
+  private getCharacterAvatarUrl(
+    worldId: string,
+    character: GeneratedCharacterMetadata
+  ): string {
+    if (character.avatarUrl && safeTrim(character.avatarUrl)) {
+      return safeTrim(character.avatarUrl);
+    }
+
+    const base = `${worldId}-${character.id}`;
+    return `https://i.pravatar.cc/150?u=${encodeURIComponent(base)}`;
+  }
+
+  private syncNpcMetadata(
+    worldId: string,
+    characters?: GeneratedCharacterMetadata[]
+  ) {
+    if (!worldId || !characters || characters.length === 0) {
+      return;
+    }
+
+    try {
+      const npcStore = useNPCStore.getState();
+      const { getById, createNPC, updateNPC } = npcStore as unknown as {
+        getById?: (id: string) => NPC | undefined;
+        createNPC?: (npc: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: string }) => string;
+        updateNPC?: (id: string, updates: Partial<NPC>) => void;
+      };
+
+      if (
+        typeof getById !== 'function' ||
+        typeof createNPC !== 'function' ||
+        typeof updateNPC !== 'function'
+      ) {
+        return;
+      }
+
+      characters.forEach((character) => {
+        if (!character?.id || !character.name) {
+          return;
+        }
+
+        const id = safeTrim(character.id);
+        if (!id) return;
+
+        const existing = getById(id);
+        const description =
+          character.description ||
+          character.role ||
+          'Supporting character encountered during the narrative.';
+
+        const avatarUrl = this.getCharacterAvatarUrl(worldId, character);
+
+        if (existing) {
+          const updates: Partial<NPC> = {};
+          if (character.name && character.name !== existing.name) {
+            updates.name = character.name;
+          }
+          if (description && description !== existing.description) {
+            updates.description = description;
+          }
+          if (avatarUrl && avatarUrl !== existing.avatarUrl) {
+            updates.avatarUrl = avatarUrl;
+          }
+          if (existing.worldId !== worldId) {
+            updates.worldId = worldId;
+          }
+
+          if (Object.keys(updates).length > 0) {
+            updateNPC(id, updates);
+          }
+        } else {
+          createNPC({
+            id,
+            name: character.name,
+            description,
+            worldId,
+            avatarUrl,
+          });
+        }
+      });
+    } catch {
+      // NPC synchronization failures should never break narrative generation
+    }
   }
 
   private getMoodForGenre(

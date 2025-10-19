@@ -59,6 +59,8 @@ NPC METADATA RULES:
 - If a single NPC is the primary speaker addressing the player, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs appear, set metadata.characterIds to [].
 - Never invent new IDs—only use the ones provided in the roster or already established in prior metadata.
+- When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase-hyphenated) and reuse that same id in later segments.
+- Prefer selecting supporting characters from this roster when the story needs additional voices; only invent new NPCs if absolutely necessary for the scene.
 
 Generate a ${segmentType} that:
 1. Shows the IMMEDIATE RESULT of the player's action
@@ -103,6 +105,15 @@ Response Format:
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
     "speakerId": "npc-id-1",
+    "characters": [
+      {
+        "id": "npc-id-1",
+        "name": "NPC Name",
+        "description": "Short vivid description",
+        "role": "Harbormaster",
+        "avatarPrompt": "Describe appearance for portrait consistency"
+      }
+    ],
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["relevant", "scene", "tags"]

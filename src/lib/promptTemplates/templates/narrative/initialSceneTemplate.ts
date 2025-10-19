@@ -32,6 +32,7 @@ NPC METADATA RULES:
 - For any NPC who appears or speaks in this opening scene, include their ID (from the roster above) in metadata.characterIds.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs appear yet, set metadata.characterIds to [].` : ''}
+- When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase with hyphens), a short description, and an avatar prompt to keep future references consistent.
 
 Create an engaging opening scene that:
 1. Introduces the world and its atmosphere
@@ -79,6 +80,15 @@ Response Format (CRITICAL - must be valid JSON):
   "metadata": {
     "characterIds": [],
     "speakerId": "npc-id-if-someone-speaks",
+    "characters": [
+      {
+        "id": "npc-id-if-someone-speaks",
+        "name": "NPC Name",
+        "description": "Short evocative description",
+        "role": "Role or relationship",
+        "avatarPrompt": "Visual prompt describing their look"
+      }
+    ],
     "mood": "mysterious",
     "location": "Starting location",
     "tags": ["opening", "introduction"]
