@@ -71,6 +71,7 @@ NPC METADATA RULES:
 - If a single NPC directly addresses the player, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs are present, set metadata.characterIds to [].
 - When inventing a new NPC, add them to metadata.characters with a slug-style id (lowercase with hyphens), a short description, and an avatar prompt so future segments can reuse the same identity.
+- Do not print character IDs or bracketed tokens (e.g., [npc-id]) in the narrative text.
 
 Response Format:
 {

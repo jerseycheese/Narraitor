@@ -20,6 +20,7 @@ NPC METADATA RULES:
 - If an NPC accompanies or addresses the player during the transition, add their ID to metadata.characterIds.
 - Set metadata.speakerId only when a single NPC speaks directly to the player; otherwise omit it.
 - If no NPCs are present, use [] for metadata.characterIds.
+- Never output bracket tokens like [npc-id] in the narrative text.
 `
     : '';
 

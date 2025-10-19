@@ -61,6 +61,7 @@ NPC METADATA RULES:
 - Never invent new IDs—only use the ones provided in the roster or already established in prior metadata.
 - When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase-hyphenated) and reuse that same id in later segments.
 - Prefer selecting supporting characters from this roster when the story needs additional voices; only invent new NPCs if absolutely necessary for the scene.
+- Do not insert character IDs or bracket tokens (e.g., [npc-id]) in the narrative text—only expose the natural name.
 
 Generate a ${segmentType} that:
 1. Shows the IMMEDIATE RESULT of the player's action

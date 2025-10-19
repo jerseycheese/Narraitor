@@ -31,8 +31,10 @@ NPC METADATA RULES:
 - Use NPC names naturally in the narrative.
 - For any NPC who appears or speaks in this opening scene, include their ID (from the roster above) in metadata.characterIds.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
-- If no NPCs appear yet, set metadata.characterIds to [].` : ''}
-- When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase with hyphens), a short description, and an avatar prompt to keep future references consistent.
+- If no NPCs appear yet, set metadata.characterIds to [].
+- When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase-hyphenated) and reuse that same id in later segments.
+- Do not surface bracketed IDs (e.g., [npc-id]) in the prose—keep identifiers in metadata only.
+` : ''}
 
 Create an engaging opening scene that:
 1. Introduces the world and its atmosphere

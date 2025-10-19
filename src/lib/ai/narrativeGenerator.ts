@@ -891,7 +891,19 @@ The items will be automatically added to the character's inventory with proper c
     }
 
     // Normalize the content for consistent formatting
-    const normalizedContent = normalizeText(actualContent, NORM_DESC);
+    let normalizedContent = normalizeText(actualContent, NORM_DESC);
+
+    if (extractedMetadata.characters && extractedMetadata.characters.length > 0 && normalizedContent) {
+      const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      extractedMetadata.characters.forEach((character) => {
+        if (!character?.id) return;
+        const tokenRegex = new RegExp(`\\[${escapeRegExp(character.id)}\\]`, 'g');
+        if (tokenRegex.test(normalizedContent)) {
+          const replacement = safeTrim(character.name) || character.id;
+          normalizedContent = normalizedContent.replace(tokenRegex, replacement);
+        }
+      });
+    }
 
     const characterIds =
       extractedMetadata.characterIds && extractedMetadata.characterIds.length > 0

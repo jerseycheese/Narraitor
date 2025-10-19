@@ -58,6 +58,7 @@ NPC METADATA RULES:
 - If no NPCs are involved, set metadata.characterIds to [].
 - When creating a new NPC, append them to metadata.characters with a slug-style id and concise description so future segments can reference them consistently.
 - Prefer pulling speaking characters from the roster when possible; avoid inventing new NPC identities unless there is no roster member who fits.
+- Do not include bracket tokens like [npc-id] in the narrative – keep IDs strictly in metadata.
 
 Response Format:
 {
