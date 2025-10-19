@@ -53,16 +53,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Access character and world stores for skill evaluation
   const characters = useCharacterStore(state => state.characters);
   const worlds = useWorldStore(state => state.worlds);
-  const { npcIds, npcs } = useNPCStore(
-    useCallback(
-      (state) => ({
-        npcIds: state.worldNpcs[worldId] ?? EMPTY_NPC_IDS,
-        npcs: state.npcs,
-      }),
-      [worldId]
-    ),
-    shallow
+  const npcIds = useNPCStore(
+    useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])
   );
+  const npcs = useNPCStore((state) => state.npcs, shallow);
 
   const npcRoster = useMemo(() => {
     if (!npcIds || npcIds.length === 0) {
