@@ -131,6 +131,9 @@ const SceneWithDialogueStory: React.FC = () => {
 };
 
 export const SceneWithDialogue: Story = {
+  args: {
+    segment: null,
+  },
   render: () => <SceneWithDialogueStory />,
 };
 
@@ -224,6 +227,9 @@ Their quest would require both courage and wisdom to succeed.`,
 };
 
 export const RealisticMixedContent: Story = {
+  args: {
+    segment: null,
+  },
   render: () => <RealisticMixedStory />,
 };
 
@@ -236,6 +242,7 @@ const DialogueWithGandalf = () => {
   useEffect(() => {
     const store = useNPCStore.getState();
     const npcId = store.createNPC({
+      id: 'storybook-gandalf',
       name: 'Gandalf',
       description: 'A wise wizard',
       worldId: 'test-world',
@@ -270,6 +277,7 @@ const DialogueWithFrodo = () => {
   useEffect(() => {
     const store = useNPCStore.getState();
     const npcId = store.createNPC({
+      id: 'storybook-frodo-dialogue',
       name: 'Frodo',
       description: 'A brave hobbit',
       worldId: 'test-world',
@@ -317,6 +325,7 @@ const MultipleNPCs = () => {
     const store = useNPCStore.getState();
 
     const elrondId = store.createNPC({
+      id: 'storybook-elrond',
       name: 'Elrond',
       description: 'Lord of Rivendell',
       worldId: 'test-world',
@@ -324,6 +333,7 @@ const MultipleNPCs = () => {
     });
 
     const boromirId = store.createNPC({
+      id: 'storybook-boromir',
       name: 'Boromir',
       description: 'Son of Gondor',
       worldId: 'test-world',
@@ -331,6 +341,7 @@ const MultipleNPCs = () => {
     });
 
     const frodoId = store.createNPC({
+      id: 'storybook-frodo-ring',
       name: 'Frodo',
       description: 'Ring bearer',
       worldId: 'test-world',

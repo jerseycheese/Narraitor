@@ -8,7 +8,6 @@ import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
-import { shallow } from 'zustand/shallow';
 import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
 import type { Character as UtilCharacter } from '@/types/character.types';
 
@@ -56,7 +55,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const npcIds = useNPCStore(
     useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])
   );
-  const npcs = useNPCStore((state) => state.npcs, shallow);
+  const npcs = useNPCStore((state) => state.npcs);
 
   const npcRoster = useMemo(() => {
     if (!npcIds || npcIds.length === 0) {

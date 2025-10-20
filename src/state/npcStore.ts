@@ -48,7 +48,11 @@ export const useNPCStore = create<NPCStore>()(
     (set, get) => ({
       ...getInitialState(),
 
-      create: (npcData) => {
+      create: (npcDataParam) => {
+        const npcData = npcDataParam as Omit<NPC, 'createdAt' | 'updatedAt'> & {
+          id?: EntityID;
+        };
+
         validateNPCData(npcData);
 
         const npcId = npcData.id || generateUniqueId('npc');

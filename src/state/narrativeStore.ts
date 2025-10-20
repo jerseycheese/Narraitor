@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
@@ -237,9 +237,22 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }
 
+    const finalMetadata: NarrativeMetadata = {
+      mood: metadata?.mood,
+      tags: metadata?.tags ?? [],
+      location: metadata?.location,
+      characterIds: metadata?.characterIds,
+      characters: metadata?.characters,
+      speakerId: metadata?.speakerId,
+      itemsAcquired: metadata?.itemsAcquired,
+      endingId: metadata?.endingId,
+      endingData: metadata?.endingData,
+      tone: metadata?.tone,
+    };
+
     const newSegment: NarrativeSegment = {
       ...segmentData,
-      metadata,
+      metadata: finalMetadata,
       content: normalizeText(segmentData.content, NORM_DESC),
       id: segmentId,
       sessionId,

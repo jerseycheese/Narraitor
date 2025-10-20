@@ -810,7 +810,7 @@ The items will be automatically added to the character's inventory with proper c
                         avatarUrl: raw?.avatarUrl ? safeTrim(String(raw.avatarUrl)) : undefined,
                       } as GeneratedCharacterMetadata;
                     })
-                    .filter((value): value is GeneratedCharacterMetadata => Boolean(value))
+                    .filter((value: GeneratedCharacterMetadata | null | undefined): value is GeneratedCharacterMetadata => Boolean(value))
                 : undefined,
             };
           }
