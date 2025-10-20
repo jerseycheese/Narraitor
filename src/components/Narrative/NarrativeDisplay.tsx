@@ -3,29 +3,14 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { parseNarrativeContent, safeTrim } from '@/lib/utils';
+import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { useNPCStore } from '@/state/npcStore';
-
-const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
-
-const deriveFallbackName = (id: string): string => {
-  if (!id) {
-    return 'Unknown NPC';
-  }
-
-  const cleaned = id
-    .replace(/^npc[-_]?/i, '')
-    .replace(/[-_]/g, ' ')
-    .trim();
-
-  if (cleaned) {
-    return `NPC ${cleaned}`;
-  }
-
-  return 'Unknown NPC';
-};
+import {
+  deriveFallbackName,
+  useNarrativeParticipants,
+} from './useNarrativeParticipants';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -145,107 +130,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     ? (speakerRecord?.name ?? deriveFallbackName(speakerId))
     : null;
 
-  const participantDetails = React.useMemo(() => {
-    if (!resolvedSegment) {
-      return [];
-    }
-
-    const normalizedIds = new Map<string, string>();
-
-    const addId = (value?: string | null) => {
-      if (!value || typeof value !== 'string') {
-        return;
-      }
-
-      const trimmed = safeTrim(value);
-      if (!trimmed) {
-        return;
-      }
-
-      const canonical = trimmed.toLowerCase();
-      if (!normalizedIds.has(canonical)) {
-        normalizedIds.set(canonical, trimmed);
-      }
-    };
-
-    resolvedSegment.metadata?.characterIds?.forEach(addId);
-    resolvedSegment.characterIds?.forEach(addId);
-    addId(speakerId);
-
-    return Array.from(normalizedIds.values())
-      .filter((id) => !(isDialogue && speakerId && id === speakerId))
-      .map((id) => {
-        const npc = getById(id);
-        return {
-          id,
-          name: npc?.name ?? deriveFallbackName(id),
-          avatarUrl: npc?.avatarUrl,
-        };
-      });
-  }, [resolvedSegment, getById, speakerId, isDialogue]);
-
-  const highlightTerms = React.useMemo(() => {
-    if (!resolvedSegment) {
-      return [];
-    }
-
-    const participantIdSet = new Set<string>();
-    participantDetails.forEach((participant) => {
-      participantIdSet.add(participant.id.toLowerCase());
-    });
-    if (speakerId) {
-      participantIdSet.add(speakerId.toLowerCase());
-    }
-
-    const terms = new Set<string>();
-
-    const addName = (value?: string | null, idHint?: string | null) => {
-      if (!value) {
-        return;
-      }
-
-      const normalized = safeTrim(value).replace(/\s+/g, ' ');
-      if (!normalized) {
-        return;
-      }
-
-      terms.add(normalized);
-
-      const tokens = normalized.split(/\s+/).filter(Boolean);
-      tokens.forEach((token) => {
-        const cleanedToken = safeTrim(token.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, ''));
-        if (
-          cleanedToken.length >= 3 &&
-          !NAME_STOP_WORDS.includes(cleanedToken.toLowerCase())
-        ) {
-          terms.add(cleanedToken);
-        }
-      });
-
-      const leadingSegment = safeTrim(normalized.split(',')[0]).replace(/\s+/g, ' ');
-      if (
-        leadingSegment &&
-        leadingSegment.length >= 3 &&
-        (leadingSegment !== normalized || (idHint && idHint.includes('-')))
-      ) {
-        terms.add(leadingSegment);
-      }
-    };
-
-    participantDetails.forEach((participant) => addName(participant.name, participant.id));
-    addName(speakerName, speakerId ?? null);
-    resolvedSegment.metadata?.characters?.forEach((character) => {
-      if (!character?.id || !character.name) {
-        return;
-      }
-      if (!participantIdSet.has(character.id.toLowerCase())) {
-        return;
-      }
-      addName(character.name, character.id);
-    });
-
-    return Array.from(terms);
-  }, [participantDetails, speakerName, resolvedSegment, speakerId]);
+  const { participants, highlightTerms } = useNarrativeParticipants({
+    segment: resolvedSegment,
+    speakerId,
+    speakerName,
+    isDialogue,
+    getById,
+  });
 
   if (isLoading) {
     return (
@@ -279,7 +170,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{resolvedSegment.type}</p>
 
-        {participantDetails.length > 0 && (
+        {participants.length > 0 && (
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Characters Present
@@ -289,7 +180,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
               role="list"
               aria-label="Characters present in this scene"
             >
-              {participantDetails.map((participant) => (
+              {participants.map((participant) => (
                 <div
                   key={participant.id}
                   className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"

@@ -140,6 +140,26 @@ describe('NarrativeDisplay', () => {
     ).toBeInTheDocument();
   });
 
+  it('handles malformed NPC IDs without crashing', () => {
+    const now = getTimestamp();
+    const segment = {
+      id: 'seg-malformed',
+      content: 'An unnamed figure watches from afar.',
+      type: 'scene' as const,
+      timestamp: new Date(),
+      createdAt: now,
+      updatedAt: now,
+      metadata: {
+        characterIds: ['', '   ', 'npc-42'],
+        tags: [],
+      },
+    };
+
+    render(<NarrativeDisplay segment={segment} />);
+
+    expect(screen.getAllByText('NPC 42').length).toBeGreaterThan(0);
+  });
+
   it('emphasizes participant names within the narrative text', () => {
     const now = getTimestamp();
     const npcState = {
