@@ -76,4 +76,21 @@ This third paragraph has *malformed emphasis without ending.
       'Excessive whitespace should be normalized.'
     );
   });
+
+  it('highlights specified terms, including possessive forms', () => {
+    const { container } = render(
+      <FormattedNarrativeContent
+        content="Marge's gaze sharpens as Marge, the Waitress wipes the counter."
+        highlightTerms={['Marge, the Waitress']}
+      />
+    );
+
+    const highlights = container.querySelectorAll('span.font-semibold');
+    expect(highlights.length).toBeGreaterThan(0);
+    expect(
+      Array.from(highlights).some(
+        (element) => element.textContent === 'Marge, the Waitress'
+      )
+    ).toBe(true);
+  });
 });

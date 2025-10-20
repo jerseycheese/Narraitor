@@ -18,6 +18,8 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 
 NPC METADATA RULES:
 - If an NPC accompanies or addresses the player during the transition, add their ID to metadata.characterIds.
+- Do NOT list NPCs who are only mentioned as destinations or references; keep metadata.characterIds limited to characters physically with the player.
+- If an off-screen NPC must be foreshadowed, add them to metadata.characters for later continuity but leave them out of metadata.characterIds.
 - Set metadata.speakerId only when a single NPC speaks directly to the player; otherwise omit it.
 - If no NPCs are present, use [] for metadata.characterIds.
 - Never output bracket tokens like [npc-id] in the narrative text.

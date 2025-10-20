@@ -14,6 +14,14 @@ const meta: Meta<typeof FormattedNarrativeContent> = {
       control: { type: 'text' },
       description: 'Additional CSS classes for styling',
     },
+    highlightTerms: {
+      control: { type: 'object' },
+      description: 'List of phrases to emphasize within the content (e.g., NPC names)',
+    },
+    highlightClassName: {
+      control: { type: 'text' },
+      description: 'Custom class names for highlighted phrases',
+    },
   },
 };
 
@@ -63,5 +71,16 @@ A figure emerged from an alleyway, their coat flapping in the mechanical wind. T
 
 The city never slept. The neon never faded. And the game was always afoot. *This paragraph demonstrates how long-form narrative text flows with proper paragraph spacing.*
     `,
+  },
+};
+
+export const WithHighlights: Story = {
+  args: {
+    content: `
+Marge, the Waitress slides a chipped mug across the counter. Moments later, Marge's voice drops to a hush, warning you about Old Man Rivers.
+
+Old Man Rivers chuckles from the corner booth, his weathered hands wrapped around a steaming bowl of chowder. You can't tell if the glint in Old Man Rivers' eye is mischief or menace.
+    `,
+    highlightTerms: ['Marge, the Waitress', 'Old Man Rivers'],
   },
 };

@@ -54,6 +54,8 @@ ${formattedRoster}
 
 NPC METADATA RULES:
 - Use NPC names in prose, but list their IDs in metadata.characterIds if they appear or speak during this beat.
+- Do NOT include NPCs who are only mentioned or remembered—only characters sharing the scene belong in metadata.characterIds.
+- If you reference an off-screen NPC for future context, add them to metadata.characters but leave metadata.characterIds unchanged.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs are involved, set metadata.characterIds to [].
 - When creating a new NPC, append them to metadata.characters with a slug-style id and concise description so future segments can reference them consistently.

@@ -30,6 +30,8 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 NPC METADATA RULES:
 - Use NPC names naturally in the narrative.
 - For any NPC who appears or speaks in this opening scene, include their ID (from the roster above) in metadata.characterIds.
+- Do NOT include NPCs who are only spoken about or foreshadowed; keep metadata.characterIds limited to characters physically sharing the scene.
+- If you reference someone off-screen for later use, add them to metadata.characters but leave metadata.characterIds untouched.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
 - If no NPCs appear yet, set metadata.characterIds to [].
 - When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase-hyphenated) and reuse that same id in later segments.

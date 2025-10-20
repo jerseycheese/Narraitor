@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
-import { generateUniqueId, getTimestamp } from '../lib/utils';
+import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 // IMPORTANT: Do not import AI generators directly in client code.
 // All AI calls must go through server/API routes per project guidelines.
 import { logger } from '../lib/utils/logger';
@@ -91,6 +91,12 @@ const getInitialState = () => ({
 });
 
 const initialState = getInitialState();
+
+const normalizeLocationKey = (value: string): string =>
+  safeTrim(value)
+    .replace(/[“”"‘’'`´]/g, '')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
 
 /**
  * Maps choice alignment to appropriate choice type preference
@@ -189,8 +195,51 @@ export const useNarrativeStore = create<NarrativeStore>()(
     const segmentId = generateUniqueId('segment');
     const now = getTimestamp();
 
+    const sessionSegmentIds = get().sessionSegments[sessionId] || [];
+    const previousSegmentId =
+      sessionSegmentIds.length > 0
+        ? sessionSegmentIds[sessionSegmentIds.length - 1]
+        : null;
+    const previousSegment = previousSegmentId
+      ? get().segments[previousSegmentId]
+      : undefined;
+
+    let metadata = segmentData.metadata
+      ? { ...segmentData.metadata }
+      : undefined;
+
+    if (metadata?.location) {
+      const cleanedLocation = safeTrim(metadata.location).replace(/\s+/g, ' ');
+
+      if (!cleanedLocation) {
+        const nextMetadata = { ...metadata };
+        delete nextMetadata.location;
+        metadata = Object.keys(nextMetadata).length > 0 ? nextMetadata : undefined;
+      } else {
+        const previousLocation = previousSegment?.metadata?.location;
+
+        if (
+          previousLocation &&
+          normalizeLocationKey(previousLocation) === normalizeLocationKey(
+            cleanedLocation
+          )
+        ) {
+          metadata = {
+            ...metadata,
+            location: previousLocation,
+          };
+        } else {
+          metadata = {
+            ...metadata,
+            location: cleanedLocation,
+          };
+        }
+      }
+    }
+
     const newSegment: NarrativeSegment = {
       ...segmentData,
+      metadata,
       content: normalizeText(segmentData.content, NORM_DESC),
       id: segmentId,
       sessionId,

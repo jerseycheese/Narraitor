@@ -880,16 +880,6 @@ The items will be automatically added to the character's inventory with proper c
     const fallbackMood = this.getMoodForGenre(this.getWorldGenre());
     const fallbackLocation = this.getLocationForGenre(this.getWorldGenre());
 
-    if (
-      !extractedMetadata.itemsAcquired ||
-      extractedMetadata.itemsAcquired.length === 0
-    ) {
-      const aiExtractedItems = await this.extractItemsFromNarrative(actualContent);
-      if (aiExtractedItems.length > 0) {
-        extractedMetadata.itemsAcquired = aiExtractedItems;
-      }
-    }
-
     // Normalize the content for consistent formatting
     let normalizedContent = normalizeText(actualContent, NORM_DESC);
 
@@ -900,24 +890,141 @@ The items will be automatically added to the character's inventory with proper c
         const tokenRegex = new RegExp(`\\[${escapeRegExp(character.id)}\\]`, 'g');
         const displayName = safeTrim(character.name) || character.id;
         const firstToken = displayName.split(/[\s,]+/)[0]?.toLowerCase();
+        const canonicalDisplayName = displayName
+          .replace(/[“”"‘’'`´]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const normalizedDisplayName = canonicalDisplayName
+          .replace(/[^0-9a-z\s]/gi, '')
+          .toLowerCase();
 
-        normalizedContent = normalizedContent.replace(tokenRegex, (match, offset, fullString) => {
-          if (firstToken) {
-            const preceding = fullString.slice(0, offset).trimEnd();
-            const lastWordMatch = preceding.match(/([A-Za-z'\-]+)$/);
-            if (lastWordMatch && lastWordMatch[1].toLowerCase() === firstToken) {
+        normalizedContent = normalizedContent.replace(
+          tokenRegex,
+          (match, offset, fullString) => {
+            const precedingRaw = fullString.slice(0, offset);
+            const precedingTrimmed = precedingRaw.trimEnd();
+            const after = fullString.slice(offset + match.length);
+            const afterTrimmed = after.trimStart();
+
+            if (normalizedDisplayName.length === 0) {
               return '';
             }
+
+            const tailSlice = precedingTrimmed.slice(
+              Math.max(0, precedingTrimmed.length - displayName.length - 3)
+            );
+            const normalizedTailCanonical = tailSlice
+              .replace(/[“”"‘’'`´]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+            const normalizedTail = normalizedTailCanonical
+              .replace(/[^0-9a-z\s]/gi, '')
+              .toLowerCase();
+
+            const precedingLower = precedingTrimmed.toLowerCase();
+            const canonicalLower = canonicalDisplayName.toLowerCase();
+            if (
+              precedingLower.endsWith(canonicalLower) ||
+              precedingLower.endsWith(`${canonicalLower}'s`) ||
+              precedingLower.endsWith(`${canonicalLower}’s`)
+            ) {
+              return '';
+            }
+
+            if (normalizedTail.endsWith(normalizedDisplayName)) {
+              const afterLower = afterTrimmed
+                .replace(/\s+/g, ' ')
+                .trimStart()
+                .toLowerCase();
+
+              if (
+                afterLower.startsWith("'s") ||
+                afterLower.startsWith('’s') ||
+                afterLower.startsWith("'") ||
+                afterLower.startsWith('’')
+              ) {
+                return '';
+              }
+
+              return '';
+            }
+
+            if (firstToken) {
+              const precedingWordMatch = precedingTrimmed.match(
+                /([A-Za-zÀ-ÖØ-öø-ÿ’']+)[,;:]?$/
+              );
+              const precedingWord = precedingWordMatch?.[1];
+
+              if (precedingWord) {
+                const normalizedPrecedingWord = precedingWord
+                  .replace(/['’]s$/i, '')
+                  .replace(/[^0-9A-Za-z]/g, '')
+                  .toLowerCase();
+
+                const normalizedFirstToken = firstToken.replace(
+                  /[^0-9A-Za-z]/g,
+                  ''
+                );
+
+                if (
+                  normalizedPrecedingWord &&
+                  normalizedFirstToken &&
+                  normalizedPrecedingWord === normalizedFirstToken
+                ) {
+                  return '';
+                }
+              }
+            }
+
+            if (
+              normalizedTail.endsWith(normalizedDisplayName) &&
+              afterTrimmed.trimStart().length === 0
+            ) {
+              return '';
+            }
+
+            const precedingChar = precedingTrimmed.slice(-1);
+            if (
+              afterTrimmed.length === 0 &&
+              ['.', '!', '?'].includes(precedingChar)
+            ) {
+              return '';
+            }
+
+            return displayName;
           }
-          return displayName;
-        });
+        );
       });
     }
 
-    const characterIds =
-      extractedMetadata.characterIds && extractedMetadata.characterIds.length > 0
-        ? extractedMetadata.characterIds
-        : extractedMetadata.characters?.map((character) => character.id) || [];
+    if (normalizedContent) {
+      normalizedContent = normalizedContent
+        .replace(/[ \t]+([,;:.!?])/g, '$1')
+        .replace(/[ \t]{2,}/g, ' ')
+        .replace(/\s*\[[a-z0-9-]+\]/gi, '');
+    }
+
+    const speakerId = this.normalizeId(extractedMetadata.speakerId);
+    const characterIds = this.normalizeCharacterIds(
+      extractedMetadata.characterIds
+    );
+    const finalCharacterIds = speakerId && !characterIds.includes(speakerId)
+      ? [...characterIds, speakerId]
+      : characterIds;
+
+    const metadataAnalysis = await this.analyzeSegmentMetadata(
+      normalizedContent,
+      extractedMetadata.characters,
+      finalCharacterIds
+    );
+    const confirmedCharacterIds =
+      metadataAnalysis.presentCharacterIds.length > 0
+        ? metadataAnalysis.presentCharacterIds
+        : finalCharacterIds;
+    const analyzedItems =
+      extractedMetadata.itemsAcquired && extractedMetadata.itemsAcquired.length > 0
+        ? extractedMetadata.itemsAcquired
+        : metadataAnalysis.items;
 
     return {
       content: normalizedContent,
@@ -927,15 +1034,16 @@ The items will be automatically added to the character's inventory with proper c
         | 'action'
         | 'transition',
       metadata: {
-        characterIds,
-        speakerId: extractedMetadata.speakerId,
+        characterIds: confirmedCharacterIds,
+        speakerId,
         location: extractedMetadata.location || fallbackLocation,
         mood: extractedMetadata.mood || fallbackMood,
         tags: extractedMetadata.tags || [
           this.getWorldGenre() || 'fantasy',
           'narrative',
         ],
-        itemsAcquired: extractedMetadata.itemsAcquired,
+        itemsAcquired:
+          analyzedItems && analyzedItems.length > 0 ? analyzedItems : undefined,
         characters: extractedMetadata.characters,
       },
       tokenUsage:
@@ -951,43 +1059,127 @@ The items will be automatically added to the character's inventory with proper c
     };
   }
 
-  private async extractItemsFromNarrative(
-    content: string
-  ): Promise<AcquiredItemMetadata[]> {
+  private normalizeId(id?: string | null): string | undefined {
+    if (!id || typeof id !== 'string') {
+      return undefined;
+    }
+
+    const trimmed = safeTrim(id);
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  private normalizeCharacterIds(ids?: unknown): string[] {
+    if (!Array.isArray(ids)) {
+      return [];
+    }
+
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+
+    for (const value of ids) {
+      if (typeof value !== 'string') {
+        continue;
+      }
+
+      const normalizedId = this.normalizeId(value);
+      if (!normalizedId) {
+        continue;
+      }
+
+      const canonical = normalizedId.toLowerCase();
+      if (seen.has(canonical)) {
+        continue;
+      }
+
+      seen.add(canonical);
+      normalized.push(normalizedId);
+    }
+
+    return normalized;
+  }
+
+  private async analyzeSegmentMetadata(
+    content: string,
+    characters: GeneratedCharacterMetadata[] | undefined,
+    candidateIds: string[]
+  ): Promise<{
+    presentCharacterIds: string[];
+    items: AcquiredItemMetadata[];
+  }> {
+    if (!content) {
+      return { presentCharacterIds: candidateIds, items: [] };
+    }
+
+    if (process.env.NODE_ENV === 'test') {
+      return { presentCharacterIds: candidateIds, items: [] };
+    }
+
+    const roster = new Map<string, { name: string; description?: string }>();
+    characters?.forEach((character) => {
+      if (character?.id && character.name) {
+        roster.set(character.id, {
+          name: character.name,
+          description: character.description,
+        });
+      }
+    });
+
+    const rosterLines = candidateIds
+      .map((id) => {
+        const entry = roster.get(id);
+        const displayName = entry?.name || id;
+        const summary = entry?.description ? ` — ${entry.description}` : '';
+        return `- ${id}: ${displayName}${summary}`;
+      })
+      .join('\n');
+
     const prompt = `
-You are a structured-data extraction assistant.
+You are validating metadata for a narrative segment. Analyze the passage and produce two things:
+1. Which of the provided NPC IDs are PHYSICALLY present in the scene with the protagonist (sharing the same location, acting together, or speaking face-to-face).
+2. Any tangible items the protagonist ends the scene possessing.
 
-Analyze the following narrative passage and list tangible objects the protagonist now possesses because of the events described. Only include items that the character physically acquires or adds to their inventory. Ignore objects that are merely observed, remembered, or immediately discarded.
+Rules for presence:
+- Only mark an NPC as present if the narration makes it clear they are co-located with the protagonist during this scene.
+- Exclude NPCs who are merely referenced, remembered, mentioned as being elsewhere, or communicating remotely (phone, radio, etc.).
+- Only use the provided candidate IDs.
 
-Return a strict JSON object with the following shape:
+Rules for items:
+- Include an item only if the protagonist finishes the scene still holding or carrying it.
+- Ignore objects that are merely observed, touched briefly, or immediately set aside.
+- Provide concise names and optional descriptions.
+
+Respond with STRICT JSON in this shape (no commentary):
 {
+  "presentCharacterIds": ["npc-id-1", "npc-id-2"],
   "items": [
     {
-      "name": string,                // Concise item name
-      "description": string,         // Optional 1–2 sentence description (omit if unnecessary)
-      "quantity": number,            // Default to 1 if not specified
+      "name": "Item name",
+      "description": "Short description",
+      "quantity": 1,
       "acquisitionMethod": "loot" | "quest" | "purchase" | "craft" | "reward" | "gift" | "manual" | "unknown"
     }
   ]
 }
 
-If the character does not acquire anything, return {"items": []}.
+CANDIDATE NPCS:
+${rosterLines || '- (none)'}
 
-Narrative:
+NARRATIVE:
 """
 ${content}
 """
-`.trim();
+    `.trim();
 
     try {
       const response = await this.geminiClient.generateContent(prompt);
       const raw = response.content ?? '';
       const jsonMatch = raw.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        return [];
+        return { presentCharacterIds: candidateIds, items: [] };
       }
 
       const parsed = JSON.parse(jsonMatch[0]) as {
+        presentCharacterIds?: string[];
         items?: Array<{
           name?: string;
           description?: string;
@@ -996,24 +1188,57 @@ ${content}
         }>;
       };
 
-      if (!Array.isArray(parsed.items) || parsed.items.length === 0) {
-        return [];
-      }
+      const allowed = new Set(candidateIds.map((id) => id.toLowerCase()));
+      const presentCharacterIds = Array.isArray(parsed.presentCharacterIds)
+        ? parsed.presentCharacterIds
+            .map((id) => id?.toString().trim())
+            .filter((id): id is string => Boolean(id))
+            .filter((id) => allowed.has(id.toLowerCase()))
+        : candidateIds;
 
-      return parsed.items
+      const rawItems = Array.isArray(parsed.items) ? parsed.items : [];
+      const allowedAcquisitionMethods: InventoryAcquisitionMethod[] = [
+        'loot',
+        'quest',
+        'purchase',
+        'craft',
+        'reward',
+        'gift',
+        'manual',
+        'unknown',
+      ];
+
+      const items = rawItems
         .filter((item): item is Required<typeof item> => Boolean(item?.name))
-        .map((item) => ({
-          name: item.name!.trim(),
-          description: item.description ? safeTrim(item.description) : undefined,
-          quantity:
-            typeof item.quantity === 'number' && !Number.isNaN(item.quantity)
-              ? item.quantity
-              : 1,
-          acquisitionMethod: item.acquisitionMethod || 'unknown',
-        }))
+        .map((item) => {
+          const rawMethod =
+            item.acquisitionMethod && typeof item.acquisitionMethod === 'string'
+              ? item.acquisitionMethod.toLowerCase().trim()
+              : 'unknown';
+          const acquisitionMethod = allowedAcquisitionMethods.includes(
+            rawMethod as InventoryAcquisitionMethod
+          )
+            ? (rawMethod as InventoryAcquisitionMethod)
+            : 'unknown';
+
+          return {
+            name: safeTrim(item.name!),
+            description: item.description ? safeTrim(item.description) : undefined,
+            quantity:
+              typeof item.quantity === 'number' && !Number.isNaN(item.quantity)
+                ? item.quantity
+                : 1,
+            acquisitionMethod,
+          };
+        })
         .filter((item) => item.name.length > 0);
+
+      return {
+        presentCharacterIds,
+        items,
+      };
     } catch {
-      return [];
+      return { presentCharacterIds: candidateIds, items: [] };
     }
   }
 
@@ -1061,13 +1286,12 @@ ${content}
   private getCharacterAvatarUrl(
     worldId: string,
     character: GeneratedCharacterMetadata
-  ): string {
+  ): string | undefined {
     if (character.avatarUrl && safeTrim(character.avatarUrl)) {
       return safeTrim(character.avatarUrl);
     }
 
-    const base = `${worldId}-${character.id}`;
-    return `https://i.pravatar.cc/150?u=${encodeURIComponent(base)}`;
+    return undefined;
   }
 
   private syncNpcMetadata(

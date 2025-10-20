@@ -46,9 +46,6 @@ const slugify = (value: string): string => {
   return `npc-${fallbackSuffix}`;
 };
 
-const defaultAvatarUrl = (worldId: string, npcId: string) =>
-  `https://i.pravatar.cc/150?u=${encodeURIComponent(`${worldId}-${npcId}`)}`;
-
 const buildFallbackNpcSeeds = (world: World): GeneratedNPCResult[] => {
   const baseName = safeTrim(world.name) || 'this world';
 
@@ -301,16 +298,21 @@ export const worldCreationService = {
       const description = safeTrim(npc.description) || 'Supporting character for this world.';
       const avatarUrl = npc.avatarUrl && safeTrim(npc.avatarUrl)
         ? safeTrim(npc.avatarUrl)
-        : defaultAvatarUrl(world.id, finalId);
+        : undefined;
 
       try {
-        npcStore.createNPC({
+        const payload: Parameters<typeof npcStore.createNPC>[0] = {
           id: finalId,
           worldId: world.id,
           name,
           description,
-          avatarUrl,
-        });
+        };
+
+        if (avatarUrl) {
+          payload.avatarUrl = avatarUrl;
+        }
+
+        npcStore.createNPC(payload);
       } catch (error) {
         logger.warn('Failed to seed NPC', { worldId: world.id, finalId, error });
       }

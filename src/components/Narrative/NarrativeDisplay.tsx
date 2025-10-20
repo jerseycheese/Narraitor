@@ -3,10 +3,12 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { parseNarrativeContent } from '@/lib/utils';
+import { parseNarrativeContent, safeTrim } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { useNPCStore } from '@/state/npcStore';
+
+const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
 
 const deriveFallbackName = (id: string): string => {
   if (!id) {
@@ -40,35 +42,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
-
-  if (isLoading) {
-    return (
-      <div className="p-8 snap-center">
-        <LoadingState message="Writing your story..." theme="light" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="snap-center">
-        <ErrorDisplay
-          variant="section"
-          severity="error"
-          title="Unable to Generate Narrative"
-          message={error}
-          showRetry={!!onRetry}
-          onRetry={onRetry}
-        />
-      </div>
-    );
-  }
-
-  if (!segment) {
-    return null;
-  }
-
-  const isDialogue = segment.type === 'dialogue';
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -151,37 +124,55 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
   };
 
-  const styles = getSegmentStyles(segment.type);
-  const formattingOptions = getFormattingOptions(segment.type);
-  const parsedContent = parseNarrativeContent(segment.content);
-  const formattedContent = formatAIResponse(parsedContent, formattingOptions);
+  const resolvedSegment = segment ?? null;
+  const segmentType = resolvedSegment?.type ?? 'scene';
+  const isDialogue = segmentType === 'dialogue';
 
-  const speakerId = segment.metadata?.speakerId;
+  const styles = getSegmentStyles(segmentType);
+  const formattingOptions = getFormattingOptions(segmentType);
+  const parsedContent = React.useMemo(
+    () => (resolvedSegment ? parseNarrativeContent(resolvedSegment.content) : ''),
+    [resolvedSegment]
+  );
+  const formattedContent = React.useMemo(
+    () => formatAIResponse(parsedContent, formattingOptions),
+    [parsedContent, formattingOptions]
+  );
+
+  const speakerId = resolvedSegment?.metadata?.speakerId;
   const speakerRecord = speakerId ? getById(speakerId) : null;
   const speakerName = speakerId
     ? (speakerRecord?.name ?? deriveFallbackName(speakerId))
     : null;
 
   const participantDetails = React.useMemo(() => {
-    const ids = new Set<string>();
-
-    segment.metadata?.characterIds?.forEach((id) => {
-      if (id) {
-        ids.add(id);
-      }
-    });
-
-    segment.characterIds?.forEach((id) => {
-      if (id) {
-        ids.add(id);
-      }
-    });
-
-    if (speakerId) {
-      ids.add(speakerId);
+    if (!resolvedSegment) {
+      return [];
     }
 
-    return Array.from(ids)
+    const normalizedIds = new Map<string, string>();
+
+    const addId = (value?: string | null) => {
+      if (!value || typeof value !== 'string') {
+        return;
+      }
+
+      const trimmed = safeTrim(value);
+      if (!trimmed) {
+        return;
+      }
+
+      const canonical = trimmed.toLowerCase();
+      if (!normalizedIds.has(canonical)) {
+        normalizedIds.set(canonical, trimmed);
+      }
+    };
+
+    resolvedSegment.metadata?.characterIds?.forEach(addId);
+    resolvedSegment.characterIds?.forEach(addId);
+    addId(speakerId);
+
+    return Array.from(normalizedIds.values())
       .filter((id) => !(isDialogue && speakerId && id === speakerId))
       .map((id) => {
         const npc = getById(id);
@@ -191,12 +182,102 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           avatarUrl: npc?.avatarUrl,
         };
       });
-  }, [segment, getById, speakerId, isDialogue]);
+  }, [resolvedSegment, getById, speakerId, isDialogue]);
+
+  const highlightTerms = React.useMemo(() => {
+    if (!resolvedSegment) {
+      return [];
+    }
+
+    const participantIdSet = new Set<string>();
+    participantDetails.forEach((participant) => {
+      participantIdSet.add(participant.id.toLowerCase());
+    });
+    if (speakerId) {
+      participantIdSet.add(speakerId.toLowerCase());
+    }
+
+    const terms = new Set<string>();
+
+    const addName = (value?: string | null, idHint?: string | null) => {
+      if (!value) {
+        return;
+      }
+
+      const normalized = safeTrim(value).replace(/\s+/g, ' ');
+      if (!normalized) {
+        return;
+      }
+
+      terms.add(normalized);
+
+      const tokens = normalized.split(/\s+/).filter(Boolean);
+      tokens.forEach((token) => {
+        const cleanedToken = safeTrim(token.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, ''));
+        if (
+          cleanedToken.length >= 3 &&
+          !NAME_STOP_WORDS.includes(cleanedToken.toLowerCase())
+        ) {
+          terms.add(cleanedToken);
+        }
+      });
+
+      const leadingSegment = safeTrim(normalized.split(',')[0]).replace(/\s+/g, ' ');
+      if (
+        leadingSegment &&
+        leadingSegment.length >= 3 &&
+        (leadingSegment !== normalized || (idHint && idHint.includes('-')))
+      ) {
+        terms.add(leadingSegment);
+      }
+    };
+
+    participantDetails.forEach((participant) => addName(participant.name, participant.id));
+    addName(speakerName, speakerId ?? null);
+    resolvedSegment.metadata?.characters?.forEach((character) => {
+      if (!character?.id || !character.name) {
+        return;
+      }
+      if (!participantIdSet.has(character.id.toLowerCase())) {
+        return;
+      }
+      addName(character.name, character.id);
+    });
+
+    return Array.from(terms);
+  }, [participantDetails, speakerName, resolvedSegment, speakerId]);
+
+  if (isLoading) {
+    return (
+      <div className="p-8 snap-center">
+        <LoadingState message="Writing your story..." theme="light" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="snap-center">
+        <ErrorDisplay
+          variant="section"
+          severity="error"
+          title="Unable to Generate Narrative"
+          message={error}
+          showRetry={!!onRetry}
+          onRetry={onRetry}
+        />
+      </div>
+    );
+  }
+
+  if (!resolvedSegment) {
+    return null;
+  }
 
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
-        <p className={styles.label}>{segment.type}</p>
+        <p className={styles.label}>{resolvedSegment.type}</p>
 
         {participantDetails.length > 0 && (
           <div className="mb-4">
@@ -243,12 +324,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
         <FormattedNarrativeContent
           content={formattedContent}
-          className={`text-lg narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          highlightTerms={highlightTerms}
         />
-        {segment.metadata?.location && (
+        {resolvedSegment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              {segment?.metadata?.location}
+              {resolvedSegment.metadata?.location}
             </p>
           </div>
         )}

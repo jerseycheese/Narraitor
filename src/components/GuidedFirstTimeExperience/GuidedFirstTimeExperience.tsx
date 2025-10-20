@@ -8,7 +8,6 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
-import { getTimestamp } from '@/lib/utils';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
@@ -23,6 +22,7 @@ interface OnboardingData {
   name: string;
   genre: string;
   worldTypeData: WorldTypeData;
+  description?: string;
 }
 
 
@@ -85,7 +85,7 @@ export function GuidedFirstTimeExperience() {
         additionalContext
       });
 
-      const { worldId, world } = await worldCreationService.createWorldFromGeneration({
+      const { worldId } = await worldCreationService.createWorldFromGeneration({
         generatedData: generatedWorldData,
         customizations: {
           name: data.name,

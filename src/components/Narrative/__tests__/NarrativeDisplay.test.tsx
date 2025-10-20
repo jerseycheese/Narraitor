@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
@@ -89,6 +89,110 @@ describe('NarrativeDisplay', () => {
     expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
     expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
+  });
+
+  it('deduplicates character identifiers with inconsistent casing and whitespace', () => {
+    const now = getTimestamp();
+    const npcState = {
+      npcs: {
+        'npc-1': {
+          id: 'npc-1',
+          name: 'Marge, the Waitress',
+          worldId: 'world-1',
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      getById: (id: string) =>
+        id in npcState.npcs
+          ? npcState.npcs[id as keyof typeof npcState.npcs]
+          : undefined,
+    };
+
+    mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>
+      selector ? selector(npcState) : npcState
+    );
+
+    const segment = {
+      id: 'seg-dup',
+      content: 'Marge polishes the counter while you wait.',
+      type: 'scene' as const,
+      timestamp: new Date(),
+      createdAt: now,
+      updatedAt: now,
+      metadata: {
+        characterIds: ['npc-1', 'npc-1 ', 'NPC-1'],
+        tags: ['diner'],
+      },
+    };
+
+    render(<NarrativeDisplay segment={segment} />);
+
+    const list = screen.getByRole('list', { name: /characters present/i });
+    expect(list).toBeInTheDocument();
+    const items = within(list).getAllByRole('listitem');
+    expect(items).toHaveLength(1);
+    expect(
+      within(items[0]).getByText((content, element) =>
+        content === 'Marge, the Waitress' &&
+        element?.classList.contains('text-sm')
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('emphasizes participant names within the narrative text', () => {
+    const now = getTimestamp();
+    const npcState = {
+      npcs: {
+        'npc-1': {
+          id: 'npc-1',
+          name: 'Marge, the Waitress',
+          worldId: 'world-1',
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      getById: (id: string) =>
+        id in npcState.npcs
+          ? npcState.npcs[id as keyof typeof npcState.npcs]
+          : undefined,
+    };
+
+    mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>
+      selector ? selector(npcState) : npcState
+    );
+
+    const segment = {
+      id: 'seg-highlight',
+      content:
+        "Marge, the Waitress slides a chipped mug toward you. Moments later, Marge's voice drops to a whisper.",
+      type: 'scene' as const,
+      timestamp: new Date(),
+      createdAt: now,
+      updatedAt: now,
+      metadata: {
+        characterIds: ['npc-1'],
+        mood: 'neutral' as const,
+        tags: ['diner'],
+        characters: [
+          {
+            id: 'npc-1',
+            name: 'Marge, the Waitress',
+          },
+        ],
+      },
+    };
+
+    render(<NarrativeDisplay segment={segment} />);
+
+    const content = screen.getByTestId('narrative-content-container');
+    const highlighted = content.querySelectorAll('span.font-semibold');
+    expect(highlighted.length).toBeGreaterThan(0);
+    expect(
+      Array.from(highlighted).some(
+        (node) => node.textContent === 'Marge, the Waitress'
+      )
+    ).toBe(true);
   });
 
   it('renders different segment types with appropriate styling', () => {
