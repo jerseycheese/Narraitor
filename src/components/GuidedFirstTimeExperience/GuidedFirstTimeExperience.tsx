@@ -8,10 +8,9 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
-import { generateUniqueId } from '@/lib/utils/generateId';
-import { getTimestamp } from '@/lib/utils';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
+import { worldCreationService } from '@/lib/services/worldCreationService';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -23,6 +22,7 @@ interface OnboardingData {
   name: string;
   genre: string;
   worldTypeData: WorldTypeData;
+  description?: string;
 }
 
 
@@ -30,7 +30,7 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const setOnboardingCompleted = useSessionStore(state => state.setOnboardingCompleted);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
-  const { createWorld, setCurrentWorld } = useWorldStore();
+  const { setCurrentWorld } = useWorldStore();
 
   // Validation function for wizard steps
   const validateStep = useCallback((step: number, data: OnboardingData) => {
@@ -85,70 +85,15 @@ export function GuidedFirstTimeExperience() {
         additionalContext
       });
 
-      // Create the world first without attributes and skills
-      const worldId = createWorld({
-        name: generatedWorldData.name,
-        description: generatedWorldData.description,
-        genre: data.genre || generatedWorldData.genre,
-        attributes: [], // Will be populated below
-        skills: [], // Will be populated below
-        settings: generatedWorldData.settings,
-        reference, // Include reference for character generation
-        relationship, // Include relationship for character generation
+      const { worldId } = await worldCreationService.createWorldFromGeneration({
+        generatedData: generatedWorldData,
+        customizations: {
+          name: data.name,
+          genre: data.genre,
+          description: data.description,
+        },
       });
 
-      // Now update the world with the AI-generated attributes and skills that include the worldId
-      const { updateWorld } = useWorldStore.getState();
-      updateWorld(worldId, {
-        attributes: generatedWorldData.attributes.map(attr => ({
-          ...attr,
-          id: generateUniqueId('attribute'),
-          worldId
-        })),
-        skills: generatedWorldData.skills.map(skill => ({
-          ...skill,
-          id: generateUniqueId('skill'),
-          worldId,
-          attributeIds: []
-        }))
-      });
-
-      // Generate world image in the background
-      try {
-        const imageResponse = await fetch('/api/generate-world-image', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            world: {
-              id: worldId,
-              name: generatedWorldData.name,
-              description: generatedWorldData.description,
-              genre: generatedWorldData.genre
-            }
-          }),
-        });
-
-        if (imageResponse.ok) {
-          const imageData = await imageResponse.json();
-          // Update the world with the generated image
-          const { updateWorld } = useWorldStore.getState();
-          updateWorld(worldId, { 
-            image: {
-              type: imageData.aiGenerated ? 'ai-generated' : 'placeholder',
-              url: imageData.imageUrl,
-              generatedAt: getTimestamp(),
-              prompt: imageData.prompt
-            }
-          });
-        }
-      } catch (imageError) {
-        console.error('Failed to generate world image:', imageError);
-        // Don't fail the onboarding if image generation fails
-      }
-
-      // Set as current world
       setCurrentWorld(worldId);
       
       // Mark onboarding as completed
@@ -160,7 +105,7 @@ export function GuidedFirstTimeExperience() {
       console.error('Error completing onboarding:', error);
       throw error; // Re-throw to let wizard handle it
     }
-  }, [createWorld, setCurrentWorld, setOnboardingCompleted, router]);
+  }, [setCurrentWorld, setOnboardingCompleted, router]);
 
   // Handle skip
   const handleSkip = useCallback(() => {

@@ -96,14 +96,15 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     });
 
     const prompts = mockAiClient.getPrompts();
-    // 2 for narrative, 2 for item extraction
-    expect(prompts).toHaveLength(4);
+    const narrativePrompts = prompts.filter((prompt) =>
+      prompt.includes('dramatic') && prompt.includes('PG-13')
+    );
 
-    // Check the narrative generation prompts (1st and 3rd calls)
-    expect(prompts[0]).toContain('dramatic');
-    expect(prompts[0]).toContain('PG-13');
-    expect(prompts[2]).toContain('dramatic');
-    expect(prompts[2]).toContain('PG-13');
+    expect(narrativePrompts).toHaveLength(2);
+    narrativePrompts.forEach((prompt) => {
+      expect(prompt).toContain('dramatic');
+      expect(prompt).toContain('PG-13');
+    });
   });
 
   test('should handle missing tone settings gracefully', async () => {

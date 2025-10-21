@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { useWorldStore } from '@/state/worldStore';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
@@ -84,6 +85,7 @@ export default function CharacterCreationTestPage() {
     };
     
     const createdId = createWorld(worldWithIds as Omit<World, 'id' | 'createdAt' | 'updatedAt'>);
+    void ensureWorldNpcRoster(createdId);
     setCurrentWorld(createdId);
     setTestWorldId(createdId);
   }, [selectedWorld, createWorld, setCurrentWorld]);

@@ -7,8 +7,11 @@ import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.
 import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
 import type { Character as UtilCharacter } from '@/types/character.types';
+
+const EMPTY_NPC_IDS: string[] = [];
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -49,6 +52,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Access character and world stores for skill evaluation
   const characters = useCharacterStore(state => state.characters);
   const worlds = useWorldStore(state => state.worlds);
+  const npcIds = useNPCStore(
+    useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])
+  );
+  const npcs = useNPCStore((state) => state.npcs);
+
+  const npcRoster = useMemo(() => {
+    if (!npcIds || npcIds.length === 0) {
+      return [];
+    }
+    return npcIds
+      .map((id) => npcs[id])
+      .filter((npc): npc is NonNullable<typeof npcs[string]> => Boolean(npc));
+  }, [npcIds, npcs]);
 
   // Track if we've already generated a narrative for this session
   const [sessionKey, setSessionKey] = useState('');
@@ -541,6 +557,7 @@ Respond with JSON format:
         id: segmentId,
         content: result.content,
         type: result.segmentType,
+        characterIds: result.metadata.characterIds || [],
         metadata: result.metadata,
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId
@@ -586,7 +603,9 @@ Respond with JSON format:
           id: segmentId,
           content: 'The adventure begins. You find yourself at the edge of a new journey. What will you do next?',
           type: 'scene',
+          characterIds: [],
           metadata: {
+            characterIds: [],
             location: 'Starting Location',
             tags: ['intro', 'fallback']
           },
@@ -602,7 +621,7 @@ Respond with JSON format:
         addSegment(sessionId, {
           content: fallbackSegment.content,
           type: fallbackSegment.type,
-          characterIds: [],
+          characterIds: fallbackSegment.characterIds || [],
           metadata: fallbackSegment.metadata,
           updatedAt: fallbackSegment.updatedAt,
           timestamp: fallbackSegment.timestamp
@@ -769,6 +788,7 @@ Respond with JSON format:
         id: segmentId,
         content: result.content,
         type: result.segmentType,
+        characterIds: result.metadata.characterIds || [],
         metadata: result.metadata,
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId
@@ -849,6 +869,42 @@ Respond with JSON format:
         error={error || undefined}
         onRetry={handleRetry}
       />
+      {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
+        <div className="mt-6 rounded-lg border border-dashed border-muted-foreground/50 bg-muted/40 p-4 text-sm text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+            NPC roster (debug)
+          </p>
+          <ul className="mt-3 space-y-3">
+            {npcRoster.map((npc) => (
+              <li key={npc.id} className="flex items-center gap-3">
+                {npc.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={npc.avatarUrl}
+                    alt={npc.name}
+                    className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted-foreground/20 text-xs font-semibold text-muted-foreground">
+                    {npc.name
+                      .split(' ')
+                      .map((segment) => segment[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2)}
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-medium text-foreground">{npc.name}</span>
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground/80">
+                    {npc.id}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

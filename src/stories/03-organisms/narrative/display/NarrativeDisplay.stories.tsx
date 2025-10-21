@@ -31,6 +31,29 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const ensureStorybookNPC = (id: string, name: string) => {
+  const npcStore = useNPCStore.getState();
+  const existing = npcStore.getById(id);
+  const description =
+    existing?.description || `${name} (storybook preview character)`;
+
+  if (!existing) {
+    npcStore.createNPC({
+      id,
+      name,
+      description,
+      worldId: 'storybook-world',
+    });
+    return;
+  }
+
+  npcStore.updateNPC(id, {
+    name,
+    description,
+    worldId: existing.worldId || 'storybook-world',
+  });
+};
+
 // Helper to create mock segments
 const createMockSegment = (
   content: string,
@@ -41,7 +64,7 @@ const createMockSegment = (
   content,
   type,
   sessionId: 'session-1',
-  worldId: 'world-1',
+  worldId: 'storybook-world',
   timestamp: new Date(),
   createdAt: getTimestamp(),
   updatedAt: getTimestamp(),
@@ -69,19 +92,49 @@ export const Scene: Story = {
 };
 
 // Scene with dialogue - shows automatic quotation mark formatting in real scene segments
+const SceneWithDialogueStory: React.FC = () => {
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
+
+  useEffect(() => {
+    ensureStorybookNPC('guardian-lysara', 'Guardian Lysara');
+    ensureStorybookNPC('captain-ryn-solis', 'Captain Ryn Solis');
+
+    setSegment(
+      createMockSegment(
+        'Guardian Lysara stepped forward from the shadows. Guardian Lysara said, Welcome to the Mystical Forest. Captain Ryn Solis replied, Thank you for your guidance.',
+        'scene',
+        {
+          characterIds: ['guardian-lysara', 'captain-ryn-solis'],
+          mood: 'mysterious',
+          tags: ['conversation', 'introduction'],
+          location: 'Forest Entrance',
+          characters: [
+            {
+              id: 'guardian-lysara',
+              name: 'Guardian Lysara',
+            },
+            {
+              id: 'captain-ryn-solis',
+              name: 'Captain Ryn Solis',
+            },
+          ],
+        }
+      )
+    );
+  }, []);
+
+  if (!segment) {
+    return null;
+  }
+
+  return <NarrativeDisplay segment={segment} />;
+};
+
 export const SceneWithDialogue: Story = {
   args: {
-    segment: createMockSegment(
-      'The guardian stepped forward from the shadows. The guardian said, Welcome to the Mystical Forest. The traveler replied, Thank you for your guidance.',
-      'scene',
-      {
-        characterIds: ['char-1'],
-        mood: 'mysterious',
-        tags: ['conversation', 'introduction'],
-        location: 'Forest Entrance'
-      }
-    ),
+    segment: null,
   },
+  render: () => <SceneWithDialogueStory />,
 };
 
 
@@ -129,25 +182,55 @@ export const Error: Story = {
 
 
 // Realistic comprehensive example - shows mixed content with all formatting features
-export const RealisticMixedContent: Story = {
-  args: {
-    segment: createMockSegment(
-      `The ancient chamber fell silent as they entered. Dust motes danced in the *ethereal* light filtering through crystal windows.
+const RealisticMixedStory: React.FC = () => {
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 
-The guardian stepped forward from the shadows. The guardian said, Welcome, travelers. You have come seeking the *ancient* knowledge.
+  useEffect(() => {
+    ensureStorybookNPC('guardian-lysara', 'Guardian Lysara');
+    ensureStorybookNPC('captain-ryn-solis', 'Captain Ryn Solis');
 
-The hero replied, We need to understand the curse that plagues our land. She whispered, "The secret lies in the old texts." But he asked, "How do we know which ones to trust?"
+    setSegment(
+      createMockSegment(
+        `The ancient chamber fell silent as they entered. Dust motes danced in the *ethereal* light filtering through crystal windows.
+
+Guardian Lysara emerged from the shadows, their cloak whispering against the stone floor. "Welcome, travelers," Guardian Lysara said. "You have come seeking the *ancient* knowledge guarded within these walls."
+
+Captain Ryn Solis replied, "We need to understand the curse that plagues our land." She whispered, "The secret lies in the old texts." But Guardian Lysara asked, "How do we know which ones to trust?"
 
 Their quest would require both courage and wisdom to succeed.`,
-      'scene',
-      {
-        location: 'Ancient Chamber',
-        characterIds: ['guardian', 'hero'],
-        mood: 'mysterious',
-        tags: ['dialogue', 'exploration', 'mystery'],
-      }
-    ),
+        'scene',
+        {
+          location: 'Ancient Chamber',
+          characterIds: ['guardian-lysara', 'captain-ryn-solis'],
+          mood: 'mysterious',
+          tags: ['dialogue', 'exploration', 'mystery'],
+          characters: [
+            {
+              id: 'guardian-lysara',
+              name: 'Guardian Lysara',
+            },
+            {
+              id: 'captain-ryn-solis',
+              name: 'Captain Ryn Solis',
+            },
+          ],
+        }
+      )
+    );
+  }, []);
+
+  if (!segment) {
+    return null;
+  }
+
+  return <NarrativeDisplay segment={segment} />;
+};
+
+export const RealisticMixedContent: Story = {
+  args: {
+    segment: null,
   },
+  render: () => <RealisticMixedStory />,
 };
 
 // NPC Dialogue Stories
@@ -159,6 +242,7 @@ const DialogueWithGandalf = () => {
   useEffect(() => {
     const store = useNPCStore.getState();
     const npcId = store.createNPC({
+      id: 'storybook-gandalf',
       name: 'Gandalf',
       description: 'A wise wizard',
       worldId: 'test-world',
@@ -193,6 +277,7 @@ const DialogueWithFrodo = () => {
   useEffect(() => {
     const store = useNPCStore.getState();
     const npcId = store.createNPC({
+      id: 'storybook-frodo-dialogue',
       name: 'Frodo',
       description: 'A brave hobbit',
       worldId: 'test-world',
@@ -240,6 +325,7 @@ const MultipleNPCs = () => {
     const store = useNPCStore.getState();
 
     const elrondId = store.createNPC({
+      id: 'storybook-elrond',
       name: 'Elrond',
       description: 'Lord of Rivendell',
       worldId: 'test-world',
@@ -247,6 +333,7 @@ const MultipleNPCs = () => {
     });
 
     const boromirId = store.createNPC({
+      id: 'storybook-boromir',
       name: 'Boromir',
       description: 'Son of Gondor',
       worldId: 'test-world',
@@ -254,6 +341,7 @@ const MultipleNPCs = () => {
     });
 
     const frodoId = store.createNPC({
+      id: 'storybook-frodo-ring',
       name: 'Frodo',
       description: 'Ring bearer',
       worldId: 'test-world',

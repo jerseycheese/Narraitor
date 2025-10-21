@@ -144,6 +144,18 @@ const dialoguePattern2 = new RegExp(
   'g'
 );
 
+const dialogueStarterPattern = /^[A-Z0-9"'“”‘’¿¡(—-]/;
+
+const shouldFormatAsDialogue = (raw: string): boolean => {
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) {
+    return false;
+  }
+
+  const firstChar = trimmed[0];
+  return dialogueStarterPattern.test(firstChar);
+};
+
 /**
  * Formats dialogue with quotation marks
  * @param text - Text containing dialogue to format
@@ -162,6 +174,9 @@ function formatDialogue(text: string): string {
     if (dialogue.match(/^(that|if|whether|to|about|how|why|when|where|what|who)/i)) {
       return match;
     }
+    if (!shouldFormatAsDialogue(dialogue)) {
+      return match;
+    }
     const finalPunct = punct || (verb.match(/ask|question|wonder|inquire/i) ? '?' : '.');
     return `${speaker} ${verb}${separator}"${dialogue.trim()}${finalPunct}"`;
   });
@@ -171,10 +186,12 @@ function formatDialogue(text: string): string {
     if (dialogue.match(/^(that|if|whether|to|about|how|why|when|where|what|who)/i)) {
       return match;
     }
+    if (!shouldFormatAsDialogue(dialogue)) {
+      return match;
+    }
     const finalPunct = punct || (verb.match(/ask|question|wonder|inquire/i) ? '?' : '.');
     return `. ${pronoun} ${verb}${separator}"${dialogue.trim()}${finalPunct}"`;
   });
   
   return formatted;
 }
-

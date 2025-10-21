@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { generateWorld, type GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { safeTrim, capitalize } from '@/lib/utils';
+import { worldCreationService } from '@/lib/services/worldCreationService';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -12,7 +13,7 @@ export default function WorldGenerationTestPage() {
   const [generatedWorld, setGeneratedWorld] = useState<GeneratedWorldData | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { worlds, createWorld } = useWorldStore();
+  const { worlds } = useWorldStore();
   
   const handleGenerate = async () => {
     if (!safeTrim(worldReference)) {
@@ -42,26 +43,18 @@ export default function WorldGenerationTestPage() {
     }
   };
   
-  const handleCreateWorld = () => {
+  const handleCreateWorld = async () => {
     if (!generatedWorld) return;
-    
-    createWorld({
-      name: generatedWorld.name,
-      genre: generatedWorld.genre,
-      description: generatedWorld.description,
-      attributes: generatedWorld.attributes.map((attr) => ({
-        ...attr,
-        id: `attr-${Date.now()}-${Math.random()}`,
-        worldId: '' // Will be set by the store
-      })),
-      skills: generatedWorld.skills.map((skill) => ({
-        ...skill,
-        id: `skill-${Date.now()}-${Math.random()}`,
-        worldId: '' // Will be set by the store
-      })),
-      settings: generatedWorld.settings
+
+    await worldCreationService.createWorldFromGeneration({
+      generatedData: generatedWorld,
+      customizations: {
+        name: generatedWorld.name,
+        genre: generatedWorld.genre,
+        description: generatedWorld.description,
+      },
     });
-    
+
     setGeneratedWorld(null);
     setWorldReference('');
     setSuggestedName('');

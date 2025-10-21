@@ -2,6 +2,7 @@ import { WorldTemplate, templates } from './worldTemplates';
 import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '../utils/generateId';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 /**
  * Applies a template to create a new world with pre-defined attributes, skills, and relationships
@@ -70,6 +71,9 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
 
   // Step 3: Update the world with populated attributes and skills
   updateWorld(worldId, { attributes, skills });
+
+  // Ensure starter NPCs exist for this world
+  void ensureWorldNpcRoster(worldId);
 
   return worldId;
 };

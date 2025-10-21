@@ -1,6 +1,7 @@
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp, safeTrim } from '@/lib/utils';
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
@@ -22,6 +23,100 @@ export interface CreateWorldFromGenerationParams {
 export interface CreateWorldResult {
   worldId: string;
   world: World;
+}
+
+interface GeneratedNPCResult {
+  id: string;
+  name: string;
+  description: string;
+  avatarPrompt?: string;
+  avatarUrl?: string;
+}
+
+const slugify = (value: string): string => {
+  const normalized = safeTrim(value).toLowerCase();
+  const slug = normalized
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+  if (slug) {
+    return slug;
+  }
+  const fallbackSuffix = generateUniqueId('npc').split('-').pop();
+  return `npc-${fallbackSuffix}`;
+};
+
+const buildFallbackNpcSeeds = (world: World): GeneratedNPCResult[] => {
+  const baseName = safeTrim(world.name) || 'this world';
+
+  return Array.from({ length: 3 }).map((_, index) => {
+    const ordinal = index + 1;
+    const name = `Resident ${ordinal} of ${baseName}`;
+    return {
+      id: slugify(name),
+      name,
+      description: `A supporting character from ${baseName}.`,
+    };
+  });
+};
+
+async function generateNpcRosterForWorld(world: World): Promise<GeneratedNPCResult[]> {
+  if (process.env.NODE_ENV === 'test') {
+    return buildFallbackNpcSeeds(world);
+  }
+
+  const client = createDefaultGeminiClient();
+  const prompt = `You are assisting a narrative world-building engine. Based on the world description below, invent exactly three non-player characters who will appear frequently in story scenes.
+
+Return STRICT JSON with this shape:
+{
+  "npcs": [
+    {
+      "id": "kebab-case-identifier",
+      "name": "NPC display name",
+      "description": "One or two vivid sentences summarizing personality and role",
+      "avatarPrompt": "(optional) Short visual prompt for portrait",
+      "avatarUrl": "(optional) Absolute URL for an avatar image"
+    }
+  ]
+}
+
+World name: ${world.name}
+Genre: ${world.genre || 'unspecified'}
+Description: ${world.description}
+Key attributes: ${(world.attributes || []).slice(0, 4).map((attr) => `${attr.name}: ${attr.description}`).join('; ') || 'None'}
+Signature skills: ${(world.skills || []).slice(0, 4).map((skill) => `${skill.name}: ${skill.description}`).join('; ') || 'None'}
+
+Every NPC must fit this world snugly. IDs must be unique, lowercase, kebab-case strings suitable for use as stable identifiers.`;
+
+  try {
+    const response = await client.generateContent(prompt);
+    const raw = response.content ?? '';
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON block found in NPC response');
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]) as { npcs?: GeneratedNPCResult[] };
+    const roster = Array.isArray(parsed?.npcs) ? parsed.npcs : [];
+
+    if (roster.length === 0) {
+      throw new Error('NPC roster empty');
+    }
+
+    return roster
+      .map((npc) => ({
+        id: npc?.id ? slugify(npc.id) : slugify(npc?.name ?? ''),
+        name: safeTrim(npc?.name) || '',
+        description: safeTrim(npc?.description) || '',
+        avatarPrompt: npc?.avatarPrompt ? safeTrim(npc.avatarPrompt) : undefined,
+        avatarUrl: npc?.avatarUrl ? safeTrim(npc.avatarUrl) : undefined,
+      }))
+      .filter((npc) => npc.name.length > 0 && npc.description.length > 0);
+  } catch (error) {
+    logger.warn('Falling back to default NPC seeds for world', { worldId: world.id, error });
+    return buildFallbackNpcSeeds(world);
+  }
 }
 
 /**
@@ -129,6 +224,12 @@ export const worldCreationService = {
     const { worlds } = useWorldStore.getState();
     const finalWorld = worlds[createdWorldId];
 
+    try {
+      await this.generateWorldNpcRoster(finalWorld);
+    } catch (error) {
+      logger.warn('Failed to generate NPC roster for world', { worldId: createdWorldId, error });
+    }
+
     return {
       worldId: createdWorldId,
       world: finalWorld,
@@ -168,6 +269,61 @@ export const worldCreationService = {
     }
   },
 
-  
+  async generateWorldNpcRoster(world: World | undefined): Promise<void> {
+    if (!world) return;
+
+    const npcStore = useNPCStore.getState();
+    if (!npcStore || typeof npcStore.createNPC !== 'function') {
+      return;
+    }
+
+    const existingIds = npcStore.worldNpcs[world.id];
+    if (Array.isArray(existingIds) && existingIds.length > 0) {
+      return; // already seeded
+    }
+
+    const roster = await generateNpcRosterForWorld(world);
+    const used = new Set<string>();
+
+    roster.forEach((npc, index) => {
+      const fallbackId = slugify(npc.name || `npc-${index + 1}`);
+      let finalId = npc.id ? slugify(npc.id) : fallbackId;
+      let counter = 1;
+      while (used.has(finalId)) {
+        finalId = `${fallbackId}-${counter++}`;
+      }
+      used.add(finalId);
+
+      const name = safeTrim(npc.name) || `Companion ${index + 1}`;
+      const description = safeTrim(npc.description) || 'Supporting character for this world.';
+      const avatarUrl = npc.avatarUrl && safeTrim(npc.avatarUrl)
+        ? safeTrim(npc.avatarUrl)
+        : undefined;
+
+      try {
+        const payload: Parameters<typeof npcStore.createNPC>[0] = {
+          id: finalId,
+          worldId: world.id,
+          name,
+          description,
+        };
+
+        if (avatarUrl) {
+          payload.avatarUrl = avatarUrl;
+        }
+
+        npcStore.createNPC(payload);
+      } catch (error) {
+        logger.warn('Failed to seed NPC', { worldId: world.id, finalId, error });
+      }
+    });
+  },
 };
 
+export const ensureWorldNpcRoster = async (worldId: string): Promise<void> => {
+  if (!worldId) return;
+  const { worlds } = useWorldStore.getState();
+  const world = worlds[worldId];
+  if (!world) return;
+  await worldCreationService.generateWorldNpcRoster(world);
+};

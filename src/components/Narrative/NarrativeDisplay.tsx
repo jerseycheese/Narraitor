@@ -5,8 +5,12 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
+import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { useNPCStore } from '@/state/npcStore';
-
+import {
+  deriveFallbackName,
+  useNarrativeParticipants,
+} from './useNarrativeParticipants';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -23,33 +27,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
-
-  if (isLoading) {
-    return (
-      <div className="p-8 snap-center">
-        <LoadingState message="Writing your story..." theme="light" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="snap-center">
-        <ErrorDisplay
-          variant="section"
-          severity="error"
-          title="Unable to Generate Narrative"
-          message={error}
-          showRetry={!!onRetry}
-          onRetry={onRetry}
-        />
-      </div>
-    );
-  }
-
-  if (!segment) {
-    return null;
-  }
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -132,46 +109,119 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
   };
 
-  const styles = getSegmentStyles(segment.type);
-  const formattingOptions = getFormattingOptions(segment.type);
-  const parsedContent = parseNarrativeContent(segment.content);
-  const formattedContent = formatAIResponse(parsedContent, formattingOptions);
+  const resolvedSegment = segment ?? null;
+  const segmentType = resolvedSegment?.type ?? 'scene';
+  const isDialogue = segmentType === 'dialogue';
 
-  // Get speaker information for dialogue segments
-  const speaker = segment.type === 'dialogue' && segment.metadata?.speakerId
-    ? getById(segment.metadata.speakerId)
+  const styles = getSegmentStyles(segmentType);
+  const formattingOptions = getFormattingOptions(segmentType);
+  const parsedContent = React.useMemo(
+    () => (resolvedSegment ? parseNarrativeContent(resolvedSegment.content) : ''),
+    [resolvedSegment]
+  );
+  const formattedContent = React.useMemo(
+    () => formatAIResponse(parsedContent, formattingOptions),
+    [parsedContent, formattingOptions]
+  );
+
+  const speakerId = resolvedSegment?.metadata?.speakerId;
+  const speakerRecord = speakerId ? getById(speakerId) : null;
+  const speakerName = speakerId
+    ? (speakerRecord?.name ?? deriveFallbackName(speakerId))
     : null;
+
+  const { participants, highlightTerms } = useNarrativeParticipants({
+    segment: resolvedSegment,
+    speakerId,
+    speakerName,
+    isDialogue,
+    getById,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="p-8 snap-center">
+        <LoadingState message="Writing your story..." theme="light" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="snap-center">
+        <ErrorDisplay
+          variant="section"
+          severity="error"
+          title="Unable to Generate Narrative"
+          message={error}
+          showRetry={!!onRetry}
+          onRetry={onRetry}
+        />
+      </div>
+    );
+  }
+
+  if (!resolvedSegment) {
+    return null;
+  }
 
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
-        <p className={styles.label}>{segment.type}</p>
+        <p className={styles.label}>{resolvedSegment.type}</p>
 
-        {speaker && (
-          <div className="flex items-center gap-2 mb-3">
-            {speaker.avatarUrl && (
-              // Use regular img for arbitrary URLs to avoid Next.js domain restrictions
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={speaker.avatarUrl}
-                alt={speaker.name}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            )}
+        {participants.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Characters Present
+            </p>
+            <div
+              className="mt-2 flex flex-wrap gap-2"
+              role="list"
+              aria-label="Characters present in this scene"
+            >
+              {participants.map((participant) => (
+                <div
+                  key={participant.id}
+                  className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
+                  role="listitem"
+                >
+                  <NarrativeCharacterAvatar
+                    name={participant.name}
+                    avatarUrl={participant.avatarUrl}
+                    size="sm"
+                  />
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {participant.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isDialogue && speakerId && speakerName && (
+          <div className="mb-3 flex items-center gap-2">
+            <NarrativeCharacterAvatar
+              name={speakerName}
+              avatarUrl={speakerRecord?.avatarUrl}
+              size="sm"
+            />
             <span className="text-sm font-semibold text-blue-700">
-              {speaker.name}
+              {speakerName}
             </span>
           </div>
         )}
 
         <FormattedNarrativeContent
           content={formattedContent}
-          className={`text-lg narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          highlightTerms={highlightTerms}
         />
-        {segment.metadata?.location && (
+        {resolvedSegment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              {segment?.metadata?.location}
+              {resolvedSegment.metadata?.location}
             </p>
           </div>
         )}

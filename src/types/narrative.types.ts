@@ -125,6 +125,15 @@ export interface AcquiredItemMetadata {
   refinesPrevious?: boolean;
 }
 
+export interface GeneratedCharacterMetadata {
+  id: EntityID;
+  name: string;
+  description?: string;
+  role?: string;
+  avatarPrompt?: string;
+  avatarUrl?: string;
+}
+
 /**
  * Metadata for narrative segments (simplified for MVP)
  */
@@ -133,6 +142,7 @@ export interface NarrativeMetadata {
   tags: string[];
   location?: string;
   characterIds?: EntityID[];
+  characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
   // Ending-specific metadata
@@ -173,6 +183,9 @@ export interface NarrativeContext {
     id: EntityID;
     type: string;
     name: string;
+    description?: string;
+    avatarUrl?: string | null;
+    role?: string;
   }>;
 }
 
@@ -201,10 +214,12 @@ export interface NarrativeGenerationResult {
   segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
   metadata: {
     characterIds: EntityID[];
+    speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
     timestamp?: string;
+    characters?: GeneratedCharacterMetadata[];
     // Skill-related metadata for tracking skill usage acknowledgment
     skillsUsed?: Array<{
       skillId: string;

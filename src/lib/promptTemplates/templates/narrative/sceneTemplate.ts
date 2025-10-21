@@ -10,7 +10,8 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
     generationParameters,
     playerCharacterName,
     characterSkillContext,
-    enhancedCharacterContext
+    enhancedCharacterContext,
+    npcRoster = []
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
@@ -18,6 +19,13 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
   ).join('\n\n');
+
+  const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
+    ? `
+NPC ROSTER (Reference IDs for metadata.characterIds):
+${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
+`
+    : '';
 
   return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
@@ -43,6 +51,19 @@ CRITICAL CONTINUITY RULES:
 - Time has NOT reset or jumped backward
 - Pick up IMMEDIATELY from where the story left off
 - The player's action happens RIGHT NOW in the current moment
+
+${formattedRoster}
+
+NPC METADATA RULES:
+- Use NPC names in the prose, but capture their IDs (from the roster above) in metadata.characterIds ONLY for characters who appear or speak in this segment.
+- Do NOT include characters who are merely mentioned, remembered, or located elsewhere—only on-screen participants belong in metadata.characterIds.
+- If you foreshadow or reference an off-screen NPC, you may add them to metadata.characters for future use, but keep them out of metadata.characterIds.
+- If a single NPC is the primary speaker addressing the player, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
+- If no NPCs appear, set metadata.characterIds to [].
+- Never invent new IDs—only use the ones provided in the roster or already established in prior metadata.
+- When you introduce a new NPC, add them to metadata.characters with a slug-style id (lowercase-hyphenated) and reuse that same id in later segments.
+- Prefer selecting supporting characters from this roster when the story needs additional voices; only invent new NPCs if absolutely necessary for the scene.
+- Do not insert character IDs or bracket tokens (e.g., [npc-id]) in the narrative text—only expose the natural name.
 
 Generate a ${segmentType} that:
 1. Shows the IMMEDIATE RESULT of the player's action
@@ -85,6 +106,17 @@ Response Format:
   "content": "The scene description goes here...",
   "type": "${segmentType}",
   "metadata": {
+    "characterIds": ["npc-id-1", "npc-id-2"],
+    "speakerId": "npc-id-1",
+    "characters": [
+      {
+        "id": "npc-id-1",
+        "name": "NPC Name",
+        "description": "Short vivid description",
+        "role": "Harbormaster",
+        "avatarPrompt": "Describe appearance for portrait consistency"
+      }
+    ],
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["relevant", "scene", "tags"]

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { CharacterEditor } from '@/components/CharacterEditor';
 
 export default function CharacterEditingTestPage() {
@@ -60,6 +61,7 @@ export default function CharacterEditingTestPage() {
           skillPointPool: 30
         }
       });
+      void ensureWorldNpcRoster(worldId);
     }
 
     // Create test character if none exists
