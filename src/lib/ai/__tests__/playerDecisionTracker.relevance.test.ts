@@ -187,6 +187,58 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
       // Current session decision should rank higher
       expect(relevantDecisions[0].sessionId).toBe('session-test');
     });
+
+    test('filters out other sessions when session filter provided', () => {
+      tracker.recordDecision(
+        'Session-scoped decision',
+        'Take patient approach',
+        'helpful',
+        'session-test',
+        'world-test'
+      );
+
+      tracker.recordDecision(
+        'Different session decision',
+        'Act rashly',
+        'aggressive',
+        'session-other',
+        'world-test'
+      );
+
+      const relevantDecisions = tracker.getRelevantDecisions(
+        mockCurrentContext,
+        5,
+        {
+          sessionId: 'session-test',
+          worldId: 'world-test'
+        }
+      );
+
+      expect(relevantDecisions).toHaveLength(1);
+      expect(relevantDecisions[0].sessionId).toBe('session-test');
+    });
+
+    test('falls back to world filter when session has no decisions', () => {
+      tracker.recordDecision(
+        'Different session decision',
+        'Act rashly',
+        'aggressive',
+        'session-other',
+        'world-test'
+      );
+
+      const relevantDecisions = tracker.getRelevantDecisions(
+        mockCurrentContext,
+        5,
+        {
+          sessionId: 'session-test',
+          worldId: 'world-test'
+        }
+      );
+
+      expect(relevantDecisions).toHaveLength(1);
+      expect(relevantDecisions[0].sessionId).toBe('session-other');
+    });
   });
 
   describe('edge cases', () => {

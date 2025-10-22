@@ -10,7 +10,8 @@ import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplat
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
-import { NarrativeGenerationRequest } from '@/types/narrative.types';
+import { NarrativeGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
+import { CurrentNarrativeContext } from '@/types/relevance.types';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -159,6 +160,63 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     expect(result.content).toBe('The story begins...');
   });
 
+  it('omits decisions from other sessions when scoring relevance', async () => {
+    playerDecisionTracker.recordDecision(
+      'You see an injured merchant',
+      'Help the injured merchant',
+      'helpful',
+      'session-test',
+      'world-test',
+      {
+        location: 'Market Square',
+        situation: 'Trading goods'
+      }
+    );
+
+    playerDecisionTracker.recordDecision(
+      'Guards block your escape',
+      'Launch a surprise assault',
+      'aggressive',
+      'session-other',
+      'world-test',
+      {
+        location: 'Market Square',
+        situation: 'Combat encounter'
+      }
+    );
+
+    const mockAIResponse = {
+      content: 'Filtered decisions prompt...',
+      finishReason: 'stop'
+    };
+
+    mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+    const request: NarrativeGenerationRequest = {
+      worldId: 'world-test',
+      sessionId: 'session-test',
+      characterIds: ['char-test'],
+      narrativeContext: {
+        worldId: 'world-test',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-test'],
+        sessionId: 'session-test',
+        previousSegments: [],
+        currentTags: ['trading'],
+        currentLocation: 'Market Square',
+        recentSegments: []
+      }
+    };
+
+    await narrativeGenerator.generateSegment(request);
+
+    const promptSent = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+    const promptLower = promptSent.toLowerCase();
+
+    expect(promptLower).toContain('help the injured merchant');
+    expect(promptLower).not.toContain('launch a surprise assault');
+  });
+
   it('works with multiple relevant decisions', async () => {
     // Record multiple decisions
     for (let i = 0; i < 5; i++) {
@@ -201,5 +259,63 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
 
     expect(result).toBeDefined();
     expect(result.content).toBe('Multiple decisions processed...');
+  });
+
+  it('builds relevance context using latest recent segment when location missing', async () => {
+    const capturedContexts: CurrentNarrativeContext[] = [];
+    const getRelevantDecisionsSpy = jest
+      .spyOn(playerDecisionTracker, 'getRelevantDecisions')
+      .mockImplementation((context, maxDecisions, filters) => {
+        capturedContexts.push(context);
+        return [];
+      });
+
+    const mockAIResponse = {
+      content: 'Context test narrative...',
+      finishReason: 'stop'
+    };
+
+    mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+    const buildSegment = (id: string, location: string): NarrativeSegment => ({
+      id,
+      worldId: 'world-test',
+      sessionId: 'session-test',
+      content: `${location} summary`,
+      type: 'scene' as const,
+      characterIds: ['char-test'],
+      metadata: {
+        tags: [],
+        location
+      },
+      decisions: [],
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    const request: NarrativeGenerationRequest = {
+      worldId: 'world-test',
+      sessionId: 'session-test',
+      characterIds: ['char-test'],
+      narrativeContext: {
+        worldId: 'world-test',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-test'],
+        sessionId: 'session-test',
+        previousSegments: [],
+        currentTags: ['stealth'],
+        recentSegments: [
+          buildSegment('segment-1', 'Old Port'),
+          buildSegment('segment-2', 'Shadow Alley')
+        ]
+      }
+    };
+
+    await narrativeGenerator.generateSegment(request);
+
+    expect(capturedContexts[0]?.location).toBe('Shadow Alley');
+
+    getRelevantDecisionsSpy.mockRestore();
   });
 });

@@ -233,8 +233,14 @@ export class NarrativeGenerator {
     narrativeContext?: NarrativeContext
   ): CurrentNarrativeContext {
     // Extract location from narrative context
+    const latestRecentSegment =
+      narrativeContext?.recentSegments &&
+      narrativeContext.recentSegments.length > 0
+        ? narrativeContext.recentSegments[narrativeContext.recentSegments.length - 1]
+        : undefined;
+
     const location = narrativeContext?.currentLocation ||
-                     narrativeContext?.recentSegments?.[0]?.metadata?.location;
+                     latestRecentSegment?.metadata?.location;
 
     // Extract characters present from narrative context
     const charactersPresent: string[] = [];
@@ -343,11 +349,38 @@ export class NarrativeGenerator {
    * Formats a single decision into compact string format
    */
   private formatSingleDecision(decision: PlayerDecision): string {
-    const location = decision.context?.location || 'Unknown location';
-    const action = decision.choiceText;
+    const location =
+      safeTrim(decision.context?.location) || 'Unknown location';
+    const action = this.formatDecisionAction(decision.choiceText);
     const type = decision.choiceType;
 
-    return `- At ${location}, you ${action.toLowerCase()} (${type})`;
+    return `- At ${location}, you ${action} (${type})`;
+  }
+
+  private formatDecisionAction(actionText: string): string {
+    const trimmed = (actionText ?? '').trim();
+
+    if (!trimmed) {
+      return 'make a choice';
+    }
+
+    const firstAlphaIndex = trimmed.search(/[A-Za-z]/);
+    if (firstAlphaIndex === -1) {
+      return trimmed;
+    }
+
+    const firstAlpha = trimmed[firstAlphaIndex];
+    const lowerFirstAlpha = firstAlpha.toLowerCase();
+
+    if (firstAlpha === lowerFirstAlpha) {
+      return trimmed;
+    }
+
+    return (
+      trimmed.slice(0, firstAlphaIndex) +
+      lowerFirstAlpha +
+      trimmed.slice(firstAlphaIndex + 1)
+    );
   }
 
   /**
@@ -389,8 +422,17 @@ export class NarrativeGenerator {
         // Use relevance system to get most important decisions (max 15)
         relevantDecisions = playerDecisionTracker.getRelevantDecisions(
           currentContext,
-          15
+          15,
+          { worldId, sessionId }
         );
+
+        if (relevantDecisions.length === 0) {
+          relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+            currentContext,
+            15,
+            { worldId }
+          );
+        }
       } else {
         // Fallback: get recent world decisions if no session ID
         const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
