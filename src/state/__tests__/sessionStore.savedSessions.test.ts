@@ -1,47 +1,76 @@
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { useSessionStore } from '../sessionStore';
+
+jest.mock('@/lib/utils/logger', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => ({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  })),
+}));
+
+jest.mock('../persistence', () => ({
+  createIndexedDBStorage: () => ({
+    getItem: jest.fn().mockResolvedValue(null),
+    setItem: jest.fn().mockResolvedValue(undefined),
+    removeItem: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+const resetSessionStore = () => {
+  useSessionStore.setState({
+    id: null,
+    status: 'initializing',
+    currentSceneId: null,
+    playerChoices: [],
+    error: null,
+    worldId: null,
+    characterId: null,
+    savedSessions: {},
+    templateHistory: [],
+    autoSave: {
+      enabled: true,
+      lastSaveTime: null,
+      status: 'idle',
+      errorMessage: null,
+      totalSaves: 0,
+    },
+    narrativeHeight: 600,
+    onboardingCompleted: false,
+  });
+};
 
 describe('Session Persistence: savedSessions collection', () => {
   beforeEach(() => {
-    // Reset the store before each test
-    useSessionStore.setState({
-      id: null,
-      status: 'initializing',
-      currentSceneId: null,
-      playerChoices: [],
-      error: null,
-      worldId: null,
-      characterId: null,
-      savedSessions: {},
-      templateHistory: [],
-      autoSave: {
-        enabled: true,
-        lastSaveTime: null,
-        status: 'idle',
-        errorMessage: null,
-        totalSaves: 0,
-      },
-      narrativeHeight: 600,
-      onboardingCompleted: false,
-    });
+    jest.useRealTimers();
+    resetSessionStore();
   });
 
   describe('updateSavedSessionNarrativeCount', () => {
-    it('should create session entry in savedSessions when session has narrative content', async () => {
-      // Arrange: Initialize a session
+    const setActiveSessionState = (sessionId: string, worldId: string | null, characterId: string | null) => {
+      useSessionStore.setState(state => ({
+        ...state,
+        id: sessionId,
+        worldId,
+        characterId,
+        status: 'active',
+      }));
+    };
+
+    it('should create session entry in savedSessions when session has narrative content', () => {
+      const sessionId = 'session-under-test';
       const worldId = 'test-world-id';
       const characterId = 'test-character-id';
-      await useSessionStore.getState().initializeSession(worldId, characterId);
 
-      const sessionId = useSessionStore.getState().id;
+      setActiveSessionState(sessionId, worldId, characterId);
 
-      // Verify session not in savedSessions initially
-      expect(useSessionStore.getState().savedSessions[sessionId!]).toBeUndefined();
+      expect(useSessionStore.getState().savedSessions[sessionId]).toBeUndefined();
 
-      // Act: Update narrative count (simulating a narrative segment being added)
-      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId!, 1);
+      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, 1);
 
-      // Assert: Session should now be in savedSessions
-      const savedSession = useSessionStore.getState().savedSessions[sessionId!];
+      const savedSession = useSessionStore.getState().savedSessions[sessionId];
       expect(savedSession).toBeDefined();
       expect(savedSession.id).toBe(sessionId);
       expect(savedSession.worldId).toBe(worldId);
@@ -50,14 +79,25 @@ describe('Session Persistence: savedSessions collection', () => {
       expect(savedSession.lastPlayed).toBeDefined();
     });
 
+    it('should skip creating a saved session if world or character context is missing', () => {
+      const sessionId = 'session-without-context';
+
+      setActiveSessionState(sessionId, null, null);
+
+      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, 1);
+
+      expect(useSessionStore.getState().savedSessions[sessionId]).toBeUndefined();
+    });
+
     it('should update narrativeCount for existing saved session', () => {
-      // Arrange: Create a session already in savedSessions
       const sessionId = 'test-session-id';
       const worldId = 'test-world-id';
       const characterId = 'test-character-id';
 
-      useSessionStore.setState({
+      useSessionStore.setState(state => ({
+        ...state,
         savedSessions: {
+          ...state.savedSessions,
           [sessionId]: {
             id: sessionId,
             worldId,
@@ -66,87 +106,85 @@ describe('Session Persistence: savedSessions collection', () => {
             narrativeCount: 2,
           },
         },
-      });
+      }));
 
-      // Act: Update narrative count
       useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, 3);
 
-      // Assert: Count should be updated
       const savedSession = useSessionStore.getState().savedSessions[sessionId];
       expect(savedSession.narrativeCount).toBe(3);
-      expect(savedSession.lastPlayed).not.toBe('2025-01-01T00:00:00.000Z'); // Should be updated
+      expect(savedSession.lastPlayed).not.toBe('2025-01-01T00:00:00.000Z');
     });
 
     it('should not create session entry for non-active session', () => {
-      // Arrange: No active session
       const randomSessionId = 'random-session-id';
 
-      // Act: Try to update narrative count for non-existent session
       useSessionStore.getState().updateSavedSessionNarrativeCount(randomSessionId, 1);
 
-      // Assert: Session should not be created
       expect(useSessionStore.getState().savedSessions[randomSessionId]).toBeUndefined();
     });
 
     it('should update lastPlayed timestamp when narrative count increases', () => {
-      // Arrange: Create active session and add it to savedSessions
+      const sessionId = 'timestamp-session';
       const worldId = 'test-world-id';
       const characterId = 'test-character-id';
-      useSessionStore.setState({
-        id: 'test-session-id',
+
+      jest.useFakeTimers();
+      const initialTime = new Date('2025-01-01T00:00:00.000Z');
+      jest.setSystemTime(initialTime);
+
+      useSessionStore.setState(state => ({
+        ...state,
+        id: sessionId,
         worldId,
         characterId,
         status: 'active',
         savedSessions: {
-          'test-session-id': {
-            id: 'test-session-id',
+          ...state.savedSessions,
+          [sessionId]: {
+            id: sessionId,
             worldId,
             characterId,
-            lastPlayed: '2025-01-01T00:00:00.000Z',
+            lastPlayed: getTimestamp(),
             narrativeCount: 1,
           },
         },
-      });
+      }));
 
-      const oldTimestamp = useSessionStore.getState().savedSessions['test-session-id'].lastPlayed;
+      const initialTimestamp = useSessionStore.getState().savedSessions[sessionId].lastPlayed;
 
-      // Wait a tick to ensure timestamp difference
-      const delay = () => new Promise(resolve => setTimeout(resolve, 10));
+      const updatedTime = new Date('2025-01-01T00:00:01.000Z');
+      jest.setSystemTime(updatedTime);
+      const updatedTimestamp = getTimestamp();
 
-      // Act: Update narrative count
-      return delay().then(() => {
-        useSessionStore.getState().updateSavedSessionNarrativeCount('test-session-id', 2);
+      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, 2);
 
-        // Assert: Timestamp should be updated
-        const savedSession = useSessionStore.getState().savedSessions['test-session-id'];
-        expect(savedSession.lastPlayed).not.toBe(oldTimestamp);
-        expect(savedSession.narrativeCount).toBe(2);
-      });
+      const savedSession = useSessionStore.getState().savedSessions[sessionId];
+      expect(savedSession.lastPlayed).not.toBe(initialTimestamp);
+      expect(savedSession.lastPlayed).toBe(updatedTimestamp);
+      expect(savedSession.narrativeCount).toBe(2);
     });
   });
 
   describe('Session persistence during gameplay', () => {
-    it('should persist session when narrative content is added during normal gameplay', async () => {
-      // This test verifies the core bug fix: sessions should appear in savedSessions
-      // when users play through the game normally (without explicitly calling endSession)
-
-      // Arrange: Initialize a session (like when user starts playing)
+    it('should persist session when narrative content is added during normal gameplay', () => {
       const worldId = 'gameplay-world';
       const characterId = 'gameplay-character';
-      await useSessionStore.getState().initializeSession(worldId, characterId);
+      const sessionId = 'gameplay-session';
 
-      const sessionId = useSessionStore.getState().id;
+      useSessionStore.setState(state => ({
+        ...state,
+        id: sessionId,
+        status: 'active',
+        worldId,
+        characterId,
+      }));
 
-      // Initially, savedSessions should be empty
       expect(Object.keys(useSessionStore.getState().savedSessions)).toHaveLength(0);
 
-      // Act: Simulate narrative segment being added (this would happen when AI generates narrative)
-      // The narrativeStore would call this when segments are added
-      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId!, 1);
+      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, 1);
 
-      // Assert: Session should now exist in savedSessions for "Continue Last Game"
       expect(Object.keys(useSessionStore.getState().savedSessions)).toHaveLength(1);
-      const savedSession = useSessionStore.getState().savedSessions[sessionId!];
+      const savedSession = useSessionStore.getState().savedSessions[sessionId];
       expect(savedSession).toBeDefined();
       expect(savedSession.worldId).toBe(worldId);
       expect(savedSession.characterId).toBe(characterId);

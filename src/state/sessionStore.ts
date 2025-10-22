@@ -497,7 +497,7 @@ export const useSessionStore = create<SessionStore>()(
   },
   
   // Update narrative count for a saved session
-  // Also creates the saved session entry if it doesn't exist yet (fixes issue #687)
+  // Also creates the saved session entry if it doesn't exist yet
   // This ensures sessions are saved when narrative content is added during gameplay,
   // not only when explicitly ended
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => {
@@ -505,6 +505,14 @@ export const useSessionStore = create<SessionStore>()(
     set(state => {
       // If session doesn't exist in savedSessions yet, create it
       if (!state.savedSessions[sessionId] && state.id === sessionId) {
+        if (!state.worldId || !state.characterId) {
+          logger.warn(
+            'Skipping saved session creation for',
+            sessionId,
+            'because world or character context is missing'
+          );
+          return state;
+        }
         // This is the active session - save it for the first time
         logger.debug('Creating new saved session entry for active session:', sessionId);
         return {
