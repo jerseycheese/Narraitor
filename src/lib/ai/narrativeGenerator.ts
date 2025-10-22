@@ -27,11 +27,15 @@ import { playerDecisionTracker } from './playerDecisionTracker';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
+import { getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { NPC } from '@/types/npc.types';
+import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { PlayerDecision } from '@/types/personalization.types';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -221,12 +225,141 @@ export class NarrativeGenerator {
   }
 
   /**
+   * Builds CurrentNarrativeContext from narrative generation request context
+   */
+  private buildCurrentNarrativeContext(
+    worldId: EntityID,
+    sessionId: EntityID,
+    narrativeContext?: NarrativeContext
+  ): CurrentNarrativeContext {
+    // Extract location from narrative context
+    const location = narrativeContext?.currentLocation ||
+                     narrativeContext?.recentSegments?.[0]?.metadata?.location;
+
+    // Extract characters present from narrative context
+    const charactersPresent: string[] = [];
+    if (narrativeContext?.characterIds) {
+      charactersPresent.push(...narrativeContext.characterIds);
+    }
+    // Add characters from recent segments
+    if (narrativeContext?.recentSegments) {
+      narrativeContext.recentSegments.forEach(segment => {
+        if (segment.metadata.characterIds) {
+          segment.metadata.characterIds.forEach(charId => {
+            if (!charactersPresent.includes(charId)) {
+              charactersPresent.push(charId);
+            }
+          });
+        }
+      });
+    }
+
+    // Extract situation from narrative context
+    const situation = narrativeContext?.currentSituation;
+
+    // Extract recent events from recent segments
+    const recentEvents: string[] = [];
+    if (narrativeContext?.recentSegments) {
+      narrativeContext.recentSegments.forEach(segment => {
+        if (segment.content) {
+          // Use first 100 chars of each segment as event summary
+          const summary = segment.content.substring(0, 100).trim();
+          if (summary) {
+            recentEvents.push(summary);
+          }
+        }
+      });
+    }
+
+    // Extract active tags from narrative context
+    const activeTags = narrativeContext?.currentTags || [];
+
+    return {
+      location,
+      charactersPresent,
+      situation,
+      recentEvents,
+      activeTags,
+      worldId,
+      sessionId,
+      timestamp: getTimestamp()
+    };
+  }
+
+  /**
+   * Formats player decisions into compact AI-readable context string
+   * Uses token-aware selection to limit context size
+   */
+  private formatDecisionHistory(
+    decisions: PlayerDecision[],
+    maxTokens: number = 1000
+  ): string {
+    if (decisions.length === 0) {
+      return '';
+    }
+
+    const formattedDecisions: string[] = [];
+    let totalTokens = 0;
+
+    // Critical decision types that should be prioritized
+    const criticalTypes = new Set(['aggressive', 'chaotic', 'diplomatic']);
+
+    // First pass: Add critical decisions
+    for (const decision of decisions) {
+      if (criticalTypes.has(decision.choiceType)) {
+        const formatted = this.formatSingleDecision(decision);
+        const tokens = estimateTokenCount(formatted);
+
+        if (totalTokens + tokens <= maxTokens) {
+          formattedDecisions.push(formatted);
+          totalTokens += tokens;
+        }
+      }
+    }
+
+    // Second pass: Add remaining decisions in relevance order
+    for (const decision of decisions) {
+      if (!criticalTypes.has(decision.choiceType)) {
+        const formatted = this.formatSingleDecision(decision);
+        const tokens = estimateTokenCount(formatted);
+
+        if (totalTokens + tokens <= maxTokens) {
+          formattedDecisions.push(formatted);
+          totalTokens += tokens;
+        } else {
+          break; // Stop when we exceed token budget
+        }
+      }
+    }
+
+    if (formattedDecisions.length === 0) {
+      return '';
+    }
+
+    return `\n\nRECENT PLAYER DECISIONS:\n${formattedDecisions.join('\n')}`;
+  }
+
+  /**
+   * Formats a single decision into compact string format
+   */
+  private formatSingleDecision(decision: PlayerDecision): string {
+    const location = decision.context?.location || 'Unknown location';
+    const action = decision.choiceText;
+    const type = decision.choiceType;
+
+    return `- At ${location}, you ${action.toLowerCase()} (${type})`;
+  }
+
+  /**
    * Enhances a prompt with personalized character context
+   * Now uses relevance system to select most important decisions
    */
   private enhancePromptWithPersonalization(
     prompt: string,
     worldId: EntityID,
-    characterIds: string[]
+    characterIds: string[],
+    sessionId?: EntityID,
+    narrativeContext?: NarrativeContext
   ): string {
     try {
       const world = this.getWorld(worldId);
@@ -244,12 +377,28 @@ export class NarrativeGenerator {
       const playerCharacter =
         this.convertToPersonalizationCharacter(storeCharacter);
 
-      // Get player decisions for this world
-      const decisions = playerDecisionTracker.getWorldDecisions(worldId);
+      // Build current narrative context for relevance scoring
+      let relevantDecisions: PlayerDecision[] = [];
+      if (sessionId) {
+        const currentContext = this.buildCurrentNarrativeContext(
+          worldId,
+          sessionId,
+          narrativeContext
+        );
+
+        // Use relevance system to get most important decisions (max 15)
+        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+          currentContext,
+          15
+        );
+      } else {
+        // Fallback: get recent world decisions if no session ID
+        const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
+        relevantDecisions = allWorldDecisions.slice(0, 15);
+      }
 
       // Create personalized context
       // Get goals from AI context store
-      const sessionId = this.extractSessionId(decisions);
       const aiContext = sessionId
         ? useAiContextStore.getState().buildContextForSession(sessionId)
         : null;
@@ -262,7 +411,7 @@ export class NarrativeGenerator {
         this.personalizationEngine.createPersonalizedContext(
           playerCharacter,
           world,
-          decisions,
+          relevantDecisions,
           [], // relationships - future enhancement
           characterGoals, // converted goals for personalization engine
           [] // narrative history - future enhancement
@@ -274,11 +423,19 @@ export class NarrativeGenerator {
           personalizedContext
         );
 
+      // Format relevant decisions with token-aware selection
+      const decisionHistory = this.formatDecisionHistory(relevantDecisions, 1000);
+
+      // Combine enhancement text and decision history
+      let enhancedPrompt = prompt;
       if (safeTrim(enhancementText)) {
-        return `${prompt}\n\n${enhancementText}`;
+        enhancedPrompt = `${enhancedPrompt}\n\n${enhancementText}`;
+      }
+      if (decisionHistory) {
+        enhancedPrompt = `${enhancedPrompt}${decisionHistory}`;
       }
 
-      return prompt;
+      return enhancedPrompt;
     } catch {
       return prompt;
     }
@@ -404,7 +561,9 @@ The items will be automatically added to the character's inventory with proper c
       const personalizedPrompt = this.enhancePromptWithPersonalization(
         goalEnhancedPrompt,
         request.worldId,
-        request.characterIds || []
+        request.characterIds || [],
+        request.sessionId,
+        request.narrativeContext
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
@@ -515,7 +674,9 @@ The items will be automatically added to the character's inventory with proper c
       const personalizedPrompt = this.enhancePromptWithPersonalization(
         loreEnhancedPrompt,
         worldId,
-        characterIds
+        characterIds,
+        sessionId,
+        undefined // No narrative context for initial scene
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
