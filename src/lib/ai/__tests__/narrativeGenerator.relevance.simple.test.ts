@@ -265,7 +265,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     const capturedContexts: CurrentNarrativeContext[] = [];
     const getRelevantDecisionsSpy = jest
       .spyOn(playerDecisionTracker, 'getRelevantDecisions')
-      .mockImplementation((context, maxDecisions, filters) => {
+      .mockImplementation((context: CurrentNarrativeContext) => {
         capturedContexts.push(context);
         return [];
       });
