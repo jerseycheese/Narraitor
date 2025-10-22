@@ -497,6 +497,9 @@ export const useSessionStore = create<SessionStore>()(
   },
   
   // Update narrative count for a saved session
+  // Also creates the saved session entry if it doesn't exist yet (fixes issue #687)
+  // This ensures sessions are saved when narrative content is added during gameplay,
+  // not only when explicitly ended
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => {
     logger.debug('Updating narrative count for session:', sessionId, narrativeCount);
     set(state => {
