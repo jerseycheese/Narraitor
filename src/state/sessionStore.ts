@@ -497,16 +497,47 @@ export const useSessionStore = create<SessionStore>()(
   },
   
   // Update narrative count for a saved session
+  // Also creates the saved session entry if it doesn't exist yet
+  // This ensures sessions are saved when narrative content is added during gameplay,
+  // not only when explicitly ended
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => {
     logger.debug('Updating narrative count for session:', sessionId, narrativeCount);
     set(state => {
+      // If session doesn't exist in savedSessions yet, create it
+      if (!state.savedSessions[sessionId] && state.id === sessionId) {
+        if (!state.worldId || !state.characterId) {
+          logger.warn(
+            'Skipping saved session creation for',
+            sessionId,
+            'because world or character context is missing'
+          );
+          return state;
+        }
+        // This is the active session - save it for the first time
+        logger.debug('Creating new saved session entry for active session:', sessionId);
+        return {
+          savedSessions: {
+            ...state.savedSessions,
+            [sessionId]: {
+              id: sessionId,
+              worldId: state.worldId!,
+              characterId: state.characterId!,
+              lastPlayed: getTimestamp(),
+              narrativeCount
+            }
+          }
+        };
+      }
+
+      // Session already exists - just update the count and timestamp
       if (state.savedSessions[sessionId]) {
         return {
           savedSessions: {
             ...state.savedSessions,
             [sessionId]: {
               ...state.savedSessions[sessionId],
-              narrativeCount
+              narrativeCount,
+              lastPlayed: getTimestamp() // Update lastPlayed on each segment
             }
           }
         };
