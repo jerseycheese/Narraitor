@@ -301,10 +301,20 @@ export class PlayerDecisionTracker {
    */
   getRelevantDecisions(
     currentContext: CurrentNarrativeContext,
-    maxDecisions: number = 10
+    maxDecisions: number = 10,
+    filters?: {
+      worldId?: EntityID;
+      sessionId?: EntityID;
+    }
   ): PlayerDecision[] {
+    const candidates = this.getFilteredDecisionsForRelevance(filters);
+
+    if (candidates.length === 0) {
+      return [];
+    }
+
     return this.relevanceCalculator.getMostRelevantDecisions(
-      this.decisions,
+      candidates,
       currentContext,
       maxDecisions
     );
@@ -379,6 +389,42 @@ export class PlayerDecisionTracker {
     if (this.decisions.length > this.config.maxTotalDecisions) {
       this.decisions = this.decisions.slice(0, this.config.maxTotalDecisions);
     }
+  }
+
+  /**
+   * Filters decisions before scoring to avoid cross-session/world bleed
+   */
+  private getFilteredDecisionsForRelevance(filters?: {
+    worldId?: EntityID;
+    sessionId?: EntityID;
+  }): PlayerDecision[] {
+    if (!filters || (!filters.worldId && !filters.sessionId)) {
+      return [...this.decisions];
+    }
+
+    const allDecisions = [...this.decisions];
+    let candidates = allDecisions;
+
+    if (filters.sessionId) {
+      const sessionMatches = allDecisions.filter(
+        decision => decision.sessionId === filters.sessionId
+      );
+
+      // Prefer exact session matches when available, even if a world filter is provided
+      if (sessionMatches.length > 0) {
+        return sessionMatches;
+      }
+
+      candidates = allDecisions;
+    }
+
+    if (filters.worldId) {
+      candidates = candidates.filter(
+        decision => decision.worldId === filters.worldId
+      );
+    }
+
+    return candidates;
   }
 
   /**
