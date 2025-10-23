@@ -198,6 +198,88 @@ const contextPrompt = buildAIPrompt({
 
 This way the AI focuses on the decisions that actually matter instead of trying to remember every single thing the player ever did.
 
+## Formatting Decisions for AI Context
+
+Once you've got the most relevant decisions, you need to actually format them for the AI to read. The trick is doing this efficiently - you want to stay within token limits without losing important context. That's where `DecisionFormatter` comes in.
+
+### Staying Within Token Budgets
+
+The formatter keeps an eye on token usage while making sure the important stuff doesn't get cut:
+
+```typescript
+import { DecisionFormatter } from '@/lib/ai/decisionFormatter';
+
+const formatter = new DecisionFormatter();
+
+// Get decisions with scores
+const decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+  currentContext,
+  15  // Get top 15 decisions
+);
+
+// Format with 1000 token budget
+const decisions = decisionsWithScores.map(item => item.decision);
+const scores = decisionsWithScores.map(item => item.relevanceScore);
+const formattedContext = formatter.formatDecisions(decisions, scores, 1000);
+```
+
+### How Much Detail to Include
+
+The formatter adjusts how much detail it includes based on each decision's relevance score:
+
+**High Relevance (≥0.7)** - Full detail:
+```
+- At Dragon Lair (Tense negotiation) with Ancient Dragon, Wise Sage, you negotiate peacefully (diplomatic)
+```
+
+**Medium Relevance (0.4-0.69)** - Compact format:
+```
+- At Market, you help the merchant (helpful)
+```
+
+**Low Relevance (<0.4)** - Minimal format:
+```
+- go left (neutral)
+```
+
+So critical decisions get the detail they deserve, while less important ones stay brief to save tokens.
+
+### Some Decisions Always Matter
+
+Certain decision types get prioritized even if their relevance scores aren't super high:
+
+- `aggressive` - Combat and confrontation choices
+- `diplomatic` - Major social decisions
+- `chaotic` - Disruptive or unpredictable actions
+
+These get included first when the formatter's building the context, which means they won't get cut even if the token budget is tight.
+
+### How This Works in Practice
+
+The `NarrativeGenerator` handles all of this automatically when it's building AI prompts:
+
+```typescript
+// This happens internally in narrativeGenerator.ts
+const decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+  currentContext,
+  15,
+  { worldId, sessionId }
+);
+
+const decisions = decisionsWithScores.map(item => item.decision);
+const scores = decisionsWithScores.map(item => item.relevanceScore);
+const decisionHistory = this.decisionFormatter.formatDecisions(decisions, scores, 1000);
+```
+
+The formatted decisions show up in the AI prompt like this:
+
+```
+RECENT PLAYER DECISIONS:
+- At Dragon Lair (Tense negotiation) with Ancient Dragon, you negotiate peacefully (diplomatic)
+- At Market, you help the merchant (helpful)
+- go left (neutral)
+```
+
 ## Why This Actually Helps
 
 ### Better AI Responses
