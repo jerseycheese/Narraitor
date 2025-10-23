@@ -96,9 +96,8 @@ export class DecisionFormatter {
       if (totalTokens + tokens <= maxTokens) {
         formattedDecisions.push(formatted);
         totalTokens += tokens;
-      } else {
-        break; // Stop when budget exceeded
       }
+      // Continue checking remaining decisions - smaller ones might still fit
     }
 
     if (formattedDecisions.length === 0) {

@@ -294,6 +294,96 @@ describe('DecisionFormatter', () => {
 
       expect(result).toContain('RECENT PLAYER DECISIONS:');
     });
+
+    it('continues checking decisions after one exceeds budget', () => {
+      // Test case: First decision is huge, but smaller decisions should still fit
+      const decisions: PlayerDecision[] = [
+        {
+          id: 'dec-huge',
+          prompt: 'Huge decision',
+          choiceText: 'Make a very long and detailed choice with lots of explanation',
+          choiceType: 'diplomatic',
+          timestamp: '2024-01-01T12:00:00Z',
+          sessionId: 'sess-1',
+          worldId: 'world-1',
+          context: {
+            location: 'Very Long Location Name With Many Details',
+            situation: 'Extremely complex situation with multiple factors',
+            charactersPresent: ['Character One', 'Character Two', 'Character Three']
+          }
+        },
+        {
+          id: 'dec-small-1',
+          prompt: 'Small',
+          choiceText: 'Go left',
+          choiceType: 'neutral',
+          timestamp: '2024-01-01T11:00:00Z',
+          sessionId: 'sess-1',
+          worldId: 'world-1',
+          context: { location: 'Path' }
+        },
+        {
+          id: 'dec-small-2',
+          prompt: 'Small',
+          choiceText: 'Wait',
+          choiceType: 'neutral',
+          timestamp: '2024-01-01T10:00:00Z',
+          sessionId: 'sess-1',
+          worldId: 'world-1',
+          context: { location: 'Path' }
+        }
+      ];
+
+      const scores: DecisionRelevanceScore[] = [
+        {
+          decisionId: 'dec-huge',
+          overallScore: 0.9, // High score but too large
+          recencyScore: 0.9,
+          contextScore: 0.9,
+          impactScore: 0.9,
+          tagMatchScore: 0.9,
+          characterScore: 0.9,
+          calculatedAt: '2024-01-01T12:00:00Z'
+        },
+        {
+          decisionId: 'dec-small-1',
+          overallScore: 0.3,
+          recencyScore: 0.3,
+          contextScore: 0.3,
+          impactScore: 0.3,
+          tagMatchScore: 0.3,
+          characterScore: 0.3,
+          calculatedAt: '2024-01-01T12:00:00Z'
+        },
+        {
+          decisionId: 'dec-small-2',
+          overallScore: 0.2,
+          recencyScore: 0.2,
+          contextScore: 0.2,
+          impactScore: 0.2,
+          tagMatchScore: 0.2,
+          characterScore: 0.2,
+          calculatedAt: '2024-01-01T12:00:00Z'
+        }
+      ];
+
+      // Very tight budget - only 15 tokens
+      // The huge decision with full detail takes ~40+ tokens
+      // Each small minimal-format decision takes ~5 tokens
+      const result = formatter.formatDecisions(decisions, scores, 15);
+
+      // Should not be empty - small decisions should still be included
+      expect(result).not.toBe('');
+      expect(result).toContain('RECENT PLAYER DECISIONS:');
+
+      // Should include at least one small decision
+      const hasSmallDecision = result.toLowerCase().includes('left') ||
+                               result.toLowerCase().includes('wait');
+      expect(hasSmallDecision).toBe(true);
+
+      // Should not include the huge decision (too big for budget)
+      expect(result.toLowerCase()).not.toContain('very long location');
+    });
   });
 
   describe('adaptive formatting levels', () => {
