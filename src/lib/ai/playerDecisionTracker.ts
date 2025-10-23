@@ -327,7 +327,7 @@ export class PlayerDecisionTracker {
     currentContext: CurrentNarrativeContext
   ): Array<{ decision: PlayerDecision; relevanceScore: DecisionRelevanceScore }> {
     const scores = this.relevanceCalculator.scoreDecisions(this.decisions, currentContext);
-    
+
     const decisionsWithScores = this.decisions.map((decision, index) => ({
       decision,
       relevanceScore: scores[index]
@@ -335,8 +335,39 @@ export class PlayerDecisionTracker {
 
     // Sort by relevance score descending
     decisionsWithScores.sort((a, b) => b.relevanceScore.overallScore - a.relevanceScore.overallScore);
-    
+
     return decisionsWithScores;
+  }
+
+  /**
+   * Gets relevant decisions with their relevance scores for AI context formatting
+   */
+  getRelevantDecisionsWithScores(
+    currentContext: CurrentNarrativeContext,
+    maxDecisions: number = 10,
+    filters?: {
+      worldId?: EntityID;
+      sessionId?: EntityID;
+    }
+  ): Array<{ decision: PlayerDecision; relevanceScore: DecisionRelevanceScore }> {
+    const candidates = this.getFilteredDecisionsForRelevance(filters);
+
+    if (candidates.length === 0) {
+      return [];
+    }
+
+    const scores = this.relevanceCalculator.scoreDecisions(candidates, currentContext);
+
+    const decisionsWithScores = candidates.map((decision, index) => ({
+      decision,
+      relevanceScore: scores[index]
+    }));
+
+    // Sort by relevance score descending
+    decisionsWithScores.sort((a, b) => b.relevanceScore.overallScore - a.relevanceScore.overallScore);
+
+    // Return top N decisions
+    return decisionsWithScores.slice(0, Math.min(maxDecisions, decisionsWithScores.length));
   }
 
   /**

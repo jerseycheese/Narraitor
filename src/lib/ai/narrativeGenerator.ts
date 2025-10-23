@@ -24,6 +24,7 @@ import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
+import { DecisionFormatter } from './decisionFormatter';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
@@ -35,17 +36,18 @@ import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { NPC } from '@/types/npc.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
 import { PlayerDecision } from '@/types/personalization.types';
-import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
   private templateGenerator: TemplateGenerator;
   private personalizationEngine: PersonalizationEngine;
+  private decisionFormatter: DecisionFormatter;
 
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
     this.templateGenerator = new TemplateGenerator(geminiClient);
     this.personalizationEngine = new PersonalizationEngine();
+    this.decisionFormatter = new DecisionFormatter();
   }
 
   /**
@@ -292,96 +294,6 @@ export class NarrativeGenerator {
     };
   }
 
-  /**
-   * Formats player decisions into compact AI-readable context string
-   * Uses token-aware selection to limit context size
-   */
-  private formatDecisionHistory(
-    decisions: PlayerDecision[],
-    maxTokens: number = 1000
-  ): string {
-    if (decisions.length === 0) {
-      return '';
-    }
-
-    const formattedDecisions: string[] = [];
-    let totalTokens = 0;
-
-    // Critical decision types that should be prioritized
-    const criticalTypes = new Set(['aggressive', 'chaotic', 'diplomatic']);
-
-    // First pass: Add critical decisions
-    for (const decision of decisions) {
-      if (criticalTypes.has(decision.choiceType)) {
-        const formatted = this.formatSingleDecision(decision);
-        const tokens = estimateTokenCount(formatted);
-
-        if (totalTokens + tokens <= maxTokens) {
-          formattedDecisions.push(formatted);
-          totalTokens += tokens;
-        }
-      }
-    }
-
-    // Second pass: Add remaining decisions in relevance order
-    for (const decision of decisions) {
-      if (!criticalTypes.has(decision.choiceType)) {
-        const formatted = this.formatSingleDecision(decision);
-        const tokens = estimateTokenCount(formatted);
-
-        if (totalTokens + tokens <= maxTokens) {
-          formattedDecisions.push(formatted);
-          totalTokens += tokens;
-        } else {
-          break; // Stop when we exceed token budget
-        }
-      }
-    }
-
-    if (formattedDecisions.length === 0) {
-      return '';
-    }
-
-    return `\n\nRECENT PLAYER DECISIONS:\n${formattedDecisions.join('\n')}`;
-  }
-
-  /**
-   * Formats a single decision into compact string format
-   */
-  private formatSingleDecision(decision: PlayerDecision): string {
-    const location =
-      safeTrim(decision.context?.location) || 'Unknown location';
-    const action = this.formatDecisionAction(decision.choiceText);
-    const type = decision.choiceType;
-
-    return `- At ${location}, you ${action} (${type})`;
-  }
-
-  private formatDecisionAction(actionText: string): string {
-    const trimmed = (actionText ?? '').trim();
-
-    if (!trimmed) {
-      return 'make a choice';
-    }
-
-    const firstAlphaIndex = trimmed.search(/[A-Za-z]/);
-    if (firstAlphaIndex === -1) {
-      return trimmed;
-    }
-
-    const firstAlpha = trimmed[firstAlphaIndex];
-    const lowerFirstAlpha = firstAlpha.toLowerCase();
-
-    if (firstAlpha === lowerFirstAlpha) {
-      return trimmed;
-    }
-
-    return (
-      trimmed.slice(0, firstAlphaIndex) +
-      lowerFirstAlpha +
-      trimmed.slice(firstAlphaIndex + 1)
-    );
-  }
 
   /**
    * Enhances a prompt with personalized character context
@@ -412,6 +324,8 @@ export class NarrativeGenerator {
 
       // Build current narrative context for relevance scoring
       let relevantDecisions: PlayerDecision[] = [];
+      let decisionHistory = '';
+
       if (sessionId) {
         const currentContext = this.buildCurrentNarrativeContext(
           worldId,
@@ -419,24 +333,45 @@ export class NarrativeGenerator {
           narrativeContext
         );
 
-        // Use relevance system to get most important decisions (max 15)
-        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        // Use relevance system to get most important decisions with scores (max 15)
+        let decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
           currentContext,
           15,
           { worldId, sessionId }
         );
 
-        if (relevantDecisions.length === 0) {
-          relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        if (decisionsWithScores.length === 0) {
+          decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
             currentContext,
             15,
             { worldId }
           );
         }
+
+        // Extract decisions for personalization engine
+        relevantDecisions = decisionsWithScores.map(item => item.decision);
+
+        // Format decisions with adaptive detail based on relevance scores
+        const decisions = decisionsWithScores.map(item => item.decision);
+        const scores = decisionsWithScores.map(item => item.relevanceScore);
+        decisionHistory = this.decisionFormatter.formatDecisions(decisions, scores, 1000);
       } else {
         // Fallback: get recent world decisions if no session ID
         const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
         relevantDecisions = allWorldDecisions.slice(0, 15);
+
+        // Format without relevance scores (fallback to default scores)
+        const fallbackScores = relevantDecisions.map(decision => ({
+          decisionId: decision.id,
+          overallScore: 0.5,
+          recencyScore: 0.5,
+          contextScore: 0.5,
+          impactScore: 0.5,
+          tagMatchScore: 0.5,
+          characterScore: 0.5,
+          calculatedAt: getTimestamp()
+        }));
+        decisionHistory = this.decisionFormatter.formatDecisions(relevantDecisions, fallbackScores, 1000);
       }
 
       // Create personalized context
@@ -464,9 +399,6 @@ export class NarrativeGenerator {
         this.personalizationEngine.generateNarrativeEnhancement(
           personalizedContext
         );
-
-      // Format relevant decisions with token-aware selection
-      const decisionHistory = this.formatDecisionHistory(relevantDecisions, 1000);
 
       // Combine enhancement text and decision history
       let enhancedPrompt = prompt;
