@@ -264,7 +264,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
   it('builds relevance context using latest recent segment when location missing', async () => {
     const capturedContexts: CurrentNarrativeContext[] = [];
     const getRelevantDecisionsSpy = jest
-      .spyOn(playerDecisionTracker, 'getRelevantDecisions')
+      .spyOn(playerDecisionTracker, 'getRelevantDecisionsWithScores')
       .mockImplementation((context: CurrentNarrativeContext) => {
         capturedContexts.push(context);
         return [];

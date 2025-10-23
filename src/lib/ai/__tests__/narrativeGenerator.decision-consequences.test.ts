@@ -153,6 +153,23 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
     mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);
     mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(pastDecisions);
 
+    // Mock getRelevantDecisionsWithScores to return decisions with high relevance scores
+    mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue(
+      pastDecisions.map(decision => ({
+        decision,
+        relevanceScore: {
+          decisionId: decision.id,
+          overallScore: 0.8, // High relevance to ensure full detail formatting
+          recencyScore: 0.8,
+          contextScore: 0.8,
+          impactScore: 0.8,
+          tagMatchScore: 0.8,
+          characterScore: 0.8,
+          calculatedAt: getTimestamp()
+        }
+      }))
+    );
+
     // Mock template manager to return a simple template function
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       (context: { worldName: string; characterIds?: string[] }) => `Generated prompt for ${context.worldName} with ${context.characterIds?.length || 0} characters`
@@ -471,6 +488,7 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
             mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue([]);
             mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue([]);
+            mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue([]);
 
             
 
@@ -542,6 +560,21 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
 
             mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(manyDecisions);
             mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(manyDecisions);
+            mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue(
+              manyDecisions.map(decision => ({
+                decision,
+                relevanceScore: {
+                  decisionId: decision.id,
+                  overallScore: 0.5,
+                  recencyScore: 0.5,
+                  contextScore: 0.5,
+                  impactScore: 0.5,
+                  tagMatchScore: 0.5,
+                  characterScore: 0.5,
+                  calculatedAt: getTimestamp()
+                }
+              }))
+            );
 
       
 
