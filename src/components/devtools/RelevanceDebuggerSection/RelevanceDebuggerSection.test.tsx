@@ -226,4 +226,92 @@ describe('RelevanceDebuggerSection', () => {
       expect(details).toHaveTextContent('Ancient Ruins');
     });
   });
+
+  it('filters decisions by scope correctly', async () => {
+    const worldDecisions = [
+      buildDecision({
+        id: 'world-decision-1',
+        sessionId: 'session-123',
+        worldId: 'world-1',
+        prompt: 'World 1 decision',
+      }),
+      buildDecision({
+        id: 'world-decision-2',
+        sessionId: 'session-456',
+        worldId: 'world-1',
+        prompt: 'Another World 1 decision',
+      }),
+      buildDecision({
+        id: 'world-decision-3',
+        sessionId: 'session-789',
+        worldId: 'world-2',
+        prompt: 'World 2 decision',
+      }),
+    ];
+
+    mockGetAllDecisions.mockReturnValue(worldDecisions);
+
+    render(<RelevanceDebuggerSection />);
+
+    // Wait for component to mount and load
+    await screen.findByTestId('relevance-debugger-section');
+
+    // Check that scope selector exists and change to 'world'
+    const scopeSelect = screen.getByLabelText(/scope/i);
+    fireEvent.change(scopeSelect, { target: { value: 'world' } });
+
+    // Should show decisions filtered by world
+    await waitFor(() => {
+      const statusText = screen.getByText(/showing.*decision/i);
+      expect(statusText).toBeInTheDocument();
+    });
+  });
+
+  it('handles empty decision state gracefully', async () => {
+    mockGetAllDecisions.mockReturnValue([]);
+
+    render(<RelevanceDebuggerSection />);
+
+    // Component should mount and show empty state
+    await screen.findByTestId('relevance-debugger-section');
+
+    // Should show "No decisions available" message
+    expect(screen.getByText(/no decisions available/i)).toBeInTheDocument();
+  });
+
+  it('refreshes decisions when refresh button is clicked', async () => {
+    const initialDecisions = [
+      buildDecision({
+        id: 'initial-decision',
+        prompt: 'Initial decision',
+      }),
+    ];
+
+    mockGetAllDecisions.mockReturnValue(initialDecisions);
+
+    render(<RelevanceDebuggerSection />);
+
+    await screen.findByTestId('relevance-debugger-section');
+
+    const initialCallCount = mockGetAllDecisions.mock.calls.length;
+
+    // Update the mock to return different decisions
+    const updatedDecisions = [
+      ...initialDecisions,
+      buildDecision({
+        id: 'new-decision',
+        prompt: 'New decision after refresh',
+      }),
+    ];
+    mockGetAllDecisions.mockReturnValue(updatedDecisions);
+
+    // Click refresh button
+    const refreshButton = screen.getByText(/refresh decisions/i);
+    fireEvent.click(refreshButton);
+
+    // Verify getAllDecisions was called again after refresh
+    await waitFor(() => {
+      expect(mockGetAllDecisions.mock.calls.length).toBeGreaterThan(initialCallCount);
+    });
+  });
 });

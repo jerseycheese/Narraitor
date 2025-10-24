@@ -210,12 +210,12 @@ import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 - Inspect structured lore context output
 
 ### Decision Relevance Debugger
-When the AI keeps surfacing a decision that feels out of place, the relevance debugger shows exactly what the scoring engine saw. It mirrors the production logic and puts the data in one pane so you can sanity-check why a decision ranked ahead of the rest.
+When the AI keeps surfacing a decision that feels out of place, the relevance debugger shows exactly what the scoring engine saw. Here's what you get:
 
-- **Factor table**: Overall, recency, context, impact, tag, and character scores side-by-side for the top decisions, sorted descending.
-- **Scoped filters**: Flip between active session, world, or all decisions without reloading the page.
+- **Factor table**: Overall, recency, context, impact, tag, and character scores side-by-side for the top decisions, sorted descending. Makes it easy to spot why one decision is ranking higher than another.
+- **Scoped filters**: Flip between active session, world, or all decisions without reloading the page. Super handy when you're testing specific scenarios.
 - **Context snapshot**: Displays the current narrative context alongside the raw decision metadata so you can confirm the inputs feeding the calculator.
-- **Detail panel**: Selecting a row reveals matched tags, impact category, and the structured context payload that informs relevance.
+- **Detail panel**: Click any row to reveal matched tags, impact category, and the structured context payload that informs relevance scoring.
 - **Quick refresh loop**: Pull the latest decisions straight from `PlayerDecisionTracker` while you rerun scenarios or scripted flows.
 
 ## DevToolsSection Component

@@ -102,7 +102,7 @@ This is really helpful when you're trying to figure out why a particular decisio
 
 ### Interactive Debugging UI
 
-Open the DevTools panel and expand **Decision Relevance Debugger** whenever you need a gut check on the scoring engine. It shows the exact data the AI is using, which means you can stop guessing about why one decision keeps bubbling to the top.
+When you need to sanity-check why a particular decision is ranking high, pop open the DevTools panel and expand the **Decision Relevance Debugger** section. It shows you exactly what the scoring engine saw, which means you can stop guessing about why that one decision from three sessions ago keeps showing up.
 
 - **Scoped filters** let you slice by session or world so the context snapshot actually reflects what the player just did.
 - **Factor-by-factor tables** highlight the individual scores, making it easier to spot when tag matching or character overlap is doing the heavy lifting.
