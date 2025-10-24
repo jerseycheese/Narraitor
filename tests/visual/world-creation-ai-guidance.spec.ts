@@ -8,9 +8,11 @@ test.describe('World Creation Wizard AI Guidance', () => {
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {
+    // Explicitly select 'fantasy' to ensure the state is updated
+    await page.getByLabel('Genre').selectOption('fantasy');
     // Verify initial guidance for 'fantasy' (default genre)
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
-    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Explain who lives here, what is changing, and why it matters to the people in this world.' })).toBeVisible();
+    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Mention how magic works, who wields it, and the legendary stakes your heroes face.' })).toBeVisible();
 
     // Change genre to 'sci-fi' and verify guidance updates
     await page.getByLabel('Genre').selectOption('sci-fi');
