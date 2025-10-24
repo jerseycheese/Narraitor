@@ -22,6 +22,7 @@ import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
 import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
+import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { createAIClient } from '@/lib/ai';
 import { getTimestamp } from '@/lib/utils';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
@@ -65,6 +66,11 @@ interface WorldCreationData extends Partial<World> {
   createOwnWorld?: boolean;
   worldType?: 'original' | 'inspired_by' | 'set_within';
   createdWorldId?: string;
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
+  };
 }
 
 export interface WorldCreationWizardProps {
@@ -73,6 +79,17 @@ export interface WorldCreationWizardProps {
   initialStep?: number;
   initialData?: Partial<WorldCreationData>;
 }
+
+type SuggestionMeta = NonNullable<WorldCreationData['aiSuggestionMeta']>;
+
+const buildSuggestionMeta = (
+  description: string | undefined,
+  source: AIGuidanceSource
+): SuggestionMeta => ({
+  source,
+  generatedAt: new Date().toISOString(),
+  descriptionSnapshot: (description || '').trim(),
+});
 
 export default function WorldCreationWizard({ 
   onComplete, 
@@ -190,17 +207,20 @@ export default function WorldCreationWizard({
   }, [wizard.state.validation, wizard.state.currentStep]);
 
   const generateAISuggestions = useCallback(async () => {
-    if (!wizard.state.data.description) {
+    const description = wizard.state.data.description;
+    if (!description || description.trim().length < 50) {
       console.log('No description provided for AI analysis');
+      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the AI understands your world.');
       return;
     }
     
-    console.log('Starting AI suggestion generation for description:', truncate(wizard.state.data.description, 100));
-    
+    console.log('Starting AI suggestion generation for description:', truncate(description, 100));
+    wizard.setProcessing(true);
+    wizard.clearError('ai');
+
     try {
-      wizard.setProcessing(true);
       console.log('Calling analyzeWorldDescriptionClient...');
-      const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
+      const suggestions = await analyzeWorldDescriptionClient(description);
       console.log('AI suggestions received:', {
         attributeCount: suggestions.attributes.length,
         skillCount: suggestions.skills.length,
@@ -209,9 +229,9 @@ export default function WorldCreationWizard({
       
       wizard.updateData({ 
         aiSuggestions: suggestions,
-        aiSuggestionsGenerated: true
+        aiSuggestionsGenerated: true,
+        aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
       });
-      wizard.setProcessing(false);
       console.log('AI suggestions successfully applied to wizard state');
     } catch (error) {
       console.error('Error generating AI suggestions:', error);
@@ -221,10 +241,17 @@ export default function WorldCreationWizard({
       const defaultSuggestions = getDefaultSuggestions();
       wizard.updateData({ 
         aiSuggestions: defaultSuggestions,
-        aiSuggestionsGenerated: false // Mark as failed so it can be retried
+        aiSuggestionsGenerated: true,
+        aiSuggestionMeta: buildSuggestionMeta(description, 'fallback'),
       });
-      wizard.setProcessing(false);
+      wizard.setError(
+        'ai',
+        'We had trouble reaching the AI service, so we loaded starter suggestions. You can generate again once the service recovers.'
+      );
+
       console.log('Default suggestions applied as fallback');
+    } finally {
+      wizard.setProcessing(false);
     }
   }, [wizard]);
 
@@ -437,6 +464,10 @@ export default function WorldCreationWizard({
           <DescriptionStep
             {...stepProps}
             isProcessing={wizard.state.isProcessing || false}
+            aiSuggestions={wizard.state.data.aiSuggestions}
+            suggestionMeta={wizard.state.data.aiSuggestionMeta}
+            canGenerateSuggestions
+            onGenerateSuggestions={generateAISuggestions}
           />
         );
       case 3:

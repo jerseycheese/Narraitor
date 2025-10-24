@@ -1,6 +1,7 @@
 // WizardState.ts
 import { World, WorldSkill } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 export interface WizardState {
   currentStep: number;
@@ -8,6 +9,11 @@ export interface WizardState {
   aiSuggestions?: {
     attributes: AttributeSuggestion[];
     skills: SkillSuggestion[];
+  };
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
   };
   customSkills?: WorldSkill[]; // New: Track user-created skills separately
   errors: Record<string, string>;
