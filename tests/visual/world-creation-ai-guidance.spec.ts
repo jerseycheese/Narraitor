@@ -29,7 +29,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
 
     // Explicitly select 'fantasy' to ensure the state is updated and trigger genre-specific guidance
     // Interact with the custom combobox
-    await genreCombobox.click(); // Open the combobox
+    await genreCombobox.click({ force: true }); // Open the combobox, forcing the click
     await page.getByRole('option', { name: 'Fantasy' }).click(); // Select 'Fantasy'
     // Verify guidance for 'fantasy'
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
