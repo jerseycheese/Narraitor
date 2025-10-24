@@ -12,6 +12,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Aurora Frontier, The Obsidian Accord, Echoes of Verdant' })).toBeVisible();
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Highlight the main conflict, the tone you want players to feel, and the types of challenges that should show up.' })).toBeVisible();
 
+    // Wait for the page to be fully loaded and stable
+    await page.waitForLoadState('networkidle');
+
     // Debugging: Check visibility and count of the parent div
     const parentDiv = page.locator('div.relative').filter({ hasText: 'Genre' });
     console.log('Parent div for Genre combobox visible:', await parentDiv.isVisible());
