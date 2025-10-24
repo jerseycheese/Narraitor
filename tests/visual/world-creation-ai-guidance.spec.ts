@@ -4,7 +4,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/worlds/create');
     // Navigate to the Basic Info step
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Create My Own World' }).click();
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {
