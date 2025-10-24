@@ -23,10 +23,6 @@ test.describe('World Creation Wizard AI Guidance', () => {
     // Debugging: Check visibility and count of the combobox itself
     const genreCombobox = parentDiv.getByRole('combobox');
 
-    // Wait for the combobox to be visible and enabled
-    await genreCombobox.waitFor({ state: 'visible' });
-    await genreCombobox.waitFor({ state: 'enabled' });
-
     console.log('Genre combobox visible:', await genreCombobox.isVisible());
     console.log('Genre combobox enabled:', await genreCombobox.isEnabled());
     console.log('Genre combobox count:', await genreCombobox.count());
