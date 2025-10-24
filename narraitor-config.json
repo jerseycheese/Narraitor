@@ -90,7 +90,7 @@
   "workflow": {
     "framework": {
       "name": "Development Framework",
-      "template_path": "/Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue-auto.template.md",
+      "template_path": "~/.claude/commands/do-issue-auto.template.md",
       "workflow_structure_file": ".claude/workflow-structure.json",
       "enforce_structure": true
     },
