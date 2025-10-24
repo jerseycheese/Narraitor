@@ -12,9 +12,20 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Aurora Frontier, The Obsidian Accord, Echoes of Verdant' })).toBeVisible();
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Highlight the main conflict, the tone you want players to feel, and the types of challenges that should show up.' })).toBeVisible();
 
+    // Debugging: Check visibility and count of the parent div
+    const parentDiv = page.locator('div.relative').filter({ hasText: 'Genre' });
+    console.log('Parent div for Genre combobox visible:', await parentDiv.isVisible());
+    console.log('Parent div for Genre combobox count:', await parentDiv.count());
+
+    // Debugging: Check visibility and count of the combobox itself
+    const genreCombobox = parentDiv.getByRole('combobox');
+    console.log('Genre combobox visible:', await genreCombobox.isVisible());
+    console.log('Genre combobox enabled:', await genreCombobox.isEnabled());
+    console.log('Genre combobox count:', await genreCombobox.count());
+
     // Explicitly select 'fantasy' to ensure the state is updated and trigger genre-specific guidance
     // Interact with the custom combobox
-    await page.locator('div.relative').filter({ hasText: 'Genre' }).getByRole('combobox').click(); // Open the combobox
+    await genreCombobox.click(); // Open the combobox
     await page.getByRole('option', { name: 'Fantasy' }).click(); // Select 'Fantasy'
     // Verify guidance for 'fantasy'
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
