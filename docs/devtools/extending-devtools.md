@@ -210,15 +210,6 @@ import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 - Inspect structured lore context output
 
 ### Decision Relevance Debugger
-<<<<<<< HEAD
-When the AI keeps surfacing a decision that feels out of place, the new relevance debugger makes it obvious why that call was made. It leans on the same scoring engine the runtime uses, but lays the numbers out so you can sanity-check the factors before tweaking anything in code.
-
-- **At-a-glance breakdowns**: Overall score alongside recency, context, impact, tag, and character factors so you can spot outliers quickly.
-- **Live tuning knobs**: Adjust weight distribution, decay rate, and minimum threshold in real time to see how the ranking shifts.
-- **Context snapshots**: Puts the current narrative context next to the decision metadata so you can confirm the inputs feeding the calculator.
-- **Contribution tracing**: Shows the weighted contribution for each factor, which helps when one dimension is dominating unexpectedly.
-- **Quick refresh loop**: Pull the latest decisions without a full reload when you’re validating a new playthrough or scripted scenario.
-=======
 When the AI keeps surfacing a decision that feels out of place, the relevance debugger shows exactly what the scoring engine saw. It mirrors the production logic and puts the data in one pane so you can sanity-check why a decision ranked ahead of the rest.
 
 - **Factor table**: Overall, recency, context, impact, tag, and character scores side-by-side for the top decisions, sorted descending.
@@ -226,7 +217,6 @@ When the AI keeps surfacing a decision that feels out of place, the relevance de
 - **Context snapshot**: Displays the current narrative context alongside the raw decision metadata so you can confirm the inputs feeding the calculator.
 - **Detail panel**: Selecting a row reveals matched tags, impact category, and the structured context payload that informs relevance.
 - **Quick refresh loop**: Pull the latest decisions straight from `PlayerDecisionTracker` while you rerun scenarios or scripted flows.
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
 
 ## DevToolsSection Component
 

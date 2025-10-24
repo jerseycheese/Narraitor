@@ -1,9 +1,5 @@
 import React from 'react';
-<<<<<<< HEAD
-import { render, screen, within, waitFor, fireEvent, act } from '@testing-library/react';
-=======
 import { render, screen, within, fireEvent, act, waitFor } from '@testing-library/react';
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
 import { RelevanceDebuggerSection } from './RelevanceDebuggerSection';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -38,13 +34,8 @@ const buildSegment = (overrides: Partial<NarrativeSegment>): NarrativeSegment =>
     characterIds: ['npc-guide'],
   },
   timestamp: overrides.timestamp ?? new Date('2025-10-20T10:00:00.000Z'),
-<<<<<<< HEAD
-  createdAt: overrides.createdAt ?? new Date('2025-10-20T10:00:00.000Z'),
-  updatedAt: overrides.updatedAt ?? new Date('2025-10-20T10:00:00.000Z'),
-=======
   createdAt: overrides.createdAt ?? '2025-10-20T10:00:00.000Z',
   updatedAt: overrides.updatedAt ?? '2025-10-20T10:00:00.000Z',
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
 });
 
 const buildDecision = (overrides: Partial<PlayerDecision>): PlayerDecision => ({
@@ -165,38 +156,15 @@ describe('RelevanceDebuggerSection', () => {
     expect(rows.length).toBeGreaterThan(1);
 
     const totalSummary = screen.getByTestId('relevance-summary-total');
-<<<<<<< HEAD
-    expect(totalSummary).toHaveTextContent('Total Decisions');
-    expect(totalSummary).toHaveTextContent('2');
-    expect(screen.getByTestId('relevance-summary-relevant')).toHaveTextContent('Above Threshold');
-    expect(screen.getByTestId('relevance-summary-average')).toHaveTextContent('Average Score');
-=======
     expect(totalSummary).toHaveTextContent('Total decisions');
     expect(totalSummary).toHaveTextContent('2');
     expect(screen.getByTestId('relevance-summary-relevant')).toHaveTextContent('Above threshold');
     expect(screen.getByTestId('relevance-summary-average')).toHaveTextContent('Average score');
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
 
     expect(within(rows[1]).getByText(/Investigate the glowing glyphs/i)).toBeInTheDocument();
     expect(within(rows[2]).getByText(/Do you approach the guardian spirit/i)).toBeInTheDocument();
   });
 
-<<<<<<< HEAD
-  it('reorders decisions when weights are adjusted to prioritize recency', async () => {
-    const matchingSegment = buildSegment({
-      id: 'segment-match',
-      metadata: {
-        tags: ['ancient', 'ritual'],
-        location: 'Ancient Ruins',
-        characterIds: ['npc-guide'],
-      },
-      content: 'The guardian spirit watches closely as you enter.',
-    });
-
-    const decisions = [
-      buildDecision({
-        id: 'recent-decision',
-=======
   it('shows decision details when a row is selected', async () => {
     const segments = [
       buildSegment({
@@ -212,25 +180,13 @@ describe('RelevanceDebuggerSection', () => {
     const decisions = [
       buildDecision({
         id: 'decision-a',
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
         prompt: 'Do you aid the villager immediately?',
         choiceText: 'Rush to help',
         choiceType: 'helpful',
         timestamp: '2025-10-23T11:30:00.000Z',
-<<<<<<< HEAD
-        context: {
-          location: 'Crystal Keep',
-          situation: 'A villager is trapped under rubble.',
-          charactersPresent: ['npc-villager'],
-        },
-      }),
-      buildDecision({
-        id: 'context-decision',
-=======
       }),
       buildDecision({
         id: 'decision-b',
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
         prompt: 'How do you address the guardian spirit?',
         choiceText: 'Speak with reverence',
         choiceType: 'diplomatic',
@@ -250,43 +206,17 @@ describe('RelevanceDebuggerSection', () => {
         ...state,
         segments: {
           ...state.segments,
-<<<<<<< HEAD
-          'segment-match': matchingSegment,
-        },
-        sessionSegments: {
-          ...state.sessionSegments,
-          'session-123': ['segment-match'],
-=======
           'segment-1': segments[0],
         },
         sessionSegments: {
           ...state.sessionSegments,
           'session-123': ['segment-1'],
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
         },
       }));
     });
 
     render(<RelevanceDebuggerSection />);
 
-<<<<<<< HEAD
-    const table = await screen.findByTestId('relevance-scores-table');
-
-    await waitFor(() => {
-      const rows = within(table).getAllByRole('row');
-      expect(within(rows[1]).getByText(/guardian spirit/i)).toBeInTheDocument();
-    });
-
-    fireEvent.change(screen.getByTestId('weight-input-recency'), { target: { value: '1' } });
-    fireEvent.change(screen.getByTestId('weight-input-context'), { target: { value: '0' } });
-    fireEvent.change(screen.getByTestId('weight-input-impact'), { target: { value: '0' } });
-    fireEvent.change(screen.getByTestId('weight-input-tagMatch'), { target: { value: '0' } });
-    fireEvent.change(screen.getByTestId('weight-input-character'), { target: { value: '0' } });
-
-    await waitFor(() => {
-      const rows = within(table).getAllByRole('row');
-      expect(within(rows[1]).getByText(/aid the villager/i)).toBeInTheDocument();
-=======
     const targetRow = await screen.findByTestId('relevance-row-decision-b');
     fireEvent.click(targetRow);
 
@@ -294,7 +224,6 @@ describe('RelevanceDebuggerSection', () => {
       const details = screen.getByTestId('relevance-details');
       expect(details).toHaveTextContent('Speak with reverence');
       expect(details).toHaveTextContent('Ancient Ruins');
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
     });
   });
 });

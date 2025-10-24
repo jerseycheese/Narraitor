@@ -34,13 +34,8 @@ const SAMPLE_SEGMENTS: NarrativeSegment[] = [
       characterIds: ['npc-guide'],
     },
     timestamp: new Date('2025-10-20T10:00:00.000Z'),
-<<<<<<< HEAD
-    createdAt: new Date('2025-10-20T10:00:00.000Z'),
-    updatedAt: new Date('2025-10-20T10:00:00.000Z'),
-=======
     createdAt: '2025-10-20T10:00:00.000Z',
     updatedAt: '2025-10-20T10:00:00.000Z',
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
   },
   {
     id: 'segment-2',
@@ -56,13 +51,8 @@ const SAMPLE_SEGMENTS: NarrativeSegment[] = [
       characterIds: ['npc-guide', 'guardian-spirit'],
     },
     timestamp: new Date('2025-10-21T14:00:00.000Z'),
-<<<<<<< HEAD
-    createdAt: new Date('2025-10-21T14:00:00.000Z'),
-    updatedAt: new Date('2025-10-21T14:00:00.000Z'),
-=======
     createdAt: '2025-10-21T14:00:00.000Z',
     updatedAt: '2025-10-21T14:00:00.000Z',
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
   },
 ];
 

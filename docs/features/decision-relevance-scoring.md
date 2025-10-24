@@ -102,18 +102,10 @@ This is really helpful when you're trying to figure out why a particular decisio
 
 ### Interactive Debugging UI
 
-<<<<<<< HEAD
-Open the DevTools panel and expand **Decision Relevance Debugger** whenever you need a gut check on the scoring engine. It shows you the exact data the AI is using, which means you can stop guessing about why one decision keeps bubbling to the top.
-
-- **Scoped filters** let you slice by session or world so the context snapshot actually reflects what the player just did.
-- **Factor-by-factor tables** highlight the individual scores, making it easier to spot when tag matching or character overlap is doing the heavy lifting.
-- **Live tuning controls** for weights, decay, and thresholds give immediate feedback before you touch config files.
-=======
 Open the DevTools panel and expand **Decision Relevance Debugger** whenever you need a gut check on the scoring engine. It shows the exact data the AI is using, which means you can stop guessing about why one decision keeps bubbling to the top.
 
 - **Scoped filters** let you slice by session or world so the context snapshot actually reflects what the player just did.
 - **Factor-by-factor tables** highlight the individual scores, making it easier to spot when tag matching or character overlap is doing the heavy lifting.
->>>>>>> 0b8c8c83 (Expose decision relevance debugger in DevTools)
 - **Detailed drilldowns** expose matched tags, impact categories, and raw decision metadata without hopping back to the tracker.
 - **Inline refresh** keeps the loop tight while you replay a sequence or run through scripted scenarios.
 
