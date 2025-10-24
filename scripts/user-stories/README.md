@@ -82,7 +82,6 @@ node update-user-stories.js --issue=123
 ```
 
 For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](/docs/requirements/github-sync-guide.md).
-========
 
 ## Processing Issues
 

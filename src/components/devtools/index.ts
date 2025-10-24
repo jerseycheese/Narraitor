@@ -7,3 +7,4 @@ export * from './ConsistencyValidationSection';
 export * from './TextNormalizationSection';
 export * from './ErrorSection';
 export * from './ErrorBoundary';
+export * from './RelevanceDebuggerSection';

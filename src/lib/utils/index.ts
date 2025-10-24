@@ -15,7 +15,7 @@ export { cn } from './classNames';
 
 // === FORMATTING UTILITIES ===
 
-/** 
+/**
  * Comprehensive formatting utilities for dates, strings, and numbers
  * @see README.md for detailed usage examples
  */
@@ -24,6 +24,8 @@ export {
   formatDate,
   formatTime,
   formatDateTime,
+  formatNumericScore,
+  formatStringList,
   truncate,
   capitalize,
   titleCase,

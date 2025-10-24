@@ -100,6 +100,15 @@ decisionsWithScores.forEach(({ decision, relevanceScore }) => {
 
 This is really helpful when you're trying to figure out why a particular decision is ranking higher or lower than you'd expect.
 
+### Interactive Debugging UI
+
+When you need to sanity-check why a particular decision is ranking high, pop open the DevTools panel and expand the **Decision Relevance Debugger** section. It shows you exactly what the scoring engine saw, which means you can stop guessing about why that one decision from three sessions ago keeps showing up.
+
+- **Scoped filters** let you slice by session or world so the context snapshot actually reflects what the player just did.
+- **Factor-by-factor tables** highlight the individual scores, making it easier to spot when tag matching or character overlap is doing the heavy lifting.
+- **Detailed drilldowns** expose matched tags, impact categories, and raw decision metadata without hopping back to the tracker.
+- **Inline refresh** keeps the loop tight while you replay a sequence or run through scripted scenarios.
+
 ## The Type Definitions
 
 If you're working with this stuff directly, here's what the score objects look like:

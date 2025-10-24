@@ -17,6 +17,7 @@ import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
+import { RelevanceDebuggerSection } from '../RelevanceDebuggerSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -187,11 +188,11 @@ export const DevToolsPanel = () => {
                     AI Tools & Validation
                   </h3>
                   <div className="space-y-3">
-                    {isSectionVisible(SectionId.AI_TESTING) && (
-                      <CollapsibleSection title="AI Testing" initialCollapsed={true}>
-                        <AITestingPanel />
-                      </CollapsibleSection>
-                    )}
+                {isSectionVisible(SectionId.AI_TESTING) && (
+                  <CollapsibleSection title="AI Testing" initialCollapsed={true}>
+                    <AITestingPanel />
+                  </CollapsibleSection>
+                )}
 
                     {isSectionVisible(SectionId.AI_MOCKING) && (
                       <CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
@@ -212,13 +213,19 @@ export const DevToolsPanel = () => {
                     )}
                     
                     {isSectionVisible(SectionId.LORE_MANAGEMENT) && (
-                      <CollapsibleSection title="Lore Management" initialCollapsed={true}>
-                        <LoreManagementSection />
-                      </CollapsibleSection>
-                    )}
-                  </div>
+                    <CollapsibleSection title="Lore Management" initialCollapsed={true}>
+                      <LoreManagementSection />
+                    </CollapsibleSection>
+                  )}
+
+                  {isSectionVisible(SectionId.RELEVANCE_DEBUGGER) && (
+                    <CollapsibleSection title="Decision Relevance Debugger" initialCollapsed={true}>
+                      <RelevanceDebuggerSection />
+                    </CollapsibleSection>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
 
               {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
                 <div className="bg-white p-4 rounded-lg border border-gray-300 shadow-sm">
