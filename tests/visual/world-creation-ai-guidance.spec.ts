@@ -13,7 +13,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Highlight the main conflict, the tone you want players to feel, and the types of challenges that should show up.' })).toBeVisible();
 
     // Explicitly select 'fantasy' to ensure the state is updated and trigger genre-specific guidance
-    await page.getByLabel('Genre').selectOption('fantasy');
+    // Interact with the custom combobox
+    await page.getByLabel('Genre').click(); // Open the combobox
+    await page.getByRole('option', { name: 'Fantasy' }).click(); // Select 'Fantasy'
     // Verify guidance for 'fantasy'
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Mention how magic works, who wields it, and the legendary stakes your heroes face.' })).toBeVisible();
