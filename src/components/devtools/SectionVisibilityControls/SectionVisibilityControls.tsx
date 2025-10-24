@@ -16,6 +16,7 @@ const SECTION_INFO = {
   [DevToolsSection.PORTRAIT_DEBUG]: 'Portrait Debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'Consistency Validation',
+  [DevToolsSection.RELEVANCE_DEBUGGER]: 'Relevance Debugger',
   [DevToolsSection.TEXT_NORMALIZATION]: 'Text Normalization',
   [DevToolsSection.LORE_MANAGEMENT]: 'Lore Management',
 } as const;
@@ -30,6 +31,7 @@ const SECTION_TEST_IDS = {
   [DevToolsSection.PORTRAIT_DEBUG]: 'toggle-portrait-debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',
+  [DevToolsSection.RELEVANCE_DEBUGGER]: 'toggle-relevance-debugger',
   [DevToolsSection.TEXT_NORMALIZATION]: 'toggle-text-normalization',
   [DevToolsSection.LORE_MANAGEMENT]: 'toggle-lore-management',
 } as const;
