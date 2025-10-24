@@ -93,7 +93,7 @@ const WORLD_GUIDANCE_MAP: Record<GenreValue | 'default', WorldGuidance> = {
   },
   western: {
     label: GENRE_LABELS['western'],
-    tagline: 'Highlight the frontier, contested resources, and moral lines the posse won't cross.',
+    tagline: 'Highlight the frontier, contested resources, and moral lines the posse won\'t cross.',
     nameExamples: ['Dustwake Territory', "Crow's Claim", 'Frontier Meridian'],
     descriptionPrompt: 'Describe the town, the controlling forces, and the showdown that keeps everyone on edge.',
     descriptionExample:
