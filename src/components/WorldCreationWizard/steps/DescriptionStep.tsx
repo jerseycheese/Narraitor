@@ -8,6 +8,7 @@ import {
   WizardFormSection,
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getWorldGuidance, type AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { type GenreValue } from '@/lib/constants/genres';
 import type { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
@@ -77,7 +78,7 @@ export default function DescriptionStep({
   const renderSuggestionPreview = () => {
     if (!hasAISuggestions) {
       return (
-        <div className="rounded-lg border border-dashed border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" data-testid="ai-suggestion-empty">
+        <div className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-foreground" data-testid="ai-suggestion-empty">
           {canGenerateSuggestions ? (
             meetsAIMinimumLength
               ? 'Generate suggestions to see examples tailored to your description.'
@@ -159,7 +160,7 @@ export default function DescriptionStep({
 
       <WizardFormSection
         title="Attribute & Skill Suggestions"
-        description="These define what your characters can do in stories. Attributes (like Strength or Intelligence) represent core traits, while skills (like Combat or Stealth) determine specific abilities. The AI suggests options that match your world's themes."
+        description="AI-generated suggestions for attributes and skills based on your world description."
       >
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
@@ -187,15 +188,17 @@ export default function DescriptionStep({
           </div>
 
           {errors.ai && (
-            <div className="rounded-md border border-amber-300 bg-amber-100 p-3 text-sm text-amber-800" data-testid="ai-warning">
-              {errors.ai}
-            </div>
+            <Alert variant="warning" data-testid="ai-warning" aria-live="polite">
+              <AlertDescription>{errors.ai}</AlertDescription>
+            </Alert>
           )}
 
           {descriptionOutdated && (
-            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800" data-testid="ai-description-outdated">
-              Your description has changed since the last AI run. Regenerate suggestions to keep them aligned.
-            </div>
+            <Alert variant="warning" data-testid="ai-description-outdated" aria-live="polite">
+              <AlertDescription>
+                Your description has changed since the last AI run. Regenerate suggestions to keep them aligned.
+              </AlertDescription>
+            </Alert>
           )}
 
           {renderSuggestionPreview()}
@@ -205,7 +208,7 @@ export default function DescriptionStep({
       {isProcessing && (
         <div className="fixed inset-0 z-10 flex items-center justify-center bg-black/50" data-testid="processing-overlay">
           <div className="rounded bg-white p-8 text-center shadow">
-            <div className="mx-auto mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent" role="status">
+            <div className="mx-auto mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" role="status">
               <span className="sr-only">Loading...</span>
             </div>
             <p aria-live="polite">Analyzing your world description...</p>

@@ -413,7 +413,7 @@ export default function SkillReviewStep({
                   {suggestion.difficulty}
                 </span>
                 {suggestion.isModified && (
-                  <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                  <span className="text-xs text-info bg-info/20 px-2 py-1 rounded">
                     Modified
                   </span>
                 )}
@@ -519,7 +519,7 @@ export default function SkillReviewStep({
                         )}
                       </div>
                       {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                        <div className="mt-2 text-xs text-blue-700">
+                        <div className="mt-2 text-xs text-info">
                           Selected: {suggestion.selectedAttributeNames.join(', ')}
                         </div>
                       )}
@@ -609,7 +609,7 @@ export default function SkillReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{skill.name}</span>
-                      <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
                         Custom
                       </span>
                       <span className={`${wizardStyles.badge.base} ${
@@ -675,20 +675,20 @@ export default function SkillReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200" data-testid="skill-count-summary">
+      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="skill-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-blue-900">
+            <span className="text-sm font-medium text-info-foreground">
               Skills Selected: {acceptedCount} / 12
             </span>
             {acceptedCount >= 12 && (
-              <span className="text-xs text-amber-500 ml-2">
+              <span className="text-xs text-warning ml-2">
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-blue-700">
-            {acceptedCount < 12 
+          <div className="text-xs text-info">
+            {acceptedCount < 12
               ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'
             }
@@ -697,7 +697,7 @@ export default function SkillReviewStep({
         <div className="mt-2 w-full">
           <div className="grid grid-cols-12 gap-0.5 h-2">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-blue-500' : 'bg-blue-200'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
             ))}
           </div>
         </div>
@@ -710,9 +710,9 @@ export default function SkillReviewStep({
 
       {/* Clear AI Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-skills-dialog-title">
           <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <h3 id="clear-skills-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
             <p className="text-sm text-gray-700 mb-4">
               This will remove all AI-generated skill suggestions. You can still add custom skills or regenerate suggestions later.
             </p>
@@ -723,6 +723,7 @@ export default function SkillReviewStep({
                 variant="outline"
                 size="sm"
                 data-testid="cancel-clear-button"
+                autoFocus
               >
                 Cancel
               </Button>

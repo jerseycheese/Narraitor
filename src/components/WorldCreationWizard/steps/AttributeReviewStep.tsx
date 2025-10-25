@@ -405,7 +405,7 @@ export default function AttributeReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{attribute.name}</span>
-                      <span className="text-xs text-green-500 bg-green-100 px-2 py-1 rounded">
+                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
                         Custom
                       </span>
                       {attribute.category && (
@@ -461,20 +461,20 @@ export default function AttributeReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200" data-testid="attribute-count-summary">
+      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="attribute-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-blue-900">
+            <span className="text-sm font-medium text-info-foreground">
               Attributes Selected: {acceptedCount} / 6
             </span>
             {acceptedCount >= 6 && (
-              <span className="text-xs text-amber-500 ml-2">
+              <span className="text-xs text-warning ml-2">
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-blue-700">
-            {acceptedCount < 6 
+          <div className="text-xs text-info">
+            {acceptedCount < 6
               ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'
             }
@@ -483,7 +483,7 @@ export default function AttributeReviewStep({
         <div className="mt-2 w-full">
           <div className="grid grid-cols-6 gap-0.5 h-2">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-blue-500' : 'bg-blue-200'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
             ))}
           </div>
         </div>
@@ -496,9 +496,9 @@ export default function AttributeReviewStep({
 
       {/* Clear AI Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
           <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
             <p className="text-sm text-gray-700 mb-4">
               This will remove all AI-generated attribute suggestions. You can still add custom attributes or regenerate suggestions later.
             </p>
@@ -509,6 +509,7 @@ export default function AttributeReviewStep({
                 variant="outline"
                 size="sm"
                 data-testid="cancel-clear-button"
+                autoFocus
               >
                 Cancel
               </Button>
