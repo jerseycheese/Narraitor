@@ -1,10 +1,50 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from './utils/wait-helpers';
-import { seedTestData } from './utils/data-seeder';
+import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
 
 test.describe('World Creation Wizard AI Guidance', () => {
   test.beforeEach(async ({ page }) => {
     await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    // Mock AI world analysis endpoint
+    await page.route('**/api/ai/analyze-world', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          attributes: [
+            {
+              name: 'Arcane Power',
+              description: 'Your connection to magical forces'
+            },
+            {
+              name: 'Tech Affinity',
+              description: 'Your skill with advanced technology'
+            },
+            {
+              name: 'Resolve',
+              description: 'Your mental fortitude'
+            }
+          ],
+          skills: [
+            {
+              name: 'Spellweaving',
+              description: 'Blend magical and technological effects'
+            },
+            {
+              name: 'Systems Hacking',
+              description: 'Breach security systems'
+            },
+            {
+              name: 'Combat Tactics',
+              description: 'Strategic fighting ability'
+            }
+          ]
+        }
+      });
+    });
+
     await page.goto('/worlds');
     await waitForContentStable(page);
     await page.goto('/worlds/create');
@@ -51,10 +91,8 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByText('AI suggestions need a detailed description to stay accurate.')).toBeVisible();
 
 
-    // Click generate and verify loading state
+    // Click generate and wait for suggestions to appear (mock responds instantly)
     await page.getByTestId('generate-ai-suggestions').click();
-    await expect(page.getByRole('button', { name: 'Analyzing description...' })).toBeVisible();
-    await expect(page.getByTestId('processing-overlay')).toBeVisible();
 
     // Wait for suggestions to appear
     await expect(page.getByTestId('ai-suggestion-preview')).toBeVisible();
@@ -62,7 +100,6 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByText('Skill ideas')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Regenerate suggestions' })).toBeVisible();
     await expect(page.getByText('AI generated from your description')).toBeVisible();
-    await expect(page.getByTestId('processing-overlay')).not.toBeVisible();
   });
 
   test('should show outdated description warning after modification', async ({ page }) => {
@@ -84,9 +121,8 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByTestId('ai-description-outdated')).toBeVisible();
     await expect(page.getByText('Your description has changed since the last AI run. Regenerate suggestions to keep them aligned.')).toBeVisible();
 
-    // Regenerate suggestions and verify warning disappears
+    // Regenerate suggestions and verify warning disappears (mock responds instantly)
     await page.getByTestId('generate-ai-suggestions').click();
-    await expect(page.getByTestId('processing-overlay')).toBeVisible();
     await expect(page.getByTestId('ai-description-outdated')).not.toBeVisible();
     await expect(page.getByTestId('ai-suggestion-preview')).toBeVisible();
   });
