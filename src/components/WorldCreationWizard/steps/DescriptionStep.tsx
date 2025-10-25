@@ -159,7 +159,7 @@ export default function DescriptionStep({
 
       <WizardFormSection
         title="Attribute & Skill Suggestions"
-        description="AI-generated suggestions for attributes and skills based on your world description."
+        description="These define what your characters can do in stories. Attributes (like Strength or Intelligence) represent core traits, while skills (like Combat or Stealth) determine specific abilities. The AI suggests options that match your world's themes."
       >
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
