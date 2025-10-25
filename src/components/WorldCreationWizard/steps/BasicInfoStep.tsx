@@ -147,7 +147,7 @@ export default function BasicInfoStep({
             label="Existing Setting"
             error={combinedErrors.reference}
             required
-            helpText="Name the universe, era, or reference material the AI should respect. This helps us produce examples that match the tone and canon."
+            helpText="Name the fictional universe (e.g., Star Wars, Forgotten Realms), era (e.g., Victorian London, Ancient Rome), or reference material the AI should respect. This helps us produce examples that match the tone and canon."
           >
             <WizardTextField
               value={worldData.reference || ''}
