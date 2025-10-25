@@ -58,14 +58,14 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       
       For each attribute, include:
       - Name
-      - Description (one sentence)
+      - Description (one sentence explaining how it's relevant to stories/gameplay in THIS specific world)
       - Minimum value (typically 1)
       - Maximum value (typically 10)
       - Category (if applicable, like Physical, Mental, Social)
-      
+
       For each skill, include:
       - Name
-      - Description (one sentence)
+      - Description (one sentence explaining how it's relevant to stories/gameplay in THIS specific world)
       - Difficulty level (easy, medium, or hard)
       - Category (if applicable, like Combat, Social, Technical)
       - Related attribute name (if any)
@@ -75,7 +75,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
         "attributes": [
           {
             "name": "Strength",
-            "description": "Physical power and endurance",
+            "description": "Essential for surviving harsh wilderness conditions and manual labor in frontier settlements",
             "minValue": 1,
             "maxValue": 10,
             "category": "Physical"
@@ -84,7 +84,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
         "skills": [
           {
             "name": "Swordsmanship",
-            "description": "Skill with bladed weapons",
+            "description": "Crucial for dueling rivals and defending honor in this sword-centric culture",
             "difficulty": "medium",
             "category": "Combat",
             "linkedAttributeNames": ["Strength"]
