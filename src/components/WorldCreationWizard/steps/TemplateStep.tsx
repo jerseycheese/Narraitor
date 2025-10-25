@@ -14,8 +14,8 @@ import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: Partial<World> & { 
-    selectedTemplateId?: string | null; 
+  onUpdate: (updates: Partial<World> & {
+    selectedTemplateId?: string | null;
     createOwnWorld?: boolean;
     aiSuggestions?: {
       attributes: AttributeSuggestion[];
@@ -25,7 +25,7 @@ interface TemplateStepProps {
       source: AIGuidanceSource;
       generatedAt?: string;
       descriptionSnapshot?: string;
-    } | null;
+    };
     aiSuggestionsGenerated?: boolean;
   }) => void;
   errors: Record<string, string>;
@@ -171,7 +171,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
     // Clear any selected template and set createOwnWorld flag
-    onUpdate({ selectedTemplateId: null, createOwnWorld: true, aiSuggestionMeta: null, aiSuggestionsGenerated: false, aiSuggestions: undefined });
+    onUpdate({ selectedTemplateId: null, createOwnWorld: true, aiSuggestionMeta: undefined, aiSuggestionsGenerated: false, aiSuggestions: undefined });
     // Proceed to next step without applying a template, passing createOwnWorld flag
     onComplete(true);
   };

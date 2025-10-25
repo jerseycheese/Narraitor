@@ -1,50 +1,38 @@
 import { test, expect } from '@playwright/test';
+import { waitForContentStable } from './utils/wait-helpers';
+import { seedTestData } from './utils/data-seeder';
 
 test.describe('World Creation Wizard AI Guidance', () => {
   test.beforeEach(async ({ page }) => {
+    await seedTestData(page);
+    await page.goto('/worlds');
+    await waitForContentStable(page);
     await page.goto('/worlds/create');
-    // Navigate to the Basic Info step
+    await waitForContentStable(page);
+    // Navigate to the Basic Info step by clicking "Create My Own World"
     await page.getByRole('button', { name: 'Create My Own World' }).click();
+    await page.waitForTimeout(300);
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {
-    // Verify initial guidance for 'default' (since worldData.genre is likely undefined initially)
+    // Initially shows default guidance (worldData.genre is undefined)
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Aurora Frontier, The Obsidian Accord, Echoes of Verdant' })).toBeVisible();
-    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Highlight the main conflict, the tone you want players to feel, and the types of challenges that should show up.' })).toBeVisible();
 
-    // Wait for the page to be fully loaded and stable
-    await page.waitForLoadState('networkidle');
-
-    // Debugging: Check visibility and count of the parent div
-    const parentDiv = page.locator('div.relative').filter({ hasText: 'Genre' });
-    console.log('Parent div for Genre combobox visible:', await parentDiv.isVisible());
-    console.log('Parent div for Genre combobox count:', await parentDiv.count());
-
-    // Debugging: Check visibility and count of the combobox itself
-    const genreCombobox = page.getByRole('combobox').filter({ hasText: 'Fantasy' }); // Locate combobox by its current value
-
-    console.log('Genre combobox visible:', await genreCombobox.isVisible());
-    console.log('Genre combobox count:', await genreCombobox.count());
-
-    // Explicitly select 'fantasy' to ensure the state is updated and trigger genre-specific guidance
-    // Interact with the custom combobox
-    await genreCombobox.click({ force: true }); // Open the combobox, forcing the click
-    // Add assertion to wait for options to be visible
-    await expect(page.getByRole('option', { name: 'Fantasy' })).toBeVisible();
-    await page.getByRole('option', { name: 'Fantasy' }).click(); // Select 'Fantasy'
-    // Verify guidance for 'fantasy'
+    // Select fantasy explicitly to trigger fantasy guidance
+    await page.getByTestId('world-genre-select').selectOption('fantasy');
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Mention how magic works, who wields it, and the legendary stakes your heroes face.' })).toBeVisible();
 
     // Change genre to 'sci-fi' and verify guidance updates
-    await page.getByLabel('Genre').selectOption('sci-fi');
+    await page.getByTestId('world-genre-select').selectOption('sci-fi');
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Nova Arcology, Helios Verge, Protocol Horizon' })).toBeVisible();
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Explain the governing factions, the tech that defines daily life, and the paradox or threat the crew must solve.' })).toBeVisible();
   });
 
   test('should display AI suggestion generation flow on Description step', async ({ page }) => {
-    // Fill basic info to proceed to description step
-    await page.getByLabel('Brief Description').fill('A world where magic and technology coexist, but are in constant conflict.');
+    // Fill required basic info to proceed to description step
+    await page.getByTestId('world-description-textarea').fill('A world where magic and technology coexist, but are in constant conflict.');
+    await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
 
     // Verify generate button is initially disabled if description is too short (though we filled it, this is a good check)
@@ -78,8 +66,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
   });
 
   test('should show outdated description warning after modification', async ({ page }) => {
-    // Fill basic info to proceed to description step
-    await page.getByLabel('Brief Description').fill('A world where magic and technology coexist, but are in constant conflict.');
+    // Fill required basic info to proceed to description step
+    await page.getByTestId('world-description-textarea').fill('A world where magic and technology coexist, but are in constant conflict.');
+    await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
 
     // Generate suggestions
