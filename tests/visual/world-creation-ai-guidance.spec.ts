@@ -55,40 +55,33 @@ test.describe('World Creation Wizard AI Guidance', () => {
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {
-    // Initially shows default guidance (worldData.genre is undefined)
+    // Initially shows default guidance for world name (worldData.genre is undefined)
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Aurora Frontier, The Obsidian Accord, Echoes of Verdant' })).toBeVisible();
 
     // Select fantasy explicitly to trigger fantasy guidance
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
-    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Mention how magic works, who wields it, and the legendary stakes your heroes face.' })).toBeVisible();
+    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Heroic journeys through mystical lands and magical conflicts.' })).toBeVisible();
 
     // Change genre to 'sci-fi' and verify guidance updates
     await page.getByTestId('world-genre-select').selectOption('sci-fi');
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Nova Arcology, Helios Verge, Protocol Horizon' })).toBeVisible();
-    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Explain the governing factions, the tech that defines daily life, and the paradox or threat the crew must solve.' })).toBeVisible();
+    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Call out the technology level, the frontier being explored, and any runaway science experiments.' })).toBeVisible();
   });
 
   test('should display AI suggestion generation flow on Description step', async ({ page }) => {
-    // Fill required basic info to proceed to description step
-    await page.getByTestId('world-description-textarea').fill('A world where magic and technology coexist, but are in constant conflict.');
+    // Select required genre and proceed to description step
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
 
-    // Verify generate button is initially disabled if description is too short (though we filled it, this is a good check)
-    // The description in beforeEach is short, so it should be disabled.
-    await expect(page.getByTestId('generate-ai-suggestions')).toBeEnabled(); // Should be enabled because we filled it in beforeEach
-
-    // Clear description to test disabled state
-    await page.getByTestId('world-full-description').fill('');
+    // Initially the description is empty, so generate button should be disabled
     await expect(page.getByTestId('generate-ai-suggestions')).toBeDisabled();
-    await expect(page.getByText('Once the description reaches 50+ characters, the AI can help with ideas.')).toBeVisible();
+    await expect(page.getByText('Add at least 50 characters so the AI can understand your world before generating suggestions.')).toBeVisible();
 
-    // Fill a long enough description
-    const longDescription = 'This is a very long description that should be more than fifty characters. It describes a world where ancient dragons sleep beneath futuristic cities, and their awakening threatens to shatter the delicate balance between magic and advanced technology. Factions vie for control over scarce resources and forgotten spells.';
+    // Fill a long enough description to enable AI generation
+    const longDescription = 'A world where magic and technology coexist in constant conflict. Ancient magical forces clash with futuristic tech.';
     await page.getByTestId('world-full-description').fill(longDescription);
     await expect(page.getByTestId('generate-ai-suggestions')).toBeEnabled();
-    await expect(page.getByText('AI suggestions need a detailed description to stay accurate.')).toBeVisible();
 
 
     // Click generate and wait for suggestions to appear (mock responds instantly)
@@ -103,8 +96,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
   });
 
   test('should show outdated description warning after modification', async ({ page }) => {
-    // Fill required basic info to proceed to description step
-    await page.getByTestId('world-description-textarea').fill('A world where magic and technology coexist, but are in constant conflict.');
+    // Select required genre and proceed to description step
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
 

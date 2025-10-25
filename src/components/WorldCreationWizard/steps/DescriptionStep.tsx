@@ -158,39 +158,8 @@ export default function DescriptionStep({
       </WizardFormSection>
 
       <WizardFormSection
-        title={`Need ${guidance.label} inspiration?`}
-        description="Use these prompts to expand your description before moving to the next step."
-      >
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" data-testid="genre-example">
-          <p className="font-semibold">Sample hook</p>
-          <p className="mt-1 leading-relaxed">{guidance.descriptionExample}</p>
-          {guidance.aiFocus && (
-            <p className="mt-2 text-xs opacity-90">{guidance.aiFocus}</p>
-          )}
-        </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2" data-testid="genre-examples-list">
-          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <h4 className="text-sm font-semibold text-gray-900">Attribute prompts</h4>
-            <ul className="mt-2 space-y-1 text-sm text-gray-700">
-              {guidance.attributeExamples.map((example) => (
-                <li key={example}>{example}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <h4 className="text-sm font-semibold text-gray-900">Skill prompts</h4>
-            <ul className="mt-2 space-y-1 text-sm text-gray-700">
-              {guidance.skillExamples.map((example) => (
-                <li key={example}>{example}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </WizardFormSection>
-
-      <WizardFormSection
-        title="AI Suggestions Preview"
-        description="Generate or refresh AI-powered examples before reviewing attributes and skills."
+        title="Attribute & Skill Suggestions"
+        description="AI-generated suggestions for attributes and skills based on your world description."
       >
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">

@@ -6,7 +6,7 @@ import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 import { AttributeEditor } from '@/components/world/AttributeEditor/AttributeEditor';
-import { 
+import {
   wizardStyles,
   WizardFormSection,
   WizardFormGroup,
@@ -14,12 +14,22 @@ import {
   WizardTextArea
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
+
+interface WorldDataWithMeta extends Partial<World> {
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
+  };
+}
 
 interface AttributeReviewStepProps {
-  worldData: Partial<World>;
+  worldData: WorldDataWithMeta;
   suggestions: AttributeSuggestion[];
   errors: Record<string, string>;
   onUpdate: (updates: Partial<World>) => void;
+  onClearSuggestions?: () => void;
 }
 
 export default function AttributeReviewStep({
@@ -27,6 +37,7 @@ export default function AttributeReviewStep({
   suggestions,
   errors,
   onUpdate,
+  onClearSuggestions,
 }: AttributeReviewStepProps) {
   // Custom attribute management state - initialize from existing world data when editing
   const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(() => {
@@ -39,6 +50,7 @@ export default function AttributeReviewStep({
   });
   const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
   const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
   /**
    * Helper function to merge accepted AI attributes with custom attributes
@@ -220,12 +232,34 @@ export default function AttributeReviewStep({
     setEditingCustomAttributeId(null);
   };
 
+  const handleClearSuggestions = () => {
+    if (onClearSuggestions) {
+      onClearSuggestions();
+      setShowClearConfirmation(false);
+    }
+  };
+
+  const showClearButton = worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
+
   return (
     <div data-testid="attribute-review-step">
       <WizardFormSection
         title="Review Attributes"
         description="We've suggested attributes for your world. At least one attribute is required to proceed. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
       >
+        {showClearButton && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => setShowClearConfirmation(true)}
+              variant="outline"
+              size="sm"
+              data-testid="clear-ai-suggestions-button"
+            >
+              Clear AI Suggestions
+            </Button>
+          </div>
+        )}
 
       <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
@@ -460,6 +494,37 @@ export default function AttributeReviewStep({
         <div className={wizardStyles.form.error}>{errors.attributes}</div>
       )}
 
+      {/* Clear AI Suggestions Confirmation Dialog */}
+      {showClearConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog">
+          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <p className="text-sm text-gray-700 mb-4">
+              This will remove all AI-generated attribute suggestions. You can still add custom attributes or regenerate suggestions later.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowClearConfirmation(false)}
+                variant="outline"
+                size="sm"
+                data-testid="cancel-clear-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleClearSuggestions}
+                variant="destructive"
+                size="sm"
+                data-testid="confirm-clear-button"
+              >
+                Clear Suggestions
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

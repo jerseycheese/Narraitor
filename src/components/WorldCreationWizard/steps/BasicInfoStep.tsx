@@ -7,7 +7,6 @@ import { ToneSettingsForm } from '@/components/forms/ToneSettingsForm';
 import {
   WizardFormGroup,
   WizardTextField,
-  WizardTextArea,
   WizardSelect,
   WizardFormSection,
   wizardStyles
@@ -57,22 +56,6 @@ export default function BasicInfoStep({
             placeholder="Enter your world's name"
             error={combinedErrors.name}
             testId="world-name-input"
-          />
-        </WizardFormGroup>
-
-        <WizardFormGroup
-          label="Brief Description"
-          error={combinedErrors.description}
-          required
-          helpText={guidance.descriptionPrompt}
-        >
-          <WizardTextArea
-            value={worldData.description || ''}
-            onChange={(value) => onUpdate({ ...worldData, description: value })}
-            placeholder="Provide a brief description of your world"
-            rows={4}
-            error={combinedErrors.description}
-            testId="world-description-textarea"
           />
         </WizardFormGroup>
 

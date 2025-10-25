@@ -255,6 +255,16 @@ export default function WorldCreationWizard({
     }
   }, [wizard]);
 
+  const clearAISuggestions = useCallback(() => {
+    wizard.updateData({
+      aiSuggestions: undefined,
+      aiSuggestionsGenerated: false,
+      aiSuggestionMeta: undefined,
+      attributes: [],
+      skills: [],
+    });
+  }, [wizard]);
+
   const handleNext = useCallback(async (createOwnWorld?: boolean) => {
     // Handle special case for step 0 where createOwnWorld might be passed
     if (wizard.state.currentStep === 0 && createOwnWorld !== undefined) {
@@ -475,6 +485,7 @@ export default function WorldCreationWizard({
           <AttributeReviewStep
             {...stepProps}
             suggestions={wizard.state.data.aiSuggestions?.attributes || []}
+            onClearSuggestions={clearAISuggestions}
           />
         );
       case 4:
@@ -482,6 +493,7 @@ export default function WorldCreationWizard({
           <SkillReviewStep
             {...stepProps}
             suggestions={wizard.state.data.aiSuggestions?.skills || []}
+            onClearSuggestions={clearAISuggestions}
           />
         );
       case 5:

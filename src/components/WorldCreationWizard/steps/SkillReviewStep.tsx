@@ -24,10 +24,19 @@ import {
   WizardSelect
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 interface ExtendedSkillSuggestion extends SkillSuggestion {
   showDetails?: boolean;
   selectedAttributeNames?: string[];
+}
+
+interface WorldDataWithMeta extends Partial<World> {
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
+  };
 }
 
 /**
@@ -35,13 +44,15 @@ interface ExtendedSkillSuggestion extends SkillSuggestion {
  */
 interface SkillReviewStepProps {
   /** Current world data being created */
-  worldData: Partial<World>;
+  worldData: WorldDataWithMeta;
   /** AI-generated skill suggestions to review */
   suggestions: SkillSuggestion[];
   /** Validation errors for the form */
   errors: Record<string, string>;
   /** Callback to update world data */
   onUpdate: (updates: Partial<World>) => void;
+  /** Callback to clear AI suggestions */
+  onClearSuggestions?: () => void;
 }
 
 /**
@@ -68,6 +79,7 @@ export default function SkillReviewStep({
   suggestions,
   errors,
   onUpdate,
+  onClearSuggestions,
 }: SkillReviewStepProps) {
   /**
    * Helper function to convert attribute names to IDs for skill linking
@@ -128,6 +140,7 @@ export default function SkillReviewStep({
   });
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
   /**
    * Helper function to initialize a suggestion with original values for modification tracking
@@ -343,6 +356,14 @@ export default function SkillReviewStep({
     setEditingCustomSkillId(null);
   };
 
+  const handleClearSuggestions = () => {
+    if (onClearSuggestions) {
+      onClearSuggestions();
+      setShowClearConfirmation(false);
+    }
+  };
+
+  const showClearButton = worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
 
   const acceptedCount = localSuggestions.filter(s => s.accepted).length + customSkills.length;
 
@@ -352,6 +373,19 @@ export default function SkillReviewStep({
         title="Review Skills"
         description="We've suggested skills for your world. At least one skill is required to proceed. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
       >
+        {showClearButton && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => setShowClearConfirmation(true)}
+              variant="outline"
+              size="sm"
+              data-testid="clear-ai-suggestions-button"
+            >
+              Clear AI Suggestions
+            </Button>
+          </div>
+        )}
 
       <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
@@ -674,6 +708,37 @@ export default function SkillReviewStep({
         <div className={wizardStyles.form.error}>{errors.skills}</div>
       )}
 
+      {/* Clear AI Suggestions Confirmation Dialog */}
+      {showClearConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog">
+          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <p className="text-sm text-gray-700 mb-4">
+              This will remove all AI-generated skill suggestions. You can still add custom skills or regenerate suggestions later.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowClearConfirmation(false)}
+                variant="outline"
+                size="sm"
+                data-testid="cancel-clear-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleClearSuggestions}
+                variant="destructive"
+                size="sm"
+                data-testid="confirm-clear-button"
+              >
+                Clear Suggestions
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
