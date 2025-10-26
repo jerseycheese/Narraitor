@@ -18,7 +18,7 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
-import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
@@ -37,6 +37,55 @@ import { NPC } from '@/types/npc.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
 import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
+import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
+import { logger } from '@/lib/utils/logger';
+
+const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
+  simple: `
+
+SIMPLE LANGUAGE ALERT:
+- Keep every sentence under ~12 words.
+- Use everyday vocabulary (grade-school level).
+- Prefer plain, direct statements over figurative language.
+- Violations will be rewritten automatically, so comply on the first pass.`,
+  moderate: `
+
+MODERATE LANGUAGE REMINDER:
+- Balance concise narration with occasional descriptive flourishes.
+- Target an average of 12-18 words per sentence.
+- Introduce advanced terms sparingly and clarify them in context.`,
+  advanced: `
+
+ADVANCED LANGUAGE REMINDER:
+- Maintain rich vocabulary and layered imagery without sacrificing clarity.
+- Aim for varied sentence structures with an average under ~25 words.
+- Avoid multi-clause run-ons that become difficult to parse.`,
+  literary: '',
+};
+
+const REWRITE_RULES: Record<ToneSettings['languageComplexity'], string[]> = {
+  simple: [
+    'Keep sentences short (target 10-12 words).',
+    'Use everyday vocabulary; avoid figurative language unless universally familiar.',
+    'Maintain existing markdown emphasis exactly as provided.',
+    'Preserve every story beat, character emotion, and outcome.',
+  ],
+  moderate: [
+    'Target 12-18 words per sentence with a mix of simple and compound structures.',
+    'Use mostly familiar vocabulary; explain any advanced term within the sentence.',
+    'Maintain markdown formatting and existing narrative content.',
+  ],
+  advanced: [
+    'Allow nuanced vocabulary and complex sentences, but keep the average under ~25 words.',
+    'Alternate longer sentences with shorter lines to preserve readability.',
+    'Maintain markdown formatting and all narrative details.',
+  ],
+  literary: [
+    'Elevate language with sophisticated imagery while keeping the prose comprehensible.',
+    'Vary pacing with intentional sentence length changes to maintain rhythm.',
+    'Maintain markdown formatting and all narrative details.',
+  ],
+};
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -96,7 +145,9 @@ export class NarrativeGenerator {
       toneSettings.customInstructions
     );
 
-    return prompt + detailedInstructions;
+    const complexityAlert = COMPLEXITY_ALERTS[toneSettings.languageComplexity] ?? '';
+
+    return prompt + detailedInstructions + complexityAlert;
   }
 
   /**
@@ -508,11 +559,115 @@ The items will be automatically added to the character's inventory with proper c
     }
   }
 
+  private async enforceLanguageComplexity(
+    result: NarrativeGenerationResult,
+    toneSettings: ToneSettings
+  ): Promise<NarrativeGenerationResult> {
+    const level = toneSettings.languageComplexity;
+
+    if (!result.content) {
+      return result;
+    }
+
+    const evaluation = evaluateLanguageComplexity(result.content, level);
+
+    if (evaluation.passes) {
+      return result;
+    }
+
+    if (level !== 'literary') {
+      const rewritten = await this.rewriteContentForComplexity(
+        result.content,
+        level,
+        toneSettings.customInstructions
+      );
+
+      if (rewritten) {
+        const secondEval = evaluateLanguageComplexity(rewritten, level);
+        if (secondEval.passes) {
+          logger.info('Narrative rewritten to align with language complexity guidelines.', {
+            level,
+            metrics: secondEval.metrics,
+          });
+
+          return {
+            ...result,
+            content: rewritten,
+          };
+        }
+
+        logger.warn('Language complexity rewrite did not pass thresholds', {
+          level,
+          reasons: secondEval.reasons,
+          metrics: secondEval.metrics,
+        });
+      }
+    }
+
+    logger.warn('Generated narrative exceeds language complexity guidelines', {
+      reasons: evaluation.reasons,
+      metrics: evaluation.metrics,
+      level,
+    });
+
+    const existingTags = Array.isArray(result.metadata.tags)
+      ? new Set(result.metadata.tags)
+      : new Set<string>();
+    existingTags.add('language-complexity-review');
+    existingTags.add(`language-complexity-${level}`);
+
+    return {
+      ...result,
+      metadata: {
+        ...result.metadata,
+        tags: Array.from(existingTags),
+      },
+    };
+  }
+
+  private async rewriteContentForComplexity(
+    content: string,
+    level: ToneSettings['languageComplexity'],
+    customInstructions?: string
+  ): Promise<string | null> {
+    try {
+      const reminder = buildLanguageComplexityReminder(level);
+      const ruleLines = REWRITE_RULES[level]
+        .map((rule) => `- ${rule}`)
+        .join('\n');
+      const prompt = `You are revising narrative content to match STRICT ${level.toUpperCase()} language requirements.
+
+${reminder}
+${customInstructions ? `
+CUSTOM WORLD INSTRUCTIONS:
+${customInstructions}
+` : ''}
+
+REVISION RULES:
+${ruleLines}
+
+Original narrative:
+<<<
+${content}
+>>>
+
+Return ONLY the rewritten narrative.`;
+
+      const response = await this.geminiClient.generateContent(prompt);
+      const rewritten = response.content?.trim();
+      return rewritten && rewritten.length > 0 ? rewritten : null;
+    } catch (error) {
+      logger.warn('Failed to rewrite narrative for language complexity', { level, error });
+      return null;
+    }
+  }
+
   async generateSegment(
     request: NarrativeGenerationRequest
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
+      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate(
         request.generationParameters?.segmentType || 'scene'
       );
@@ -569,10 +724,12 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
-      const result = await this.formatResponse(
+      let result = await this.formatResponse(
         response,
         request.generationParameters?.segmentType || inferSegmentType(response.content || '')
       );
+
+      result = await this.enforceLanguageComplexity(result, toneSettings);
 
       // Process any acquired items from the narrative
       if (
@@ -606,6 +763,7 @@ The items will be automatically added to the character's inventory with proper c
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
+      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('initialScene');
 
       // Get character details
@@ -617,8 +775,6 @@ The items will be automatically added to the character's inventory with proper c
       const playerCharacter = storeCharacter
         ? this.convertToPersonalizationCharacter(storeCharacter)
         : null;
-
-      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
 
       const npcRoster = this.buildNpcRoster(world.id);
 
@@ -682,7 +838,9 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
-      const result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+
+      result = await this.enforceLanguageComplexity(result, toneSettings);
 
       // Process any acquired items from the initial scene
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
@@ -1573,6 +1731,7 @@ ${content}
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
+      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('skillAcknowledgment');
 
       // Get character details
@@ -1611,7 +1770,9 @@ ${content}
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      const result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+
+      result = await this.enforceLanguageComplexity(result, toneSettings);
 
       // Process any acquired items from skill acknowledgment
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {

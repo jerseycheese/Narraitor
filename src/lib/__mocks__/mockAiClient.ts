@@ -12,9 +12,13 @@ export class MockAIClient implements AIClient {
     promptTokens: 100,
     completionTokens: 200
   };
+  private responseQueue: AIResponse[] = [];
 
   async generateContent(prompt: string): Promise<AIResponse> {
     this.prompts.push(prompt);
+    if (this.responseQueue.length > 0) {
+      return Promise.resolve(this.responseQueue.shift() as AIResponse);
+    }
     return Promise.resolve(this.mockResponse);
   }
 
@@ -33,6 +37,13 @@ export class MockAIClient implements AIClient {
     };
   }
 
+  setMockResponses(responses: Array<Partial<AIResponse>>): void {
+    this.responseQueue = responses.map((response) => ({
+      ...this.mockResponse,
+      ...response,
+    }));
+  }
+
   reset(): void {
     this.prompts = [];
     this.mockResponse = {
@@ -41,5 +52,6 @@ export class MockAIClient implements AIClient {
       promptTokens: 100,
       completionTokens: 200
     };
+    this.responseQueue = [];
   }
 }

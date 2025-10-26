@@ -152,4 +152,96 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     expect(narrativePrompt).toContain('DRAMATIC NARRATIVE STYLE');
     expect(narrativePrompt).toContain('PG-13 CONTENT GUIDELINES');
   });
+
+  test('rewrites narrative when simple language complexity is violated', async () => {
+    useWorldStore.getState().reset();
+    mockAiClient.reset();
+    const simpleWorldId = useWorldStore.getState().createWorld({
+      name: 'Simple World',
+      description: 'A world for accessible language.',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 100,
+        skillPointPool: 100
+      },
+      toneSettings: {
+        contentRating: 'PG',
+        narrativeStyle: 'balanced',
+        languageComplexity: 'simple'
+      }
+    });
+
+    const complexContent = 'The emergency klaxon screams, a brutal assault on your ears as you stumble through the flickering fluorescent lights of the lab.';
+    const simpleContent = 'The alarm blares. You stumble under the harsh lab lights.';
+
+    mockAiClient.setMockResponses([
+      { content: complexContent },
+      { content: simpleContent }
+    ]);
+
+    const result = await generator.generateSegment({
+      worldId: simpleWorldId,
+      sessionId: 'simple-session',
+      characterIds: ['simple-character']
+    });
+
+    const prompts = mockAiClient.getPrompts();
+    expect(prompts.length).toBe(2);
+    expect(prompts[0]).toContain('SIMPLE LANGUAGE ALERT');
+    expect(prompts[1]).toContain('STRICT SIMPLE language requirements');
+    expect(result.content).toBe(simpleContent);
+    const tags = result.metadata.tags || [];
+    expect(tags).not.toContain('language-complexity-review');
+    expect(tags).not.toContain('language-complexity-simple');
+  });
+
+  test('rewrites narrative when moderate language complexity is violated', async () => {
+    useWorldStore.getState().reset();
+    mockAiClient.reset();
+    const moderateWorldId = useWorldStore.getState().createWorld({
+      name: 'Moderate World',
+      description: 'A world with balanced prose.',
+      genre: 'mystery',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 80,
+        skillPointPool: 80
+      },
+      toneSettings: {
+        contentRating: 'PG',
+        narrativeStyle: 'mysterious',
+        languageComplexity: 'moderate'
+      }
+    });
+
+    const denseModerate = 'With excruciatingly elaborate precision, you delineate the intersecting chronicles of five clandestine factions, each clause unfurling like an unending ribbon of conjecture.';
+    const balancedModerate = 'You explain the tangled web of factions clearly, pausing so everyone can follow.';
+
+    mockAiClient.setMockResponses([
+      { content: denseModerate },
+      { content: balancedModerate }
+    ]);
+
+    const result = await generator.generateSegment({
+      worldId: moderateWorldId,
+      sessionId: 'moderate-session',
+      characterIds: ['moderate-character']
+    });
+
+    const prompts = mockAiClient.getPrompts();
+    expect(prompts.length).toBe(2);
+    expect(prompts[0]).toContain('MODERATE LANGUAGE REMINDER');
+    expect(prompts[1]).toContain('STRICT MODERATE language requirements');
+    expect(result.content).toBe(balancedModerate);
+    const tags = result.metadata.tags || [];
+    expect(tags).not.toContain('language-complexity-review');
+    expect(tags).not.toContain('language-complexity-moderate');
+  });
 });
