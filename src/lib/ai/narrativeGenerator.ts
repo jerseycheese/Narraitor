@@ -36,6 +36,7 @@ import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { NPC } from '@/types/npc.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
 import { PlayerDecision } from '@/types/personalization.types';
+import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -570,7 +571,7 @@ The items will be automatically added to the character's inventory with proper c
 
       const result = await this.formatResponse(
         response,
-        request.generationParameters?.segmentType || 'scene'
+        request.generationParameters?.segmentType || inferSegmentType(response.content || '')
       );
 
       // Process any acquired items from the narrative
@@ -681,7 +682,7 @@ The items will be automatically added to the character's inventory with proper c
         }
       }
 
-      const result = await this.formatResponse(response, 'scene');
+      const result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       // Process any acquired items from the initial scene
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
@@ -1610,7 +1611,7 @@ ${content}
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      const result = await this.formatResponse(response, 'scene');
+      const result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       // Process any acquired items from skill acknowledgment
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
