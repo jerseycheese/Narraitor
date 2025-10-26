@@ -6,7 +6,7 @@ import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 import { AttributeEditor } from '@/components/world/AttributeEditor/AttributeEditor';
-import { 
+import {
   wizardStyles,
   WizardFormSection,
   WizardFormGroup,
@@ -14,12 +14,22 @@ import {
   WizardTextArea
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
+
+interface WorldDataWithMeta extends Partial<World> {
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
+  };
+}
 
 interface AttributeReviewStepProps {
-  worldData: Partial<World>;
+  worldData: WorldDataWithMeta;
   suggestions: AttributeSuggestion[];
   errors: Record<string, string>;
   onUpdate: (updates: Partial<World>) => void;
+  onClearSuggestions?: () => void;
 }
 
 export default function AttributeReviewStep({
@@ -27,6 +37,7 @@ export default function AttributeReviewStep({
   suggestions,
   errors,
   onUpdate,
+  onClearSuggestions,
 }: AttributeReviewStepProps) {
   // Custom attribute management state - initialize from existing world data when editing
   const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(() => {
@@ -39,6 +50,7 @@ export default function AttributeReviewStep({
   });
   const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
   const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
   /**
    * Helper function to merge accepted AI attributes with custom attributes
@@ -107,9 +119,9 @@ export default function AttributeReviewStep({
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
-      
+
       setLocalSuggestions(newSuggestions);
-      
+
       // Automatically save the initially selected attributes to parent state
       const acceptedAttributes = newSuggestions
         .filter(s => s.accepted)
@@ -123,7 +135,7 @@ export default function AttributeReviewStep({
           maxValue: s.maxValue,
           category: s.category,
         }));
-      
+
       // Only update if we don't already have attributes or if the count is different
       if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
         console.log('[AttributeReviewStep] Auto-applying accepted AI suggestions:', {
@@ -137,6 +149,18 @@ export default function AttributeReviewStep({
           existingCount: worldData.attributes.length,
           acceptedCount: acceptedAttributes.length
         });
+      }
+    } else {
+      // Clear AI suggestions when they are removed (preserves custom attributes)
+      setLocalSuggestions([]);
+
+      // Update worldData to only contain custom attributes (preserving user's manual work)
+      // Only update if attributes have actually changed to prevent infinite loop
+      const currentAttributeIds = (worldData.attributes || []).map(a => a.id).sort().join(',');
+      const customAttributeIds = customAttributes.map(a => a.id).sort().join(',');
+
+      if (currentAttributeIds !== customAttributeIds) {
+        onUpdate({ ...worldData, attributes: customAttributes });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -220,12 +244,34 @@ export default function AttributeReviewStep({
     setEditingCustomAttributeId(null);
   };
 
+  const handleClearSuggestions = () => {
+    if (onClearSuggestions) {
+      onClearSuggestions();
+      setShowClearConfirmation(false);
+    }
+  };
+
+  const showClearButton = worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
+
   return (
     <div data-testid="attribute-review-step">
       <WizardFormSection
         title="Review Attributes"
         description="We've suggested attributes for your world. At least one attribute is required to proceed. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
       >
+        {showClearButton && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => setShowClearConfirmation(true)}
+              variant="outline"
+              size="sm"
+              data-testid="clear-ai-suggestions-button"
+            >
+              Clear AI Suggestions
+            </Button>
+          </div>
+        )}
 
       <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
@@ -371,7 +417,7 @@ export default function AttributeReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{attribute.name}</span>
-                      <span className="text-xs text-green-500 bg-green-100 px-2 py-1 rounded">
+                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
                         Custom
                       </span>
                       {attribute.category && (
@@ -427,20 +473,20 @@ export default function AttributeReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200" data-testid="attribute-count-summary">
+      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="attribute-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-blue-900">
+            <span className="text-sm font-medium text-gray-900">
               Attributes Selected: {acceptedCount} / 6
             </span>
             {acceptedCount >= 6 && (
-              <span className="text-xs text-amber-500 ml-2">
+              <span className="text-xs text-warning ml-2">
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-blue-700">
-            {acceptedCount < 6 
+          <div className="text-xs text-gray-700">
+            {acceptedCount < 6
               ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'
             }
@@ -449,7 +495,7 @@ export default function AttributeReviewStep({
         <div className="mt-2 w-full">
           <div className="grid grid-cols-6 gap-0.5 h-2">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-blue-500' : 'bg-blue-200'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
             ))}
           </div>
         </div>
@@ -460,6 +506,38 @@ export default function AttributeReviewStep({
         <div className={wizardStyles.form.error}>{errors.attributes}</div>
       )}
 
+      {/* Clear AI Suggestions Confirmation Dialog */}
+      {showClearConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
+          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
+            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <p className="text-sm text-gray-700 mb-4">
+              This will remove all AI-generated attribute suggestions. You can still add custom attributes or regenerate suggestions later.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowClearConfirmation(false)}
+                variant="outline"
+                size="sm"
+                data-testid="cancel-clear-button"
+                autoFocus
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleClearSuggestions}
+                variant="destructive"
+                size="sm"
+                data-testid="confirm-clear-button"
+              >
+                Clear Suggestions
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

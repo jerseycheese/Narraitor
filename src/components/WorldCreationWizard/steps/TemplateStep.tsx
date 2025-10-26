@@ -10,16 +10,23 @@ import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
 import { World } from '@/types/world.types';
 import { Button } from '@/components/ui/button';
+import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: Partial<World> & { 
-    selectedTemplateId?: string | null; 
+  onUpdate: (updates: Partial<World> & {
+    selectedTemplateId?: string | null;
     createOwnWorld?: boolean;
     aiSuggestions?: {
       attributes: AttributeSuggestion[];
       skills: SkillSuggestion[];
     };
+    aiSuggestionMeta?: {
+      source: AIGuidanceSource;
+      generatedAt?: string;
+      descriptionSnapshot?: string;
+    };
+    aiSuggestionsGenerated?: boolean;
   }) => void;
   errors: Record<string, string>;
   onComplete: (createOwnWorld?: boolean) => void;
@@ -37,6 +44,12 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
 }) => {
   const [isApplying, setIsApplying] = useState(false);
   const [currentMode, setCurrentMode] = useState<TemplateMode>('traditional');
+
+  const createSuggestionMeta = (description: string, source: AIGuidanceSource) => ({
+    source,
+    generatedAt: new Date().toISOString(),
+    descriptionSnapshot: (description || '').trim(),
+  });
 
   // Tab navigation options
   const tabOptions: TabOption<TemplateMode>[] = [
@@ -66,7 +79,11 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
           try {
             const templateData = JSON.parse(recentTemplateData);
             // Apply the AI template data directly to wizard state
-            onUpdate(templateData);
+            onUpdate({
+              ...templateData,
+              aiSuggestionsGenerated: true,
+              aiSuggestionMeta: templateData.aiSuggestionMeta ?? createSuggestionMeta(templateData.description || '', 'template'),
+            });
             console.log('Applied recent AI template:', templateData.name);
             
             // Proceed to next step
@@ -134,7 +151,9 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         aiSuggestions: {
           attributes: convertedAttributes,
           skills: convertedSkills
-        }
+        },
+        aiSuggestionMeta: createSuggestionMeta(template.description, 'template'),
+        aiSuggestionsGenerated: true,
       };
       
       onUpdate(updateData);
@@ -152,7 +171,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
     // Clear any selected template and set createOwnWorld flag
-    onUpdate({ selectedTemplateId: null, createOwnWorld: true });
+    onUpdate({ selectedTemplateId: null, createOwnWorld: true, aiSuggestionMeta: undefined, aiSuggestionsGenerated: false, aiSuggestions: undefined });
     // Proceed to next step without applying a template, passing createOwnWorld flag
     onComplete(true);
   };

@@ -9,6 +9,7 @@ interface WizardFormGroupProps {
   label: string;
   error?: string;
   required?: boolean;
+  helpText?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -16,6 +17,7 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
   label, 
   error, 
   required = false, 
+  helpText,
   children 
 }) => {
   return (
@@ -24,6 +26,11 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
+      {helpText && (
+        <p className={wizardStyles.form.helpText} data-testid="wizard-form-help-text">
+          {helpText}
+        </p>
+      )}
       {children}
       {error && (
         <p className={errorStyles.message}>{error}</p>

@@ -7,14 +7,14 @@ import { ToneSettingsForm } from '@/components/forms/ToneSettingsForm';
 import {
   WizardFormGroup,
   WizardTextField,
-  WizardTextArea,
   WizardSelect,
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { GENRES } from '@/lib/constants/genres';
+import { GENRES, type GenreValue } from '@/lib/constants/genres';
+import { getWorldGuidance } from '@/lib/constants/worldGuidance';
 
 interface BasicInfoStepProps {
   worldData: Partial<World>;
@@ -31,6 +31,7 @@ export default function BasicInfoStep({
   onUpdate,
 }: BasicInfoStepProps) {
   const combinedErrors = { ...errors };
+  const guidance = getWorldGuidance(worldData.genre as GenreValue | undefined);
 
   return (
     <div data-testid="basic-info-step">
@@ -44,7 +45,11 @@ export default function BasicInfoStep({
         title="World Details"
         description="Essential information about your world."
       >
-        <WizardFormGroup label="World Name (optional)" error={combinedErrors.name}>
+        <WizardFormGroup
+          label="World Name (optional)"
+          error={combinedErrors.name}
+          helpText={guidance.nameExamples.length ? `Examples: ${guidance.nameExamples.slice(0, 3).join(', ')}` : undefined}
+        >
           <WizardTextField
             value={worldData.name || ''}
             onChange={(value) => onUpdate({ ...worldData, name: value })}
@@ -54,18 +59,11 @@ export default function BasicInfoStep({
           />
         </WizardFormGroup>
 
-        <WizardFormGroup label="Brief Description" error={combinedErrors.description} required>
-          <WizardTextArea
-            value={worldData.description || ''}
-            onChange={(value) => onUpdate({ ...worldData, description: value })}
-            placeholder="Provide a brief description of your world"
-            rows={4}
-            error={combinedErrors.description}
-            testId="world-description-textarea"
-          />
-        </WizardFormGroup>
-
-        <WizardFormGroup label="Genre" required>
+        <WizardFormGroup
+          label="Genre"
+          required
+          helpText={guidance.tagline}
+        >
           <WizardSelect
             value={worldData.genre || 'fantasy'}
             onChange={(value) => onUpdate({ ...worldData, genre: value })}
@@ -74,7 +72,11 @@ export default function BasicInfoStep({
           />
         </WizardFormGroup>
 
-        <WizardFormGroup label="World Type" error={combinedErrors.relationship}>
+        <WizardFormGroup
+          label="World Type"
+          error={combinedErrors.relationship}
+          helpText="Pick how closely this world should track an existing setting. The choice controls whether the AI invents new canon or leans on established material."
+        >
           <div className="space-y-4 my-4">
             <div className="flex items-start space-x-3">
               <Input
@@ -141,7 +143,12 @@ export default function BasicInfoStep({
         </WizardFormGroup>
 
         {worldData.relationship && (
-          <WizardFormGroup label="Existing Setting" error={combinedErrors.reference} required>
+          <WizardFormGroup
+            label="Existing Setting"
+            error={combinedErrors.reference}
+            required
+            helpText="Name the fictional universe (e.g., Star Wars, Forgotten Realms), era (e.g., Victorian London, Ancient Rome), or reference material the AI should respect. This helps us produce examples that match the tone and canon."
+          >
             <WizardTextField
               value={worldData.reference || ''}
               onChange={(value) => onUpdate({ ...worldData, reference: value })}
@@ -173,4 +180,3 @@ export default function BasicInfoStep({
     </div>
   );
 }
-

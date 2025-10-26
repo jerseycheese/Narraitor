@@ -52,6 +52,15 @@ This is where the wizard gets smart. Describe a post-apocalyptic wasteland and i
 3. Presents suggestions for user review
 4. Falls back to defaults if AI fails
 
+### Context-Aware Guidance
+
+To make world building feel less intimidating, each step now surfaces genre-aware coaching:
+
+- Inline help text explains what to include in each field, with tailored prompts per genre.
+- Example world descriptions, attribute hooks, and skill ideas appear before you ever invoke the AI.
+- After running the analyzer, a preview highlights the top attribute and skill ideas so you can gauge tone at a glance.
+- If you tweak the description later, the wizard flags that your AI suggestions are out of date and invites you to refresh them.
+
 ### Validation
 
 We keep the validation reasonable but firm - enough to prevent obviously broken worlds:

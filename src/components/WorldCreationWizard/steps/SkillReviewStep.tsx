@@ -24,10 +24,19 @@ import {
   WizardSelect
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 interface ExtendedSkillSuggestion extends SkillSuggestion {
   showDetails?: boolean;
   selectedAttributeNames?: string[];
+}
+
+interface WorldDataWithMeta extends Partial<World> {
+  aiSuggestionMeta?: {
+    source: AIGuidanceSource;
+    generatedAt?: string;
+    descriptionSnapshot?: string;
+  };
 }
 
 /**
@@ -35,13 +44,15 @@ interface ExtendedSkillSuggestion extends SkillSuggestion {
  */
 interface SkillReviewStepProps {
   /** Current world data being created */
-  worldData: Partial<World>;
+  worldData: WorldDataWithMeta;
   /** AI-generated skill suggestions to review */
   suggestions: SkillSuggestion[];
   /** Validation errors for the form */
   errors: Record<string, string>;
   /** Callback to update world data */
   onUpdate: (updates: Partial<World>) => void;
+  /** Callback to clear AI suggestions */
+  onClearSuggestions?: () => void;
 }
 
 /**
@@ -68,6 +79,7 @@ export default function SkillReviewStep({
   suggestions,
   errors,
   onUpdate,
+  onClearSuggestions,
 }: SkillReviewStepProps) {
   /**
    * Helper function to convert attribute names to IDs for skill linking
@@ -128,6 +140,7 @@ export default function SkillReviewStep({
   });
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
   /**
    * Helper function to initialize a suggestion with original values for modification tracking
@@ -188,12 +201,12 @@ export default function SkillReviewStep({
         // Use the suggestion's accepted value, defaulting to true if not specified
         const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
         const showDetails = index === 0; // Show details for the first one
-        
+
         return initializeSuggestionWithTracking(suggestion, accepted, showDetails);
       });
-      
+
       setLocalSuggestions(newSuggestions);
-      
+
       // Automatically save the initially selected skills to parent state
       const acceptedSkills = newSuggestions
         .filter(s => s.accepted)
@@ -209,7 +222,7 @@ export default function SkillReviewStep({
           maxValue: SKILL_MAX_VALUE,
           attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
         }));
-      
+
       // Only update if we don't already have skills or if the count is different
       if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
         console.log('[SkillReviewStep] Auto-applying accepted AI suggestions:', {
@@ -223,6 +236,18 @@ export default function SkillReviewStep({
           existingCount: worldData.skills.length,
           acceptedCount: acceptedSkills.length
         });
+      }
+    } else {
+      // Clear AI suggestions when they are removed (preserves custom skills)
+      setLocalSuggestions([]);
+
+      // Update worldData to only contain custom skills (preserving user's manual work)
+      // Only update if skills have actually changed to prevent infinite loop
+      const currentSkillIds = (worldData.skills || []).map(s => s.id).sort().join(',');
+      const customSkillIds = customSkills.map(s => s.id).sort().join(',');
+
+      if (currentSkillIds !== customSkillIds) {
+        onUpdate({ ...worldData, skills: customSkills });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -343,6 +368,14 @@ export default function SkillReviewStep({
     setEditingCustomSkillId(null);
   };
 
+  const handleClearSuggestions = () => {
+    if (onClearSuggestions) {
+      onClearSuggestions();
+      setShowClearConfirmation(false);
+    }
+  };
+
+  const showClearButton = worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
 
   const acceptedCount = localSuggestions.filter(s => s.accepted).length + customSkills.length;
 
@@ -352,6 +385,19 @@ export default function SkillReviewStep({
         title="Review Skills"
         description="We've suggested skills for your world. At least one skill is required to proceed. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
       >
+        {showClearButton && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => setShowClearConfirmation(true)}
+              variant="outline"
+              size="sm"
+              data-testid="clear-ai-suggestions-button"
+            >
+              Clear AI Suggestions
+            </Button>
+          </div>
+        )}
 
       <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
@@ -379,7 +425,7 @@ export default function SkillReviewStep({
                   {suggestion.difficulty}
                 </span>
                 {suggestion.isModified && (
-                  <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                  <span className="text-xs text-info bg-info/20 px-2 py-1 rounded">
                     Modified
                   </span>
                 )}
@@ -485,7 +531,7 @@ export default function SkillReviewStep({
                         )}
                       </div>
                       {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                        <div className="mt-2 text-xs text-blue-700">
+                        <div className="mt-2 text-xs text-info">
                           Selected: {suggestion.selectedAttributeNames.join(', ')}
                         </div>
                       )}
@@ -575,7 +621,7 @@ export default function SkillReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{skill.name}</span>
-                      <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
                         Custom
                       </span>
                       <span className={`${wizardStyles.badge.base} ${
@@ -641,20 +687,20 @@ export default function SkillReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200" data-testid="skill-count-summary">
+      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="skill-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-blue-900">
+            <span className="text-sm font-medium text-gray-900">
               Skills Selected: {acceptedCount} / 12
             </span>
             {acceptedCount >= 12 && (
-              <span className="text-xs text-amber-500 ml-2">
+              <span className="text-xs text-warning ml-2">
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-blue-700">
-            {acceptedCount < 12 
+          <div className="text-xs text-gray-700">
+            {acceptedCount < 12
               ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'
             }
@@ -663,7 +709,7 @@ export default function SkillReviewStep({
         <div className="mt-2 w-full">
           <div className="grid grid-cols-12 gap-0.5 h-2">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-blue-500' : 'bg-blue-200'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
             ))}
           </div>
         </div>
@@ -674,6 +720,38 @@ export default function SkillReviewStep({
         <div className={wizardStyles.form.error}>{errors.skills}</div>
       )}
 
+      {/* Clear AI Suggestions Confirmation Dialog */}
+      {showClearConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-skills-dialog-title">
+          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
+            <h3 id="clear-skills-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <p className="text-sm text-gray-700 mb-4">
+              This will remove all AI-generated skill suggestions. You can still add custom skills or regenerate suggestions later.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowClearConfirmation(false)}
+                variant="outline"
+                size="sm"
+                data-testid="cancel-clear-button"
+                autoFocus
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleClearSuggestions}
+                variant="destructive"
+                size="sm"
+                data-testid="confirm-clear-button"
+              >
+                Clear Suggestions
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
