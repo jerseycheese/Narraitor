@@ -183,15 +183,16 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should detect dirty state when description is changed', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
-      
+      // Start on step 2 (DescriptionStep) where the full description field is located
+      render(<WorldCreationWizard initialStep={2} onCancel={mockOnCancel} />);
+
       // Enter description to make wizard dirty
-      const descriptionInput = screen.getByTestId('world-description-textarea');
+      const descriptionInput = screen.getByTestId('world-full-description');
       await user.type(descriptionInput, TEST_WORLD_DATA.description);
-      
+
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
-      
+
       expect(screen.getByText('Cancel World Creation?')).toBeInTheDocument();
     });
 

@@ -61,7 +61,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
     // Select fantasy explicitly to trigger fantasy guidance
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Examples: Elderwind Realms, The Shattered Grove, Crown of Embers' })).toBeVisible();
-    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Heroic journeys through mystical lands and magical conflicts.' })).toBeVisible();
+    await expect(page.getByTestId('wizard-form-help-text').filter({ hasText: 'Mention how magic works, who wields it, and the legendary stakes your heroes face.' })).toBeVisible();
 
     // Change genre to 'sci-fi' and verify guidance updates
     await page.getByTestId('world-genre-select').selectOption('sci-fi');

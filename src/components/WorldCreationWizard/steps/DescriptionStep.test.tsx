@@ -76,9 +76,8 @@ describe('DescriptionStep', () => {
       />
     );
 
-    expect(screen.getByText(/floating citadels circle a wounded sun/i)).toBeInTheDocument();
-    expect(screen.getByText(/attribute prompts/i)).toBeInTheDocument();
-    expect(screen.getByText(/skill prompts/i)).toBeInTheDocument();
+    // Check that fantasy genre guidance is shown in the description help text
+    expect(screen.getByText(/Describe iconic locations, magical traditions, and the looming prophecy or crisis the world must solve/i)).toBeInTheDocument();
   });
 
   it('disables suggestion generation until description is long enough', async () => {

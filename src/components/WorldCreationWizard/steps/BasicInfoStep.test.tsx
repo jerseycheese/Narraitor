@@ -26,8 +26,6 @@ describe('BasicInfoStep', () => {
     );
 
     expect(screen.getByPlaceholderText(/enter your world's name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/provide a brief description/i)).toBeInTheDocument();
-    // Genre select - using test ID as fallback since component doesn't have proper label
     expect(screen.getByTestId('world-genre-select')).toBeInTheDocument();
   });
 
@@ -48,22 +46,6 @@ describe('BasicInfoStep', () => {
     expect(screen.getByText('World name must be at least 3 characters')).toBeInTheDocument();
   });
 
-  test('displays error for description when provided', () => {
-    // Since BasicInfoStep no longer handles validation directly,
-    // we test that errors passed in are displayed correctly
-    const errors = { description: 'Description must be at least 10 characters' };
-    
-    render(
-      <BasicInfoStep
-        worldData={{ ...mockWorldData, name: 'Valid Name', description: 'Too short' }}
-        errors={errors}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Should display the error
-    expect(screen.getByText('Description must be at least 10 characters')).toBeInTheDocument();
-  });
 
   test('updates world data through form interactions', () => {
     const TestWrapper = () => {
@@ -97,12 +79,6 @@ describe('BasicInfoStep', () => {
     });
     expect(screen.getByLabelText('World preview')).toHaveTextContent('Name: My New World');
 
-    // Change description
-    fireEvent.change(screen.getByPlaceholderText(/provide a brief description/i), {
-      target: { value: 'A detailed description' },
-    });
-    expect(screen.getByLabelText('World preview')).toHaveTextContent('Description: A detailed description');
-
     // Change genre
     const genreSelect = screen.getByTestId('world-genre-select');
     fireEvent.change(genreSelect, {
@@ -116,7 +92,6 @@ describe('BasicInfoStep', () => {
       <BasicInfoStep
         worldData={{
           name: 'Valid World Name',
-          description: 'This is a valid description for our world',
           genre: 'fantasy',
         }}
         errors={{}}
@@ -125,8 +100,6 @@ describe('BasicInfoStep', () => {
     );
 
     expect(screen.getByDisplayValue('Valid World Name')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('This is a valid description for our world')).toBeInTheDocument();
-    // Check that genre select has the correct value
     const genreSelect = screen.getByTestId('world-genre-select');
     expect(genreSelect).toHaveValue('fantasy');
   });
@@ -134,7 +107,6 @@ describe('BasicInfoStep', () => {
   test('displays error messages for invalid inputs', () => {
     const errors = {
       name: 'Name is too short',
-      description: 'Description is required',
     };
 
     render(
@@ -146,7 +118,6 @@ describe('BasicInfoStep', () => {
     );
 
     expect(screen.getByText('Name is too short')).toBeInTheDocument();
-    expect(screen.getByText('Description is required')).toBeInTheDocument();
   });
 
   test('allows entering all basic info fields', () => {
@@ -160,11 +131,9 @@ describe('BasicInfoStep', () => {
 
     // Test all inputs are functional
     const nameInput = screen.getByPlaceholderText(/enter your world's name/i);
-    const descriptionTextarea = screen.getByPlaceholderText(/provide a brief description/i);
     const genreSelect = screen.getByTestId('world-genre-select');
 
     expect(nameInput).toBeEnabled();
-    expect(descriptionTextarea).toBeEnabled();
     expect(genreSelect).toBeEnabled();
   });
 
