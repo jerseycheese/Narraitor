@@ -19,10 +19,12 @@ const mockWorld = {
   name: 'Epic Fantasy World',
   description: 'A world of magic and adventure',
   genre: 'fantasy',
+  attributes: [],
+  skills: [],
   toneSettings: {
     contentRating: 'teen',
     narrativeStyle: 'epic',
-    languageComplexity: 'medium'
+    languageComplexity: 'moderate'
   }
 };
 
@@ -67,9 +69,14 @@ rules: world_rule = Elven magic protects this realm
 
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
-    mockAIClient.generateContent.mockResolvedValue({
-      content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
-    });
+    // Provide responses for both initial generation and potential complexity rewrite
+    mockAIClient.generateContent
+      .mockResolvedValueOnce({
+        content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
+      })
+      .mockResolvedValueOnce({
+        content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
+      });
 
     const request = {
       worldId: 'world-123',
@@ -104,9 +111,14 @@ rules: journey_rule = Every hero must start their journey at dawn
 
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
-    mockAIClient.generateContent.mockResolvedValue({
-      content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
-    });
+    // Provide responses for both initial generation and potential complexity rewrite
+    mockAIClient.generateContent
+      .mockResolvedValueOnce({
+        content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
+      })
+      .mockResolvedValueOnce({
+        content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
+      });
 
     await narrativeGenerator.generateInitialScene('world-123', ['char-1']);
 
@@ -121,9 +133,14 @@ rules: journey_rule = Every hero must start their journey at dawn
   it('should handle narrative generation with empty lore gracefully', async () => {
     mockGetLoreContextForPrompt.mockReturnValue('');
 
-    mockAIClient.generateContent.mockResolvedValue({
-      content: 'A new adventure begins in an unexplored realm...'
-    });
+    // Provide responses for both initial generation and potential complexity rewrite
+    mockAIClient.generateContent
+      .mockResolvedValueOnce({
+        content: 'A new adventure begins in an unexplored realm...'
+      })
+      .mockResolvedValueOnce({
+        content: 'A new adventure begins in an unexplored realm...'
+      });
 
     const request = {
       worldId: 'world-123',
@@ -154,9 +171,14 @@ events: prophecy = The chosen one will bring balance
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
     // Mock AI response that respects established lore
-    mockAIClient.generateContent.mockResolvedValue({
-      content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
-    });
+    // Provide responses for both initial generation and potential complexity rewrite
+    mockAIClient.generateContent
+      .mockResolvedValueOnce({
+        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
+      })
+      .mockResolvedValueOnce({
+        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
+      });
 
     const request = {
       worldId: 'world-123',
@@ -199,9 +221,14 @@ events: ritual = Monthly blessing ceremony
 
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
-    mockAIClient.generateContent.mockResolvedValue({
-      content: 'The narrative continues...'
-    });
+    // Provide responses for both initial generation and potential complexity rewrite
+    mockAIClient.generateContent
+      .mockResolvedValueOnce({
+        content: 'The narrative continues...'
+      })
+      .mockResolvedValueOnce({
+        content: 'The narrative continues...'
+      });
 
     const request = {
       worldId: 'world-123',
