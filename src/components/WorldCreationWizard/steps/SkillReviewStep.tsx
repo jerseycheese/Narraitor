@@ -201,12 +201,12 @@ export default function SkillReviewStep({
         // Use the suggestion's accepted value, defaulting to true if not specified
         const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
         const showDetails = index === 0; // Show details for the first one
-        
+
         return initializeSuggestionWithTracking(suggestion, accepted, showDetails);
       });
-      
+
       setLocalSuggestions(newSuggestions);
-      
+
       // Automatically save the initially selected skills to parent state
       const acceptedSkills = newSuggestions
         .filter(s => s.accepted)
@@ -222,7 +222,7 @@ export default function SkillReviewStep({
           maxValue: SKILL_MAX_VALUE,
           attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
         }));
-      
+
       // Only update if we don't already have skills or if the count is different
       if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
         console.log('[SkillReviewStep] Auto-applying accepted AI suggestions:', {
@@ -236,6 +236,18 @@ export default function SkillReviewStep({
           existingCount: worldData.skills.length,
           acceptedCount: acceptedSkills.length
         });
+      }
+    } else {
+      // Clear AI suggestions when they are removed (preserves custom skills)
+      setLocalSuggestions([]);
+
+      // Update worldData to only contain custom skills (preserving user's manual work)
+      // Only update if skills have actually changed to prevent infinite loop
+      const currentSkillIds = (worldData.skills || []).map(s => s.id).sort().join(',');
+      const customSkillIds = customSkills.map(s => s.id).sort().join(',');
+
+      if (currentSkillIds !== customSkillIds) {
+        onUpdate({ ...worldData, skills: customSkills });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -678,7 +690,7 @@ export default function SkillReviewStep({
       <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="skill-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-info-foreground">
+            <span className="text-sm font-medium text-gray-900">
               Skills Selected: {acceptedCount} / 12
             </span>
             {acceptedCount >= 12 && (
@@ -687,7 +699,7 @@ export default function SkillReviewStep({
               </span>
             )}
           </div>
-          <div className="text-xs text-info">
+          <div className="text-xs text-gray-700">
             {acceptedCount < 12
               ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'

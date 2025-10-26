@@ -119,9 +119,9 @@ export default function AttributeReviewStep({
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
-      
+
       setLocalSuggestions(newSuggestions);
-      
+
       // Automatically save the initially selected attributes to parent state
       const acceptedAttributes = newSuggestions
         .filter(s => s.accepted)
@@ -135,7 +135,7 @@ export default function AttributeReviewStep({
           maxValue: s.maxValue,
           category: s.category,
         }));
-      
+
       // Only update if we don't already have attributes or if the count is different
       if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
         console.log('[AttributeReviewStep] Auto-applying accepted AI suggestions:', {
@@ -149,6 +149,18 @@ export default function AttributeReviewStep({
           existingCount: worldData.attributes.length,
           acceptedCount: acceptedAttributes.length
         });
+      }
+    } else {
+      // Clear AI suggestions when they are removed (preserves custom attributes)
+      setLocalSuggestions([]);
+
+      // Update worldData to only contain custom attributes (preserving user's manual work)
+      // Only update if attributes have actually changed to prevent infinite loop
+      const currentAttributeIds = (worldData.attributes || []).map(a => a.id).sort().join(',');
+      const customAttributeIds = customAttributes.map(a => a.id).sort().join(',');
+
+      if (currentAttributeIds !== customAttributeIds) {
+        onUpdate({ ...worldData, attributes: customAttributes });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -464,7 +476,7 @@ export default function AttributeReviewStep({
       <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="attribute-count-summary">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm font-medium text-info-foreground">
+            <span className="text-sm font-medium text-gray-900">
               Attributes Selected: {acceptedCount} / 6
             </span>
             {acceptedCount >= 6 && (
@@ -473,7 +485,7 @@ export default function AttributeReviewStep({
               </span>
             )}
           </div>
-          <div className="text-xs text-info">
+          <div className="text-xs text-gray-700">
             {acceptedCount < 6
               ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
               : 'All slots filled'

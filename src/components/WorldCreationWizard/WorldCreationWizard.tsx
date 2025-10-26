@@ -260,8 +260,8 @@ export default function WorldCreationWizard({
       aiSuggestions: undefined,
       aiSuggestionsGenerated: false,
       aiSuggestionMeta: undefined,
-      attributes: [],
-      skills: [],
+      // Note: Don't clear attributes/skills here - let the step components
+      // preserve custom attributes/skills that the user manually created
     });
   }, [wizard]);
 
