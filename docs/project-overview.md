@@ -17,8 +17,8 @@ The core functionality is working and stable. All the main systems (world creati
 
 ## Technical Foundation
 
-Built on a solid foundation of modern tools:
-- **Framework**: Next.js 15+ with App Router
+ Built on a solid foundation of modern tools:
+- **Framework**: Next.js 15.5.6 with App Router (updated 2025-10-27)
 - **AI Integration**: Google Gemini (secure server-side)
 - **State Management**: Zustand stores with IndexedDB persistence
 - **UI**: Tailwind CSS v4 with shadcn/ui components

@@ -11,7 +11,7 @@ This the tech stack here prioritizes maintainability and developer experience ov
 
 ## Technology Choices
 
-**Next.js 15 with App Router** - Went with the latest stable version for better performance with server components and built-in optimizations. The App Router makes routing much cleaner than the old Pages Router, and nested layouts eliminate a lot of layout duplication.
+**Next.js 15.5.6 with App Router** - Went with the latest stable version for better performance with server components and built-in optimizations. The App Router makes routing much cleaner than the old Pages Router, and nested layouts eliminate a lot of layout duplication. (Updated 2025-10-27.)
 
 **TypeScript everywhere** - Static typing catches so many issues early, especially with complex state management and AI integrations. The IDE integration makes refactoring much safer, and types serve as documentation.
 
