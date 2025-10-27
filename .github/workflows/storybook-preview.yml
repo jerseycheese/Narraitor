@@ -47,25 +47,27 @@ jobs:
             comment.body.includes('📚 **Storybook Preview Built!**')
           );
           
+          const commentBody = `📚 **Storybook Preview Built!**
+
+          Your Storybook documentation is ready for preview.
+
+          **Download the preview:**
+          1. Go to the [Actions tab](https://github.com/${owner}/${repo}/actions/runs/${{ github.run_id }})
+          2. Download the "storybook-preview-${pr_number}" artifact
+          3. Extract and open \`index.html\` in your browser
+
+          **Or wait for merge to develop to see it live at:**
+          https://${owner}.github.io/${repo}/`;
+          
           if (existingComment) {
             // Update the existing comment instead of creating a new one
             await github.rest.issues.updateComment({
               owner,
               repo,
               comment_id: existingComment.id,
-              body: `📚 **Storybook Preview Built!**
-              
-              Your design token documentation is ready for preview.
-              
-              **Download the preview:**
-              1. Go to the [Actions tab](https://github.com/${owner}/${repo}/actions/runs/${{ github.run_id }})
-              2. Download the "storybook-preview-${pr_number}" artifact
-              3. Extract and open \`index.html\` in your browser
-              
-              **Or wait for merge to develop to see it live at:**
-              https://${owner}.github.io/${repo}/
-              
-              _Updated: ${{ github.run_id }}_`
+              body: `${commentBody}
+
+          _Updated: ${{ github.run_id }}_`
             });
           } else {
             // Create new comment only if none exists
@@ -73,16 +75,6 @@ jobs:
               owner,
               repo,
               issue_number: pr_number,
-              body: `📚 **Storybook Preview Built!**
-              
-              Your design token documentation is ready for preview.
-              
-              **Download the preview:**
-              1. Go to the [Actions tab](https://github.com/${owner}/${repo}/actions/runs/${{ github.run_id }})
-              2. Download the "storybook-preview-${pr_number}" artifact
-              3. Extract and open \`index.html\` in your browser
-              
-              **Or wait for merge to develop to see it live at:**
-              https://${owner}.github.io/${repo}/`
+              body: commentBody
             });
           }
