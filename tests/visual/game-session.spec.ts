@@ -353,6 +353,17 @@ test.describe('Game Session Visual Tests', () => {
     });
     console.log('🎨 Fade overlay:', fadeOverlay);
 
+    // Ensure Suggested Actions are expanded so the screenshot captures AI recommendations
+    const suggestedActionsToggle = page.locator('[data-testid="collapsible-section-toggle"]');
+    if (await suggestedActionsToggle.count()) {
+      const toggle = suggestedActionsToggle.first();
+      const isExpanded = await toggle.getAttribute('aria-expanded');
+      if (isExpanded !== 'true') {
+        await toggle.click();
+        await page.waitForTimeout(250);
+      }
+    }
+
     // Remove duplicate textarea that can appear inside the suggested actions section in tests
     await page.evaluate(() => {
       const suggestedActionsSection = document.querySelector('[data-testid="collapsible-section"]');
