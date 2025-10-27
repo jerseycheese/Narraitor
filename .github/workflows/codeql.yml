@@ -41,4 +41,3 @@ jobs:
         with:
           category: '/language:javascript'
           fail-on: none
-        continue-on-error: true

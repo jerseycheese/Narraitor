@@ -131,99 +131,20 @@ jobs:
         run: mkdir -p ci-security
 
       - name: Run npm audit (fails on high severity only)
+        # Non-blocking during initial rollout; flip to false once issues #787/#788 land.
         run: npm audit --production --audit-level=high | tee ci-security/npm-audit.txt
         continue-on-error: true
 
       - name: Generate npm audit JSON report
-        run: npm audit --production --json > ci-security/npm-audit.json || true
+        run: npm audit --production --json > ci-security/npm-audit.json
+        continue-on-error: true
 
       - name: Capture dependency update suggestions
-        run: npm outdated --json > ci-security/npm-outdated.json || true
+        run: npm outdated --json > ci-security/npm-outdated.json
+        continue-on-error: true
 
       - name: Generate security scan summary
-        run: |
-          node <<'NODE'
-          import fs from 'node:fs';
-          import path from 'node:path';
-
-          const reportDir = 'ci-security';
-
-          const summaryLines = [
-            '# CI Security Scan Summary',
-            `Generated: ${new Date().toISOString()}`,
-            ''
-          ];
-
-          const readJson = (filename) => {
-            try {
-              const content = fs.readFileSync(path.join(reportDir, filename), 'utf8').trim();
-              return content ? JSON.parse(content) : null;
-            } catch (error) {
-              return null;
-            }
-          };
-
-          const auditData = readJson('npm-audit.json');
-          if (auditData?.metadata?.vulnerabilities) {
-            const counts = auditData.metadata.vulnerabilities;
-            const severities = ['critical', 'high', 'moderate', 'low'];
-            const total = severities.reduce((acc, level) => acc + (counts[level] ?? 0), 0);
-
-            summaryLines.push('## npm audit results');
-            summaryLines.push(
-              total
-                ? `Detected ${total} total vulnerabilities across severity levels.`
-                : 'No vulnerabilities detected at the configured threshold.'
-            );
-
-            severities.forEach((level) => {
-              if (counts[level] !== undefined) {
-                const label = level.charAt(0).toUpperCase() + level.slice(1);
-                summaryLines.push(`- ${label}: ${counts[level]}`);
-              }
-            });
-
-            const vulnerablePackages = Object.entries(auditData.vulnerabilities ?? {});
-            if (vulnerablePackages.length) {
-              summaryLines.push('', 'Packages requiring attention (up to 5):');
-              vulnerablePackages.slice(0, 5).forEach(([pkg, details]) => {
-                const severity = details?.severity ?? 'unknown';
-                const via = Array.isArray(details?.via)
-                  ? details.via
-                      .filter((item) => typeof item === 'object' && item.title)
-                      .map((item) => item.title)
-                  : [];
-                const viaLabel = via.length ? ` – ${via.slice(0, 2).join('; ')}` : '';
-                summaryLines.push(`- ${pkg} (${severity})${viaLabel}`);
-              });
-            }
-          } else {
-            summaryLines.push('## npm audit results');
-            summaryLines.push('*No npm audit report generated.*');
-          }
-
-          const outdatedData = readJson('npm-outdated.json');
-          if (outdatedData && Object.keys(outdatedData).length) {
-            const entries = Object.entries(outdatedData);
-            summaryLines.push('', `## Outdated dependencies (${entries.length})`);
-            summaryLines.push('First 5 entries:');
-            entries.slice(0, 5).forEach(([pkg, info]) => {
-              const current = info?.current ?? 'unknown';
-              const wanted = info?.wanted ?? 'unknown';
-              const latest = info?.latest ?? 'unknown';
-              const type = info?.type ?? 'prod';
-              summaryLines.push(`- ${pkg} (${type}) – current: ${current}, wanted: ${wanted}, latest: ${latest}`);
-            });
-          } else {
-            summaryLines.push('', '## Outdated dependencies');
-            summaryLines.push('No outdated packages detected.');
-          }
-
-          summaryLines.push('', 'Reports are attached as workflow artifacts.');
-
-          fs.writeFileSync(path.join(reportDir, 'summary.md'), summaryLines.join('\n') + '\n');
-          console.log('Security summary written to ci-security/summary.md');
-          NODE
+        run: node .github/scripts/generate-security-summary.js
 
       - name: Upload security artifacts
         uses: actions/upload-artifact@v4
