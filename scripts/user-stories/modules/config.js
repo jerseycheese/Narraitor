@@ -21,9 +21,9 @@ export const CSV_DEFAULT_ENCODING = 'utf8';
 export const DEBUG_MODE = false;
 
 // Directory paths for requirements documents
-export const CORE_DIR = './docs/requirements/core';
-export const UI_DIR = './docs/requirements/ui';
-export const INTEGRATIONS_DIR = './docs/requirements/integrations';
+export const CORE_DIR = './docs/core-systems';
+export const UI_DIR = './docs/ui';
+export const INTEGRATIONS_DIR = './docs/features';
 
 // Domain types
 export const DOMAIN_TYPES = {
