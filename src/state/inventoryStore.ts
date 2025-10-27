@@ -1,7 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
+import {
+  UserFriendlyError,
+  ErrorType,
+  createStoreError,
+} from '@/lib/utils/errorUtils';
+import {
+  logInventoryGuardSanitized,
+  logInventoryStateReset,
+} from '@/lib/inventory/inventoryTelemetry';
 import {
   InventoryItem,
   InventoryItemCategorization,
@@ -27,8 +35,15 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   deleteItem: (itemId: EntityID) => void;
 
   // Inventory-specific operations
-  addItem: (characterId: EntityID, itemData: InventoryItemAddPayload) => EntityID;
-  removeItem: (characterId: EntityID, itemId: EntityID, quantity?: number) => void;
+  addItem: (
+    characterId: EntityID,
+    itemData: InventoryItemAddPayload
+  ) => EntityID;
+  removeItem: (
+    characterId: EntityID,
+    itemId: EntityID,
+    quantity?: number
+  ) => void;
   updateItemQuantity: (itemId: EntityID, quantity: number) => void;
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   clearCharacterInventory: (characterId: EntityID) => void;
@@ -51,7 +66,10 @@ export interface InventoryItemCreatePayload {
   acquisition: InventoryAcquisitionRecord;
 }
 
-export type InventoryItemAddPayload = Omit<InventoryItemCreatePayload, 'categorization'> & {
+export type InventoryItemAddPayload = Omit<
+  InventoryItemCreatePayload,
+  'categorization'
+> & {
   categorization?: InventoryItemCategorization;
 };
 
@@ -66,52 +84,137 @@ const getInitialState = () => ({
   loading: false,
 });
 
-type LegacyInventoryShape =
-  | EntityID[]
-  | { items?: unknown }
-  | null
-  | undefined;
+export const INVENTORY_STORE_VERSION = 2;
+// v2 drops pre-array inventory payloads outright and enforces Record<EntityID, EntityID[]>
 
-const normalizeInventoryValue = (
-  value: LegacyInventoryShape
+export const createInventoryInitialState = (): ReturnType<
+  typeof getInitialState
+> => getInitialState();
+
+const sanitizeInventoryValue = (
+  characterId: EntityID,
+  value: unknown
 ): {
   ids: EntityID[];
-  needsUpdate: boolean;
+  shouldPatch: boolean;
   shouldDelete: boolean;
 } => {
-  if (Array.isArray(value)) {
-    const filtered = value.filter(
-      (id): id is EntityID => typeof id === 'string' && id.length > 0
-    );
-    const needsUpdate = filtered.length !== value.length;
+  if (value === undefined) {
     return {
-      ids: filtered,
-      needsUpdate,
+      ids: [],
+      shouldPatch: false,
       shouldDelete: false,
     };
   }
 
-  if (value && typeof value === 'object') {
+  if (!Array.isArray(value)) {
+    logInventoryGuardSanitized({
+      characterId,
+      reason: 'non-array',
+      removedCount: 0,
+    });
     return {
       ids: [],
-      needsUpdate: true,
+      shouldPatch: true,
       shouldDelete: true,
     };
   }
 
-  if (value == null) {
-    return {
-      ids: [],
-      needsUpdate: value !== undefined,
-      shouldDelete: true,
-    };
+  const filtered = value.filter(
+    (id): id is EntityID => typeof id === 'string' && id.length > 0
+  );
+  const removedCount = value.length - filtered.length;
+
+  if (removedCount > 0) {
+    logInventoryGuardSanitized({
+      characterId,
+      reason: 'invalid-entries',
+      removedCount,
+    });
   }
 
   return {
-    ids: [],
-    needsUpdate: true,
-    shouldDelete: true,
+    ids: filtered,
+    shouldPatch: removedCount > 0,
+    shouldDelete: false,
   };
+};
+
+const normalizeCharacterInventories = (
+  characterInventories: Record<EntityID, unknown> | undefined
+): Record<EntityID, EntityID[]> => {
+  if (!characterInventories || typeof characterInventories !== 'object') {
+    return {};
+  }
+
+  return Object.entries(characterInventories).reduce<
+    Record<EntityID, EntityID[]>
+  >((acc, [characterId, value]) => {
+    const sanitized = sanitizeInventoryValue(characterId, value);
+    if (!sanitized.shouldDelete) {
+      acc[characterId] = sanitized.ids;
+    }
+    return acc;
+  }, {});
+};
+
+type PersistedInventorySlice = Partial<
+  Pick<
+    InventoryStore,
+    'items' | 'characterInventories' | 'error' | 'loading' | 'currentEntityId'
+  >
+>;
+
+export const migrateInventoryState = (
+  persistedState: unknown,
+  version: number | undefined
+): InventoryStore => {
+  if (!persistedState || typeof persistedState !== 'object') {
+    return createInventoryInitialState() as InventoryStore;
+  }
+
+  const incoming = persistedState as PersistedInventorySlice;
+
+  if (!version || version < INVENTORY_STORE_VERSION) {
+    const characterInventories = incoming.characterInventories;
+    const characterCount =
+      characterInventories && typeof characterInventories === 'object'
+        ? Object.keys(characterInventories).length
+        : 0;
+
+    logInventoryStateReset({
+      reason: 'schema-reset',
+      characterCount,
+    });
+
+    return createInventoryInitialState() as InventoryStore;
+  }
+
+  const items =
+    incoming.items && typeof incoming.items === 'object'
+      ? (incoming.items as Record<EntityID, InventoryItem>)
+      : {};
+
+  const normalizedInventories = normalizeCharacterInventories(
+    incoming.characterInventories as Record<EntityID, unknown> | undefined
+  );
+
+  return {
+    ...createInventoryInitialState(),
+    ...incoming,
+    items,
+    entities: { ...items },
+    characterInventories: normalizedInventories,
+    error:
+      incoming.error && typeof incoming.error === 'object'
+        ? incoming.error
+        : null,
+    loading: typeof incoming.loading === 'boolean' ? incoming.loading : false,
+    currentEntityId:
+      typeof incoming.currentEntityId === 'string'
+        ? incoming.currentEntityId
+        : null,
+  } as InventoryStore;
 };
 
 const validateNewItemData = (data: InventoryItemCreatePayload): void => {
@@ -126,7 +229,9 @@ const validateNewItemData = (data: InventoryItemCreatePayload): void => {
   }
 
   if (!data.stackable && quantity > 1) {
-    throw new Error('Non-stackable items cannot have quantity greater than one');
+    throw new Error(
+      'Non-stackable items cannot have quantity greater than one'
+    );
   }
 
   if (!data.categorization) {
@@ -134,7 +239,9 @@ const validateNewItemData = (data: InventoryItemCreatePayload): void => {
   }
 
   if (!isValidCategory(data.categorization.categoryId)) {
-    throw new Error('Categorization must resolve to a standard inventory category');
+    throw new Error(
+      'Categorization must resolve to a standard inventory category'
+    );
   }
 
   if (!data.acquisition) {
@@ -196,11 +303,17 @@ const createJournalEntryForAcquisition = async (
 export const useInventoryStore = create<InventoryStore>()(
   persist(
     (set, get) => {
-      const ensureCharacterInventory = (characterId: EntityID, snapshot = get()): EntityID[] => {
+      const ensureCharacterInventory = (
+        characterId: EntityID,
+        snapshot = get()
+      ): EntityID[] => {
         const raw = snapshot.characterInventories[characterId];
-        const { ids, needsUpdate, shouldDelete } = normalizeInventoryValue(raw as LegacyInventoryShape);
+        const { ids, shouldPatch, shouldDelete } = sanitizeInventoryValue(
+          characterId,
+          raw
+        );
 
-        if (needsUpdate) {
+        if (shouldPatch) {
           set((state) => {
             const nextInventories = { ...state.characterInventories };
             if (shouldDelete) {
@@ -221,612 +334,679 @@ export const useInventoryStore = create<InventoryStore>()(
 
       return {
         ...getInitialState(),
+        create: (itemData) => {
+          const itemId = generateUniqueId('item');
+          const now = getTimestamp();
 
-      create: (itemData) => {
-        const itemId = generateUniqueId('item');
-        const now = getTimestamp();
+          const normalizedName = normalizeText(itemData.name, NORM_NAME);
+          const normalizedDescription = normalizeText(
+            itemData.description || '',
+            NORM_DESC
+          );
 
-        const normalizedName = normalizeText(itemData.name, NORM_NAME);
-        const normalizedDescription = normalizeText(itemData.description || '', NORM_DESC);
-
-        const newItem: InventoryItem = {
-          ...itemData,
-          id: itemId,
-          name: normalizedName,
-          description: normalizedDescription,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        set((state) => ({
-          items: { ...state.items, [itemId]: newItem },
-          entities: { ...state.entities, [itemId]: newItem },
-          error: null,
-        }));
-
-        return itemId;
-      },
-
-      update: (itemId, updates) => {
-        const existingItem = get().items[itemId];
-        if (!existingItem) {
-          set({
-            error: createStoreError(
-              'Item Not Found',
-              'The specified item could not be found.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return;
-        }
-
-        const normalizedUpdates: Partial<InventoryItem> = {};
-
-        if (updates.name) {
-          normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
-        }
-
-        if (updates.description) {
-          normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
-        }
-
-        if (updates.maxStack !== undefined && updates.maxStack <= 0) {
-          set({
-            error: createStoreError(
-              'Invalid Max Stack',
-              'Max stack size must be greater than zero.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return;
-        } else if (updates.maxStack !== undefined) {
-          normalizedUpdates.maxStack = updates.maxStack;
-        }
-
-        if (updates.quantity !== undefined) {
-          if (updates.quantity < 0) {
-            set({
-              error: createStoreError(
-                'Invalid Quantity',
-                'Item quantity cannot be negative.',
-                ErrorType.VALIDATION
-              ),
-            });
-            return;
-          }
-
-          const maxStack = updates.maxStack ?? existingItem.maxStack;
-          if (maxStack && updates.quantity > maxStack) {
-            set({
-              error: createStoreError(
-                'Stack Limit Exceeded',
-                `Quantity cannot exceed maximum stack size of ${maxStack}.`,
-                ErrorType.VALIDATION
-              ),
-            });
-            return;
-          }
-
-          normalizedUpdates.quantity = updates.quantity;
-        }
-
-        if (updates.categorization) {
-          if (!isValidCategory(updates.categorization.categoryId)) {
-            set({
-              error: createStoreError(
-                'Invalid Category',
-                'Categorization must use a standard inventory category.',
-                ErrorType.VALIDATION
-              ),
-            });
-            return;
-          }
-
-          normalizedUpdates.categorization = {
-            ...existingItem.categorization,
-            ...updates.categorization,
-            classifiedAt: updates.categorization.classifiedAt ?? getTimestamp(),
+          const newItem: InventoryItem = {
+            ...itemData,
+            id: itemId,
+            name: normalizedName,
+            description: normalizedDescription,
+            createdAt: now,
+            updatedAt: now,
           };
-          normalizedUpdates.categoryId = normalizedUpdates.categorization.categoryId;
-        } else if (updates.categoryId) {
-          if (!isValidCategory(updates.categoryId)) {
-            set({
-              error: createStoreError(
-                'Invalid Category',
-                'Categorization must use a standard inventory category.',
-                ErrorType.VALIDATION
-              ),
-            });
-            return;
-          }
-          normalizedUpdates.categoryId = updates.categoryId;
-          normalizedUpdates.categorization = {
-            ...existingItem.categorization,
-            categoryId: updates.categoryId,
-            classifiedAt: getTimestamp(),
-            source: 'manual',
-          };
-        }
 
-        if (updates.acquisitionHistory) {
-          normalizedUpdates.acquisitionHistory = updates.acquisitionHistory;
-        }
-
-        const now = getTimestamp();
-        const updatedItem: InventoryItem = {
-          ...existingItem,
-          ...normalizedUpdates,
-          updatedAt: now,
-        };
-
-        set((state) => ({
-          items: { ...state.items, [itemId]: updatedItem },
-          entities: { ...state.entities, [itemId]: updatedItem },
-          error: null,
-        }));
-      },
-
-      delete: (itemId) => {
-        const existingItem = get().items[itemId];
-        if (!existingItem) {
-          return;
-        }
-
-        set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [itemId]: _removedItem, ...remainingItems } = state.items;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [itemId]: _removedEntity, ...remainingEntities } = state.entities;
-
-          // Remove item from all character inventories
-          const updatedCharacterInventories = { ...state.characterInventories };
-          Object.keys(updatedCharacterInventories).forEach((characterId) => {
-            updatedCharacterInventories[characterId] = updatedCharacterInventories[characterId].filter(
-              (id) => id !== itemId
-            );
-            if (updatedCharacterInventories[characterId].length === 0) {
-              delete updatedCharacterInventories[characterId];
-            }
-          });
-
-          return {
-            items: remainingItems,
-            entities: remainingEntities,
-            characterInventories: updatedCharacterInventories,
-            currentEntityId: state.currentEntityId === itemId ? null : state.currentEntityId,
+          set((state) => ({
+            items: { ...state.items, [itemId]: newItem },
+            entities: { ...state.entities, [itemId]: newItem },
             error: null,
-          };
-        });
-      },
+          }));
 
-      setCurrent: (id) => {
-        if (id && !get().items[id]) {
-          set({
-            error: createStoreError('Item Not Found', 'The specified item could not be found.', ErrorType.VALIDATION),
-            currentEntityId: null,
-          });
-          return;
-        }
+          return itemId;
+        },
 
-        set({ currentEntityId: id ?? null, error: null });
-      },
+        update: (itemId, updates) => {
+          const existingItem = get().items[itemId];
+          if (!existingItem) {
+            set({
+              error: createStoreError(
+                'Item Not Found',
+                'The specified item could not be found.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
 
-      getById: (id) => get().items[id],
-      getAll: () => Object.values(get().items),
+          const normalizedUpdates: Partial<InventoryItem> = {};
 
-      reset: () => set(getInitialState()),
+          if (updates.name) {
+            normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
+          }
 
-      setError: (error) => set({ error }),
-      clearError: () => set({ error: null }),
-      setLoading: (loading) => set({ loading }),
+          if (updates.description) {
+            normalizedUpdates.description = normalizeText(
+              updates.description,
+              NORM_DESC
+            );
+          }
 
-      createItem: (itemData) => {
-        try {
-          validateNewItemData(itemData);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Invalid item data';
-          set({
-            error: createStoreError('Validation Error', errorMessage, ErrorType.VALIDATION),
-          });
-          return '';
-        }
+          if (updates.maxStack !== undefined && updates.maxStack <= 0) {
+            set({
+              error: createStoreError(
+                'Invalid Max Stack',
+                'Max stack size must be greater than zero.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          } else if (updates.maxStack !== undefined) {
+            normalizedUpdates.maxStack = updates.maxStack;
+          }
 
-        const now = getTimestamp();
-        const acquisitionRecord: InventoryAcquisitionRecord = {
-          ...itemData.acquisition,
-          acquiredAt: itemData.acquisition.acquiredAt ?? now,
-          quantity: itemData.acquisition.quantity ?? itemData.quantity ?? 1,
-        };
-
-        const categorization: InventoryItemCategorization = {
-          ...itemData.categorization,
-          classifiedAt: itemData.categorization.classifiedAt ?? now,
-        };
-
-        const itemDraft: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'> = {
-          name: itemData.name,
-          description: itemData.description ?? '',
-          quantity: itemData.quantity ?? acquisitionRecord.quantity,
-          stackable: itemData.stackable,
-          maxStack: itemData.maxStack,
-          categoryId: categorization.categoryId,
-          acquisitionHistory: [acquisitionRecord],
-          categorization,
-        };
-
-        return get().create(itemDraft);
-      },
-      updateItem: (itemId, updates) => get().update(itemId, updates),
-      deleteItem: (itemId) => get().delete(itemId),
-
-      addItem: (characterId, itemData) => {
-        const acquisition = itemData.acquisition;
-
-        if (!acquisition) {
-          set({
-            error: createStoreError(
-              'Acquisition Missing',
-              'Unable to add item without acquisition metadata.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return '';
-        }
-
-        const now = getTimestamp();
-        const quantityToAdd =
-          itemData.quantity ?? acquisition.quantity ?? 1;
-
-        if (quantityToAdd <= 0) {
-          set({
-            error: createStoreError(
-              'Invalid Quantity',
-              'Item quantity must be greater than zero.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return '';
-        }
-
-        const normalizedName = normalizeText(itemData.name, NORM_NAME);
-        const state = get();
-        const characterItems = ensureCharacterInventory(characterId, state);
-
-        if (itemData.stackable) {
-          const existingItemId = characterItems.find((id) => {
-            const item = state.items[id];
-            if (!item) {
-              return false;
-            }
-
-            if (item.name !== normalizedName) {
-              return false;
-            }
-
-            if (itemData.categorization && item.categoryId !== itemData.categorization.categoryId) {
-              return false;
-            }
-
-            return true;
-          });
-
-          if (existingItemId) {
-            const existingItem = state.items[existingItemId];
-            const maxStack = existingItem.maxStack ?? itemData.maxStack;
-            const newQuantity = existingItem.quantity + quantityToAdd;
-
-            if (maxStack && newQuantity > maxStack) {
+          if (updates.quantity !== undefined) {
+            if (updates.quantity < 0) {
               set({
                 error: createStoreError(
-                  'Stack Limit Exceeded',
-                  `Cannot add more items. Maximum stack size is ${maxStack}.`,
+                  'Invalid Quantity',
+                  'Item quantity cannot be negative.',
                   ErrorType.VALIDATION
                 ),
               });
-              return existingItemId;
+              return;
             }
 
-            const acquisitionRecord: InventoryAcquisitionRecord = {
-              ...acquisition,
-              acquiredAt: acquisition.acquiredAt ?? now,
-              quantity: acquisition.quantity ?? quantityToAdd,
+            const maxStack = updates.maxStack ?? existingItem.maxStack;
+            if (maxStack && updates.quantity > maxStack) {
+              set({
+                error: createStoreError(
+                  'Stack Limit Exceeded',
+                  `Quantity cannot exceed maximum stack size of ${maxStack}.`,
+                  ErrorType.VALIDATION
+                ),
+              });
+              return;
+            }
+
+            normalizedUpdates.quantity = updates.quantity;
+          }
+
+          if (updates.categorization) {
+            if (!isValidCategory(updates.categorization.categoryId)) {
+              set({
+                error: createStoreError(
+                  'Invalid Category',
+                  'Categorization must use a standard inventory category.',
+                  ErrorType.VALIDATION
+                ),
+              });
+              return;
+            }
+
+            normalizedUpdates.categorization = {
+              ...existingItem.categorization,
+              ...updates.categorization,
+              classifiedAt:
+                updates.categorization.classifiedAt ?? getTimestamp(),
             };
+            normalizedUpdates.categoryId =
+              normalizedUpdates.categorization.categoryId;
+          } else if (updates.categoryId) {
+            if (!isValidCategory(updates.categoryId)) {
+              set({
+                error: createStoreError(
+                  'Invalid Category',
+                  'Categorization must use a standard inventory category.',
+                  ErrorType.VALIDATION
+                ),
+              });
+              return;
+            }
+            normalizedUpdates.categoryId = updates.categoryId;
+            normalizedUpdates.categorization = {
+              ...existingItem.categorization,
+              categoryId: updates.categoryId,
+              classifiedAt: getTimestamp(),
+              source: 'manual',
+            };
+          }
 
-            set((currentState) => {
-              const targetItem = currentState.items[existingItemId];
-              if (!targetItem) {
-                return currentState;
+          if (updates.acquisitionHistory) {
+            normalizedUpdates.acquisitionHistory = updates.acquisitionHistory;
+          }
+
+          const now = getTimestamp();
+          const updatedItem: InventoryItem = {
+            ...existingItem,
+            ...normalizedUpdates,
+            updatedAt: now,
+          };
+
+          set((state) => ({
+            items: { ...state.items, [itemId]: updatedItem },
+            entities: { ...state.entities, [itemId]: updatedItem },
+            error: null,
+          }));
+        },
+
+        delete: (itemId) => {
+          const existingItem = get().items[itemId];
+          if (!existingItem) {
+            return;
+          }
+
+          set((state) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [itemId]: _removedItem, ...remainingItems } = state.items;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [itemId]: _removedEntity, ...remainingEntities } =
+              state.entities;
+
+            // Remove item from all character inventories
+            const updatedCharacterInventories = {
+              ...state.characterInventories,
+            };
+            Object.keys(updatedCharacterInventories).forEach((characterId) => {
+              updatedCharacterInventories[characterId] =
+                updatedCharacterInventories[characterId].filter(
+                  (id) => id !== itemId
+                );
+              if (updatedCharacterInventories[characterId].length === 0) {
+                delete updatedCharacterInventories[characterId];
               }
-
-              const nextCategorization = itemData.categorization
-                ? {
-                    ...targetItem.categorization,
-                    ...itemData.categorization,
-                    classifiedAt: itemData.categorization.classifiedAt ?? now,
-                  }
-                : targetItem.categorization;
-
-              const nextItem: InventoryItem = {
-                ...targetItem,
-                quantity: newQuantity,
-                maxStack: maxStack ?? targetItem.maxStack,
-                updatedAt: now,
-                acquisitionHistory: [...targetItem.acquisitionHistory, acquisitionRecord],
-                categorization: nextCategorization,
-                categoryId: nextCategorization.categoryId,
-              };
-
-              return {
-                items: { ...currentState.items, [existingItemId]: nextItem },
-                entities: { ...currentState.entities, [existingItemId]: nextItem },
-                error: null,
-              };
             });
 
-            // Create journal entry for stacked item acquisition if sessionId provided
-            if (acquisition.sessionId) {
-              const updatedItem = get().items[existingItemId];
-              if (updatedItem) {
-                void createJournalEntryForAcquisition(updatedItem, acquisition.sessionId, characterId);
+            return {
+              items: remainingItems,
+              entities: remainingEntities,
+              characterInventories: updatedCharacterInventories,
+              currentEntityId:
+                state.currentEntityId === itemId ? null : state.currentEntityId,
+              error: null,
+            };
+          });
+        },
+
+        setCurrent: (id) => {
+          if (id && !get().items[id]) {
+            set({
+              error: createStoreError(
+                'Item Not Found',
+                'The specified item could not be found.',
+                ErrorType.VALIDATION
+              ),
+              currentEntityId: null,
+            });
+            return;
+          }
+
+          set({ currentEntityId: id ?? null, error: null });
+        },
+
+        getById: (id) => get().items[id],
+        getAll: () => Object.values(get().items),
+
+        reset: () => set(getInitialState()),
+
+        setError: (error) => set({ error }),
+        clearError: () => set({ error: null }),
+        setLoading: (loading) => set({ loading }),
+
+        createItem: (itemData) => {
+          try {
+            validateNewItemData(itemData);
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : 'Invalid item data';
+            set({
+              error: createStoreError(
+                'Validation Error',
+                errorMessage,
+                ErrorType.VALIDATION
+              ),
+            });
+            return '';
+          }
+
+          const now = getTimestamp();
+          const acquisitionRecord: InventoryAcquisitionRecord = {
+            ...itemData.acquisition,
+            acquiredAt: itemData.acquisition.acquiredAt ?? now,
+            quantity: itemData.acquisition.quantity ?? itemData.quantity ?? 1,
+          };
+
+          const categorization: InventoryItemCategorization = {
+            ...itemData.categorization,
+            classifiedAt: itemData.categorization.classifiedAt ?? now,
+          };
+
+          const itemDraft: Omit<
+            InventoryItem,
+            'id' | 'createdAt' | 'updatedAt'
+          > = {
+            name: itemData.name,
+            description: itemData.description ?? '',
+            quantity: itemData.quantity ?? acquisitionRecord.quantity,
+            stackable: itemData.stackable,
+            maxStack: itemData.maxStack,
+            categoryId: categorization.categoryId,
+            acquisitionHistory: [acquisitionRecord],
+            categorization,
+          };
+
+          return get().create(itemDraft);
+        },
+        updateItem: (itemId, updates) => get().update(itemId, updates),
+        deleteItem: (itemId) => get().delete(itemId),
+
+        addItem: (characterId, itemData) => {
+          const acquisition = itemData.acquisition;
+
+          if (!acquisition) {
+            set({
+              error: createStoreError(
+                'Acquisition Missing',
+                'Unable to add item without acquisition metadata.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return '';
+          }
+
+          const now = getTimestamp();
+          const quantityToAdd = itemData.quantity ?? acquisition.quantity ?? 1;
+
+          if (quantityToAdd <= 0) {
+            set({
+              error: createStoreError(
+                'Invalid Quantity',
+                'Item quantity must be greater than zero.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return '';
+          }
+
+          const normalizedName = normalizeText(itemData.name, NORM_NAME);
+          const state = get();
+          const characterItems = ensureCharacterInventory(characterId, state);
+
+          if (itemData.stackable) {
+            const existingItemId = characterItems.find((id) => {
+              const item = state.items[id];
+              if (!item) {
+                return false;
               }
+
+              if (item.name !== normalizedName) {
+                return false;
+              }
+
+              if (
+                itemData.categorization &&
+                item.categoryId !== itemData.categorization.categoryId
+              ) {
+                return false;
+              }
+
+              return true;
+            });
+
+            if (existingItemId) {
+              const existingItem = state.items[existingItemId];
+              const maxStack = existingItem.maxStack ?? itemData.maxStack;
+              const newQuantity = existingItem.quantity + quantityToAdd;
+
+              if (maxStack && newQuantity > maxStack) {
+                set({
+                  error: createStoreError(
+                    'Stack Limit Exceeded',
+                    `Cannot add more items. Maximum stack size is ${maxStack}.`,
+                    ErrorType.VALIDATION
+                  ),
+                });
+                return existingItemId;
+              }
+
+              const acquisitionRecord: InventoryAcquisitionRecord = {
+                ...acquisition,
+                acquiredAt: acquisition.acquiredAt ?? now,
+                quantity: acquisition.quantity ?? quantityToAdd,
+              };
+
+              set((currentState) => {
+                const targetItem = currentState.items[existingItemId];
+                if (!targetItem) {
+                  return currentState;
+                }
+
+                const nextCategorization = itemData.categorization
+                  ? {
+                      ...targetItem.categorization,
+                      ...itemData.categorization,
+                      classifiedAt: itemData.categorization.classifiedAt ?? now,
+                    }
+                  : targetItem.categorization;
+
+                const nextItem: InventoryItem = {
+                  ...targetItem,
+                  quantity: newQuantity,
+                  maxStack: maxStack ?? targetItem.maxStack,
+                  updatedAt: now,
+                  acquisitionHistory: [
+                    ...targetItem.acquisitionHistory,
+                    acquisitionRecord,
+                  ],
+                  categorization: nextCategorization,
+                  categoryId: nextCategorization.categoryId,
+                };
+
+                return {
+                  items: { ...currentState.items, [existingItemId]: nextItem },
+                  entities: {
+                    ...currentState.entities,
+                    [existingItemId]: nextItem,
+                  },
+                  error: null,
+                };
+              });
+
+              // Create journal entry for stacked item acquisition if sessionId provided
+              if (acquisition.sessionId) {
+                const updatedItem = get().items[existingItemId];
+                if (updatedItem) {
+                  void createJournalEntryForAcquisition(
+                    updatedItem,
+                    acquisition.sessionId,
+                    characterId
+                  );
+                }
+              }
+
+              return existingItemId;
             }
-
-            return existingItemId;
           }
-        }
 
-        if (!itemData.categorization) {
-          set({
-            error: createStoreError(
-              'Categorization Missing',
-              'Unable to add new item without categorization metadata.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return '';
-        }
-
-        const newItemPayload: InventoryItemCreatePayload = {
-          name: itemData.name,
-          description: itemData.description,
-          stackable: itemData.stackable,
-          maxStack: itemData.maxStack,
-          quantity: quantityToAdd,
-          categorization: itemData.categorization,
-          acquisition,
-        };
-
-        try {
-          validateNewItemData(newItemPayload);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Invalid item data';
-          set({
-            error: createStoreError('Validation Error', errorMessage, ErrorType.VALIDATION),
-          });
-          return '';
-        }
-
-        const acquisitionRecord: InventoryAcquisitionRecord = {
-          ...acquisition,
-          acquiredAt: acquisition.acquiredAt ?? now,
-          quantity: acquisition.quantity ?? quantityToAdd,
-        };
-
-        const categorization: InventoryItemCategorization = {
-          ...itemData.categorization,
-          classifiedAt: itemData.categorization.classifiedAt ?? now,
-        };
-
-        const itemDraft: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'> = {
-          name: newItemPayload.name,
-          description: newItemPayload.description ?? '',
-          stackable: newItemPayload.stackable,
-          maxStack: newItemPayload.maxStack,
-          quantity: quantityToAdd,
-          categoryId: categorization.categoryId,
-          acquisitionHistory: [acquisitionRecord],
-          categorization,
-        };
-
-        const itemId = get().create(itemDraft);
-
-        set((currentState) => ({
-          characterInventories: {
-            ...currentState.characterInventories,
-            [characterId]: [...characterItems, itemId],
-          },
-        }));
-
-        // Create journal entry for new item acquisition if sessionId provided
-        if (acquisition.sessionId) {
-          const newItem = get().items[itemId];
-          if (newItem) {
-            void createJournalEntryForAcquisition(newItem, acquisition.sessionId, characterId);
+          if (!itemData.categorization) {
+            set({
+              error: createStoreError(
+                'Categorization Missing',
+                'Unable to add new item without categorization metadata.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return '';
           }
-        }
 
-        return itemId;
-      },
-
-      removeItem: (characterId, itemId, quantity) => {
-        const state = get();
-        const item = state.items[itemId];
-
-        if (!item) {
-          set({ error: createStoreError('Item Not Found', 'The specified item could not be found.', ErrorType.VALIDATION) });
-          return;
-        }
-
-        const characterItems = ensureCharacterInventory(characterId, state);
-        if (!characterItems.includes(itemId)) {
-          set({
-            error: createStoreError(
-              'Item Not In Inventory',
-              'The specified item is not in this character\'s inventory.',
-              ErrorType.VALIDATION
-            ),
-          });
-          return;
-        }
-
-        const removeQuantity = quantity ?? item.quantity;
-
-        if (removeQuantity > item.quantity) {
-          set({
-            error: createStoreError(
-              'Insufficient Quantity',
-              `Cannot remove ${removeQuantity} items. Only ${item.quantity} available.`,
-              ErrorType.VALIDATION
-            ),
-          });
-          return;
-        }
-
-        if (removeQuantity === item.quantity) {
-          // Remove entire item
-          get().delete(itemId);
-        } else {
-          // Update quantity
-          get().update(itemId, { quantity: item.quantity - removeQuantity });
-        }
-      },
-
-      updateItemQuantity: (itemId, quantity) => {
-        const item = get().items[itemId];
-
-        if (!item) {
-          set({ error: createStoreError('Item Not Found', 'The specified item could not be found.', ErrorType.VALIDATION) });
-          return;
-        }
-
-        if (quantity <= 0) {
-          set({ error: createStoreError('Invalid Quantity', 'Item quantity must be greater than zero.', ErrorType.VALIDATION) });
-          return;
-        }
-
-        if (item.maxStack && quantity > item.maxStack) {
-          set({
-            error: createStoreError(
-              'Stack Limit Exceeded',
-              `Quantity cannot exceed maximum stack size of ${item.maxStack}.`,
-              ErrorType.VALIDATION
-            ),
-          });
-          return;
-        }
-
-        get().update(itemId, { quantity });
-      },
-
-      getCharacterItems: (characterId) => {
-        const state = get();
-        const itemIds = ensureCharacterInventory(characterId, state);
-        return itemIds
-          .map((id) => state.items[id])
-          .filter((item): item is InventoryItem => Boolean(item));
-      },
-
-      clearCharacterInventory: (characterId) => {
-        const itemIds = ensureCharacterInventory(characterId);
-        itemIds.forEach((itemId) => get().delete(itemId));
-      },
-
-      useItem: (characterId, itemId) => {
-        const state = get();
-        const item = state.items[itemId];
-
-        // Validate item exists
-        if (!item) {
-          const error = createStoreError(
-            'Item Not Found',
-            'The specified item could not be found.',
-            ErrorType.VALIDATION
-          );
-          set({ error });
-          return {
-            success: false,
-            error: {
-              type: error.type,
-              title: error.title,
-              message: error.message,
-            },
+          const newItemPayload: InventoryItemCreatePayload = {
+            name: itemData.name,
+            description: itemData.description,
+            stackable: itemData.stackable,
+            maxStack: itemData.maxStack,
+            quantity: quantityToAdd,
+            categorization: itemData.categorization,
+            acquisition,
           };
-        }
 
-        // Validate character owns this item
-        const characterItems = ensureCharacterInventory(characterId, state);
-        if (!characterItems.includes(itemId)) {
-          const error = createStoreError(
-            'Item Not Available',
-            'This item is not in your inventory.',
-            ErrorType.VALIDATION
-          );
-          set({ error });
-          return {
-            success: false,
-            error: {
-              type: error.type,
-              title: error.title,
-              message: error.message,
-            },
+          try {
+            validateNewItemData(newItemPayload);
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : 'Invalid item data';
+            set({
+              error: createStoreError(
+                'Validation Error',
+                errorMessage,
+                ErrorType.VALIDATION
+              ),
+            });
+            return '';
+          }
+
+          const acquisitionRecord: InventoryAcquisitionRecord = {
+            ...acquisition,
+            acquiredAt: acquisition.acquiredAt ?? now,
+            quantity: acquisition.quantity ?? quantityToAdd,
           };
-        }
 
-        // Validate item has quantity > 0
-        if (item.quantity <= 0) {
-          const error = createStoreError(
-            'Item Not Available',
-            'This item is no longer available.',
-            ErrorType.VALIDATION
-          );
-          set({ error });
-          return {
-            success: false,
-            error: {
-              type: error.type,
-              title: error.title,
-              message: error.message,
-            },
+          const categorization: InventoryItemCategorization = {
+            ...itemData.categorization,
+            classifiedAt: itemData.categorization.classifiedAt ?? now,
           };
-        }
 
-        // Determine if item usage should consume quantity.
-        // Items explicitly categorized as consumables always consume.
-        // Additionally, stackable items are treated as consumables so quantities decrement on use.
-        const shouldConsume = item.categoryId === 'consumables' || item.stackable;
-        let wasConsumed = false;
-        let remainingQuantity = item.quantity;
+          const itemDraft: Omit<
+            InventoryItem,
+            'id' | 'createdAt' | 'updatedAt'
+          > = {
+            name: newItemPayload.name,
+            description: newItemPayload.description ?? '',
+            stackable: newItemPayload.stackable,
+            maxStack: newItemPayload.maxStack,
+            quantity: quantityToAdd,
+            categoryId: categorization.categoryId,
+            acquisitionHistory: [acquisitionRecord],
+            categorization,
+          };
 
-        const previousQuantity = item.quantity;
+          const itemId = get().create(itemDraft);
 
-        if (shouldConsume) {
-          wasConsumed = true;
-          if (item.quantity === 1) {
-            // Remove the entire item
+          set((currentState) => ({
+            characterInventories: {
+              ...currentState.characterInventories,
+              [characterId]: [...characterItems, itemId],
+            },
+          }));
+
+          // Create journal entry for new item acquisition if sessionId provided
+          if (acquisition.sessionId) {
+            const newItem = get().items[itemId];
+            if (newItem) {
+              void createJournalEntryForAcquisition(
+                newItem,
+                acquisition.sessionId,
+                characterId
+              );
+            }
+          }
+
+          return itemId;
+        },
+
+        removeItem: (characterId, itemId, quantity) => {
+          const state = get();
+          const item = state.items[itemId];
+
+          if (!item) {
+            set({
+              error: createStoreError(
+                'Item Not Found',
+                'The specified item could not be found.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          const characterItems = ensureCharacterInventory(characterId, state);
+          if (!characterItems.includes(itemId)) {
+            set({
+              error: createStoreError(
+                'Item Not In Inventory',
+                "The specified item is not in this character's inventory.",
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          const removeQuantity = quantity ?? item.quantity;
+
+          if (removeQuantity > item.quantity) {
+            set({
+              error: createStoreError(
+                'Insufficient Quantity',
+                `Cannot remove ${removeQuantity} items. Only ${item.quantity} available.`,
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          if (removeQuantity === item.quantity) {
+            // Remove entire item
             get().delete(itemId);
-            remainingQuantity = 0;
           } else {
-            // Reduce quantity by 1
-            get().update(itemId, { quantity: item.quantity - 1 });
-            remainingQuantity = item.quantity - 1;
+            // Update quantity
+            get().update(itemId, { quantity: item.quantity - removeQuantity });
           }
-        }
+        },
 
-        return {
-          success: true,
-          itemName: item.name,
-          categoryId: item.categoryId,
-          wasConsumed,
-          remainingQuantity,
-          previousQuantity,
-        };
-      },
-    };
-  },
+        updateItemQuantity: (itemId, quantity) => {
+          const item = get().items[itemId];
+
+          if (!item) {
+            set({
+              error: createStoreError(
+                'Item Not Found',
+                'The specified item could not be found.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          if (quantity <= 0) {
+            set({
+              error: createStoreError(
+                'Invalid Quantity',
+                'Item quantity must be greater than zero.',
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          if (item.maxStack && quantity > item.maxStack) {
+            set({
+              error: createStoreError(
+                'Stack Limit Exceeded',
+                `Quantity cannot exceed maximum stack size of ${item.maxStack}.`,
+                ErrorType.VALIDATION
+              ),
+            });
+            return;
+          }
+
+          get().update(itemId, { quantity });
+        },
+
+        getCharacterItems: (characterId) => {
+          const state = get();
+          const itemIds = ensureCharacterInventory(characterId, state);
+          return itemIds
+            .map((id) => state.items[id])
+            .filter((item): item is InventoryItem => Boolean(item));
+        },
+
+        clearCharacterInventory: (characterId) => {
+          const itemIds = ensureCharacterInventory(characterId);
+          itemIds.forEach((itemId) => get().delete(itemId));
+        },
+
+        useItem: (characterId, itemId) => {
+          const state = get();
+          const item = state.items[itemId];
+
+          // Validate item exists
+          if (!item) {
+            const error = createStoreError(
+              'Item Not Found',
+              'The specified item could not be found.',
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          // Validate character owns this item
+          const characterItems = ensureCharacterInventory(characterId, state);
+          if (!characterItems.includes(itemId)) {
+            const error = createStoreError(
+              'Item Not Available',
+              'This item is not in your inventory.',
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          // Validate item has quantity > 0
+          if (item.quantity <= 0) {
+            const error = createStoreError(
+              'Item Not Available',
+              'This item is no longer available.',
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          // Determine if item usage should consume quantity.
+          // Items explicitly categorized as consumables always consume.
+          // Additionally, stackable items are treated as consumables so quantities decrement on use.
+          const shouldConsume =
+            item.categoryId === 'consumables' || item.stackable;
+          let wasConsumed = false;
+          let remainingQuantity = item.quantity;
+
+          const previousQuantity = item.quantity;
+
+          if (shouldConsume) {
+            wasConsumed = true;
+            if (item.quantity === 1) {
+              // Remove the entire item
+              get().delete(itemId);
+              remainingQuantity = 0;
+            } else {
+              // Reduce quantity by 1
+              get().update(itemId, { quantity: item.quantity - 1 });
+              remainingQuantity = item.quantity - 1;
+            }
+          }
+
+          return {
+            success: true,
+            itemName: item.name,
+            categoryId: item.categoryId,
+            wasConsumed,
+            remainingQuantity,
+            previousQuantity,
+          };
+        },
+      };
+    },
     {
       name: 'narraitor-inventory-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: INVENTORY_STORE_VERSION,
       partialize: (state) => ({
         items: state.items,
         entities: state.entities,
@@ -838,22 +1018,8 @@ export const useInventoryStore = create<InventoryStore>()(
           state.entities = { ...state.items };
         }
       },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'items' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-          if (state.items && typeof state.items === 'object') {
-            state.entities = { ...state.items };
-          }
-          if (typeof state.error === 'string') {
-            state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
-          }
-          if (typeof state.loading !== 'boolean') {
-            state.loading = false;
-          }
-        }
-        return persistedState as InventoryStore;
-      },
+      migrate: (persistedState: unknown, version: number | undefined) =>
+        migrateInventoryState(persistedState, version),
     }
   )
 );
