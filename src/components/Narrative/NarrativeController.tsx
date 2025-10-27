@@ -272,8 +272,43 @@ Respond with JSON format:
 
   // Primary generation effect
   useEffect(() => {
-    // Skip if component is unmounted
-    if (!mountedRef.current) return;
+    // Skip if component is unmounted or persistence not ready
+    if (!mountedRef.current || !hasHydrated) return;
+
+    // Always prefer persisted store segments before generating anything new
+    const persistedSegments = useNarrativeStore
+      .getState()
+      .getSessionSegments(sessionId);
+
+    if (persistedSegments.length > 0 && segments.length === 0) {
+      setSegments(persistedSegments);
+      setInitialGenerationCompleted(true);
+      setIsLoading(false);
+      return;
+    }
+
+    const isPlaywrightRuntime =
+      typeof window !== 'undefined' &&
+      Boolean(
+        (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__
+      );
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[NarrativeController] persistedSegments', persistedSegments.length, {
+        isPlaywrightRuntime,
+        localSegments: segments.length,
+        initialGenerationCompleted,
+        hasHydrated,
+      });
+    }
+
+    if (isPlaywrightRuntime && persistedSegments.length === 0) {
+      // Visual regression tests seed data via persistence; wait for hydration
+      setInitialGenerationCompleted(true);
+      initialGenerationInitiated.current = true;
+      setIsLoading(false);
+      return;
+    }
     
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
@@ -303,7 +338,7 @@ Respond with JSON format:
       // (No action needed for other cases)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);
+  }, [hasHydrated, triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);
 
   /**
    * Generate player choices based on current narrative context
@@ -477,7 +512,78 @@ Respond with JSON format:
     }
 
     // Load segments for the current session
-    const existingSegments = getSessionSegments(sessionId);
+    let existingSegments = getSessionSegments(sessionId);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[NarrativeController] hydration load', existingSegments.length, {
+        sessionId,
+      });
+    }
+
+    if (existingSegments.length === 0 && typeof window !== 'undefined') {
+      const testWindow = window as typeof window & {
+        __TEST_SEGMENTS__?: Record<string, NarrativeSegment>;
+        __TEST_SESSION_SEGMENTS__?: Record<string, string[]>;
+      };
+
+      const seededIds = testWindow.__TEST_SESSION_SEGMENTS__?.[sessionId] || [];
+      if (seededIds.length > 0) {
+        const seededSegments = seededIds
+          .map((segmentId) => {
+            const raw = testWindow.__TEST_SEGMENTS__?.[segmentId];
+            if (!raw) return null;
+            return {
+              ...raw,
+              id: raw.id ?? segmentId,
+              sessionId: raw.sessionId ?? sessionId,
+              timestamp:
+                raw.timestamp instanceof Date
+                  ? raw.timestamp
+                  : new Date(
+                      typeof raw.timestamp === 'string'
+                        ? raw.timestamp
+                        : raw.createdAt ?? Date.now()
+                    ),
+              createdAt:
+                typeof raw.createdAt === 'string'
+                  ? raw.createdAt
+                  : new Date(
+                      typeof raw.createdAt === 'string'
+                        ? raw.createdAt
+                        : Date.now()
+                    ).toISOString(),
+              updatedAt:
+                typeof raw.updatedAt === 'string'
+                  ? raw.updatedAt
+                  : new Date(
+                      typeof raw.updatedAt === 'string'
+                        ? raw.updatedAt
+                        : raw.createdAt ?? Date.now()
+                    ).toISOString(),
+            } as NarrativeSegment;
+          })
+          .filter((segment): segment is NarrativeSegment => Boolean(segment));
+
+        if (seededSegments.length > 0) {
+          useNarrativeStore.setState((state) => ({
+            ...state,
+            segments: {
+              ...state.segments,
+              ...seededSegments.reduce<Record<string, NarrativeSegment>>((acc, segment) => {
+                acc[segment.id] = segment;
+                return acc;
+              }, {}),
+            },
+            sessionSegments: {
+              ...state.sessionSegments,
+              [sessionId]: seededIds,
+            },
+          }));
+
+          existingSegments = seededSegments;
+        }
+      }
+    }
+
     setSegments(existingSegments);
 
     // Check if we already have an initial scene by looking for the 'intro' tag
@@ -509,6 +615,10 @@ Respond with JSON format:
   }, [hasHydrated, sessionId, generateChoices, getSessionSegments, generatePlayerChoices]);
 
   const generateInitialNarrative = async () => {
+    if (!hasHydrated) {
+      return;
+    }
+
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
@@ -517,6 +627,7 @@ Respond with JSON format:
     
     // If we have ANY segments, this is a resumed session - don't generate initial narrative
     if (hasAnySegments) {
+      setSegments(existingSegments);
       setInitialGenerationCompleted(true);
       setIsLoading(false);
       return;
