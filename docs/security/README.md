@@ -2,7 +2,7 @@
 title: Security Overview
 tags: [security, api, protection]
 created: 2025-06-01
-updated: 2025-06-26
+updated: 2025-10-27
 ---
 
 # Security Overview
@@ -29,3 +29,10 @@ cd docs/security
 **Development**: Use `GEMINI_API_KEY` in `.env.local` (never `NEXT_PUBLIC_`)
 **Production**: Configure environment variables in deployment platform
 **Code Review**: Check for exposed secrets, verify rate limiting active
+
+## CI Security Scanning
+
+- **Security Scan job**: `.github/workflows/ci.yml` now runs `npm audit --production --audit-level=high` and captures `npm outdated` metadata every pull request.
+- **Artifacts**: Review `ci-security/summary.md`, `npm-audit.json`, and `npm-outdated.json` artifacts when the job surfaces findings.
+- **CodeQL analysis**: `.github/workflows/codeql.yml` runs on pushes, pull requests, and Mondays at 09:00 UTC with `fail-on: none` so new alerts appear in the GitHub Security tab without blocking deploys.
+- **Next steps**: After triaging vulnerabilities, tighten thresholds (remove `continue-on-error`) so CI fails if critical issues persist.
