@@ -135,4 +135,32 @@ describe('FormattedNarrativeContent with chunking', () => {
     expect(screen.getByText('bold')).toBeInTheDocument();
     expect(screen.getByText('italic')).toBeInTheDocument();
   });
+
+  it('preserves paragraph breaks when revealing chunks', async () => {
+    const user = userEvent.setup();
+    const content = 'First paragraph here.\n\nSecond paragraph here.\n\nThird paragraph here.';
+
+    render(
+      <FormattedNarrativeContent
+        content={content}
+        enableChunking={true}
+        chunkingOptions={{ minWordsPerChunk: 1 }}
+      />
+    );
+
+    // Initially only first chunk visible
+    expect(screen.getByText('First paragraph here.')).toBeInTheDocument();
+
+    // Click to reveal more
+    const button = screen.getByRole('button', { name: /continue reading/i });
+    await user.click(button);
+
+    // Both paragraphs should be separate (not joined with single space)
+    expect(screen.getByText('First paragraph here.')).toBeInTheDocument();
+    expect(screen.getByText('Second paragraph here.')).toBeInTheDocument();
+
+    // Verify they're in separate paragraph elements
+    const paragraphs = screen.getAllByText(/paragraph here\./);
+    expect(paragraphs.length).toBeGreaterThanOrEqual(2);
+  });
 });

@@ -45,8 +45,9 @@ export const FormattedNarrativeContent: React.FC<
   );
 
   // Determine which content to display
-  const contentToDisplay = enableChunking
-    ? visibleChunks.map(chunk => chunk.content).join(' ')
+  // Preserve original formatting by slicing the original string instead of joining chunks
+  const contentToDisplay = enableChunking && visibleChunks.length > 0
+    ? trimmedContent.substring(0, visibleChunks[visibleChunks.length - 1].endIndex)
     : trimmedContent;
 
   const paragraphs = React.useMemo(() => {
