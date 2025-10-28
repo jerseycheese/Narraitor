@@ -1294,12 +1294,12 @@ export async function seedTestData(page: Page): Promise<void> {
       }
 
       // Approach 3: Store test data globally for later access
-        const testWindow = window;
+      const testWindow = window;
 
-        testWindow.__TEST_WORLDS__ = worldsRecord;
-        testWindow.__TEST_CHARACTERS__ = charactersRecord;
-        testWindow.__TEST_SESSIONS__ = sessionsRecord;
-        testWindow.__TEST_SEGMENTS__ = segmentsRecord;
+      testWindow.__TEST_WORLDS__ = worldsRecord;
+      testWindow.__TEST_CHARACTERS__ = charactersRecord;
+      testWindow.__TEST_SESSIONS__ = sessionsRecord;
+      testWindow.__TEST_SEGMENTS__ = segmentsRecord;
       testWindow.__TEST_DECISIONS__ = decisionsRecord;
 
       // Also set current world context for proper navigation/breadcrumbs
