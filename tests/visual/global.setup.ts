@@ -7,6 +7,7 @@ import {
   SAMPLE_DECISIONS,
 } from './utils/data-seeder';
 import { getTimestamp } from '@/lib/utils';
+import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 
 const authFile = 'tests/visual/.auth/seeded-state.json';
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
@@ -182,16 +183,16 @@ async function globalSetup(config: FullConfig) {
           {}
         );
 
-        const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce(
-          (acc: Record<string, unknown>, segment) => {
+        const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce<Record<string, NarrativeSegment>>(
+          (acc, segment) => {
             acc[segment.id] = segment;
             return acc;
           },
           {}
         );
 
-        const decisionsRecord = SAMPLE_DECISIONS.reduce(
-          (acc: Record<string, unknown>, decision) => {
+        const decisionsRecord = SAMPLE_DECISIONS.reduce<Record<string, Decision>>(
+          (acc, decision) => {
             acc[decision.id] = decision;
             return acc;
           },
@@ -252,13 +253,13 @@ async function globalSetup(config: FullConfig) {
             sessionSegments: {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[0]?.id;
                 }
               ),
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[1]?.id;
                 }
               ),
@@ -268,7 +269,7 @@ async function globalSetup(config: FullConfig) {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -279,7 +280,7 @@ async function globalSetup(config: FullConfig) {
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -324,15 +325,7 @@ async function globalSetup(config: FullConfig) {
         );
 
         // Store test data globally for later access
-        const testWindow = window as typeof window & {
-          __TEST_WORLDS__?: Record<string, unknown>;
-          __TEST_CHARACTERS__?: Record<string, unknown>;
-          __TEST_SESSIONS__?: Record<string, unknown>;
-          __TEST_SEGMENTS__?: Record<string, unknown>;
-          __TEST_DECISIONS__?: Record<string, unknown>;
-          __TEST_CURRENT_WORLD_ID__?: string | null;
-          __TEST_SEEDED__?: boolean;
-        };
+        const testWindow = window;
 
         testWindow.__TEST_WORLDS__ = worldsRecord;
         testWindow.__TEST_CHARACTERS__ = charactersRecord;

@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { getTimestamp } from '@/lib/utils';
+import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 
@@ -974,16 +975,16 @@ export async function seedTestData(page: Page): Promise<void> {
         {}
       );
 
-      const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce(
-        (acc: Record<string, unknown>, segment) => {
+      const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce<Record<string, NarrativeSegment>>(
+        (acc, segment) => {
           acc[segment.id] = segment;
           return acc;
         },
         {}
       );
 
-      const decisionsRecord = SAMPLE_DECISIONS.reduce(
-        (acc: Record<string, unknown>, decision) => {
+      const decisionsRecord = SAMPLE_DECISIONS.reduce<Record<string, Decision>>(
+        (acc, decision) => {
           acc[decision.id] = decision;
           return acc;
         },
@@ -1157,13 +1158,13 @@ export async function seedTestData(page: Page): Promise<void> {
             sessionSegments: {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[0]?.id;
                 }
               ),
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[1]?.id;
                 }
               ),
@@ -1173,7 +1174,7 @@ export async function seedTestData(page: Page): Promise<void> {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -1184,7 +1185,7 @@ export async function seedTestData(page: Page): Promise<void> {
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -1298,20 +1299,12 @@ export async function seedTestData(page: Page): Promise<void> {
       }
 
       // Approach 3: Store test data globally for later access
-      const testWindow = window as typeof window & {
-        __TEST_WORLDS__?: Record<string, unknown>;
-        __TEST_CHARACTERS__?: Record<string, unknown>;
-        __TEST_SESSIONS__?: Record<string, unknown>;
-        __TEST_SEGMENTS__?: Record<string, unknown>;
-        __TEST_DECISIONS__?: Record<string, unknown>;
-        __TEST_CURRENT_WORLD_ID__?: string | null;
-        __TEST_SEEDED__?: boolean;
-      };
+        const testWindow = window;
 
-      testWindow.__TEST_WORLDS__ = worldsRecord;
-      testWindow.__TEST_CHARACTERS__ = charactersRecord;
-      testWindow.__TEST_SESSIONS__ = sessionsRecord;
-      testWindow.__TEST_SEGMENTS__ = segmentsRecord;
+        testWindow.__TEST_WORLDS__ = worldsRecord;
+        testWindow.__TEST_CHARACTERS__ = charactersRecord;
+        testWindow.__TEST_SESSIONS__ = sessionsRecord;
+        testWindow.__TEST_SEGMENTS__ = segmentsRecord;
       testWindow.__TEST_DECISIONS__ = decisionsRecord;
 
       // Also set current world context for proper navigation/breadcrumbs
@@ -1319,32 +1312,29 @@ export async function seedTestData(page: Page): Promise<void> {
       testWindow.__TEST_SEEDED__ = true;
 
       // Add additional session/narrative data for active session testing
-      const sessionWindow = window as typeof window & {
-        __TEST_SESSION_SEGMENTS__?: Record<string, string[]>;
-        __TEST_SESSION_DECISIONS__?: Record<string, string[]>;
-      };
+      const sessionWindow = window;
 
       sessionWindow.__TEST_SESSION_SEGMENTS__ = {
         'session-cyberpunk-ghost': Object.keys(segmentsRecord).filter((id) => {
-          const segment = segmentsRecord[id] as Record<string, unknown>;
+          const segment = segmentsRecord[id];
           return segment?.sessionId === 'session-cyberpunk-ghost';
         }),
         'session-fantasy-mage': Object.keys(segmentsRecord).filter((id) => {
-          const segment = segmentsRecord[id] as Record<string, unknown>;
+          const segment = segmentsRecord[id];
           return segment?.sessionId === 'session-fantasy-mage';
         }),
       };
 
       sessionWindow.__TEST_SESSION_DECISIONS__ = {
         'session-cyberpunk-ghost': Object.keys(decisionsRecord).filter((id) => {
-          const decision = decisionsRecord[id] as Record<string, unknown>;
+          const decision = decisionsRecord[id];
           return (
             decision?.narrativeSegmentId &&
             String(decision.narrativeSegmentId).includes('cyberpunk')
           );
         }),
         'session-fantasy-mage': Object.keys(decisionsRecord).filter((id) => {
-          const decision = decisionsRecord[id] as Record<string, unknown>;
+          const decision = decisionsRecord[id];
           return (
             decision?.narrativeSegmentId &&
             String(decision.narrativeSegmentId).includes('fantasy')
