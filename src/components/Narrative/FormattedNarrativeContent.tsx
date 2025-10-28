@@ -1,11 +1,19 @@
 import React from 'react';
 import { safeTrim } from '@/lib/utils';
+import { useChunkedContent, type UseChunkedContentOptions } from '@/hooks/useChunkedContent';
+import { ChunkRevealButton } from './ChunkRevealButton';
 
 interface FormattedNarrativeContentProps {
   content: string;
   className?: string;
   highlightTerms?: string[];
   highlightClassName?: string;
+  /** Enable progressive disclosure with chunking */
+  enableChunking?: boolean;
+  /** Options for chunking behavior */
+  chunkingOptions?: UseChunkedContentOptions;
+  /** Custom text for reveal button */
+  revealButtonText?: string;
 }
 
 const escapeRegExp = (value: string) =>
@@ -13,19 +21,43 @@ const escapeRegExp = (value: string) =>
 
 export const FormattedNarrativeContent: React.FC<
   FormattedNarrativeContentProps
-> = ({ content, className, highlightTerms, highlightClassName }) => {
+> = ({
+  content,
+  className,
+  highlightTerms,
+  highlightClassName,
+  enableChunking = false,
+  chunkingOptions,
+  revealButtonText,
+}) => {
   const normalizedContent = typeof content === 'string' ? content : '';
   const trimmedContent = safeTrim(normalizedContent);
 
+  // Use chunking hook if enabled
+  const {
+    visibleChunks,
+    hasMore,
+    revealNext,
+    totalCount,
+  } = useChunkedContent(
+    enableChunking ? trimmedContent : '',
+    chunkingOptions || { revealAll: !enableChunking }
+  );
+
+  // Determine which content to display
+  const contentToDisplay = enableChunking
+    ? visibleChunks.map(chunk => chunk.content).join(' ')
+    : trimmedContent;
+
   const paragraphs = React.useMemo(() => {
-    if (!trimmedContent) {
+    if (!contentToDisplay) {
       return [];
     }
-    return trimmedContent
+    return contentToDisplay
       .split(/(?:\n\s*){2,}/)
       .map((paragraph) => paragraph.trim())
       .filter((paragraph) => paragraph.length > 0);
-  }, [trimmedContent]);
+  }, [contentToDisplay]);
 
   const normalizedHighlightTerms = React.useMemo(() => {
     if (!highlightTerms || highlightTerms.length === 0) {
@@ -250,12 +282,23 @@ export const FormattedNarrativeContent: React.FC<
         return (
           <p
             key={index}
-            className="my-4 leading-relaxed max-w-3xl mx-auto first-of-type:mt-0 last-of-type:mb-0"
+            className="my-4 leading-relaxed max-w-3xl mx-auto first-of-type:mt-0 last-of-type:mb-0 animate-fade-in"
           >
             {paragraphNodes}
           </p>
         );
       })}
+
+      {enableChunking && hasMore && (
+        <div className="flex justify-center">
+          <ChunkRevealButton
+            onClick={revealNext}
+            remainingChunks={totalCount - visibleChunks.length}
+            totalChunks={totalCount}
+            text={revealButtonText}
+          />
+        </div>
+      )}
     </div>
   );
 };
