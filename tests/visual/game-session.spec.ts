@@ -380,10 +380,36 @@ test.describe('Game Session Visual Tests', () => {
           element.setAttribute('aria-hidden', 'false');
           element.style.display = 'block';
           element.style.maxHeight = 'none';
+
+          const testWindow = window as typeof window & {
+            __TEST_DECISIONS__?: Record<string, {
+              prompt?: string;
+              options?: Array<{ id: string; text: string; hint?: string }>;
+            }>;
+          };
+
+          const seededDecision = testWindow.__TEST_DECISIONS__?.['decision-cyberpunk-route'];
+          if (seededDecision?.options?.length) {
+            const optionMarkup = seededDecision.options
+              .map((option) => `
+                <button class="block w-full text-left p-3 border rounded bg-white shadow-sm mb-2" data-testid="choice-option-${option.id}">
+                  <div class="font-medium text-gray-900">${option.text}</div>
+                  ${option.hint ? `<div class="text-sm text-gray-500 mt-1">${option.hint}</div>` : ''}
+                </button>
+              `)
+              .join('');
+
+            element.innerHTML = `
+              <div class="space-y-2" role="radiogroup" aria-labelledby="choices-heading">
+                ${optionMarkup}
+              </div>
+            `;
+          }
         }
         const toggleEl = sectionEl.querySelector('[data-testid="collapsible-section-toggle"]');
         if (toggleEl) {
           toggleEl.setAttribute('aria-expanded', 'true');
+          toggleEl.textContent = '−';
         }
       });
 
