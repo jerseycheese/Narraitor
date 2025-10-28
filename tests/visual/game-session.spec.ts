@@ -354,9 +354,15 @@ test.describe('Game Session Visual Tests', () => {
     console.log('🎨 Fade overlay:', fadeOverlay);
 
     // Ensure Suggested Actions are expanded so the screenshot captures AI recommendations
-    const suggestedActionsToggle = page.locator('[data-testid="collapsible-section-toggle"]');
-    if (await suggestedActionsToggle.count()) {
-      const toggle = suggestedActionsToggle.first();
+    const suggestedActionsSection = page.locator('[data-testid="collapsible-section"]', {
+      hasText: 'Suggested Actions'
+    });
+
+    const sectionCount = await suggestedActionsSection.count();
+    if (sectionCount > 0) {
+      const toggle = suggestedActionsSection
+        .first()
+        .locator('[data-testid="collapsible-section-toggle"]');
       const isExpanded = await toggle.getAttribute('aria-expanded');
       if (isExpanded !== 'true') {
         await toggle.click();
@@ -372,10 +378,19 @@ test.describe('Game Session Visual Tests', () => {
       element.classList.add('block');
       element.classList.remove('hidden');
       element.setAttribute('aria-hidden', 'false');
+      element.style.display = 'block';
+      element.style.maxHeight = 'none';
+      element.style.opacity = '1';
       const toggle = document.querySelector('[data-testid="collapsible-section-toggle"]');
       if (toggle) {
         toggle.setAttribute('aria-expanded', 'true');
       }
+    });
+
+    // Wait for at least one suggested action button to be visible in the DOM
+    await page.waitForSelector('[data-testid^="choice-option-"]', {
+      timeout: 2000,
+      state: 'visible'
     });
 
     // Remove duplicate textarea that can appear inside the suggested actions section in tests
