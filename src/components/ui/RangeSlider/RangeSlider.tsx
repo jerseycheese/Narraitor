@@ -77,6 +77,16 @@ export interface RangeSliderProps {
    * The effective maximum value (for constraints), while max remains the visual max
    */
   effectiveMax?: number;
+
+  /**
+   * Accessible label for screen readers
+   */
+  ariaLabel?: string;
+
+  /**
+   * Accessible labelled-by reference
+   */
+  ariaLabelledBy?: string;
 }
 
 /**
@@ -97,6 +107,8 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   testId = "range-slider",
   isConstrained = false,
   effectiveMax,
+  ariaLabel,
+  ariaLabelledBy,
 }) => {
   const [value, setValue] = useState(initialValue);
   
@@ -232,6 +244,8 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                   : ''
                 }`}
               data-testid={`${testId}-slider`}
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledBy}
             />
           </div>
           

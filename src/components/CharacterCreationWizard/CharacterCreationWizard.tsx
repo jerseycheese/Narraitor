@@ -6,7 +6,7 @@ import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
-import { useAttributePointPool, useSkillPointPool } from '@/hooks/usePointPoolManager';
+import { useAttributePointPool } from '@/hooks/usePointPoolManager';
 import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { 
   WizardContainer, 
@@ -22,6 +22,7 @@ import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from './utils/validation';
+import { normalizeSkillBounds, calculateSkillPointPool } from './utils/skillAllocation';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -67,6 +68,8 @@ interface CharacterCreationData {
     name: string;
     description?: string;
     level: number;
+    minLevel: number;
+    maxLevel: number;
     /** Multi-attribute support */
     attributeIds?: EntityID[];
     /** Legacy support */
@@ -117,8 +120,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
     if (data?.characterData) {
+      const existingSkills = (
+        (data.characterData as Partial<CharacterCreationData>)?.skills ?? []
+      ) as CharacterCreationData['skills'];
+
+      const skillsWithBounds = normalizeSkillBounds(existingSkills, world);
+
       return {
         ...(data.characterData as CharacterCreationData),
+        skills: skillsWithBounds,
         worldId, // Ensure worldId is correct
       };
     }
@@ -140,15 +150,20 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         minValue: attr.minValue,
         maxValue: attr.maxValue,
       })) || [],
-      skills: world?.skills.map(skill => ({
-        skillId: skill.id,
-        name: skill.name,
-        description: skill.description,
-        level: skill.minValue,
-        attributeIds: skill.attributeIds || [], // Preserve full multi-attribute support
-        linkedAttributeId: skill.attributeIds?.[0], // Keep legacy field for backward compatibility
-        isSelected: false,
-      })) || [],
+      skills: normalizeSkillBounds(
+        world?.skills.map(skill => ({
+          skillId: skill.id,
+          name: skill.name,
+          description: skill.description,
+          level: skill.minValue,
+          minLevel: skill.minValue,
+          maxLevel: skill.maxValue,
+          attributeIds: skill.attributeIds || [], // Preserve full multi-attribute support
+          linkedAttributeId: skill.attributeIds?.[0], // Keep legacy field for backward compatibility
+          isSelected: false,
+        })) || [],
+        world
+      ),
       background: {
         history: '',
         personality: '',
@@ -178,7 +193,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         .build(),
       2: createWizardValidator<CharacterCreationData>()
         .customValidation((data) => {
-          const result = validateSkills(data.skills);
+          const result = validateSkills(
+            data.skills,
+            world?.settings.skillPointPool || 0,
+            world?.skills?.map(skill => ({
+              id: skill.id,
+              minValue: skill.minValue,
+              maxValue: skill.maxValue,
+            })) || []
+          );
           return { ...result, touched: true };
         })
         .build(),
@@ -214,19 +237,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     })),
   });
 
-  const skillPool = useSkillPointPool({
-    totalPoints: world?.settings.skillPointPool || 0,
-    skills: wizard.state.data.skills.map(skill => {
-      const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
-      return {
-        id: skill.skillId,
-        value: skill.level,
-        minValue: worldSkill?.minValue || 1,
-        maxValue: worldSkill?.maxValue || 10,
-        isSelected: skill.isSelected,
-      };
-    }),
-  });
+  const skillPool = React.useMemo(() => {
+    const totalPoints = world?.settings.skillPointPool || 0;
+    return calculateSkillPointPool(wizard.state.data.skills, world, totalPoints);
+  }, [wizard.state.data.skills, world]);
 
   // Navigation handlers
   const handleNext = () => {
@@ -238,7 +252,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       validation: wizard.state.validation,
       pointPools: {
         attributes: attributePool.pool,
-        skills: skillPool.pool,
+        skills: skillPool,
       },
     };
     setData(newData);
@@ -254,7 +268,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       validation: wizard.state.validation,
       pointPools: {
         attributes: attributePool.pool,
-        skills: skillPool.pool,
+        skills: skillPool,
       },
     };
     setData(newData);
@@ -397,7 +411,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       worldId: wizard.state.data.worldId,
       pointPools: { 
         attributes: attributePool.pool, 
-        skills: skillPool.pool 
+        skills: skillPool 
       },
       validation: wizard.state.validation
     };

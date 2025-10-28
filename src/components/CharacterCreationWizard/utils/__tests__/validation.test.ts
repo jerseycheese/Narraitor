@@ -93,10 +93,15 @@ describe('Character Creation Validation', () => {
       { skillId: 'skill-2', name: 'Magic', level: 2, isSelected: true },
       { skillId: 'skill-3', name: 'Stealth', level: 1, isSelected: false },
     ];
+    const mockWorldSkills = mockSkills.map(skill => ({
+      id: skill.skillId,
+      minValue: 1,
+      maxValue: 5,
+    }));
 
     it('returns error when no skills selected', () => {
       const noSelectedSkills = mockSkills.map(s => ({ ...s, isSelected: false }));
-      const result = validateSkills(noSelectedSkills);
+      const result = validateSkills(noSelectedSkills, 3, mockWorldSkills);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Select at least one skill');
     });
@@ -108,15 +113,41 @@ describe('Character Creation Validation', () => {
         level: 1,
         isSelected: true,
       }));
-      const result = validateSkills(manySkills);
+      const result = validateSkills(manySkills, 0, mockWorldSkills);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Maximum 8 skills allowed');
     });
 
     it('validates successfully with valid skill selection', () => {
-      const result = validateSkills(mockSkills);
+      const result = validateSkills(mockSkills, 3, mockWorldSkills);
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
+    });
+
+    it('flags skills that cannot be leveled due to identical bounds', () => {
+      const stagnantSkill = [{ skillId: 'skill-locked', name: 'Locked Skill', level: 1, isSelected: true }];
+      const worldMeta = [{ id: 'skill-locked', minValue: 1, maxValue: 1 }];
+      const result = validateSkills(stagnantSkill, 0, worldMeta);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain(
+        'Skill Locked Skill cannot be leveled because its configuration has no available range.'
+      );
+    });
+
+    it('allows progression when pool exceeds total capacity but skills are maxed out', () => {
+      const highPoolSkills = [
+        { skillId: 'skill-1', name: 'Blade', level: 5, isSelected: true, minLevel: 1, maxLevel: 5 },
+        { skillId: 'skill-2', name: 'Bow', level: 5, isSelected: true, minLevel: 1, maxLevel: 5 },
+      ];
+      const worldMeta = [
+        { id: 'skill-1', minValue: 1, maxValue: 5 },
+        { id: 'skill-2', minValue: 1, maxValue: 5 },
+      ];
+      const result = validateSkills(highPoolSkills, 20, worldMeta);
+
+      expect(result.valid).toBe(true);
+      expect(result.errors).not.toContain('Spend all remaining skill points before continuing.');
     });
   });
 
