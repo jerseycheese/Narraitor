@@ -400,27 +400,43 @@ test.describe('Game Session Visual Tests', () => {
           };
 
           const seededDecision = testWindow.__TEST_DECISIONS__?.['decision-cyberpunk-route'];
-          if (seededDecision?.options?.length) {
-            const badgeMap: Record<string, string[]> = {
-              'option-elevator': ['Tech Level ≥ 6', 'Maintenance ID'],
-              'option-stairs': ['Street Cred ≥ 5'],
-              'option-ventilation': ['Hacking ≥ 10', 'Lockpicks'],
-            };
+          const decodeBadgeVariant = (variant) => {
+            switch (variant) {
+              case 'success':
+                return 'bg-green-100 text-green-800 border border-green-200';
+              case 'destructive':
+                return 'bg-red-100 text-red-800 border border-red-200';
+              case 'outline':
+                return 'border border-border text-foreground';
+              default:
+                return 'bg-muted text-foreground';
+            }
+          };
 
+          if (seededDecision?.options?.length) {
             const optionMarkup = seededDecision.options
-              .map((option) => `
-                <button class="block w-full text-left p-3 border rounded bg-white shadow-sm mb-2" data-testid="choice-option-${option.id}">
-                  <div class="font-medium text-gray-900">${option.text}</div>
-                  ${option.hint ? `<div class="text-sm text-gray-500 mt-1">${option.hint}</div>` : ''}
-                  ${badgeMap[option.id]?.length ? `
-                    <div class="flex flex-wrap gap-2 mt-2" aria-label="Skill requirements">
-                      ${badgeMap[option.id]
-                        .map((badge) => `<span class=\"inline-flex items-center px-2 py-1 rounded-full bg-sky-100 text-sky-800 text-xs\">${badge}</span>`)
+              .map((option) => {
+                const skillMarkup = option.skillRequirements?.length
+                  ? `<div class="flex flex-wrap gap-1 mt-2" role="group" aria-label="Skill requirements">
+                      ${option.skillRequirements
+                        .map((req, index) => `
+                          <span class="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-xs font-medium text-foreground"
+                            data-testid="skill-badge-${option.id}-${index}">
+                            ${req.skillName || 'Skill Requirement'}
+                          </span>
+                        `)
                         .join('')}
-                    </div>
-                  ` : ''}
-                </button>
-              `)
+                    </div>`
+                  : '';
+
+                return `
+                  <button class="block w-full text-left p-3 border rounded bg-white shadow-sm mb-2" data-testid="choice-option-${option.id}">
+                    <div class="font-medium text-gray-900">${option.text}</div>
+                    ${option.hint ? `<div class="text-sm text-gray-500 mt-1">${option.hint}</div>` : ''}
+                    ${skillMarkup}
+                  </button>
+                `;
+              })
               .join('');
 
             element.innerHTML = `
