@@ -354,20 +354,43 @@ test.describe('Game Session Visual Tests', () => {
     console.log('🎨 Fade overlay:', fadeOverlay);
 
     // Ensure Suggested Actions are expanded so the screenshot captures AI recommendations
-    const suggestedActionsSection = page.locator('[data-testid="collapsible-section"]', {
+    const suggestedActionsTitle = page.locator('[data-testid="collapsible-section-title"]', {
       hasText: 'Suggested Actions'
     });
 
-    const sectionCount = await suggestedActionsSection.count();
-    if (sectionCount > 0) {
-      const toggle = suggestedActionsSection
-        .first()
-        .locator('[data-testid="collapsible-section-toggle"]');
+    if (await suggestedActionsTitle.count()) {
+      const toggle = suggestedActionsTitle.first().locator('..').locator('..').locator('[data-testid="collapsible-section-toggle"]');
       const isExpanded = await toggle.getAttribute('aria-expanded');
       if (isExpanded !== 'true') {
         await toggle.click();
-        await page.waitForTimeout(250);
+        await page.waitForTimeout(200);
       }
+
+      await page.evaluate(() => {
+        const title = Array.from(document.querySelectorAll('[data-testid="collapsible-section-title"]'))
+          .find((el) => el.textContent?.includes('Suggested Actions'));
+        if (!title) return;
+        const sectionEl = title.closest('[data-testid="collapsible-section"]');
+        if (!sectionEl) return;
+        const content = sectionEl.querySelector('[data-testid="collapsible-section-content"]');
+        if (content) {
+          const element = content as HTMLElement;
+          element.classList.add('block');
+          element.classList.remove('hidden');
+          element.setAttribute('aria-hidden', 'false');
+          element.style.display = 'block';
+          element.style.maxHeight = 'none';
+        }
+        const toggleEl = sectionEl.querySelector('[data-testid="collapsible-section-toggle"]');
+        if (toggleEl) {
+          toggleEl.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      await page.waitForSelector('[data-testid^="choice-option-"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
     }
 
     // Force the collapsible section content to be visible (defensive in case layout toggles collapse again)
