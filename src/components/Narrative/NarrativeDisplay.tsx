@@ -17,13 +17,16 @@ interface NarrativeDisplayProps {
   isLoading?: boolean;
   error?: string;
   onRetry?: () => void;
+  /** Enable progressive disclosure with text chunking */
+  enableChunking?: boolean;
 }
 
 export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   segment,
   isLoading = false,
   error,
-  onRetry
+  onRetry,
+  enableChunking = false
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
@@ -217,6 +220,12 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           content={formattedContent}
           className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
           highlightTerms={highlightTerms}
+          enableChunking={enableChunking}
+          chunkingOptions={{
+            minWordsPerChunk: 20,
+            maxWordsPerChunk: 150,
+            targetWordsPerChunk: 75,
+          }}
         />
         {resolvedSegment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-300">
