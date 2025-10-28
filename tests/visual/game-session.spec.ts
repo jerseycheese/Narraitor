@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
 import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
+import {
+  ensureSuggestedActionsExpanded,
+  renderSeededSuggestedActions,
+  seedInventoryItemsForVisual,
+  ensureSuggestedActionsContentVisible,
+  removeDuplicateSuggestedActionsTextarea,
+  relaxStoryColumnHeight,
+} from './utils/game-session-page-seeder';
 
 /**
  * Game Session Visual Regression Tests
@@ -353,35 +361,23 @@ test.describe('Game Session Visual Tests', () => {
     });
     console.log('🎨 Fade overlay:', fadeOverlay);
 
-    // Remove duplicate textarea that can appear inside the suggested actions section in tests
-    await page.evaluate(() => {
-      const suggestedActionsSection = document.querySelector('[data-testid="collapsible-section"]');
-      if (!suggestedActionsSection) return;
+    await ensureSuggestedActionsExpanded(page);
+    await renderSeededSuggestedActions(page);
+    await seedInventoryItemsForVisual(page);
 
-      const duplicateTextarea = suggestedActionsSection.querySelector('textarea');
-      if (!duplicateTextarea) return;
-
-      const wrapper = duplicateTextarea.closest('.mb-4, .p-4, .bg-gray-100');
-      if (wrapper && suggestedActionsSection.contains(wrapper)) {
-        wrapper.remove();
-        console.log('✅ Removed duplicate textarea wrapper inside collapsible section');
-        return;
-      }
-
-      duplicateTextarea.remove();
-      console.log('✅ Removed duplicate textarea inside collapsible section');
+    await page.waitForSelector('[data-testid^="choice-option-"]', {
+      state: 'visible',
+      timeout: 2000,
     });
 
-    // Temporarily remove height constraints to show all segments in fullPage screenshot
-    await page.evaluate(() => {
-      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-      if (storyColumn) {
-        const element = storyColumn as HTMLElement;
-        element.style.maxHeight = 'none';
-        element.style.overflow = 'visible';
-        console.log('✅ Removed height constraints for fullPage screenshot');
-      }
+    await page.waitForSelector('.inventory-item', {
+      state: 'visible',
+      timeout: 2000,
     });
+
+    await ensureSuggestedActionsContentVisible(page);
+    await removeDuplicateSuggestedActionsTextarea(page);
+    await relaxStoryColumnHeight(page);
 
     await page.waitForTimeout(200); // Wait for layout to adjust
 

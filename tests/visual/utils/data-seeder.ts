@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { getTimestamp } from '@/lib/utils';
+import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 
@@ -457,7 +458,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'tense',
       location: 'Starting Location',
-      timeOfDay: 'night',
       tags: ['intro'],
     },
     timestamp: new Date('2024-01-01T02:00:00.000Z'),
@@ -475,7 +475,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'mysterious',
       location: 'Neo-Tokyo alley',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:01:00.000Z'),
@@ -493,7 +492,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'action',
       location: 'Arasaka building interior',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:02:00.000Z'),
@@ -511,7 +509,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'neutral',
       location: 'Arasaka building',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:03:00.000Z'),
@@ -527,9 +524,8 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     type: 'action' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
-      mood: 'tactical',
+      mood: 'action',
       location: 'Arasaka building lobby',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:02:30.000Z'),
@@ -547,7 +543,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'tense',
       location: 'Arasaka floor 47',
-      timeOfDay: 'night',
+      tags: [],
     },
     timestamp: new Date('2024-01-01T02:04:00.000Z'),
     createdAt: '2024-01-01T02:04:00.000Z',
@@ -562,15 +558,15 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     type: 'scene' as const,
     characterIds: ['char-fantasy-mage'],
     metadata: {
-      mood: 'urgent',
+      mood: 'tense',
       location: 'Silverwind Academy',
-      timeOfDay: 'dawn',
+      tags: [],
     },
     timestamp: new Date('2024-01-02T02:00:00.000Z'),
     createdAt: '2024-01-02T02:00:00.000Z',
     updatedAt: '2024-01-02T02:00:00.000Z',
   },
-];
+] satisfies NarrativeSegment[];
 
 export const SAMPLE_DECISIONS = [
   {
@@ -582,18 +578,48 @@ export const SAMPLE_DECISIONS = [
         text: 'Take the maintenance elevator - quieter but slower',
         alignment: 'neutral' as const,
         hint: 'Lower risk of detection but takes more time',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-hacking',
+            operator: 'gte',
+            value: 10,
+          },
+        ],
       },
       {
         id: 'option-stairs',
         text: 'Use the emergency stairs - faster but riskier',
         alignment: 'chaotic' as const,
         hint: 'Quick route but higher chance of encountering security',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-streetwise',
+            operator: 'gte',
+            value: 8,
+          },
+        ],
       },
       {
         id: 'option-ventilation',
         text: 'Crawl through the ventilation system - stealthy but difficult',
         alignment: 'lawful' as const,
         hint: 'Requires high tech skill but nearly undetectable',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-hacking',
+            operator: 'gte',
+            value: 14,
+          },
+          {
+            type: 'skill' as const,
+            targetId: 'skill-streetwise',
+            operator: 'gte',
+            value: 10,
+          },
+        ],
       },
     ],
     selectedOptionId: 'option-ventilation',
@@ -632,7 +658,7 @@ export const SAMPLE_DECISIONS = [
     decisionWeight: 'critical' as const,
     narrativeSegmentId: 'segment-fantasy-1',
   },
-];
+] satisfies Decision[];
 
 /**
  * Base seeding for empty state tests - minimal data needed for app initialization
@@ -944,16 +970,16 @@ export async function seedTestData(page: Page): Promise<void> {
         {}
       );
 
-      const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce(
-        (acc: Record<string, unknown>, segment) => {
+      const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce<Record<string, NarrativeSegment>>(
+        (acc, segment) => {
           acc[segment.id] = segment;
           return acc;
         },
         {}
       );
 
-      const decisionsRecord = SAMPLE_DECISIONS.reduce(
-        (acc: Record<string, unknown>, decision) => {
+      const decisionsRecord = SAMPLE_DECISIONS.reduce<Record<string, Decision>>(
+        (acc, decision) => {
           acc[decision.id] = decision;
           return acc;
         },
@@ -1127,13 +1153,13 @@ export async function seedTestData(page: Page): Promise<void> {
             sessionSegments: {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[0]?.id;
                 }
               ),
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(segmentsRecord).filter(
                 (id) => {
-                  const segment = segmentsRecord[id] as Record<string, unknown>;
+                  const segment = segmentsRecord[id];
                   return segment?.sessionId === SAMPLE_GAME_SESSIONS[1]?.id;
                 }
               ),
@@ -1143,7 +1169,7 @@ export async function seedTestData(page: Page): Promise<void> {
               [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -1154,7 +1180,7 @@ export async function seedTestData(page: Page): Promise<void> {
               [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(
                 decisionsRecord
               ).filter((id) => {
-                const decision = decisionsRecord[id] as Record<string, unknown>;
+                const decision = decisionsRecord[id];
                 return (
                   decision?.narrativeSegmentId &&
                   String(decision.narrativeSegmentId).startsWith(
@@ -1268,15 +1294,7 @@ export async function seedTestData(page: Page): Promise<void> {
       }
 
       // Approach 3: Store test data globally for later access
-      const testWindow = window as typeof window & {
-        __TEST_WORLDS__?: Record<string, unknown>;
-        __TEST_CHARACTERS__?: Record<string, unknown>;
-        __TEST_SESSIONS__?: Record<string, unknown>;
-        __TEST_SEGMENTS__?: Record<string, unknown>;
-        __TEST_DECISIONS__?: Record<string, unknown>;
-        __TEST_CURRENT_WORLD_ID__?: string | null;
-        __TEST_SEEDED__?: boolean;
-      };
+      const testWindow = window;
 
       testWindow.__TEST_WORLDS__ = worldsRecord;
       testWindow.__TEST_CHARACTERS__ = charactersRecord;
@@ -1289,32 +1307,29 @@ export async function seedTestData(page: Page): Promise<void> {
       testWindow.__TEST_SEEDED__ = true;
 
       // Add additional session/narrative data for active session testing
-      const sessionWindow = window as typeof window & {
-        __TEST_SESSION_SEGMENTS__?: Record<string, string[]>;
-        __TEST_SESSION_DECISIONS__?: Record<string, string[]>;
-      };
+      const sessionWindow = window;
 
       sessionWindow.__TEST_SESSION_SEGMENTS__ = {
         'session-cyberpunk-ghost': Object.keys(segmentsRecord).filter((id) => {
-          const segment = segmentsRecord[id] as Record<string, unknown>;
+          const segment = segmentsRecord[id];
           return segment?.sessionId === 'session-cyberpunk-ghost';
         }),
         'session-fantasy-mage': Object.keys(segmentsRecord).filter((id) => {
-          const segment = segmentsRecord[id] as Record<string, unknown>;
+          const segment = segmentsRecord[id];
           return segment?.sessionId === 'session-fantasy-mage';
         }),
       };
 
       sessionWindow.__TEST_SESSION_DECISIONS__ = {
         'session-cyberpunk-ghost': Object.keys(decisionsRecord).filter((id) => {
-          const decision = decisionsRecord[id] as Record<string, unknown>;
+          const decision = decisionsRecord[id];
           return (
             decision?.narrativeSegmentId &&
             String(decision.narrativeSegmentId).includes('cyberpunk')
           );
         }),
         'session-fantasy-mage': Object.keys(decisionsRecord).filter((id) => {
-          const decision = decisionsRecord[id] as Record<string, unknown>;
+          const decision = decisionsRecord[id];
           return (
             decision?.narrativeSegmentId &&
             String(decision.narrativeSegmentId).includes('fantasy')
@@ -1384,7 +1399,6 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
           metadata: {
             mood: 'tense',
             location: 'Neo-Tokyo streets',
-            timeOfDay: 'night',
           },
         },
       },
