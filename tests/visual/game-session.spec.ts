@@ -384,7 +384,25 @@ test.describe('Game Session Visual Tests', () => {
           const testWindow = window as typeof window & {
             __TEST_DECISIONS__?: Record<string, {
               prompt?: string;
-              options?: Array<{ id: string; text: string; hint?: string }>;
+              options?: Array<{
+                id: string;
+                text: string;
+                hint?: string;
+                alignment?: string;
+                skillRequirements?: Array<{
+                  skillName?: string;
+                  targetId?: string;
+                  operator?: string;
+                  value?: number | string;
+                }>;
+                requirements?: Array<{
+                  type?: string;
+                  targetId?: string;
+                  operator?: string;
+                  value?: number | string;
+                  skillName?: string;
+                }>;
+              }>;
             }>;
             useInventoryStore?: {
               setState: (
@@ -400,37 +418,95 @@ test.describe('Game Session Visual Tests', () => {
           };
 
           const seededDecision = testWindow.__TEST_DECISIONS__?.['decision-cyberpunk-route'];
-          const decodeBadgeVariant = (variant) => {
-            switch (variant) {
-              case 'success':
-                return 'bg-green-100 text-green-800 border border-green-200';
-              case 'destructive':
-                return 'bg-red-100 text-red-800 border border-red-200';
-              case 'outline':
-                return 'border border-border text-foreground';
-              default:
-                return 'bg-muted text-foreground';
-            }
+          const skillNameLookup: Record<string, string> = {
+            'skill-hacking': 'Hacking',
+            'skill-streetwise': 'Streetwise',
+          };
+
+          const formatSkillRequirement = (requirement: any) => {
+            if (!requirement) return 'Skill Requirement';
+
+            const operatorSuffix = (operator: string, value: unknown) => {
+              if (value === undefined || value === null || value === '') return '';
+              const numericValue = typeof value === 'number' || typeof value === 'string' ? value : '';
+
+              switch (operator) {
+                case 'gte':
+                  return `${numericValue}+`;
+                case 'gt':
+                  return `>${numericValue}`;
+                case 'lte':
+                  return `≤${numericValue}`;
+                case 'lt':
+                  return `<${numericValue}`;
+                case 'eq':
+                  return `=${numericValue}`;
+                case 'neq':
+                  return `≠${numericValue}`;
+                default:
+                  return `${numericValue}`;
+              }
+            };
+
+            const baseName =
+              requirement.skillName ||
+              skillNameLookup[requirement.targetId as string] ||
+              requirement.targetId ||
+              'Skill Requirement';
+
+            const suffix = operatorSuffix(requirement.operator, requirement.value);
+            return suffix ? `${baseName} • ${suffix}` : baseName;
           };
 
           if (seededDecision?.options?.length) {
+            const badgeClasses = [
+              'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+              'transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+              'border border-gray-300 bg-gray-100 text-gray-700',
+            ].join(' ');
+
             const optionMarkup = seededDecision.options
               .map((option) => {
-                const skillMarkup = option.skillRequirements?.length
+                const resolvedSkillRequirements = (() => {
+                  if (Array.isArray(option.skillRequirements) && option.skillRequirements.length > 0) {
+                    return option.skillRequirements.map((req) =>
+                      req?.skillName || req?.label || 'Skill Requirement'
+                    );
+                  }
+
+                  if (Array.isArray(option.requirements)) {
+                    const rawSkillRequirements = option.requirements.filter(
+                      (req: any) => req?.type === 'skill'
+                    );
+                    if (rawSkillRequirements.length > 0) {
+                      return rawSkillRequirements.map((req: any) => formatSkillRequirement(req));
+                    }
+                  }
+
+                  return [];
+                })();
+
+                const skillMarkup = resolvedSkillRequirements.length
                   ? `<div class="flex flex-wrap gap-1 mt-2" role="group" aria-label="Skill requirements">
-                      ${option.skillRequirements
-                        .map((req, index) => `
-                          <span class="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-xs font-medium text-foreground"
-                            data-testid="skill-badge-${option.id}-${index}">
-                            ${req.skillName || 'Skill Requirement'}
-                          </span>
-                        `)
+                      ${resolvedSkillRequirements
+                        .map(
+                          (label: string, index: number) => `
+                          <div class="${badgeClasses}" data-testid="skill-badge-${option.id}-${index}">
+                            ${label}
+                          </div>
+                        `
+                        )
                         .join('')}
                     </div>`
                   : '';
 
+                const optionClasses = [
+                  'block w-full text-left p-3 border rounded-md shadow-sm mb-2 transition-colors',
+                  'bg-white hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+                ].join(' ');
+
                 return `
-                  <button class="block w-full text-left p-3 border rounded bg-white shadow-sm mb-2" data-testid="choice-option-${option.id}">
+                  <button class="${optionClasses}" data-testid="choice-option-${option.id}">
                     <div class="font-medium text-gray-900">${option.text}</div>
                     ${option.hint ? `<div class="text-sm text-gray-500 mt-1">${option.hint}</div>` : ''}
                     ${skillMarkup}

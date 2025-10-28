@@ -582,18 +582,48 @@ export const SAMPLE_DECISIONS = [
         text: 'Take the maintenance elevator - quieter but slower',
         alignment: 'neutral' as const,
         hint: 'Lower risk of detection but takes more time',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-hacking',
+            operator: 'gte',
+            value: 10,
+          },
+        ],
       },
       {
         id: 'option-stairs',
         text: 'Use the emergency stairs - faster but riskier',
         alignment: 'chaotic' as const,
         hint: 'Quick route but higher chance of encountering security',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-streetwise',
+            operator: 'gte',
+            value: 8,
+          },
+        ],
       },
       {
         id: 'option-ventilation',
         text: 'Crawl through the ventilation system - stealthy but difficult',
         alignment: 'lawful' as const,
         hint: 'Requires high tech skill but nearly undetectable',
+        requirements: [
+          {
+            type: 'skill' as const,
+            targetId: 'skill-hacking',
+            operator: 'gte',
+            value: 14,
+          },
+          {
+            type: 'skill' as const,
+            targetId: 'skill-streetwise',
+            operator: 'gte',
+            value: 10,
+          },
+        ],
       },
     ],
     selectedOptionId: 'option-ventilation',
