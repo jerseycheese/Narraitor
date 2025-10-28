@@ -458,7 +458,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'tense',
       location: 'Starting Location',
-      timeOfDay: 'night',
       tags: ['intro'],
     },
     timestamp: new Date('2024-01-01T02:00:00.000Z'),
@@ -476,7 +475,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'mysterious',
       location: 'Neo-Tokyo alley',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:01:00.000Z'),
@@ -494,7 +492,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'action',
       location: 'Arasaka building interior',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:02:00.000Z'),
@@ -512,7 +509,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'neutral',
       location: 'Arasaka building',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:03:00.000Z'),
@@ -528,9 +524,8 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     type: 'action' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
-      mood: 'tactical',
+      mood: 'action',
       location: 'Arasaka building lobby',
-      timeOfDay: 'night',
       tags: [],
     },
     timestamp: new Date('2024-01-01T02:02:30.000Z'),
@@ -548,7 +543,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     metadata: {
       mood: 'tense',
       location: 'Arasaka floor 47',
-      timeOfDay: 'night',
+      tags: [],
     },
     timestamp: new Date('2024-01-01T02:04:00.000Z'),
     createdAt: '2024-01-01T02:04:00.000Z',
@@ -563,15 +558,15 @@ export const SAMPLE_NARRATIVE_SEGMENTS = [
     type: 'scene' as const,
     characterIds: ['char-fantasy-mage'],
     metadata: {
-      mood: 'urgent',
+      mood: 'tense',
       location: 'Silverwind Academy',
-      timeOfDay: 'dawn',
+      tags: [],
     },
     timestamp: new Date('2024-01-02T02:00:00.000Z'),
     createdAt: '2024-01-02T02:00:00.000Z',
     updatedAt: '2024-01-02T02:00:00.000Z',
   },
-];
+] satisfies NarrativeSegment[];
 
 export const SAMPLE_DECISIONS = [
   {
@@ -663,7 +658,7 @@ export const SAMPLE_DECISIONS = [
     decisionWeight: 'critical' as const,
     narrativeSegmentId: 'segment-fantasy-1',
   },
-];
+] satisfies Decision[];
 
 /**
  * Base seeding for empty state tests - minimal data needed for app initialization
@@ -1404,7 +1399,6 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
           metadata: {
             mood: 'tense',
             location: 'Neo-Tokyo streets',
-            timeOfDay: 'night',
           },
         },
       },

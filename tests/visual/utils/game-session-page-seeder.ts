@@ -143,9 +143,22 @@ export async function renderSeededSuggestedActions(page: Page): Promise<void> {
       const optionMarkup = seededDecision.options
         .map((option) => {
           const resolvedSkillRequirements = (() => {
-            if (Array.isArray(option.skillRequirements) && option.skillRequirements.length > 0) {
-              return option.skillRequirements.map(
-                (req: any) => req?.skillName || req?.label || 'Skill Requirement'
+            const optionWithSkills = option as typeof option & {
+              skillRequirements?: Array<{
+                skillName?: string;
+                label?: string;
+                targetId?: string;
+                operator?: string;
+                value?: number | string;
+              }>;
+            };
+
+            if (
+              Array.isArray(optionWithSkills.skillRequirements) &&
+              optionWithSkills.skillRequirements.length > 0
+            ) {
+              return optionWithSkills.skillRequirements.map(
+                (req) => req?.skillName || req?.label || 'Skill Requirement'
               );
             }
 
