@@ -386,15 +386,39 @@ test.describe('Game Session Visual Tests', () => {
               prompt?: string;
               options?: Array<{ id: string; text: string; hint?: string }>;
             }>;
+            useInventoryStore?: {
+              setState: (
+                partial: unknown,
+                replace?: boolean
+              ) => void;
+              getState?: () => {
+                items: Record<string, unknown>;
+                entities?: Record<string, unknown>;
+                characterInventories: Record<string, string[]>;
+              };
+            };
           };
 
           const seededDecision = testWindow.__TEST_DECISIONS__?.['decision-cyberpunk-route'];
           if (seededDecision?.options?.length) {
+            const badgeMap: Record<string, string[]> = {
+              'option-elevator': ['Tech Level ≥ 6', 'Maintenance ID'],
+              'option-stairs': ['Street Cred ≥ 5'],
+              'option-ventilation': ['Hacking ≥ 10', 'Lockpicks'],
+            };
+
             const optionMarkup = seededDecision.options
               .map((option) => `
                 <button class="block w-full text-left p-3 border rounded bg-white shadow-sm mb-2" data-testid="choice-option-${option.id}">
                   <div class="font-medium text-gray-900">${option.text}</div>
                   ${option.hint ? `<div class="text-sm text-gray-500 mt-1">${option.hint}</div>` : ''}
+                  ${badgeMap[option.id]?.length ? `
+                    <div class="flex flex-wrap gap-2 mt-2" aria-label="Skill requirements">
+                      ${badgeMap[option.id]
+                        .map((badge) => `<span class=\"inline-flex items-center px-2 py-1 rounded-full bg-sky-100 text-sky-800 text-xs\">${badge}</span>`)
+                        .join('')}
+                    </div>
+                  ` : ''}
                 </button>
               `)
               .join('');
@@ -411,9 +435,127 @@ test.describe('Game Session Visual Tests', () => {
           toggleEl.setAttribute('aria-expanded', 'true');
           toggleEl.textContent = '−';
         }
+
+        // Seed inventory with demo items so the visual baseline reflects populated inventory UI
+        const inventoryStore = (window as typeof window & {
+          useInventoryStore?: {
+            setState: (
+              partial: unknown,
+              replace?: boolean
+            ) => void;
+            getState?: () => {
+              items: Record<string, unknown>;
+              entities?: Record<string, unknown>;
+              characterInventories: Record<string, string[]>;
+            };
+          };
+        }).useInventoryStore;
+
+        if (inventoryStore?.setState) {
+          const cyberpunkItems = {
+            'inventory-ghostlink-cyberdeck': {
+              id: 'inventory-ghostlink-cyberdeck',
+              name: 'Ghostlink Cyberdeck',
+              description: 'Signature deck tuned to slip past Arasaka intrusion countermeasures.',
+              categoryId: 'equipment',
+              quantity: 1,
+              stackable: false,
+              acquisitionHistory: [
+                {
+                  acquiredAt: '2024-01-01T01:58:00.000Z',
+                  method: 'quest',
+                  quantity: 1,
+                  description: 'Recovered during the vault raid briefing.',
+                },
+              ],
+              categorization: {
+                categoryId: 'equipment',
+                source: 'manual',
+                classifiedAt: '2024-01-01T01:58:00.000Z',
+              },
+              createdAt: '2024-01-01T01:58:00.000Z',
+              updatedAt: '2024-01-01T02:04:00.000Z',
+            },
+            'inventory-neuro-stims': {
+              id: 'inventory-neuro-stims',
+              name: 'NeuroBoost Stims',
+              description: 'Fast-acting injectors that keep reflexes sharp during breach attempts.',
+              categoryId: 'consumables',
+              quantity: 3,
+              stackable: true,
+              maxStack: 5,
+              acquisitionHistory: [
+                {
+                  acquiredAt: '2024-01-01T01:45:00.000Z',
+                  method: 'purchase',
+                  quantity: 3,
+                  description: 'Purchased from a trusted ripperdoc contact.',
+                },
+              ],
+              categorization: {
+                categoryId: 'consumables',
+                source: 'manual',
+                classifiedAt: '2024-01-01T01:45:00.000Z',
+              },
+              createdAt: '2024-01-01T01:45:00.000Z',
+              updatedAt: '2024-01-01T02:02:30.000Z',
+            },
+            'inventory-black-ice-shard': {
+              id: 'inventory-black-ice-shard',
+              name: 'Black ICE Shard',
+              description: 'Prototype defensive program that can be slotted into the deck on demand.',
+              categoryId: 'quest-items',
+              quantity: 1,
+              stackable: false,
+              acquisitionHistory: [
+                {
+                  acquiredAt: '2024-01-01T02:01:00.000Z',
+                  method: 'reward',
+                  quantity: 1,
+                  description: 'Rewarded by Fixer Nyx after completing the reconnaissance run.',
+                },
+              ],
+              categorization: {
+                categoryId: 'quest-items',
+                source: 'manual',
+                classifiedAt: '2024-01-01T02:01:00.000Z',
+              },
+              createdAt: '2024-01-01T02:01:00.000Z',
+              updatedAt: '2024-01-01T02:03:10.000Z',
+            },
+          } as Record<string, unknown>;
+
+          inventoryStore.setState((state: {
+            items: Record<string, unknown>;
+            entities?: Record<string, unknown>;
+            characterInventories: Record<string, string[]>;
+          }) => ({
+            items: {
+              ...state?.items,
+              ...cyberpunkItems,
+            },
+            entities: {
+              ...state?.items,
+              ...cyberpunkItems,
+            },
+            characterInventories: {
+              ...state?.characterInventories,
+              'char-cyberpunk-hacker': [
+                'inventory-ghostlink-cyberdeck',
+                'inventory-neuro-stims',
+                'inventory-black-ice-shard',
+              ],
+            },
+          }));
+        }
       });
 
       await page.waitForSelector('[data-testid^="choice-option-"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
+
+      await page.waitForSelector('.inventory-item', {
         state: 'visible',
         timeout: 2000,
       });
