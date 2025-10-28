@@ -26,7 +26,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   isLoading = false,
   error,
   onRetry,
-  enableChunking = false
+  enableChunking = true
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
