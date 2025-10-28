@@ -172,7 +172,17 @@ describe('Character Creation Wizard with Portrait Integration', () => {
       { id: 'strength', name: 'Strength', category: 'physical', min: 1, max: 20, defaultValue: 10 }
     ],
     skills: [
-      { id: 'magic', name: 'Magic', category: 'arcane', difficultyLevels: {} }
+      { 
+        id: 'magic', 
+        name: 'Magic', 
+        category: 'arcane', 
+        description: 'Harness arcane energies.',
+        difficultyLevels: {},
+        minValue: 1,
+        maxValue: 5,
+        baseValue: 1,
+        attributeIds: ['strength']
+      }
     ],
     settings: {
       maxAttributes: 10,

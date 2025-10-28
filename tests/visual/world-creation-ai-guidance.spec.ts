@@ -3,6 +3,8 @@ import { waitForContentStable } from './utils/wait-helpers';
 import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
 
 test.describe('World Creation Wizard AI Guidance', () => {
+  test.setTimeout(45000);
+
   test.beforeEach(async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -50,7 +52,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await page.goto('/worlds/create');
     await waitForContentStable(page);
     // Navigate to the Basic Info step by clicking "Create My Own World"
-    await page.getByRole('button', { name: 'Create My Own World' }).click();
+    const createOwnButton = page.getByRole('button', { name: 'Create My Own World' });
+    await expect(createOwnButton).toBeEnabled({ timeout: 15000 });
+    await createOwnButton.click();
     await page.waitForTimeout(300);
   });
 

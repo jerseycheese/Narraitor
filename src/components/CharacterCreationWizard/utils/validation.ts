@@ -38,7 +38,16 @@ export const validateAttributes = (
 };
 
 export const validateSkills = (
-  skills: Array<{ isSelected: boolean }>
+  skills: Array<{
+    skillId: EntityID;
+    isSelected: boolean;
+    level: number;
+    name?: string;
+    minLevel?: number;
+    maxLevel?: number;
+  }>,
+  skillPointPool: number,
+  worldSkills: Array<{ id: EntityID; minValue: number; maxValue: number }> = []
 ): ValidationResult => {
   const selections = skills.map(skill => skill.isSelected);
   const result = validateSelectionCount(selections, {
@@ -58,9 +67,53 @@ export const validateSkills = (
     return error;
   });
   
+  const errors = [...updatedErrors];
+
+  const getBounds = (skill: { minLevel?: number; maxLevel?: number; skillId: EntityID }) => {
+    const worldSkill = worldSkills.find(ws => ws.id === skill.skillId);
+    const minLevel = skill.minLevel ?? worldSkill?.minValue ?? 1;
+    const maxLevel = skill.maxLevel ?? worldSkill?.maxValue ?? minLevel;
+    return { minLevel, maxLevel };
+  };
+
+  const selectedSkills = skills.filter(skill => skill.isSelected);
+  const totalAllocated = selectedSkills.reduce((sum, skill) => {
+    const { minLevel } = getBounds(skill);
+    return sum + Math.max(0, (skill.level ?? minLevel) - minLevel);
+  }, 0);
+  const totalCapacity = selectedSkills.reduce((sum, skill) => {
+    const { minLevel, maxLevel } = getBounds(skill);
+    return sum + Math.max(0, maxLevel - minLevel);
+  }, 0);
+
+  selectedSkills.forEach(skill => {
+    const { minLevel, maxLevel } = getBounds(skill);
+    const skillLabel = skill.name || skill.skillId;
+    if (maxLevel === minLevel) {
+      errors.push(`Skill ${skillLabel} cannot be leveled because its configuration has no available range.`);
+    }
+    if (skill.level < minLevel) {
+      errors.push(`Skill ${skillLabel} is below its minimum level of ${minLevel}.`);
+    }
+    if (skill.level > maxLevel) {
+      errors.push(`Skill ${skillLabel} exceeds its maximum level of ${maxLevel}.`);
+    }
+  });
+
+  if (skillPointPool >= 0) {
+    const effectivePool = Math.min(skillPointPool, totalCapacity);
+    if (totalAllocated < effectivePool) {
+      errors.push('Spend all remaining skill points before continuing.');
+    } else if (totalAllocated > skillPointPool) {
+      errors.push('You have allocated more skill points than available.');
+    }
+  }
+
+  const uniqueErrors = Array.from(new Set(errors));
+
   return {
-    valid: result.valid,
-    errors: updatedErrors
+    valid: uniqueErrors.length === 0,
+    errors: uniqueErrors
   };
 };
 
