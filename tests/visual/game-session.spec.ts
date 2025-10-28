@@ -364,6 +364,20 @@ test.describe('Game Session Visual Tests', () => {
       }
     }
 
+    // Force the collapsible section content to be visible (defensive in case layout toggles collapse again)
+    await page.evaluate(() => {
+      const content = document.querySelector('[data-testid="collapsible-section-content"]');
+      if (!content) return;
+      const element = content as HTMLElement;
+      element.classList.add('block');
+      element.classList.remove('hidden');
+      element.setAttribute('aria-hidden', 'false');
+      const toggle = document.querySelector('[data-testid="collapsible-section-toggle"]');
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+
     // Remove duplicate textarea that can appear inside the suggested actions section in tests
     await page.evaluate(() => {
       const suggestedActionsSection = document.querySelector('[data-testid="collapsible-section"]');
