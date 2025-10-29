@@ -31,13 +31,6 @@ const ABBREVIATIONS = new Set([
 ]);
 
 /**
- * Check if a word count is within acceptable chunk size
- */
-function isValidChunkSize(wordCount: number, options: Required<ChunkingOptions>): boolean {
-  return wordCount >= options.minWordsPerChunk && wordCount <= options.maxWordsPerChunk;
-}
-
-/**
  * Count words in a string
  */
 function countWords(text: string): number {
