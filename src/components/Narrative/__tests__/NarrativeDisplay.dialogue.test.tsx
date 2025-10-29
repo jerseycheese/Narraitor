@@ -64,7 +64,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       updatedAt: new Date(),
     };
 
-    render(<NarrativeDisplay segment={dialogueSegment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={dialogueSegment} />);
 
     expect(screen.getAllByText('Gandalf')[0]).toBeInTheDocument();
     expect(screen.getByText('You shall not pass!')).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       updatedAt: new Date(),
     };
 
-    render(<NarrativeDisplay segment={dialogueSegment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={dialogueSegment} />);
 
     const avatar = screen.getByAltText(/aragorn/i);
     expect(avatar).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       updatedAt: new Date(),
     };
 
-    render(<NarrativeDisplay segment={dialogueSegment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={dialogueSegment} />);
 
     expect(screen.getByText('A mysterious voice echoes...')).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
@@ -167,7 +167,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       updatedAt: new Date(),
     };
 
-    render(<NarrativeDisplay segment={dialogueSegment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={dialogueSegment} />);
 
     expect(screen.getByText('Unknown speaker dialogue')).toBeInTheDocument();
   });

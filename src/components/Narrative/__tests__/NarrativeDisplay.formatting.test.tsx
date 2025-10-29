@@ -31,7 +31,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'First paragraph about the forest.\n\nSecond paragraph about the adventure.\n\nThird paragraph continues the story.';
       const segment = createMockSegment(rawContent);
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // With HTML formatting and dangerouslySetInnerHTML, content is structured in paragraphs
       expect(screen.getByText('First paragraph about the forest.')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'Opening scene description.\n\n\n\nMiddle section with extra breaks.\n\nClosing paragraph.';
       const segment = createMockSegment(rawContent);
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // Content should be organized into clean paragraphs
       expect(screen.getByText('Opening scene description.')).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'The wizard said, Welcome to my tower! The visitor replied, Thank you for having me.';
       const segment = createMockSegment(rawContent, 'dialogue');
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // Dialogue segments should format dialogue with quotes
       expect(screen.getByText(/The wizard said, "Welcome to my tower!"/)).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'The room was silent until she spoke.\n\nShe said, This place holds many secrets.\n\nHer words echoed in the chamber.';
       const segment = createMockSegment(rawContent);
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // Scene segments format dialogue with quotes
       expect(screen.getByText('The room was silent until she spoke.')).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'He said, "I already have quotes!" and she replied, "Me too!"';
       const segment = createMockSegment(rawContent, 'dialogue');
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // Should maintain existing quote structure
       expect(screen.getByText(/He said, "I already have quotes!" and she replied, "Me too!"/)).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'The *ancient* artifact glowed with *mysterious* power.';
       const segment = createMockSegment(rawContent);
 
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
 
       // Verify emphasized words are rendered as em elements
       const emphasizedWords = screen.getAllByText(/ancient|mysterious/);
@@ -104,7 +104,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'He leaped forward!\n\nThe sword clashed against the shield.\n\n*Victory* was within reach.';
       const segment = createMockSegment(rawContent, 'action');
 
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
 
       // Action segments organize paragraphs
       expect(screen.getByText('He leaped forward!')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'The enemy approaches with **unstoppable force**!';
       const segment = createMockSegment(rawContent, 'action');
 
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
 
       // Verify bold text is rendered as strong element
       const boldText = screen.getByText('unstoppable force');
@@ -132,7 +132,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       const rawContent = 'The tavern was *bustling* with activity.\n\nThe bartender said, What can I get you? The traveler replied, Just some information.\n\nThe conversation continued late into the night.';
       const segment = createMockSegment(rawContent);
 
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
 
       // All formatting should work together: emphasis, dialogue quotes, and paragraphs
       const emphasizedWord = screen.getByText('bustling');
@@ -152,7 +152,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
 
       contents.forEach(({ content, type }) => {
         const segment = createMockSegment(content, type);
-        const { unmount } = render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+        const { unmount } = render(<NarrativeDisplay segment={segment} />);
         
         // Each segment type should display with appropriate formatting
         if (type === 'scene') {
@@ -182,7 +182,7 @@ This was only the beginning of their quest.`;
 
       const segment = createMockSegment(longContent);
 
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
 
       // Long content should be organized into clear paragraphs with proper formatting
       expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.')).toBeInTheDocument();
@@ -198,7 +198,7 @@ This was only the beginning of their quest.`;
       const messyContent = '   The story begins   here.   \n\n\n   Multiple    spaces    everywhere.   \n\n   The  end.   ';
       const segment = createMockSegment(messyContent);
       
-      render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+      render(<NarrativeDisplay segment={segment} />);
       
       // Whitespace should be normalized and content organized into clean paragraphs
       expect(screen.getByText('The story begins here.')).toBeInTheDocument();
@@ -215,7 +215,7 @@ This was only the beginning of their quest.`;
         const content = `This is a ${type} segment.\n\nIt has multiple paragraphs.\n\nThe character said, This should be formatted properly.`;
         const segment = createMockSegment(content, type);
         
-        const { unmount } = render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+        const { unmount } = render(<NarrativeDisplay segment={segment} />);
         
         // Each segment type should display content with appropriate formatting
         if (type === 'transition') {

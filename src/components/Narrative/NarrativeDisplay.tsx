@@ -17,7 +17,20 @@ interface NarrativeDisplayProps {
   isLoading?: boolean;
   error?: string;
   onRetry?: () => void;
-  /** Enable progressive disclosure with text chunking */
+  /**
+   * Enable progressive disclosure chunking within narrative segments.
+   *
+   * @default false - Most AI-generated segments are 50-100 words and don't need chunking.
+   *
+   * Enable this when:
+   * - AI generates unusually long responses (>200 words)
+   * - Manually authored content has long paragraphs
+   * - Testing the chunking behavior specifically
+   *
+   * Note: Research showed the real engagement problem is session-level pacing (managing
+   * 10-15 min sessions with many segments), not individual segment length. For session-level
+   * solutions, see the session pacing features instead of enabling this.
+   */
   enableChunking?: boolean;
 }
 
@@ -26,7 +39,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   isLoading = false,
   error,
   onRetry,
-  enableChunking = true
+  enableChunking = false
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);

@@ -1,6 +1,15 @@
 /**
  * Hook for managing progressive disclosure of chunked narrative content.
  * Handles chunk visibility state and reveal interactions.
+ *
+ * **Usage Note:** Most AI-generated narrative segments are 50-100 words and don't need
+ * intra-segment chunking. This hook is intended for edge cases:
+ * - Unusually long AI responses (>200 words)
+ * - Manually authored content with long paragraphs
+ * - Testing chunking behavior
+ *
+ * For typical usage, consider session-level pacing solutions instead of chunking
+ * individual segments. See session pacing features for managing long reading sessions.
  */
 
 import { useState, useEffect, useMemo } from 'react';

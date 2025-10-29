@@ -37,7 +37,7 @@ describe('NarrativeDisplay', () => {
       }
     };
 
-    render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={segment} />);
 
     expect(screen.getByText(/ancient forest whispered secrets/)).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe('NarrativeDisplay', () => {
       },
     };
 
-    render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={segment} />);
 
     expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
     expect(screen.getByText('Eldria Sunshadow')).toBeInTheDocument();
@@ -126,7 +126,7 @@ describe('NarrativeDisplay', () => {
       },
     };
 
-    render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={segment} />);
 
     const list = screen.getByRole('list', { name: /characters present/i });
     expect(list).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('NarrativeDisplay', () => {
       },
     };
 
-    render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={segment} />);
 
     expect(screen.getAllByText('NPC 42').length).toBeGreaterThan(0);
   });
@@ -203,7 +203,7 @@ describe('NarrativeDisplay', () => {
       },
     };
 
-    render(<NarrativeDisplay segment={segment} enableChunking={false} />);
+    render(<NarrativeDisplay segment={segment} />);
 
     const content = screen.getByTestId('narrative-content-container');
     const highlighted = content.querySelectorAll('span.font-semibold');
@@ -230,7 +230,7 @@ describe('NarrativeDisplay', () => {
       }
     };
 
-    const { rerender } = render(<NarrativeDisplay segment={dialogueSegment} enableChunking={false} />);
+    const { rerender } = render(<NarrativeDisplay segment={dialogueSegment} />);
     expect(screen.getByText(/Hello there/)).toBeInTheDocument();
 
     const actionSegment = {
@@ -247,7 +247,7 @@ describe('NarrativeDisplay', () => {
       }
     };
 
-    rerender(<NarrativeDisplay segment={actionSegment} enableChunking={false} />);
+    rerender(<NarrativeDisplay segment={actionSegment} />);
     expect(screen.getByText(/hero leapt across/)).toBeInTheDocument();
   });
 
