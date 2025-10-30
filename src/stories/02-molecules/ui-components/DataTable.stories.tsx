@@ -1,6 +1,6 @@
 /**
  * DataTable Storybook Stories
- * Demonstrates various states and configurations of the reusable DataTable component
+ * Demonstrates the reusable DataTable component with sorting, filtering, and pagination
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -68,7 +68,7 @@ interface DataTableProps {
 }
 
 const meta: Meta<DataTableProps> = {
-  title: 'Components/DataTable',
+  title: 'Molecules/UI Components/DataTable',
   component: DataTable,
   parameters: {
     layout: 'padded',
@@ -91,37 +91,7 @@ export const Default: Story = {
 };
 
 /**
- * Table with pagination enabled
- */
-export const WithPagination: Story = {
-  args: {
-    columns,
-    data: sampleData,
-    pagination: {
-      pageSize: 5,
-      showPagination: true,
-    },
-    ariaLabel: 'Paginated data table',
-  },
-};
-
-/**
- * Table with search/filter functionality
- */
-export const WithSearch: Story = {
-  args: {
-    columns,
-    data: sampleData,
-    searchable: {
-      enabled: true,
-      placeholder: 'Search items...',
-    },
-    ariaLabel: 'Searchable data table',
-  },
-};
-
-/**
- * Table with both search and pagination
+ * Full-featured table with search and pagination
  */
 export const WithSearchAndPagination: Story = {
   args: {
@@ -140,29 +110,7 @@ export const WithSearchAndPagination: Story = {
 };
 
 /**
- * Empty state when no data is provided
- */
-export const EmptyState: Story = {
-  args: {
-    columns,
-    data: [],
-    ariaLabel: 'Empty data table',
-  },
-};
-
-/**
- * Table with single item
- */
-export const SingleItem: Story = {
-  args: {
-    columns,
-    data: [sampleData[0]],
-    ariaLabel: 'Single item table',
-  },
-};
-
-/**
- * Table with many items demonstrating scroll
+ * Large dataset with pagination
  */
 export const LargeDataset: Story = {
   args: {
