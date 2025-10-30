@@ -154,7 +154,7 @@ const withInventoryData = (Story: React.ComponentType, items: InventoryItem[]) =
 };
 
 const meta: Meta<typeof InventoryTable> = {
-  title: 'Organisms/Inventory/InventoryTable',
+  title: '03-Organisms/Inventory/InventoryTable',
   component: InventoryTable,
   parameters: {
     layout: 'padded',
