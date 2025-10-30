@@ -1,6 +1,9 @@
 /**
  * Playwright E2E tests for narrative text chunking and progressive disclosure.
  * Tests the full user experience of revealing narrative chunks in game sessions.
+ *
+ * NOTE: These tests are currently skipped pending test data infrastructure.
+ * See issue #806 for E2E test fixture implementation.
  */
 
 import { test, expect } from '@playwright/test';
@@ -13,7 +16,8 @@ test.describe('Narrative Text Chunking', () => {
     await page.goto('/');
   });
 
-  test('initially shows only first chunk of long narrative', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('initially shows only first chunk of long narrative', async ({ page }) => {
     // TODO: Set up test data with a long narrative segment
     // For now, this is a placeholder demonstrating the test structure
 
@@ -31,7 +35,8 @@ test.describe('Narrative Text Chunking', () => {
     await expect(revealButton).toContainText(/more/i);
   });
 
-  test('reveals more content when continue button is clicked', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('reveals more content when continue button is clicked', async ({ page }) => {
     // TODO: Set up test data
 
     await page.waitForSelector('[data-testid="narrative-content-container"]');
@@ -52,7 +57,8 @@ test.describe('Narrative Text Chunking', () => {
     expect(newText?.length).toBeGreaterThan(initialText?.length || 0);
   });
 
-  test('hides reveal button when all chunks are shown', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('hides reveal button when all chunks are shown', async ({ page }) => {
     // TODO: Set up test data with short narrative (2-3 chunks)
 
     await page.waitForSelector('[data-testid="narrative-content-container"]');
@@ -78,7 +84,8 @@ test.describe('Narrative Text Chunking', () => {
     await expect(revealButton).not.toBeVisible();
   });
 
-  test('applies fade-in animation to revealed chunks', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('applies fade-in animation to revealed chunks', async ({ page }) => {
     // TODO: Set up test data
 
     await page.waitForSelector('[data-testid="narrative-content-container"]');
@@ -93,7 +100,8 @@ test.describe('Narrative Text Chunking', () => {
     await expect(firstParagraph).toHaveClass(/animate-fade-in/);
   });
 
-  test('maintains highlighting and formatting with chunking enabled', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('maintains highlighting and formatting with chunking enabled', async ({ page }) => {
     // TODO: Set up test data with character names that should be highlighted
 
     await page.waitForSelector('[data-testid="narrative-content-container"]');
@@ -106,7 +114,8 @@ test.describe('Narrative Text Chunking', () => {
     }
   });
 
-  test('works correctly on mobile viewports', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('works correctly on mobile viewports', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
 
@@ -127,7 +136,8 @@ test.describe('Narrative Text Chunking', () => {
     await expect(contentContainer).toBeVisible();
   });
 
-  test('is accessible with keyboard navigation', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('is accessible with keyboard navigation', async ({ page }) => {
     await page.waitForSelector('[data-testid="narrative-content-container"]');
 
     const revealButton = page.getByRole('button', { name: /continue reading/i });
@@ -147,7 +157,8 @@ test.describe('Narrative Text Chunking', () => {
     await expect(contentContainer).toBeVisible();
   });
 
-  test('has proper ARIA labels for screen readers', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('has proper ARIA labels for screen readers', async ({ page }) => {
     await page.waitForSelector('[data-testid="narrative-content-container"]');
 
     const revealButton = page.getByRole('button', { name: /continue reading/i });
@@ -159,7 +170,8 @@ test.describe('Narrative Text Chunking', () => {
 });
 
 test.describe('Narrative Chunking - Visual Regression', () => {
-  test('renders initial chunk state correctly', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('renders initial chunk state correctly', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('[data-testid="narrative-content-container"]');
 
@@ -169,7 +181,8 @@ test.describe('Narrative Chunking - Visual Regression', () => {
     });
   });
 
-  test('renders revealed chunk state correctly', async ({ page }) => {
+  // Skipped pending #806: E2E test data infrastructure
+  test.skip('renders revealed chunk state correctly', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('[data-testid="narrative-content-container"]');
 
