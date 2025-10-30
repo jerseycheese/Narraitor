@@ -68,6 +68,7 @@ export function InventoryTable({
           <div className="text-center">{row.getValue('quantity')}</div>
         ),
         enableSorting: true,
+        sortingFn: 'basic',
       },
       {
         accessorKey: 'categoryId',
