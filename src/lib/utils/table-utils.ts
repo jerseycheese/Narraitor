@@ -73,7 +73,7 @@ export function getTotalPages(totalItems: number, pageSize: number): number {
  * @param searchFields - Fields to search in
  * @returns Filtered dataset
  */
-export function filterBySearch<T extends Record<string, any>>(
+export function filterBySearch<T extends Record<string, unknown>>(
   data: T[],
   searchTerm: string,
   searchFields: (keyof T)[]
@@ -124,7 +124,7 @@ export function getPageRange(
 
   const halfVisible = Math.floor(maxVisible / 2);
   let start = Math.max(1, currentPage - halfVisible);
-  let end = Math.min(totalPages, start + maxVisible - 1);
+  const end = Math.min(totalPages, start + maxVisible - 1);
 
   if (end - start < maxVisible - 1) {
     start = Math.max(1, end - maxVisible + 1);
