@@ -13,6 +13,9 @@ import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory
 // Mock inventory data
 const mockCharacterId = 'char-123' as EntityID;
 
+// Track if store has been initialized to prevent re-initialization
+let storeInitialized = false;
+
 const mockInventoryItems: InventoryItem[] = [
   {
     id: 'item-1' as EntityID,
@@ -128,30 +131,27 @@ const mockInventoryItems: InventoryItem[] = [
   },
 ];
 
-// Decorator to populate the store with mock data
-const withInventoryData = (Story: React.ComponentType, items: InventoryItem[]) => {
-  const StoryWithData = () => {
-    const initRef = React.useRef(false);
+// Helper to initialize store data once at module level
+function initializeStoreData(items: InventoryItem[]) {
+  if (storeInitialized) {
+    return;
+  }
 
-    // Initialize store once on mount
-    if (!initRef.current) {
-      const itemsRecord = items.reduce((acc, item) => {
-        acc[item.id] = item;
-        return acc;
-      }, {} as Record<EntityID, InventoryItem>);
+  const itemsRecord = items.reduce((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {} as Record<EntityID, InventoryItem>);
 
-      useInventoryStore.setState({
-        items: itemsRecord,
-        entities: itemsRecord,
-      });
-      initRef.current = true;
-    }
+  useInventoryStore.setState({
+    items: itemsRecord,
+    entities: itemsRecord,
+  });
 
-    return <Story />;
-  };
+  storeInitialized = true;
+}
 
-  return <StoryWithData />;
-};
+// Initialize store with default mock data at module level
+initializeStoreData(mockInventoryItems);
 
 const meta: Meta<typeof InventoryTable> = {
   title: '03-Organisms/inventory/InventoryTable',
@@ -169,7 +169,6 @@ type Story = StoryObj<typeof InventoryTable>;
  * Default inventory table with all categories
  */
 export const Default: Story = {
-  decorators: [(Story) => withInventoryData(Story, mockInventoryItems)],
   args: {
     characterId: mockCharacterId,
   },
@@ -179,13 +178,14 @@ export const Default: Story = {
  * Large inventory demonstrating pagination
  */
 export const LargeInventory: Story = {
-  decorators: [
-    (Story) => {
+  loaders: [
+    async () => {
+      // Generate large dataset for this story
       const categories: StandardInventoryCategory[] = ['consumables', 'equipment', 'documents', 'valuables', 'personal'];
       const methods = ['loot', 'purchase', 'quest', 'craft', 'reward'] as const;
 
       const largeItemSet = Array.from({ length: 25 }, (_, i) => ({
-        id: `item-${i + 1}` as EntityID,
+        id: `large-item-${i + 1}` as EntityID,
         name: `Item ${i + 1}`,
         description: `Description for item ${i + 1}`,
         categoryId: categories[i % 5],
@@ -208,7 +208,18 @@ export const LargeInventory: Story = {
         updatedAt: new Date().toISOString(),
       }));
 
-      return withInventoryData(Story, largeItemSet);
+      // Update store with large dataset before rendering
+      const itemsRecord = largeItemSet.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<EntityID, InventoryItem>);
+
+      useInventoryStore.setState({
+        items: itemsRecord,
+        entities: itemsRecord,
+      });
+
+      return {};
     },
   ],
   args: {
