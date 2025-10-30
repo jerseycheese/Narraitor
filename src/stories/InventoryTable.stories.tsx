@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { InventoryTable } from '@/components/inventory/InventoryTable';
 import { useInventoryStore } from '@/state/inventoryStore';
 import type { EntityID } from '@/types/common.types';
-import type { InventoryItem } from '@/types/inventory.types';
+import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
 
 // Mock inventory data
 const mockCharacterId = 'char-123' as EntityID;
@@ -25,7 +25,7 @@ const mockInventoryItems: InventoryItem[] = [
     acquisitionHistory: [
       {
         acquiredAt: '2024-01-15T10:00:00Z',
-        method: 'found',
+        method: 'loot',
         quantity: 5,
       },
     ],
@@ -129,19 +129,25 @@ const mockInventoryItems: InventoryItem[] = [
 ];
 
 // Decorator to populate the store with mock data
-const withInventoryData = (Story: any) => {
-  const { setItems } = useInventoryStore();
+const withInventoryData = (Story: React.ComponentType) => {
+  const StoryWithData = () => {
+    // Populate store with mock items directly
+    React.useEffect(() => {
+      const itemsRecord = mockInventoryItems.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<EntityID, InventoryItem>);
 
-  // Populate store with mock items
-  React.useEffect(() => {
-    const itemsRecord = mockInventoryItems.reduce((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {} as Record<EntityID, InventoryItem>);
-    setItems(itemsRecord);
-  }, [setItems]);
+      useInventoryStore.setState({
+        items: itemsRecord,
+        entities: itemsRecord,
+      });
+    }, []);
 
-  return <Story />;
+    return <Story />;
+  };
+
+  return <StoryWithData />;
 };
 
 const meta: Meta<typeof InventoryTable> = {
@@ -191,12 +197,17 @@ export const EquipmentOnly: Story = {
  */
 export const EmptyInventory: Story = {
   decorators: [
-    (Story: any) => {
-      const { setItems } = useInventoryStore();
-      React.useEffect(() => {
-        setItems({});
-      }, [setItems]);
-      return <Story />;
+    (Story: React.ComponentType) => {
+      const StoryWithEmptyData = () => {
+        React.useEffect(() => {
+          useInventoryStore.setState({
+            items: {},
+            entities: {},
+          });
+        }, []);
+        return <Story />;
+      };
+      return <StoryWithEmptyData />;
     },
   ],
   args: {
@@ -209,43 +220,51 @@ export const EmptyInventory: Story = {
  */
 export const LargeInventory: Story = {
   decorators: [
-    (Story: any) => {
-      const { setItems } = useInventoryStore();
+    (Story: React.ComponentType) => {
+      const StoryWithLargeData = () => {
+        React.useEffect(() => {
+          const categories: StandardInventoryCategory[] = ['consumables', 'equipment', 'documents', 'valuables', 'personal'];
+          const methods = ['loot', 'purchase', 'quest', 'craft', 'reward'] as const;
 
-      React.useEffect(() => {
-        const largeItemSet = Array.from({ length: 25 }, (_, i) => ({
-          id: `item-${i + 1}` as EntityID,
-          name: `Item ${i + 1}`,
-          description: `Description for item ${i + 1}`,
-          categoryId: ['consumables', 'equipment', 'documents', 'valuables', 'personal'][i % 5] as any,
-          quantity: Math.floor(Math.random() * 50) + 1,
-          stackable: i % 2 === 0,
-          maxStack: i % 2 === 0 ? 99 : undefined,
-          acquisitionHistory: [
-            {
-              acquiredAt: new Date(2024, 0, (i % 28) + 1).toISOString(),
-              method: ['loot', 'purchase', 'quest', 'craft', 'reward'][i % 5] as any,
-              quantity: 1,
+          const largeItemSet = Array.from({ length: 25 }, (_, i) => ({
+            id: `item-${i + 1}` as EntityID,
+            name: `Item ${i + 1}`,
+            description: `Description for item ${i + 1}`,
+            categoryId: categories[i % 5],
+            quantity: Math.floor(Math.random() * 50) + 1,
+            stackable: i % 2 === 0,
+            maxStack: i % 2 === 0 ? 99 : undefined,
+            acquisitionHistory: [
+              {
+                acquiredAt: new Date(2024, 0, (i % 28) + 1).toISOString(),
+                method: methods[i % 5],
+                quantity: 1,
+              },
+            ],
+            categorization: {
+              categoryId: categories[i % 5],
+              source: 'manual' as const,
+              classifiedAt: new Date().toISOString(),
             },
-          ],
-          categorization: {
-            categoryId: ['consumables', 'equipment', 'documents', 'valuables', 'personal'][i % 5] as any,
-            source: 'manual' as const,
-            classifiedAt: new Date().toISOString(),
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }));
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }));
 
-        const itemsRecord = largeItemSet.reduce((acc, item) => {
-          acc[item.id] = item;
-          return acc;
-        }, {} as Record<EntityID, InventoryItem>);
+          const itemsRecord = largeItemSet.reduce((acc, item) => {
+            acc[item.id] = item;
+            return acc;
+          }, {} as Record<EntityID, InventoryItem>);
 
-        setItems(itemsRecord);
-      }, [setItems]);
+          useInventoryStore.setState({
+            items: itemsRecord,
+            entities: itemsRecord,
+          });
+        }, []);
 
-      return <Story />;
+        return <Story />;
+      };
+
+      return <StoryWithLargeData />;
     },
   ],
   args: {

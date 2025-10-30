@@ -53,7 +53,21 @@ const columns: ColumnDef<SampleData>[] = [
   },
 ];
 
-const meta: Meta<typeof DataTable> = {
+interface DataTableProps {
+  columns: ColumnDef<SampleData>[];
+  data: SampleData[];
+  pagination?: {
+    pageSize?: number;
+    showPagination?: boolean;
+  };
+  searchable?: {
+    enabled?: boolean;
+    placeholder?: string;
+  };
+  ariaLabel?: string;
+}
+
+const meta: Meta<DataTableProps> = {
   title: 'Components/DataTable',
   component: DataTable,
   parameters: {
@@ -63,7 +77,7 @@ const meta: Meta<typeof DataTable> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof DataTable>;
+type Story = StoryObj<DataTableProps>;
 
 /**
  * Basic table with sortable columns
