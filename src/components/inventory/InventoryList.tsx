@@ -12,6 +12,8 @@ import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
+import { InventoryViewToggle, type InventoryViewMode } from './InventoryViewToggle';
+import { InventoryTable } from './InventoryTable';
 
 interface InventoryListProps {
   characterId: EntityID;
@@ -37,6 +39,22 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<InventoryViewMode>(() => {
+    // Load preference from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('inventory-view-mode');
+      return (saved as InventoryViewMode) || 'grid';
+    }
+    return 'grid';
+  });
+
+  // Persist view mode preference
+  const handleViewModeChange = (mode: InventoryViewMode) => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('inventory-view-mode', mode);
+    }
+  };
 
   // Get all items for this character
   const items = getCharacterItems(characterId);
@@ -91,6 +109,11 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
+      {/* View Toggle */}
+      <div className="flex justify-end">
+        <InventoryViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
+      </div>
+
       {/* Feedback message */}
       {errorFeedback && (
         <div
@@ -101,7 +124,13 @@ export const InventoryList: React.FC<InventoryListProps> = ({
         </div>
       )}
 
-      {populatedCategories.map((categoryId) => {
+      {/* Table View */}
+      {viewMode === 'table' ? (
+        <InventoryTable characterId={characterId} />
+      ) : (
+        /* Grid View */
+        <>
+          {populatedCategories.map((categoryId) => {
         const categoryItems = itemsByCategory[categoryId];
         const metadata = getCategoryMetadata(categoryId);
         const categoryName = metadata?.name || categoryId;
@@ -198,6 +227,8 @@ export const InventoryList: React.FC<InventoryListProps> = ({
           </section>
         );
       })}
+        </>
+      )}
     </div>
   );
 };
