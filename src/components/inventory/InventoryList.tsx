@@ -8,6 +8,7 @@ import { InventoryItem } from '@/types/inventory.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
@@ -116,12 +117,9 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
       {/* Feedback message */}
       {errorFeedback && (
-        <div
-          className="p-4 rounded-lg bg-red-50 text-red-800 border border-red-200"
-          role="alert"
-        >
-          {errorFeedback}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{errorFeedback}</AlertDescription>
+        </Alert>
       )}
 
       {/* Table View */}
@@ -200,7 +198,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                       <Badge
                         variant="outline"
                         size="sm"
-                        className="item-category hover:bg-white"
+                        className="item-category"
                         aria-label={`Category: ${categoryName}`}
                       >
                         {categoryName}

@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 data-table">
       {/* Search Filter */}
       {searchable.enabled && (
         <div className="flex items-center">
@@ -89,6 +89,7 @@ export function DataTable<TData, TValue>({
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="max-w-sm"
+            aria-label={searchable.placeholder || 'Search table'}
           />
         </div>
       )}
@@ -109,7 +110,7 @@ export function DataTable<TData, TValue>({
                         <div
                           className={
                             canSort
-                              ? 'flex items-center space-x-2 cursor-pointer select-none'
+                              ? 'flex items-center space-x-2 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm'
                               : ''
                           }
                           onClick={
