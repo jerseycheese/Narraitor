@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCharacterStore, type CharacterAttribute, type CharacterSkill } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
-// Removed direct AI client imports - using API routes instead
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
@@ -31,7 +30,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const [saving, setSaving] = useState(false);
   const [generatingPortrait, setGeneratingPortrait] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   // Load character data on mount
   useEffect(() => {
     try {
@@ -44,7 +43,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         return;
       }
       
-      // Load world data for attribute/skill limits
       const { worlds } = useWorldStore.getState();
       const worldData = worlds[characterData.worldId];
       setWorld(worldData);
@@ -57,20 +55,31 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       console.error('Error loading character:', err);
     }
   }, [characterId]);
-  
+
+  const isPoolValid = useMemo(() => {
+    if (!character || !world) return true;
+
+    const attributePointsSpent = character.attributes.reduce((sum, attr) => sum + attr.baseValue, 0);
+    const skillPointsSpent = character.skills.reduce((sum, skill) => sum + skill.level, 0);
+
+    const isAttributesValid = attributePointsSpent <= world.settings.attributePointPool;
+    const isSkillsValid = skillPointsSpent <= world.settings.skillPointPool;
+
+    return isAttributesValid && isSkillsValid;
+  }, [character, world]);
+
   // Handle saving all character changes
   const handleSave = async () => {
-    if (!character) return;
+    if (!character || !isPoolValid) return;
     
     setSaving(true);
     try {
       const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, character);
       
-      // Small delay to show save state
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      router.push(`/characters/${characterId}`); // Navigate back to character view
+      router.push(`/characters/${characterId}`);
     } catch (err) {
       setError('Failed to save character');
       console.error('Error saving character:', err);
@@ -79,66 +88,25 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     }
   };
   
-  // Handle canceling edits
   const handleCancel = () => {
     router.push(`/characters/${characterId}`);
   };
   
-  // Handle character deletion
   const handleDelete = () => {
     useCharacterStore.getState().deleteCharacter(characterId);
     router.push('/characters');
   };
   
-  // Handle portrait generation
   const handleGeneratePortrait = async (customDescription?: string) => {
     if (!character || !world) return;
     
     setGeneratingPortrait(true);
     try {
-      // Use the portrait generation API route
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          character: {
-            id: characterId,
-            name: character.name,
-            worldId: character.worldId,
-            background: {
-              history: character.background.history,
-              personality: character.background.personality,
-              physicalDescription: customDescription || character.background.physicalDescription || '',
-              goals: character.background.goals || [],
-              fears: character.background.fears || [],
-              relationships: []
-            },
-            attributes: character.attributes.map((attr: CharacterAttribute) => ({
-              attributeId: attr.id,
-              value: attr.modifiedValue
-            })),
-            skills: character.skills.map((skill: CharacterSkill) => ({
-              skillId: skill.id,
-              level: skill.level,
-              experience: 0,
-              isActive: true
-            })),
-            inventory: {
-              characterId: characterId,
-              items: [],
-              capacity: 100,
-              categories: []
-            },
-            status: {
-              health: character.status.health,
-              maxHealth: character.status.maxHealth,
-              conditions: character.status.conditions
-            },
-            createdAt: character.createdAt,
-            updatedAt: character.updatedAt
-          },
+          character: { ...character, id: characterId },
           world: world,
           customDescription: customDescription
         }),
@@ -151,10 +119,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
 
       const { portrait } = await response.json();
       
-      // Update character with new portrait
       setCharacter({ ...character, portrait });
-      
-      // Also update the character store
       useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       console.error('Failed to generate portrait:', error);
@@ -181,11 +146,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   
   return (
     <div className="component-character-editor space-y-6">
-      <CollapsibleSection 
-        title="Character Portrait" 
-        initiallyExpanded={false}
-        className="bg-background"
-      >
+      <CollapsibleSection title="Character Portrait" initiallyExpanded={false} className="bg-background">
         <PortraitSection
           portrait={character.portrait}
           characterName={character.name}
@@ -195,11 +156,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Basic Information" 
-        initiallyExpanded={true}
-        className="bg-background"
-      >
+      <CollapsibleSection title="Basic Information" initiallyExpanded={true} className="bg-background">
         <BasicInfoForm
           name={character.name}
           level={character.level}
@@ -210,46 +167,23 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Background" 
-        initiallyExpanded={false}
-        className="bg-background"
-      >
+      <CollapsibleSection title="Background" initiallyExpanded={false} className="bg-background">
         <BackgroundForm
-          background={{
-            history: character.background.history,
-            personality: character.background.personality,
-            goals: character.background.goals,
-            fears: character.background.fears,
-            physicalDescription: character.background.physicalDescription
-          }}
+          background={character.background}
           onBackgroundChange={(background) => setCharacter({ 
             ...character, 
-            background: {
-              ...character.background,
-              ...background
-            }
+            background: { ...character.background, ...background }
           })}
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Attributes" 
-        initiallyExpanded={false}
-        className="bg-background"
-      >
+      <CollapsibleSection title="Attributes" initiallyExpanded={false} className="bg-background">
         <AttributesForm
-          attributes={character.attributes.map((attr: CharacterAttribute) => ({
-            attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
-            value: attr.baseValue
-          }))}
+          attributes={character.attributes.map(attr => ({ attributeId: attr.id, value: attr.baseValue }))}
           world={world}
           onAttributesChange={(formAttributes) => {
-            const updatedAttributes = character.attributes.map((attr: CharacterAttribute) => {
-              const formAttr = formAttributes.find(fa => {
-                const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
-                return worldAttr?.name === attr.name;
-              });
+            const updatedAttributes = character.attributes.map(attr => {
+              const formAttr = formAttributes.find(fa => fa.attributeId === attr.id);
               return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
             });
             setCharacter({ ...character, attributes: updatedAttributes });
@@ -257,25 +191,18 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Skills" 
-        initiallyExpanded={false}
-        className="bg-background"
-      >
+      <CollapsibleSection title="Skills" initiallyExpanded={false} className="bg-background">
         <SkillsForm
-          skills={character.skills.map((skill: CharacterSkill) => ({
-            skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+          skills={character.skills.map(skill => ({
+            skillId: skill.id,
             level: skill.level,
             experience: 0,
             isActive: true
           }))}
           world={world}
           onSkillsChange={(formSkills) => {
-            const updatedSkills = character.skills.map((skill: CharacterSkill) => {
-              const formSkill = formSkills.find(fs => {
-                const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
-                return worldSkill?.name === skill.name;
-              });
+            const updatedSkills = character.skills.map(skill => {
+              const formSkill = formSkills.find(fs => fs.skillId === skill.id);
               return formSkill ? { ...skill, level: formSkill.level } : skill;
             });
             setCharacter({ ...character, skills: updatedSkills });
@@ -283,33 +210,20 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      {/* Action Buttons */}
       <div className="flex justify-between pt-6 border-t border-border">
-        <Button 
-          variant="destructive"
-          onClick={() => setShowDeleteDialog(true)}
-          disabled={saving}
-        >
+        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={saving}>
           Delete Character
         </Button>
         <div className="flex space-x-4">
-          <Button 
-            variant="outline"
-            onClick={handleCancel}
-            disabled={saving}
-          >
+          <Button variant="outline" onClick={handleCancel} disabled={saving}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleSave}
-            disabled={saving}
-          >
+          <Button onClick={handleSave} disabled={saving || !isPoolValid}>
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
       
-      {/* Delete Confirmation Dialog */}
       {character && (
         <DeleteConfirmationDialog
           isOpen={showDeleteDialog}

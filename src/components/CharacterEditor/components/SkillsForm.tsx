@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { World } from '@/types/world.types';
 import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
+import { useSkillPointPool } from '@/hooks/usePointPoolManager';
+import { PointPoolDisplay } from './PointPoolDisplay';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
 
 interface CharacterSkill {
-  skillId: string;      // ← Actual structure from store
+  skillId: string;
   level: number;
   experience: number;
   isActive: boolean;
@@ -19,63 +23,113 @@ interface SkillsFormProps {
 export const SkillsForm: React.FC<SkillsFormProps> = ({
   skills,
   world,
-  onSkillsChange
+  onSkillsChange,
 }) => {
-  const handleSkillChange = (skillId: string, level: number) => {
-    const newSkills = skills.map(skill =>
-      skill.skillId === skillId ? { ...skill, level } : skill
-    );
+  const {
+    pool,
+    skills: managedSkills,
+    canIncrease,
+    setValue,
+    isValidDistribution,
+  } = useSkillPointPool({
+    totalPoints: world.settings.skillPointPool,
+    skills: skills.map(skill => {
+      const worldSkill = world.skills.find(ws => ws.id === skill.skillId);
+      return {
+        id: skill.skillId,
+        value: skill.level,
+        minValue: worldSkill?.minValue || 0,
+        maxValue: worldSkill?.maxValue || 10,
+        isSelected: true, // All skills in editor count toward pool
+      };
+    }),
+  });
+
+  const handleValueChange = useCallback((skillId: string, newValue: number) => {
+    setValue(skillId, newValue);
+
+    // Update parent with new values
+    const newSkills = skills.map(skill => ({
+      ...skill,
+      level: skill.skillId === skillId ? newValue : skill.level,
+    }));
     onSkillsChange(newSkills);
-  };
+  }, [setValue, skills, onSkillsChange]);
 
   return (
-    <div className="bg-background rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Skills</h2>
+    <div className="component-skills-form bg-background rounded-lg p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Skills</h2>
+        <PointPoolDisplay pool={pool} />
+      </div>
+
+      {!isValidDistribution && (
+        <Alert variant="destructive" className="mb-4">
+          <InfoCircledIcon className="h-4 w-4" />
+          <AlertDescription>
+            You have exceeded the available skill points. Please lower some skill
+            levels.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {skills.map((skill, index) => {
-          // Ensure we have a unique key
-          const uniqueKey = skill.skillId || `skill-${index}`;
-          const worldSkill = world.skills.find(ws => ws.id === skill.skillId);
-          const minValue = worldSkill?.minValue || 0;
-          const maxValue = worldSkill?.maxValue || 10;
-          
+        {managedSkills.map((skill, index) => {
+          const uniqueKey = skill.id || `skill-${index}`;
+          const worldSkill = world.skills.find(ws => ws.id === skill.id);
+          const isSliderDisabled = !canIncrease(skill.id) && skill.value === skill.maxValue;
+
           return (
-            <div key={uniqueKey} className="bg-muted rounded-lg p-4 border border-l-4 border-l-primary">
+            <div
+              key={uniqueKey}
+              className="bg-muted rounded-lg p-4 border border-l-4 border-l-primary"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <Label className="block text-sm font-medium">
                   {worldSkill?.name || `Skill ${index + 1}`}
                 </Label>
                 {worldSkill?.difficulty && (
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    worldSkill.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                    worldSkill.difficulty === 'medium' ? 'bg-amber-100 text-amber-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      worldSkill.difficulty === 'easy'
+                        ? 'bg-green-100 text-green-800'
+                        : worldSkill.difficulty === 'medium'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {worldSkill.difficulty}
                   </span>
                 )}
               </div>
               {worldSkill?.description && (
-                <p className="text-xs text-muted-foreground mb-2">{worldSkill.description}</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {worldSkill.description}
+                </p>
               )}
               <RangeSlider
-                value={skill.level}
-                min={minValue}
-                max={maxValue}
-                onChange={(value) => handleSkillChange(skill.skillId, value)}
+                value={skill.value}
+                min={skill.minValue}
+                max={skill.maxValue}
+                onChange={newValue => handleValueChange(skill.id, newValue)}
+                disabled={isSliderDisabled || !canIncrease(skill.id)}
                 showLabel={false}
-                testId={`skill-${skill.skillId}`}
+                testId={`skill-${skill.id}`}
               />
               <div className="text-xs text-muted-foreground mt-1">
-                Range: {minValue} - {maxValue}
-                {worldSkill?.attributeIds && worldSkill.attributeIds.length > 0 && (
-                  <span className="ml-2">
-                    • Linked to: {worldSkill.attributeIds
-                      .map(id => world.attributes.find(a => a.id === id)?.name)
-                      .filter(Boolean)
-                      .join(', ') || 'Unknown'}
-                  </span>
-                )}
+                Range: {skill.minValue} - {skill.maxValue}
+                {worldSkill?.attributeIds &&
+                  worldSkill.attributeIds.length > 0 && (
+                    <span className="ml-2">
+                      • Linked to:{' '}
+                      {worldSkill.attributeIds
+                        .map(
+                          id => world.attributes.find(a => a.id === id)?.name
+                        )
+                        .filter(Boolean)
+                        .join(', ') || 'Unknown'}
+                    </span>
+                  )}
               </div>
             </div>
           );

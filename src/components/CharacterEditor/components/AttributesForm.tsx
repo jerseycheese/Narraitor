@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { World } from '@/types/world.types';
 import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
+import { useAttributePointPool } from '@/hooks/usePointPoolManager';
+import { PointPoolDisplay } from './PointPoolDisplay';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
 
 interface CharacterAttribute {
-  attributeId: string;  // ← Actual structure from store
-  value: number;        // ← Actual structure from store
+  attributeId: string;
+  value: number;
 }
 
 interface AttributesFormProps {
@@ -17,46 +21,83 @@ interface AttributesFormProps {
 export const AttributesForm: React.FC<AttributesFormProps> = ({
   attributes,
   world,
-  onAttributesChange
+  onAttributesChange,
 }) => {
-  const handleAttributeChange = (attrId: string, value: number) => {
-    const newAttributes = attributes.map(attr =>
-      attr.attributeId === attrId ? { ...attr, value } : attr
-    );
+  const {
+    pool,
+    items: managedAttributes,
+    canIncrease,
+    setValue,
+    isValidDistribution,
+  } = useAttributePointPool({
+    totalPoints: world.settings.attributePointPool,
+    items: attributes.map(attr => {
+      const worldAttr = world.attributes.find(wa => wa.id === attr.attributeId);
+      return {
+        id: attr.attributeId,
+        value: attr.value,
+        minValue: worldAttr?.minValue || 1,
+        maxValue: worldAttr?.maxValue || 10,
+      };
+    }),
+  });
+
+  const handleValueChange = useCallback((attrId: string, newValue: number) => {
+    setValue(attrId, newValue);
+
+    // Update parent with new values
+    const newAttributes = managedAttributes.map(attr => ({
+      attributeId: attr.id,
+      value: attr.id === attrId ? newValue : attr.value,
+    }));
     onAttributesChange(newAttributes);
-  };
+  }, [setValue, managedAttributes, onAttributesChange]);
 
   return (
     <div className="component-attributes-form bg-background rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Attributes</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Attributes</h2>
+        <PointPoolDisplay pool={pool} />
+      </div>
+
+      {!isValidDistribution && (
+        <Alert variant="destructive" className="mb-4">
+          <InfoCircledIcon className="h-4 w-4" />
+          <AlertDescription>
+            You have exceeded the available attribute points. Please lower some
+            attribute values.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {attributes.map((attr, index) => {
-          const worldAttr = world.attributes.find(wa => wa.id === attr.attributeId);
-          const minValue = worldAttr?.minValue || 1;
-          const maxValue = worldAttr?.maxValue || 10;
-          
-          
-          // Ensure we have a unique key 
-          const uniqueKey = attr.attributeId || `attr-${index}`;
-          
+        {managedAttributes.map((attr, index) => {
+          const worldAttr = world.attributes.find(wa => wa.id === attr.id);
+          const isSliderDisabled = !canIncrease(attr.id) && attr.value === attr.maxValue;
+
+          const uniqueKey = attr.id || `attr-${index}`;
+
           return (
             <div key={uniqueKey} className="bg-muted rounded-lg p-4 border">
               <Label className="block text-sm font-medium mb-1">
                 {worldAttr?.name || `Attribute ${index + 1}`}
               </Label>
               {worldAttr?.description && (
-                <p className="text-xs text-muted-foreground mb-2">{worldAttr.description}</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {worldAttr.description}
+                </p>
               )}
               <RangeSlider
                 value={attr.value}
-                min={minValue}
-                max={maxValue}
-                onChange={(value) => handleAttributeChange(attr.attributeId, value)}
+                min={attr.minValue}
+                max={attr.maxValue}
+                onChange={newValue => handleValueChange(attr.id, newValue)}
+                disabled={isSliderDisabled || !canIncrease(attr.id)}
                 showLabel={false}
-                testId={`attribute-${attr.attributeId}`}
+                testId={`attribute-${attr.id}`}
               />
               <div className="text-xs text-muted-foreground mt-1">
-                Range: {minValue} - {maxValue}
+                Range: {attr.minValue} - {attr.maxValue}
               </div>
             </div>
           );
