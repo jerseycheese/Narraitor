@@ -57,7 +57,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
     <div className="component-attributes-form bg-background rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Attributes</h2>
-        <PointPoolDisplay pool={pool} />
+        <PointPoolDisplay pool={pool} label="Attribute Points" />
       </div>
 
       {!isValidDistribution && (
@@ -73,7 +73,8 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {managedAttributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.id);
-          const isSliderDisabled = !canIncrease(attr.id) && attr.value === attr.maxValue;
+          const isAtMax = attr.value === attr.maxValue;
+          const cannotIncrease = !canIncrease(attr.id);
 
           const uniqueKey = attr.id || `attr-${index}`;
 
@@ -87,12 +88,17 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                   {worldAttr.description}
                 </p>
               )}
+              {cannotIncrease && !isAtMax && pool.remaining === 0 && (
+                <p className="text-xs text-amber-500 mb-2 font-medium">
+                  No points remaining. Reduce other attributes to increase this one.
+                </p>
+              )}
               <RangeSlider
                 value={attr.value}
                 min={attr.minValue}
                 max={attr.maxValue}
                 onChange={newValue => handleValueChange(attr.id, newValue)}
-                disabled={isSliderDisabled || !canIncrease(attr.id)}
+                disabled={false}
                 showLabel={false}
                 testId={`attribute-${attr.id}`}
               />

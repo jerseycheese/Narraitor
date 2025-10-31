@@ -60,7 +60,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
     <div className="component-skills-form bg-background rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Skills</h2>
-        <PointPoolDisplay pool={pool} />
+        <PointPoolDisplay pool={pool} label="Skill Points" />
       </div>
 
       {!isValidDistribution && (
@@ -77,7 +77,8 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
         {managedSkills.map((skill, index) => {
           const uniqueKey = skill.id || `skill-${index}`;
           const worldSkill = world.skills.find(ws => ws.id === skill.id);
-          const isSliderDisabled = !canIncrease(skill.id) && skill.value === skill.maxValue;
+          const isAtMax = skill.value === skill.maxValue;
+          const cannotIncrease = !canIncrease(skill.id);
 
           return (
             <div
@@ -107,12 +108,17 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                   {worldSkill.description}
                 </p>
               )}
+              {cannotIncrease && !isAtMax && pool.remaining === 0 && (
+                <p className="text-xs text-amber-500 mb-2 font-medium">
+                  No points remaining. Reduce other skills to increase this one.
+                </p>
+              )}
               <RangeSlider
                 value={skill.value}
                 min={skill.minValue}
                 max={skill.maxValue}
                 onChange={newValue => handleValueChange(skill.id, newValue)}
-                disabled={isSliderDisabled || !canIncrease(skill.id)}
+                disabled={false}
                 showLabel={false}
                 testId={`skill-${skill.id}`}
               />
