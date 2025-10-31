@@ -17,17 +17,11 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
   label = 'Point Pool'
 }) => {
   const remainingColor =
-    pool.remaining === 0
-      ? 'text-green-500'
-      : pool.remaining < 0
-      ? 'text-red-500'
-      : 'text-amber-500';
+    pool.remaining === 0 ? 'text-green-500' : 'text-amber-500';
 
   const statusText =
     pool.remaining === 0
       ? 'All points allocated!'
-      : pool.remaining < 0
-      ? `Over by ${Math.abs(pool.remaining)} points`
       : `${pool.remaining} points remaining`;
 
   return (
@@ -57,11 +51,6 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
             <span className="flex items-center gap-2 text-green-700 text-xs font-medium">
               <CheckCircle className="w-4 h-4" aria-hidden="true" />
               All allocated!
-            </span>
-          )}
-          {pool.remaining < 0 && (
-            <span className="text-red-700 text-xs font-medium">
-              Exceeded!
             </span>
           )}
         </div>

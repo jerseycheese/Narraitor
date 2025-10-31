@@ -4,8 +4,6 @@ import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
 import { useSkillPointPool } from '@/hooks/usePointPoolManager';
 import { PointPoolDisplay } from './PointPoolDisplay';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoCircledIcon } from '@radix-ui/react-icons';
 
 interface CharacterSkill {
   skillId: string;
@@ -30,7 +28,6 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
     skills: managedSkills,
     canIncrease,
     setValue,
-    isValidDistribution,
   } = useSkillPointPool({
     totalPoints: world.settings.skillPointPool,
     skills: skills.map(skill => {
@@ -63,22 +60,17 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
         <PointPoolDisplay pool={pool} label="Skill Points" />
       </div>
 
-      {!isValidDistribution && (
-        <Alert variant="destructive" className="mb-4">
-          <InfoCircledIcon className="h-4 w-4" />
-          <AlertDescription>
-            You have exceeded the available skill points. Please lower some skill
-            levels.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {managedSkills.map((skill, index) => {
           const uniqueKey = skill.id || `skill-${index}`;
           const worldSkill = world.skills.find(ws => ws.id === skill.id);
-          const isAtMax = skill.value === skill.maxValue;
           const cannotIncrease = !canIncrease(skill.id);
+
+          // Calculate effective max based on pool constraints
+          const currentValue = skill.value;
+          const effectiveMax = cannotIncrease
+            ? currentValue  // Can't increase beyond current value if pool exhausted
+            : skill.maxValue; // Can increase up to max if pool has points
 
           return (
             <div
@@ -108,7 +100,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                   {worldSkill.description}
                 </p>
               )}
-              {cannotIncrease && !isAtMax && pool.remaining === 0 && (
+              {cannotIncrease && currentValue < skill.maxValue && (
                 <p className="text-xs text-amber-500 mb-2 font-medium">
                   No points remaining. Reduce other skills to increase this one.
                 </p>
@@ -117,6 +109,8 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 value={skill.value}
                 min={skill.minValue}
                 max={skill.maxValue}
+                effectiveMax={effectiveMax}
+                isConstrained={cannotIncrease}
                 onChange={newValue => handleValueChange(skill.id, newValue)}
                 disabled={false}
                 showLabel={false}

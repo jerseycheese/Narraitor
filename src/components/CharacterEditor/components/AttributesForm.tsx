@@ -4,8 +4,6 @@ import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
 import { useAttributePointPool } from '@/hooks/usePointPoolManager';
 import { PointPoolDisplay } from './PointPoolDisplay';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoCircledIcon } from '@radix-ui/react-icons';
 
 interface CharacterAttribute {
   attributeId: string;
@@ -28,7 +26,6 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
     items: managedAttributes,
     canIncrease,
     setValue,
-    isValidDistribution,
   } = useAttributePointPool({
     totalPoints: world.settings.attributePointPool,
     items: attributes.map(attr => {
@@ -60,21 +57,16 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
         <PointPoolDisplay pool={pool} label="Attribute Points" />
       </div>
 
-      {!isValidDistribution && (
-        <Alert variant="destructive" className="mb-4">
-          <InfoCircledIcon className="h-4 w-4" />
-          <AlertDescription>
-            You have exceeded the available attribute points. Please lower some
-            attribute values.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {managedAttributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.id);
-          const isAtMax = attr.value === attr.maxValue;
           const cannotIncrease = !canIncrease(attr.id);
+
+          // Calculate effective max based on pool constraints
+          const currentValue = attr.value;
+          const effectiveMax = cannotIncrease
+            ? currentValue  // Can't increase beyond current value if pool exhausted
+            : attr.maxValue; // Can increase up to max if pool has points
 
           const uniqueKey = attr.id || `attr-${index}`;
 
@@ -88,7 +80,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                   {worldAttr.description}
                 </p>
               )}
-              {cannotIncrease && !isAtMax && pool.remaining === 0 && (
+              {cannotIncrease && currentValue < attr.maxValue && (
                 <p className="text-xs text-amber-500 mb-2 font-medium">
                   No points remaining. Reduce other attributes to increase this one.
                 </p>
@@ -97,6 +89,8 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 value={attr.value}
                 min={attr.minValue}
                 max={attr.maxValue}
+                effectiveMax={effectiveMax}
+                isConstrained={cannotIncrease}
                 onChange={newValue => handleValueChange(attr.id, newValue)}
                 disabled={false}
                 showLabel={false}
