@@ -34,10 +34,8 @@ export function InventoryTable({
   characterId,
   categoryFilter,
 }: InventoryTableProps) {
-  const { items, removeItem } = useInventoryStore((state) => ({
-    items: Object.values(state.items),
-    removeItem: state.removeItem,
-  }));
+  const items = useInventoryStore((state) => Object.values(state.items));
+  const removeItem = useInventoryStore((state) => state.removeItem);
 
   // Filter items by character and optional category
   const filteredItems = React.useMemo(() => {

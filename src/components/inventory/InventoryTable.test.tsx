@@ -81,10 +81,17 @@ const mockInventoryItems: InventoryItem[] = [
 
 describe('InventoryTable', () => {
   beforeEach(() => {
-    (useInventoryStore as unknown as jest.Mock).mockReturnValue({
-      items: mockInventoryItems,
+    const mockState = {
+      items: mockInventoryItems.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<string, typeof mockInventoryItems[0]>),
       removeItem: jest.fn(),
-    });
+    };
+
+    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector(mockState)
+    );
   });
 
   it('renders inventory items in table format', () => {
@@ -179,10 +186,17 @@ describe('InventoryTable', () => {
     const user = userEvent.setup();
     const mockRemoveItem = jest.fn();
 
-    (useInventoryStore as unknown as jest.Mock).mockReturnValue({
-      items: mockInventoryItems,
+    const mockState = {
+      items: mockInventoryItems.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<string, typeof mockInventoryItems[0]>),
       removeItem: mockRemoveItem,
-    });
+    };
+
+    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector(mockState)
+    );
 
     render(<InventoryTable characterId="char-1" />);
 
@@ -193,10 +207,14 @@ describe('InventoryTable', () => {
   });
 
   it('displays empty state when no inventory items', () => {
-    (useInventoryStore as unknown as jest.Mock).mockReturnValue({
-      items: [],
+    const mockState = {
+      items: {},
       removeItem: jest.fn(),
-    });
+    };
+
+    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector(mockState)
+    );
 
     render(<InventoryTable characterId="char-1" />);
 
