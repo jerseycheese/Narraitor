@@ -86,6 +86,12 @@ const mockWorld = {
       maxValue: 10,
     }
   ],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 10,
+    attributePointPool: 50,
+    skillPointPool: 30,
+  },
 };
 
 describe('CharacterEditor MVP Tests', () => {
