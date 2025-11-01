@@ -17,9 +17,26 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Cache ESLint
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-eslint-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '.eslintrc*') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
+
+      - name: Cache Stylelint
+        uses: actions/cache@v4
+        with:
+          path: .stylelintcache
+          key: ${{ runner.os }}-stylelint-${{ hashFiles('**/*.css', '**/*.scss', '.stylelintrc*') }}
+          restore-keys: |
+            ${{ runner.os }}-stylelint-
+
       - name: Install dependencies
         run: npm ci
-      - name: Run ESLint  
+      - name: Run ESLint
         run: npm run lint
       - name: Run Stylelint (CSS Design Token Enforcement)
         run: npm run lint:css
@@ -36,6 +53,17 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Cache Jest
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.cache/jest
+            .jest-cache
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/*.test.ts', '**/*.test.tsx', 'jest.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-jest-
+
       - name: Install dependencies
         run: npm ci
       - name: Run tests
@@ -53,6 +81,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx', 'next.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
+
       - name: Install dependencies
         run: npm ci
       - name: Build application
@@ -68,6 +106,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Cache Storybook build
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.cache/storybook
+          key: ${{ runner.os }}-storybook-${{ hashFiles('**/*.stories.tsx', '**/*.stories.ts', '.storybook/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-storybook-
+
       - name: Install dependencies
         run: npm ci
       - name: Build Storybook
@@ -86,6 +134,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright browsers
