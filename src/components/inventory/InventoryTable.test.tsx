@@ -1,6 +1,3 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { describe, beforeEach, jest } from '@jest/globals';
 import { InventoryTable } from './InventoryTable';
@@ -18,7 +15,7 @@ jest.mock('@/state/inventoryStore', () => ({
 
 // After the mock is defined, we can access its properties and set getState
 const { useInventoryStore } = require('@/state/inventoryStore');
-(useInventoryStore as any).getState = jest.fn(() => mockInventoryStoreState);
+(useInventoryStore as jest.Mock).getState = jest.fn(() => mockInventoryStoreState);
 
 const mockInventoryItems: InventoryItem[] = [
   {

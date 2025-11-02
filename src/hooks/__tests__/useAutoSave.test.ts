@@ -66,12 +66,13 @@ const mockSessionStore: SessionStore = {
   shouldShowOnboarding: jest.fn(),
 };
 
-const useSessionStore = jest.fn((selector) => selector ? selector(mockSessionStore) : mockSessionStore) as unknown as typeof import('../../state/sessionStore').useSessionStore;
-(useSessionStore as any).getState = () => mockSessionStore;
+jest.mock('../../state/sessionStore');
 
-jest.mock('../../state/sessionStore', () => ({
-  useSessionStore,
-}));
+// Configure session store mock
+import { useSessionStore } from '../../state/sessionStore';
+const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
+mockUseSessionStore.mockImplementation((selector) => selector ? selector(mockSessionStore as unknown as ReturnType<typeof useSessionStore>) : mockSessionStore as unknown as ReturnType<typeof useSessionStore>);
+(mockUseSessionStore as jest.Mock).getState = jest.fn(() => mockSessionStore);
 
 // Mock other stores
 jest.mock('../../state/worldStore', () => ({

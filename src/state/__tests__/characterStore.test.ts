@@ -1,5 +1,6 @@
 import { useCharacterStore } from '../characterStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
+import type { Character } from '@/types/character.types';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
@@ -97,7 +98,7 @@ describe('useCharacterStore', () => {
       }; // Missing name
 
       expect(() => {
-        useCharacterStore.getState().createCharacter(invalidCharacterData as any);
+        useCharacterStore.getState().createCharacter(invalidCharacterData as unknown as Omit<Character, 'id' | 'createdAt' | 'updatedAt'>);
       }).toThrow('Character name is required');
     });
   });

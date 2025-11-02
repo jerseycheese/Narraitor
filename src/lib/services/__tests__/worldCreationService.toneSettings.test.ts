@@ -65,7 +65,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
 
     mockGenerator = {
       generateToneSettings: jest.fn()
-    } as any; // Cast to any to bypass strict type checking
+    } as jest.Mocked<ToneSettingsGenerator>;
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
     // Mock the extractWorldAnalysisData function
@@ -149,7 +149,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify world was created with AI-generated tone settings
-      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
+      expect(mockStore.createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Cyberpunk Metropolis',
           description: 'A dark future city where technology dominates human life',
@@ -176,7 +176,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify fallback to default settings
-      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
+      expect(mockStore.createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           toneSettings: DEFAULT_TONE_SETTINGS
         })
@@ -216,7 +216,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify world was created with customizations and AI tone settings
-      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
+      expect(mockStore.createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Custom Cyber City',
           description: 'My custom cyberpunk world',
