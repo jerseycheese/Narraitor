@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, beforeEach, jest } from '@jest/globals';
 import { InventoryTable } from './InventoryTable';
 import { InventoryStore, InventoryItemCreatePayload, InventoryItemAddPayload } from '@/state/inventoryStore';
 import type { InventoryItem, ItemUsageResult } from '@/types/inventory.types';
