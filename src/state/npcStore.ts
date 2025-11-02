@@ -12,7 +12,7 @@ export interface NPCStore extends CrudStore<NPC> {
   npcs: Record<EntityID, NPC>;
   worldNpcs: Record<EntityID, EntityID[]>;
 
-  createNPC: (npcData: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: EntityID }) => EntityID;
+  createNPC: (npcData: Omit<NPC, 'id' | 'createdAt' | 'updatedAt'> & { id?: EntityID }) => EntityID;
   updateNPC: (npcId: EntityID, updates: Partial<NPC>) => void;
   deleteNPC: (npcId: EntityID) => void;
 

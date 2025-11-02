@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock worldStore
 jest.mock('@/state/worldStore', () => {
-  const mockUseWorldStore = jest.fn();
+  const mockUseWorldStore = jest.fn() as jest.Mock & { getState: jest.Mock };
   mockUseWorldStore.getState = jest.fn();
   return {
     useWorldStore: mockUseWorldStore,
@@ -127,15 +127,16 @@ describe('WorldEditor - MVP Level Tests', () => {
     };
     
     // Mock useWorldStore to return different values based on the selector
-    (useWorldStore as jest.Mock).mockImplementation((selector) => {
+    const mockStore = useWorldStore as unknown as jest.Mock & { getState: jest.Mock };
+    mockStore.mockImplementation((selector) => {
       if (typeof selector === 'function') {
         return selector(mockState);
       }
       return mockState;
     });
-    
+
     // Mock the direct getState access
-    (useWorldStore as jest.Mock).getState.mockReturnValue(mockState);
+    mockStore.getState.mockReturnValue(mockState);
   });
 
   // Acceptance Criteria: Selecting a world allows viewing/editing its details via the WorldEditor
@@ -222,13 +223,14 @@ describe('WorldEditor - MVP Level Tests', () => {
       updateWorld: mockUpdateWorld,
     };
     
-    (useWorldStore as jest.Mock).mockImplementation((selector) => {
+    const mockStore = useWorldStore as unknown as jest.Mock & { getState: jest.Mock };
+    mockStore.mockImplementation((selector) => {
       if (typeof selector === 'function') {
         return selector(stateWithOtherWorlds);
       }
       return stateWithOtherWorlds;
     });
-    (useWorldStore as jest.Mock).getState.mockReturnValue(stateWithOtherWorlds);
+    mockStore.getState.mockReturnValue(stateWithOtherWorlds);
 
     render(<WorldEditor worldId="non-existent" />);
 
