@@ -7,16 +7,71 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  # Phase 1: Setup job - Install dependencies once and cache for all other jobs
+  setup:
+    name: Setup Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node_modules
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci
+
+  # Phase 2: TypeScript type-checking (fast, parallel with lint/test)
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Run TypeScript type check
+        run: npm run type-check
+
   lint:
     name: Lint Check
     runs-on: ubuntu-latest
+    needs: [setup]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Cache ESLint
         uses: actions/cache@v4
@@ -34,8 +89,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-stylelint-
 
-      - name: Install dependencies
-        run: npm ci
       - name: Run ESLint
         run: npm run lint
       - name: Run Stylelint (CSS Design Token Enforcement)
@@ -46,13 +99,21 @@ jobs:
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
+    needs: [setup]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Cache Jest
         uses: actions/cache@v4
@@ -64,8 +125,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-jest-
 
-      - name: Install dependencies
-        run: npm ci
       - name: Run tests
         run: npm run test
       - name: Check code coverage
@@ -74,13 +133,21 @@ jobs:
   build:
     name: Build Check
     runs-on: ubuntu-latest
+    needs: [setup, type-check, lint]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Cache Next.js build
         uses: actions/cache@v4
@@ -91,21 +158,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-
 
-      - name: Install dependencies
-        run: npm ci
       - name: Build application
         run: npm run build
 
   storybook:
     name: Storybook Build
     runs-on: ubuntu-latest
+    needs: [setup, type-check, lint]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Cache Storybook build
         uses: actions/cache@v4
@@ -116,8 +189,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-storybook-
 
-      - name: Install dependencies
-        run: npm ci
       - name: Build Storybook
         run: npm run build-storybook
 
@@ -133,7 +204,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Restore node_modules cache
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -144,8 +227,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Install dependencies
-        run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run E2E tests (fail on visual diffs)
@@ -170,6 +251,7 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    needs: [setup]
     env:
       NODE_ENV: production
     steps:
@@ -180,10 +262,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Prepare security report directory
         run: mkdir -p ci-security

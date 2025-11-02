@@ -22,7 +22,11 @@ const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFu
 const mockExtractWorldAnalysisData = extractWorldAnalysisData as jest.MockedFunction<typeof extractWorldAnalysisData>;
 
 describe('worldCreationService - AI Tone Settings Integration', () => {
-  let mockStore: ReturnType<typeof useWorldStore>;
+  let mockStore: ReturnType<typeof useWorldStore> & {
+    createWorld: jest.Mock;
+    updateWorld: jest.Mock;
+    worlds: Record<string, unknown>;
+  };
   let mockClient: ReturnType<typeof createDefaultGeminiClient>;
   let mockGenerator: jest.Mocked<ToneSettingsGenerator>;
 
@@ -65,7 +69,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
 
     mockGenerator = {
       generateToneSettings: jest.fn()
-    } as jest.Mocked<ToneSettingsGenerator>;
+    } as unknown as jest.Mocked<ToneSettingsGenerator>;
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
     // Mock the extractWorldAnalysisData function

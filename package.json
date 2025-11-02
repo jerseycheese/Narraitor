@@ -14,6 +14,7 @@
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
+    "type-check": "tsc --noEmit",
     "tailwind:build-for-storybook": "npx @tailwindcss/cli -i src/app/globals.css -o .storybook/tailwind-compiled.css",
     "tailwind:watch-for-storybook": "npx @tailwindcss/cli -i src/app/globals.css -o .storybook/tailwind-compiled.css --watch",
     "storybook": "storybook dev -p 6006",

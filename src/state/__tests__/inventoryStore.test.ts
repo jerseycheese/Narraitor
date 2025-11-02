@@ -186,7 +186,7 @@ describe('useInventoryStore', () => {
       const store = useInventoryStore.getState();
       const result = store.addItem('char-1', {
         ...buildAddPayload(),
-        acquisition: undefined,
+        acquisition: undefined as unknown,
       } as InventoryItemAddPayload);
 
       const state = useInventoryStore.getState();

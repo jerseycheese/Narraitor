@@ -98,7 +98,8 @@ describe('useCharacterStore', () => {
       }; // Missing name
 
       expect(() => {
-        useCharacterStore.getState().createCharacter(invalidCharacterData as unknown as Omit<Character, 'id' | 'createdAt' | 'updatedAt'>);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        useCharacterStore.getState().createCharacter(invalidCharacterData as any);
       }).toThrow('Character name is required');
     });
   });
