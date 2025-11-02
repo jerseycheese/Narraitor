@@ -51,8 +51,8 @@ export async function buildEndingContext(
     : [];
 
   const session = useSessionStore.getState().savedSessions[request.sessionId];
-  const sessionStartTime = session?.state?.lastActivity
-    ? new Date(session.state.lastActivity)
+  const sessionStartTime = session?.lastPlayed
+    ? new Date(session.lastPlayed)
     : undefined;
 
   return {

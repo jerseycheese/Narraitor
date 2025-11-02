@@ -1,7 +1,8 @@
 import { buildEndingContext } from '../contextManager';
-import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry, createMockSession } from '@/lib/test-utils/testDataFactory';
+import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry } from '@/lib/test-utils/testDataFactory';
 import type { EndingGenerationRequest } from '@/types/narrative.types';
 import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { SavedSessionInfo } from '@/types/game.types';
 
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: { getState: jest.fn() },
@@ -224,13 +225,13 @@ describe('buildEndingContext', () => {
       id: 'journal-2',
       sessionId: 'session-2',
     });
-    const session = createMockSession({
+    const session: SavedSessionInfo = {
       id: request.sessionId,
-      state: {
-        status: 'active',
-        lastActivity: '2024-01-01T09:30:00Z',
-      },
-    });
+      worldId: request.worldId,
+      characterId: request.characterId,
+      lastPlayed: '2024-01-01T09:30:00Z',
+      narrativeCount: 5,
+    };
 
     mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
     mockCharacterStoreGetState.mockReturnValue({
@@ -250,7 +251,7 @@ describe('buildEndingContext', () => {
     const context = await buildEndingContext(request);
 
     expect(context.journalEntries).toEqual([matchingEntry]);
-    expect(context.sessionStartTime).toEqual(new Date(session.state.lastActivity));
+    expect(context.sessionStartTime).toEqual(new Date(session.lastPlayed));
   });
 
   it('throws when the world cannot be resolved', async () => {
