@@ -4,7 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useAutoSave } from '../useAutoSave';
-import { SessionStore, PlayerChoice, SavedSessionInfo, TemplateHistoryEntry, GameSessionState, AutoSaveState } from '../../types/game.types';
+import { SessionStore } from '../../types/game.types';
 import { EntityID } from '../../types/common.types';
 
 // Mock the auto-save service
