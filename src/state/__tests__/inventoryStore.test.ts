@@ -185,13 +185,9 @@ describe('useInventoryStore', () => {
     test('requires acquisition metadata', () => {
       const store = useInventoryStore.getState();
       const result = store.addItem('char-1', {
-        name: 'Iron Dagger',
-        description: 'Quick blade',
-        stackable: true,
-        maxStack: 5,
-        categorization: buildCategorization('equipment'),
-        acquisition: buildAcquisition(1),
-      });
+        ...buildAddPayload(),
+        acquisition: undefined,
+      } as InventoryItemAddPayload);
 
       const state = useInventoryStore.getState();
       expect(result).toBe('');

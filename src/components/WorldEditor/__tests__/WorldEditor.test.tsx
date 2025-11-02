@@ -11,20 +11,14 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-type MockedUseWorldStore = jest.Mock & {
-  getState: jest.Mock;
-  setState: jest.Mock;
-  subscribe: jest.Mock;
-};
-
 // Mock worldStore
-jest.mock('@/state/worldStore', () => ({
-  useWorldStore: {
-    getState: jest.fn(),
-    setState: jest.fn(),
-    subscribe: jest.fn(),
-  } as MockedUseWorldStore,
-}));
+jest.mock('@/state/worldStore', () => {
+  const mockUseWorldStore = jest.fn();
+  mockUseWorldStore.getState = jest.fn();
+  return {
+    useWorldStore: mockUseWorldStore,
+  };
+});
 
 interface MockBasicInfoFormProps {
   world: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -133,7 +127,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     };
     
     // Mock useWorldStore to return different values based on the selector
-    (useWorldStore as unknown as MockedUseWorldStore).mockImplementation((selector) => {
+    (useWorldStore as jest.Mock).mockImplementation((selector) => {
       if (typeof selector === 'function') {
         return selector(mockState);
       }
@@ -141,7 +135,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     });
     
     // Mock the direct getState access
-    (useWorldStore as unknown as MockedUseWorldStore).getState.mockReturnValue(mockState);
+    (useWorldStore as jest.Mock).getState.mockReturnValue(mockState);
   });
 
   // Acceptance Criteria: Selecting a world allows viewing/editing its details via the WorldEditor
@@ -228,13 +222,13 @@ describe('WorldEditor - MVP Level Tests', () => {
       updateWorld: mockUpdateWorld,
     };
     
-    (useWorldStore as unknown as MockedUseWorldStore).mockImplementation((selector) => {
+    (useWorldStore as jest.Mock).mockImplementation((selector) => {
       if (typeof selector === 'function') {
         return selector(stateWithOtherWorlds);
       }
       return stateWithOtherWorlds;
     });
-    (useWorldStore as unknown as MockedUseWorldStore).getState.mockReturnValue(stateWithOtherWorlds);
+    (useWorldStore as jest.Mock).getState.mockReturnValue(stateWithOtherWorlds);
 
     render(<WorldEditor worldId="non-existent" />);
 

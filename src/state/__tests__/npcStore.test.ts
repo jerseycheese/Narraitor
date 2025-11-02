@@ -19,7 +19,6 @@ describe('npcStore', () => {
   describe('NPC CRUD Operations', () => {
     test('should create a new NPC with generated ID', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Mysterious Stranger',
         description: 'A hooded figure lurking in the shadows',
@@ -39,7 +38,6 @@ describe('npcStore', () => {
 
     test('should create NPC with optional avatarUrl', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Elara the Wise',
         description: 'An ancient sage with silver hair',
@@ -54,7 +52,6 @@ describe('npcStore', () => {
 
     test('should update NPC properties', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Guard Captain',
         description: 'A stern-looking warrior',
@@ -81,7 +78,6 @@ describe('npcStore', () => {
 
     test('should update NPC worldId and maintain world references', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Traveling Merchant',
         description: 'A well-traveled trader',
@@ -104,7 +100,6 @@ describe('npcStore', () => {
 
     test('should delete NPC and clean up references', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Temporary NPC',
         description: 'To be deleted',
@@ -126,21 +121,18 @@ describe('npcStore', () => {
 
       // Create NPCs for different worlds
       const npc1Id = useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: world1,
         name: 'NPC 1',
         description: 'First NPC',
       });
 
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: world1,
         name: 'NPC 2',
         description: 'Second NPC',
       });
 
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: world2,
         name: 'NPC 3',
         description: 'Different world NPC',
@@ -162,7 +154,6 @@ describe('npcStore', () => {
 
     test('should get NPC by ID', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
@@ -177,14 +168,12 @@ describe('npcStore', () => {
 
     test('should get all NPCs', () => {
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'NPC 1',
         description: 'First',
       });
 
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'NPC 2',
         description: 'Second',
@@ -201,14 +190,12 @@ describe('npcStore', () => {
 
       // Create multiple NPCs for the world
       const npc1Id = useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId,
         name: 'NPC 1',
         description: 'First NPC',
       });
 
       const npc2Id = useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId,
         name: 'NPC 2',
         description: 'Second NPC',
@@ -228,14 +215,12 @@ describe('npcStore', () => {
       const world2 = 'world-456';
 
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: world1,
         name: 'NPC 1',
         description: 'World 1 NPC',
       });
 
       const npc2Id = useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: world2,
         name: 'NPC 2',
         description: 'World 2 NPC',
@@ -261,9 +246,8 @@ describe('npcStore', () => {
     test('should validate required fields', () => {
       expect(() => {
         useNPCStore.getState().createNPC({
-          id: 'dummy-id',
           worldId: 'world-123',
-          name: 'Test NPC',
+          name: '', // Empty name should fail
           description: 'Test description',
         });
       }).toThrow();
@@ -272,7 +256,6 @@ describe('npcStore', () => {
     test('should validate worldId is required', () => {
       expect(() => {
         useNPCStore.getState().createNPC({
-          id: 'dummy-id',
           worldId: '',
           name: 'Test NPC',
           description: 'Test description',
@@ -283,7 +266,6 @@ describe('npcStore', () => {
     test('should validate description is required', () => {
       expect(() => {
         useNPCStore.getState().createNPC({
-          id: 'dummy-id',
           worldId: 'world-123',
           name: 'Test NPC',
           description: '',
@@ -293,7 +275,6 @@ describe('npcStore', () => {
 
     test('should reject updates with empty name after normalization', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
@@ -313,7 +294,6 @@ describe('npcStore', () => {
 
     test('should reject updates with empty description after normalization', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
@@ -333,7 +313,6 @@ describe('npcStore', () => {
 
     test('should reject updates with empty worldId', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
@@ -370,7 +349,6 @@ describe('npcStore', () => {
   describe('State Management', () => {
     test('should set current NPC', () => {
       const npcData = {
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
@@ -392,7 +370,6 @@ describe('npcStore', () => {
 
     test('should reset store', () => {
       useNPCStore.getState().createNPC({
-        id: 'dummy-id',
         worldId: 'world-123',
         name: 'Test NPC',
         description: 'Test description',
