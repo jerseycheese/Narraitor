@@ -60,7 +60,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     mockUseWorldStore.getState = jest.fn().mockReturnValue(mockStore);
 
     // Setup mock AI client and generator
-    mockClient = { generateContent: jest.fn() };
+    mockClient = { generateContent: jest.fn() } as unknown as ReturnType<typeof createDefaultGeminiClient>;
     mockCreateDefaultGeminiClient.mockReturnValue(mockClient);
 
     mockGenerator = {
@@ -108,7 +108,11 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',
-          category: 'Technical'
+          category: 'Technical',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+          difficulty: 'medium'
         }
       ],
       settings: {

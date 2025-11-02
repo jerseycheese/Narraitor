@@ -156,6 +156,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
     },
     portrait: {
       type: 'ai-generated' as const,
@@ -189,6 +190,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
     },
     portrait: {
       type: 'ai-generated' as const,
@@ -222,6 +224,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
     },
     portrait: {
       type: 'ai-generated' as const,

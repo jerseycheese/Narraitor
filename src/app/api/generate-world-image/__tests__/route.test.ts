@@ -47,7 +47,7 @@ describe('/api/generate-world-image', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as ReturnType<typeof createDefaultGeminiClient>);
+    mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as unknown as ReturnType<typeof createDefaultGeminiClient>);
     
     // Mock environment variable
     process.env.GEMINI_API_KEY = 'test-api-key';

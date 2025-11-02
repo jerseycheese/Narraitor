@@ -4,6 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useAutoSave } from '../useAutoSave';
+import { SessionStore } from '../../types/game.types';
 
 // Mock the auto-save service
 const mockAutoSaveService = {
@@ -17,45 +18,60 @@ jest.mock('../../lib/services/autoSaveService', () => ({
   AutoSaveService: jest.fn().mockImplementation(() => mockAutoSaveService)
 }));
 
-// Mock session store
-const mockSessionStore = {
+const mockSessionStore: SessionStore = {
+  id: 'test-session',
+  status: 'active',
+  currentSceneId: 'scene-001',
+  playerChoices: [],
+  error: null,
+  worldId: 'world-1',
+  characterId: 'char-1',
+  savedSessions: {},
+  templateHistory: [],
   autoSave: {
     enabled: true,
-    lastSaveTime: null as string | null,
+    lastSaveTime: null,
     status: 'idle',
     errorMessage: null,
     totalSaves: 0,
   },
+  narrativeHeight: 600,
+  onboardingCompleted: false,
+  initializeSession: jest.fn(),
+  endSession: jest.fn(),
+  setStatus: jest.fn(),
+  setError: jest.fn(),
+  setPlayerChoices: jest.fn(),
+  selectChoice: jest.fn(),
+  clearPlayerChoices: jest.fn(),
+  setCurrentScene: jest.fn(),
+  pauseSession: jest.fn(),
+  resumeSession: jest.fn(),
+  setSessionId: jest.fn(),
+  setCharacterId: jest.fn(),
+  getSavedSession: jest.fn(),
+  resumeSavedSession: jest.fn(),
+  deleteSavedSession: jest.fn(),
+  updateSavedSessionNarrativeCount: jest.fn(),
+  fixExistingSessionNarrativeCounts: jest.fn(),
+  addTemplateToHistory: jest.fn(),
+  getTemplateHistory: jest.fn(),
+  clearTemplateHistory: jest.fn(),
+  setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),
-  setAutoSaveEnabled: jest.fn(),
+  setOnboardingCompleted: jest.fn(),
+  isFirstTimeUser: jest.fn(),
+  shouldShowOnboarding: jest.fn(),
 };
 
-jest.mock('../../state/sessionStore', () => ({
-  useSessionStore: Object.assign(
-    (selector = (state) => state) => {
-      const fullState = {
-        ...mockSessionStore,
-        id: 'test-session',
-        status: 'active',
-        worldId: 'world-1',
-        characterId: 'char-1',
-        autoSave: mockSessionStore.autoSave,
-      };
-      return selector(fullState);
-    },
-    {
-      getState: () => ({
-        ...mockSessionStore,
-        id: 'test-session',
-        status: 'active',
-        worldId: 'world-1',
-        characterId: 'char-1',
-        autoSave: mockSessionStore.autoSave,
-      }),
-    }
-  ),
-}));
+jest.mock('../../state/sessionStore');
+
+// Configure session store mock
+import { useSessionStore } from '../../state/sessionStore';
+const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
+mockUseSessionStore.mockImplementation((selector) => selector ? selector(mockSessionStore as unknown as ReturnType<typeof useSessionStore>) : mockSessionStore as unknown as ReturnType<typeof useSessionStore>);
+(mockUseSessionStore as jest.Mock).getState = jest.fn(() => mockSessionStore);
 
 // Mock other stores
 jest.mock('../../state/worldStore', () => ({

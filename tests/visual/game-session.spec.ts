@@ -301,8 +301,8 @@ test.describe('Game Session Visual Tests', () => {
         } else {
           console.log('❌ Could not access narrative store for direct injection');
         }
-      } catch (e) {
-        console.log('❌ Failed to inject segments:', e.message);
+      } catch (e: unknown) {
+        console.log('❌ Failed to inject segments:', e instanceof Error ? e.message : String(e));
       }
     });
 

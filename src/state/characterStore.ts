@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
+import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
@@ -59,9 +60,10 @@ export interface Character {
   status: CharacterStatus;
   inventory: {
     characterId: EntityID;
-    items: unknown[];
+    items: InventoryItem[];
     capacity: number;
-    categories: string[];
+    categories: InventoryCategory[];
+    itemOrder: EntityID[];
   };
   portrait?: {
     type: 'ai-generated' | 'placeholder';

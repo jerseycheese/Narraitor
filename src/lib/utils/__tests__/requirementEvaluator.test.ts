@@ -1,5 +1,6 @@
 import { evaluateRequirement } from '../requirementEvaluator';
 import { DecisionRequirement } from '@/types/narrative.types';
+import { InventoryItem } from '@/types/inventory.types';
 
 // Character interface matching the actual store structure
 interface Character {
@@ -40,7 +41,7 @@ interface Character {
   };
   inventory: {
     characterId: string;
-    items: unknown[];
+    items: InventoryItem[];
     capacity: number;
     categories: string[];
   };

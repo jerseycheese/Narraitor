@@ -114,6 +114,7 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
         { id: 'consumables', name: 'Consumables', description: 'Potions and single-use items', sortOrder: 1 },
         { id: 'quest-items', name: 'Quest Items', description: 'Important story items', sortOrder: 2 }
       ],
+      itemOrder: [],
     },
     status: {
       health: 100,

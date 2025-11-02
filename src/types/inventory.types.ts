@@ -32,6 +32,7 @@ export interface Inventory {
   items: InventoryItem[];
   capacity: number;
   categories: InventoryCategory[];
+  itemOrder: EntityID[];
 }
 
 /**

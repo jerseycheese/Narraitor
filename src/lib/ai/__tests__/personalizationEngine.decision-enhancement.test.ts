@@ -220,14 +220,16 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
               description: 'Protect the innocent',
               priority: 'primary',
               progress: 50,
-              isActive: true
+              isActive: true,
+              establishedAt: getTimestamp()
             },
             {
               id: 'goal-2',
               description: 'Find the truth',
               priority: 'secondary',
               progress: 25,
-              isActive: true
+              isActive: true,
+              establishedAt: getTimestamp()
             }
           ],
           relationships: [],

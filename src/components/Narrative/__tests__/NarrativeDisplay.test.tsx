@@ -3,7 +3,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
-import { useNPCStore } from '@/state/npcStore';
+import { useNPCStore, NPCStore } from '@/state/npcStore';
+import { NPC } from '@/types/npc.types';
 
 jest.mock('@/state/npcStore');
 
@@ -11,12 +12,31 @@ const mockUseNPCStore = useNPCStore as jest.MockedFunction<typeof useNPCStore>;
 
 describe('NarrativeDisplay', () => {
   beforeEach(() => {
-    const defaultState = {
-      npcs: {},
-      getById: () => undefined,
-    };
+    const defaultState: NPCStore = {
+  npcs: {},
+  entities: {},
+  worldNpcs: {},
+  currentEntityId: null,
+  error: null,
+  loading: false,
+  create: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+  setCurrent: jest.fn(),
+  getById: jest.fn(() => undefined),
+  getAll: jest.fn(() => []),
+  reset: jest.fn(),
+  setError: jest.fn(),
+  clearError: jest.fn(),
+  setLoading: jest.fn(),
+  createNPC: jest.fn(),
+  updateNPC: jest.fn(),
+  deleteNPC: jest.fn(),
+  getNPCsByWorld: jest.fn(() => []),
+  clearWorldNPCs: jest.fn(),
+};
 
-    mockUseNPCStore.mockImplementation((selector?: (state: typeof defaultState) => unknown) =>
+    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) =>
       selector ? selector(defaultState) : defaultState
     );
   });
@@ -44,7 +64,7 @@ describe('NarrativeDisplay', () => {
 
   it('renders character avatars for metadata characterIds', () => {
     const now = getTimestamp();
-    const npcState = {
+    const npcState: NPCStore = {
       npcs: {
         'npc-1': {
           id: 'npc-1',
@@ -53,6 +73,7 @@ describe('NarrativeDisplay', () => {
           avatarUrl: 'https://example.com/eldria.png',
           createdAt: now,
           updatedAt: now,
+          description: 'A brave adventurer',
         },
         'npc-2': {
           id: 'npc-2',
@@ -60,9 +81,34 @@ describe('NarrativeDisplay', () => {
           worldId: 'world-1',
           createdAt: now,
           updatedAt: now,
+          description: 'A gruff barkeep',
         },
       },
-      getById: (id: string) => (id in npcState.npcs ? npcState.npcs[id as keyof typeof npcState.npcs] : undefined),
+      entities: {},
+      worldNpcs: {
+        'world-1': ['npc-1', 'npc-2'],
+      },
+      currentEntityId: null,
+      error: null,
+      loading: false,
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      setCurrent: jest.fn(),
+      getById: jest.fn((id) => npcState.npcs[id]),
+      getAll: jest.fn(() => Object.values(npcState.npcs)),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+      deleteNPC: jest.fn(),
+      getNPCsByWorld: jest.fn((worldId) => {
+        const ids = npcState.worldNpcs[worldId] || [];
+        return ids.map((id) => npcState.npcs[id]).filter(Boolean) as NPC[];
+      }),
+      clearWorldNPCs: jest.fn(),
     };
 
     mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>
@@ -93,7 +139,7 @@ describe('NarrativeDisplay', () => {
 
   it('deduplicates character identifiers with inconsistent casing and whitespace', () => {
     const now = getTimestamp();
-    const npcState = {
+    const npcState: NPCStore = {
       npcs: {
         'npc-1': {
           id: 'npc-1',
@@ -101,12 +147,34 @@ describe('NarrativeDisplay', () => {
           worldId: 'world-1',
           createdAt: now,
           updatedAt: now,
+          description: 'A friendly waitress.',
         },
       },
-      getById: (id: string) =>
-        id in npcState.npcs
-          ? npcState.npcs[id as keyof typeof npcState.npcs]
-          : undefined,
+      entities: {},
+      worldNpcs: {
+        'world-1': ['npc-1'],
+      },
+      currentEntityId: null,
+      error: null,
+      loading: false,
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      setCurrent: jest.fn(),
+      getById: jest.fn((id) => npcState.npcs[id]),
+      getAll: jest.fn(() => Object.values(npcState.npcs)),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+      deleteNPC: jest.fn(),
+      getNPCsByWorld: jest.fn((worldId) => {
+        const ids = npcState.worldNpcs[worldId] || [];
+        return ids.map((id) => npcState.npcs[id]).filter(Boolean) as NPC[];
+      }),
+      clearWorldNPCs: jest.fn(),
     };
 
     mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>
@@ -135,7 +203,7 @@ describe('NarrativeDisplay', () => {
     expect(
       within(items[0]).getByText((content, element) =>
         content === 'Marge, the Waitress' &&
-        element?.classList.contains('text-sm')
+        element?.classList.contains('text-sm') || false
       )
     ).toBeInTheDocument();
   });
@@ -162,7 +230,7 @@ describe('NarrativeDisplay', () => {
 
   it('emphasizes participant names within the narrative text', () => {
     const now = getTimestamp();
-    const npcState = {
+    const npcState: NPCStore = {
       npcs: {
         'npc-1': {
           id: 'npc-1',
@@ -170,12 +238,34 @@ describe('NarrativeDisplay', () => {
           worldId: 'world-1',
           createdAt: now,
           updatedAt: now,
+          description: 'A friendly waitress.',
         },
       },
-      getById: (id: string) =>
-        id in npcState.npcs
-          ? npcState.npcs[id as keyof typeof npcState.npcs]
-          : undefined,
+      entities: {},
+      worldNpcs: {
+        'world-1': ['npc-1'],
+      },
+      currentEntityId: null,
+      error: null,
+      loading: false,
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      setCurrent: jest.fn(),
+      getById: jest.fn((id) => npcState.npcs[id]),
+      getAll: jest.fn(() => Object.values(npcState.npcs)),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+      deleteNPC: jest.fn(),
+      getNPCsByWorld: jest.fn((worldId) => {
+        const ids = npcState.worldNpcs[worldId] || [];
+        return ids.map((id) => npcState.npcs[id]).filter(Boolean) as NPC[];
+      }),
+      clearWorldNPCs: jest.fn(),
     };
 
     mockUseNPCStore.mockImplementation((selector?: (state: typeof npcState) => unknown) =>

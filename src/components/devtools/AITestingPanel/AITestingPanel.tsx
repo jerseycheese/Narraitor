@@ -55,7 +55,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       characterId: 'test-character',
       items: [],
       capacity: 10,
-      categories: []
+      categories: [],
+      itemOrder: [],
     },
     status: {
       health: 100,

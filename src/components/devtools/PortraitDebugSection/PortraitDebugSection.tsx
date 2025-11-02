@@ -102,7 +102,8 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         items: [], 
         capacity: 100, 
         categories: [], 
-        characterId: id 
+        characterId: id, 
+        itemOrder: [] 
       },
       status: {
         health: getStatusProp('health') || getStatusProp('hp') || 100,

@@ -3,33 +3,29 @@ import { useCharacterStore } from '../../characterStore';
 
 // Mock the module with our mock adapter
 jest.mock('../../../lib/storage/indexedDBAdapter', () => {
-  // Create mock adapter functions
   const mockGetItem = jest.fn().mockResolvedValue(null);
   const mockSetItem = jest.fn().mockResolvedValue(undefined);
   const mockRemoveItem = jest.fn().mockResolvedValue(undefined);
-  
-  // Create mock adapter object
-  const mockAdapter = {
+
+  const mockAdapterInstance = {
     initialize: jest.fn().mockResolvedValue(undefined),
     getItem: mockGetItem,
     setItem: mockSetItem,
-    removeItem: mockRemoveItem
-  };
-  
-  // Create mock class with static create method
-  const MockAdapter = jest.fn().mockImplementation(() => mockAdapter);
-  MockAdapter.create = jest.fn().mockResolvedValue(mockAdapter);
-  
-  // Export mocks for test access
-  MockAdapter.mockFunctions = {
-    getItem: mockGetItem,
-    setItem: mockSetItem,
     removeItem: mockRemoveItem,
-    create: MockAdapter.create
   };
-  
+
+  const mockCreate = jest.fn().mockResolvedValue(mockAdapterInstance);
+
   return {
-    IndexedDBAdapter: MockAdapter
+    IndexedDBAdapter: {
+      create: mockCreate,
+      mockFunctions: {
+        getItem: mockGetItem,
+        setItem: mockSetItem,
+        removeItem: mockRemoveItem,
+        create: mockCreate,
+      },
+    },
   };
 });
 

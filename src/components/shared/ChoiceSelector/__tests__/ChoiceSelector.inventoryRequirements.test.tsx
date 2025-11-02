@@ -8,6 +8,7 @@ import {
   DecisionRequirement,
   DecisionItemRequirements,
 } from '@/types/narrative.types';
+import { StandardInventoryCategory } from '@/types/inventory.types';
 
 describe('ChoiceSelector - Inventory Requirements', () => {
   const mockInventoryItems = [
@@ -17,10 +18,10 @@ describe('ChoiceSelector - Inventory Requirements', () => {
       description: '',
       quantity: 1,
       stackable: false,
-      categoryId: 'equipment',
+      categoryId: 'equipment' as StandardInventoryCategory,
       acquisitionHistory: [],
       categorization: {
-        categoryId: 'equipment',
+        categoryId: 'equipment' as StandardInventoryCategory,
         source: 'manual' as const,
         classifiedAt: new Date().toISOString(),
       },
@@ -33,10 +34,10 @@ describe('ChoiceSelector - Inventory Requirements', () => {
       description: '',
       quantity: 3,
       stackable: true,
-      categoryId: 'consumables',
+      categoryId: 'consumables' as StandardInventoryCategory,
       acquisitionHistory: [],
       categorization: {
-        categoryId: 'consumables',
+        categoryId: 'consumables' as StandardInventoryCategory,
         source: 'manual' as const,
         classifiedAt: new Date().toISOString(),
       },
