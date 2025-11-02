@@ -841,7 +841,8 @@ Respond with JSON format:
                 characterId: character.inventory.characterId,
                 items: [], // Store uses unknown[], evaluator expects InventoryItem[]
                 capacity: character.inventory.capacity,
-                categories: [] // Store uses string[], evaluator expects InventoryCategory[]
+                categories: [], // Store uses string[], evaluator expects InventoryCategory[]
+                itemOrder: [],
               },
               status: character.status,
               createdAt: character.createdAt,

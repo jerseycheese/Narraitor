@@ -48,7 +48,8 @@ async function buildPortraitPrompt(
         characterId: 'detection-temp',
         items: [],
         capacity: 100,
-        categories: []
+        categories: [],
+        itemOrder: []
       },
       status: {
         health: 100,

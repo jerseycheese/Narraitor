@@ -25,7 +25,8 @@ describe('Portrait Generation Documentation Examples', () => {
           characterId: 'char-123',
           items: [],
           capacity: 100,
-          categories: []
+          categories: [],
+          itemOrder: []
         },
         status: {
           health: 100,

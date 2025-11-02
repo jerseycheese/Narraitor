@@ -21,13 +21,35 @@ describe('InventoryStore - Item Usage', () => {
       description: 'A world for testing',
       genre: 'fantasy',
       attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
     });
 
     // Create test character
     characterId = useCharacterStore.getState().create({
       name: 'Test Hero',
       worldId,
-      background: { summary: 'A brave adventurer' },
+      description: 'A hero for testing purposes',
+      level: 1,
+      isPlayer: true,
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+      },
+      inventory: {
+        characterId: '',
+        items: [],
+        capacity: 0,
+        categories: [],
+        itemOrder: [],
+      },
+      background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
       skills: [],
     });
@@ -169,7 +191,22 @@ describe('InventoryStore - Item Usage', () => {
       const character2Id = useCharacterStore.getState().create({
         name: 'Other Hero',
         worldId,
-        background: { summary: 'Another adventurer' },
+        description: 'Another hero for testing purposes',
+        level: 1,
+        isPlayer: false,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 0,
+          categories: [],
+          itemOrder: [],
+        },
+        background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
         attributes: [],
         skills: [],
       });

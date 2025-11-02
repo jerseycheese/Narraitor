@@ -267,7 +267,8 @@ export default function CharactersPage() {
           characterId: '', // Will be set by the store
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: []
         },
         portrait: {
           type: 'placeholder',

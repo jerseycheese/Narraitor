@@ -8,7 +8,7 @@ import { UserFriendlyError } from '@/lib/utils/errorUtils';
 const mockFetchWorlds = jest.fn();
 const mockSetCurrentWorld = jest.fn();
 const mockDeleteWorld = jest.fn();
-const mockGetState = jest.fn();
+const mockGetState: jest.Mock<MockWorldStore> = jest.fn();
 
 // Mock the child components
 jest.mock('../../WorldList/WorldList', () => {
@@ -84,17 +84,24 @@ let mockState: MockWorldStore = {
   deleteWorld: mockDeleteWorld,
 };
 
+type MockWorldStoreFunction = jest.Mock & {
+  getState: () => MockWorldStore;
+  setState: (updater: ((state: MockWorldStore) => Partial<MockWorldStore>) | Partial<MockWorldStore>) => void;
+  subscribe: (listener: () => void) => () => void;
+  listeners: (() => void)[];
+};
+
 // Mock the worldStore
 jest.mock('../../../state/worldStore', () => {
   // Create a mock store function that can be called with a selector
-  const mockStore = jest.fn((selector) => {
+  const mockStore: MockWorldStoreFunction = jest.fn((selector) => {
     // When called with a selector, apply the selector to our mock state
     if (typeof selector === 'function') {
       return selector(mockState);
     }
     // Otherwise return the mock store
     return mockState;
-  });
+  }) as MockWorldStoreFunction;
   
   // Add proper store methods
   mockStore.setState = jest.fn((updater: ((state: MockWorldStore) => Partial<MockWorldStore>) | Partial<MockWorldStore>) => {
@@ -125,16 +132,7 @@ jest.mock('../../../state/worldStore', () => {
 });
 
 // Define type for worldStore function
-type WorldStoreFunction = {
-  (selector: (state: MockWorldStore) => unknown): unknown;
-  getState: () => MockWorldStore;
-  setState: jest.Mock;
-  listeners: (() => void)[];
-  subscribe: jest.Mock;
-};
 
-// Mock getState for the store
-(jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction).getState = mockGetState;
 
 // Import after mocks are set up
 import WorldListScreen from '../WorldListScreen';

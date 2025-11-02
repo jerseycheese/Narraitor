@@ -3,106 +3,79 @@ import { useGameSessionState } from './useGameSessionState';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Create a complete mock of the stores
-const mockWorldStoreState = {
-  worlds: {
-    'test-world': {
-      id: 'test-world',
-      name: 'Test World',
-      description: 'A test world',
-      genre: 'fantasy',
-      attributes: [],
-      skills: [],
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 8,
-        attributePointPool: 27,
-        skillPointPool: 20
-      },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp()
-    }
-  }
-};
-
-const mockCharacterStoreState = {
-  currentCharacterId: 'test-character-id',
-  characters: {
-    'test-character-id': {
-      id: 'test-character-id',
-      name: 'Test Character',
-      description: 'A test character',
-      worldId: 'test-world',
-      level: 1,
-      attributes: [],
-      skills: [],
-      background: { 
-        history: '', 
-        personality: '', 
-        goals: [],
-        fears: [],
-        relationships: []
-      },
-      isPlayer: true,
-      inventory: {
-        characterId: 'test-character-id',
-        items: [],
-        capacity: 100,
-        categories: []
-      },
-      status: { 
-        health: 100, 
-        maxHealth: 100, 
-        conditions: []
-      },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp()
-    }
-  }
-};
-
-const mockSessionStoreState = {
-  status: 'active' as const,
-  error: null,
-  currentSceneId: 'scene-001',
-  playerChoices: [
-    { id: 'choice-1', text: 'Choice 1', isSelected: false }
-  ],
-  initializeSession: jest.fn(),
-  pauseSession: jest.fn(),
-  resumeSession: jest.fn(),
-  endSession: jest.fn(),
-  selectChoice: jest.fn(),
-};
-
-// Mock the stores
-jest.mock('@/state/worldStore', () => ({
-  useWorldStore: Object.assign(
-    jest.fn(() => mockWorldStoreState),
-    { getState: jest.fn(() => mockWorldStoreState) }
-  )
-}));
-
-jest.mock('@/state/sessionStore', () => ({
-  useSessionStore: Object.assign(
-    jest.fn(() => mockSessionStoreState),
-    { 
-      getState: jest.fn(() => mockSessionStoreState),
-      subscribe: jest.fn(() => jest.fn()) // Mock subscribe method that returns unsubscribe function
-    }
-  )
-}));
-
-jest.mock('@/state/characterStore', () => ({
-  useCharacterStore: Object.assign(
-    jest.fn(() => mockCharacterStoreState),
-    { getState: jest.fn(() => mockCharacterStoreState) }
-  )
-}));
-
-describe('useGameSessionState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
+    const mockWorldStoreState = {
+      worlds: {
+        'test-world': {
+          id: 'test-world',
+          name: 'Test World',
+          description: 'A test world',
+          genre: 'fantasy',
+          attributes: [],
+          skills: [],
+          settings: {
+            maxAttributes: 6,
+            maxSkills: 8,
+            attributePointPool: 27,
+            skillPointPool: 20
+          },
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
+        }
+      }
+    };
+
+    const mockCharacterStoreState = {
+      currentCharacterId: 'test-character-id',
+      characters: {
+        'test-character-id': {
+          id: 'test-character-id',
+          name: 'Test Character',
+          description: 'A test character',
+          worldId: 'test-world',
+          level: 1,
+          attributes: [],
+          skills: [],
+          background: { 
+            history: '', 
+            personality: '', 
+            goals: [],
+            fears: [],
+            relationships: []
+          },
+          isPlayer: true,
+          inventory: {
+            characterId: 'test-character-id',
+            items: [],
+            capacity: 100,
+            categories: [],
+            itemOrder: []
+          },
+          status: { 
+            health: 100, 
+            maxHealth: 100, 
+            conditions: []
+          },
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
+        }
+      }
+    };
+
+    const mockSessionStoreState = {
+      status: 'active' as const,
+      error: null,
+      currentSceneId: 'scene-001',
+      playerChoices: [
+        { id: 'choice-1', text: 'Choice 1', isSelected: false }
+      ],
+      initializeSession: jest.fn(),
+      pauseSession: jest.fn(),
+      resumeSession: jest.fn(),
+      endSession: jest.fn(),
+      selectChoice: jest.fn(),
+    };
 
   test('initializes with session store state', () => {
     const { result } = renderHook(() => useGameSessionState({

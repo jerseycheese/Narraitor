@@ -109,7 +109,8 @@ describe('Persistence Integration - MVP', () => {
           characterId: "",
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         },
         status: {
           health: 100,
@@ -175,7 +176,8 @@ describe('Persistence Integration - MVP', () => {
           characterId: "",
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         },
         status: {
           health: 100,

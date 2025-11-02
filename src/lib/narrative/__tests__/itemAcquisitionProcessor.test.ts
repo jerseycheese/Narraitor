@@ -41,6 +41,7 @@ describe('itemAcquisitionProcessor', () => {
         source: 'ai',
         confidence: 0.95,
         rationale: 'Consumable healing item',
+        classifiedAt: new Date().toISOString(),
       });
 
       await processAcquiredItems(
@@ -95,11 +96,12 @@ describe('itemAcquisitionProcessor', () => {
           categoryId: 'equipment',
           source: 'ai',
           confidence: 0.9,
-        })
-        .mockResolvedValueOnce({
+          classifiedAt: new Date().toISOString(),
+        })        .mockResolvedValueOnce({
           categoryId: 'valuables',
           source: 'ai',
           confidence: 0.95,
+          classifiedAt: new Date().toISOString(),
         });
 
       await processAcquiredItems(items, 'character-123', 'session-456');
@@ -128,6 +130,7 @@ describe('itemAcquisitionProcessor', () => {
         categoryId: 'consumables',
         source: 'ai',
         confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
       });
 
       await processAcquiredItems(
@@ -186,6 +189,7 @@ describe('itemAcquisitionProcessor', () => {
         categoryId: 'miscellaneous',
         source: 'ai',
         confidence: 0.5,
+        classifiedAt: new Date().toISOString(),
       });
 
       await processAcquiredItems(
@@ -232,6 +236,7 @@ describe('itemAcquisitionProcessor', () => {
           categoryId: 'equipment',
           source: 'ai',
           confidence: 0.9,
+          classifiedAt: new Date().toISOString(),
         });
 
       // Second categorization succeeds but addItem fails
@@ -239,6 +244,7 @@ describe('itemAcquisitionProcessor', () => {
         categoryId: 'equipment',
         source: 'ai',
         confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
       });
 
       mockAddItem
@@ -267,6 +273,7 @@ describe('itemAcquisitionProcessor', () => {
         categoryId: 'equipment',
         source: 'ai',
         confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
       });
 
       await processAcquiredItems(

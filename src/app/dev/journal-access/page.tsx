@@ -75,7 +75,8 @@ export default function JournalAccessTestPage() {
           characterId: 'test-char-1',
           items: [],
           capacity: 10,
-          categories: []
+          categories: [],
+          itemOrder: []
         },
         status: {
           health: 100,

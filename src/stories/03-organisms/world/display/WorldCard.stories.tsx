@@ -23,7 +23,7 @@ const mockCharacters: Character[] = [
     },
     isPlayer: false,
     status: { health: 100, maxHealth: 100, conditions: [] },
-    inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },
+    inventory: { characterId: 'char1', items: [], capacity: 20, categories: [], itemOrder: [] },
     portrait: {
       type: 'ai-generated',
       url: 'https://picsum.photos/64/64?random=201',
@@ -50,7 +50,7 @@ const mockCharacters: Character[] = [
     },
     isPlayer: true,
     status: { health: 100, maxHealth: 100, conditions: [] },
-    inventory: { characterId: 'char2', items: [], capacity: 15, categories: [] },
+    inventory: { characterId: 'char2', items: [], capacity: 15, categories: [], itemOrder: [] },
     portrait: {
       type: 'ai-generated',
       url: 'https://picsum.photos/64/64?random=202',
@@ -77,7 +77,7 @@ const mockCharacters: Character[] = [
     },
     isPlayer: false,
     status: { health: 100, maxHealth: 100, conditions: [] },
-    inventory: { characterId: 'char3', items: [], capacity: 25, categories: [] },
+    inventory: { characterId: 'char3', items: [], capacity: 25, categories: [], itemOrder: [] },
     // No portrait - will show initials fallback
     createdAt: '2023-01-03T10:00:00Z',
     updatedAt: '2023-01-03T10:00:00Z',

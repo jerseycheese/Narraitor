@@ -40,7 +40,8 @@ const MOCK_CHARACTER_DATA = {
       characterId: '', // Will be set after creation
       items: [],
       capacity: 20,
-      categories: []
+      categories: [],
+      itemOrder: []
     }
   };
 

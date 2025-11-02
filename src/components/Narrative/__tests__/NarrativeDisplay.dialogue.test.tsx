@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
-import { useNPCStore } from '@/state/npcStore';
+import { useNPCStore, NPCStore } from '@/state/npcStore';
 
 jest.mock('@/state/npcStore');
 
@@ -11,13 +11,12 @@ const mockUseNPCStore = useNPCStore as jest.MockedFunction<typeof useNPCStore>;
 describe('NarrativeDisplay - Dialogue with Speaker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
-      const defaultState = {
-        npcs: {},
-        getById: () => undefined,
-      };
-
-      return selector ? selector(defaultState) : defaultState;
+    const defaultState: Partial<NPCStore> = {
+      npcs: {},
+      getById: () => undefined,
+    };
+    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
+      return selector ? selector(defaultState as NPCStore) : defaultState;
     });
   });
 
@@ -27,28 +26,29 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         id: 'npc-1',
         name: 'Gandalf',
         worldId: 'world-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       } : undefined
     );
 
     // Mock the selector pattern - return the function directly
-    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
-      if (selector) {
-        return selector({
-          npcs: {
-            'npc-1': {
-              id: 'npc-1',
-              name: 'Gandalf',
-              worldId: 'world-1',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
+    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
+      const state = {
+        npcs: {
+          'npc-1': {
+            id: 'npc-1',
+            name: 'Gandalf',
+            worldId: 'world-1',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
-          getById: mockGetById,
-        });
+        },
+        getById: mockGetById,
+      };
+      if (selector) {
+        return selector(state as unknown as NPCStore);
       }
-      return mockGetById;
+      return state;
     });
 
     const dialogueSegment: NarrativeSegment = {
@@ -60,8 +60,8 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         speakerId: 'npc-1',
       },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
@@ -78,28 +78,29 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         name: 'Aragorn',
         worldId: 'world-1',
         avatarUrl: 'https://example.com/aragorn.jpg',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       } : undefined
     );
 
-    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
-      if (selector) {
-        return selector({
-          npcs: {
-            'npc-2': {
-              id: 'npc-2',
-              name: 'Aragorn',
-              worldId: 'world-1',
-              avatarUrl: 'https://example.com/aragorn.jpg',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
+    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
+      const state = {
+        npcs: {
+          'npc-2': {
+            id: 'npc-2',
+            name: 'Aragorn',
+            worldId: 'world-1',
+            avatarUrl: 'https://example.com/aragorn.jpg',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
-          getById: mockGetById,
-        });
+        },
+        getById: mockGetById,
+      };
+      if (selector) {
+        return selector(state as unknown as NPCStore);
       }
-      return mockGetById;
+      return state;
     });
 
     const dialogueSegment: NarrativeSegment = {
@@ -111,8 +112,8 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         speakerId: 'npc-2',
       },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
@@ -131,8 +132,8 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         tags: [],
       },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
@@ -144,14 +145,15 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
   it('handles missing NPC gracefully when speakerId does not match', () => {
     const mockGetById = jest.fn(() => undefined);
 
-    mockUseNPCStore.mockImplementation((selector?: (state: unknown) => unknown) => {
+    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
+      const state = {
+        npcs: {},
+        getById: mockGetById,
+      };
       if (selector) {
-        return selector({
-          npcs: {},
-          getById: mockGetById,
-        });
+        return selector(state as unknown as NPCStore);
       }
-      return mockGetById;
+      return state;
     });
 
     const dialogueSegment: NarrativeSegment = {
@@ -163,8 +165,8 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         speakerId: 'nonexistent-npc',
       },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     render(<NarrativeDisplay segment={dialogueSegment} />);

@@ -455,7 +455,8 @@ export const TestDataGeneratorSection: React.FC = () => {
             characterId: '', // Will be set by store
             items: [],
             capacity: 100,
-            categories: []
+            categories: [],
+            itemOrder: []
           }
         };
 

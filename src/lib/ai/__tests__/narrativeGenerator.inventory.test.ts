@@ -36,16 +36,47 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       description: 'A world for testing',
       genre: 'fantasy',
       attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
     });
     useWorldStore.getState().setCurrent(worldId);
 
-    // Create test character
-    characterId = useCharacterStore.getState().create({
+    const newCharacterId = useCharacterStore.getState().create({
       name: 'Test Hero',
       worldId,
-      background: { summary: 'A brave adventurer' },
+      description: 'A hero for testing purposes',
+      level: 1,
+      isPlayer: true,
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+      },
+      background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
       skills: [],
+      inventory: {
+        characterId: '',
+        items: [],
+        capacity: 0,
+        categories: [],
+        itemOrder: [],
+      },
+    });
+    characterId = newCharacterId;
+    useCharacterStore.getState().updateCharacter(characterId, {
+      inventory: {
+        characterId: characterId,
+        items: [],
+        capacity: 0,
+        categories: [],
+        itemOrder: [],
+      },
     });
   });
 
@@ -142,12 +173,37 @@ describe('NarrativeGenerator - Inventory Integration', () => {
 
     it('should retrieve inventory for the correct character', async () => {
       // Create second character
-      const character2Id = useCharacterStore.getState().create({
+      const newCharacter2Id = useCharacterStore.getState().create({
         name: 'Other Hero',
         worldId,
-        background: { summary: 'Another adventurer' },
+        description: 'Another hero for testing purposes',
+        level: 1,
+        isPlayer: false,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
         attributes: [],
         skills: [],
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 0,
+          categories: [],
+          itemOrder: [],
+        },
+      });
+      const character2Id = newCharacter2Id;
+      useCharacterStore.getState().updateCharacter(character2Id, {
+        inventory: {
+          characterId: character2Id,
+          items: [],
+          capacity: 0,
+          categories: [],
+          itemOrder: [],
+        },
       });
 
       // Add different items to each character

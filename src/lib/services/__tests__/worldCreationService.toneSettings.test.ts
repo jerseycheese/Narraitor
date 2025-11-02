@@ -60,12 +60,12 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     mockUseWorldStore.getState = jest.fn().mockReturnValue(mockStore);
 
     // Setup mock AI client and generator
-    mockClient = { generateContent: jest.fn() };
+    mockClient = { generateContent: jest.fn() } as unknown as ReturnType<typeof createDefaultGeminiClient>;
     mockCreateDefaultGeminiClient.mockReturnValue(mockClient);
 
     mockGenerator = {
       generateToneSettings: jest.fn()
-    } as jest.Mocked<ToneSettingsGenerator>;
+    } as any; // Cast to any to bypass strict type checking
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
     // Mock the extractWorldAnalysisData function
@@ -108,7 +108,11 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',
-          category: 'Technical'
+          category: 'Technical',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+          difficulty: 'medium'
         }
       ],
       settings: {
@@ -145,7 +149,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify world was created with AI-generated tone settings
-      expect(mockStore.createWorld).toHaveBeenCalledWith(
+      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Cyberpunk Metropolis',
           description: 'A dark future city where technology dominates human life',
@@ -172,7 +176,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify fallback to default settings
-      expect(mockStore.createWorld).toHaveBeenCalledWith(
+      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           toneSettings: DEFAULT_TONE_SETTINGS
         })
@@ -212,7 +216,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify world was created with customizations and AI tone settings
-      expect(mockStore.createWorld).toHaveBeenCalledWith(
+      expect((mockStore as any).createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Custom Cyber City',
           description: 'My custom cyberpunk world',

@@ -69,7 +69,8 @@ const mockCharacter: StoreCharacter = {
     characterId: 'char-1',
     items: [],
     capacity: 20,
-    categories: []
+    categories: [],
+    itemOrder: []
   },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',

@@ -1,6 +1,7 @@
 import { CharacterDeletionService } from '../characterDeletionService';
 import { useJournalStore } from '@/state/journalStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { JournalEntryType } from '@/types/journal.types';
 
 // Mock the stores
 jest.mock('@/state/journalStore');
@@ -12,27 +13,97 @@ describe('CharacterDeletionService', () => {
       'entry-1': {
         id: 'entry-1',
         sessionId: 'session-1',
+        worldId: 'world-1',
         characterId: 'char-1',
-        content: 'Test entry'
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 1',
+        content: 'Test entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       'entry-2': {
         id: 'entry-2',
-        sessionId: 'session-2', 
+        sessionId: 'session-2',
+        worldId: 'world-1',
         characterId: 'char-1',
-        content: 'Another entry'
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 2',
+        content: 'Another entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       'entry-3': {
         id: 'entry-3',
         sessionId: 'session-3',
+        worldId: 'world-1',
         characterId: 'char-2',
-        content: 'Different character entry'
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 3',
+        content: 'Different character entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       }
     },
-    deleteSessionEntries: jest.fn()
+    sessionEntries: {},
+    error: null,
+    loading: false,
+    addEntry: jest.fn(),
+    updateEntry: jest.fn(),
+    deleteEntry: jest.fn(),
+    deleteSessionEntries: jest.fn(),
+    getSessionEntries: jest.fn(),
+    clearAllEntries: jest.fn(),
+    reset: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn(),
+    setLoading: jest.fn(),
+    markAsRead: jest.fn(),
+    getSessionEntriesWithCharacter: jest.fn(),
+    getEntriesByType: jest.fn(),
   };
 
   const mockCharacterStore = {
-    deleteCharacter: jest.fn()
+    characters: {},
+    entities: {},
+    currentCharacterId: null,
+    currentEntityId: null,
+    error: null,
+    loading: false,
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    setCurrent: jest.fn(),
+    getById: jest.fn(),
+    getAll: jest.fn(),
+    createCharacter: jest.fn(),
+    updateCharacter: jest.fn(),
+    deleteCharacter: jest.fn(),
+    setCurrentCharacter: jest.fn(),
+    addAttribute: jest.fn(),
+    updateAttribute: jest.fn(),
+    removeAttribute: jest.fn(),
+    addSkill: jest.fn(),
+    cleanupCharacterHistory: jest.fn(),
+    compactCharacterData: jest.fn(),
+    getCharactersCount: jest.fn(),
+    deleteCharactersInWorld: jest.fn(),
+    reset: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn(),
+    setLoading: jest.fn(),
+    syncDerivedState: jest.fn(),
   };
 
   beforeEach(() => {

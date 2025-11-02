@@ -40,7 +40,8 @@ describe('buildEndingContext', () => {
     sessionId: 'session-1',
     characterId: 'character-1',
     worldId: 'world-1',
-    endingType: 'triumphant',
+    desiredTone: 'triumphant',
+    endingType: 'story-complete',
   };
 
   beforeEach(() => {
@@ -79,6 +80,7 @@ describe('buildEndingContext', () => {
         items: [],
         capacity: 10,
         categories: [],
+        itemOrder: [],
       },
       portrait: undefined,
       createdAt: '2024-01-01T00:00:00Z',
@@ -133,6 +135,7 @@ describe('buildEndingContext', () => {
         items: [],
         capacity: 20,
         categories: [],
+        itemOrder: [],
       },
       portrait: undefined,
       createdAt: '2024-01-01T00:00:00Z',
@@ -207,6 +210,7 @@ describe('buildEndingContext', () => {
         items: [],
         capacity: 30,
         categories: [],
+        itemOrder: [],
       },
       portrait: undefined,
       createdAt: '2024-01-01T00:00:00Z',
@@ -222,7 +226,7 @@ describe('buildEndingContext', () => {
     });
     const session = createMockSession({
       id: request.sessionId,
-      lastPlayed: '2024-01-01T09:30:00Z',
+      state: { status: 'active', lastActivity: '2024-01-01T09:30:00Z' },
     });
 
     mockWorldStoreGetState.mockReturnValue({ worlds: { [world.id]: world } });
@@ -243,7 +247,7 @@ describe('buildEndingContext', () => {
     const context = await buildEndingContext(request);
 
     expect(context.journalEntries).toEqual([matchingEntry]);
-    expect(context.sessionStartTime).toEqual(new Date(session.lastPlayed!));
+    expect(context.sessionStartTime).toEqual(new Date(session.state.lastActivity));
   });
 
   it('throws when the world cannot be resolved', async () => {

@@ -48,23 +48,29 @@ describe('Standard Inventory Categories', () => {
     test('should return metadata for equipment category', () => {
       const metadata = getCategoryMetadata('equipment');
 
-      expect(metadata).toMatchObject({
-        name: 'Equipment',
-        description: expect.any(String),
-      });
-      expect(metadata.description.length).toBeGreaterThan(0);
+      expect(metadata).toBeDefined();
+      if (metadata) {
+        expect(metadata).toMatchObject({
+          name: 'Equipment',
+          description: expect.any(String),
+        });
+        expect(metadata.description.length).toBeGreaterThan(0);
+      }
     });
 
     test('should return metadata for all categories', () => {
       STANDARD_CATEGORIES.forEach((category) => {
         const metadata = getCategoryMetadata(category);
 
-        expect(metadata).toMatchObject({
-          name: expect.any(String),
-          description: expect.any(String),
-        });
-        expect(metadata.name.length).toBeGreaterThan(0);
-        expect(metadata.description.length).toBeGreaterThan(0);
+        expect(metadata).toBeDefined();
+        if (metadata) {
+          expect(metadata).toMatchObject({
+            name: expect.any(String),
+            description: expect.any(String),
+          });
+          expect(metadata.name.length).toBeGreaterThan(0);
+          expect(metadata.description.length).toBeGreaterThan(0);
+        }
       });
     });
 

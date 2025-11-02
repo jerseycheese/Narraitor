@@ -122,7 +122,8 @@ export default function CharacterCreatePage() {
           characterId: '', // Will be set by store
           items: [],
           capacity: 10,
-          categories: []
+          categories: [],
+          itemOrder: []
         }
       };
 
