@@ -1,5 +1,6 @@
 import { useCharacterStore } from '../characterStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
+import type { Character } from '@/types/character.types';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
@@ -51,7 +52,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       };
 
@@ -68,16 +70,15 @@ describe('useCharacterStore', () => {
 
     test('should validate required fields', () => {
       const invalidCharacterData = {
-        name: '',
-        description: '',
-        worldId: '',
+        description: 'A test character',
+        worldId: 'world-1',
         level: 1,
         attributes: [],
         skills: [],
         background: {
-          history: '',
-          personality: '',
-          goals: [],
+          history: 'A test character',
+          personality: 'Friendly',
+          goals: ['Testing'],
           fears: [],
           relationships: []
         },
@@ -91,12 +92,13 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
-      };
+      }; // Missing name
 
       expect(() => {
-        useCharacterStore.getState().createCharacter(invalidCharacterData);
+        useCharacterStore.getState().createCharacter(invalidCharacterData as unknown as Omit<Character, 'id' | 'createdAt' | 'updatedAt'>);
       }).toThrow('Character name is required');
     });
   });
@@ -127,7 +129,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
 
@@ -190,7 +193,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
 
@@ -225,7 +229,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
 
@@ -263,7 +268,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
 
@@ -313,7 +319,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
     });
@@ -403,7 +410,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
     });
@@ -506,7 +514,8 @@ describe('useCharacterStore', () => {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: [],
         }
       });
       useCharacterStore.getState().setError({

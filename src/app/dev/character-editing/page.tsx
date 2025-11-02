@@ -115,6 +115,7 @@ export default function CharacterEditingTestPage() {
           items: [],
           capacity: 20,
           categories: [],
+          itemOrder: [],
         }
       });
       setTestCharacterId(charId);

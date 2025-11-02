@@ -1,56 +1,99 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
 import { useJournalStore } from '../journalStore';
+import { JournalEntry, JournalEntryType } from '@/types/journal.types';
+import { EntityID } from '@/types/common.types';
 
 // Mock journal store
 jest.mock('../journalStore');
 
 describe('CharacterStore - Related Data Cleanup', () => {
-  let testCharacterId1: string;
-  let testCharacterId2: string;
+  let testCharacterId1: EntityID;
+  let testCharacterId2: EntityID;
 
   const mockJournalStore = {
-    entries: {} as Record<string, {
-      id: string;
-      sessionId: string;
-      characterId: string;
-      content: string;
-    }>,
+    entries: {} as Record<EntityID, JournalEntry>,
     sessionEntries: {
       'session-1': ['entry-1'],
       'session-2': ['entry-2'],
       'session-3': ['entry-3']
     },
     deleteSessionEntries: jest.fn(),
-    getSessionEntries: jest.fn()
+    getSessionEntries: jest.fn(),
+    error: null,
+    loading: false,
+    addEntry: jest.fn(),
+    updateEntry: jest.fn(),
+    deleteEntry: jest.fn(),
+    clearAllEntries: jest.fn(),
+    reset: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn(),
+    setLoading: jest.fn(),
+    markAsRead: jest.fn(),
+    getSessionEntriesWithCharacter: jest.fn(),
+    getEntriesByType: jest.fn(),
   };
 
   // Initialize entries dynamically based on test character IDs
-  const initializeMockEntries = () => {
+  const initializeMockEntries = (charId1: EntityID, charId2: EntityID) => {
     mockJournalStore.entries = {
       'entry-1': {
-        id: 'entry-1',
-        sessionId: 'session-1',
-        characterId: testCharacterId1,
-        content: 'Test entry'
+        id: 'entry-1' as EntityID,
+        sessionId: 'session-1' as EntityID,
+        worldId: 'world-1' as EntityID,
+        characterId: charId1,
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 1',
+        content: 'Test entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       'entry-2': {
-        id: 'entry-2', 
-        sessionId: 'session-2',
-        characterId: testCharacterId1,
-        content: 'Another entry'
+        id: 'entry-2' as EntityID,
+        sessionId: 'session-2' as EntityID,
+        worldId: 'world-1' as EntityID,
+        characterId: charId1,
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 2',
+        content: 'Another entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       'entry-3': {
-        id: 'entry-3',
-        sessionId: 'session-3', 
-        characterId: testCharacterId2,
-        content: 'Different character entry'
+        id: 'entry-3' as EntityID,
+        sessionId: 'session-3' as EntityID,
+        worldId: 'world-1' as EntityID,
+        characterId: charId2,
+        type: 'character_event' as JournalEntryType,
+        title: 'Test Entry 3',
+        content: 'Different character entry',
+        significance: 'minor' as const,
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: true },
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       }
     };
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Initialize test character IDs
+    testCharacterId1 = 'char-1' as EntityID;
+    testCharacterId2 = 'char-2' as EntityID;
+    initializeMockEntries(testCharacterId1, testCharacterId2);
+
     (useJournalStore as unknown as jest.Mock).mockImplementation((selector?: (state: typeof mockJournalStore) => unknown) => {
       if (selector) {
         return selector(mockJournalStore);
@@ -60,9 +103,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
 
     // Mock getState for store access
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
-  });
 
-  beforeEach(() => {
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());
     act(() => {
@@ -75,18 +116,17 @@ describe('CharacterStore - Related Data Cleanup', () => {
       const { result } = renderHook(() => useCharacterStore());
 
       // Create test characters
-
       act(() => {
         testCharacterId1 = result.current.createCharacter({
           name: 'Test Character 1',
-          description: 'Test description',
+          description: 'Test description 1',
           worldId: 'world-1',
           level: 1,
           attributes: [],
           skills: [],
           background: {
-            history: 'Test history',
-            personality: 'Test personality',
+            history: 'Test history 1',
+            personality: 'Test personality 1',
             goals: [],
             fears: [],
             relationships: []
@@ -101,7 +141,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: [],
           }
         });
 
@@ -129,12 +170,13 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: [],
           }
         });
 
         // Initialize mock journal entries with actual character IDs
-        initializeMockEntries();
+        initializeMockEntries(testCharacterId1, testCharacterId2);
       });
 
       // Verify characters exist
@@ -169,7 +211,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
           skills: [],
           background: {
             history: 'Test history',
-            personality: 'Test personality', 
+            personality: 'Test personality',
             goals: [],
             fears: [],
             relationships: []
@@ -184,7 +226,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: [],
           }
         });
 
@@ -212,14 +255,14 @@ describe('CharacterStore - Related Data Cleanup', () => {
       act(() => {
         activeCharacterId = result.current.createCharacter({
           name: 'Active Character',
-          description: 'Active description',
+          description: 'Active character description',
           worldId: 'world-1',
           level: 1,
           attributes: [],
           skills: [],
           background: {
-            history: 'Active history',
-            personality: 'Active personality',
+            history: 'Active character history',
+            personality: 'Active character personality',
             goals: [],
             fears: [],
             relationships: []
@@ -234,7 +277,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: [],
           }
         });
 
@@ -262,7 +306,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: []
           }
         });
 
@@ -328,7 +373,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
             characterId: '',
             items: [],
             capacity: 20,
-            categories: []
+            categories: [],
+            itemOrder: [],
           }
         });
       });

@@ -66,7 +66,8 @@ const mockCharacter: StoreCharacter = {
     characterId: 'char-1',
     items: [],
     capacity: 20,
-    categories: []
+    categories: [],
+    itemOrder: []
   },
   portrait: {
     type: 'ai-generated',

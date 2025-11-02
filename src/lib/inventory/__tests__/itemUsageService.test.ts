@@ -39,13 +39,35 @@ describe('Item Usage Service', () => {
       description: 'A magical world',
       genre: 'fantasy',
       attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
     });
 
     // Create test character
     characterId = useCharacterStore.getState().create({
       name: 'Aria the Brave',
       worldId,
-      background: { summary: 'A courageous warrior' },
+      description: 'A courageous warrior of the realm',
+      level: 1,
+      isPlayer: true,
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+      },
+      inventory: {
+        characterId: characterId,
+        items: [],
+        capacity: 0,
+        categories: [],
+        itemOrder: [],
+      },
+      background: { history: 'A courageous warrior', personality: 'Brave', goals: [], fears: [], relationships: [] },
       attributes: [],
       skills: [],
     });

@@ -146,7 +146,8 @@ describe('endingGenerator', () => {
       characterId: 'char-456',
       items: [],
       capacity: 100,
-      categories: []
+      categories: [],
+      itemOrder: [],
     },
     isPlayer: true,
     status: {

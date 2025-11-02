@@ -6,6 +6,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { InventoryTable } from './InventoryTable';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -19,20 +20,22 @@ const mockInventoryItems: InventoryItem[] = [
   {
     id: 'item-1' as EntityID,
     name: 'Health Potion',
+    description: 'A simple potion that restores a small amount of health.',
     categoryId: 'consumables',
     quantity: 5,
     stackable: true,
     maxStack: 99,
     acquisitionHistory: [
       {
-        method: 'found',
-        timestamp: '2024-01-15T10:00:00Z',
+        method: 'unknown',
+        acquiredAt: '2024-01-15T10:00:00Z',
         quantity: 5,
       },
     ],
     categorization: {
-      tags: ['healing'],
-      primaryCategoryId: 'consumables',
+      categoryId: 'consumables',
+      source: 'manual',
+      classifiedAt: '2024-01-15T10:00:00Z',
     },
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
@@ -40,19 +43,21 @@ const mockInventoryItems: InventoryItem[] = [
   {
     id: 'item-2' as EntityID,
     name: 'Iron Sword',
+    description: 'A basic but reliable sword.',
     categoryId: 'equipment',
     quantity: 1,
     stackable: false,
     acquisitionHistory: [
       {
-        method: 'purchased',
-        timestamp: '2024-01-10T12:00:00Z',
+        method: 'purchase',
+        acquiredAt: '2024-01-10T12:00:00Z',
         quantity: 1,
       },
     ],
     categorization: {
-      tags: ['weapon'],
-      primaryCategoryId: 'equipment',
+      categoryId: 'equipment',
+      source: 'manual',
+      classifiedAt: '2024-01-10T12:00:00Z',
     },
     createdAt: '2024-01-10T12:00:00Z',
     updatedAt: '2024-01-10T12:00:00Z',
@@ -60,19 +65,21 @@ const mockInventoryItems: InventoryItem[] = [
   {
     id: 'item-3' as EntityID,
     name: 'Ancient Map',
+    description: 'A mysterious map with faded markings.',
     categoryId: 'documents',
     quantity: 1,
     stackable: false,
     acquisitionHistory: [
       {
-        method: 'quest-reward',
-        timestamp: '2024-01-20T14:00:00Z',
+        method: 'reward',
+        acquiredAt: '2024-01-20T14:00:00Z',
         quantity: 1,
       },
     ],
     categorization: {
-      tags: ['quest'],
-      primaryCategoryId: 'documents',
+      categoryId: 'documents',
+      source: 'manual',
+      classifiedAt: '2024-01-20T14:00:00Z',
     },
     createdAt: '2024-01-20T14:00:00Z',
     updatedAt: '2024-01-20T14:00:00Z',

@@ -169,7 +169,8 @@ export const NewCharacter: Story = {
           characterId: '', // Will be set by the store
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: []
         }
       });
       
@@ -231,7 +232,8 @@ export const WithPortrait: Story = {
           characterId: '', // Will be set by the store
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: []
         }
       });
       
@@ -341,7 +343,8 @@ export const CustomPromptTesting: Story = {
           characterId: '',
           items: [],
           capacity: 20,
-          categories: []
+          categories: [],
+          itemOrder: []
         }
       });
       
@@ -413,7 +416,8 @@ export const UIComponentShowcase: Story = {
           characterId: '',
           items: [],
           capacity: 25,
-          categories: []
+          categories: [],
+          itemOrder: []
         }
       });
       

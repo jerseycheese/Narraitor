@@ -111,8 +111,7 @@ describe('buildInventoryContext', () => {
       baseItem({
         id: 'item-1',
         name: 'Enchanted Longsword',
-        description: 'A finely crafted blade imbued with ancient magic.',
-        categoryId: 'weapons',
+        categoryId: 'equipment',
       }),
       baseItem({
         id: 'item-2',
@@ -141,7 +140,7 @@ describe('buildInventoryContext', () => {
         id: `item-${index}`,
         name: `Weapon ${index}`,
         description: 'Short description.',
-        categoryId: 'weapons',
+        categoryId: 'equipment',
       })
     );
 

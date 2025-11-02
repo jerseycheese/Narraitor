@@ -144,6 +144,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
     },
     portrait: {
       type: 'ai-generated' as const,
@@ -167,16 +168,17 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       physicalDescription: 'Small and quick',
       relationships: [],
     },
-    status: {
-      health: 80,
-      maxHealth: 100,
-      conditions: [],
-    },
     inventory: {
       characterId: '',
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
+    },
+    status: {
+      health: 100,
+      maxHealth: 100,
+      conditions: [],
     },
     portrait: {
       type: 'ai-generated' as const,
@@ -210,6 +212,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       items: [],
       capacity: 100,
       categories: [],
+      itemOrder: [],
     },
     portrait: {
       type: 'ai-generated' as const,

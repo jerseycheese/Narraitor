@@ -43,6 +43,7 @@ export const mockCharacter = {
     items: [],
     capacity: 100,
     categories: [],
+    itemOrder: [],
   },
   status: {
     health: 100,

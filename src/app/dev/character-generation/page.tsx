@@ -94,7 +94,8 @@ export default function CharacterGenerationTestPage() {
         characterId: '',
         items: [],
         capacity: 20,
-        categories: []
+        categories: [],
+        itemOrder: []
       }
     });
     

@@ -191,7 +191,8 @@ const mockCharacter = {
     characterId: 'test-character-123',
     items: [],
     capacity: 20,
-    categories: []
+    categories: [],
+    itemOrder: []
   },
   createdAt: getTimestamp(),
   updatedAt: getTimestamp()

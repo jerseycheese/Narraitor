@@ -47,7 +47,8 @@ const mockCharacterStoreState = {
         characterId: 'test-character-id',
         items: [],
         capacity: 100,
-        categories: []
+        categories: [],
+        itemOrder: []
       },
       status: { 
         health: 100, 

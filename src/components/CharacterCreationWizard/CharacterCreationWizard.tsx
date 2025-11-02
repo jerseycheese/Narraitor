@@ -366,7 +366,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         characterId: '', // Will be set by the store
         items: [],
         capacity: 20,
-        categories: []
+        categories: [],
+        itemOrder: []
       },
     });
 

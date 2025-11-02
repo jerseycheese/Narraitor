@@ -82,7 +82,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           fears: [],
           relationships: []
         },
-        inventory: { items: [], capacity: 100, categories: [], characterId: 'temp' },
+        inventory: { items: [], capacity: 100, categories: [], characterId: 'temp', itemOrder: [] },
         status: { health: 100, maxHealth: 100, conditions: [] },
         createdAt: getTimestamp(),
         updatedAt: getTimestamp()

@@ -78,7 +78,7 @@ describe('PortraitGenerator', () => {
         fears: ['Losing control of power'],
         relationships: []
       },
-      inventory: { items: [], capacity: 100, categories: [], characterId: 'char-1' },
+      inventory: { items: [], capacity: 100, categories: [], characterId: 'char-1', itemOrder: [] },
       status: { health: 100, maxHealth: 100, conditions: [] },
       createdAt: getTimestamp(),
       updatedAt: getTimestamp()

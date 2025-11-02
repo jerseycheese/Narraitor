@@ -54,7 +54,8 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         characterId: 'char-1',
         items: [],
         capacity: 100,
-        categories: []
+        categories: [],
+        itemOrder: [],
       },
       status: {
         health: 100,
