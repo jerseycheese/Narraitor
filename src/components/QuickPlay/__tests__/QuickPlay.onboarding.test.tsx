@@ -6,6 +6,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { mockZustandStore, createMockWorldStore, createMockSessionStore, createMockCharacterStore } from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -31,26 +32,29 @@ describe('QuickPlay - Onboarding Integration', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     
     // Default mock for empty stores
-    (useWorldStore as unknown as jest.Mock).mockReturnValue({
-      worlds: {},
-    });
-    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-      characters: {},
-    });
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({
+        worlds: {},
+      })
+    );
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: {},
+      })
+    );
   });
 
   describe('First-time user experience', () => {
     beforeEach(() => {
       // Mock first-time user state
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: false,
           isFirstTimeUser: () => true,
           shouldShowOnboarding: () => true,
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
     });
 
     it('shows guided first-time experience instead of generic "Start New Game" button', () => {
@@ -72,16 +76,14 @@ describe('QuickPlay - Onboarding Integration', () => {
 
   describe('Returning user experience', () => {
     beforeEach(() => {
-      // Mock returning user state (onboarding completed, no saved sessions yet)
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: true,
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
     });
 
     it('shows standard "Start New Game" button for returning users with no sessions', () => {
@@ -137,8 +139,8 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     beforeEach(() => {
       // Mock returning user with saved sessions
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {
             'session-1': mockSavedSession,
           },
@@ -146,21 +148,24 @@ describe('QuickPlay - Onboarding Integration', () => {
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
           resumeSavedSession: jest.fn().mockReturnValue(true),
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
       
-      (useWorldStore as unknown as jest.Mock).mockReturnValue({
-        worlds: {
-          'world-1': mockWorld,
-        },
-      });
+      mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+        createMockWorldStore({
+          worlds: {
+            'world-1': mockWorld,
+          },
+        })
+      );
       
-      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-        characters: {
-          'char-1': mockCharacter,
-        },
-      });
+      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+        createMockCharacterStore({
+          characters: {
+            'char-1': mockCharacter,
+          },
+        })
+      );
     });
 
     it('shows both "Continue Last Game" and "Start New Game" options', () => {
@@ -185,15 +190,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('User who skipped onboarding', () => {
     beforeEach(() => {
       // Mock user who completed onboarding (via skip) but has no saved sessions
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: true,
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
     });
 
     it('shows standard interface, not guided experience', () => {
@@ -215,15 +219,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('Edge cases', () => {
     it('handles corrupted onboarding state gracefully', () => {
       // Mock corrupted state
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: undefined, // Corrupted
           isFirstTimeUser: () => true, // Fallback to true
           shouldShowOnboarding: () => true,
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
 
       render(<QuickPlay />);
       
@@ -233,14 +236,13 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('handles missing helper methods gracefully', () => {
       // Mock state without helper methods
-      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
-        const mockState = {
+      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: false,
           // Missing isFirstTimeUser and shouldShowOnboarding methods
-        };
-        return selector ? selector(mockState) : mockState;
-      });
+        })
+      );
 
       render(<QuickPlay />);
       
