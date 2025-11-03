@@ -16,10 +16,6 @@ import {
 } from '../mockStoreFactories';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useJournalStore } from '@/state/journalStore';
-import { useNarrativeStore } from '@/state/narrativeStore';
-import { useInventoryStore } from '@/state/inventoryStore';
-import { useNPCStore } from '@/state/npcStore';
 
 // Mock the stores
 jest.mock('@/state/characterStore');
@@ -69,6 +65,7 @@ describe('createMockCharacterStore', () => {
     const mock = createMockCharacterStore({
       create: customCreate,
       loading: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       characters: { 'char-1': { id: 'char-1' } as any },
     });
 
@@ -99,9 +96,12 @@ describe('createMockSessionStore', () => {
 
 describe('createMockJournalStore', () => {
   it('allows overriding store values', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockJournalStore({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entries: { 'entry-1': {} as any },
       loading: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
     expect(mock.entries).toHaveProperty('entry-1');
@@ -111,9 +111,12 @@ describe('createMockJournalStore', () => {
 
 describe('createMockNarrativeStore', () => {
   it('allows overriding store values', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockNarrativeStore({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       segments: { 'seg-1': {} as any },
       currentSegmentId: 'seg-1',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
     expect(mock.segments).toHaveProperty('seg-1');
@@ -124,9 +127,11 @@ describe('createMockNarrativeStore', () => {
 describe('createMockInventoryStore', () => {
   it('allows overriding store values', () => {
     const addItemMock = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockInventoryStore({
       addItem: addItemMock,
       loading: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
     expect(mock.addItem).toBe(addItemMock);
@@ -137,6 +142,7 @@ describe('createMockInventoryStore', () => {
 describe('createMockNPCStore', () => {
   it('allows overriding store values', () => {
     const mock = createMockNPCStore({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       npcs: { 'npc-1': {} as any },
       loading: false,
     });
@@ -157,6 +163,7 @@ describe('Integration: Using mock factories in actual test scenarios', () => {
 
     // NEW PATTERN (what we're testing):
     const mockState = createMockCharacterStore({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       characters: { 'char-1': { id: 'char-1', name: 'Test' } as any },
       loading: false,
     });
