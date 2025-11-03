@@ -8,15 +8,14 @@ jest.mock('@/state/characterStore');
 describe('Character Creation Validation', () => {
   describe('validateCharacterName', () => {
     beforeEach(() => {
-      const mockCharacterState = {
+      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
         characters: {
-          'char-1': { id: 'char-1', name: 'Existing Hero', worldId: 'world-1' },
-          'char-2': { id: 'char-2', name: 'Another Hero', worldId: 'world-2' },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          'char-1': { id: 'char-1', name: 'Existing Hero', worldId: 'world-1' } as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          'char-2': { id: 'char-2', name: 'Another Hero', worldId: 'world-2' } as any,
         },
-      };
-
-      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore(mockCharacterState));
-      (useCharacterStore as jest.MockedFunction<typeof useCharacterStore>).getState = jest.fn(() => mockCharacterState);
+      }));
     });
 
     it('returns error when name is empty', () => {

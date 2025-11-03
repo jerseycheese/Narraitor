@@ -12,7 +12,6 @@ jest.mock('@/lib/inventory/categorizeInventoryItemClient');
 
 describe('itemAcquisitionProcessor', () => {
   const mockAddItem = jest.fn();
-  const mockGetState = jest.fn();
   const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
     typeof categorizeInventoryItemClient
   >;

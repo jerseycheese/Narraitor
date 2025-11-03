@@ -76,10 +76,10 @@ export function mockZustandStore<T>(
 ): jest.MockedFunction<typeof useStore> & { getState: () => T } {
   const mock = useStore as unknown as jest.MockedFunction<typeof useStore> & { getState: () => T };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mock.mockImplementation(((selector?: (state: T) => unknown) => {
     const fullState = partialState as T;
     return selector ? selector(fullState) : fullState;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any);
 
   // Add this line to mock getState

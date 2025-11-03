@@ -70,22 +70,29 @@ const mockCharacter = {
 const mockWorld = {
   id: 'test-world-1',
   name: 'Test World',
+  description: 'A test world',
+  genre: 'fantasy' as const,
   attributes: [
     {
       id: 'attr-1',
+      worldId: 'test-world-1',
       name: 'Strength',
       description: 'Physical power',
       minValue: 1,
       maxValue: 20,
+      baseValue: 10,
     }
   ],
   skills: [
     {
       id: 'skill-1',
+      worldId: 'test-world-1',
       name: 'Swordsmanship',
       description: 'Skill with bladed weapons',
       minValue: 0,
       maxValue: 10,
+      baseValue: 0,
+      difficulty: 'medium' as const,
     }
   ],
   settings: {
@@ -94,6 +101,8 @@ const mockWorld = {
     attributePointPool: 50,
     skillPointPool: 30,
   },
+  createdAt: '2023-01-01T00:00:00Z',
+  updatedAt: '2023-01-01T00:00:00Z',
 };
 
 describe('CharacterEditor MVP Tests', () => {

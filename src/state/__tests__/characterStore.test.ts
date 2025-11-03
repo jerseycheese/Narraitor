@@ -1,6 +1,5 @@
 import { useCharacterStore } from '../characterStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
-import type { Character } from '@/types/character.types';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
