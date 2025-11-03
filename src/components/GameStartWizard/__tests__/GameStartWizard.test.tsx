@@ -5,6 +5,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useRouter } from 'next/navigation';
+import { mockZustandStore, createMockWorldStore, createMockCharacterStore, createMockSessionStore } from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -74,21 +75,23 @@ describe('GameStartWizard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    
-    // Default store mocks
-    (useWorldStore as unknown as jest.Mock).mockReturnValue({
+
+    // Default store mocks using typed factories
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>, createMockWorldStore({
       worlds: {
-        'world-1': { id: 'world-1', name: 'Test World' },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        'world-1': { id: 'world-1', name: 'Test World' } as any,
       },
-    });
-    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
+    }));
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
       characters: {
-        'char-1': { id: 'char-1', name: 'Test Character', worldId: 'world-1' },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        'char-1': { id: 'char-1', name: 'Test Character', worldId: 'world-1' } as any,
       },
-    });
-    (useSessionStore as unknown as jest.Mock).mockReturnValue({
+    }));
+    mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
       initializeSession: jest.fn(),
-    });
+    }));
   });
 
   it('should start at world selection step', () => {
