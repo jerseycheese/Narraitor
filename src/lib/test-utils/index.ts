@@ -4,6 +4,6 @@
  * Centralized exports for all test utility functions.
  */
 
-export * from './mockStore';
+export { createMockStore } from './mockStore';
 export * from './mockStoreFactories';
 export * from './testDataFactory';

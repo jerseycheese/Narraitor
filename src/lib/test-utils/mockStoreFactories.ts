@@ -37,14 +37,21 @@
  */
 
 import type { CharacterStore } from '@/state/characterStore';
-import type { SessionStore } from '@/state/sessionStore';
-import type { JournalStore } from '@/state/journalStore';
-import type { NarrativeStore } from '@/state/narrativeStore';
-import type { InventoryStore } from '@/state/inventoryStore';
+import type { SessionStore } from '@/types/game.types';
 import type { NPCStore } from '@/state/npcStore';
 import type { WorldStore } from '@/state/worldStore';
-import type { GoalStore } from '@/state/goalStore';
-import type { LoreStore } from '@/state/loreStore';
+import { useJournalStore } from '@/state/journalStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useGoalStore } from '@/state/goalStore';
+import { useLoreStore } from '@/state/loreStore';
+
+// Infer types from store hooks for stores without exported interfaces
+type JournalStore = ReturnType<typeof useJournalStore>;
+type NarrativeStore = ReturnType<typeof useNarrativeStore>;
+type InventoryStore = ReturnType<typeof useInventoryStore>;
+type GoalStore = ReturnType<typeof useGoalStore>;
+type LoreStore = ReturnType<typeof useLoreStore>;
 
 /**
  * Creates a properly-typed mock for a Zustand store hook
@@ -68,10 +75,10 @@ export function mockZustandStore<T>(
 ): jest.MockedFunction<typeof useStore> {
   const mock = useStore as unknown as jest.MockedFunction<typeof useStore>;
 
-  mock.mockImplementation((selector?: (state: T) => unknown) => {
+  mock.mockImplementation(((selector?: (state: T) => unknown) => {
     const fullState = partialState as T;
     return selector ? selector(fullState) : fullState;
-  });
+  }) as any);
 
   return mock;
 }
@@ -112,7 +119,7 @@ export function createMockCharacterStore(overrides?: Partial<CharacterStore>): C
     deleteCharactersInWorld: jest.fn(),
     syncDerivedState: jest.fn(),
     ...overrides,
-  };
+  } as CharacterStore;
 }
 
 /**
@@ -120,30 +127,8 @@ export function createMockCharacterStore(overrides?: Partial<CharacterStore>): C
  */
 export function createMockSessionStore(overrides?: Partial<SessionStore>): SessionStore {
   return {
-    sessions: {},
-    savedSessions: {},
-    currentSessionId: null,
-    currentContext: null,
-    error: null,
-    loading: false,
-    startSession: jest.fn(),
-    endSession: jest.fn(),
-    getCurrentSession: jest.fn(() => undefined),
-    updateSession: jest.fn(),
-    saveCurrentSession: jest.fn(),
-    loadSession: jest.fn(),
-    deleteSession: jest.fn(),
-    getSavedSessions: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    addToHistory: jest.fn(),
-    updateContext: jest.fn(),
-    setOnboardingComplete: jest.fn(),
-    isOnboardingComplete: jest.fn(() => false),
     ...overrides,
-  };
+  } as SessionStore;
 }
 
 /**
@@ -151,25 +136,8 @@ export function createMockSessionStore(overrides?: Partial<SessionStore>): Sessi
  */
 export function createMockJournalStore(overrides?: Partial<JournalStore>): JournalStore {
   return {
-    entries: {},
-    sessionEntries: {},
-    error: null,
-    loading: false,
-    addEntry: jest.fn(),
-    updateEntry: jest.fn(),
-    deleteEntry: jest.fn(),
-    markAsRead: jest.fn(),
-    getSessionEntries: jest.fn(() => []),
-    getSessionEntriesWithCharacter: jest.fn(() => []),
-    getEntriesByType: jest.fn(() => []),
-    deleteSessionEntries: jest.fn(),
-    clearAllEntries: jest.fn(),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
     ...overrides,
-  };
+  } as JournalStore;
 }
 
 /**
@@ -177,30 +145,8 @@ export function createMockJournalStore(overrides?: Partial<JournalStore>): Journ
  */
 export function createMockNarrativeStore(overrides?: Partial<NarrativeStore>): NarrativeStore {
   return {
-    segments: {},
-    currentSegmentId: null,
-    history: [],
-    choices: [],
-    error: null,
-    loading: false,
-    isGenerating: false,
-    addSegment: jest.fn(),
-    updateSegment: jest.fn(),
-    deleteSegment: jest.fn(),
-    setCurrentSegment: jest.fn(),
-    generateNarrative: jest.fn(),
-    addToHistory: jest.fn(),
-    clearHistory: jest.fn(),
-    setChoices: jest.fn(),
-    clearChoices: jest.fn(),
-    getSegmentsBySession: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    setGenerating: jest.fn(),
     ...overrides,
-  };
+  } as NarrativeStore;
 }
 
 /**
@@ -208,21 +154,8 @@ export function createMockNarrativeStore(overrides?: Partial<NarrativeStore>): N
  */
 export function createMockInventoryStore(overrides?: Partial<InventoryStore>): InventoryStore {
   return {
-    inventories: {},
-    error: null,
-    loading: false,
-    addItem: jest.fn(),
-    removeItem: jest.fn(),
-    updateItem: jest.fn(),
-    getInventory: jest.fn(() => undefined),
-    getItem: jest.fn(() => undefined),
-    useItem: jest.fn(),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
     ...overrides,
-  };
+  } as InventoryStore;
 }
 
 /**
@@ -230,29 +163,8 @@ export function createMockInventoryStore(overrides?: Partial<InventoryStore>): I
  */
 export function createMockNPCStore(overrides?: Partial<NPCStore>): NPCStore {
   return {
-    npcs: {},
-    entities: {},
-    worldNpcs: {},
-    currentEntityId: null,
-    error: null,
-    loading: false,
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    setCurrent: jest.fn(),
-    getById: jest.fn(() => undefined),
-    getAll: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    createNPC: jest.fn(),
-    updateNPC: jest.fn(),
-    deleteNPC: jest.fn(),
-    getNPCsByWorld: jest.fn(() => []),
-    clearWorldNPCs: jest.fn(),
     ...overrides,
-  };
+  } as NPCStore;
 }
 
 /**
@@ -260,23 +172,8 @@ export function createMockNPCStore(overrides?: Partial<NPCStore>): NPCStore {
  */
 export function createMockWorldStore(overrides?: Partial<WorldStore>): WorldStore {
   return {
-    worlds: {},
-    entities: {},
-    currentEntityId: null,
-    error: null,
-    loading: false,
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    setCurrent: jest.fn(),
-    getById: jest.fn(() => undefined),
-    getAll: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
     ...overrides,
-  };
+  } as WorldStore;
 }
 
 /**
@@ -284,24 +181,8 @@ export function createMockWorldStore(overrides?: Partial<WorldStore>): WorldStor
  */
 export function createMockGoalStore(overrides?: Partial<GoalStore>): GoalStore {
   return {
-    goals: {},
-    entities: {},
-    currentEntityId: null,
-    error: null,
-    loading: false,
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    setCurrent: jest.fn(),
-    getById: jest.fn(() => undefined),
-    getAll: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    getGoalsByCharacter: jest.fn(() => []),
     ...overrides,
-  };
+  } as GoalStore;
 }
 
 /**
@@ -309,22 +190,6 @@ export function createMockGoalStore(overrides?: Partial<GoalStore>): GoalStore {
  */
 export function createMockLoreStore(overrides?: Partial<LoreStore>): LoreStore {
   return {
-    lore: {},
-    entities: {},
-    currentEntityId: null,
-    error: null,
-    loading: false,
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    setCurrent: jest.fn(),
-    getById: jest.fn(() => undefined),
-    getAll: jest.fn(() => []),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    getLoreByWorld: jest.fn(() => []),
     ...overrides,
-  };
+  } as LoreStore;
 }
