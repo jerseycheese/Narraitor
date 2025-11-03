@@ -199,7 +199,10 @@ describe('InventoryTable', () => {
       removeItem: mockRemoveItem,
     };
 
-    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockState));
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
+    );
 
     render(<InventoryTable characterId="char-1" />);
 
@@ -215,7 +218,10 @@ describe('InventoryTable', () => {
       removeItem: jest.fn(),
     };
 
-    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockState));
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
+    );
 
     render(<InventoryTable characterId="char-1" />);
 

@@ -61,6 +61,7 @@ const mockCharacter = {
     items: [],
     capacity: 20,
     categories: [],
+    itemOrder: [],
   },
   createdAt: '2023-01-01T00:00:00Z',
   updatedAt: '2023-01-01T00:00:00Z',
@@ -135,29 +136,38 @@ describe('CharacterEditor MVP Tests', () => {
 
 
   test('saves changes when user clicks save', async () => {
+    const mockUpdateCharacter = jest.fn();
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: mockUpdateCharacter,
+        deleteCharacter: jest.fn(),
+      })
+    );
+
     render(<CharacterEditor characterId="test-char-1" />);
-    
+
     // Wait for character to load
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
     });
-    
+
     // Modify character name
     const nameInput = screen.getByDisplayValue('Test Character');
     fireEvent.change(nameInput, { target: { value: 'Modified Character' } });
-    
+
     // Click save button
     const saveButton = screen.getByText('Save Changes');
     fireEvent.click(saveButton);
-    
+
     // Verify saving feedback is shown
     await waitFor(() => {
       expect(screen.getByText('Saving...')).toBeInTheDocument();
     });
-    
+
     // Verify updateCharacter was called
     await waitFor(() => {
-      expect(useCharacterStore().updateCharacter).toHaveBeenCalled();
+      expect(mockUpdateCharacter).toHaveBeenCalled();
     });
   });
 

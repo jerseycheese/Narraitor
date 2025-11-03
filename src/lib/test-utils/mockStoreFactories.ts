@@ -207,7 +207,6 @@ export function createMockWorldStore(overrides?: Partial<WorldStore>): WorldStor
     removeSkill: jest.fn(),
     updateSettings: jest.fn(),
     updateToneSettings: jest.fn(),
-    updateToneSettings: jest.fn(),
     ...overrides,
   } as WorldStore;
 }
