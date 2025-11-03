@@ -96,7 +96,6 @@ describe('createMockSessionStore', () => {
 
 describe('createMockJournalStore', () => {
   it('allows overriding store values', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockJournalStore({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entries: { 'entry-1': {} as any },
@@ -111,7 +110,6 @@ describe('createMockJournalStore', () => {
 
 describe('createMockNarrativeStore', () => {
   it('allows overriding store values', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockNarrativeStore({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       segments: { 'seg-1': {} as any },
