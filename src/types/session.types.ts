@@ -2,6 +2,18 @@
 
 import { EntityID, TimestampedEntity, ISODateString } from './common.types';
 
+export type SessionLifecycleStatus = 'active' | 'ended' | 'abandoned';
+
+export type SessionStatus = SessionLifecycleStatus | 'paused' | 'completed';
+
+export interface SessionLifecycleMetadata {
+  id: EntityID;
+  worldId: EntityID;
+  characterId: EntityID;
+  status: SessionLifecycleStatus;
+  lastActivity: ISODateString;
+}
+
 /**
  * Represents a game session
  */
@@ -18,7 +30,7 @@ export interface GameSession extends TimestampedEntity {
  * State of a game session
  */
 export interface SessionState {
-  status: 'active' | 'paused' | 'completed';
+  status: SessionStatus;
   lastActivity: ISODateString;
   savePoint?: SavePoint;
 }

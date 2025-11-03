@@ -9,6 +9,25 @@ import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/l
 import { validateWorld } from '../types/type-guards';
 import { CrudStore } from './createCrudStore';
 import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
+import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
+import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('WorldStore');
+let sessionStoreModule: typeof import('./sessionStore') | null = null;
+
+const resolveSessionStatus = (sessionId: EntityID) => {
+  try {
+    if (!sessionStoreModule) {
+      sessionStoreModule = eval('require("./sessionStore")');
+    }
+    const { useSessionStore } = sessionStoreModule;
+    return useSessionStore.getState().getSessionLifecycle(sessionId)?.status;
+  } catch (error) {
+    logger.warn('Failed to resolve session status', { sessionId, error });
+    return undefined;
+  }
+};
 
 /**
  * World store interface with state and actions
@@ -41,6 +60,14 @@ export interface WorldStore extends CrudStore<World> {
 
   // Tone settings management
   updateToneSettings: (worldId: EntityID, toneSettings: Partial<ToneSettings>) => void;
+
+  // World state management
+  worldStates: Record<EntityID, WorldState>;
+  initializeWorldState: (worldId: EntityID) => void;
+  updateWorldState: (worldId: EntityID, stateUpdate: WorldStateUpdate, sessionId: EntityID) => void;
+  mergeWorldState: (incomingState: WorldState) => void;
+  getWorldState: (worldId: EntityID, options?: { includeEndedSessions?: boolean }) => WorldState;
+  getRawWorldState: (worldId: EntityID) => WorldState | undefined;
 }
 
 // World Store implementation with persistence
@@ -51,6 +78,7 @@ export const useWorldStore = create<WorldStore>()(
         // State
         worlds: {},
         entities: {},
+        worldStates: {},
         currentWorldId: null,
         currentEntityId: null,
         error: null,
@@ -84,6 +112,10 @@ export const useWorldStore = create<WorldStore>()(
             entities: {
               ...state.entities,
               [worldId]: newWorld,
+            },
+            worldStates: {
+              ...state.worldStates,
+              [worldId]: createEmptyWorldState(worldId),
             },
             error: null,
           }));
@@ -144,10 +176,13 @@ export const useWorldStore = create<WorldStore>()(
             const { [id]: _removedWorld, ...remainingWorlds } = state.worlds;
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedEntity, ...remainingEntities } = state.entities;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _removedState, ...remainingStates } = state.worldStates;
             const currentIsDeleted = state.currentEntityId === id || state.currentWorldId === id;
             return {
               worlds: remainingWorlds,
               entities: remainingEntities,
+              worldStates: remainingStates,
               currentEntityId: currentIsDeleted ? null : state.currentEntityId,
               currentWorldId: currentIsDeleted ? null : state.currentWorldId,
               error: null,
@@ -169,7 +204,7 @@ export const useWorldStore = create<WorldStore>()(
 
         getById: (id) => get().worlds[id],
         getAll: () => Object.values(get().worlds),
-        reset: () => set({ worlds: {}, entities: {}, currentEntityId: null, currentWorldId: null, error: null, loading: false }),
+        reset: () => set({ worlds: {}, entities: {}, worldStates: {}, currentEntityId: null, currentWorldId: null, error: null, loading: false }),
         setError: (error) => set({ error }),
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
@@ -179,6 +214,17 @@ export const useWorldStore = create<WorldStore>()(
               state.worlds && typeof state.worlds === 'object' ? state.worlds : {};
 
             const hasWorlds = Object.keys(worlds).length > 0;
+
+            const existingWorldStates =
+              state.worldStates && typeof state.worldStates === 'object' ? state.worldStates : {};
+
+            const nextWorldStates: Record<EntityID, WorldState> = {};
+
+            if (hasWorlds) {
+              for (const worldId of Object.keys(worlds)) {
+                nextWorldStates[worldId] = existingWorldStates[worldId] ?? createEmptyWorldState(worldId);
+              }
+            }
 
             const isValidWorldId = (id: EntityID | null | undefined) => Boolean(id && worlds[id]);
 
@@ -198,6 +244,7 @@ export const useWorldStore = create<WorldStore>()(
             return {
               worlds: hasWorlds ? worlds : {},
               entities: { ...worlds },
+              worldStates: hasWorlds ? nextWorldStates : {},
               currentWorldId: hasWorlds ? nextCurrentWorldId : null,
               currentEntityId: hasWorlds ? nextCurrentEntityId : null,
               error: state.error ?? null,
@@ -373,6 +420,71 @@ export const useWorldStore = create<WorldStore>()(
               ...toneSettings,
             } as ToneSettings,
           });
+        },
+
+        initializeWorldState: (worldId) => {
+          set(state => {
+            if (state.worldStates[worldId]) {
+              return {};
+            }
+
+            logger.debug('Initializing world state for world:', worldId);
+            return {
+              worldStates: {
+                ...state.worldStates,
+                [worldId]: createEmptyWorldState(worldId),
+              }
+            };
+          });
+        },
+
+        updateWorldState: (worldId, stateUpdate, sessionId) => {
+          if (!get().worlds[worldId]) {
+            logger.warn('Attempted to update state for unknown world', { worldId, sessionId });
+            return;
+          }
+          logger.debug('Applying world state update', { worldId, sessionId, keys: Object.keys(stateUpdate ?? {}) });
+          set(state => {
+            const currentState = state.worldStates[worldId];
+            const nextState = applyWorldStateUpdate(worldId, currentState, stateUpdate, sessionId);
+
+            return {
+              worldStates: {
+                ...state.worldStates,
+                [worldId]: nextState,
+              }
+            };
+          });
+        },
+
+        mergeWorldState: (incomingState) => {
+          logger.debug('Merging external world state', { worldId: incomingState.worldId, version: incomingState.version });
+          set(state => {
+            const currentState = state.worldStates[incomingState.worldId];
+            const merged = currentState ? mergeState(currentState, incomingState) : incomingState;
+
+            return {
+              worldStates: {
+                ...state.worldStates,
+                [incomingState.worldId]: merged,
+              }
+            };
+          });
+        },
+
+        getWorldState: (worldId, options) => {
+          const includeEndedSessions = options?.includeEndedSessions ?? false;
+          const rawState = get().worldStates[worldId];
+
+          if (includeEndedSessions) {
+            return rawState ?? createEmptyWorldState(worldId);
+          }
+
+          return getActiveWorldState(worldId, rawState, resolveSessionStatus);
+        },
+
+        getRawWorldState: (worldId) => {
+          return get().worldStates[worldId];
         },
 
         // Fetch worlds action - loads from persisted state

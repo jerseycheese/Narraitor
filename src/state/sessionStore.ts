@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
+import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
@@ -40,6 +41,7 @@ const initialState = {
     narrativeCount: number;
   }>,
   templateHistory: [] as TemplateHistoryEntry[],
+  sessionLifecycle: {} as Record<string, SessionLifecycleMetadata>,
   // Auto-save state
   autoSave: {
     enabled: true,
@@ -160,6 +162,13 @@ export const useSessionStore = create<SessionStore>()(
         logger.warn('Failed to clear inventory for fresh session:', error);
       }
     }
+    const lifecycleEntry: SessionLifecycleMetadata = {
+      id: sessionId,
+      worldId,
+      characterId,
+      status: 'active',
+      lastActivity: getTimestamp(),
+    };
     
     set(state => {
       logger.debug('Setting loading state from:', state);
@@ -168,7 +177,11 @@ export const useSessionStore = create<SessionStore>()(
         status: 'loading', 
         worldId, 
         characterId, 
-        error: null 
+        error: null,
+        sessionLifecycle: {
+          ...state.sessionLifecycle,
+          [sessionId]: lifecycleEntry,
+        }
       };
     });
     
@@ -177,6 +190,7 @@ export const useSessionStore = create<SessionStore>()(
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       logger.debug('Session loaded, setting active state');
+      const activationTimestamp = getTimestamp();
       set(state => {
         logger.debug('Current state before setting active:', state);
         return { 
@@ -184,6 +198,16 @@ export const useSessionStore = create<SessionStore>()(
           currentSceneId: 'initial-scene',
           playerChoices: [], // Empty player choices - will be populated by AI choice generator
           error: null,
+          sessionLifecycle: {
+            ...state.sessionLifecycle,
+            [sessionId]: {
+              ...(state.sessionLifecycle[sessionId] ?? lifecycleEntry),
+              status: 'active',
+              worldId,
+              characterId,
+              lastActivity: activationTimestamp,
+            }
+          }
         };
       });
       
@@ -262,6 +286,7 @@ export const useSessionStore = create<SessionStore>()(
   // End the current session (save it instead of destroying)
   endSession: async () => {
     const state = get();
+    const lifecycleUpdateTime = getTimestamp();
     
     // Add stack trace to debug unexpected calls
     const stack = new Error().stack;
@@ -370,11 +395,29 @@ export const useSessionStore = create<SessionStore>()(
         };
         
         logger.debug('🔚 Saving session and resetting state:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
+        const previousMetadata = prevState.sessionLifecycle[sessionId];
+        const updatedLifecycle: Record<string, SessionLifecycleMetadata> = {
+          ...prevState.sessionLifecycle,
+          [sessionId]: {
+            ...(previousMetadata ?? {
+              id: sessionId,
+              worldId: state.worldId!,
+              characterId: state.characterId!,
+              status: 'active',
+              lastActivity: lifecycleUpdateTime,
+            }),
+            status: 'ended',
+            worldId: state.worldId!,
+            characterId: state.characterId!,
+            lastActivity: lifecycleUpdateTime,
+          },
+        };
         
         return {
           ...initialState,
           savedSessions: newSavedSessions,
-          onboardingCompleted: prevState.onboardingCompleted
+          onboardingCompleted: prevState.onboardingCompleted,
+          sessionLifecycle: updatedLifecycle
         };
       });
     } else {
@@ -383,7 +426,8 @@ export const useSessionStore = create<SessionStore>()(
       set(prevState => ({
         ...initialState,
         savedSessions: prevState.savedSessions,
-        onboardingCompleted: prevState.onboardingCompleted
+        onboardingCompleted: prevState.onboardingCompleted,
+        sessionLifecycle: prevState.sessionLifecycle
       }));
     }
   },
@@ -472,7 +516,8 @@ export const useSessionStore = create<SessionStore>()(
     
     if (savedSession) {
       logger.debug('Resuming session:', sessionId);
-      set({
+      const activationTimestamp = getTimestamp();
+      set(state => ({
         id: savedSession.id,
         worldId: savedSession.worldId,
         characterId: savedSession.characterId,
@@ -480,7 +525,23 @@ export const useSessionStore = create<SessionStore>()(
         currentSceneId: 'resumed-scene',
         playerChoices: [],
         error: null,
-      });
+        sessionLifecycle: {
+          ...state.sessionLifecycle,
+          [sessionId]: {
+            ...(state.sessionLifecycle[sessionId] ?? {
+              id: sessionId,
+              worldId: savedSession.worldId,
+              characterId: savedSession.characterId,
+              status: 'active',
+              lastActivity: activationTimestamp,
+            }),
+            worldId: savedSession.worldId,
+            characterId: savedSession.characterId,
+            status: 'active',
+            lastActivity: activationTimestamp,
+          }
+        }
+      }));
       return true;
     }
     return false;
@@ -492,7 +553,21 @@ export const useSessionStore = create<SessionStore>()(
     set(state => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [sessionId]: _, ...remainingSessions } = state.savedSessions;
-      return { savedSessions: remainingSessions };
+      const lifecycleEntry = state.sessionLifecycle[sessionId];
+      const updatedLifecycle = lifecycleEntry
+        ? {
+            ...state.sessionLifecycle,
+            [sessionId]: {
+              ...lifecycleEntry,
+              status: 'abandoned',
+              lastActivity: getTimestamp(),
+            },
+          }
+        : state.sessionLifecycle;
+      return { 
+        savedSessions: remainingSessions,
+        sessionLifecycle: updatedLifecycle
+      };
     });
   },
   
@@ -503,6 +578,7 @@ export const useSessionStore = create<SessionStore>()(
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => {
     logger.debug('Updating narrative count for session:', sessionId, narrativeCount);
     set(state => {
+      const timestamp = getTimestamp();
       // If session doesn't exist in savedSessions yet, create it
       if (!state.savedSessions[sessionId] && state.id === sessionId) {
         if (!state.worldId || !state.characterId) {
@@ -522,28 +598,95 @@ export const useSessionStore = create<SessionStore>()(
               id: sessionId,
               worldId: state.worldId!,
               characterId: state.characterId!,
-              lastPlayed: getTimestamp(),
+              lastPlayed: timestamp,
               narrativeCount
             }
-          }
+          },
+          sessionLifecycle: {
+            ...state.sessionLifecycle,
+            [sessionId]: {
+              ...(state.sessionLifecycle[sessionId] ?? {
+                id: sessionId,
+                worldId: state.worldId!,
+                characterId: state.characterId!,
+                status: 'active',
+                lastActivity: timestamp,
+              }),
+              lastActivity: timestamp,
+            }
+          },
         };
       }
 
       // Session already exists - just update the count and timestamp
-      if (state.savedSessions[sessionId]) {
-        return {
-          savedSessions: {
-            ...state.savedSessions,
-            [sessionId]: {
-              ...state.savedSessions[sessionId],
-              narrativeCount,
-              lastPlayed: getTimestamp() // Update lastPlayed on each segment
-            }
-          }
-        };
+      const savedSession = state.savedSessions[sessionId];
+      if (!savedSession) {
+        return state;
       }
-      return state;
+
+      return {
+        savedSessions: {
+          ...state.savedSessions,
+          [sessionId]: {
+            ...savedSession,
+            narrativeCount,
+            lastPlayed: timestamp // Update lastPlayed on each segment
+          }
+        },
+        sessionLifecycle: {
+          ...state.sessionLifecycle,
+          [sessionId]: {
+            ...(state.sessionLifecycle[sessionId] ?? {
+              id: sessionId,
+              worldId: savedSession.worldId,
+              characterId: savedSession.characterId,
+              status: 'active',
+              lastActivity: timestamp,
+            }),
+            lastActivity: timestamp,
+          }
+        }
+      };
     });
+  },
+
+  upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => {
+    logger.debug('Upserting session lifecycle metadata:', metadata);
+    set(state => ({
+      sessionLifecycle: {
+        ...state.sessionLifecycle,
+        [metadata.id]: {
+          ...metadata,
+          lastActivity: metadata.lastActivity ?? getTimestamp(),
+        }
+      }
+    }));
+  },
+
+  setSessionLifecycleStatus: (sessionId: string, status: SessionLifecycleStatus) => {
+    logger.debug('Setting session lifecycle status:', { sessionId, status });
+    set(state => {
+      const existing = state.sessionLifecycle[sessionId];
+      if (!existing) {
+        logger.warn('Cannot update lifecycle status for unknown session:', sessionId);
+        return {};
+      }
+
+      return {
+        sessionLifecycle: {
+          ...state.sessionLifecycle,
+          [sessionId]: {
+            ...existing,
+            status,
+            lastActivity: getTimestamp(),
+          }
+        }
+      };
+    });
+  },
+
+  getSessionLifecycle: (sessionId: string) => {
+    return get().sessionLifecycle[sessionId];
   },
 
   // Template history actions

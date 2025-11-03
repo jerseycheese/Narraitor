@@ -4,10 +4,13 @@ console.log('[__mocks__/worldStore.ts] Mock module loading');
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { formatForDebug, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
+import { WorldState, WorldStateUpdate, createEmptyWorldState } from '@/types/world-state.types';
+import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
 
 interface MockWorldState {
   worlds: Record<string, World>;
   entities: Record<string, World>;
+  worldStates: Record<string, WorldState>;
   currentWorldId: string | null;
   currentEntityId: string | null;
   error: UserFriendlyError | null;
@@ -18,6 +21,7 @@ interface MockWorldState {
 let mockState: MockWorldState = {
   worlds: {},
   entities: {},
+  worldStates: {},
   currentWorldId: null,
   currentEntityId: null,
   error: null,
@@ -46,6 +50,44 @@ const syncWorldToEntities = (worldId: string) => {
     delete mockState.entities[worldId];
   }
 };
+
+const ensureWorldState = (worldId: string): WorldState => {
+  if (!mockState.worldStates[worldId]) {
+    mockState.worldStates[worldId] = createEmptyWorldState(worldId);
+  }
+  return mockState.worldStates[worldId];
+};
+
+const mockInitializeWorldState = jest.fn((worldId: string) => {
+  console.log('[__mocks__/worldStore.ts] initializeWorldState called:', worldId);
+  ensureWorldState(worldId);
+});
+
+const mockUpdateWorldState = jest.fn((worldId: string, update: WorldStateUpdate, sessionId: string) => {
+  console.log('[__mocks__/worldStore.ts] updateWorldState called:', { worldId, sessionId, update });
+  const current = ensureWorldState(worldId);
+  mockState.worldStates[worldId] = applyWorldStateUpdate(worldId, current, update, sessionId);
+});
+
+const mockMergeWorldState = jest.fn((incomingState: WorldState) => {
+  console.log('[__mocks__/worldStore.ts] mergeWorldState called:', incomingState.worldId);
+  const current = mockState.worldStates[incomingState.worldId];
+  mockState.worldStates[incomingState.worldId] = current ? mergeState(current, incomingState) : incomingState;
+});
+
+const mockGetWorldState = jest.fn((worldId: string, options?: { includeEndedSessions?: boolean }) => {
+  console.log('[__mocks__/worldStore.ts] getWorldState called:', worldId, options);
+  const current = ensureWorldState(worldId);
+  if (options?.includeEndedSessions) {
+    return current;
+  }
+  return getActiveWorldState(worldId, current);
+});
+
+const mockGetRawWorldState = jest.fn((worldId: string) => {
+  console.log('[__mocks__/worldStore.ts] getRawWorldState called:', worldId);
+  return mockState.worldStates[worldId];
+});
 
 const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   console.log('[__mocks__/worldStore.ts] mockCreateWorld called with:', formatForDebug(worldData, { indent: 2 }));
@@ -80,6 +122,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   
   mockState.worlds[worldId] = newWorld;
   syncWorldToEntities(worldId);
+  ensureWorldState(worldId);
   console.log('[__mocks__/worldStore.ts] Created world in mock state:', mockState.worlds[worldId]);
   return worldId;
 });
@@ -99,6 +142,11 @@ interface WorldStoreActions {
   removeSkill: jest.Mock;
   updateSettings: jest.Mock;
   updateToneSettings: jest.Mock;
+  initializeWorldState: jest.Mock;
+  updateWorldState: jest.Mock;
+  mergeWorldState: jest.Mock;
+  getWorldState: jest.Mock;
+  getRawWorldState: jest.Mock;
   reset: jest.Mock;
   setError: jest.Mock;
   clearError: jest.Mock;
@@ -305,6 +353,7 @@ const mockReset = jest.fn(() => {
   mockState = {
     worlds: {},
     entities: {},
+    worldStates: {},
     currentWorldId: null,
     currentEntityId: null,
     error: null,
@@ -339,6 +388,7 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
   
   const state: WorldStore = {
     ...mockState,
+    worldStates: mockState.worldStates,
     createWorld: mockCreateWorld,
     updateWorld: mockUpdateWorld,
     deleteWorld: mockDeleteWorld,
@@ -353,6 +403,11 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     updateSettings: mockUpdateSettings,
     updateToneSettings: mockUpdateToneSettings,
     getWorldById: mockGetWorldById,
+    initializeWorldState: mockInitializeWorldState,
+    updateWorldState: mockUpdateWorldState,
+    mergeWorldState: mockMergeWorldState,
+    getWorldState: mockGetWorldState,
+    getRawWorldState: mockGetRawWorldState,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -382,6 +437,7 @@ const mockGetState = jest.fn((): WorldStore => {
   
   const state: WorldStore = {
     ...mockState,
+    worldStates: mockState.worldStates,
     createWorld: mockCreateWorld,
     updateWorld: mockUpdateWorld,
     deleteWorld: mockDeleteWorld,
@@ -396,6 +452,11 @@ const mockGetState = jest.fn((): WorldStore => {
     updateSettings: mockUpdateSettings,
     updateToneSettings: mockUpdateToneSettings,
     getWorldById: mockGetWorldById,
+    initializeWorldState: mockInitializeWorldState,
+    updateWorldState: mockUpdateWorldState,
+    mergeWorldState: mockMergeWorldState,
+    getWorldState: mockGetWorldState,
+    getRawWorldState: mockGetRawWorldState,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -443,6 +504,7 @@ export const worldStore = Object.assign(mockWorldStore, {
     mockState = {
       worlds: {},
       entities: {},
+      worldStates: {},
       currentWorldId: null,
       currentEntityId: null,
       error: null,
