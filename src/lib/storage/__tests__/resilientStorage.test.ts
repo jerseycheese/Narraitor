@@ -30,7 +30,7 @@ describe('ResilientStorageMiddleware', () => {
       version: 1,
       storeName: 'test-store',
       db: null
-    } as jest.Mocked<IndexedDBAdapter>;
+    } as unknown as jest.Mocked<IndexedDBAdapter>;
     
     // Ensure the static create method returns our mock adapter
     mockIndexedDBAdapter.create = jest.fn().mockResolvedValue(mockAdapter);

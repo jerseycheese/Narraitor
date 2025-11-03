@@ -69,7 +69,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
 
     mockGeminiClient = {
       generateContent: jest.fn()
-    } as jest.Mocked<GeminiClient>;
+    } as unknown as jest.Mocked<GeminiClient>;
 
     narrativeGenerator = new NarrativeGenerator(mockGeminiClient);
 

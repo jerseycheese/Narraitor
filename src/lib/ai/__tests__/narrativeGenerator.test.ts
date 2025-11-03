@@ -40,7 +40,7 @@ describe('NarrativeGenerator', () => {
     // Create mocked client
     mockGeminiClient = {
       generateContent: jest.fn()
-    } as jest.Mocked<GeminiClient>;
+    } as unknown as jest.Mocked<GeminiClient>;
     
     narrativeGenerator = new NarrativeGenerator(mockGeminiClient);
 
