@@ -25,7 +25,6 @@ describe('itemAcquisitionProcessor', () => {
     };
 
     mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockInventoryState));
-    (useInventoryStore as jest.MockedFunction<typeof useInventoryStore>).getState = jest.fn(() => mockInventoryState);
   });
 
   describe('processAcquiredItems', () => {

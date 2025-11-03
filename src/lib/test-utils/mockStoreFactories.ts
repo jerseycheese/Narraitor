@@ -72,7 +72,7 @@ type LoreStore = ReturnType<typeof useLoreStore>;
 export function mockZustandStore<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useStore: (...args: any[]) => T,
-  partialState: Partial<T>
+  partialState: Partial<T> | T
 ): jest.MockedFunction<typeof useStore> & { getState: () => T } {
   const mock = useStore as unknown as jest.MockedFunction<typeof useStore> & { getState: () => T };
 
