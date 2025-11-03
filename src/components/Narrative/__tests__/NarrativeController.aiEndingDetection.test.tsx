@@ -4,6 +4,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { NarrativeController } from '../NarrativeController';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { mockZustandStore, createMockNarrativeStore } from '@/lib/test-utils';
 
 // Mock the AI client
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
@@ -47,13 +48,10 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
     jest.clearAllMocks();
     
     // Setup narrative store mock
-    (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) => {
-      const state = {
-        addSegment: mockAddSegment,
-        getSessionSegments: mockGetSessionSegments
-      };
-      return selector(state);
-    });
+    mockZustandStore(useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>, createMockNarrativeStore({
+      addSegment: mockAddSegment,
+      getSessionSegments: mockGetSessionSegments
+    }));
 
     // Setup default segments
     mockGetSessionSegments.mockReturnValue([

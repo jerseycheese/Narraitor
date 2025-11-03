@@ -125,7 +125,6 @@ describe('createMockNarrativeStore', () => {
 describe('createMockInventoryStore', () => {
   it('allows overriding store values', () => {
     const addItemMock = jest.fn();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mock = createMockInventoryStore({
       addItem: addItemMock,
       loading: false,

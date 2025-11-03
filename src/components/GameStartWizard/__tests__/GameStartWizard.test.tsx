@@ -174,13 +174,13 @@ describe('GameStartWizard', () => {
   });
 
   it('should initialize session and navigate to play when starting game', async () => {
-    const mockInitializeSession = jest.fn((worldId, characterId, onComplete) => {
-      onComplete();
+    const mockInitializeSession = jest.fn(async (worldId, characterId, onComplete) => {
+      onComplete?.();
     });
-    
-    (useSessionStore as unknown as jest.Mock).mockReturnValue({
+
+    mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
       initializeSession: mockInitializeSession,
-    });
+    }));
     
     render(<GameStartWizard />);
     

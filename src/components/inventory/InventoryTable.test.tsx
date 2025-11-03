@@ -11,6 +11,7 @@ import { InventoryTable } from './InventoryTable';
 import { useInventoryStore } from '@/state/inventoryStore';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
+import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 
 // Mock the inventory store
 jest.mock('@/state/inventoryStore');
@@ -95,9 +96,7 @@ describe('InventoryTable', () => {
       removeItem: jest.fn(),
     };
 
-    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector(mockState)
-    );
+    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockState));
   });
 
   it('renders inventory items in table format', () => {
@@ -200,8 +199,9 @@ describe('InventoryTable', () => {
       removeItem: mockRemoveItem,
     };
 
-    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector(mockState)
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
     );
 
     render(<InventoryTable characterId="char-1" />);
@@ -218,8 +218,9 @@ describe('InventoryTable', () => {
       removeItem: jest.fn(),
     };
 
-    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector(mockState)
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
     );
 
     render(<InventoryTable characterId="char-1" />);

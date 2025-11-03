@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import CharacterEditor from '../CharacterEditor';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { mockZustandStore, createMockCharacterStore, createMockWorldStore } from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -60,6 +61,7 @@ const mockCharacter = {
     items: [],
     capacity: 20,
     categories: [],
+    itemOrder: [],
   },
   createdAt: '2023-01-01T00:00:00Z',
   updatedAt: '2023-01-01T00:00:00Z',
@@ -68,22 +70,29 @@ const mockCharacter = {
 const mockWorld = {
   id: 'test-world-1',
   name: 'Test World',
+  description: 'A test world',
+  genre: 'fantasy' as const,
   attributes: [
     {
       id: 'attr-1',
+      worldId: 'test-world-1',
       name: 'Strength',
       description: 'Physical power',
       minValue: 1,
       maxValue: 20,
+      baseValue: 10,
     }
   ],
   skills: [
     {
       id: 'skill-1',
+      worldId: 'test-world-1',
       name: 'Swordsmanship',
       description: 'Skill with bladed weapons',
       minValue: 0,
       maxValue: 10,
+      baseValue: 0,
+      difficulty: 'medium' as const,
     }
   ],
   settings: {
@@ -92,6 +101,8 @@ const mockWorld = {
     attributePointPool: 50,
     skillPointPool: 30,
   },
+  createdAt: '2023-01-01T00:00:00Z',
+  updatedAt: '2023-01-01T00:00:00Z',
 };
 
 describe('CharacterEditor MVP Tests', () => {
@@ -100,24 +111,20 @@ describe('CharacterEditor MVP Tests', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     
     // Mock character store
-    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: jest.fn(),
+        deleteCharacter: jest.fn(),
+      })
+    );
     
     // Mock world store
-    (useWorldStore as unknown as jest.Mock).mockReturnValue({});
-    
-    // Mock store getState methods
-    (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
-    
-    (useWorldStore.getState as jest.Mock) = jest.fn().mockReturnValue({
-      worlds: { 'test-world-1': mockWorld },
-    });
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({
+        worlds: { 'test-world-1': mockWorld },
+      })
+    );
   });
 
   // Acceptance Criteria 1: An editing interface allows modification of existing character fields
@@ -135,35 +142,38 @@ describe('CharacterEditor MVP Tests', () => {
     expect(nameInput).toHaveValue('Modified Character');
   });
 
-  // Acceptance Criteria 3 & 4: Changes are saved immediately when submitted & Interface provides clear feedback
-  test('saves changes and provides feedback when submitted', async () => {
+
+
+  test('saves changes when user clicks save', async () => {
     const mockUpdateCharacter = jest.fn();
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: mockUpdateCharacter,
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: mockUpdateCharacter,
+        deleteCharacter: jest.fn(),
+      })
+    );
 
     render(<CharacterEditor characterId="test-char-1" />);
-    
+
     // Wait for character to load
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
     });
-    
+
     // Modify character name
     const nameInput = screen.getByDisplayValue('Test Character');
     fireEvent.change(nameInput, { target: { value: 'Modified Character' } });
-    
+
     // Click save button
     const saveButton = screen.getByText('Save Changes');
     fireEvent.click(saveButton);
-    
+
     // Verify saving feedback is shown
     await waitFor(() => {
       expect(screen.getByText('Saving...')).toBeInTheDocument();
     });
-    
+
     // Verify updateCharacter was called
     await waitFor(() => {
       expect(mockUpdateCharacter).toHaveBeenCalled();
@@ -173,11 +183,13 @@ describe('CharacterEditor MVP Tests', () => {
   // Acceptance Criteria 5: Users can cancel edits without saving changes
   test('cancels edits without saving changes', async () => {
     const mockUpdateCharacter = jest.fn();
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: mockUpdateCharacter,
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: mockUpdateCharacter,
+        deleteCharacter: jest.fn(),
+      })
+    );
 
     render(<CharacterEditor characterId="test-char-1" />);
     
@@ -203,11 +215,13 @@ describe('CharacterEditor MVP Tests', () => {
 
   // Basic error handling test
   test('displays error when character not found', () => {
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: {},
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: {},
+        updateCharacter: jest.fn(),
+        deleteCharacter: jest.fn(),
+      })
+    );
 
     render(<CharacterEditor characterId="non-existent" />);
     

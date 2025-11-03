@@ -4,6 +4,7 @@ import { processAcquiredItems } from '../itemAcquisitionProcessor';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
+import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 
 // Mock the dependencies
 jest.mock('@/state/inventoryStore');
@@ -11,20 +12,19 @@ jest.mock('@/lib/inventory/categorizeInventoryItemClient');
 
 describe('itemAcquisitionProcessor', () => {
   const mockAddItem = jest.fn();
-  const mockGetState = jest.fn();
   const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
     typeof categorizeInventoryItemClient
   >;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetState.mockReturnValue({
+    const mockInventoryState = {
       addItem: mockAddItem,
       getCharacterItems: jest.fn().mockReturnValue([]),
       updateItemQuantity: jest.fn(),
-    });
-    (useInventoryStore as unknown as jest.Mock).mockReturnValue({});
-    (useInventoryStore as unknown as { getState: jest.Mock }).getState = mockGetState;
+    };
+
+    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockInventoryState));
   });
 
   describe('processAcquiredItems', () => {

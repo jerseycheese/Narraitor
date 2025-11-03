@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useWorldStore } from '@/state/worldStore';
 import WorldEditor from '../WorldEditor';
+import { mockZustandStore, createMockWorldStore } from '@/lib/test-utils';
 
 // Mock Next.js router
 const mockPush = jest.fn();
@@ -12,13 +13,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock worldStore
-jest.mock('@/state/worldStore', () => {
-  const mockUseWorldStore = jest.fn() as jest.Mock & { getState: jest.Mock };
-  mockUseWorldStore.getState = jest.fn();
-  return {
-    useWorldStore: mockUseWorldStore,
-  };
-});
+jest.mock('@/state/worldStore');
 
 interface MockBasicInfoFormProps {
   world: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -115,28 +110,17 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUpdateWorld.mockClear();
     
-    // Mock the store state
-    const mockState = {
-      worlds: {
-        'world-123': mockWorld,
-      },
-      loading: false,
-      fetchWorlds: jest.fn().mockResolvedValue(undefined),
-      updateWorld: mockUpdateWorld,
-    };
-    
-    // Mock useWorldStore to return different values based on the selector
-    const mockStore = useWorldStore as unknown as jest.Mock & { getState: jest.Mock };
-    mockStore.mockImplementation((selector) => {
-      if (typeof selector === 'function') {
-        return selector(mockState);
-      }
-      return mockState;
-    });
-
-    // Mock the direct getState access
-    mockStore.getState.mockReturnValue(mockState);
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({
+        worlds: {
+          'world-123': mockWorld,
+        },
+        fetchWorlds: jest.fn().mockResolvedValue(undefined),
+        updateWorld: mockUpdateWorld,
+      })
+    );
   });
 
   // Acceptance Criteria: Selecting a world allows viewing/editing its details via the WorldEditor
@@ -213,24 +197,15 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   // Test error handling when world not found
   test('shows error when world is not found', async () => {
-    // State with some worlds loaded, but not the one we're looking for
-    const stateWithOtherWorlds = {
-      worlds: {
-        'world-456': mockWorld, // Different world ID
-      },
-      loading: false,
-      fetchWorlds: jest.fn().mockResolvedValue(undefined),
-      updateWorld: mockUpdateWorld,
-    };
-    
-    const mockStore = useWorldStore as unknown as jest.Mock & { getState: jest.Mock };
-    mockStore.mockImplementation((selector) => {
-      if (typeof selector === 'function') {
-        return selector(stateWithOtherWorlds);
-      }
-      return stateWithOtherWorlds;
-    });
-    mockStore.getState.mockReturnValue(stateWithOtherWorlds);
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({
+        worlds: {
+          'world-456': mockWorld, // Different world ID
+        },
+        fetchWorlds: jest.fn().mockResolvedValue(undefined),
+        updateWorld: mockUpdateWorld,
+      })
+    );
 
     render(<WorldEditor worldId="non-existent" />);
 
