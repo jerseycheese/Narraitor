@@ -178,9 +178,9 @@ describe('GameStartWizard', () => {
       onComplete();
     });
     
-    (useSessionStore as unknown as jest.Mock).mockReturnValue({
+    mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
       initializeSession: mockInitializeSession,
-    });
+    }));
     
     render(<GameStartWizard />);
     

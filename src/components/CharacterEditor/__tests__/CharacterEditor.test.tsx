@@ -103,6 +103,7 @@ describe('CharacterEditor MVP Tests', () => {
     // Mock character store
     mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
         updateCharacter: jest.fn(),
         deleteCharacter: jest.fn(),
       })
@@ -110,19 +111,10 @@ describe('CharacterEditor MVP Tests', () => {
     
     // Mock world store
     mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
-      createMockWorldStore({})
+      createMockWorldStore({
+        worlds: { 'test-world-1': mockWorld },
+      })
     );
-    
-    // Mock store getState methods
-    (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
-    
-    (useWorldStore.getState as jest.Mock) = jest.fn().mockReturnValue({
-      worlds: { 'test-world-1': mockWorld },
-    });
   });
 
   // Acceptance Criteria 1: An editing interface allows modification of existing character fields
@@ -140,15 +132,9 @@ describe('CharacterEditor MVP Tests', () => {
     expect(nameInput).toHaveValue('Modified Character');
   });
 
-  // Acceptance Criteria 3 & 4: Changes are saved immediately when submitted & Interface provides clear feedback
-  test('saves changes and provides feedback when submitted', async () => {
-    const mockUpdateCharacter = jest.fn();
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: mockUpdateCharacter,
-      deleteCharacter: jest.fn(),
-    });
 
+
+  test('saves changes when user clicks save', async () => {
     render(<CharacterEditor characterId="test-char-1" />);
     
     // Wait for character to load
@@ -171,18 +157,20 @@ describe('CharacterEditor MVP Tests', () => {
     
     // Verify updateCharacter was called
     await waitFor(() => {
-      expect(mockUpdateCharacter).toHaveBeenCalled();
+      expect(useCharacterStore().updateCharacter).toHaveBeenCalled();
     });
   });
 
   // Acceptance Criteria 5: Users can cancel edits without saving changes
   test('cancels edits without saving changes', async () => {
     const mockUpdateCharacter = jest.fn();
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: { 'test-char-1': mockCharacter },
-      updateCharacter: mockUpdateCharacter,
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: mockUpdateCharacter,
+        deleteCharacter: jest.fn(),
+      })
+    );
 
     render(<CharacterEditor characterId="test-char-1" />);
     
@@ -208,11 +196,13 @@ describe('CharacterEditor MVP Tests', () => {
 
   // Basic error handling test
   test('displays error when character not found', () => {
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
-      characters: {},
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: {},
+        updateCharacter: jest.fn(),
+        deleteCharacter: jest.fn(),
+      })
+    );
 
     render(<CharacterEditor characterId="non-existent" />);
     

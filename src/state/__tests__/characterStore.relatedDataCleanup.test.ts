@@ -3,6 +3,7 @@ import { useCharacterStore } from '../characterStore';
 import { useJournalStore } from '../journalStore';
 import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
+import { mockZustandStore, createMockJournalStore } from '@/lib/test-utils';
 
 // Mock journal store
 jest.mock('../journalStore');
@@ -94,12 +95,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     testCharacterId2 = 'char-2' as EntityID;
     initializeMockEntries(testCharacterId1, testCharacterId2);
 
-    (useJournalStore as unknown as jest.Mock).mockImplementation((selector?: (state: typeof mockJournalStore) => unknown) => {
-      if (selector) {
-        return selector(mockJournalStore);
-      }
-      return mockJournalStore;
-    });
+    mockZustandStore(useJournalStore as jest.MockedFunction<typeof useJournalStore>, createMockJournalStore(mockJournalStore));
 
     // Mock getState for store access
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);

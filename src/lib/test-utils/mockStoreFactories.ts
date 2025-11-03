@@ -73,15 +73,17 @@ export function mockZustandStore<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useStore: (...args: any[]) => T,
   partialState: Partial<T>
-): jest.MockedFunction<typeof useStore> {
-  const mock = useStore as unknown as jest.MockedFunction<typeof useStore>;
+): jest.MockedFunction<typeof useStore> & { getState: () => T } {
+  const mock = useStore as unknown as jest.MockedFunction<typeof useStore> & { getState: () => T };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mock.mockImplementation(((selector?: (state: T) => unknown) => {
     const fullState = partialState as T;
     return selector ? selector(fullState) : fullState;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any);
+
+  // Add this line to mock getState
+  mock.getState = jest.fn(() => partialState as T);
 
   return mock;
 }
@@ -175,6 +177,37 @@ export function createMockNPCStore(overrides?: Partial<NPCStore>): NPCStore {
  */
 export function createMockWorldStore(overrides?: Partial<WorldStore>): WorldStore {
   return {
+    worlds: {},
+    entities: {},
+    currentWorldId: null,
+    currentEntityId: null,
+    error: null,
+    loading: false,
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    setCurrent: jest.fn(),
+    getById: jest.fn(() => undefined),
+    getAll: jest.fn(() => []),
+    reset: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn(),
+    setLoading: jest.fn(),
+    syncDerivedState: jest.fn(),
+    createWorld: jest.fn(),
+    updateWorld: jest.fn(),
+    deleteWorld: jest.fn(),
+    setCurrentWorld: jest.fn(),
+    fetchWorlds: jest.fn().mockResolvedValue(undefined),
+    addAttribute: jest.fn(),
+    updateAttribute: jest.fn(),
+    removeAttribute: jest.fn(),
+    addSkill: jest.fn(),
+    updateSkill: jest.fn(),
+    removeSkill: jest.fn(),
+    updateSettings: jest.fn(),
+    updateToneSettings: jest.fn(),
+    updateToneSettings: jest.fn(),
     ...overrides,
   } as WorldStore;
 }

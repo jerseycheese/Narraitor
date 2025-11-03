@@ -64,12 +64,12 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     mockUseWorldStore.getState = jest.fn().mockReturnValue(mockStore);
 
     // Setup mock AI client and generator
-    mockClient = { generateContent: jest.fn() } as unknown as ReturnType<typeof createDefaultGeminiClient>;
+    mockClient = { generateContent: jest.fn() } as ReturnType<typeof createDefaultGeminiClient>;
     mockCreateDefaultGeminiClient.mockReturnValue(mockClient);
 
     mockGenerator = {
       generateToneSettings: jest.fn()
-    } as unknown as jest.Mocked<ToneSettingsGenerator>;
+    } as jest.Mocked<ToneSettingsGenerator>;
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
     // Mock the extractWorldAnalysisData function

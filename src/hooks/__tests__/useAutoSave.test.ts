@@ -5,6 +5,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAutoSave } from '../useAutoSave';
 import { SessionStore } from '../../types/game.types';
+import { mockZustandStore, createMockSessionStore } from '@/lib/test-utils';
 
 // Mock the auto-save service
 const mockAutoSaveService = {
@@ -69,9 +70,7 @@ jest.mock('../../state/sessionStore');
 
 // Configure session store mock
 import { useSessionStore } from '../../state/sessionStore';
-const mockUseSessionStore = useSessionStore as unknown as jest.Mock & { getState: jest.Mock };
-mockUseSessionStore.mockImplementation((selector) => selector ? selector(mockSessionStore as SessionStore) : mockSessionStore as SessionStore);
-mockUseSessionStore.getState = jest.fn(() => mockSessionStore);
+mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore(mockSessionStore));
 
 // Mock other stores
 jest.mock('../../state/worldStore', () => ({
