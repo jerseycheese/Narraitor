@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import CharacterEditor from '../CharacterEditor';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { mockZustandStore, createMockCharacterStore, createMockWorldStore } from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -100,13 +101,17 @@ describe('CharacterEditor MVP Tests', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     
     // Mock character store
-    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-      updateCharacter: jest.fn(),
-      deleteCharacter: jest.fn(),
-    });
+    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        updateCharacter: jest.fn(),
+        deleteCharacter: jest.fn(),
+      })
+    );
     
     // Mock world store
-    (useWorldStore as unknown as jest.Mock).mockReturnValue({});
+    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({})
+    );
     
     // Mock store getState methods
     (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue({
