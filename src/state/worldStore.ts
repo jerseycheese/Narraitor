@@ -586,19 +586,28 @@ export const useWorldStore = create<WorldStore>()(
           }
 
           if (state.worldStates && typeof state.worldStates === 'object') {
-            for (const [worldId, worldState] of Object.entries(state.worldStates)) {
-              if (!worldState || typeof worldState !== 'object') {
+            for (const [worldId, rawWorldState] of Object.entries(state.worldStates)) {
+              if (!rawWorldState || typeof rawWorldState !== 'object') {
                 state.worldStates[worldId] = createEmptyWorldState(worldId);
                 continue;
               }
 
-              if (!('playerCharacterThreads' in worldState) || typeof worldState.playerCharacterThreads !== 'object') {
-                worldState.playerCharacterThreads = {};
+              const existingState = rawWorldState as Partial<WorldState>;
+
+              if (!existingState.playerCharacterThreads || typeof existingState.playerCharacterThreads !== 'object') {
+                existingState.playerCharacterThreads = {};
               }
 
-              if (!('characterRelationships' in worldState) || typeof worldState.characterRelationships !== 'object') {
-                worldState.characterRelationships = {};
+              if (!existingState.characterRelationships || typeof existingState.characterRelationships !== 'object') {
+                existingState.characterRelationships = {};
               }
+
+              state.worldStates[worldId] = {
+                ...createEmptyWorldState(worldId),
+                ...existingState,
+                playerCharacterThreads: existingState.playerCharacterThreads,
+                characterRelationships: existingState.characterRelationships,
+              };
             }
           }
         }

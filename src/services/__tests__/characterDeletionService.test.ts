@@ -77,6 +77,7 @@ describe('CharacterDeletionService', () => {
   const mockCharacterStore = {
     characters: {},
     entities: {},
+    worldCharacterIds: {},
     currentCharacterId: null,
     currentEntityId: null,
     error: null,
@@ -98,6 +99,8 @@ describe('CharacterDeletionService', () => {
     cleanupCharacterHistory: jest.fn(),
     compactCharacterData: jest.fn(),
     getCharactersCount: jest.fn(),
+    getCharactersByWorld: jest.fn(),
+    getWorldRoster: jest.fn(),
     deleteCharactersInWorld: jest.fn(),
     reset: jest.fn(),
     setError: jest.fn(),

@@ -201,6 +201,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       return {
         characters: {},
         entities: {},
+        worldCharacterIds: {},
         currentCharacterId: null,
         currentEntityId: null,
         error: null,
