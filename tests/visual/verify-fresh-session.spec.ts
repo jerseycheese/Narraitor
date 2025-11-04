@@ -69,11 +69,35 @@ test.describe('Fresh GameSession skeleton → content', () => {
               updatedAt: now,
             },
           },
+          entities: {
+            [WORLD_ID]: {
+              id: WORLD_ID,
+              name: 'Playwright Test World',
+              description: 'Seeded world for fresh-session test',
+              genre: 'fantasy',
+              attributes: [],
+              skills: [],
+              createdAt: now,
+              updatedAt: now,
+            },
+          },
+          worldStates: {
+            [WORLD_ID]: {
+              worldId: WORLD_ID,
+              version: 0,
+              lastModified: now,
+              npcRelationships: {},
+              majorEvents: [],
+              playerCharacterThreads: {},
+              characterRelationships: {},
+            },
+          },
           currentWorldId: WORLD_ID,
+          currentEntityId: WORLD_ID,
           error: null,
           loading: false,
         },
-        version: 1,
+        version: 2,
       } as const;
 
       const characterPersist = {
@@ -106,11 +130,43 @@ test.describe('Fresh GameSession skeleton → content', () => {
               updatedAt: now,
             },
           },
+          entities: {
+            [CHAR_ID]: {
+              id: CHAR_ID,
+              name: 'E2E Hero',
+              description: 'Playwright seeded character',
+              worldId: WORLD_ID,
+              level: 1,
+              isPlayer: true,
+              attributes: [],
+              skills: [],
+              background: {
+                history: '',
+                personality: '',
+                goals: [],
+                fears: [],
+                relationships: [],
+              },
+              status: { health: 100, maxHealth: 100, conditions: [] },
+              inventory: {
+                characterId: CHAR_ID,
+                items: [],
+                capacity: 100,
+                categories: [],
+              },
+              createdAt: now,
+              updatedAt: now,
+            },
+          },
+          worldCharacterIds: {
+            [WORLD_ID]: [CHAR_ID],
+          },
           currentCharacterId: CHAR_ID,
+          currentEntityId: CHAR_ID,
           error: null,
           loading: false,
         },
-        version: 1,
+        version: 2,
       } as const;
 
       const sessionPersist = {
@@ -168,7 +224,21 @@ test.describe('Fresh GameSession skeleton → content', () => {
           };
           worldHook.setState((prev: any) => ({
             worlds: { ...(prev?.worlds || {}), [WORLD_ID]: world },
+            entities: { ...(prev?.entities || {}), [WORLD_ID]: world },
+            worldStates: {
+              ...(prev?.worldStates || {}),
+              [WORLD_ID]: {
+                worldId: WORLD_ID,
+                version: 0,
+                lastModified: now,
+                npcRelationships: {},
+                majorEvents: [],
+                playerCharacterThreads: {},
+                characterRelationships: {},
+              },
+            },
             currentWorldId: WORLD_ID,
+            currentEntityId: WORLD_ID,
             error: null,
             loading: false,
           }));
@@ -205,7 +275,15 @@ test.describe('Fresh GameSession skeleton → content', () => {
           };
           charHook.setState((prev: any) => ({
             characters: { ...(prev?.characters || {}), [CHAR_ID]: character },
+            entities: { ...(prev?.entities || {}), [CHAR_ID]: character },
+            worldCharacterIds: {
+              ...(prev?.worldCharacterIds || {}),
+              [WORLD_ID]: Array.from(
+                new Set([...(prev?.worldCharacterIds?.[WORLD_ID] || []), CHAR_ID])
+              ),
+            },
             currentCharacterId: CHAR_ID,
+            currentEntityId: CHAR_ID,
             error: null,
             loading: false,
           }));
