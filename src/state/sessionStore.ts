@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
+import { EntityID } from '../types/common.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
@@ -20,6 +21,22 @@ let worldStoreModule: typeof import('./worldStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
 let narrativeStoreModule: typeof import('./narrativeStore') | null = null;
 let inventoryStoreModule: typeof import('./inventoryStore') | null = null;
+
+const buildLifecycleMetadata = (
+  params: {
+    id: EntityID;
+    worldId: EntityID;
+    characterId: EntityID;
+    status?: SessionLifecycleStatus;
+    lastActivity?: string;
+  }
+): SessionLifecycleMetadata => ({
+  id: params.id,
+  worldId: params.worldId,
+  characterId: params.characterId,
+  status: params.status ?? 'active',
+  lastActivity: params.lastActivity ?? getTimestamp(),
+});
 
 /**
  * Initial state for the session store
@@ -517,31 +534,38 @@ export const useSessionStore = create<SessionStore>()(
     if (savedSession) {
       logger.debug('Resuming session:', sessionId);
       const activationTimestamp = getTimestamp();
-      set(state => ({
-        id: savedSession.id,
-        worldId: savedSession.worldId,
-        characterId: savedSession.characterId,
-        status: 'active',
-        currentSceneId: 'resumed-scene',
-        playerChoices: [],
-        error: null,
-        sessionLifecycle: {
+      set(state => {
+        const nextLifecycle: Record<string, SessionLifecycleMetadata> = {
           ...state.sessionLifecycle,
           [sessionId]: {
-            ...(state.sessionLifecycle[sessionId] ?? {
-              id: sessionId,
-              worldId: savedSession.worldId,
-              characterId: savedSession.characterId,
-              status: 'active',
-              lastActivity: activationTimestamp,
-            }),
+            ...(
+              state.sessionLifecycle[sessionId] ??
+              buildLifecycleMetadata({
+                id: sessionId,
+                worldId: savedSession.worldId,
+                characterId: savedSession.characterId,
+                status: 'active',
+                lastActivity: activationTimestamp,
+              })
+            ),
             worldId: savedSession.worldId,
             characterId: savedSession.characterId,
-            status: 'active',
+            status: 'active' as SessionLifecycleStatus,
             lastActivity: activationTimestamp,
           }
-        }
-      }));
+        };
+
+        return {
+          id: savedSession.id,
+          worldId: savedSession.worldId,
+          characterId: savedSession.characterId,
+          status: 'active',
+          currentSceneId: 'resumed-scene',
+          playerChoices: [],
+          error: null,
+          sessionLifecycle: nextLifecycle,
+        };
+      });
       return true;
     }
     return false;
@@ -559,7 +583,7 @@ export const useSessionStore = create<SessionStore>()(
             ...state.sessionLifecycle,
             [sessionId]: {
               ...lifecycleEntry,
-              status: 'abandoned',
+              status: 'abandoned' as SessionLifecycleStatus,
               lastActivity: getTimestamp(),
             },
           }
@@ -591,6 +615,24 @@ export const useSessionStore = create<SessionStore>()(
         }
         // This is the active session - save it for the first time
         logger.debug('Creating new saved session entry for active session:', sessionId);
+        const nextLifecycle: Record<string, SessionLifecycleMetadata> = {
+          ...state.sessionLifecycle,
+          [sessionId]: {
+            ...(
+              state.sessionLifecycle[sessionId] ??
+              buildLifecycleMetadata({
+                id: sessionId,
+                worldId: state.worldId!,
+                characterId: state.characterId!,
+                status: 'active',
+                lastActivity: timestamp,
+              })
+            ),
+            status: 'active' as SessionLifecycleStatus,
+            lastActivity: timestamp,
+          }
+        };
+
         return {
           savedSessions: {
             ...state.savedSessions,
@@ -602,19 +644,7 @@ export const useSessionStore = create<SessionStore>()(
               narrativeCount
             }
           },
-          sessionLifecycle: {
-            ...state.sessionLifecycle,
-            [sessionId]: {
-              ...(state.sessionLifecycle[sessionId] ?? {
-                id: sessionId,
-                worldId: state.worldId!,
-                characterId: state.characterId!,
-                status: 'active',
-                lastActivity: timestamp,
-              }),
-              lastActivity: timestamp,
-            }
-          },
+          sessionLifecycle: nextLifecycle,
         };
       }
 
@@ -623,6 +653,24 @@ export const useSessionStore = create<SessionStore>()(
       if (!savedSession) {
         return state;
       }
+
+      const nextLifecycle: Record<string, SessionLifecycleMetadata> = {
+        ...state.sessionLifecycle,
+        [sessionId]: {
+          ...(
+            state.sessionLifecycle[sessionId] ??
+            buildLifecycleMetadata({
+              id: sessionId,
+              worldId: savedSession.worldId,
+              characterId: savedSession.characterId,
+              status: 'active',
+              lastActivity: timestamp,
+            })
+          ),
+          status: 'active' as SessionLifecycleStatus,
+          lastActivity: timestamp,
+        }
+      };
 
       return {
         savedSessions: {
@@ -633,19 +681,7 @@ export const useSessionStore = create<SessionStore>()(
             lastPlayed: timestamp // Update lastPlayed on each segment
           }
         },
-        sessionLifecycle: {
-          ...state.sessionLifecycle,
-          [sessionId]: {
-            ...(state.sessionLifecycle[sessionId] ?? {
-              id: sessionId,
-              worldId: savedSession.worldId,
-              characterId: savedSession.characterId,
-              status: 'active',
-              lastActivity: timestamp,
-            }),
-            lastActivity: timestamp,
-          }
-        }
+        sessionLifecycle: nextLifecycle,
       };
     });
   },

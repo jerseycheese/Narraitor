@@ -131,6 +131,13 @@ interface ExtractedWorldStateImpact {
   events: WorldStateMajorEventInput[];
 }
 
+type DecisionWorldStatePayload = {
+  worldId: EntityID;
+  sessionId: EntityID;
+  relationships: Record<EntityID, NPCRelationshipUpdate>;
+  events: WorldStateMajorEventInput[];
+};
+
 const MAJOR_EVENT_PATTERNS: RegExp[] = [
   /world[-\s]?changing/i,
   /major\s+event/i,
@@ -633,12 +640,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
   }),
   
   selectDecisionOption: (decisionId, optionId, characterId) => {
-    let worldStatePayload: {
-      worldId: EntityID;
-      sessionId: EntityID;
-      relationships: Record<EntityID, NPCRelationshipUpdate>;
-      events: WorldStateMajorEventInput[];
-    } | null = null;
+    let worldStatePayload: DecisionWorldStatePayload | undefined;
 
     set((state) => {
       if (!state.decisions[decisionId]) {
@@ -727,19 +729,20 @@ export const useNarrativeStore = create<NarrativeStore>()(
       };
     });
 
-    if (worldStatePayload) {
+    const payload = worldStatePayload;
+    if (payload) {
       try {
         if (!worldStoreModule) {
           worldStoreModule = eval('require("./worldStore")');
         }
         const { useWorldStore } = worldStoreModule!;
         useWorldStore.getState().updateWorldState(
-          worldStatePayload.worldId,
+          payload.worldId,
           {
-            npcRelationships: worldStatePayload.relationships,
-            majorEvents: worldStatePayload.events,
+            npcRelationships: payload.relationships,
+            majorEvents: payload.events,
           },
-          worldStatePayload.sessionId
+          payload.sessionId
         );
       } catch (error) {
         logger.warn('Failed to apply world state update from decision', error);
