@@ -75,6 +75,69 @@ export interface Character {
   updatedAt: string;
 }
 
+const addCharacterToRoster = (
+  rosters: Record<EntityID, EntityID[]>,
+  worldId: EntityID,
+  characterId: EntityID,
+): Record<EntityID, EntityID[]> => {
+  const existingRoster = rosters[worldId] ?? [];
+  if (existingRoster.includes(characterId)) {
+    return rosters;
+  }
+
+  return {
+    ...rosters,
+    [worldId]: [...existingRoster, characterId],
+  };
+};
+
+const removeCharacterFromRoster = (
+  rosters: Record<EntityID, EntityID[]>,
+  worldId: EntityID,
+  characterId: EntityID,
+): Record<EntityID, EntityID[]> => {
+  const existingRoster = rosters[worldId];
+  if (!existingRoster) {
+    return rosters;
+  }
+
+  const filteredRoster = existingRoster.filter((id) => id !== characterId);
+  if (filteredRoster.length === existingRoster.length) {
+    return rosters;
+  }
+
+  if (filteredRoster.length === 0) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [worldId]: _removedRoster, ...remainingRosters } = rosters;
+    return remainingRosters;
+  }
+
+  return {
+    ...rosters,
+    [worldId]: filteredRoster,
+  };
+};
+
+const buildWorldCharacterIds = (
+  characters: Record<EntityID, Character>,
+): Record<EntityID, EntityID[]> => {
+  const rosters: Record<EntityID, EntityID[]> = {};
+
+  Object.values(characters).forEach((character) => {
+    if (!character || !character.worldId) {
+      return;
+    }
+
+    if (!rosters[character.worldId]) {
+      rosters[character.worldId] = [];
+    }
+
+    rosters[character.worldId].push(character.id);
+  });
+
+  return rosters;
+};
+
 /**
  * Character store interface with state and actions
  */
@@ -84,6 +147,7 @@ export interface CharacterStore extends CrudStore<Character> {
   currentCharacterId: EntityID | null;
   error: UserFriendlyError | null;
   loading: boolean;
+  worldCharacterIds: Record<EntityID, EntityID[]>;
   syncDerivedState: () => void;
 
   // Actions
@@ -91,6 +155,10 @@ export interface CharacterStore extends CrudStore<Character> {
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
   deleteCharacter: (id: EntityID) => void;
   setCurrentCharacter: (id: EntityID) => void;
+
+  // Queries
+  getCharactersByWorld: (worldId: EntityID) => Character[];
+  getWorldRoster: (worldId: EntityID) => EntityID[];
 
   // Attribute management
   addAttribute: (characterId: EntityID, attribute: Omit<CharacterAttribute, 'id' | 'characterId'>) => void;
@@ -119,6 +187,7 @@ export interface CharacterStore extends CrudStore<Character> {
 const getInitialState = () => ({
     characters: {},
     entities: {},
+    worldCharacterIds: {},
     currentCharacterId: null,
     currentEntityId: null,
     error: null,
@@ -191,6 +260,11 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
               ...state.entities,
               [characterId]: newCharacter,
             },
+            worldCharacterIds: addCharacterToRoster(
+              state.worldCharacterIds ?? {},
+              newCharacter.worldId,
+              characterId,
+            ),
             error: null,
           }));
 
@@ -203,6 +277,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
             return;
           }
+
+          const previousWorldId = character.worldId;
 
           const normalizedUpdates: Partial<Character> = { ...updates };
 
@@ -240,17 +316,36 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             updatedAt: getTimestamp(),
           };
 
-          set((state) => ({
-            characters: {
+          set((state) => {
+            const nextCharacters = {
               ...state.characters,
               [id]: updatedCharacter,
-            },
-            entities: {
-              ...state.entities,
-              [id]: updatedCharacter,
-            },
-            error: null,
-          }));
+            };
+
+            let nextWorldCharacterIds = state.worldCharacterIds ?? {};
+            if (previousWorldId !== updatedCharacter.worldId) {
+              const withoutPrevious = removeCharacterFromRoster(
+                nextWorldCharacterIds,
+                previousWorldId,
+                id,
+              );
+              nextWorldCharacterIds = addCharacterToRoster(
+                withoutPrevious,
+                updatedCharacter.worldId,
+                id,
+              );
+            }
+
+            return {
+              characters: nextCharacters,
+              entities: {
+                ...state.entities,
+                [id]: updatedCharacter,
+              },
+              worldCharacterIds: nextWorldCharacterIds,
+              error: null,
+            };
+          });
         },
 
         delete: (id) => {
@@ -269,6 +364,11 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return {
               characters: remainingCharacters,
               entities: remainingEntities,
+              worldCharacterIds: removeCharacterFromRoster(
+                state.worldCharacterIds ?? {},
+                character.worldId,
+                id,
+              ),
               currentCharacterId: isCurrent ? null : state.currentCharacterId,
               currentEntityId: isCurrent ? null : state.currentEntityId,
               error: null,
@@ -295,6 +395,17 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
         getById: (id) => get().characters[id],
         getAll: () => Object.values(get().characters),
+        getCharactersByWorld: (worldId) => {
+          const { characters, worldCharacterIds } = get();
+          const roster = worldCharacterIds[worldId] ?? [];
+          return roster
+            .map((characterId) => characters[characterId])
+            .filter((char): char is Character => Boolean(char));
+        },
+        getWorldRoster: (worldId) => {
+          const { worldCharacterIds } = get();
+          return [...(worldCharacterIds[worldId] ?? [])];
+        },
 
         reset: () => set(getInitialState()),
 
@@ -328,6 +439,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return {
               characters: hasCharacters ? characters : {},
               entities: { ...characters },
+              worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {},
               currentCharacterId: hasCharacters ? nextCurrentCharacterId : null,
               currentEntityId: hasCharacters ? nextCurrentEntityId : null,
               error: state.error ?? null,
@@ -444,6 +556,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return {
               characters: newCharacters,
               entities: newCharacters,
+              worldCharacterIds: buildWorldCharacterIds(newCharacters as Record<EntityID, Character>),
               currentCharacterId: state.currentCharacterId && idsToRemove.has(state.currentCharacterId) ? null : state.currentCharacterId,
               currentEntityId: state.currentEntityId && idsToRemove.has(state.currentEntityId) ? null : state.currentEntityId,
             };
@@ -471,6 +584,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return {
               characters: compactedCharacters,
               entities: compactedCharacters,
+              worldCharacterIds: buildWorldCharacterIds(compactedCharacters as Record<EntityID, Character>),
             };
           });
         },
@@ -493,6 +607,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           return {
             characters: charactersToKeep,
             entities: charactersToKeep,
+            worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
             currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
             currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
           };
@@ -502,7 +617,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
     {
       name: 'narraitor-character-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[CharacterStore] Failed to rehydrate state', error);
@@ -547,6 +662,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             if (typeof state.currentEntityId === 'string' && !state.currentCharacterId) {
               state.currentCharacterId = state.currentEntityId;
             }
+
+            state.worldCharacterIds = buildWorldCharacterIds(state.characters as Record<EntityID, Character>);
           }
         }
         return persistedState as CharacterStore;

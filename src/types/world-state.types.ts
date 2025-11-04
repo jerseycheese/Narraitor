@@ -25,6 +25,41 @@ export interface WorldStateMajorEvent {
 }
 
 /**
+ * Reference to another player character within a story thread.
+ */
+export interface CharacterThreadReference {
+  characterId: EntityID;
+  summary: string;
+  sessionId?: EntityID;
+  lastReferencedAt: ISODateString;
+}
+
+/**
+ * Ongoing narrative thread for a player-controlled character.
+ */
+export interface PlayerCharacterThread {
+  id: EntityID;
+  characterId: EntityID;
+  worldId: EntityID;
+  summary: string;
+  highlights: string[];
+  sessionIds: EntityID[];
+  crossCharacterReferences: CharacterThreadReference[];
+  lastUpdated: ISODateString;
+}
+
+/**
+ * Relationship snapshot between two player-controlled characters.
+ */
+export interface CharacterRelationshipState {
+  sentiment: number; // Range -100 to 100
+  trust: number; // Range 0 to 100
+  tension: number; // Range 0 to 100
+  lastInteraction: ISODateString;
+  sessionId: EntityID;
+}
+
+/**
  * Aggregate world state snapshot scoped to active sessions.
  */
 export interface WorldState {
@@ -33,6 +68,8 @@ export interface WorldState {
   lastModified: ISODateString;
   npcRelationships: Record<EntityID, NPCRelationshipState>;
   majorEvents: WorldStateMajorEvent[];
+  playerCharacterThreads: Record<EntityID, PlayerCharacterThread>;
+  characterRelationships: Record<EntityID, Record<EntityID, CharacterRelationshipState>>;
 }
 
 /**
@@ -41,6 +78,10 @@ export interface WorldState {
 export interface WorldStateUpdate {
   npcRelationships?: Record<EntityID, NPCRelationshipUpdate>;
   majorEvents?: WorldStateMajorEventInput[];
+  playerCharacterThreads?: Record<EntityID, PlayerCharacterThreadUpdate>;
+  characterRelationships?: Record<EntityID, Record<EntityID, CharacterRelationshipUpdate>>;
+  removePlayerCharacterThreads?: EntityID[];
+  removeCharacterRelationships?: CharacterRelationshipRemoval[];
 }
 
 export interface NPCRelationshipUpdate {
@@ -49,6 +90,34 @@ export interface NPCRelationshipUpdate {
   trust?: number;
   trustDelta?: number;
   lastInteraction?: ISODateString;
+}
+
+export interface PlayerCharacterThreadUpdate {
+  id?: EntityID;
+  summary?: string;
+  highlights?: string[];
+  appendHighlights?: string[];
+  sessionIds?: EntityID[];
+  crossCharacterReferences?: CharacterThreadReference[];
+  lastUpdated?: ISODateString;
+  characterId?: EntityID;
+  replaceCrossCharacterReferences?: boolean;
+}
+
+export interface CharacterRelationshipUpdate {
+  sentiment?: number;
+  sentimentDelta?: number;
+  trust?: number;
+  trustDelta?: number;
+  tension?: number;
+  tensionDelta?: number;
+  lastInteraction?: ISODateString;
+  sessionId?: EntityID;
+}
+
+export interface CharacterRelationshipRemoval {
+  sourceId: EntityID;
+  targetId: EntityID;
 }
 
 export type WorldStateMajorEventInput = Omit<WorldStateMajorEvent, 'sessionId'>;
@@ -68,4 +137,6 @@ export const createEmptyWorldState = (worldId: EntityID): WorldState => ({
   lastModified: new Date().toISOString(),
   npcRelationships: {},
   majorEvents: [],
+  playerCharacterThreads: {},
+  characterRelationships: {},
 });

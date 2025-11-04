@@ -4,6 +4,7 @@ import {
   getActiveWorldState,
   detectConflict,
   mergeState,
+  applyWorldStateUpdate,
 } from '../worldStateManager';
 import { createEmptyWorldState } from '@/types/world-state.types';
 
@@ -89,5 +90,94 @@ describe('worldStateManager', () => {
 
     expect(relationship.trust).toBe(65);
     expect(merged.version).toBe(Math.max(current.version, incoming.version));
+  });
+
+  it('removes player character threads and relationship edges when requested', () => {
+    let state = createEmptyWorldState(baseWorldId);
+
+    state = applyWorldStateUpdate(
+      baseWorldId,
+      state,
+      {
+        playerCharacterThreads: {
+          'thread-charA': {
+            id: 'thread-charA',
+            characterId: 'charA',
+            summary: 'CharA investigates the ruins.',
+            highlights: ['CharA investigates the ruins.'],
+            sessionIds: ['session-1'],
+          },
+          'thread-charB': {
+            id: 'thread-charB',
+            characterId: 'charB',
+            summary: 'CharB patrols the marketplace.',
+            highlights: ['CharB patrols the marketplace.'],
+            sessionIds: ['session-1'],
+            crossCharacterReferences: [
+              {
+                characterId: 'charA',
+                summary: 'CharA asked CharB for backup.',
+                lastReferencedAt: new Date().toISOString(),
+                sessionId: 'session-1',
+              },
+            ],
+          },
+        },
+      },
+      'session-1'
+    );
+
+    state = applyWorldStateUpdate(
+      baseWorldId,
+      state,
+      {
+        characterRelationships: {
+          charA: {
+            charB: {
+              sentiment: 35,
+              trust: 70,
+              tension: 15,
+            },
+          },
+          charB: {
+            charA: {
+              sentiment: 20,
+              trust: 55,
+              tension: 10,
+            },
+          },
+        },
+      },
+      'session-1'
+    );
+
+    expect(Object.keys(state.playerCharacterThreads)).toHaveLength(2);
+    expect(state.characterRelationships.charA?.charB?.trust).toBe(70);
+
+    state = applyWorldStateUpdate(
+      baseWorldId,
+      state,
+      {
+        removePlayerCharacterThreads: ['thread-charA'],
+        removeCharacterRelationships: [
+          { sourceId: 'charA', targetId: 'charB' },
+          { sourceId: 'charB', targetId: 'charA' },
+        ],
+        playerCharacterThreads: {
+          'thread-charB': {
+            id: 'thread-charB',
+            characterId: 'charB',
+            crossCharacterReferences: [],
+            replaceCrossCharacterReferences: true,
+          },
+        },
+      },
+      'cleanup-session'
+    );
+
+    expect(state.playerCharacterThreads).not.toHaveProperty('thread-charA');
+    expect(state.characterRelationships.charA).toBeUndefined();
+    expect(state.characterRelationships.charB?.charA).toBeUndefined();
+    expect(state.playerCharacterThreads['thread-charB'].crossCharacterReferences).toHaveLength(0);
   });
 });

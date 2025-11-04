@@ -12,10 +12,16 @@ import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { createIndexedDBStorage } from './persistence';
-import { NPCRelationshipUpdate, WorldStateMajorEventInput } from '../types/world-state.types';
+import {
+  NPCRelationshipUpdate,
+  WorldStateMajorEventInput,
+  PlayerCharacterThreadUpdate,
+  CharacterRelationshipUpdate,
+} from '../types/world-state.types';
 
 let worldStoreModule: typeof import('./worldStore') | null = null;
 let sessionStoreModule: typeof import('./sessionStore') | null = null;
+let characterStoreModule: typeof import('./characterStore') | null = null;
 
 
 /**
@@ -508,6 +514,156 @@ export const useNarrativeStore = create<NarrativeStore>()(
         // Silently fail goal processing if goalStore is not available
         // This is not critical for narrative functionality
         logger.debug('[NarrativeStore]', 'Goal processing skipped:', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
+
+    // Update world state threads and character relationships asynchronously
+    Promise.resolve().then(async () => {
+      try {
+        if (!sessionStoreModule) {
+          sessionStoreModule = await import('./sessionStore');
+        }
+        if (!worldStoreModule) {
+          worldStoreModule = await import('./worldStore');
+        }
+        if (!characterStoreModule) {
+          characterStoreModule = await import('./characterStore');
+        }
+
+        const { useSessionStore } = sessionStoreModule!;
+        const { useWorldStore } = worldStoreModule!;
+        const { useCharacterStore } = characterStoreModule!;
+
+        const sessionStore = useSessionStore.getState();
+        const worldStore = useWorldStore.getState();
+        const characterStore = useCharacterStore.getState();
+
+        const effectiveWorldId =
+          newSegment.worldId ??
+          segmentData.worldId ??
+          sessionStore.worldId ??
+          worldStore.currentWorldId;
+
+        if (!effectiveWorldId) {
+          return;
+        }
+
+        const activeCharacterId =
+          sessionStore.characterId ??
+          segmentData.characterIds?.[0] ??
+          finalMetadata.characterIds?.[0] ??
+          characterStore.currentCharacterId;
+
+        if (!activeCharacterId) {
+          return;
+        }
+
+        const rosterIds = characterStore.getWorldRoster
+          ? characterStore.getWorldRoster(effectiveWorldId)
+          : characterStore.getCharactersByWorld
+            ? characterStore.getCharactersByWorld(effectiveWorldId).map((character) => character.id)
+            : Object.values(characterStore.characters || {})
+                .filter((character) => character.worldId === effectiveWorldId)
+                .map((character) => character.id);
+
+        if (!Array.isArray(rosterIds) || rosterIds.length === 0) {
+          return;
+        }
+
+        const referencedIds = new Set<EntityID>();
+        (segmentData.characterIds ?? []).forEach((id) => referencedIds.add(id));
+        (finalMetadata.characterIds ?? []).forEach((id) => referencedIds.add(id));
+        (finalMetadata.characters ?? []).forEach((character) => {
+          if (character.id) {
+            referencedIds.add(character.id);
+          }
+        });
+
+        const otherPlayerCharacterIds = rosterIds.filter(
+          (id) => id !== activeCharacterId && referencedIds.has(id)
+        );
+
+        const normalizedContent = newSegment.content?.trim();
+        if (!normalizedContent) {
+          return;
+        }
+
+        const summarySnippet = normalizedContent.length > 220
+          ? `${normalizedContent.slice(0, 217)}...`
+          : normalizedContent;
+
+        if (!summarySnippet) {
+          return;
+        }
+
+        const threadId = `thread-${activeCharacterId}`;
+        const crossReferences = otherPlayerCharacterIds.map((otherId) => ({
+          characterId: otherId,
+          summary: summarySnippet,
+          sessionId,
+          lastReferencedAt: getTimestamp(),
+        }));
+
+        const threadUpdate: PlayerCharacterThreadUpdate = {
+          id: threadId,
+          characterId: activeCharacterId,
+          summary: summarySnippet,
+          appendHighlights: [summarySnippet],
+          sessionIds: [sessionId],
+          crossCharacterReferences: crossReferences.length > 0 ? crossReferences : undefined,
+        };
+
+        let relationshipUpdates: Record<EntityID, Record<EntityID, CharacterRelationshipUpdate>> | undefined;
+
+        if (otherPlayerCharacterIds.length > 0) {
+          const timestamp = getTimestamp();
+          relationshipUpdates = {};
+
+          otherPlayerCharacterIds.forEach((otherId) => {
+            if (!relationshipUpdates![activeCharacterId]) {
+              relationshipUpdates![activeCharacterId] = {};
+            }
+            relationshipUpdates![activeCharacterId][otherId] = {
+              sentimentDelta: 2,
+              trustDelta: 1,
+              tensionDelta: 0,
+              lastInteraction: timestamp,
+              sessionId,
+            };
+
+            if (!relationshipUpdates![otherId]) {
+              relationshipUpdates![otherId] = {};
+            }
+            relationshipUpdates![otherId][activeCharacterId] = {
+              sentimentDelta: 1,
+              trustDelta: 1,
+              tensionDelta: 0,
+              lastInteraction: timestamp,
+              sessionId,
+            };
+          });
+        }
+
+        const updatePayload: {
+          playerCharacterThreads: Record<EntityID, PlayerCharacterThreadUpdate>;
+          characterRelationships?: Record<EntityID, Record<EntityID, CharacterRelationshipUpdate>>;
+        } = {
+          playerCharacterThreads: {
+            [threadId]: threadUpdate,
+          },
+        };
+
+        if (relationshipUpdates) {
+          updatePayload.characterRelationships = relationshipUpdates;
+        }
+
+        worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
+      } catch (error) {
+        logger.debug(
+          '[NarrativeStore]',
+          'World state thread update skipped:',
+          error instanceof Error ? error.message : 'Unknown error'
+        );
       }
     });
 

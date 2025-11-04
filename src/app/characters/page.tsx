@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Sparkles, Play, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -24,6 +24,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
+import type { PlayerCharacterThread, CharacterRelationshipState } from '@/types/world-state.types';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -64,6 +65,51 @@ function transformGeneratedSkills(generatedData: GeneratedCharacterData, current
       category: worldSkill?.category
     };
   });
+}
+
+function summarizeThread(thread?: PlayerCharacterThread): string | undefined {
+  if (!thread) {
+    return undefined;
+  }
+
+  const source =
+    (thread.highlights && thread.highlights.length > 0
+      ? thread.highlights[thread.highlights.length - 1]
+      : thread.summary) || '';
+  const trimmed = source.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+  return trimmed.length > 220 ? `${trimmed.slice(0, 217)}...` : trimmed;
+}
+
+function formatRelationshipSummary(relationship: CharacterRelationshipState): string {
+  const sentiment =
+    relationship.sentiment > 40
+      ? 'strongly positive'
+      : relationship.sentiment < -40
+        ? 'hostile'
+        : relationship.sentiment > 10
+          ? 'friendly'
+          : relationship.sentiment < -10
+            ? 'strained'
+            : 'balanced';
+
+  const trust =
+    relationship.trust > 70
+      ? 'high trust'
+      : relationship.trust < 30
+        ? 'low trust'
+        : 'guarded trust';
+
+  const tension =
+    relationship.tension > 60
+      ? 'volatile tension'
+      : relationship.tension > 30
+        ? 'rising tension'
+        : 'steady';
+
+  return `${sentiment}, ${trust}, ${tension}`;
 }
 
 // Helper function to generate portrait for character
@@ -123,7 +169,7 @@ export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
-  const { worlds, currentWorldId } = useWorldStore();
+  const { worlds, currentWorldId, worldStates } = useWorldStore();
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
   const [mounted, setMounted] = useState(false);
@@ -163,6 +209,54 @@ export default function CharactersPage() {
   const worldCharacters = (Object.values(characters) as Character[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
+  const worldState = effectiveWorldId ? worldStates?.[effectiveWorldId] : undefined;
+
+  const characterContextById = useMemo(() => {
+    if (!worldState) {
+      return {} as Record<string, {
+        threadSummary?: string;
+        lastUpdated?: string;
+        relationships: Array<{ characterId: string; characterName: string; description: string }>;
+      }>;
+    }
+
+    const threadsByCharacter = Object.values(worldState.playerCharacterThreads ?? {}).reduce(
+      (acc, thread) => {
+        acc[thread.characterId] = thread;
+        return acc;
+      },
+      {} as Record<string, PlayerCharacterThread>
+    );
+
+    const relationshipByCharacter = worldState.characterRelationships ?? {};
+
+    return worldCharacters.reduce((acc, character) => {
+      const thread = threadsByCharacter[character.id];
+      const relationshipEntries = relationshipByCharacter[character.id] ?? {};
+
+      const relationships = Object.entries(relationshipEntries)
+        .filter(([otherId]) => otherId !== character.id && Boolean(characters[otherId]))
+        .sort(([, a], [, b]) => b.lastInteraction.localeCompare(a.lastInteraction))
+        .slice(0, 2)
+        .map(([otherId, relationship]) => ({
+          characterId: otherId,
+          characterName: characters[otherId]?.name ?? 'Unknown',
+          description: formatRelationshipSummary(relationship),
+        }));
+
+      acc[character.id] = {
+        threadSummary: summarizeThread(thread),
+        lastUpdated: thread?.lastUpdated,
+        relationships,
+      };
+
+      return acc;
+    }, {} as Record<string, {
+      threadSummary?: string;
+      lastUpdated?: string;
+      relationships: Array<{ characterId: string; characterName: string; description: string }>;
+    }>);
+  }, [worldState, worldCharacters, characters]);
 
   // Get current session progress for confirmation dialog
   const currentProgress = currentSessionId ? getSessionSegments(currentSessionId).length : 0;
@@ -602,6 +696,7 @@ export default function CharactersPage() {
                 onPlay={() => handleCharacterPlay(character.id)}
                 onEdit={() => handleEditCharacter(character.id)}
                 onDelete={() => handleDeleteCharacter(character.id)}
+                context={characterContextById[character.id]}
               />
             ))}
           </div>

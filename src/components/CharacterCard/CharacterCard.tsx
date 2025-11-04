@@ -10,7 +10,17 @@ import {
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate, safeTrim, formatRelativeTime } from '@/lib/utils';
+
+interface CharacterContextSummary {
+  threadSummary?: string;
+  lastUpdated?: string;
+  relationships?: Array<{
+    characterId: string;
+    characterName: string;
+    description: string;
+  }>;
+}
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -27,6 +37,8 @@ interface CharacterCardProps {
   onEdit: () => void;
   /** Callback when user wants to delete this character */
   onDelete: () => void;
+  /** Optional context describing the character's ongoing storyline */
+  context?: CharacterContextSummary;
 }
 
 /**
@@ -57,7 +69,8 @@ export function CharacterCard({
   onView,
   onPlay,
   onEdit,
-  onDelete
+  onDelete,
+  context,
 }: CharacterCardProps) {
 
   return (
@@ -121,6 +134,32 @@ export function CharacterCard({
               return result || truncate(text, 280);
             })()}
           </p>
+          {context?.threadSummary && (
+            <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <h4 className="text-sm font-semibold text-gray-600 mb-1">Latest Thread</h4>
+              <p className="text-sm text-gray-700">
+                {context.threadSummary}
+              </p>
+              {context.lastUpdated && (
+                <p className="mt-2 text-xs text-gray-500">
+                  Updated {formatRelativeTime(context.lastUpdated)}
+                </p>
+              )}
+            </div>
+          )}
+          {context?.relationships && context.relationships.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
+              <ul className="space-y-1 text-xs text-gray-600">
+                {context.relationships.map((relation) => (
+                  <li key={relation.characterId}>
+                    <span className="font-medium text-gray-700">{relation.characterName}</span>
+                    {`: ${relation.description}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="clear-both"></div>
         </div>
         

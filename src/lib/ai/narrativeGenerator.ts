@@ -39,6 +39,7 @@ import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
 import { logger } from '@/lib/utils/logger';
+import { CharacterRelationshipState } from '@/types/world-state.types';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -461,10 +462,110 @@ export class NarrativeGenerator {
         enhancedPrompt = `${enhancedPrompt}${decisionHistory}`;
       }
 
+      const otherCharacterContext = this.buildOtherCharacterContext(worldId, playerCharacterId);
+      if (otherCharacterContext) {
+        enhancedPrompt = `${enhancedPrompt}\n\n${otherCharacterContext}\nWeave these concurrent storylines naturally when they influence the current scene, but avoid forced references.`;
+      }
+
       return enhancedPrompt;
     } catch {
       return prompt;
     }
+  }
+
+  private buildOtherCharacterContext(
+    worldId: EntityID,
+    activeCharacterId: EntityID,
+  ): string | null {
+    try {
+      const { worldStates } = useWorldStore.getState();
+      const worldState = worldStates[worldId];
+      if (!worldState?.playerCharacterThreads) {
+        return null;
+      }
+
+      const threads = Object.values(worldState.playerCharacterThreads)
+        .filter((thread) => thread.characterId !== activeCharacterId)
+        .sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated))
+        .slice(0, 3);
+
+      if (threads.length === 0) {
+        return null;
+      }
+
+      const { characters } = useCharacterStore.getState();
+      const relationshipMap =
+        worldState.characterRelationships?.[activeCharacterId] ?? {};
+
+      const lines = threads.map((thread) => {
+        const name =
+          characters[thread.characterId]?.name ?? `Character ${thread.characterId}`;
+        const highlightSource =
+          thread.highlights && thread.highlights.length > 0
+            ? thread.highlights[thread.highlights.length - 1]
+            : thread.summary;
+        const trimmedHighlight =
+          highlightSource.length > 160
+            ? `${highlightSource.slice(0, 157)}...`
+            : highlightSource;
+
+        const relationship = relationshipMap[thread.characterId];
+        const relationshipDescriptor = relationship
+          ? ` Relationship: ${this.describeCharacterRelationship(relationship)}.`
+          : '';
+
+        const referencesToActive =
+          thread.crossCharacterReferences?.filter(
+            (reference) => reference.characterId === activeCharacterId
+          ) ?? [];
+        const referenceDescriptor =
+          referencesToActive.length > 0
+            ? ` Recent cross-over: ${referencesToActive
+                .slice(-2)
+                .map((reference) =>
+                  reference.summary.length > 120
+                    ? `${reference.summary.slice(0, 117)}...`
+                    : reference.summary
+                )
+                .join('; ')}.`
+            : '';
+
+        return `- ${name}: ${trimmedHighlight}.${relationshipDescriptor}${referenceDescriptor}`;
+      });
+
+      return `OTHER PLAYER CHARACTERS (SHARED WORLD CONTEXT):\n${lines.join('\n')}`;
+    } catch {
+      return null;
+    }
+  }
+
+  private describeCharacterRelationship(
+    relationship: CharacterRelationshipState,
+  ): string {
+    const sentiment =
+      relationship.sentiment > 40
+        ? 'warm'
+        : relationship.sentiment < -40
+          ? 'hostile'
+          : relationship.sentiment >= 0
+            ? 'cautious'
+            : 'strained';
+
+    const trust =
+      relationship.trust > 70
+        ? 'high trust'
+        : relationship.trust < 30
+          ? 'low trust'
+          : 'guarded trust';
+
+    const tension =
+      relationship.tension > 60
+        ? 'volatile'
+        : relationship.tension > 30
+          ? 'tense'
+          : 'stable';
+
+    return `${sentiment}, ${trust}, ${tension}`;
   }
 
   /**
