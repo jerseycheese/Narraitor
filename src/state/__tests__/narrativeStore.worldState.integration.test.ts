@@ -69,12 +69,14 @@ describe('Narrative store world state integration', () => {
       lastActivity: new Date().toISOString(),
     });
 
+    const segmentTimestamp = new Date();
     useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
       content: 'The guard eyes you suspiciously.',
       type: 'scene',
       metadata: { tags: [], characterIds: [characterId] },
-      timestamp: new Date(),
+      timestamp: segmentTimestamp,
+      updatedAt: segmentTimestamp.toISOString(),
     });
 
     const optionId = 'option-charm';

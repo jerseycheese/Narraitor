@@ -21,7 +21,7 @@ const resolveSessionStatus = (sessionId: EntityID) => {
     if (!sessionStoreModule) {
       sessionStoreModule = eval('require("./sessionStore")');
     }
-    const { useSessionStore } = sessionStoreModule;
+    const { useSessionStore } = sessionStoreModule!;
     return useSessionStore.getState().getSessionLifecycle(sessionId)?.status;
   } catch (error) {
     logger.warn('Failed to resolve session status', { sessionId, error });

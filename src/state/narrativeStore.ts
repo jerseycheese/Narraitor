@@ -732,7 +732,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
         if (!worldStoreModule) {
           worldStoreModule = eval('require("./worldStore")');
         }
-        const { useWorldStore } = worldStoreModule;
+        const { useWorldStore } = worldStoreModule!;
         useWorldStore.getState().updateWorldState(
           worldStatePayload.worldId,
           {
@@ -951,7 +951,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       if (!sessionStoreModule) {
         sessionStoreModule = eval('require("./sessionStore")');
       }
-      const { useSessionStore } = sessionStoreModule;
+      const { useSessionStore } = sessionStoreModule!;
       useSessionStore.getState().setSessionLifecycleStatus(sessionId, 'ended');
     } catch (error) {
       logger.warn('Failed to propagate session lifecycle status on ending', error);
