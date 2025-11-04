@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
@@ -12,6 +12,10 @@ import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { createIndexedDBStorage } from './persistence';
+import { NPCRelationshipUpdate, WorldStateMajorEventInput } from '../types/world-state.types';
+
+let worldStoreModule: typeof import('./worldStore') | null = null;
+let sessionStoreModule: typeof import('./sessionStore') | null = null;
 
 
 /**
@@ -120,6 +124,214 @@ const inferChoiceTypeFromText = (): ChoiceTypePreference => {
   // The alignment-based mapping handles the majority of cases effectively
   // AI-based inference will be implemented in a follow-up enhancement
   return 'neutral';
+};
+
+interface ExtractedWorldStateImpact {
+  relationships: Record<EntityID, NPCRelationshipUpdate>;
+  events: WorldStateMajorEventInput[];
+}
+
+type DecisionWorldStatePayload = {
+  worldId: EntityID;
+  sessionId: EntityID;
+  relationships: Record<EntityID, NPCRelationshipUpdate>;
+  events: WorldStateMajorEventInput[];
+};
+
+const MAJOR_EVENT_PATTERNS: RegExp[] = [
+  /world[-\s]?changing/i,
+  /major\s+event/i,
+  /kingdom\s+(?:falls|celebrates|rejoices|crumbles)/i,
+  /celebration/i,
+  /catastrophe/i,
+  /disaster/i,
+  /uprising/i,
+  /war\s+erupts/i,
+  /reputation\s+(?:soars|plummets|spreads)/i,
+];
+
+const parseNumericValue = (value: unknown): number | undefined => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const match = value.match(/-?\d+/);
+    if (match) {
+      const parsed = Number(match[0]);
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }
+  }
+  return undefined;
+};
+
+const ensureRelationshipUpdate = (
+  relationships: Record<EntityID, NPCRelationshipUpdate>,
+  npcId: EntityID,
+  timestamp: string
+): NPCRelationshipUpdate => {
+  const existing = relationships[npcId];
+  if (existing) {
+    if (!existing.lastInteraction) {
+      existing.lastInteraction = timestamp;
+    }
+    return existing;
+  }
+
+  const update: NPCRelationshipUpdate = { lastInteraction: timestamp };
+  relationships[npcId] = update;
+  return update;
+};
+
+const queueMajorEvent = (
+  description: string | undefined,
+  characterId: EntityID | undefined,
+  processed: Set<string>,
+  events: WorldStateMajorEventInput[]
+) => {
+  const trimmed = safeTrim(description ?? '');
+  if (!trimmed) {
+    return;
+  }
+
+  const key = trimmed.toLowerCase();
+  if (processed.has(key)) {
+    return;
+  }
+
+  processed.add(key);
+  events.push({
+    id: generateUniqueId('event'),
+    description: trimmed,
+    timestamp: getTimestamp(),
+    characterId: (characterId ?? 'unknown-character') as EntityID,
+  });
+};
+
+const extractWorldStateImpacts = (
+  decision: Decision,
+  selectedOption: Decision['options'][number],
+  characterId?: EntityID
+): ExtractedWorldStateImpact => {
+  const relationships: Record<EntityID, NPCRelationshipUpdate> = {};
+  const events: WorldStateMajorEventInput[] = [];
+  const processedDescriptions = new Set<string>();
+  const timestamp = getTimestamp();
+
+  const handleConsequence = (consequence?: Consequence) => {
+    if (!consequence) {
+      return;
+    }
+
+    if (consequence.type === 'relationship') {
+      const npcId = consequence.targetId;
+      if (!npcId) {
+        return;
+      }
+
+      const update = ensureRelationshipUpdate(relationships, npcId, timestamp);
+      const value = consequence.value;
+
+      if (value && typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        if (typeof record.trust === 'number') {
+          update.trust = record.trust;
+        }
+        if (typeof record.sentiment === 'number') {
+          update.sentiment = record.sentiment;
+        }
+        if (typeof record.trustDelta === 'number') {
+          update.trustDelta = (update.trustDelta ?? 0) + (record.trustDelta as number);
+        }
+        if (typeof record.sentimentDelta === 'number') {
+          update.sentimentDelta = (update.sentimentDelta ?? 0) + (record.sentimentDelta as number);
+        }
+        if (typeof record.lastInteraction === 'string') {
+          update.lastInteraction = record.lastInteraction;
+        }
+      } else {
+        const numeric = parseNumericValue(value);
+        if (typeof numeric === 'number') {
+          if (consequence.action === 'add') {
+            update.trustDelta = (update.trustDelta ?? 0) + numeric;
+          } else if (consequence.action === 'remove') {
+            update.trustDelta = (update.trustDelta ?? 0) - numeric;
+          } else {
+            update.trust = numeric;
+          }
+        }
+      }
+
+      update.lastInteraction = update.lastInteraction ?? timestamp;
+
+      if (typeof consequence.description === 'string') {
+        queueMajorEvent(consequence.description, characterId, processedDescriptions, events);
+      }
+      return;
+    }
+
+    if (consequence.type === 'narrative') {
+      const description = typeof consequence.value === 'string'
+        ? consequence.value
+        : consequence.description;
+      queueMajorEvent(description, characterId, processedDescriptions, events);
+    }
+  };
+
+  const optionConsequences = (selectedOption as unknown as { consequences?: Consequence[] }).consequences || [];
+  optionConsequences.forEach(handleConsequence);
+  (decision.consequences ?? []).forEach(handleConsequence);
+
+  const candidateTexts: string[] = [];
+  const optionText = safeTrim(selectedOption.text || '');
+  if (optionText) candidateTexts.push(optionText);
+
+  const customText = safeTrim((selectedOption as { customText?: string }).customText ?? '');
+  if (customText) candidateTexts.push(customText);
+
+  const hintText = safeTrim((selectedOption as { hint?: string }).hint ?? '');
+  if (hintText) candidateTexts.push(hintText);
+
+  const decisionPrompt = safeTrim(decision.prompt || '');
+  if (decisionPrompt) candidateTexts.push(decisionPrompt);
+
+  const consequenceDescriptions = [...optionConsequences, ...(decision.consequences ?? [])]
+    .map((cons) => safeTrim(cons?.description || (typeof cons?.value === 'string' ? cons.value : '')))
+    .filter(Boolean) as string[];
+
+  candidateTexts.push(...consequenceDescriptions);
+
+  candidateTexts.forEach(text => {
+    const sentences = text.split(/(?<=[.!?])\s+/u);
+    sentences.forEach(sentence => {
+      const trimmed = safeTrim(sentence);
+      if (!trimmed) {
+        return;
+      }
+
+      if (MAJOR_EVENT_PATTERNS.some(pattern => pattern.test(trimmed))) {
+        queueMajorEvent(trimmed, characterId, processedDescriptions, events);
+      }
+    });
+  });
+
+  for (const [npcId, update] of Object.entries(relationships)) {
+    const meaningful =
+      typeof update.sentiment !== 'undefined' ||
+      typeof update.sentimentDelta !== 'undefined' ||
+      typeof update.trust !== 'undefined' ||
+      typeof update.trustDelta !== 'undefined';
+
+    if (!meaningful) {
+      delete relationships[npcId];
+    } else if (!update.lastInteraction) {
+      update.lastInteraction = timestamp;
+    }
+  }
+
+  return {
+    relationships,
+    events,
+  };
 };
 
 /**
@@ -427,88 +639,116 @@ export const useNarrativeStore = create<NarrativeStore>()(
     };
   }),
   
-  selectDecisionOption: (decisionId, optionId, characterId) => set((state) => {
-    if (!state.decisions[decisionId]) {
-      return { error: 'Decision not found' };
-    }
+  selectDecisionOption: (decisionId, optionId, characterId) => {
+    let worldStatePayload: DecisionWorldStatePayload | undefined;
 
-    const decision = state.decisions[decisionId];
-    const selectedOption = decision.options.find(opt => opt.id === optionId);
-    
-    if (!selectedOption) {
-      return { error: 'Selected option not found' };
-    }
+    set((state) => {
+      if (!state.decisions[decisionId]) {
+        return { error: 'Decision not found' };
+      }
 
-    const updatedDecision: Decision = {
-      ...decision,
-      selectedOptionId: optionId,
-      selectedAt: new Date(),
-      characterId,
-    };
+      const decision = state.decisions[decisionId];
+      const selectedOption = decision.options.find(opt => opt.id === optionId);
+      
+      if (!selectedOption) {
+        return { error: 'Selected option not found' };
+      }
 
-    // Track decision in PlayerDecisionTracker for narrative personalization
-    try {
-      // Find session and world IDs
+      const updatedDecision: Decision = {
+        ...decision,
+        selectedOptionId: optionId,
+        selectedAt: new Date(),
+        characterId,
+      };
+
       let sessionId: EntityID | null = null;
       let worldId: EntityID | null = null;
 
-      // Find which session contains this decision
-      for (const [sId, decisionIds] of Object.entries(state.sessionDecisions)) {
-        if (decisionIds.includes(decisionId)) {
-          sessionId = sId;
-          break;
-        }
-      }
-
-      // Find worldId from narrative segments in the same session
-      if (sessionId) {
-        const segmentIds = state.sessionSegments[sessionId] || [];
-        for (const segmentId of segmentIds) {
-          const segment = state.segments[segmentId];
-          if (segment?.worldId) {
-            worldId = segment.worldId;
+      try {
+        for (const [sId, decisionIds] of Object.entries(state.sessionDecisions)) {
+          if (decisionIds.includes(decisionId)) {
+            sessionId = sId;
             break;
           }
         }
-      }
 
-      if (sessionId && characterId) {
-        // Determine choice type from alignment or text analysis
-        let choiceType: ChoiceTypePreference = 'neutral';
-        if (selectedOption.alignment) {
-          choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
-        } else {
-          choiceType = inferChoiceTypeFromText();
+        if (sessionId) {
+          const segmentIds = state.sessionSegments[sessionId] || [];
+          for (const segmentId of segmentIds) {
+            const segment = state.segments[segmentId];
+            if (segment?.worldId) {
+              worldId = segment.worldId;
+              break;
+            }
+          }
         }
 
-        // Extract context from decision and recent segments
-        const sessionSegmentIds = state.sessionSegments[sessionId] || [];
-        const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);
-        const context = extractDecisionContext(decision.prompt, sessionSegments);
+        if (sessionId && characterId) {
+          let choiceType: ChoiceTypePreference = 'neutral';
+          if (selectedOption.alignment) {
+            choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
+          } else {
+            choiceType = inferChoiceTypeFromText();
+          }
 
-        // Record decision in PlayerDecisionTracker
-        playerDecisionTracker.recordDecision(
-          decision.prompt,
-          selectedOption.text,
-          choiceType,
-          sessionId,
-          worldId || 'unknown-world',
-          context
-        );
+          const sessionSegmentIds = state.sessionSegments[sessionId] || [];
+          const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);
+          const context = extractDecisionContext(decision.prompt, sessionSegments);
+
+          playerDecisionTracker.recordDecision(
+            decision.prompt,
+            selectedOption.text,
+            choiceType,
+            sessionId,
+            worldId || 'unknown-world',
+            context
+          );
+        }
+      } catch (error) {
+        logger.warn('Failed to track player decision:', error);
       }
-    } catch (error) {
-      // Log error but don't break the game flow
-      logger.warn('Failed to track player decision:', error);
-    }
 
-    return {
-      decisions: {
-        ...state.decisions,
-        [decisionId]: updatedDecision,
-      },
-      error: null,
-    };
-  }),
+      if (sessionId && worldId) {
+        const impacts = extractWorldStateImpacts(decision, selectedOption, characterId);
+        if (Object.keys(impacts.relationships).length > 0 || impacts.events.length > 0) {
+          worldStatePayload = {
+            worldId,
+            sessionId,
+            relationships: impacts.relationships,
+            events: impacts.events,
+          };
+        }
+      }
+
+      return {
+        decisions: {
+          ...state.decisions,
+          [decisionId]: updatedDecision,
+        },
+        error: null,
+      };
+    });
+
+    const payload = worldStatePayload;
+    if (payload) {
+      try {
+        if (!worldStoreModule) {
+          worldStoreModule = eval('require("./worldStore")');
+        }
+        const { useWorldStore } = worldStoreModule!;
+        useWorldStore.getState().updateWorldState(
+          payload.worldId,
+          {
+            npcRelationships: payload.relationships,
+            majorEvents: payload.events,
+          },
+          payload.sessionId
+        );
+      } catch (error) {
+        logger.warn('Failed to apply world state update from decision', error);
+      }
+    }
+  },
   
   getSessionDecisions: (sessionId) => {
     const state = get();
@@ -709,6 +949,16 @@ export const useNarrativeStore = create<NarrativeStore>()(
         [sessionId]: true,
       }
     }));
+
+    try {
+      if (!sessionStoreModule) {
+        sessionStoreModule = eval('require("./sessionStore")');
+      }
+      const { useSessionStore } = sessionStoreModule!;
+      useSessionStore.getState().setSessionLifecycleStatus(sessionId, 'ended');
+    } catch (error) {
+      logger.warn('Failed to propagate session lifecycle status on ending', error);
+    }
   },
 
   setHasHydrated: (hasHydrated: boolean) => {

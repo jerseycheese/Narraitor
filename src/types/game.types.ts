@@ -1,5 +1,6 @@
 import { EntityID } from './common.types';
 import { WorldTemplate } from '../lib/ai/templateGenerator';
+import { SessionLifecycleMetadata, SessionLifecycleStatus } from './session.types';
 
 /**
  * Player choice interface
@@ -68,6 +69,7 @@ export interface SessionStore {
   worldId: EntityID | null;
   characterId: EntityID | null;
   savedSessions: Record<string, SavedSessionInfo>;
+  sessionLifecycle: Record<string, SessionLifecycleMetadata>;
   templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
   onboardingCompleted: boolean;
@@ -91,6 +93,9 @@ export interface SessionStore {
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
   fixExistingSessionNarrativeCounts: () => Promise<void>;
+  upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => void;
+  setSessionLifecycleStatus: (sessionId: string, status: SessionLifecycleStatus) => void;
+  getSessionLifecycle: (sessionId: string) => SessionLifecycleMetadata | undefined;
   
   // Template history actions
   addTemplateToHistory: (entry: TemplateHistoryEntry) => void;

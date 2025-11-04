@@ -131,18 +131,64 @@ selectChoice('choice-1');
 import { useSessionStore } from '@/state/sessionStore';
 
 const {
-  sessions,
-  currentSessionId,
-  createSession,
+  id,
+  status,
+  sessionLifecycle,
+  initializeSession,
   endSession,
-  updateSessionState
+  setSessionLifecycleStatus,
+  getSessionLifecycle
 } = useSessionStore();
 
-// Start new session
-const sessionId = createSession({
-  worldId: 'world-1',
-  characterIds: ['char-1', 'char-2']
-});
+// Start or resume a session
+await initializeSession('world-1', 'char-1');
+
+// Session lifecycle metadata persists across reloads
+const lifecycle = getSessionLifecycle('session-abc');
+if (lifecycle?.status === 'ended') {
+  // Hide decisions that belong to this finished branch
+}
+```
+
+Session lifecycle statuses:
+
+- `active` – session currently influencing shared world state.
+- `ended` – session reached a narrative ending; its changes are frozen.
+- `abandoned` – user deleted or discarded the session; its contributions are removed from the active snapshot but metadata remains for audits.
+
+### World State Persistence (Active Sessions)
+```typescript
+import { useWorldStore } from '@/state/worldStore';
+
+const { updateWorldState, getWorldState } = useWorldStore();
+
+// Apply relationship or major event updates attributed to the current session
+updateWorldState('world-1', {
+  npcRelationships: {
+    'npc-guard': { trustDelta: 10 }
+  },
+  majorEvents: [
+    {
+      id: 'event-kingdom-celebrates',
+      description: 'The kingdom celebrates your diplomatic victory.',
+      timestamp: new Date().toISOString(),
+      characterId: 'char-1'
+    }
+  ]
+}, 'session-abc');
+
+// Consumers get an "active session" filtered snapshot by default
+const activeState = getWorldState('world-1');
+
+// Include historical (ended session) changes if needed
+const archivalView = getWorldState('world-1', { includeEndedSessions: true });
+```
+
+#### Active Session Persistence
+- World state changes persist only while the originating session remains `active`.
+- When `markSessionEnded` runs, the narrative store flips the session lifecycle to `ended` and those relationship/event changes stop propagating to other characters.
+- Abandoned sessions (manually deleted) are marked `abandoned`, which also removes their contributions from the active snapshot while keeping audit data.
+- Conflict handling is deliberately lightweight: world state updates carry a monotonically increasing `version` so that last-write-wins remains predictable for the MVP.
 ```
 
 ## Usage Patterns

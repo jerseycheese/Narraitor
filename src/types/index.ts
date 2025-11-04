@@ -52,8 +52,20 @@ export type {
   GameSession, 
   SessionState, 
   SavePoint, 
-  NarrativeContext 
+  NarrativeContext,
+  SessionLifecycleMetadata,
+  SessionLifecycleStatus,
+  SessionStatus
 } from './session.types';
+export type {
+  WorldState,
+  WorldStateUpdate,
+  NPCRelationshipState,
+  NPCRelationshipUpdate,
+  WorldStateMajorEvent,
+  WorldStateMajorEventInput,
+  SessionLifecycleSnapshot
+} from './world-state.types';
 export type { 
   AIContext, 
   AIPromptContext, 
