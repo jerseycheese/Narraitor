@@ -24,7 +24,8 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
-import type { PlayerCharacterThread, CharacterRelationshipState } from '@/types/world-state.types';
+import type { PlayerCharacterThread } from '@/types/world-state.types';
+import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -65,51 +66,6 @@ function transformGeneratedSkills(generatedData: GeneratedCharacterData, current
       category: worldSkill?.category
     };
   });
-}
-
-function summarizeThread(thread?: PlayerCharacterThread): string | undefined {
-  if (!thread) {
-    return undefined;
-  }
-
-  const source =
-    (thread.highlights && thread.highlights.length > 0
-      ? thread.highlights[thread.highlights.length - 1]
-      : thread.summary) || '';
-  const trimmed = source.trim();
-  if (!trimmed) {
-    return undefined;
-  }
-  return trimmed.length > 220 ? `${trimmed.slice(0, 217)}...` : trimmed;
-}
-
-function formatRelationshipSummary(relationship: CharacterRelationshipState): string {
-  const sentiment =
-    relationship.sentiment > 40
-      ? 'strongly positive'
-      : relationship.sentiment < -40
-        ? 'hostile'
-        : relationship.sentiment > 10
-          ? 'friendly'
-          : relationship.sentiment < -10
-            ? 'strained'
-            : 'balanced';
-
-  const trust =
-    relationship.trust > 70
-      ? 'high trust'
-      : relationship.trust < 30
-        ? 'low trust'
-        : 'guarded trust';
-
-  const tension =
-    relationship.tension > 60
-      ? 'volatile tension'
-      : relationship.tension > 30
-        ? 'rising tension'
-        : 'steady';
-
-  return `${sentiment}, ${trust}, ${tension}`;
 }
 
 // Helper function to generate portrait for character
@@ -241,11 +197,11 @@ export default function CharactersPage() {
         .map(([otherId, relationship]) => ({
           characterId: otherId,
           characterName: characters[otherId]?.name ?? 'Unknown',
-          description: formatRelationshipSummary(relationship),
+          description: describeCharacterRelationship(relationship),
         }));
 
       acc[character.id] = {
-        threadSummary: summarizeThread(thread),
+        threadSummary: summarizeThreadHighlight(thread, 220),
         lastUpdated: thread?.lastUpdated,
         relationships,
       };

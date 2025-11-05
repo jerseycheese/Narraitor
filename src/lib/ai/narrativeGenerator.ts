@@ -39,7 +39,7 @@ import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
 import { logger } from '@/lib/utils/logger';
-import { CharacterRelationshipState } from '@/types/world-state.types';
+import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -87,6 +87,11 @@ const REWRITE_RULES: Record<ToneSettings['languageComplexity'], string[]> = {
     'Maintain markdown formatting and all narrative details.',
   ],
 };
+
+// Prompt guardrails to keep Gemini context predictable. Tuned for narrative cost/benefit trade-offs.
+const MAX_OTHER_CHARACTER_THREADS = 3;
+const MAX_CROSS_CHARACTER_REFERENCES = 2;
+const PROMPT_THREAD_SUMMARY_LENGTH = 160;
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -487,7 +492,7 @@ export class NarrativeGenerator {
       const threads = Object.values(worldState.playerCharacterThreads)
         .filter((thread) => thread.characterId !== activeCharacterId)
         .sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated))
-        .slice(0, 3);
+        .slice(0, MAX_OTHER_CHARACTER_THREADS);
 
       if (threads.length === 0) {
         return null;
@@ -500,72 +505,41 @@ export class NarrativeGenerator {
       const lines = threads.map((thread) => {
         const name =
           characters[thread.characterId]?.name ?? `Character ${thread.characterId}`;
-        const highlightSource =
-          thread.highlights && thread.highlights.length > 0
-            ? thread.highlights[thread.highlights.length - 1]
-            : thread.summary;
-        const trimmedHighlight =
-          highlightSource.length > 160
-            ? `${highlightSource.slice(0, 157)}...`
-            : highlightSource;
+        const highlight =
+          summarizeThreadHighlight(thread, PROMPT_THREAD_SUMMARY_LENGTH) ??
+          'No recent activity recorded yet.';
 
         const relationship = relationshipMap[thread.characterId];
         const relationshipDescriptor = relationship
-          ? ` Relationship: ${this.describeCharacterRelationship(relationship)}.`
+          ? ` Relationship: ${describeCharacterRelationship(relationship)}.`
           : '';
 
         const referencesToActive =
           thread.crossCharacterReferences?.filter(
             (reference) => reference.characterId === activeCharacterId
           ) ?? [];
+        const recentReferences = referencesToActive.slice(
+          -MAX_CROSS_CHARACTER_REFERENCES
+        );
         const referenceDescriptor =
-          referencesToActive.length > 0
-            ? ` Recent cross-over: ${referencesToActive
-                .slice(-2)
-                .map((reference) =>
-                  reference.summary.length > 120
-                    ? `${reference.summary.slice(0, 117)}...`
-                    : reference.summary
-                )
+          recentReferences.length > 0
+            ? ` Recent cross-over: ${recentReferences
+                .map((reference) => {
+                  const summary = reference.summary.trim();
+                  return summary.length > PROMPT_THREAD_SUMMARY_LENGTH
+                    ? `${summary.slice(0, PROMPT_THREAD_SUMMARY_LENGTH - 3)}...`
+                    : summary;
+                })
                 .join('; ')}.`
             : '';
 
-        return `- ${name}: ${trimmedHighlight}.${relationshipDescriptor}${referenceDescriptor}`;
+        return `- ${name}: ${highlight}.${relationshipDescriptor}${referenceDescriptor}`;
       });
 
       return `OTHER PLAYER CHARACTERS (SHARED WORLD CONTEXT):\n${lines.join('\n')}`;
     } catch {
       return null;
     }
-  }
-
-  private describeCharacterRelationship(
-    relationship: CharacterRelationshipState,
-  ): string {
-    const sentiment =
-      relationship.sentiment > 40
-        ? 'warm'
-        : relationship.sentiment < -40
-          ? 'hostile'
-          : relationship.sentiment >= 0
-            ? 'cautious'
-            : 'strained';
-
-    const trust =
-      relationship.trust > 70
-        ? 'high trust'
-        : relationship.trust < 30
-          ? 'low trust'
-          : 'guarded trust';
-
-    const tension =
-      relationship.tension > 60
-        ? 'volatile'
-        : relationship.tension > 30
-          ? 'tense'
-          : 'stable';
-
-    return `${sentiment}, ${trust}, ${tension}`;
   }
 
   /**
