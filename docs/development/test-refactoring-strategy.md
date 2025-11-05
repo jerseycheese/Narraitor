@@ -1,7 +1,14 @@
 # Test File Refactoring Strategy - Issue #818
 
 ## Overview
-This document outlines the systematic approach to refactoring 48 test files that exceed the 300-line limit.
+This document outlines the systematic approach to refactoring test files that exceed the 300-line limit.
+
+## Progress Summary
+- **Original scan**: 48 files over 300 lines
+- **Current scan**: 40 files over 300 lines (after recent refactorings)
+- **Files refactored this session**: 1 (IndexedDB Adapter)
+- **Test helpers created**: 2 (IndexedDB, DecisionFormatter)
+- **Remaining work**: ~40 files
 
 ## Refactoring Pattern
 
@@ -32,7 +39,7 @@ Organize tests into focused files (each <300 lines):
 
 ## Completed Refactoring
 
-### IndexedDB Adapter (736 → 3 files)
+### IndexedDB Adapter (736 → 4 files) ✅
 **Original**: `src/lib/storage/__tests__/indexedDBAdapter.test.ts` (736 lines)
 
 **Refactored to**:
@@ -46,34 +53,44 @@ Organize tests into focused files (each <300 lines):
 - Each test file has a single, clear responsibility
 - Reusable test helpers for future tests
 
+### Character Store ✅
+Already refactored in previous work:
+- `characterStore.attributes.test.ts` (145 lines)
+- `characterStore.crud.test.ts` (181 lines)
+- `characterStore.state.test.ts` (83 lines)
+- `characterStore.relatedDataCleanup.test.ts` (389 lines) - Still over limit
+
+### Lore Store ✅
+Already refactored in previous work:
+- `loreStore.basic.test.ts` (66 lines)
+- `loreStore.crud.test.ts` (96 lines)
+- `loreStore.search.test.ts` (115 lines)
+- `loreStore.advanced.test.ts` (243 lines)
+
+### Ending Generator ✅
+Already refactored in previous work:
+- `endingGenerator.basic.test.ts` (177 lines)
+- `endingGenerator.errors.test.ts` (145 lines)
+- `endingGenerator.advanced.test.ts` (222 lines)
+
+### DecisionFormatter (In Progress) 🚧
+**Helper created**: `decisionFormatter.testHelpers.ts` - Factory functions for test data
+**Status**: Ready for splitting into focused test files
+
 ## Test Files Requiring Refactoring
 
 ### Critical Priority (700+ lines)
-None remaining ✓
+None remaining ✅
 
-### High Priority (600-700 lines)
-1. `narrativeGenerator.decision-consequences.test.ts` (613 lines)
-   - Split into: integration, mapping, errors
-   - Extract: mock decision factory
-
-### Medium Priority (500-600 lines)
-1. `characterStore.test.ts` (541 lines)
-   - Split into: CRUD, relationships, validation
-
-2. `SessionBoundaryLogging.integration.test.tsx` (533 lines)
+### High Priority (500-600 lines)
+1. ⏳ `SessionBoundaryLogging.integration.test.tsx` (533 lines)
    - Split by: logging scenarios, boundary conditions
 
-3. `narrativeStore.playerDecisionTracker.integration.test.ts` (519 lines)
+2. ⏳ `narrativeStore.playerDecisionTracker.integration.test.ts` (519 lines)
    - Split by: tracker functionality, integration tests
 
-4. `loreStore.test.ts` (518 lines)
-   - Split into: CRUD, categorization, filtering
-
-5. `narrativeContextExtractor.test.ts` (513 lines)
+3. ⏳ `narrativeContextExtractor.test.ts` (513 lines)
    - Split by: extraction types, context scenarios
-
-6. `endingGenerator.test.ts` (500 lines)
-   - Split by: ending types, generation scenarios
 
 ### Standard Priority (400-500 lines)
 7-19. Various files in the 400-500 line range
