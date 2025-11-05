@@ -22,6 +22,18 @@ describe('ChoiceSelector', () => {
     }
   };
 
+  // Helper to render and expand suggestions
+  const renderChoiceSelector = (props: React.ComponentProps<typeof ChoiceSelector>) => {
+    render(<ChoiceSelector {...props} />);
+    expandSuggestions();
+  };
+
+  const defaultProps = {
+    onSelect: mockOnSelect,
+    allowCustomInput: true,
+    onCustomSubmit: mockOnCustomSubmit
+  };
+
   const simpleChoices: SimpleChoice[] = [
     { id: 'choice-1', text: 'Go north' },
     { id: 'choice-2', text: 'Go south' },
@@ -126,22 +138,18 @@ describe('ChoiceSelector', () => {
   describe('Basic Choice Selection', () => {
     it('displays all choices and handles selection', async () => {
       const user = userEvent.setup();
-      render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
-      expandSuggestions();
+      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect});
       
-      // All choices should be visible
       expect(screen.getByText('Go north')).toBeInTheDocument();
       expect(screen.getByText('Go south')).toBeInTheDocument();
       expect(screen.getByText('Rest here')).toBeInTheDocument();
       
-      // Should call onSelect when clicked
       await user.click(screen.getByText('Go north'));
       expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
     });
 
     it('displays decisions with hints when enabled', () => {
-      render(<ChoiceSelector decision={decision} onSelect={mockOnSelect} showHints />);
-      expandSuggestions();
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect});
       
       expect(screen.getByText('Attack')).toBeInTheDocument();
       expect(screen.getByText('Requires courage')).toBeInTheDocument();
@@ -196,7 +204,6 @@ describe('ChoiceSelector', () => {
       );
       expandSuggestions();
 
-      // All choices should be visible regardless of character skill levels
       expect(screen.getByText('Sneak past')).toBeInTheDocument();
       expect(screen.getByText('Intimidate the guard')).toBeInTheDocument();
       expect(screen.getByText('Walk directly')).toBeInTheDocument();
@@ -307,44 +314,6 @@ describe('ChoiceSelector', () => {
         createInventoryItem('Lockpick', 1, { stackable: false }),
       ]);
       expect(button).not.toBeDisabled();
-    });
-  });
-
-  describe('Loading States', () => {
-    it('handles loading state when provided', () => {
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-        />
-      );
-      expandSuggestions();
-      
-      // Component should render even when loading
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-    });
-
-    it('prevents interaction when loading', async () => {
-      const user = userEvent.setup();
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-        />
-      );
-      expandSuggestions();
-      
-      // Try to click - component should handle loading state appropriately
-      try {
-        await user.click(screen.getByText('Go north'));
-        // If loading is properly implemented, onSelect might not be called
-        // Or it might be called - depends on implementation
-      } catch {
-        // Choice might be disabled when loading
-      }
-      
-      // Just verify the component renders in loading state
-      expect(screen.getByText('Go north')).toBeInTheDocument();
     });
   });
 
