@@ -10,15 +10,13 @@ import {
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
-import { truncate, safeTrim, formatRelativeTime } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 
 interface CharacterContextSummary {
   threadSummary?: string;
-  lastUpdated?: string;
   relationships?: Array<{
     characterId: string;
     characterName: string;
-    description: string;
   }>;
 }
 
@@ -87,7 +85,7 @@ export function CharacterCard({
               e.stopPropagation();
               onView();
             }}
-            className="cursor-pointer float-right ml-4 mb-3"
+            className="cursor-pointer float-right ml-4 mb-6"
           >
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
@@ -136,28 +134,26 @@ export function CharacterCard({
           </p>
           {context?.threadSummary && (
             <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <h4 className="text-sm font-semibold text-gray-600 mb-1">Latest Thread</h4>
               <p className="text-sm text-gray-700">
                 {context.threadSummary}
               </p>
-              {context.lastUpdated && (
-                <p className="mt-2 text-xs text-gray-500">
-                  Updated {formatRelativeTime(context.lastUpdated)}
-                </p>
-              )}
             </div>
           )}
           {context?.relationships && context.relationships.length > 0 && (
             <div className="mt-4">
               <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
-              <ul className="space-y-1 text-xs text-gray-600">
+              <div className="flex flex-wrap gap-2">
                 {context.relationships.map((relation) => (
-                  <li key={relation.characterId}>
-                    <span className="font-medium text-gray-700">{relation.characterName}</span>
-                    {`: ${relation.description}`}
-                  </li>
+                  <Badge
+                    key={relation.characterId}
+                    variant="secondary-static"
+                    size="sm"
+                    className="text-xs"
+                  >
+                    {relation.characterName}
+                  </Badge>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           <div className="clear-both"></div>

@@ -25,7 +25,7 @@ import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { PlayerCharacterThread } from '@/types/world-state.types';
-import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
+import { summarizeThreadHighlight } from '@/lib/utils/worldStateFormatters';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -171,8 +171,7 @@ export default function CharactersPage() {
     if (!worldState) {
       return {} as Record<string, {
         threadSummary?: string;
-        lastUpdated?: string;
-        relationships: Array<{ characterId: string; characterName: string; description: string }>;
+        relationships: Array<{ characterId: string; characterName: string }>;
       }>;
     }
 
@@ -194,23 +193,20 @@ export default function CharactersPage() {
         .filter(([otherId]) => otherId !== character.id && Boolean(characters[otherId]))
         .sort(([, a], [, b]) => b.lastInteraction.localeCompare(a.lastInteraction))
         .slice(0, 2)
-        .map(([otherId, relationship]) => ({
+        .map(([otherId]) => ({
           characterId: otherId,
           characterName: characters[otherId]?.name ?? 'Unknown',
-          description: describeCharacterRelationship(relationship),
         }));
 
       acc[character.id] = {
         threadSummary: summarizeThreadHighlight(thread, 220),
-        lastUpdated: thread?.lastUpdated,
         relationships,
       };
 
       return acc;
     }, {} as Record<string, {
       threadSummary?: string;
-      lastUpdated?: string;
-      relationships: Array<{ characterId: string; characterName: string; description: string }>;
+      relationships: Array<{ characterId: string; characterName: string }>;
     }>);
   }, [worldState, worldCharacters, characters]);
 

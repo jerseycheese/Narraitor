@@ -255,10 +255,10 @@ test.describe('Character roster context', () => {
     await expect(cards).toHaveCount(2);
 
     await expect(cards.first().locator('text=Investigating the ruins near the falls.')).toBeVisible();
-    await expect(cards.first().locator('text=Envoy Beta: warm, high trust, tense')).toBeVisible();
+    await expect(cards.first().locator('text=Envoy Beta')).toBeVisible();
 
     await expect(cards.nth(1).locator('text=Monitoring the northern pass for unrest.')).toBeVisible();
-    await expect(cards.nth(1).locator('text=Hero Alpha: cautious, guarded trust, steady')).toBeVisible();
+    await expect(cards.nth(1).locator('text=Hero Alpha')).toBeVisible();
 
     await expect(page).toHaveScreenshot('characters-roster.png', {
       animations: 'disabled',
