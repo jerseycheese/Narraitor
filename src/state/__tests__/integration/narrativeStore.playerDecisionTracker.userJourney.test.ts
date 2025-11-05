@@ -24,8 +24,10 @@ import {
   recordDecisionInTracker
 } from './narrativeStore.playerDecisionTracker.testHelpers';
 import { PlayerDecisionTracker } from '../../../lib/ai/playerDecisionTracker';
-import { DecisionOption } from '../../../types/narrative.types';
+import { DecisionOption, NarrativeSegment } from '../../../types/narrative.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+
+type SegmentInput = Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>;
 
 describe('NarrativeStore ↔ PlayerDecisionTracker User Journey Integration', () => {
   let testTracker: PlayerDecisionTracker;
@@ -172,7 +174,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker User Journey Integration', ()
       // Create party scenario context
       store.addSegment(sessionId, createTempleSegment(sessionId, worldId, playerCharacterId, companionCharacterId));
 
-      store.addSegment(sessionId, {
+      const guardianWarningSegment: SegmentInput = {
         worldId,
         content: 'The guardian spirit warns that opening the door will release both great knowledge and terrible danger.',
         type: 'dialogue',
@@ -182,7 +184,8 @@ describe('NarrativeStore ↔ PlayerDecisionTracker User Journey Integration', ()
         },
         updatedAt: getTimestamp(),
         timestamp: new Date()
-      });
+      };
+      store.addSegment(sessionId, guardianWarningSegment);
 
       // Player decision
       const playerDecisionId = store.addDecision(sessionId, {

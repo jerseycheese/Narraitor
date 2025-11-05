@@ -4,9 +4,14 @@
 
 import { PlayerDecisionTracker } from '../../../lib/ai/playerDecisionTracker';
 import { useNarrativeStore } from '../../narrativeStore';
-import { DecisionOption } from '../../../types/narrative.types';
+import { DecisionOption, NarrativeSegment } from '../../../types/narrative.types';
 import { ChoiceTypePreference } from '../../../types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+
+/**
+ * Type for segment data passed to addSegment
+ */
+type SegmentInput = Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>;
 
 /**
  * Creates a test instance of PlayerDecisionTracker isolated from global state
@@ -84,10 +89,10 @@ export const TEST_IDS = {
 /**
  * Creates a marketplace scene segment
  */
-export const createMarketplaceSegment = (sessionId: string, worldId: string) => ({
+export const createMarketplaceSegment = (sessionId: string, worldId: string): SegmentInput => ({
   worldId,
   content: 'You enter the bustling marketplace of Rivertown, filled with merchants and travelers.',
-  type: 'scene' as const,
+  type: 'scene',
   metadata: {
     tags: ['marketplace', 'social', 'entry'],
     location: 'Rivertown Marketplace',
@@ -100,10 +105,10 @@ export const createMarketplaceSegment = (sessionId: string, worldId: string) => 
 /**
  * Creates a merchant encounter segment
  */
-export const createMerchantEncounterSegment = (sessionId: string, worldId: string, characterId: string) => ({
+export const createMerchantEncounterSegment = (sessionId: string, worldId: string, characterId: string): SegmentInput => ({
   worldId,
   content: 'A distressed merchant approaches you, wringing his hands nervously.',
-  type: 'dialogue' as const,
+  type: 'dialogue',
   characterIds: [characterId, 'merchant-desperate'],
   metadata: {
     tags: ['encounter', 'merchant', 'distress'],
@@ -116,10 +121,10 @@ export const createMerchantEncounterSegment = (sessionId: string, worldId: strin
 /**
  * Creates a merchant plea segment
  */
-export const createMerchantPleaSegment = (sessionId: string, worldId: string, characterId: string) => ({
+export const createMerchantPleaSegment = (sessionId: string, worldId: string, characterId: string): SegmentInput => ({
   worldId,
   content: '"Please, adventurer! Bandits stole my entire shipment on the road from Millhaven!"',
-  type: 'dialogue' as const,
+  type: 'dialogue',
   characterIds: [characterId, 'merchant-desperate'],
   metadata: {
     tags: ['plea', 'backstory', 'quest-hook']
@@ -131,10 +136,10 @@ export const createMerchantPleaSegment = (sessionId: string, worldId: string, ch
 /**
  * Creates a temple scene segment
  */
-export const createTempleSegment = (sessionId: string, worldId: string, playerCharacterId: string, companionCharacterId: string) => ({
+export const createTempleSegment = (sessionId: string, worldId: string, playerCharacterId: string, companionCharacterId: string): SegmentInput => ({
   worldId,
   content: 'Your party stands before the ancient sealed door of the lost temple.',
-  type: 'scene' as const,
+  type: 'scene',
   characterIds: [playerCharacterId, companionCharacterId, 'temple-guardian'],
   metadata: {
     tags: ['temple', 'party', 'ancient', 'mystery'],
