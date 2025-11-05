@@ -3,7 +3,6 @@
  * Provides shared setup and mock utilities
  */
 
-import { NarrativeGenerator } from '../narrativeGenerator';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
