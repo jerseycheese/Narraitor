@@ -5,10 +5,11 @@ This document outlines the systematic approach to refactoring test files that ex
 
 ## Progress Summary
 - **Original scan**: 48 files over 300 lines
-- **Current scan**: 40 files over 300 lines (after recent refactorings)
-- **Files refactored this session**: 1 (IndexedDB Adapter)
-- **Test helpers created**: 2 (IndexedDB, DecisionFormatter)
-- **Remaining work**: ~40 files
+- **Previous refactorings**: ~8 files (CharacterStore, LoreStore, EndingGenerator, etc.)
+- **This session**: 3 files refactored (IndexedDB, SessionBoundaryLogging, DecisionFormatter)
+- **Test helpers created**: 4 (IndexedDB, SessionBoundaryLogging, DecisionFormatter, PlayerDecisionTracker)
+- **Current status**: ~37 files remaining over 300 lines
+- **Lines reduced**: 1,762 lines → 1,158 lines (604 lines eliminated through helpers)
 
 ## Refactoring Pattern
 
@@ -73,9 +74,33 @@ Already refactored in previous work:
 - `endingGenerator.errors.test.ts` (145 lines)
 - `endingGenerator.advanced.test.ts` (222 lines)
 
-### DecisionFormatter (In Progress) 🚧
-**Helper created**: `decisionFormatter.testHelpers.ts` - Factory functions for test data
-**Status**: Ready for splitting into focused test files
+### DecisionFormatter (493 → 4 files) ✅
+**Original**: `src/lib/ai/__tests__/decisionFormatter.test.ts` (493 lines)
+
+**Refactored to**:
+- `decisionFormatter.testHelpers.ts` (143 lines) - Test data factories
+- `decisionFormatter.formatting.test.ts` (127 lines) - Formatting logic tests
+- `decisionFormatter.edgeCases.test.ts` (93 lines) - Edge case handling
+- `decisionFormatter.adaptiveLevels.test.ts` (100 lines) - Adaptive formatting tests
+
+**Key improvements**:
+- Eliminated duplicate test data creation
+- Clear separation by functional concern
+- Reusable test data factories
+
+### SessionBoundaryLogging (533 → 4 files) ✅
+**Original**: `src/components/GameSession/__tests__/SessionBoundaryLogging.integration.test.tsx` (533 lines)
+
+**Refactored to**:
+- `SessionBoundaryLogging.testHelpers.tsx` (122 lines) - Mock factories and setup
+- `SessionBoundaryLogging.sessionStart.test.tsx` (148 lines) - Session start workflow
+- `SessionBoundaryLogging.sessionEnd.test.tsx` (143 lines) - Session end workflow
+- `SessionBoundaryLogging.lifecycle.test.tsx` (160 lines) - Complete lifecycle tests
+
+**Key improvements**:
+- Extracted complex mock setup to helpers
+- Each workflow tested independently
+- Reduced mock duplication by ~200 lines
 
 ## Test Files Requiring Refactoring
 
