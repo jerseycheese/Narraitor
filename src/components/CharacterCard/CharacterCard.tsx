@@ -17,6 +17,7 @@ interface CharacterContextSummary {
   relationships?: Array<{
     characterId: string;
     characterName: string;
+    portraitUrl?: string | null;
   }>;
 }
 
@@ -144,14 +145,26 @@ export function CharacterCard({
               <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
               <div className="flex flex-wrap gap-2">
                 {context.relationships.map((relation) => (
-                  <Badge
+                  <div
                     key={relation.characterId}
-                    variant="secondary-static"
-                    size="sm"
-                    className="text-xs"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-sm font-medium text-blue-700"
                   >
-                    {relation.characterName}
-                  </Badge>
+                    {relation.portraitUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={relation.portraitUrl}
+                        alt={`${relation.characterName} portrait`}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
+                          {relation.characterName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-sm leading-snug">{relation.characterName}</span>
+                  </div>
                 ))}
               </div>
             </div>

@@ -171,7 +171,7 @@ export default function CharactersPage() {
     if (!worldState) {
       return {} as Record<string, {
         threadSummary?: string;
-        relationships: Array<{ characterId: string; characterName: string }>;
+        relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
       }>;
     }
 
@@ -193,10 +193,14 @@ export default function CharactersPage() {
         .filter(([otherId]) => otherId !== character.id && Boolean(characters[otherId]))
         .sort(([, a], [, b]) => b.lastInteraction.localeCompare(a.lastInteraction))
         .slice(0, 2)
-        .map(([otherId]) => ({
-          characterId: otherId,
-          characterName: characters[otherId]?.name ?? 'Unknown',
-        }));
+        .map(([otherId]) => {
+          const relatedCharacter = characters[otherId];
+          return {
+            characterId: otherId,
+            characterName: relatedCharacter?.name ?? 'Unknown',
+            portraitUrl: relatedCharacter?.portrait?.url ?? null,
+          };
+        });
 
       acc[character.id] = {
         threadSummary: summarizeThreadHighlight(thread, 220),
@@ -206,7 +210,7 @@ export default function CharactersPage() {
       return acc;
     }, {} as Record<string, {
       threadSummary?: string;
-      relationships: Array<{ characterId: string; characterName: string }>;
+      relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
     }>);
   }, [worldState, worldCharacters, characters]);
 
