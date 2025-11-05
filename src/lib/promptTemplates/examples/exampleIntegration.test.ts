@@ -126,10 +126,16 @@ describe('Example Library Template Integration', () => {
         worldName: 'Test World',
         genre: 'fantasy',
         narrativeContext: {
+          worldId: 'test-world',
+          currentSceneId: 'test-scene',
+          characterIds: [],
+          previousSegments: [],
+          currentTags: [],
+          sessionId: 'test-session',
           recentSegments: [
             { content: 'You attempt to pick the lock.' },
           ],
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         playerCharacterName: 'Hero',
         skillUsed: {
           skillId: 'lockpicking',
@@ -151,10 +157,16 @@ describe('Example Library Template Integration', () => {
         worldName: 'Test World',
         genre: 'fantasy',
         narrativeContext: {
+          worldId: 'test-world',
+          currentSceneId: 'test-scene',
+          characterIds: [],
+          previousSegments: [],
+          currentTags: [],
+          sessionId: 'test-session',
           recentSegments: [
             { content: 'You attempt to pick the lock.' },
           ],
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         playerCharacterName: 'Hero',
         skillUsed: {
           skillId: 'lockpicking',
@@ -175,10 +187,16 @@ describe('Example Library Template Integration', () => {
         worldName: 'Test World',
         genre: 'fantasy',
         narrativeContext: {
+          worldId: 'test-world',
+          currentSceneId: 'test-scene',
+          characterIds: [],
+          previousSegments: [],
+          currentTags: [],
+          sessionId: 'test-session',
           recentSegments: [
             { content: 'You perform a custom action.' },
           ],
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         playerCharacterName: 'Hero',
         // skillUsed is undefined - custom action without explicit result
         customAction: {
@@ -200,10 +218,16 @@ describe('Example Library Template Integration', () => {
         worldName: 'Test World',
         genre: 'fantasy',
         narrativeContext: {
+          worldId: 'test-world',
+          currentSceneId: 'test-scene',
+          characterIds: [],
+          previousSegments: [],
+          currentTags: [],
+          sessionId: 'test-session',
           recentSegments: [
             { content: 'You perform an action.' },
           ],
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         playerCharacterName: 'Hero',
         skillUsed: {
           skillId: 'custom',
