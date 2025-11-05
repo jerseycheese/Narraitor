@@ -6,22 +6,39 @@ const originalEnv = process.env.NODE_ENV;
 
 describe('debugInfoBuilder', () => {
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    // Restore original environment
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 
   describe('isDebugInfoEnabled', () => {
     it('should return true in development mode', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true,
+      });
       expect(isDebugInfoEnabled()).toBe(true);
     });
 
     it('should return false in production mode', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true,
+      });
       expect(isDebugInfoEnabled()).toBe(false);
     });
 
     it('should return false in test mode', () => {
-      process.env.NODE_ENV = 'test';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'test',
+        writable: true,
+        configurable: true,
+      });
       expect(isDebugInfoEnabled()).toBe(false);
     });
   });
@@ -31,12 +48,17 @@ describe('debugInfoBuilder', () => {
       id: 'world-1',
       name: 'Test World',
       description: 'A test world',
-      tone: 'mysterious',
-      imageStyle: 'fantasy',
+      genre: 'fantasy',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
       attributes: [],
-      worldStateThreads: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 30,
+      },
     };
 
     it('should build basic debug info', () => {
@@ -62,8 +84,8 @@ describe('debugInfoBuilder', () => {
         world: mockWorld,
         modelUsed: 'gemini-2.0-flash',
         toneSettings: {
-          contentRating: 'teen',
-          narrativeStyle: 'descriptive',
+          contentRating: 'PG-13',
+          narrativeStyle: 'dramatic',
           languageComplexity: 'moderate',
           customInstructions: 'Keep it light',
         },

@@ -158,7 +158,7 @@ describe('PromptDebugSection', () => {
     render(<PromptDebugSection debugInfo={debugInfoWithPrevious} />);
 
     expect(screen.getByText(/Previous Segment/i)).toBeInTheDocument();
-    expect(screen.getByText(/scene/i)).toBeInTheDocument();
+    expect(screen.getByText(/Type: scene/i)).toBeInTheDocument();
     expect(screen.getByText(/You enter the dark cave/i)).toBeInTheDocument();
   });
 
@@ -171,15 +171,18 @@ describe('PromptDebugSection', () => {
     const user = userEvent.setup();
     render(<PromptDebugSection debugInfo={mockDebugInfo} />);
 
-    // Section starts collapsed - full prompt should not be visible
-    expect(screen.queryByText('Test prompt text that was sent to the AI')).not.toBeInTheDocument();
+    // Section starts collapsed - content should be hidden
+    const allContents = screen.getAllByTestId('collapsible-section-content');
+    const mainContent = allContents[0]; // First collapsible is the main section
+    expect(mainContent).toHaveClass('hidden');
 
-    // Click to expand
-    const toggleButton = screen.getByRole('button', { name: /Prompt Debug Info/i });
+    // Click to expand using the toggle button
+    const toggleButton = screen.getByRole('button', { name: /Expand.*Prompt Debug Info/i });
     await user.click(toggleButton);
 
-    // Now the template name should be visible
-    expect(screen.getByText('Scene Template')).toBeInTheDocument();
+    // Now the content should be visible
+    expect(mainContent).not.toHaveClass('hidden');
+    expect(screen.getByText('Scene Template')).toBeVisible();
   });
 
   it('should have nested collapsible for full prompt', async () => {
@@ -187,18 +190,24 @@ describe('PromptDebugSection', () => {
     render(<PromptDebugSection debugInfo={mockDebugInfo} />);
 
     // Expand main section
-    const mainToggle = screen.getByRole('button', { name: /Prompt Debug Info/i });
+    const mainToggle = screen.getByRole('button', { name: /Expand.*Prompt Debug Info/i });
     await user.click(mainToggle);
 
-    // Full prompt text is nested and starts collapsed
-    expect(screen.queryByText('Test prompt text that was sent to the AI')).not.toBeInTheDocument();
+    // Full prompt section should now be visible but still collapsed
+    const nestedToggle = screen.getByRole('button', { name: /Expand Full Prompt Text/i });
+    expect(nestedToggle).toBeInTheDocument();
 
-    // Find and click the full prompt toggle
-    const promptToggle = screen.getByRole('button', { name: /Full Prompt Text/i });
-    await user.click(promptToggle);
+    // Full prompt text starts collapsed - find the nested content
+    const allContents = screen.getAllByTestId('collapsible-section-content');
+    const nestedContent = allContents[1]; // Second collapsible is the nested one
+    expect(nestedContent).toHaveClass('hidden');
+
+    // Click the nested toggle to expand
+    await user.click(nestedToggle);
 
     // Now full prompt should be visible
-    expect(screen.getByText('Test prompt text that was sent to the AI')).toBeInTheDocument();
+    expect(nestedContent).not.toHaveClass('hidden');
+    expect(screen.getByText('Test prompt text that was sent to the AI')).toBeVisible();
   });
 
   it('should not display optional sections when data is missing', () => {

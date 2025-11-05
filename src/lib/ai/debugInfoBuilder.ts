@@ -51,7 +51,7 @@ export function buildPromptDebugInfo(context: DebugInfoContext): PromptDebugInfo
   // Build tone settings object
   const toneSettingsInfo = context.toneSettings
     ? {
-        mood: context.world.tone || undefined,
+        mood: context.world.toneSettings?.narrativeStyle || undefined,
         complexity: context.toneSettings.languageComplexity,
         customTone: context.toneSettings.customInstructions || undefined,
       }
@@ -174,7 +174,8 @@ function extractInventoryItemsFromPrompt(fullPrompt: string): Array<{
   }> = [];
 
   // Find the inventory section in the prompt
-  const inventoryMatch = fullPrompt.match(/INVENTORY CONTEXT:([\s\S]*?)(?=\n\n[A-Z]|$)/);
+  // Match until we hit a double newline followed by a major section header (all caps + CONTEXT/GOALS), or end of string
+  const inventoryMatch = fullPrompt.match(/INVENTORY CONTEXT:([\s\S]*?)(?=\n\n[A-Z\s]+(CONTEXT|GOALS):|$)/);
   if (!inventoryMatch) {
     return items;
   }
