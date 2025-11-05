@@ -1,8 +1,8 @@
-import type { Character } from '@/types/character.types';
+import type { Character } from '@/state/characterStore';
 
 /**
  * Test fixture data for Character entities
- * Used in visual regression tests and integration tests
+ * Uses the store shape (not domain type) for visual regression tests
  */
 
 export const SAMPLE_CHARACTERS: Character[] = [
@@ -11,28 +11,40 @@ export const SAMPLE_CHARACTERS: Character[] = [
     name: 'Nova "Ghost" Chen',
     description: 'Elite corporate hacker turned underground resistance fighter',
     worldId: 'world-cyberpunk-2077',
+    level: 3,
+    isPlayer: true,
     attributes: [
       {
-        attributeId: 'attr-world-cyberpunk-2077-1', // Tech Level
-        value: 8,
+        id: 'char-attr-tech-level',
+        characterId: 'char-cyberpunk-hacker',
+        worldAttributeId: 'attr-world-cyberpunk-2077-1',
+        name: 'Tech Level',
+        baseValue: 8,
+        modifiedValue: 8,
       },
       {
-        attributeId: 'attr-world-cyberpunk-2077-2', // Street Cred
-        value: 6,
+        id: 'char-attr-street-cred',
+        characterId: 'char-cyberpunk-hacker',
+        worldAttributeId: 'attr-world-cyberpunk-2077-2',
+        name: 'Street Cred',
+        baseValue: 6,
+        modifiedValue: 6,
       },
     ],
     skills: [
       {
-        skillId: 'skill-world-cyberpunk-2077-1', // Hacking
+        id: 'char-skill-hacking',
+        characterId: 'char-cyberpunk-hacker',
+        worldSkillId: 'skill-world-cyberpunk-2077-1',
+        name: 'Hacking',
         level: 12,
-        experience: 0,
-        isActive: true,
       },
       {
-        skillId: 'skill-world-cyberpunk-2077-2', // Streetwise
+        id: 'char-skill-streetwise',
+        characterId: 'char-cyberpunk-hacker',
+        worldSkillId: 'skill-world-cyberpunk-2077-2',
+        name: 'Streetwise',
         level: 8,
-        experience: 0,
-        isActive: true,
       },
     ],
     background: {
@@ -74,28 +86,40 @@ export const SAMPLE_CHARACTERS: Character[] = [
     name: 'Kade "Null" Armitage',
     description: 'Field operative who prefers to stay off-grid',
     worldId: 'world-cyberpunk-2077',
+    level: 2,
+    isPlayer: false,
     attributes: [
       {
-        attributeId: 'attr-world-cyberpunk-2077-1', // Tech Level
-        value: 5,
+        id: 'char-attr-tech-level-2',
+        characterId: 'char-cyberpunk-operative',
+        worldAttributeId: 'attr-world-cyberpunk-2077-1',
+        name: 'Tech Level',
+        baseValue: 5,
+        modifiedValue: 5,
       },
       {
-        attributeId: 'attr-world-cyberpunk-2077-2', // Street Cred
-        value: 7,
+        id: 'char-attr-street-cred-2',
+        characterId: 'char-cyberpunk-operative',
+        worldAttributeId: 'attr-world-cyberpunk-2077-2',
+        name: 'Street Cred',
+        baseValue: 7,
+        modifiedValue: 7,
       },
     ],
     skills: [
       {
-        skillId: 'skill-world-cyberpunk-2077-1', // Hacking (placeholder)
+        id: 'char-skill-hacking-2',
+        characterId: 'char-cyberpunk-operative',
+        worldSkillId: 'skill-world-cyberpunk-2077-1',
+        name: 'Hacking',
         level: 6,
-        experience: 0,
-        isActive: true,
       },
       {
-        skillId: 'skill-world-cyberpunk-2077-2', // Streetwise (placeholder)
+        id: 'char-skill-streetwise-2',
+        characterId: 'char-cyberpunk-operative',
+        worldSkillId: 'skill-world-cyberpunk-2077-2',
+        name: 'Streetwise',
         level: 5,
-        experience: 0,
-        isActive: true,
       },
     ],
     background: {
@@ -129,28 +153,40 @@ export const SAMPLE_CHARACTERS: Character[] = [
     name: 'Lyralei Moonwhisper',
     description: 'Young elven archmage seeking to restore balance to the realm',
     worldId: 'world-fantasy-realm',
+    level: 4,
+    isPlayer: true,
     attributes: [
       {
-        attributeId: 'attr-world-fantasy-realm-1', // Magic Power
-        value: 9,
+        id: 'char-attr-magic-power',
+        characterId: 'char-fantasy-mage',
+        worldAttributeId: 'attr-world-fantasy-realm-1',
+        name: 'Magic Power',
+        baseValue: 9,
+        modifiedValue: 9,
       },
       {
-        attributeId: 'attr-world-fantasy-realm-2', // Noble Standing
-        value: 4,
+        id: 'char-attr-noble-standing',
+        characterId: 'char-fantasy-mage',
+        worldAttributeId: 'attr-world-fantasy-realm-2',
+        name: 'Noble Standing',
+        baseValue: 4,
+        modifiedValue: 4,
       },
     ],
     skills: [
       {
-        skillId: 'skill-world-fantasy-realm-1', // Spellcasting
+        id: 'char-skill-spellcasting',
+        characterId: 'char-fantasy-mage',
+        worldSkillId: 'skill-world-fantasy-realm-1',
+        name: 'Spellcasting',
         level: 14,
-        experience: 0,
-        isActive: true,
       },
       {
-        skillId: 'skill-world-fantasy-realm-2', // Dragon Lore
+        id: 'char-skill-lore',
+        characterId: 'char-fantasy-mage',
+        worldSkillId: 'skill-world-fantasy-realm-2',
+        name: 'Dragon Lore',
         level: 7,
-        experience: 0,
-        isActive: true,
       },
     ],
     background: {
@@ -186,28 +222,40 @@ export const SAMPLE_CHARACTERS: Character[] = [
     name: 'Thalen Oakstride',
     description: 'Ranger of Aethermoor sworn to protect ancient paths',
     worldId: 'world-fantasy-realm',
+    level: 2,
+    isPlayer: false,
     attributes: [
       {
-        attributeId: 'attr-world-fantasy-realm-1', // Magic Power
-        value: 3,
+        id: 'char-attr-magic-power-2',
+        characterId: 'char-fantasy-ranger',
+        worldAttributeId: 'attr-world-fantasy-realm-1',
+        name: 'Magic Power',
+        baseValue: 3,
+        modifiedValue: 3,
       },
       {
-        attributeId: 'attr-world-fantasy-realm-2', // Noble Standing
-        value: 1,
+        id: 'char-attr-noble-standing-2',
+        characterId: 'char-fantasy-ranger',
+        worldAttributeId: 'attr-world-fantasy-realm-2',
+        name: 'Noble Standing',
+        baseValue: 1,
+        modifiedValue: 1,
       },
     ],
     skills: [
       {
-        skillId: 'skill-world-fantasy-realm-1', // Spellcasting (minimal)
+        id: 'char-skill-spellcasting-2',
+        characterId: 'char-fantasy-ranger',
+        worldSkillId: 'skill-world-fantasy-realm-1',
+        name: 'Spellcasting',
         level: 2,
-        experience: 0,
-        isActive: true,
       },
       {
-        skillId: 'skill-world-fantasy-realm-2', // Dragon Lore
+        id: 'char-skill-lore-2',
+        characterId: 'char-fantasy-ranger',
+        worldSkillId: 'skill-world-fantasy-realm-2',
+        name: 'Dragon Lore',
         level: 9,
-        experience: 0,
-        isActive: true,
       },
     ],
     background: {

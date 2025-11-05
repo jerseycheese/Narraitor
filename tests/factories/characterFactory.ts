@@ -1,8 +1,9 @@
 import { Factory } from 'fishery';
-import type { Character } from '@/types/character.types';
+import type { Character, CharacterAttribute, CharacterSkill } from '@/state/characterStore';
 
 /**
  * Factory for generating Character test data
+ * Uses the store shape (not domain type) for consistency with visual tests
  *
  * Usage:
  * ```typescript
@@ -12,7 +13,9 @@ import type { Character } from '@/types/character.types';
  * // Override specific properties
  * const hacker = characterFactory.build({
  *   name: 'Nova Chen',
- *   worldId: 'world-cyberpunk-2077'
+ *   worldId: 'world-cyberpunk-2077',
+ *   level: 5,
+ *   isPlayer: true
  * });
  *
  * // Generate multiple characters
@@ -24,6 +27,8 @@ export const characterFactory = Factory.define<Character>(({ sequence }) => ({
   name: `Test Character ${sequence}`,
   description: `A test character for testing purposes`,
   worldId: `world-${sequence}`,
+  level: 1,
+  isPlayer: true,
   attributes: [],
   skills: [],
   background: {
@@ -52,23 +57,28 @@ export const characterFactory = Factory.define<Character>(({ sequence }) => ({
 }));
 
 /**
- * Factory for generating CharacterAttribute test data
+ * Factory for generating CharacterAttribute test data (store shape)
  */
-export const characterAttributeFactory = Factory.define<Character['attributes'][0]>(
+export const characterAttributeFactory = Factory.define<CharacterAttribute>(
   ({ sequence }) => ({
-    attributeId: `attr-${sequence}`,
-    value: 5,
+    id: `char-attr-${sequence}`,
+    characterId: `char-${sequence}`,
+    worldAttributeId: `attr-${sequence}`,
+    name: `Attribute ${sequence}`,
+    baseValue: 5,
+    modifiedValue: 5,
   })
 );
 
 /**
- * Factory for generating CharacterSkill test data
+ * Factory for generating CharacterSkill test data (store shape)
  */
-export const characterSkillFactory = Factory.define<Character['skills'][0]>(
+export const characterSkillFactory = Factory.define<CharacterSkill>(
   ({ sequence }) => ({
-    skillId: `skill-${sequence}`,
+    id: `char-skill-${sequence}`,
+    characterId: `char-${sequence}`,
+    worldSkillId: `skill-${sequence}`,
+    name: `Skill ${sequence}`,
     level: 1,
-    experience: 0,
-    isActive: true,
   })
 );
