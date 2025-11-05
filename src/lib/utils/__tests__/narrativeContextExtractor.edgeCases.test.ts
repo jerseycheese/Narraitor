@@ -13,7 +13,6 @@ import {
   createSequentialSegments,
   createEmptyContentSegment,
   createCharacterSegment,
-  createLocationSegment,
   extractDecisionContext
 } from './narrativeContextExtractor.testHelpers';
 
