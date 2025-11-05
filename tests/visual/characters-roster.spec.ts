@@ -259,5 +259,10 @@ test.describe('Character roster context', () => {
 
     await expect(cards.nth(1).locator('text=Monitoring the northern pass for unrest.')).toBeVisible();
     await expect(cards.nth(1).locator('text=Hero Alpha: cautious, guarded trust, steady')).toBeVisible();
+
+    await expect(page).toHaveScreenshot('characters-roster.png', {
+      animations: 'disabled',
+      fullPage: true,
+    });
   });
 });
