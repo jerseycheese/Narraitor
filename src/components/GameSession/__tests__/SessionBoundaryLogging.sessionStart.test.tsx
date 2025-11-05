@@ -5,11 +5,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useJournalStore } from '@/state/journalStore';
 import {
   setupMockStores,
-  setupSessionStoreStatics,
-  mockUseSessionStore,
-  mockUseJournalStore,
-  createMockSessionStore,
-  createMockJournalStore
+  setupSessionStoreStatics
 } from './SessionBoundaryLogging.testHelpers';
 
 // Mock the stores

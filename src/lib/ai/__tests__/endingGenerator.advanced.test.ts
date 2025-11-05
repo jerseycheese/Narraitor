@@ -4,8 +4,6 @@
  * Verifies play time calculation, custom prompts, and ending type variations.
  */
 
-import { getTimestamp } from '@/lib/utils/timestamp';
-
 // Mock modules
 jest.mock('../../../state/sessionStore', () => ({
   useSessionStore: {

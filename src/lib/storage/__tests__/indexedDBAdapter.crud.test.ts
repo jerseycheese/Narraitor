@@ -65,7 +65,6 @@ describe('IndexedDBAdapter - CRUD Operations', () => {
     });
 
     test('should handle IndexedDB errors gracefully', async () => {
-      const mockDB2 = createMockDB();
       const mockIDB2 = createMockIDB();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

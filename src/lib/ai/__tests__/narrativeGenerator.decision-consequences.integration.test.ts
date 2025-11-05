@@ -12,8 +12,7 @@ import { PlayerDecision } from '@/types/personalization.types';
 import {
   setupFakeTimers,
   createPastDecisions,
-  setupDecisionConsequencesMocks,
-  mockPlayerDecisionTracker
+  setupDecisionConsequencesMocks
 } from './narrativeGenerator.decisionConsequences.testHelpers';
 
 // Mock the store modules

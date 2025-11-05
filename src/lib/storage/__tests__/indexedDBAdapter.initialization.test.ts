@@ -2,8 +2,7 @@ import { IndexedDBAdapter } from '../indexedDBAdapter';
 import {
   createMockDB,
   createMockIDB,
-  createMockRequest,
-  setupSuccessfulOpen
+  createMockRequest
 } from './indexedDBAdapter.testHelpers';
 
 describe('IndexedDBAdapter - Initialization', () => {

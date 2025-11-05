@@ -6,7 +6,6 @@ import { getTimestamp } from '@/lib/utils/timestamp';
 import {
   setupMockStores,
   setupSessionStoreStatics,
-  mockUseSessionStore,
   mockUseJournalStore
 } from './SessionBoundaryLogging.testHelpers';
 

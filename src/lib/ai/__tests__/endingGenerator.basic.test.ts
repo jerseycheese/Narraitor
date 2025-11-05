@@ -4,8 +4,6 @@
  * Verifies core ending generation with required fields and tone handling.
  */
 
-import { getTimestamp } from '@/lib/utils/timestamp';
-
 // Mock modules
 jest.mock('../../../state/sessionStore', () => ({
   useSessionStore: {

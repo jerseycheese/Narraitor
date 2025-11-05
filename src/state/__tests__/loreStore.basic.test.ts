@@ -7,11 +7,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useLoreStore } from '../loreStore';
 import {
-  setupLoreStore,
-  addFact,
-  addMultipleFacts,
-  createCharacterFacts,
-  createLocationFacts
+  setupLoreStore
 } from './loreStore.testHelpers';
 
 describe('LoreStore - Basic Operations', () => {
