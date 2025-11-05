@@ -3,10 +3,10 @@
  * Provides reusable utilities for testing lore functionality
  */
 
-import { renderHook, act, RenderHookResult } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useLoreStore } from '../loreStore';
 
-type LoreStoreResult = RenderHookResult<ReturnType<typeof useLoreStore>, unknown>['result'];
+type LoreStoreHook = ReturnType<typeof useLoreStore>;
 
 /**
  * Sets up a fresh lore store and clears test worlds
@@ -25,7 +25,7 @@ export function setupLoreStore(worldIds: string[] = ['test-world', 'world-1', 'w
  * Adds a fact to the store using act
  */
 export function addFact(
-  result: LoreStoreResult,
+  result: { current: LoreStoreHook },
   key: string,
   value: string,
   category: string,
@@ -41,7 +41,7 @@ export function addFact(
  * Adds multiple facts to the store
  */
 export function addMultipleFacts(
-  result: LoreStoreResult,
+  result: { current: LoreStoreHook },
   facts: Array<{
     key: string;
     value: string;

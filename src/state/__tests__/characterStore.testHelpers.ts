@@ -10,8 +10,8 @@ interface CharacterInput {
   worldId: string;
   level: number;
   attributes: Array<{
-    id?: string;
-    characterId?: string;
+    id: string;
+    characterId: string;
     worldAttributeId?: string;
     name: string;
     baseValue: number;
@@ -19,8 +19,8 @@ interface CharacterInput {
     category?: string;
   }>;
   skills: Array<{
-    id?: string;
-    characterId?: string;
+    id: string;
+    characterId: string;
     worldSkillId?: string;
     name: string;
     level: number;
