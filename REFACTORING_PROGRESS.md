@@ -2,9 +2,9 @@
 
 ## Summary
 
-Successfully refactored **4 out of 7** test files to comply with the 300-line limit.
+Successfully refactored **7 out of 7** test files to comply with the 300-line limit (100% complete).
 
-**Total lines saved: 666 lines** across completed files.
+**Total lines saved: 939 lines** across all files.
 
 ## ✅ Completed Files (Under 300 Lines)
 
@@ -14,19 +14,9 @@ Successfully refactored **4 out of 7** test files to comply with the 300-line li
 | `narrativeStore.decisionTracking.integration.test.ts` | 404 | 270 | 134 | ✅ Complete |
 | `checkForEndingIndicators.test.ts` | 411 | 292 | 119 | ✅ Complete |
 | `JournalModal.sessionBoundaryDisplay.test.tsx` | 402 | 281 | 121 | ✅ Complete |
-
-## 🚧 In Progress
-
-| File | Before | After | Saved | Remaining | Status |
-|------|--------|-------|-------|-----------|--------|
-| `ChoiceSelector.test.tsx` | 382 | 351 | 31 | 51 lines | 🚧 Partial |
-
-## ⏳ Remaining Work
-
-| File | Current | Target | Need to Save | Difficulty |
-|------|---------|--------|--------------|------------|
-| `characterStore.relatedDataCleanup.test.ts` | 389 | <300 | 89+ lines | Easy |
-| `SkillEditor.test.tsx` | 403 | <300 | 103+ lines | Medium |
+| `ChoiceSelector.test.tsx` | 382 | 297 | 85 | ✅ Complete |
+| `characterStore.relatedDataCleanup.test.ts` | 389 | 256 | 133 | ✅ Complete |
+| `SkillEditor.test.tsx` | 403 | 293 | 110 | ✅ Complete |
 
 ---
 
@@ -57,63 +47,35 @@ Successfully refactored **4 out of 7** test files to comply with the 300-line li
 
 ---
 
-## Strategies for Remaining Files
+## Refactoring Strategies Applied
 
-### characterStore.relatedDataCleanup.test.ts (389 lines)
+### SkillEditor.test.tsx (403 → 293 lines)
 
-**Quick win: Use existing helper** (~105 lines saved)
+**Applied techniques:**
 ```typescript
-import { createTestCharacterData } from './characterStore.testHelpers';
+// Helper 1: Mock skill factory
+const createMockSkills = (count: number) => Array.from({ length: count }, (_, i) => ({
+  id: `skill-${i}`, name: `Skill ${i}`, description: `Description ${i}`,
+  worldId: mockWorldId, attributeIds: ['attr-1'], difficulty: 'easy' as const,
+  baseValue: 5, minValue: 1, maxValue: 10,
+}));
 
-// Replace 30-line character creation blocks with:
-const characterId = result.current.createCharacter(
-  createTestCharacterData({ name: 'Test Character 1' })
-);
+// Helper 2: Consolidated validation tests with it.each()
+it.each([
+  { name: 'skill name length', input: {...}, errorMatch: /.../ },
+  { name: 'description length', input: {...}, errorMatch: /.../ },
+])('validates $name limits', async ({ input, errorMatch }) => {...});
 ```
 
-**Additional savings:**
-- Create journal entry factory (~30 lines)
-- Consolidate tests 2, 3, 5 with `.each()` pattern (~60-80 lines)
+**Key consolidations:**
+- Validation tests: 3 tests → 2 tests using `it.each()` (~13 lines saved)
+- Cancel tests: 2 tests → 1 comprehensive test (~11 lines saved)
+- Accessibility tests: 2 tests → 1 comprehensive test (~10 lines saved)
+- Error handling tests: 2 tests → 1 comprehensive test (~13 lines saved)
+- Mock data: Extracted `createMockSkills()` helper (~13 lines saved)
+- Fixed editProps syntax errors
 
-**Expected result:** ~260 lines
-
-### SkillEditor.test.tsx (403 lines)
-
-**Quick wins:**
-```typescript
-// Helper 1: Render + setup (~36 lines saved)
-const renderAndSetup = (props = mockProps) => {
-  const user = userEvent.setup();
-  render(<SkillEditor {...props} />);
-  return user;
-};
-
-// Helper 2: Fill form (~40 lines saved)
-const fillSkillForm = async (user, name, desc, attrs) => {
-  await user.type(screen.getByLabelText(/skill name/i), name);
-  await user.type(screen.getByLabelText(/description/i), desc);
-  for (const attr of attrs) {
-    await user.click(screen.getByLabelText(attr));
-  }
-};
-```
-
-**Additional savings:**
-- Compress mock data (~20 lines)
-- Consolidate delete tests (~15 lines)
-
-**Expected result:** ~280-290 lines
-
-### ChoiceSelector.test.tsx (351 lines)
-
-**Needs 51 more lines saved:**
-- Fix broken renderChoiceSelector syntax issues
-- Extract `assertChoicesVisible()` helper (~12 lines)
-- Create `createCharacterSkills()` factory (~18 lines)
-- Remove duplicate Accessibility test (~15 lines)
-- Additional comment cleanup (~10 lines)
-
-**Expected result:** ~295 lines
+**Final result:** 293 lines (110 lines saved)
 
 ---
 
@@ -131,37 +93,32 @@ const fillSkillForm = async (user, name, desc, attrs) => {
    - JournalModal.sessionBoundaryDisplay.test.tsx
    - Total: 121 lines saved
 
-3. **ChoiceSelector partial** - `1406c7e`
-   - ChoiceSelector.test.tsx (partial)
-   - Total: 31 lines saved
+3. **ChoiceSelector completion** - `1406c7e` + followups
+   - ChoiceSelector.test.tsx (completed)
+   - Total: 85 lines saved
+
+4. **characterStore refactoring** - Completed
+   - characterStore.relatedDataCleanup.test.ts
+   - Total: 133 lines saved
+
+5. **SkillEditor completion** - Pending commit
+   - SkillEditor.test.tsx (completed)
+   - Total: 110 lines saved
 
 ### Branch
 - `claude/issue-831-011CUqHAiCyiigSvdZWk6rKa`
-- All changes pushed to remote
+- Changes ready to push
 
 ---
 
 ## Next Steps
 
-To complete the refactoring:
+✅ All 7 files successfully refactored to under 300 lines!
 
-1. **Finish ChoiceSelector.test.tsx** (30 min)
-   - Fix renderChoiceSelector call syntax
-   - Add assertChoicesVisible helper
-   - Remove duplicate test
-
-2. **Refactor characterStore.relatedDataCleanup.test.ts** (30 min)
-   - Import and use existing createTestCharacterData helper
-   - Create journal entry factory
-   - Consolidate similar tests with .each()
-
-3. **Refactor SkillEditor.test.tsx** (45 min)
-   - Add renderAndSetup and fillSkillForm helpers
-   - Consolidate delete tests
-   - Compress mock data
-
-4. **Run full test suite** to verify all changes
-5. **Create PR** targeting `develop` branch
+Remaining tasks:
+1. **Commit and push SkillEditor completion**
+2. **Run full test suite** to verify all changes work correctly
+3. **Create PR** targeting `develop` branch
 
 ---
 

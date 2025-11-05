@@ -77,6 +77,11 @@ const fillSkillForm = async (user: ReturnType<typeof userEvent.setup>, name: str
   }
 };
 
+const createMockSkills = (count: number) => Array.from({ length: count }, (_, i) => ({
+  id: `skill-${i}`, name: `Skill ${i}`, description: `Description ${i}`, worldId: mockWorldId,
+  attributeIds: ['attr-1'], difficulty: 'easy' as const, baseValue: 5, minValue: 1, maxValue: 10,
+}));
+
 describe('SkillEditor', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -153,26 +158,7 @@ describe('SkillEditor', () => {
     });
 
     it('enforces maximum skills limit when provided', () => {
-      const skillsAtMax = Array.from({ length: 12 }, (_, i) => ({
-        id: `skill-${i}`,
-        name: `Skill ${i}`,
-        description: `Description ${i}`,
-        worldId: mockWorldId,
-        attributeIds: ['attr-1'],
-        difficulty: 'easy' as const,
-        baseValue: 5,
-        minValue: 1,
-        maxValue: 10,
-      }));
-
-      render(
-        <SkillEditor 
-          {...mockProps} 
-          existingSkills={skillsAtMax}
-          maxSkills={12}
-        />
-      );
-      
+      render(<SkillEditor {...mockProps} existingSkills={createMockSkills(12)} maxSkills={12} />);
       expect(screen.getByText(/maximum number of skills \(12\) reached/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /create skill/i })).toBeDisabled();
     });
@@ -206,7 +192,7 @@ describe('SkillEditor', () => {
     });
 
     it('allows updating skill with new attribute links', async () => {
-      const user = renderAndSetup({editProps});
+      const user = renderAndSetup(editProps);
       
       await user.clear(screen.getByDisplayValue('Swordsmanship'));
       await user.type(screen.getByLabelText(/skill name/i), 'Advanced Swordsmanship');
@@ -226,7 +212,7 @@ describe('SkillEditor', () => {
     });
 
     it('handles delete confirmation dialog flow', async () => {
-      const user = renderAndSetup({editProps});
+      const user = renderAndSetup(editProps);
       await user.click(screen.getByRole('button', { name: /delete skill/i }));
       expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
 
@@ -241,109 +227,68 @@ describe('SkillEditor', () => {
   });
 
   describe('Validation', () => {
-    it('validates skill name length limits', async () => {
+    it.each([
+      {
+        name: 'skill name length',
+        input: { name: 'a'.repeat(101), description: 'Valid' },
+        errorMatch: /skill name must be 100 characters or less/i
+      },
+      {
+        name: 'description length',
+        input: { name: 'Valid Name', description: 'a'.repeat(501) },
+        errorMatch: /description must be 500 characters or less/i
+      },
+    ])('validates $name limits', async ({ input, errorMatch }) => {
       const user = renderAndSetup();
-      
-      const longName = 'a'.repeat(101);
-      await user.type(screen.getByLabelText(/skill name/i), longName);
+      await user.type(screen.getByLabelText(/skill name/i), input.name);
+      await user.type(screen.getByLabelText(/description/i), input.description);
       await user.click(screen.getByRole('button', { name: /create skill/i }));
-      
-      expect(screen.getByText(/skill name must be 100 characters or less/i)).toBeInTheDocument();
-    });
-
-    it('validates description length limits', async () => {
-      const user = renderAndSetup();
-      
-      await user.type(screen.getByLabelText(/skill name/i), 'Valid Name');
-      
-      const longDescription = 'a'.repeat(501);
-      await user.type(screen.getByLabelText(/description/i), longDescription);
-      await user.click(screen.getByRole('button', { name: /create skill/i }));
-      
-      expect(screen.getByText(/description must be 500 characters or less/i)).toBeInTheDocument();
+      expect(screen.getByText(errorMatch)).toBeInTheDocument();
     });
 
     it('trims whitespace from inputs', async () => {
       const user = renderAndSetup();
-      
       await fillSkillForm(user, '  Swimming  ', '  Water-based movement  ', ['Strength']);
-      
       await user.click(screen.getByRole('button', { name: /create skill/i }));
-      
       expect(mockProps.onSave).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'Swimming',
-          description: 'Water-based movement',
-        })
+        expect.objectContaining({ name: 'Swimming', description: 'Water-based movement' })
       );
     });
   });
 
   describe('Error Handling', () => {
-    it('displays multiple validation errors', async () => {
+    it('displays multiple validation errors and clears them when fixed', async () => {
       const user = renderAndSetup();
-      
       await user.click(screen.getByRole('button', { name: /create skill/i }));
-      
       expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
       expect(screen.getByText(/description is required/i)).toBeInTheDocument();
       expect(screen.getByText(/at least one attribute must be selected/i)).toBeInTheDocument();
-    });
 
-    it('clears errors when valid input is provided', async () => {
-      const user = renderAndSetup();
-      
-      await user.click(screen.getByRole('button', { name: /create skill/i }));
-      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
-      
       await user.type(screen.getByLabelText(/skill name/i), 'Valid Name');
-      
-      await waitFor(() => {
-        expect(screen.queryByText(/skill name is required/i)).not.toBeInTheDocument();
-      });
+      await waitFor(() => expect(screen.queryByText(/skill name is required/i)).not.toBeInTheDocument());
     });
   });
 
   describe('Cancel Functionality', () => {
-    it('calls onCancel when cancel button is clicked', async () => {
+    it('calls onCancel and does not save when cancel is clicked', async () => {
       const user = renderAndSetup();
-      
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
-      
-      expect(mockProps.onCancel).toHaveBeenCalled();
-    });
-
-    it('does not save when canceling after making changes', async () => {
-      const user = renderAndSetup();
-      
       await user.type(screen.getByLabelText(/skill name/i), 'Test Skill');
       await user.click(screen.getByRole('button', { name: /cancel/i }));
-      
       expect(mockProps.onSave).not.toHaveBeenCalled();
       expect(mockProps.onCancel).toHaveBeenCalled();
     });
   });
 
   describe('Accessibility', () => {
-    it('has proper ARIA labels and structure', () => {
-      render(<SkillEditor {...mockProps} />);
-      
+    it('has proper ARIA labels, structure, and error messages', async () => {
+      const user = renderAndSetup();
       expect(screen.getByRole('form')).toBeInTheDocument();
       expect(screen.getByLabelText(/skill name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
-      
-      mockAttributes.forEach(attr => {
-        expect(screen.getByLabelText(attr.name)).toBeInTheDocument();
-      });
-    });
+      mockAttributes.forEach(attr => expect(screen.getByLabelText(attr.name)).toBeInTheDocument());
 
-    it('displays error messages with proper ARIA attributes', async () => {
-      const user = renderAndSetup();
-      
       await user.click(screen.getByRole('button', { name: /create skill/i }));
-      
-      const errorMessages = screen.getAllByRole('alert');
-      expect(errorMessages.length).toBeGreaterThan(0);
+      expect(screen.getAllByRole('alert').length).toBeGreaterThan(0);
     });
   });
 });
