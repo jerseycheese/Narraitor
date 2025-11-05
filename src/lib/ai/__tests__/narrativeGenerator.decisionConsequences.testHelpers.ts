@@ -12,6 +12,8 @@ import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
+export { getTimestamp } from '@/lib/utils/timestamp';
+
 export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
 
 export const mockWorld = {
