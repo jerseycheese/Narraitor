@@ -511,7 +511,7 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
@@ -583,6 +583,32 @@ export const useWorldStore = create<WorldStore>()(
               retryable: false,
               type: ErrorType.VALIDATION,
             };
+          }
+
+          if (state.worldStates && typeof state.worldStates === 'object') {
+            for (const [worldId, rawWorldState] of Object.entries(state.worldStates)) {
+              if (!rawWorldState || typeof rawWorldState !== 'object') {
+                state.worldStates[worldId] = createEmptyWorldState(worldId);
+                continue;
+              }
+
+              const existingState = rawWorldState as Partial<WorldState>;
+
+              if (!existingState.playerCharacterThreads || typeof existingState.playerCharacterThreads !== 'object') {
+                existingState.playerCharacterThreads = {};
+              }
+
+              if (!existingState.characterRelationships || typeof existingState.characterRelationships !== 'object') {
+                existingState.characterRelationships = {};
+              }
+
+              state.worldStates[worldId] = {
+                ...createEmptyWorldState(worldId),
+                ...existingState,
+                playerCharacterThreads: existingState.playerCharacterThreads,
+                characterRelationships: existingState.characterRelationships,
+              };
+            }
           }
         }
 

@@ -92,6 +92,9 @@ export default function PlayPage() {
             titleElement="h1"
             actions={
               <div className="hidden sm:flex flex-row gap-2">
+                <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
+                  Switch Character
+                </Button>
                 <Button size="sm" variant="default" onClick={handleStartNewClick}>
                   Start New
                 </Button>

@@ -12,6 +12,15 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
 import { truncate, safeTrim } from '@/lib/utils';
 
+interface CharacterContextSummary {
+  threadSummary?: string;
+  relationships?: Array<{
+    characterId: string;
+    characterName: string;
+    portraitUrl?: string | null;
+  }>;
+}
+
 interface CharacterCardProps {
   /** The character data to display */
   character: StoreCharacter;
@@ -27,6 +36,8 @@ interface CharacterCardProps {
   onEdit: () => void;
   /** Callback when user wants to delete this character */
   onDelete: () => void;
+  /** Optional context describing the character's ongoing storyline */
+  context?: CharacterContextSummary;
 }
 
 /**
@@ -57,7 +68,8 @@ export function CharacterCard({
   onView,
   onPlay,
   onEdit,
-  onDelete
+  onDelete,
+  context,
 }: CharacterCardProps) {
 
   return (
@@ -74,7 +86,7 @@ export function CharacterCard({
               e.stopPropagation();
               onView();
             }}
-            className="cursor-pointer float-right ml-4 mb-3"
+            className="cursor-pointer float-right ml-4 mb-6"
           >
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
@@ -121,6 +133,42 @@ export function CharacterCard({
               return result || truncate(text, 280);
             })()}
           </p>
+          {context?.relationships && context.relationships.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
+              <div className="flex flex-wrap gap-2">
+                {context.relationships.map((relation) => (
+                  <div
+                    key={relation.characterId}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-sm font-medium text-blue-700"
+                  >
+                    {relation.portraitUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={relation.portraitUrl}
+                        alt={`${relation.characterName} portrait`}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
+                          {relation.characterName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-sm leading-snug">{relation.characterName}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {context?.threadSummary && (
+            <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <p className="text-sm text-gray-700">
+                {context.threadSummary}
+              </p>
+            </div>
+          )}
           <div className="clear-both"></div>
         </div>
         

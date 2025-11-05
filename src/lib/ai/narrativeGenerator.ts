@@ -39,6 +39,7 @@ import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
 import { logger } from '@/lib/utils/logger';
+import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -86,6 +87,11 @@ const REWRITE_RULES: Record<ToneSettings['languageComplexity'], string[]> = {
     'Maintain markdown formatting and all narrative details.',
   ],
 };
+
+// Prompt guardrails to keep Gemini context predictable. Tuned for narrative cost/benefit trade-offs.
+const MAX_OTHER_CHARACTER_THREADS = 3;
+const MAX_CROSS_CHARACTER_REFERENCES = 2;
+const PROMPT_THREAD_SUMMARY_LENGTH = 160;
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -461,9 +467,78 @@ export class NarrativeGenerator {
         enhancedPrompt = `${enhancedPrompt}${decisionHistory}`;
       }
 
+      const otherCharacterContext = this.buildOtherCharacterContext(worldId, playerCharacterId);
+      if (otherCharacterContext) {
+        enhancedPrompt = `${enhancedPrompt}\n\n${otherCharacterContext}\nWeave these concurrent storylines naturally when they influence the current scene, but avoid forced references.`;
+      }
+
       return enhancedPrompt;
     } catch {
       return prompt;
+    }
+  }
+
+  private buildOtherCharacterContext(
+    worldId: EntityID,
+    activeCharacterId: EntityID,
+  ): string | null {
+    try {
+      const { worldStates } = useWorldStore.getState();
+      const worldState = worldStates[worldId];
+      if (!worldState?.playerCharacterThreads) {
+        return null;
+      }
+
+      const threads = Object.values(worldState.playerCharacterThreads)
+        .filter((thread) => thread.characterId !== activeCharacterId)
+        .sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated))
+        .slice(0, MAX_OTHER_CHARACTER_THREADS);
+
+      if (threads.length === 0) {
+        return null;
+      }
+
+      const { characters } = useCharacterStore.getState();
+      const relationshipMap =
+        worldState.characterRelationships?.[activeCharacterId] ?? {};
+
+      const lines = threads.map((thread) => {
+        const name =
+          characters[thread.characterId]?.name ?? `Character ${thread.characterId}`;
+        const highlight =
+          summarizeThreadHighlight(thread, PROMPT_THREAD_SUMMARY_LENGTH) ??
+          'No recent activity recorded yet.';
+
+        const relationship = relationshipMap[thread.characterId];
+        const relationshipDescriptor = relationship
+          ? ` Relationship: ${describeCharacterRelationship(relationship)}.`
+          : '';
+
+        const referencesToActive =
+          thread.crossCharacterReferences?.filter(
+            (reference) => reference.characterId === activeCharacterId
+          ) ?? [];
+        const recentReferences = referencesToActive.slice(
+          -MAX_CROSS_CHARACTER_REFERENCES
+        );
+        const referenceDescriptor =
+          recentReferences.length > 0
+            ? ` Recent cross-over: ${recentReferences
+                .map((reference) => {
+                  const summary = reference.summary.trim();
+                  return summary.length > PROMPT_THREAD_SUMMARY_LENGTH
+                    ? `${summary.slice(0, PROMPT_THREAD_SUMMARY_LENGTH - 3)}...`
+                    : summary;
+                })
+                .join('; ')}.`
+            : '';
+
+        return `- ${name}: ${highlight}.${relationshipDescriptor}${referenceDescriptor}`;
+      });
+
+      return `OTHER PLAYER CHARACTERS (SHARED WORLD CONTEXT):\n${lines.join('\n')}`;
+    } catch {
+      return null;
     }
   }
 
