@@ -214,7 +214,7 @@ describe('CharacterEditor MVP Tests', () => {
   });
 
   // Basic error handling test
-  test('displays error when character not found', () => {
+  test('displays error when character not found', async () => {
     mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: {},
@@ -224,7 +224,8 @@ describe('CharacterEditor MVP Tests', () => {
     );
 
     render(<CharacterEditor characterId="non-existent" />);
-    
-    expect(screen.getByText('Character Not Found')).toBeInTheDocument();
+
+    // Wait for the hydration timeout (2 seconds) to show error
+    expect(await screen.findByText('Character Not Found', {}, { timeout: 3000 })).toBeInTheDocument();
   });
 });

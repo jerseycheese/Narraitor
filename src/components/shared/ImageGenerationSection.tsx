@@ -24,6 +24,7 @@ interface ImageGenerationSectionProps {
   imageComponent: React.ReactNode;
   className?: string;
   defaultCustomPromptChecked?: boolean; // Whether the custom prompt checkbox should be checked by default
+  error?: string | null; // Inline error message for generation failures
 }
 
 export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
@@ -44,7 +45,8 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   removeButtonText = "Remove Image",
   imageComponent,
   className = "",
-  defaultCustomPromptChecked = !!currentPrompt
+  defaultCustomPromptChecked = !!currentPrompt,
+  error = null
 }) => {
   // Separate user input from API-returned prompts
   const [showCustomPrompt, setShowCustomPrompt] = useState(defaultCustomPromptChecked);
@@ -154,6 +156,14 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
               </Button>
             )}
           </div>
+
+          {/* Error display */}
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
           {generatedAt && (
             <p className="text-sm text-gray-500 mt-2">
               Generated: {formatDate(generatedAt)}
