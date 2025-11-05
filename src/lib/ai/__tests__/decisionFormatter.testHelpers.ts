@@ -2,7 +2,7 @@
  * Test helpers for DecisionFormatter tests
  */
 
-import { PlayerDecision } from '@/types/personalization.types';
+import { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
 import { DecisionRelevanceScore } from '@/types/relevance.types';
 
 export interface TestDecisionInput {
@@ -34,7 +34,7 @@ export function createTestDecision(input: TestDecisionInput): PlayerDecision {
     id: input.id,
     prompt: input.prompt,
     choiceText: input.choiceText,
-    choiceType: input.choiceType || 'neutral',
+    choiceType: (input.choiceType || 'neutral') as ChoiceTypePreference,
     timestamp: input.timestamp || '2024-01-01T12:00:00Z',
     sessionId: 'sess-1',
     worldId: 'world-1',

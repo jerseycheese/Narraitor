@@ -57,9 +57,9 @@ describe('DecisionFormatter - Edge Cases', () => {
     const decisions = [
       createTestDecision({
         id: 'dec-huge',
-        prompt: 'A'.repeat(500),
-        choiceText: 'B'.repeat(500),
-        location: 'Very long location name'.repeat(20)
+        prompt: 'A'.repeat(2000),
+        choiceText: 'B'.repeat(2000),
+        location: 'Extremely long location name that will definitely exceed token budget'.repeat(100)
       }),
       createTestDecision({
         id: 'dec-small1',
@@ -80,7 +80,7 @@ describe('DecisionFormatter - Edge Cases', () => {
       overallScore: 0.5
     }));
 
-    const result = formatter.formatDecisions(decisions, scores, 100);
+    const result = formatter.formatDecisions(decisions, scores, 50);
 
     // Should include at least one of the small decisions
     const hasSmallDecision = result.toLowerCase().includes('left') ||
@@ -88,6 +88,6 @@ describe('DecisionFormatter - Edge Cases', () => {
     expect(hasSmallDecision).toBe(true);
 
     // Should not include the huge decision (too big for budget)
-    expect(result.toLowerCase()).not.toContain('very long location');
+    expect(result.toLowerCase()).not.toContain('extremely long location');
   });
 });

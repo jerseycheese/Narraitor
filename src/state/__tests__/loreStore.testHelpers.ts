@@ -23,7 +23,7 @@ export function setupLoreStore(worldIds: string[] = ['test-world', 'world-1', 'w
  * Adds a fact to the store using act
  */
 export function addFact(
-  result: ReturnType<typeof renderHook<ReturnType<typeof useLoreStore>, unknown>>['result'],
+  result: { current: ReturnType<typeof useLoreStore> },
   key: string,
   value: string,
   category: string,
@@ -39,7 +39,7 @@ export function addFact(
  * Adds multiple facts to the store
  */
 export function addMultipleFacts(
-  result: ReturnType<typeof renderHook<ReturnType<typeof useLoreStore>, unknown>>['result'],
+  result: { current: ReturnType<typeof useLoreStore> },
   facts: Array<{
     key: string;
     value: string;

@@ -3,7 +3,9 @@
  * Provides reusable mock character data factories
  */
 
-import { CharacterInput } from '@/types/character.types';
+import { Character } from '@/types/character.types';
+
+type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
 
 /**
  * Creates basic character test data
