@@ -1,4 +1,6 @@
 // import { PromptTemplate } from '../../types';
+import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -39,7 +41,8 @@ NPC METADATA RULES:
 `
     : '';
 
-  return `You are a narrative generator for a ${genre} story world called "${worldName}".
+  // Build the base template content
+  const baseContent = `You are a narrative generator for a ${genre} story world called "${worldName}".
 
 World Description: ${worldDescription}
 Tone: ${tone}
@@ -63,8 +66,22 @@ Generate a narrative segment that:
 8. Adds emphasis for dramatic effect using markdown formatting:
    - Use *single asterisks* around important phrases, atmospheric details, or notable objects
    - Use **double asterisks** around critical moments, intense emotions, or dramatic revelations
-   - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact
-   - Example: "The *Arasaka building* looms ahead, its security pulsing like a **digital heartbeat**"
+   - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact`;
+
+  // Determine budget for examples and context length
+  const tokenBudget = generationParameters?.exampleTokenBudget ?? 150;
+  const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg: any) => seg.content).join('\n\n') || ''); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  // Get examples if they should be included
+  let examplesSection = '';
+  if (shouldIncludeExamples(tokenBudget, contextLength)) {
+    examplesSection = getExamplesForPrompt('scene', tokenBudget, {
+      tags: ['formatting', 'emphasis', 'perspective'],
+      minPriority: 'medium',
+    });
+  }
+
+  return `${baseContent}${examplesSection}
 
 ${formattedRoster}
 

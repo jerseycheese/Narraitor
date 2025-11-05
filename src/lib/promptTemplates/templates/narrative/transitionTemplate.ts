@@ -1,4 +1,5 @@
 // import { PromptTemplate } from '../../types';
+import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
 export const transitionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -26,7 +27,8 @@ NPC METADATA RULES:
 `
     : '';
 
-  return `Create a transition in the ${genre} narrative for "${worldName}".
+  // Build the base template
+  const baseContent = `Create a transition in the ${genre} narrative for "${worldName}".
 
 Previous Content: ${previousContent}
 Previous Type: ${previousType}
@@ -40,8 +42,19 @@ Generate a smooth transition that:
 4. Keeps the ${tone} tone consistent
 5. Is concise (1-2 sentences)
 
-IMPORTANT: Write in SECOND PERSON perspective (using "you").
-Example: "You make your way through..." NOT "The character travels..." or using character names.
+IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
+
+  // Get examples for perspective if token budget allows
+  const tokenBudget = context.generationParameters?.exampleTokenBudget ?? 100;
+  let examplesSection = '';
+  if (shouldIncludeExamples(tokenBudget, previousContent?.length || 0)) {
+    examplesSection = getExamplesForPrompt('transition', tokenBudget, {
+      tags: ['perspective', 'second-person'],
+      minPriority: 'high',
+    });
+  }
+
+  return `${baseContent}${examplesSection}
 
 ${formattedRoster}
 

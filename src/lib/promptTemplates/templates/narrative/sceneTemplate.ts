@@ -1,5 +1,6 @@
 // import { PromptTemplate } from '../../types';
 import { NarrativeSegment } from '../../../../types/narrative.types';
+import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
 export const sceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -27,7 +28,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 `
     : '';
 
-  return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
+  const baseContent = `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
 Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
@@ -91,15 +92,23 @@ CRITICAL INSTRUCTIONS:
 3. Only use "${playerCharacterName}" when OTHER characters speak TO or ABOUT the player
 4. The player experiences everything through ${playerCharacterName || 'their character'}'s perspective
 
-Examples:
-✓ CORRECT: "You feel the cold wind bite at your face..."
-✗ WRONG: "${playerCharacterName || 'The character'} feels the cold wind..."
-✓ CORRECT (dialogue): "'${playerCharacterName || 'Friend'}, are you alright?' the guard asks."
-
-Focus on varied sensory details and the character's reactions to bring the scene to life. 
+Focus on varied sensory details and the character's reactions to bring the scene to life.
 - Use visual, auditory, and tactile descriptions primarily
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
-- Vary your sensory language to avoid overused phrases
+- Vary your sensory language to avoid overused phrases`;
+
+  // Get examples for perspective and formatting if token budget allows
+  const tokenBudget = generationParameters?.exampleTokenBudget ?? 120;
+  const contextLength = recentContent.length;
+  let examplesSection = '';
+  if (shouldIncludeExamples(tokenBudget, contextLength)) {
+    examplesSection = getExamplesForPrompt('scene', tokenBudget, {
+      tags: ['perspective', 'second-person', 'sensory'],
+      minPriority: 'high',
+    });
+  }
+
+  return `${baseContent}${examplesSection}
 
 Response Format:
 {

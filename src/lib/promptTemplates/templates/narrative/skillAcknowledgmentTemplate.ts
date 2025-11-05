@@ -1,11 +1,12 @@
 /**
  * @fileoverview Skill Acknowledgment Template
- * 
+ *
  * This template guides AI to acknowledge skill usage in narrative generation,
  * making player abilities feel meaningful to the story progression.
  */
 
 import { NarrativeContext } from '@/types/narrative.types';
+import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
 interface SkillAcknowledgmentContext {
   worldName: string;
@@ -60,7 +61,7 @@ CUSTOM ACTION WITH IMPLICIT SKILLS:
 - Acknowledge the character's relevant abilities in performing this action`;
   }
 
-  return `Generate a narrative response for "${worldName}" that meaningfully acknowledges the character's skill usage.
+  const baseContent = `Generate a narrative response for "${worldName}" that meaningfully acknowledges the character's skill usage.
 
 World: ${worldName}
 ${genre ? `Genre: ${genre}` : ''}
@@ -79,7 +80,6 @@ SUCCESS ACKNOWLEDGMENT:
 - Reference specific techniques or knowledge they demonstrated
 - Make the success feel earned and meaningful
 - Other characters or the environment should react appropriately to their skillful performance
-- Example phrases: "Your training in X proves invaluable...", "Years of practice with X show...", "Your expertise in X becomes evident..."
 ` : ''}
 
 ${skillUsed?.success === false ? `
@@ -88,7 +88,6 @@ FAILURE ACKNOWLEDGMENT:
 - Reference what the character learned or how they could improve
 - Show consequences that are meaningful but not overly punishing for MVP
 - Keep it constructive - focus on growth opportunities
-- Example phrases: "Despite your efforts with X...", "You realize you need more practice with X...", "The technique requires more refinement..."
 ` : ''}
 
 ${customAction ? `
@@ -107,7 +106,24 @@ NARRATIVE REQUIREMENTS:
 5. Advance the story while acknowledging the skill usage
 6. Show don't tell - demonstrate skill through action and reaction
 
-CRITICAL: Make the character's abilities feel like they truly matter to the story outcome.
+CRITICAL: Make the character's abilities feel like they truly matter to the story outcome.`;
+
+  // Get examples for skill acknowledgment if token budget allows
+  const tokenBudget = 120;
+  const contextLength = recentContent.length;
+  let examplesSection = '';
+  if (shouldIncludeExamples(tokenBudget, contextLength)) {
+    // Determine appropriate tag based on skill result
+    // Default to 'success' for custom actions without explicit failure
+    const resultTag = skillUsed?.success === false ? 'failure' : 'success';
+
+    examplesSection = getExamplesForPrompt('skill-acknowledgment', tokenBudget, {
+      tags: ['skill', 'acknowledgment', resultTag],
+      minPriority: 'high',
+    });
+  }
+
+  return `${baseContent}${examplesSection}
 
 Response Format:
 {
