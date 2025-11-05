@@ -43,12 +43,6 @@ describe('ChoiceSelector', () => {
     }));
   };
 
-  const defaultProps = {
-    onSelect: mockOnSelect,
-    allowCustomInput: true,
-    onCustomSubmit: mockOnCustomSubmit
-  };
-
   const simpleChoices: SimpleChoice[] = [
     { id: 'choice-1', text: 'Go north' },
     { id: 'choice-2', text: 'Go south' },

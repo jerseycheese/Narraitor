@@ -30,8 +30,6 @@ const createStandardSegments = () => [
   createSegment('3', 'The hero faces their first challenge against dark forces.')
 ];
 
-const suppressConsoleError = () => jest.spyOn(console, 'error').mockImplementation(() => {});
-
 describe('Pure AI Ending Detection', () => {
   const mockOnEndingSuggested = jest.fn();
   let checkForEndingIndicators: ReturnType<typeof createMockCheckForEndingIndicators>;
