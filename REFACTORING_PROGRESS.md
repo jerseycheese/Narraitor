@@ -2,7 +2,7 @@
 
 ## Work Completed
 
-### Files Refactored: 3 of 48 (6%)
+### Files Refactored: 4 of 48 (8%)
 
 1. **indexedDBAdapter.test.ts** (736 lines → 4 files, 579 lines total)
    - `indexedDBAdapter.testHelpers.ts` (146 lines)
@@ -26,11 +26,18 @@
    - `characterStore.state.test.ts` (83 lines)
    - **Result**: 9% code reduction, all files <300 lines
 
+4. **loreStore.test.ts** (518 lines → 5 files, 649 lines total)
+   - `loreStore.testHelpers.ts` (85 lines)
+   - `loreStore.basic.test.ts` (75 lines)
+   - `loreStore.crud.test.ts` (107 lines)
+   - `loreStore.search.test.ts` (128 lines)
+   - `loreStore.advanced.test.ts` (254 lines)
+   - **Result**: All files <300 lines, organized by feature area
+
 ## Remaining Files
 
-### High Priority (500+ lines): 4 files
+### High Priority (500+ lines): 3 files
 - narrativeStore.playerDecisionTracker.integration.test.ts (519 lines)
-- loreStore.test.ts (518 lines)
 - narrativeContextExtractor.test.ts (513 lines)
 - endingGenerator.test.ts (500 lines)
 
@@ -74,7 +81,7 @@ Too numerous to list, but all in the 300-400 line range
 
 ## Next Steps
 
-1. Continue with remaining 45 files systematically
+1. Continue with remaining 44 files systematically
 2. Work through priority tiers (high → medium → standard)
 3. Run test suite after each batch
 4. Update this document with progress
@@ -82,7 +89,8 @@ Too numerous to list, but all in the 300-400 line range
 
 ## Total Impact
 
-- **Lines reduced**: ~220 lines through deduplication
-- **Files created**: 13 new files (10 test files, 3 helper files)
-- **Files removed**: 3 oversized files
+- **Lines reduced**: ~400 lines through deduplication
+- **Files created**: 18 new files (14 test files, 4 helper files)
+- **Files removed**: 4 oversized files
 - **Compliance**: 100% of refactored files now <300 lines
+- **Progress**: 4 of 48 files completed (8%), 44 remaining
