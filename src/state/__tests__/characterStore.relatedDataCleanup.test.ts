@@ -253,4 +253,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
       });
 
       expect(Object.keys(result.current.characters)).toHaveLength(initialCharacterCount);
-      
+    });
+  });
+});
