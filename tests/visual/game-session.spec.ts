@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
-import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
+import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
 import {
   ensureSuggestedActionsExpanded,
   renderSeededSuggestedActions,

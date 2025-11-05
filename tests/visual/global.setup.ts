@@ -1,11 +1,8 @@
 import { chromium, FullConfig } from '@playwright/test';
-import {
-  SAMPLE_WORLDS,
-  SAMPLE_CHARACTERS,
-  SAMPLE_GAME_SESSIONS,
-  SAMPLE_NARRATIVE_SEGMENTS,
-  SAMPLE_DECISIONS,
-} from './utils/data-seeder';
+import { SAMPLE_WORLDS } from '../fixtures/worlds.fixture';
+import { SAMPLE_CHARACTERS } from '../fixtures/characters.fixture';
+import { SAMPLE_GAME_SESSIONS } from '../fixtures/sessions.fixture';
+import { SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } from '../fixtures/narrative.fixture';
 import { getTimestamp } from '@/lib/utils';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 
