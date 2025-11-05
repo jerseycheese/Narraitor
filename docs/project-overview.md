@@ -31,7 +31,7 @@ The core functionality is working and stable. All the main systems (world creati
 
 **Character Building**: Point-allocation system that adapts to your world's rules. Create characters with backgrounds that make sense for your setting. The wizard guides you through attribute allocation, skill selection, and story background.
 
-**Shared World, Multi-Character Play**: Maintain parallel protagonists inside the same persistent world. The character roster now shows per-character thread summaries and cross-character relationships, while the narrative engine cross-references your other heroes so their choices can intersect naturally.
+**Shared World, Multi-Character Play**: Maintain parallel protagonists inside the same persistent world. The character roster now shows per-character thread summaries and cross-character relationships, while the narrative engine cross-references your other characters so their choices actually acknowledge one another.
 
 **Adaptive AI Narratives**: This is the interesting part. The AI doesn't just generate random fantasy stories. It maintains context about your world's rules, your character's abilities, and the ongoing story to create narratives that feel consistent with your setting.
 
