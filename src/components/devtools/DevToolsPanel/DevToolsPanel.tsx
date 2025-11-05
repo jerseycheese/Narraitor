@@ -69,7 +69,7 @@ const EnvironmentInfo = () => {
  * @see /docs/devtools/extending-devtools.md for more information
  */
 export const DevToolsPanel = () => {
-  const { isOpen, toggleDevTools, isSectionVisible } = useDevTools();
+  const { isOpen, toggleDevTools, isSectionVisible, settings, updateSetting } = useDevTools();
   const [mounted, setMounted] = useState(false);
   const [isTestPage, setIsTestPage] = useState(false);
   
@@ -118,7 +118,7 @@ export const DevToolsPanel = () => {
       } min-h-[3rem] shadow-lg`}
     >
       {/* Header with toggle button */}
-      <div 
+      <div
         data-testid="devtools-panel-header"
         className="flex justify-between items-center px-4 py-2 border-b border-gray-300 flex-shrink-0 bg-gray-300 h-12"
       >
@@ -127,7 +127,21 @@ export const DevToolsPanel = () => {
           {isTestPage && ' (Test Page Mode)'}
         </div>
         <div className="flex gap-2 items-center">
-          {isOpen && <SectionVisibilityControls />}
+          {isOpen && (
+            <>
+              <label className="flex items-center gap-1.5 text-xs text-gray-900 cursor-pointer hover:text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={settings.showPromptDebugInfo}
+                  onChange={(e) => updateSetting('showPromptDebugInfo', e.target.checked)}
+                  className="cursor-pointer"
+                  title="Toggle prompt debug information in narrative segments"
+                />
+                <span>Show Prompts</span>
+              </label>
+              <SectionVisibilityControls />
+            </>
+          )}
           <Button
             data-testid="devtools-panel-toggle"
             onClick={toggleDevTools}

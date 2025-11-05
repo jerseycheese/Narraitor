@@ -135,6 +135,63 @@ export interface GeneratedCharacterMetadata {
 }
 
 /**
+ * Debug information for narrative generation (dev mode only)
+ * Contains all the context and factors that contributed to generating narrative text
+ */
+export interface PromptDebugInfo {
+  /** The complete prompt text sent to the AI */
+  fullPrompt: string;
+  /** The template used for generation (e.g., "Scene Template", "Transition Template") */
+  templateName: string;
+  /** World lore excerpts included in the prompt context */
+  loreContext?: Array<{
+    loreId: EntityID;
+    title: string;
+    excerpt: string;
+  }>;
+  /** Active goals/objectives that influenced the narrative */
+  activeGoals?: string[];
+  /** Character context included in generation */
+  characterContext?: Array<{
+    characterId: EntityID;
+    name: string;
+    relevantTraits?: string[];
+  }>;
+  /** Inventory items mentioned or used in context */
+  inventoryContext?: Array<{
+    itemName: string;
+    isEquipped?: boolean;
+  }>;
+  /** Tone and complexity settings applied */
+  toneSettings?: {
+    mood?: string;
+    complexity?: 'simple' | 'moderate' | 'advanced' | 'literary';
+    customTone?: string;
+  };
+  /** Recent player decisions that influenced this segment */
+  recentDecisions?: Array<{
+    decisionText: string;
+    selectedOption: string;
+    timestamp: Date;
+  }>;
+  /** Content from previous segment for continuity */
+  previousSegmentContext?: {
+    type: string;
+    excerpt: string;
+  };
+  /** Token usage statistics */
+  tokenUsage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  /** AI model used for generation */
+  modelUsed: string;
+  /** Timestamp when this prompt was generated */
+  generatedAt: Date;
+}
+
+/**
  * Metadata for narrative segments (simplified for MVP)
  */
 export interface NarrativeMetadata {
@@ -151,6 +208,8 @@ export interface NarrativeMetadata {
   tone?: EndingTone;
   // Item acquisition metadata
   itemsAcquired?: AcquiredItemMetadata[];
+  // Debug information (dev mode only)
+  debugInfo?: PromptDebugInfo;
 }
 
 /**
@@ -234,6 +293,8 @@ export interface NarrativeGenerationResult {
     };
     // Item acquisition metadata
     itemsAcquired?: AcquiredItemMetadata[];
+    // Debug information (dev mode only)
+    debugInfo?: PromptDebugInfo;
   };
   choices?: Array<{
     text: string;

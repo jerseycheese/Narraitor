@@ -1,14 +1,19 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
-import { 
-  loadSectionVisibility, 
+import {
+  loadSectionVisibility,
   loadSectionVisibilityWithDefaults,
   toggleSectionVisibility as toggleStoredSectionVisibility,
   setSectionVisibility as setStoredSectionVisibility,
   isSectionVisible,
-  type SectionVisibility 
+  type SectionVisibility
 } from '@/lib/devtools/sectionVisibilityStorage';
+import {
+  loadDevToolsSettings,
+  updateSetting,
+  type DevToolsSettings
+} from '@/lib/devtools/devToolsSettings';
 
 /**
  * DevTools context interface
@@ -20,6 +25,8 @@ interface DevToolsContextType {
   toggleSectionVisibility: (sectionId: string) => void;
   isSectionVisible: (sectionId: string) => boolean;
   setSectionVisibility: (visibility: SectionVisibility) => void;
+  settings: DevToolsSettings;
+  updateSetting: <K extends keyof DevToolsSettings>(key: K, value: DevToolsSettings[K]) => void;
 }
 
 /**
@@ -34,7 +41,9 @@ const defaultContext: DevToolsContextType = {
   sectionVisibility: {},
   toggleSectionVisibility: () => {},
   isSectionVisible: () => true,
-  setSectionVisibility: () => {}
+  setSectionVisibility: () => {},
+  settings: { showPromptDebugInfo: false },
+  updateSetting: () => {}
 };
 
 /**
@@ -57,29 +66,34 @@ interface DevToolsProviderProps {
  * Provides state management for the DevTools panel's open/closed state and section visibility.
  * Only renders children in development environment.
  */
-export const DevToolsProvider = ({ 
-  children, 
+export const DevToolsProvider = ({
+  children,
   initialIsOpen = false,
   defaultSectionVisibility
 }: DevToolsProviderProps) => {
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [isDev, setIsDev] = useState(false);
   const [sectionVisibility, setSectionVisibilityState] = useState<SectionVisibility>({});
-  
+  const [settings, setSettings] = useState<DevToolsSettings>({ showPromptDebugInfo: false });
+
   // Use ref to stabilize defaultSectionVisibility to prevent unnecessary re-runs
   const defaultSectionVisibilityRef = useRef(defaultSectionVisibility);
   defaultSectionVisibilityRef.current = defaultSectionVisibility;
-  
-  // Set client-side flag and check environment, load section visibility
+
+  // Set client-side flag and check environment, load section visibility and settings
   useEffect(() => {
     setIsDev(process.env.NODE_ENV === 'development');
-    
+
     // Load section visibility from localStorage on mount
     // Use custom defaults if provided, otherwise use standard defaults
     const loadedVisibility = defaultSectionVisibilityRef.current
       ? loadSectionVisibilityWithDefaults(defaultSectionVisibilityRef.current)
       : loadSectionVisibility();
     setSectionVisibilityState(loadedVisibility);
+
+    // Load DevTools settings from localStorage
+    const loadedSettings = loadDevToolsSettings();
+    setSettings(loadedSettings);
   }, [initialIsOpen]);
 
   // Toggle function to show/hide DevTools
@@ -104,15 +118,26 @@ export const DevToolsProvider = ({
     setSectionVisibilityState(newVisibility);
   };
 
+  // Update a specific setting
+  const updateSettingHandler = <K extends keyof DevToolsSettings>(
+    key: K,
+    value: DevToolsSettings[K]
+  ) => {
+    const newSettings = updateSetting(key, value);
+    setSettings(newSettings);
+  };
+
   // Always render children, but only provide DevTools functionality in dev
   return (
-    <DevToolsContext.Provider value={{ 
-      isOpen: isDev ? isOpen : false, 
+    <DevToolsContext.Provider value={{
+      isOpen: isDev ? isOpen : false,
       toggleDevTools,
       sectionVisibility,
       toggleSectionVisibility,
       isSectionVisible: checkSectionVisible,
-      setSectionVisibility
+      setSectionVisibility,
+      settings,
+      updateSetting: updateSettingHandler
     }}>
       {children}
     </DevToolsContext.Provider>
