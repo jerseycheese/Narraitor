@@ -63,7 +63,7 @@ const mockProps = {
 };
 
 // Test helpers
-const renderAndSetup = (props = mockProps) => {
+const renderAndSetup = (props: React.ComponentProps<typeof SkillEditor> = mockProps) => {
   const user = userEvent.setup();
   render(<SkillEditor {...props} />);
   return user;
