@@ -113,8 +113,12 @@ CRITICAL: Make the character's abilities feel like they truly matter to the stor
   const contextLength = recentContent.length;
   let examplesSection = '';
   if (shouldIncludeExamples(tokenBudget, contextLength)) {
+    // Determine appropriate tag based on skill result
+    // Default to 'success' for custom actions without explicit failure
+    const resultTag = skillUsed?.success === false ? 'failure' : 'success';
+
     examplesSection = getExamplesForPrompt('skill-acknowledgment', tokenBudget, {
-      tags: ['skill', 'acknowledgment', skillUsed?.success ? 'success' : 'failure'],
+      tags: ['skill', 'acknowledgment', resultTag],
       minPriority: 'high',
     });
   }

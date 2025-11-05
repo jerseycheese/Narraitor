@@ -69,7 +69,7 @@ Generate a narrative segment that:
    - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact`;
 
   // Determine budget for examples and context length
-  const tokenBudget = generationParameters?.exampleTokenBudget || 150;
+  const tokenBudget = generationParameters?.exampleTokenBudget ?? 150;
   const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg: any) => seg.content).join('\n\n') || ''); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   // Get examples if they should be included

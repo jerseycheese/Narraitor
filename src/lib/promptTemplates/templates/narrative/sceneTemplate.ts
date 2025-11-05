@@ -98,7 +98,7 @@ Focus on varied sensory details and the character's reactions to bring the scene
 - Vary your sensory language to avoid overused phrases`;
 
   // Get examples for perspective and formatting if token budget allows
-  const tokenBudget = generationParameters?.exampleTokenBudget || 120;
+  const tokenBudget = generationParameters?.exampleTokenBudget ?? 120;
   const contextLength = recentContent.length;
   let examplesSection = '';
   if (shouldIncludeExamples(tokenBudget, contextLength)) {
