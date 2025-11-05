@@ -41,11 +41,13 @@ export function setupMockStorage() {
   Object.defineProperty(window, 'sessionStorage', {
     value: mockSessionStorage,
     writable: true,
+    configurable: true,
   });
 
   Object.defineProperty(window, 'localStorage', {
     value: mockLocalStorage,
     writable: true,
+    configurable: true,
   });
 
   return { mockSessionStorage, mockLocalStorage };
