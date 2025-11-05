@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
+import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
 
 /**
  * Journal Modal Visual Test

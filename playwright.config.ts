@@ -38,8 +38,8 @@ export default defineConfig({
   // Snapshot handling - Darwin-only strategy for consistent visual comparisons
   updateSnapshots: process.env.CI ? 'none' : 'missing',
   
-  // Opt out of parallel tests on CI
-  workers: process.env.CI ? 1 : undefined,
+  // Use 2 parallel workers on CI for optimal speed (tested: 4 workers showed no improvement)
+  workers: process.env.CI ? 2 : undefined,
   
   // Reporter configuration
   reporter: process.env.CI 

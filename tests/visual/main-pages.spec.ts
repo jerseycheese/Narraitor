@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent, waitForInteraction, expandAllCollapsibleSections } from './utils/wait-helpers';
-import { seedTestData, seedBaseData } from './utils/data-seeder';
+import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**
  * Main Pages Visual Regression Tests

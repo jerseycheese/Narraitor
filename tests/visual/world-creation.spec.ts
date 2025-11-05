@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
-import { seedTestData } from './utils/data-seeder';
+import { seedTestData } from './utils/seedTestData';
 
 /**
  * World Creation Wizard Visual Regression Test (Sequential)
