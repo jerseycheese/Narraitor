@@ -1,0 +1,202 @@
+/**
+ * Tests for EndingGenerator - Basic Generation
+ *
+ * Verifies core ending generation with required fields and tone handling.
+ */
+
+import { getTimestamp } from '@/lib/utils/timestamp';
+
+// Mock modules
+jest.mock('../../../state/sessionStore', () => ({
+  useSessionStore: {
+    getState: jest.fn().mockReturnValue({
+      currentSessionId: 'test-session',
+      sessionId: 'test-session'
+    })
+  }
+}));
+
+jest.mock('../../../state/journalStore', () => ({
+  useJournalStore: {
+    getState: jest.fn().mockReturnValue({
+      entries: []
+    })
+  }
+}));
+
+import { endingGenerator } from '../endingGenerator';
+import { buildEndingContext } from '../contextManager';
+import { promptTemplateManager } from '../../promptTemplates/promptTemplateManager';
+import type { EndingGenerationRequest } from '../../../types/narrative.types';
+import { PromptType } from '../../promptTemplates/types';
+import {
+  mockGeminiClient,
+  createMockWorld,
+  createMockCharacter,
+  createMockNarrativeSegments,
+  createMockJournalEntries,
+  setupTestTimers,
+  cleanupTestTimers
+} from './endingGenerator.testHelpers';
+
+jest.mock('../defaultGeminiClient', () => ({
+  createDefaultGeminiClient: () => mockGeminiClient
+}));
+
+const mockBuildEndingContext = buildEndingContext as jest.Mock;
+
+jest.mock('../../utils/logger', () => {
+  const mockLogger = {
+    debug: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn()
+  };
+
+  class MockLogger {
+    constructor() {
+      Object.assign(this, mockLogger);
+    }
+    debug = mockLogger.debug;
+    error = mockLogger.error;
+    warn = mockLogger.warn;
+    info = mockLogger.info;
+  }
+
+  return {
+    logger: mockLogger,
+    Logger: MockLogger,
+    default: MockLogger
+  };
+});
+
+jest.mock('../geminiClient', () => ({
+  geminiClient: {
+    generateContent: jest.fn(),
+    getLastTokenUsage: jest.fn().mockReturnValue({
+      promptTokens: 100,
+      completionTokens: 50,
+      totalTokens: 150
+    })
+  }
+}));
+
+jest.mock('../contextManager', () => ({
+  buildEndingContext: jest.fn()
+}));
+
+jest.mock('../../promptTemplates/promptTemplateManager', () => ({
+  promptTemplateManager: {
+    getTemplate: jest.fn(),
+    addTemplate: jest.fn()
+  }
+}));
+
+jest.mock('../../../state/sessionStore');
+jest.mock('../../../state/journalStore');
+
+describe('EndingGenerator - Basic Generation', () => {
+  const mockWorld = createMockWorld();
+  const mockCharacter = createMockCharacter();
+  const mockNarrativeSegments = createMockNarrativeSegments();
+  const mockJournalEntries = createMockJournalEntries();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setupTestTimers();
+  });
+
+  afterEach(() => {
+    cleanupTestTimers();
+  });
+
+  it('should generate an ending with all required fields', async () => {
+    const mockRequest: EndingGenerationRequest = {
+      sessionId: 'session-789',
+      characterId: 'char-456',
+      worldId: 'world-123',
+      endingType: 'story-complete'
+    };
+
+    const mockContext = {
+      world: mockWorld,
+      character: mockCharacter,
+      narrativeSegments: mockNarrativeSegments,
+      journalEntries: mockJournalEntries
+    };
+
+    const mockResponse = `{
+      "epilogue": "As the sun set over the kingdom, Aria stood victorious...",
+      "characterLegacy": "Aria Stormblade would be remembered as the hero who saved the realm...",
+      "worldImpact": "The defeat of the dark lord brought peace to the land for generations...",
+      "tone": "triumphant",
+      "achievements": ["Dragon Slayer", "Savior of the Realm", "Master Warrior"]
+    }`;
+
+    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
+
+    mockBuildEndingContext.mockResolvedValue(mockContext);
+    mockPromptTemplateManager.getTemplate.mockReturnValue({
+      id: 'test-template',
+      type: PromptType.NARRATIVE,
+      content: 'Generate an epic ending...',
+      variables: []
+    });
+    mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
+
+    const result = await endingGenerator.generateEnding(mockRequest);
+
+    expect(result).toMatchObject({
+      epilogue: expect.any(String),
+      characterLegacy: expect.any(String),
+      worldImpact: expect.any(String),
+      tone: 'triumphant',
+      achievements: expect.arrayContaining(['Dragon Slayer'])
+    });
+
+    expect(mockBuildEndingContext).toHaveBeenCalledWith(mockRequest);
+    expect(mockPromptTemplateManager.getTemplate).toHaveBeenCalledWith('ending');
+    expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+  });
+
+  it('should use desired tone when provided', async () => {
+    const mockRequest: EndingGenerationRequest = {
+      sessionId: 'session-789',
+      characterId: 'char-456',
+      worldId: 'world-123',
+      endingType: 'player-choice',
+      desiredTone: 'triumphant'
+    };
+
+    const mockContext = {
+      world: mockWorld,
+      character: mockCharacter,
+      narrativeSegments: mockNarrativeSegments,
+      journalEntries: []
+    };
+
+    const mockResponse = `{
+      "epilogue": "Victory came at a great cost...",
+      "characterLegacy": "Aria saved the realm, but lost much along the way...",
+      "worldImpact": "Peace was restored, though scars remained...",
+      "tone": "triumphant",
+      "achievements": ["Pyrrhic Victory", "The Sacrifice"]
+    }`;
+
+    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
+
+    mockBuildEndingContext.mockResolvedValue(mockContext);
+    mockPromptTemplateManager.getTemplate.mockReturnValue({
+      id: 'test-template',
+      type: PromptType.NARRATIVE,
+      content: 'Generate triumphant ending...',
+      variables: []
+    });
+    mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
+
+    const result = await endingGenerator.generateEnding(mockRequest);
+
+    expect(result.tone).toBe('triumphant');
+    expect(result.epilogue).toContain('cost');
+  });
+});
