@@ -1,4 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
+import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -50,7 +51,7 @@ AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
 
-  return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
+  const baseContent = `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
@@ -136,7 +137,6 @@ CONTEXT SUMMARY INSTRUCTIONS:
 - Provide a brief 1-2 sentence summary that captures the current narrative moment
 - Focus on what just happened that led to this decision point
 - Reference specific story elements, locations, or character actions
-- Example: "After discovering the hidden chamber, strange symbols glow on the walls around you."
 
 IMPORTANT FORMATTING RULES:
 - Each option starts with a number and period
@@ -147,6 +147,19 @@ IMPORTANT FORMATTING RULES:
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary, then Decision and Options sections with optional Hint and Requirements for each choice.
 
 IMPORTANT: Never include emojis anywhere in your response. Use only plain text - the user interface will add visual elements automatically.`;
+
+  // Get examples for choice generation if token budget allows
+  const tokenBudget = 100;
+  const contextLength = shortContext.length;
+  let examplesSection = '';
+  if (shouldIncludeExamples(tokenBudget, contextLength)) {
+    examplesSection = getExamplesForPrompt('choice', tokenBudget, {
+      tags: ['choice', 'context-summary', 'chaotic'],
+      minPriority: 'medium',
+    });
+  }
+
+  return `${baseContent}${examplesSection}`;
 };
 
 export default playerChoiceTemplate;
