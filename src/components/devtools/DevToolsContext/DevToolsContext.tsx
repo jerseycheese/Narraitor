@@ -94,7 +94,8 @@ export const DevToolsProvider = ({
     // Load DevTools settings from localStorage
     const loadedSettings = loadDevToolsSettings();
     setSettings(loadedSettings);
-  }, [initialIsOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {
