@@ -156,8 +156,10 @@ npm run test:coverage
 
 ## Next Steps
 
-1. Complete narrativeGenerator.decision-consequences refactoring
-2. Move through priority tiers systematically
-3. Run full test suite after each batch
-4. Document any patterns that emerge
-5. Create PR when complete
+This PR (#825) completes the first batch of refactoring. For future PRs:
+
+1. Continue with high-priority files (500-600 lines)
+2. Use established patterns: extract helpers → split by concern
+3. Maintain incremental PRs (3-5 files per PR for reviewability)
+4. Run full test suite after each batch
+5. Update this document with progress in each new PR
