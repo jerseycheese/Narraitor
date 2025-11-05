@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base, Page } from '@playwright/test';
 import { seedTestData, seedBaseData } from './seedTestData';
 
 /**
@@ -22,7 +22,12 @@ import { seedTestData, seedBaseData } from './seedTestData';
  * ```
  */
 
-export const test = base.extend({
+type CustomFixtures = {
+  seededPage: Page;
+  emptyStatePage: Page;
+};
+
+export const test = base.extend<CustomFixtures>({
   /**
    * Page fixture with full test data seeded
    * Use this for tests that require populated state

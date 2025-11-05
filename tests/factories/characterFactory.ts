@@ -45,6 +45,7 @@ export const characterFactory = Factory.define<Character>(({ sequence }) => ({
     items: [],
     capacity: 15,
     categories: [],
+    itemOrder: [],
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),

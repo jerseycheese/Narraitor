@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test';
-import { getTimestamp } from '@/lib/utils';
 import {
   SAMPLE_WORLDS,
   SAMPLE_CHARACTERS,
@@ -7,8 +6,6 @@ import {
   SAMPLE_NARRATIVE_SEGMENTS,
   SAMPLE_DECISIONS,
 } from '@/tests/fixtures';
-
-const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 
 /**
  * Base seeding for empty state tests - minimal data needed for app initialization
@@ -119,11 +116,7 @@ export async function seedTestData(page: Page): Promise<void> {
 
   // Use addInitScript to set data BEFORE the app loads
   await page.addInitScript(
-    async ({ testData, getTimestampSource }) => {
-      const instantiateGetTimestamp = (source: string) =>
-        new Function(`return (${source});`)() as () => string;
-      const getTimestamp = instantiateGetTimestamp(getTimestampSource);
-
+    async ({ testData }) => {
       const {
         SAMPLE_WORLDS,
         SAMPLE_CHARACTERS,
@@ -159,7 +152,7 @@ export async function seedTestData(page: Page): Promise<void> {
 
       // Convert arrays to Record format
       const worldsRecord = SAMPLE_WORLDS.reduce(
-        (acc: Record<string, unknown>, world) => {
+        (acc: Record<string, any>, world: any) => {
           acc[world.id] = world;
           return acc;
         },
@@ -167,7 +160,7 @@ export async function seedTestData(page: Page): Promise<void> {
       );
 
       const charactersRecord = SAMPLE_CHARACTERS.reduce(
-        (acc: Record<string, unknown>, char) => {
+        (acc: Record<string, any>, char: any) => {
           acc[char.id] = char;
           return acc;
         },
@@ -175,7 +168,7 @@ export async function seedTestData(page: Page): Promise<void> {
       );
 
       const sessionsRecord = SAMPLE_GAME_SESSIONS.reduce(
-        (acc: Record<string, unknown>, session) => {
+        (acc: Record<string, any>, session: any) => {
           acc[session.id] = session;
           return acc;
         },
@@ -183,7 +176,7 @@ export async function seedTestData(page: Page): Promise<void> {
       );
 
       const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce<Record<string, any>>(
-        (acc, segment) => {
+        (acc: Record<string, any>, segment: any) => {
           acc[segment.id] = segment;
           return acc;
         },
@@ -191,7 +184,7 @@ export async function seedTestData(page: Page): Promise<void> {
       );
 
       const decisionsRecord = SAMPLE_DECISIONS.reduce<Record<string, any>>(
-        (acc, decision) => {
+        (acc: Record<string, any>, decision: any) => {
           acc[decision.id] = decision;
           return acc;
         },
@@ -227,7 +220,7 @@ export async function seedTestData(page: Page): Promise<void> {
             worldId: SAMPLE_GAME_SESSIONS[0]?.worldId,
             characterId: SAMPLE_GAME_SESSIONS[0]?.characterId,
             savedSessions: SAMPLE_GAME_SESSIONS.reduce<Record<string, any>>(
-              (acc, session) => {
+              (acc: Record<string, any>, session: any) => {
                 acc[session.id] = {
                   id: session.id,
                   worldId: session.worldId,
@@ -249,7 +242,7 @@ export async function seedTestData(page: Page): Promise<void> {
           state: {
             segments: segmentsRecord,
             sessionSegments: SAMPLE_GAME_SESSIONS.reduce<Record<string, string[]>>(
-              (acc, session) => {
+              (acc: Record<string, string[]>, session: any) => {
                 acc[session.id] = Object.keys(segmentsRecord).filter(
                   (id) => segmentsRecord[id]?.sessionId === session.id
                 );
@@ -259,7 +252,7 @@ export async function seedTestData(page: Page): Promise<void> {
             ),
             decisions: decisionsRecord,
             sessionDecisions: SAMPLE_GAME_SESSIONS.reduce<Record<string, string[]>>(
-              (acc, session) => {
+              (acc: Record<string, string[]>, session: any) => {
                 acc[session.id] = Object.keys(decisionsRecord).filter((id) => {
                   const decision = decisionsRecord[id];
                   return decision?.narrativeSegmentId?.includes(
@@ -316,7 +309,6 @@ export async function seedTestData(page: Page): Promise<void> {
         SAMPLE_NARRATIVE_SEGMENTS,
         SAMPLE_DECISIONS,
       },
-      getTimestampSource: GET_TIMESTAMP_SOURCE,
     }
   );
 

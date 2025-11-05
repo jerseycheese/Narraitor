@@ -20,7 +20,6 @@ export const SAMPLE_WORLDS: World[] = [
     genre: 'cyberpunk',
     image: {
       url: '/visual-assets/world-cyberpunk.png',
-      alt: 'Cyberpunk cityscape',
       type: 'ai-generated',
       prompt:
         'A cyberpunk cityscape with neon lights, towering skyscrapers, and flying vehicles in a dystopian future setting',
@@ -77,11 +76,9 @@ export const SAMPLE_WORLDS: World[] = [
       skillPointPool: 20,
     },
     toneSettings: {
-      complexity: 'medium' as const,
-      maturityLevel: 'mature' as const,
-      pacing: 'moderate' as const,
-      focusAreas: ['technology', 'social-inequality'],
-      narrativeStyle: 'gritty-realism' as const,
+      contentRating: 'R' as const,
+      narrativeStyle: 'serious' as const,
+      languageComplexity: 'moderate' as const,
     },
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
@@ -94,7 +91,6 @@ export const SAMPLE_WORLDS: World[] = [
     genre: 'fantasy',
     image: {
       url: STABLE_WORLD_IMAGE,
-      alt: 'Fantasy realm',
       type: 'ai-generated',
       prompt:
         'A magical fantasy realm with floating cities, ancient dragons soaring through mystical clouds, and arcane energy flowing through the sky',
@@ -151,11 +147,9 @@ export const SAMPLE_WORLDS: World[] = [
       skillPointPool: 20,
     },
     toneSettings: {
-      complexity: 'high' as const,
-      maturityLevel: 'teen' as const,
-      pacing: 'epic' as const,
-      focusAreas: ['magic', 'political-intrigue'],
-      narrativeStyle: 'heroic-fantasy' as const,
+      contentRating: 'PG' as const,
+      narrativeStyle: 'epic' as const,
+      languageComplexity: 'moderate' as const,
     },
     createdAt: '2024-01-02T00:00:00.000Z',
     updatedAt: '2024-01-02T00:00:00.000Z',
