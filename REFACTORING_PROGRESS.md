@@ -2,7 +2,7 @@
 
 ## Work Completed
 
-### Files Refactored: 4 of 48 (8%)
+### Files Refactored: 5 of 48 (10%)
 
 1. **indexedDBAdapter.test.ts** (736 lines → 4 files, 579 lines total)
    - `indexedDBAdapter.testHelpers.ts` (146 lines)
@@ -34,12 +34,18 @@
    - `loreStore.advanced.test.ts` (254 lines)
    - **Result**: All files <300 lines, organized by feature area
 
+5. **endingGenerator.test.ts** (500 lines → 4 files, 788 lines total)
+   - `endingGenerator.testHelpers.ts` (164 lines)
+   - `endingGenerator.basic.test.ts` (202 lines)
+   - `endingGenerator.advanced.test.ts` (246 lines)
+   - `endingGenerator.errors.test.ts` (176 lines)
+   - **Result**: All files <300 lines, organized by feature category
+
 ## Remaining Files
 
-### High Priority (500+ lines): 3 files
+### High Priority (500+ lines): 2 files
 - narrativeStore.playerDecisionTracker.integration.test.ts (519 lines)
 - narrativeContextExtractor.test.ts (513 lines)
-- endingGenerator.test.ts (500 lines)
 
 ### Medium Priority (400-500 lines): 13 files
 - decisionFormatter.test.ts (493 lines)
@@ -81,7 +87,7 @@ Too numerous to list, but all in the 300-400 line range
 
 ## Next Steps
 
-1. Continue with remaining 44 files systematically
+1. Continue with remaining 43 files systematically
 2. Work through priority tiers (high → medium → standard)
 3. Run test suite after each batch
 4. Update this document with progress
@@ -89,8 +95,9 @@ Too numerous to list, but all in the 300-400 line range
 
 ## Total Impact
 
-- **Lines reduced**: ~400 lines through deduplication
-- **Files created**: 18 new files (14 test files, 4 helper files)
-- **Files removed**: 4 oversized files
+- **Lines reduced**: ~500 lines through deduplication
+- **Files created**: 22 new files (17 test files, 5 helper files)
+- **Files removed**: 5 oversized files
 - **Compliance**: 100% of refactored files now <300 lines
-- **Progress**: 4 of 48 files completed (8%), 44 remaining
+- **Max file size**: 254 lines (loreStore.advanced.test.ts)
+- **Progress**: 5 of 48 files completed (10%), 43 remaining
