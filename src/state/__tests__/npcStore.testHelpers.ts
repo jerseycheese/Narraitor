@@ -23,7 +23,8 @@ export function createTestNPCData(overrides?: Partial<{
 /**
  * Resets the NPC store to initial state
  */
-export function resetNPCStore(useNPCStore: { setState: (state: unknown) => void }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function resetNPCStore(useNPCStore: any) {
   useNPCStore.setState({
     npcs: {},
     entities: {},

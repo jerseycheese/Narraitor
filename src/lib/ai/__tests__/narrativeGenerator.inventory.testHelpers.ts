@@ -7,6 +7,7 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { AIClient } from '../types';
+import { InventoryAcquisitionMethod, StandardInventoryCategory } from '@/types/inventory.types';
 
 /**
  * Creates a mock Gemini client for testing
@@ -96,8 +97,8 @@ export function createMockItem(overrides?: Partial<{
   description: string;
   stackable: boolean;
   quantity: number;
-  categoryId: string;
-  method: string;
+  categoryId: StandardInventoryCategory;
+  method: InventoryAcquisitionMethod;
 }>) {
   return {
     name: 'Test Item',
@@ -105,12 +106,12 @@ export function createMockItem(overrides?: Partial<{
     stackable: false,
     quantity: 1,
     categorization: {
-      categoryId: overrides?.categoryId || 'equipment',
+      categoryId: (overrides?.categoryId || 'equipment') as StandardInventoryCategory,
       source: 'manual' as const,
       classifiedAt: new Date().toISOString(),
     },
     acquisition: {
-      method: overrides?.method || 'loot',
+      method: (overrides?.method || 'loot') as InventoryAcquisitionMethod,
       description: 'Found in test',
       acquiredAt: new Date().toISOString(),
       quantity: overrides?.quantity || 1,

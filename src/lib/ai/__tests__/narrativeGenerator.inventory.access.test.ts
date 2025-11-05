@@ -5,6 +5,7 @@
 
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useCharacterStore } from '@/state/characterStore';
 import {
   createMockGeminiClient,
   setupTestWorldAndCharacter,
