@@ -68,8 +68,7 @@ Generate a narrative segment that:
    - Use **double asterisks** around critical moments, intense emotions, or dramatic revelations
    - Apply emphasis sparingly (2-4 times per paragraph) to maintain impact`;
 
-  // Calculate tokens used so far and determine budget for examples
-  const baseTokens = estimateTokenCount(baseContent);
+  // Determine budget for examples and context length
   const tokenBudget = generationParameters?.exampleTokenBudget || 150;
   const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg: any) => seg.content).join('\n\n') || ''); // eslint-disable-line @typescript-eslint/no-explicit-any
 

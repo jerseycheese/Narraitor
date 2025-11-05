@@ -211,7 +211,7 @@ export function getExamplesByCategory(
   category: string
 ): PromptExample[] {
   return allExamples.filter((example) =>
-    example.categories.includes(category as any)
+    example.categories.some((cat) => cat === category)
   );
 }
 
