@@ -133,13 +133,6 @@ export function CharacterCard({
               return result || truncate(text, 280);
             })()}
           </p>
-          {context?.threadSummary && (
-            <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <p className="text-sm text-gray-700">
-                {context.threadSummary}
-              </p>
-            </div>
-          )}
           {context?.relationships && context.relationships.length > 0 && (
             <div className="mt-4">
               <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
@@ -167,6 +160,13 @@ export function CharacterCard({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+          {context?.threadSummary && (
+            <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <p className="text-sm text-gray-700">
+                {context.threadSummary}
+              </p>
             </div>
           )}
           <div className="clear-both"></div>
