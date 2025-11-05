@@ -3,65 +3,18 @@
  * Provides reusable mock character data factories
  */
 
-// Type matching the Character interface from characterStore.ts
-interface CharacterInput {
-  name: string;
-  description: string;
-  worldId: string;
-  level: number;
-  attributes: Array<{
-    id: string;
-    characterId: string;
-    worldAttributeId?: string;
-    name: string;
-    baseValue: number;
-    modifiedValue: number;
-    category?: string;
-  }>;
-  skills: Array<{
-    id: string;
-    characterId: string;
-    worldSkillId?: string;
-    name: string;
-    level: number;
-    category?: string;
-  }>;
-  background: {
-    history: string;
-    personality: string;
-    goals: string[];
-    fears: string[];
-    physicalDescription?: string;
-    relationships: unknown[];
-    isKnownFigure?: boolean;
-    knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
-  };
-  isPlayer: boolean;
-  status: {
-    health: number;
-    maxHealth: number;
-    conditions: string[];
-    location?: string;
-  };
-  inventory: {
-    characterId: string;
-    items: unknown[];
-    capacity: number;
-    categories: unknown[];
-    itemOrder: string[];
-  };
-  portrait?: {
-    type: 'ai-generated' | 'placeholder';
-    url: string | null;
-    generatedAt?: string;
-    prompt?: string;
-  };
-}
+import type { Character } from '../characterStore';
+import type { EntityID } from '@/types/common.types';
+
+// Type for creating test characters (omits fields added by store)
+type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
 
 /**
  * Creates basic character test data
  */
 export function createTestCharacterData(overrides?: Partial<CharacterInput>): CharacterInput {
+  const characterId: EntityID = '';
+
   return {
     name: 'Test Character',
     description: 'A test character',
@@ -83,7 +36,7 @@ export function createTestCharacterData(overrides?: Partial<CharacterInput>): Ch
       conditions: []
     },
     inventory: {
-      characterId: '',
+      characterId,
       items: [],
       capacity: 20,
       categories: [],
