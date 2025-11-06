@@ -1,15 +1,12 @@
 import { normalizeSkillBounds, calculateSkillPointPool } from '../skillAllocation';
 import type { WizardSkillData, WizardSkillInput } from '../skillAllocation';
 import type { World } from '@/types/world.types';
+import { createMockWorld, createMockWorldSkill } from '@/lib/test-utils';
 
-const buildWorld = (overrides: Partial<World> = {}): World => ({
+const buildWorld = (overrides: Partial<World> = {}): World => createMockWorld({
   id: 'world-1',
-  name: 'Test World',
-  description: 'A world used for testing skill normalization.',
-  genre: 'fantasy',
-  attributes: [],
   skills: [
-    {
+    createMockWorldSkill({
       id: 'skill-1',
       worldId: 'world-1',
       name: 'Archery',
@@ -20,7 +17,7 @@ const buildWorld = (overrides: Partial<World> = {}): World => ({
       baseValue: 1,
       minValue: 1,
       maxValue: 5,
-    },
+    }),
   ],
   settings: {
     maxAttributes: 6,
@@ -28,8 +25,6 @@ const buildWorld = (overrides: Partial<World> = {}): World => ({
     attributePointPool: 20,
     skillPointPool: 10,
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
   ...overrides,
 });
 

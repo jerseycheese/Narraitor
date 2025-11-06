@@ -3,25 +3,22 @@
 import { generateCharacterArchetypes, getArchetypeTemplatesForGenre } from '../characterArchetypes';
 import { World } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
+import { createMockWorld as factoryCreateMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';
 
 describe('characterArchetypes', () => {
   // Mock world data for testing
-  const createMockWorld = (genre: GenreValue): World => ({
+  const createMockWorld = (genre: GenreValue): World => factoryCreateMockWorld({
     id: 'test-world',
-    name: 'Test World',
-    description: 'A test world for character generation',
     genre,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
     attributes: [
-      { id: 'str', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
-      { id: 'int', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
-      { id: 'agi', name: 'Agility', description: 'Speed and dexterity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }
+      createMockWorldAttribute({ id: 'str', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
+      createMockWorldAttribute({ id: 'int', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
+      createMockWorldAttribute({ id: 'agi', name: 'Agility', description: 'Speed and dexterity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' })
     ],
     skills: [
-      { id: 'combat', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
-      { id: 'stealth', name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
-      { id: 'magic', name: 'Magic', description: 'Mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }
+      createMockWorldSkill({ id: 'combat', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
+      createMockWorldSkill({ id: 'stealth', name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
+      createMockWorldSkill({ id: 'magic', name: 'Magic', description: 'Mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' })
     ],
     settings: {
       maxAttributes: 10,
