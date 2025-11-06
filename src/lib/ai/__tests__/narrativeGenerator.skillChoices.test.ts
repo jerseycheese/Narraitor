@@ -12,6 +12,7 @@ import { NarrativeContext } from '@/types/narrative.types';
 import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils/mockStoreFactories';
 
 describe('NarrativeGenerator - Skill-Based Choices', () => {
   let narrativeGenerator: NarrativeGenerator;

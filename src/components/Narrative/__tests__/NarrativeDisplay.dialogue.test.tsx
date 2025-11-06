@@ -21,6 +21,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       id === 'npc-1' ? {
         id: 'npc-1',
         name: 'Gandalf',
+        description: 'A wise wizard',
         worldId: 'world-1',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -32,6 +33,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         'npc-1': {
           id: 'npc-1',
           name: 'Gandalf',
+          description: 'A wise wizard',
           worldId: 'world-1',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -65,6 +67,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       id === 'npc-2' ? {
         id: 'npc-2',
         name: 'Aragorn',
+        description: 'Ranger of the North',
         worldId: 'world-1',
         avatarUrl: 'https://example.com/aragorn.jpg',
         createdAt: new Date().toISOString(),
@@ -77,6 +80,7 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
         'npc-2': {
           id: 'npc-2',
           name: 'Aragorn',
+          description: 'Ranger of the North',
           worldId: 'world-1',
           avatarUrl: 'https://example.com/aragorn.jpg',
           createdAt: new Date().toISOString(),

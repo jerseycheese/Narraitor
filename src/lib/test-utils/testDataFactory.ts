@@ -5,11 +5,10 @@
  * Provides consistent test data with sensible defaults that can be overridden.
  */
 
-import type { 
-  World, 
-  WorldAttribute, 
-  WorldSkill, 
-  Character,
+import type {
+  World,
+  WorldAttribute,
+  WorldSkill,
   NarrativeSegment,
   GameSession,
   JournalEntry,
@@ -17,6 +16,7 @@ import type {
   InventoryItem,
   Decision
 } from '@/types';
+import type { Character } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils';
 
 // PlayerChoice is a custom type for this factory
@@ -96,6 +96,8 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
     worldId: 'world-test-1',
     name: 'Test Character',
     description: 'A test character for unit testing',
+    level: 1,
+    isPlayer: false,
     attributes: [],
     skills: [],
     background: {

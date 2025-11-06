@@ -41,7 +41,9 @@ const mockWorld = {
   skills: [],
   settings: {
     maxAttributes: 10,
-    maxSkills: 20
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'
@@ -50,12 +52,31 @@ const mockWorld = {
 const mockCharacter = {
   id: 'char-test',
   name: 'Test Hero',
+  description: 'A brave adventurer',
   worldId: 'world-test',
+  level: 1,
+  isPlayer: true,
   background: {
-    summary: 'A brave adventurer'
+    history: 'A brave adventurer',
+    personality: 'Courageous',
+    goals: [],
+    fears: [],
+    relationships: []
   },
-  attributes: {},
+  attributes: [],
   skills: [],
+  inventory: {
+    characterId: 'char-test',
+    items: [],
+    capacity: 10,
+    categories: [],
+    itemOrder: []
+  },
+  status: {
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'
 };

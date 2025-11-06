@@ -25,7 +25,9 @@ const mockWorld = {
   skills: [],
   settings: {
     maxAttributes: 10,
-    maxSkills: 20
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'

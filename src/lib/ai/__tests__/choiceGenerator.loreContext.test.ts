@@ -25,10 +25,20 @@ const mockWorld = {
   name: 'Fantasy Realm',
   description: 'A magical fantasy world',
   genre: 'fantasy',
+  attributes: [],
+  skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
+  },
+  createdAt: '2023-01-01',
+  updatedAt: '2023-01-01',
   toneSettings: {
-    contentRating: 'teen',
-    narrativeStyle: 'adventure',
-    languageComplexity: 'medium'
+    contentRating: 'PG-13' as const,
+    narrativeStyle: 'action-packed' as const,
+    languageComplexity: 'moderate' as const
   }
 };
 

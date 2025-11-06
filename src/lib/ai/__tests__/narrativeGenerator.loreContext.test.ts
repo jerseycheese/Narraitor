@@ -22,10 +22,18 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
+  },
+  createdAt: '2023-01-01',
+  updatedAt: '2023-01-01',
   toneSettings: {
-    contentRating: 'teen',
-    narrativeStyle: 'epic',
-    languageComplexity: 'moderate'
+    contentRating: 'PG' as const,
+    narrativeStyle: 'epic' as const,
+    languageComplexity: 'moderate' as const
   }
 };
 
