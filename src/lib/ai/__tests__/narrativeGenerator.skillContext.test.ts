@@ -26,16 +26,16 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
 
     (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'skill-world': mockWorld },
-      currentWorldId: 'skill-world'}));
-    )))
+      currentWorldId: 'skill-world'
+    }));
 
     (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-1': mockCharacter }
-    )))
+    }));
 
     mockAIClient = createMockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAIClient);
-  )))
+  });
 
   test('should include character skill information in narrative context', async () => {
     const mockResponse = {
@@ -58,7 +58,7 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
         previousSegments: [],
         currentTags: []
       }
-    )))
+    });
 
     // Verify that the AI client was called with a prompt
     expect(mockAIClient.generateContent).toHaveBeenCalled();
@@ -67,5 +67,5 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     // The prompt should include character skill context
     expect(typeof calledPrompt).toBe('string');
     expect(calledPrompt.length).toBeGreaterThan(0);
-  )))
-)))
+  });
+});

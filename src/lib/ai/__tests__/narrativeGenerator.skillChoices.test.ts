@@ -27,15 +27,15 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
     (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'skill-world': mockWorld },
       currentWorldId: 'skill-world'
-    )))
+    }));
 
     (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-1': mockCharacter }
-    )))
+    }));
 
     mockAIClient = createMockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAIClient);
-  )))
+  });
 
   test('should pass character skills to choice generator', async () => {
     // Mock the choice generator to spy on the context passed to it
@@ -94,8 +94,8 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       minOptions: 3,
       maxOptions: 4,
       useAlignedChoices: false
-    )))
+    });
 
     // Verify the choice generator was called - the choices themselves are tested in choiceGenerator tests
-  )))
-)))
+  });
+});
