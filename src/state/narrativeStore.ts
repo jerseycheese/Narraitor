@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
@@ -24,6 +24,19 @@ let sessionStoreModule: typeof import('./sessionStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
+
+/**
+ * Serialized version of PromptDebugInfo for IndexedDB storage.
+ * Date fields are converted to ISO strings for persistence.
+ */
+type SerializedPromptDebugInfo = Omit<PromptDebugInfo, 'generatedAt' | 'recentDecisions'> & {
+  generatedAt: string;
+  recentDecisions?: Array<{
+    decisionText: string;
+    selectedOption: string;
+    timestamp: string;
+  }>;
+};
 
 interface WorldStateUpdateParams {
   newSegment: NarrativeSegment;
@@ -1153,7 +1166,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       (acc, [id, segment]) => {
         if (segment.metadata?.debugInfo) {
           // Serialize Date objects in debugInfo
-          const serializedDebugInfo = {
+          const serializedDebugInfo: SerializedPromptDebugInfo = {
             ...segment.metadata.debugInfo,
             generatedAt: segment.metadata.debugInfo.generatedAt.toISOString(),
             recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision) => ({
@@ -1165,7 +1178,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
             ...segment,
             metadata: {
               ...segment.metadata,
-              debugInfo: serializedDebugInfo as any, // Type cast because we're converting Date to string
+              debugInfo: serializedDebugInfo as unknown as PromptDebugInfo,
             },
           };
         } else {
@@ -1192,10 +1205,15 @@ export const useNarrativeStore = create<NarrativeStore>()(
         (acc, [id, segment]) => {
           if (segment.metadata?.debugInfo) {
             // Convert ISO strings back to Date objects
-            const deserializedDebugInfo = {
+            type SerializedDecision = {
+              decisionText: string;
+              selectedOption: string;
+              timestamp: string;
+            };
+            const deserializedDebugInfo: PromptDebugInfo = {
               ...segment.metadata.debugInfo,
               generatedAt: new Date(segment.metadata.debugInfo.generatedAt),
-              recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision: any) => ({
+              recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision: SerializedDecision) => ({
                 ...decision,
                 timestamp: new Date(decision.timestamp),
               })),

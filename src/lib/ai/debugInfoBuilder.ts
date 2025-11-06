@@ -43,7 +43,7 @@ export function buildPromptDebugInfo(context: DebugInfoContext): PromptDebugInfo
   const activeGoals = extractActiveGoalsFromPrompt(context.fullPrompt);
 
   // Build character context
-  const characterContext = buildCharacterContext(context.characterIds || [], context.world);
+  const characterContext = buildCharacterContext(context.characterIds || []);
 
   // Extract inventory items from the full prompt
   const inventoryItems = extractInventoryItemsFromPrompt(context.fullPrompt);
@@ -142,18 +142,18 @@ function extractActiveGoalsFromPrompt(fullPrompt: string): string[] {
 }
 
 /**
- * Build character context from character IDs and world data
+ * Build character context from character IDs
+ * @todo Add world parameter when implementing full character context lookup
  */
 function buildCharacterContext(
-  characterIds: EntityID[],
-  world: World
+  characterIds: EntityID[]
 ): Array<{
   characterId: EntityID;
   name: string;
   relevantTraits?: string[];
 }> {
   // For now, just return basic character info
-  // In a full implementation, this would query the character store
+  // In a full implementation, this would query the character store and use world data
   return characterIds.map((id) => ({
     characterId: id,
     name: `Character ${id}`,
