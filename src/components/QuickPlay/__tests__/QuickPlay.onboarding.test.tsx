@@ -267,12 +267,14 @@ describe('QuickPlay - Onboarding Integration', () => {
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: false,
-          // Missing isFirstTimeUser and shouldShowOnboarding methods
+          // Override default methods to simulate them being missing/undefined
+          isFirstTimeUser: undefined as unknown as () => boolean,
+          shouldShowOnboarding: undefined as unknown as () => boolean,
         })
       );
 
       render(<QuickPlay />);
-      
+
       // Should fall back to checking savedSessions directly
       // If no saved sessions and onboarding not completed, should show guided experience
       expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
