@@ -1205,15 +1205,12 @@ export const useNarrativeStore = create<NarrativeStore>()(
         (acc, [id, segment]) => {
           if (segment.metadata?.debugInfo) {
             // Convert ISO strings back to Date objects
-            type SerializedDecision = {
-              decisionText: string;
-              selectedOption: string;
-              timestamp: string;
-            };
+            // At this point, debugInfo has been deserialized from JSON, so timestamps are strings
+            const serializedDebugInfo = segment.metadata.debugInfo as unknown as SerializedPromptDebugInfo;
             const deserializedDebugInfo: PromptDebugInfo = {
-              ...segment.metadata.debugInfo,
-              generatedAt: new Date(segment.metadata.debugInfo.generatedAt),
-              recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision: SerializedDecision) => ({
+              ...serializedDebugInfo,
+              generatedAt: new Date(serializedDebugInfo.generatedAt),
+              recentDecisions: serializedDebugInfo.recentDecisions?.map((decision) => ({
                 ...decision,
                 timestamp: new Date(decision.timestamp),
               })),
