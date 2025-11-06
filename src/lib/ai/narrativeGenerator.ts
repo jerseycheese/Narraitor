@@ -40,6 +40,7 @@ import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
 import { logger } from '@/lib/utils/logger';
 import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
+import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -750,6 +751,9 @@ Return ONLY the rewritten narrative.`;
       const context = this.buildContext(world, request);
       const prompt = template(context);
 
+      // Capture lore context for debug info
+      const loreContext = getLoreContextForPrompt(request.worldId);
+
       // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
@@ -805,6 +809,28 @@ Return ONLY the rewritten narrative.`;
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
+
+      // Capture debug info if enabled (dev mode only)
+      if (isDebugInfoEnabled()) {
+        const previousSegments = request.narrativeContext?.previousSegments || [];
+        const previousSegment = previousSegments[previousSegments.length - 1];
+        const segmentType = request.generationParameters?.segmentType || 'scene';
+
+        const debugInfoContext: DebugInfoContext = {
+          fullPrompt: fullyEnhancedPrompt,
+          templateName: this.getTemplateName(segmentType),
+          world,
+          toneSettings,
+          loreContext,
+          characterIds: request.characterIds,
+          previousSegmentContent: previousSegment?.content,
+          previousSegmentType: previousSegment?.type,
+          tokenUsage: result.tokenUsage,
+          modelUsed: 'gemini-2.0-flash',
+        };
+
+        result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
+      }
 
       // Process any acquired items from the narrative
       if (
@@ -976,6 +1002,17 @@ Return ONLY the rewritten narrative.`;
   private getTemplate(segmentType: string) {
     const templateKey = `narrative/${segmentType}`;
     return narrativeTemplateManager.getTemplate(templateKey);
+  }
+
+  private getTemplateName(segmentType: string): string {
+    const names: Record<string, string> = {
+      scene: 'Scene Template',
+      dialogue: 'Dialogue Template',
+      action: 'Action Template',
+      transition: 'Transition Template',
+      initial: 'Initial Scene Template',
+    };
+    return names[segmentType] || 'Unknown Template';
   }
 
   private buildContext(world: World, request: NarrativeGenerationRequest) {

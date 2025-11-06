@@ -23,65 +23,87 @@ interface CharacterEditorProps {
 
 const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const router = useRouter();
-  const [character, setCharacter] = useState<Character | null>(null);
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
   const [world, setWorld] = useState<World | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [portraitError, setPortraitError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [generatingPortrait, setGeneratingPortrait] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Load character data on mount
+  // Subscribe to character from store (reactive to hydration)
+  const storeCharacter = useCharacterStore((state) => state.characters[characterId]);
+
+  // Load character data - subscribes to store updates, so will update after hydration
   useEffect(() => {
     try {
-      const { characters } = useCharacterStore.getState();
-      const characterData = characters[characterId];
-      
-      if (!characterData) {
-        setError('Character not found');
+      if (!storeCharacter) {
+        // Still loading or character doesn't exist
+        // Don't set error immediately - hydration may not be complete
+        setLoading(true);
+        return;
+      }
+
+      const { worlds } = useWorldStore.getState();
+      const worldData = worlds[storeCharacter.worldId];
+
+      if (!worldData) {
+        setLoadError('World data not found for this character');
         setLoading(false);
         return;
       }
-      
-      const { worlds } = useWorldStore.getState();
-      const worldData = worlds[characterData.worldId];
+
+      // Initialize editing copy from store
+      setEditingCharacter(storeCharacter);
       setWorld(worldData);
-      
-      setCharacter(characterData);
+      setLoadError(null); // Clear any previous errors
       setLoading(false);
     } catch (err) {
-      setError('Failed to load character data');
+      setLoadError('Failed to load character data');
       setLoading(false);
       console.error('Error loading character:', err);
     }
-  }, [characterId]);
+  }, [storeCharacter, characterId]);
+
+  // Timeout to detect if character truly doesn't exist after hydration
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!storeCharacter && loading) {
+        setLoadError('Character not found');
+        setLoading(false);
+      }
+    }, 2000); // Wait 2 seconds for hydration
+
+    return () => clearTimeout(timeout);
+  }, [storeCharacter, loading]);
 
   const isPoolValid = useMemo(() => {
-    if (!character || !world) return true;
+    if (!editingCharacter || !world) return true;
 
-    const attributePointsSpent = character.attributes.reduce((sum, attr) => sum + attr.baseValue, 0);
-    const skillPointsSpent = character.skills.reduce((sum, skill) => sum + skill.level, 0);
+    const attributePointsSpent = editingCharacter.attributes.reduce((sum, attr) => sum + attr.baseValue, 0);
+    const skillPointsSpent = editingCharacter.skills.reduce((sum, skill) => sum + skill.level, 0);
 
     const isAttributesValid = attributePointsSpent <= world.settings.attributePointPool;
     const isSkillsValid = skillPointsSpent <= world.settings.skillPointPool;
 
     return isAttributesValid && isSkillsValid;
-  }, [character, world]);
+  }, [editingCharacter, world]);
 
   // Handle saving all character changes
   const handleSave = async () => {
-    if (!character || !isPoolValid) return;
-    
+    if (!editingCharacter || !isPoolValid) return;
+
     setSaving(true);
     try {
       const { updateCharacter } = useCharacterStore.getState();
-      updateCharacter(characterId, character);
-      
+      updateCharacter(characterId, editingCharacter);
+
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       router.push(`/characters/${characterId}`);
     } catch (err) {
-      setError('Failed to save character');
+      setLoadError('Failed to save character');
       console.error('Error saving character:', err);
     } finally {
       setSaving(false);
@@ -98,15 +120,16 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   };
   
   const handleGeneratePortrait = async (customDescription?: string) => {
-    if (!character || !world) return;
-    
+    if (!editingCharacter || !world) return;
+
     setGeneratingPortrait(true);
+    setPortraitError(null); // Clear previous portrait errors
     try {
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          character: { ...character, id: characterId },
+          character: { ...editingCharacter, id: characterId },
           world: world,
           customDescription: customDescription
         }),
@@ -118,26 +141,28 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
 
       const { portrait } = await response.json();
-      
-      setCharacter({ ...character, portrait });
+
+      // Update both local editing state and store
+      setEditingCharacter({ ...editingCharacter, portrait });
       useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       console.error('Failed to generate portrait:', error);
-      setError('Failed to generate portrait. Please try again.');
+      setPortraitError('Failed to generate portrait. Please try again.');
     } finally {
       setGeneratingPortrait(false);
     }
   };
-  
+
   if (loading) {
     return <LoadingState message="Loading character data..." />;
   }
-  
-  if (error || !character || !world) {
+
+  // Only show full-page error for load errors, not portrait errors
+  if (loadError || !editingCharacter || !world) {
     return (
       <PageError
         title="Character Not Found"
-        message={error || 'The requested character could not be found or loaded.'}
+        message={loadError || 'The requested character could not be found or loaded.'}
         showRetry={true}
         onRetry={() => router.push('/characters')}
       />
@@ -148,52 +173,56 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     <div className="component-character-editor space-y-6">
       <CollapsibleSection title="Character Portrait" initiallyExpanded={false} className="bg-background">
         <PortraitSection
-          portrait={character.portrait}
-          characterName={character.name}
+          portrait={editingCharacter.portrait}
+          characterName={editingCharacter.name}
           generatingPortrait={generatingPortrait}
           onGeneratePortrait={handleGeneratePortrait}
-          onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
+          onRemovePortrait={() => {
+            setEditingCharacter({ ...editingCharacter, portrait: undefined });
+            useCharacterStore.getState().updateCharacter(characterId, { portrait: undefined });
+          }}
+          error={portraitError}
         />
       </CollapsibleSection>
-      
+
       <CollapsibleSection title="Basic Information" initiallyExpanded={true} className="bg-background">
         <BasicInfoForm
-          name={character.name}
-          level={character.level}
-          isPlayer={character.isPlayer}
-          onNameChange={(name) => setCharacter({ ...character, name })}
-          onLevelChange={(level) => setCharacter({ ...character, level })}
-          onPlayerTypeChange={(isPlayer) => setCharacter({ ...character, isPlayer })}
+          name={editingCharacter.name}
+          level={editingCharacter.level}
+          isPlayer={editingCharacter.isPlayer}
+          onNameChange={(name) => setEditingCharacter({ ...editingCharacter, name })}
+          onLevelChange={(level) => setEditingCharacter({ ...editingCharacter, level })}
+          onPlayerTypeChange={(isPlayer) => setEditingCharacter({ ...editingCharacter, isPlayer })}
         />
       </CollapsibleSection>
-      
+
       <CollapsibleSection title="Background" initiallyExpanded={false} className="bg-background">
         <BackgroundForm
-          background={character.background}
-          onBackgroundChange={(background) => setCharacter({ 
-            ...character, 
-            background: { ...character.background, ...background }
+          background={editingCharacter.background}
+          onBackgroundChange={(background) => setEditingCharacter({
+            ...editingCharacter,
+            background: { ...editingCharacter.background, ...background }
           })}
         />
       </CollapsibleSection>
-      
+
       <CollapsibleSection title="Attributes" initiallyExpanded={false} className="bg-background">
         <AttributesForm
-          attributes={character.attributes.map(attr => ({ attributeId: attr.id, value: attr.baseValue }))}
+          attributes={editingCharacter.attributes.map(attr => ({ attributeId: attr.id, value: attr.baseValue }))}
           world={world}
           onAttributesChange={(formAttributes) => {
-            const updatedAttributes = character.attributes.map(attr => {
+            const updatedAttributes = editingCharacter.attributes.map(attr => {
               const formAttr = formAttributes.find(fa => fa.attributeId === attr.id);
               return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
             });
-            setCharacter({ ...character, attributes: updatedAttributes });
+            setEditingCharacter({ ...editingCharacter, attributes: updatedAttributes });
           }}
         />
       </CollapsibleSection>
-      
+
       <CollapsibleSection title="Skills" initiallyExpanded={false} className="bg-background">
         <SkillsForm
-          skills={character.skills.map(skill => ({
+          skills={editingCharacter.skills.map(skill => ({
             skillId: skill.id,
             level: skill.level,
             experience: 0,
@@ -201,11 +230,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           }))}
           world={world}
           onSkillsChange={(formSkills) => {
-            const updatedSkills = character.skills.map(skill => {
+            const updatedSkills = editingCharacter.skills.map(skill => {
               const formSkill = formSkills.find(fs => fs.skillId === skill.id);
               return formSkill ? { ...skill, level: formSkill.level } : skill;
             });
-            setCharacter({ ...character, skills: updatedSkills });
+            setEditingCharacter({ ...editingCharacter, skills: updatedSkills });
           }}
         />
       </CollapsibleSection>
@@ -223,19 +252,17 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           </Button>
         </div>
       </div>
-      
-      {character && (
-        <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDelete}
-          title="Delete Character"
-          description={`Are you sure you want to delete "${character.name}"? This action cannot be undone.`}
-          itemName={character.name}
-          confirmButtonText="Delete"
-          cancelButtonText="Cancel"
-        />
-      )}
+
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title="Delete Character"
+        description={`Are you sure you want to delete "${editingCharacter.name}"? This action cannot be undone.`}
+        itemName={editingCharacter.name}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 };

@@ -15,6 +15,7 @@ interface PortraitSectionProps {
   generatingPortrait: boolean;
   onGeneratePortrait: (customDescription?: string) => void;
   onRemovePortrait: () => void;
+  error?: string | null;
 }
 
 export const PortraitSection: React.FC<PortraitSectionProps> = ({
@@ -22,7 +23,8 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
   characterName,
   generatingPortrait,
   onGeneratePortrait,
-  onRemovePortrait
+  onRemovePortrait,
+  error = null
 }) => {
   return (
     <ImageGenerationSection
@@ -42,6 +44,7 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
       regenerateButtonText="Regenerate Portrait"
       removeButtonText="Remove Portrait"
       defaultCustomPromptChecked={false}
+      error={error}
       imageComponent={
         <CharacterPortrait
           portrait={portrait || { type: 'placeholder', url: null }}

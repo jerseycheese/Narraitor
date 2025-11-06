@@ -6,7 +6,9 @@ import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
+import { PromptDebugSection } from './PromptDebugSection';
 import { useNPCStore } from '@/state/npcStore';
+import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
   deriveFallbackName,
   useNarrativeParticipants,
@@ -27,6 +29,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 }) => {
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
+  const { settings } = useDevTools();
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -224,6 +227,11 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
               {resolvedSegment.metadata?.location}
             </p>
           </div>
+        )}
+
+        {/* Debug Information Section (dev mode only) */}
+        {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
+          <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
         )}
       </div>
     </div>

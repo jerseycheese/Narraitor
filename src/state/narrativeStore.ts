@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { Character } from './characterStore';
@@ -24,6 +24,19 @@ let sessionStoreModule: typeof import('./sessionStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
+
+/**
+ * Serialized version of PromptDebugInfo for IndexedDB storage.
+ * Date fields are converted to ISO strings for persistence.
+ */
+type SerializedPromptDebugInfo = Omit<PromptDebugInfo, 'generatedAt' | 'recentDecisions'> & {
+  generatedAt: string;
+  recentDecisions?: Array<{
+    decisionText: string;
+    selectedOption: string;
+    timestamp: string;
+  }>;
+};
 
 interface WorldStateUpdateParams {
   newSegment: NarrativeSegment;
@@ -629,6 +642,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       endingId: metadata?.endingId,
       endingData: metadata?.endingData,
       tone: metadata?.tone,
+      debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 
     const newSegment: NarrativeSegment = {
@@ -1146,16 +1160,79 @@ export const useNarrativeStore = create<NarrativeStore>()(
   storage: createIndexedDBStorage(),
   version: 1,
   // Persist narrative data to maintain story progress across browser refreshes
-  partialize: (state) => ({
-    segments: state.segments,
-    sessionSegments: state.sessionSegments,
-    decisions: state.decisions,
-    sessionDecisions: state.sessionDecisions,
-    endedSessions: state.endedSessions,
-    currentEnding: state.currentEnding,
-  }),
+  partialize: (state) => {
+    // Convert Date objects in debugInfo to ISO strings for persistence
+    const segmentsWithSerializedDebug = Object.entries(state.segments).reduce(
+      (acc, [id, segment]) => {
+        if (segment.metadata?.debugInfo) {
+          // Serialize Date objects in debugInfo
+          const serializedDebugInfo: SerializedPromptDebugInfo = {
+            ...segment.metadata.debugInfo,
+            generatedAt: segment.metadata.debugInfo.generatedAt.toISOString(),
+            recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision) => ({
+              ...decision,
+              timestamp: decision.timestamp.toISOString(),
+            })),
+          };
+          acc[id] = {
+            ...segment,
+            metadata: {
+              ...segment.metadata,
+              debugInfo: serializedDebugInfo as unknown as PromptDebugInfo,
+            },
+          };
+        } else {
+          acc[id] = segment;
+        }
+        return acc;
+      },
+      {} as Record<EntityID, NarrativeSegment>
+    );
+
+    return {
+      segments: segmentsWithSerializedDebug,
+      sessionSegments: state.sessionSegments,
+      decisions: state.decisions,
+      sessionDecisions: state.sessionDecisions,
+      endedSessions: state.endedSessions,
+      currentEnding: state.currentEnding,
+    };
+  },
   onRehydrateStorage: () => (state) => {
     if (state) {
+      // Deserialize Date objects in debugInfo after rehydration
+      const deserializedSegments = Object.entries(state.segments).reduce(
+        (acc, [id, segment]) => {
+          if (segment.metadata?.debugInfo) {
+            // Convert ISO strings back to Date objects
+            // At this point, debugInfo has been deserialized from JSON, so timestamps are strings
+            const serializedDebugInfo = segment.metadata.debugInfo as unknown as SerializedPromptDebugInfo;
+            const deserializedDebugInfo: PromptDebugInfo = {
+              ...serializedDebugInfo,
+              generatedAt: new Date(serializedDebugInfo.generatedAt),
+              recentDecisions: serializedDebugInfo.recentDecisions?.map((decision) => ({
+                ...decision,
+                timestamp: new Date(decision.timestamp),
+              })),
+            };
+            acc[id] = {
+              ...segment,
+              metadata: {
+                ...segment.metadata,
+                debugInfo: deserializedDebugInfo,
+              },
+            };
+          } else {
+            acc[id] = segment;
+          }
+          return acc;
+        },
+        {} as Record<EntityID, NarrativeSegment>
+      );
+
+      // Update state with deserialized segments
+      state.segments = deserializedSegments;
+
       // Use proper state setter to trigger subscriptions
       state.setHasHydrated(true);
     }
