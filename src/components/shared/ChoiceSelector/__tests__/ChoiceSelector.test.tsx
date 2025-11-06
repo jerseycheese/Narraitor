@@ -22,6 +22,27 @@ describe('ChoiceSelector', () => {
     }
   };
 
+  // Helper to render and expand suggestions
+  const renderChoiceSelector = (props: React.ComponentProps<typeof ChoiceSelector>) => {
+    render(<ChoiceSelector {...props} />);
+    expandSuggestions();
+  };
+
+  const assertChoicesVisible = (texts: string[]) => {
+    texts.forEach(text => expect(screen.getByText(text)).toBeInTheDocument());
+  };
+
+  const createCharacterSkills = (skillLevels: Record<string, number>) => {
+    return Object.entries(skillLevels).map(([worldSkillId, level]) => ({
+      id: `skill-${worldSkillId}`,
+      characterId: 'char-1',
+      worldSkillId,
+      name: worldSkillId.replace('-skill', '').replace(/^\w/, c => c.toUpperCase()),
+      level,
+      category: 'Physical'
+    }));
+  };
+
   const simpleChoices: SimpleChoice[] = [
     { id: 'choice-1', text: 'Go north' },
     { id: 'choice-2', text: 'Go south' },
@@ -126,56 +147,30 @@ describe('ChoiceSelector', () => {
   describe('Basic Choice Selection', () => {
     it('displays all choices and handles selection', async () => {
       const user = userEvent.setup();
-      render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
-      expandSuggestions();
-      
-      // All choices should be visible
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-      expect(screen.getByText('Go south')).toBeInTheDocument();
-      expect(screen.getByText('Rest here')).toBeInTheDocument();
-      
-      // Should call onSelect when clicked
+      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect});
+
+      assertChoicesVisible(['Go north', 'Go south', 'Rest here']);
+
       await user.click(screen.getByText('Go north'));
       expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
     });
 
     it('displays decisions with hints when enabled', () => {
-      render(<ChoiceSelector decision={decision} onSelect={mockOnSelect} showHints />);
-      expandSuggestions();
-      
-      expect(screen.getByText('Attack')).toBeInTheDocument();
-      expect(screen.getByText('Requires courage')).toBeInTheDocument();
-      expect(screen.getByText('Defend')).toBeInTheDocument();
-      expect(screen.getByText('Safe option')).toBeInTheDocument();
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect});
+      assertChoicesVisible(['Attack', 'Requires courage', 'Defend', 'Safe option']);
     });
   });
 
   describe('Custom Input', () => {
     it('shows custom input field when enabled', () => {
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-          enableCustomInput
-          onCustomSubmit={mockOnCustomSubmit}
-        />
-      );
-      expandSuggestions();
+      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
       
       expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
     });
 
     it('submits custom input when entered', async () => {
       const user = userEvent.setup();
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-          enableCustomInput
-          onCustomSubmit={mockOnCustomSubmit}
-        />
-      );
-      expandSuggestions();
+      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
       
       const input = screen.getByPlaceholderText('Type your custom response...');
       await user.type(input, 'Custom action');
@@ -187,19 +182,8 @@ describe('ChoiceSelector', () => {
 
   describe('Skill Requirements', () => {
     it('shows skill badges with skill names only (no difficulty)', () => {
-      render(
-        <ChoiceSelector
-          decision={decisionWithSkillRequirements}
-          onSelect={mockOnSelect}
-          worldSkills={mockWorldSkills}
-        />
-      );
-      expandSuggestions();
-
-      // All choices should be visible regardless of character skill levels
-      expect(screen.getByText('Sneak past')).toBeInTheDocument();
-      expect(screen.getByText('Intimidate the guard')).toBeInTheDocument();
-      expect(screen.getByText('Walk directly')).toBeInTheDocument();
+      renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
+      assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
       // Skill badges should show skill name only (no numbers)
       expect(screen.getByText('Stealth')).toBeInTheDocument();
@@ -208,11 +192,7 @@ describe('ChoiceSelector', () => {
 
     it('disables options when character lacks required skills', async () => {
       const user = userEvent.setup();
-      // Character with low skills that don't meet requirements
-      const characterSkills = [
-        { id: 'skill-1', characterId: 'char-1', worldSkillId: 'stealth-skill', name: 'Stealth', level: 2, category: 'Physical' },
-        { id: 'skill-2', characterId: 'char-1', worldSkillId: 'intimidation-skill', name: 'Intimidation', level: 3, category: 'Social' },
-      ];
+      const characterSkills = createCharacterSkills({ 'stealth-skill': 2, 'intimidation-skill': 3 });
 
       render(
         <ChoiceSelector
@@ -241,27 +221,8 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill and Item Requirement Interplay', () => {
-    const proficientSkills = [
-      {
-        id: 'skill-1',
-        characterId: 'char-1',
-        worldSkillId: 'stealth-skill',
-        name: 'Stealth',
-        level: 6,
-        category: 'Physical',
-      },
-    ];
-
-    const insufficientSkills = [
-      {
-        id: 'skill-1',
-        characterId: 'char-1',
-        worldSkillId: 'stealth-skill',
-        name: 'Stealth',
-        level: 2,
-        category: 'Physical',
-      },
-    ];
+    const proficientSkills = createCharacterSkills({ 'stealth-skill': 6 });
+    const insufficientSkills = createCharacterSkills({ 'stealth-skill': 2 });
 
     const renderCombinedOption = (
       skills: typeof proficientSkills,
@@ -310,59 +271,7 @@ describe('ChoiceSelector', () => {
     });
   });
 
-  describe('Loading States', () => {
-    it('handles loading state when provided', () => {
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-        />
-      );
-      expandSuggestions();
-      
-      // Component should render even when loading
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-    });
-
-    it('prevents interaction when loading', async () => {
-      const user = userEvent.setup();
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-        />
-      );
-      expandSuggestions();
-      
-      // Try to click - component should handle loading state appropriately
-      try {
-        await user.click(screen.getByText('Go north'));
-        // If loading is properly implemented, onSelect might not be called
-        // Or it might be called - depends on implementation
-      } catch {
-        // Choice might be disabled when loading
-      }
-      
-      // Just verify the component renders in loading state
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-    });
-  });
-
   describe('Accessibility', () => {
-    it('provides interactive choice elements', async () => {
-      const user = userEvent.setup();
-      render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
-      
-      // Should display the choices as text at minimum
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-      expect(screen.getByText('Go south')).toBeInTheDocument();
-      expect(screen.getByText('Rest here')).toBeInTheDocument();
-      
-      // Should be able to interact with choices
-      await user.click(screen.getByText('Go north'));
-      expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
-    });
-
     it('displays skill requirement information accessibly', () => {
       render(
         <ChoiceSelector

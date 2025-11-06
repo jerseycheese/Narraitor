@@ -1,7 +1,7 @@
 // src/state/__tests__/narrativeStore.ending.test.ts
 
 import { useNarrativeStore } from '../narrativeStore';
-import type { 
+import type {
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
@@ -21,6 +21,46 @@ afterEach(() => {
 afterAll(() => {
   global.fetch = originalFetch;
 });
+
+// Test helpers
+const createMockEnding = (overrides?: Partial<StoryEnding>): StoryEnding => ({
+  id: 'ending-123',
+  sessionId: 'session-123',
+  characterId: 'char-456',
+  worldId: 'world-789',
+  type: 'story-complete',
+  tone: 'triumphant',
+  epilogue: 'The end...',
+  characterLegacy: 'A hero...',
+  worldImpact: 'Peace...',
+  timestamp: new Date(),
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
+  ...overrides
+});
+
+const createMockGenerationResult = (overrides?: Partial<EndingGenerationResult>): EndingGenerationResult => ({
+  epilogue: 'The hero saved the day...',
+  characterLegacy: 'Remembered as a champion...',
+  worldImpact: 'Peace was restored...',
+  tone: 'triumphant',
+  achievements: ['Hero', 'Savior'],
+  playTime: 3600,
+  ...overrides
+});
+
+const mockSuccessfulEndingGeneration = (result: EndingGenerationResult) => {
+  (global.fetch as jest.Mock).mockResolvedValue({
+    ok: true,
+    json: async () => ({ success: true, data: result })
+  });
+};
+
+const defaultEndingContext = {
+  sessionId: 'session-123',
+  characterId: 'char-456',
+  worldId: 'world-789'
+};
 
 describe('narrativeStore - Ending functionality', () => {
   beforeEach(() => {
@@ -42,35 +82,15 @@ describe('narrativeStore - Ending functionality', () => {
 
   describe('generateEnding', () => {
     it('should generate and store a story ending', async () => {
-      const mockGenerationResult: EndingGenerationResult = {
-        epilogue: 'The hero saved the day...',
-        characterLegacy: 'Remembered as a champion...',
-        worldImpact: 'Peace was restored...',
-        tone: 'triumphant',
-        achievements: ['Hero', 'Savior'],
-        playTime: 3600
-      };
+      const mockGenerationResult = createMockGenerationResult();
+      mockSuccessfulEndingGeneration(mockGenerationResult);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockGenerationResult })
-      });
+      await useNarrativeStore.getState().generateEnding('player-choice', defaultEndingContext);
 
-      const store = useNarrativeStore.getState();
-      
-      await store.generateEnding('player-choice', {
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789'
-      });
-
-      const updatedState = useNarrativeStore.getState();
-      
-      expect(updatedState.currentEnding).toMatchObject({
+      const { currentEnding } = useNarrativeStore.getState();
+      expect(currentEnding).toMatchObject({
+        ...defaultEndingContext,
         id: expect.any(String),
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
         type: 'player-choice',
         tone: 'triumphant',
         epilogue: 'The hero saved the day...',
@@ -90,111 +110,62 @@ describe('narrativeStore - Ending functionality', () => {
         json: () => jsonPromise as unknown as Promise<EndingGenerationResult>
       });
 
-      const store = useNarrativeStore.getState();
-      
-      const generatePromise = store.generateEnding('story-complete', {
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789'
-      });
+      const generatePromise = useNarrativeStore.getState().generateEnding('story-complete', defaultEndingContext);
 
-      // Check loading state is true
       expect(useNarrativeStore.getState().isGeneratingEnding).toBe(true);
       expect(useNarrativeStore.getState().endingError).toBeNull();
 
-      // Resolve the API response
-      resolveJson!({ success: true, data: {
+      resolveJson!({ success: true, data: createMockGenerationResult({
         epilogue: 'Story complete...',
         characterLegacy: 'A legend...',
         worldImpact: 'Changed forever...',
-        tone: 'triumphant',
         achievements: [],
         playTime: 1800
-      }});
+      })});
 
       await generatePromise;
-
-      // Check loading state is false
       expect(useNarrativeStore.getState().isGeneratingEnding).toBe(false);
     });
 
     it('should handle generation errors', async () => {
-      const mockError = new Error('Failed to generate ending');
-      (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500, text: async () => mockError.message });
-
-      const store = useNarrativeStore.getState();
-      
-      await store.generateEnding('session-limit', {
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789'
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: async () => 'Failed to generate ending'
       });
 
-      const updatedState = useNarrativeStore.getState();
-      
-      expect(updatedState.currentEnding).toBeNull();
-      expect(updatedState.endingError).toContain('Failed to generate ending');
-      expect(updatedState.isGeneratingEnding).toBe(false);
+      await useNarrativeStore.getState().generateEnding('session-limit', defaultEndingContext);
+
+      const { currentEnding, endingError, isGeneratingEnding } = useNarrativeStore.getState();
+      expect(currentEnding).toBeNull();
+      expect(endingError).toContain('Failed to generate ending');
+      expect(isGeneratingEnding).toBe(false);
     });
 
     it('should use custom prompt when provided', async () => {
-      const mockGenerationResult: EndingGenerationResult = {
-        epilogue: 'Custom ending...',
-        characterLegacy: 'Custom legacy...',
-        worldImpact: 'Custom impact...',
-        tone: 'mysterious',
-        achievements: [],
-        playTime: 0
-      };
+      mockSuccessfulEndingGeneration(createMockGenerationResult({ tone: 'mysterious' }));
 
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockGenerationResult })
-      });
-
-      const store = useNarrativeStore.getState();
-      
-      await store.generateEnding('character-retirement', {
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
+      await useNarrativeStore.getState().generateEnding('character-retirement', {
+        ...defaultEndingContext,
         customPrompt: 'The character retires to a peaceful cottage'
       });
 
       expect(global.fetch).toHaveBeenCalledWith('/api/narrative/ending', expect.objectContaining({
         method: 'POST',
-        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
         body: expect.stringContaining('character-retirement')
       }));
     });
 
     it('should use desired tone when provided', async () => {
-      const mockGenerationResult: EndingGenerationResult = {
-        epilogue: 'Triumphant ending...',
-        characterLegacy: 'Victorious legacy...',
-        worldImpact: 'Positive impact...',
-        tone: 'triumphant',
-        achievements: [],
-        playTime: 0
-      };
+      mockSuccessfulEndingGeneration(createMockGenerationResult());
 
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true, data: mockGenerationResult })
-      });
-
-      const store = useNarrativeStore.getState();
-      
-      await store.generateEnding('player-choice', {
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
+      await useNarrativeStore.getState().generateEnding('player-choice', {
+        ...defaultEndingContext,
         desiredTone: 'triumphant'
       });
 
       expect(global.fetch).toHaveBeenCalledWith('/api/narrative/ending', expect.objectContaining({
         method: 'POST',
-        headers: expect.any(Object),
         body: expect.stringContaining('triumphant')
       }));
     });
@@ -202,63 +173,22 @@ describe('narrativeStore - Ending functionality', () => {
 
   describe('clearEnding', () => {
     it('should clear the current ending', () => {
-      const mockEnding: StoryEnding = {
-        id: 'ending-123',
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        type: 'story-complete',
-        tone: 'triumphant',
-        epilogue: 'The end...',
-        characterLegacy: 'A hero...',
-        worldImpact: 'Peace...',
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp()
-      };
+      useNarrativeStore.setState({ currentEnding: createMockEnding(), endingError: 'Some error' });
 
-      useNarrativeStore.setState({
-        currentEnding: mockEnding,
-        endingError: 'Some error'
-      });
+      useNarrativeStore.getState().clearEnding();
 
-      const store = useNarrativeStore.getState();
-      store.clearEnding();
-
-      const updatedState = useNarrativeStore.getState();
-      expect(updatedState.currentEnding).toBeNull();
-      expect(updatedState.endingError).toBeNull();
+      const { currentEnding, endingError } = useNarrativeStore.getState();
+      expect(currentEnding).toBeNull();
+      expect(endingError).toBeNull();
     });
   });
 
   describe('saveEndingToHistory', () => {
     it('should save ending to segments for persistence', async () => {
-      const mockEnding: StoryEnding = {
-        id: 'ending-123',
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        type: 'story-complete',
-        tone: 'triumphant',
-        epilogue: 'The end...',
-        characterLegacy: 'A hero...',
-        worldImpact: 'Peace...',
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp()
-      };
+      useNarrativeStore.setState({ currentEnding: createMockEnding() });
+      useNarrativeStore.getState().saveEndingToHistory();
 
-      useNarrativeStore.setState({
-        currentEnding: mockEnding
-      });
-
-      const store = useNarrativeStore.getState();
-      store.saveEndingToHistory();
-
-      const updatedState = useNarrativeStore.getState();
-      
-      // Should create a special segment for the ending
-      const endingSegment = Object.values(updatedState.segments).find(
+      const endingSegment = Object.values(useNarrativeStore.getState().segments).find(
         seg => seg.type === 'ending' && seg.metadata.endingId === 'ending-123'
       );
 
@@ -270,52 +200,18 @@ describe('narrativeStore - Ending functionality', () => {
 
   describe('hasActiveEnding', () => {
     it('should return true when ending exists', () => {
-      const mockEnding: StoryEnding = {
-        id: 'ending-123',
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        type: 'story-complete',
-        tone: 'triumphant',
-        epilogue: 'The end...',
-        characterLegacy: 'A hero...',
-        worldImpact: 'Peace...',
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp()
-      };
-
-      useNarrativeStore.setState({
-        currentEnding: mockEnding
-      });
-
-      const store = useNarrativeStore.getState();
-      expect(store.hasActiveEnding()).toBe(true);
+      useNarrativeStore.setState({ currentEnding: createMockEnding() });
+      expect(useNarrativeStore.getState().hasActiveEnding()).toBe(true);
     });
 
     it('should return false when no ending exists', () => {
-      const store = useNarrativeStore.getState();
-      expect(store.hasActiveEnding()).toBe(false);
+      expect(useNarrativeStore.getState().hasActiveEnding()).toBe(false);
     });
   });
 
   describe('getEndingForSession', () => {
     it('should retrieve ending for a specific session', () => {
-      const mockEnding: StoryEnding = {
-        id: 'ending-123',
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        type: 'story-complete',
-        tone: 'triumphant',
-        epilogue: 'The end...',
-        characterLegacy: 'A hero...',
-        worldImpact: 'Peace...',
-        timestamp: new Date(),
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp()
-      };
-
+      const mockEnding = createMockEnding();
       useNarrativeStore.setState({
         segments: {
           'seg-ending': {
@@ -323,11 +219,7 @@ describe('narrativeStore - Ending functionality', () => {
             type: 'ending',
             content: 'Ending content',
             sessionId: 'session-123',
-            metadata: {
-              tags: ['ending'],
-              endingId: 'ending-123',
-              endingData: mockEnding
-            },
+            metadata: { tags: ['ending'], endingId: 'ending-123', endingData: mockEnding },
             timestamp: new Date(),
             createdAt: getTimestamp(),
             updatedAt: getTimestamp()
@@ -335,55 +227,23 @@ describe('narrativeStore - Ending functionality', () => {
         }
       });
 
-      const store = useNarrativeStore.getState();
-      const ending = store.getEndingForSession('session-123');
-
-      expect(ending).toMatchObject({
-        id: 'ending-123',
-        sessionId: 'session-123',
-        type: 'story-complete'
-      });
+      const ending = useNarrativeStore.getState().getEndingForSession('session-123');
+      expect(ending).toMatchObject({ id: 'ending-123', sessionId: 'session-123', type: 'story-complete' });
     });
 
     it('should return null if no ending exists for session', () => {
-      const store = useNarrativeStore.getState();
-      const ending = store.getEndingForSession('non-existent-session');
-
-      expect(ending).toBeNull();
+      expect(useNarrativeStore.getState().getEndingForSession('non-existent-session')).toBeNull();
     });
   });
 
   describe('Session Locking', () => {
     it('should mark session as ended when ending is generated', async () => {
-      const mockGenerationResult = {
-        epilogue: 'The story concludes...',
-        characterLegacy: 'A hero remembered...',
-        worldImpact: 'Peace restored...',
-        tone: 'triumphant' as const,
-        achievements: ['Hero'],
-        playTime: 3600
-      };
-
-      // Mock the fetch response for the API call
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockGenerationResult)
-      });
-
-      const store = useNarrativeStore.getState();
+      mockSuccessfulEndingGeneration(createMockGenerationResult());
       const sessionId = 'session-123';
-      
-      // Session should not be ended initially
-      expect(store.isSessionEnded(sessionId)).toBe(false);
 
-      await store.generateEnding('player-choice', {
-        sessionId,
-        characterId: 'char-456',
-        worldId: 'world-789'
-      });
-
-      // Session should be marked as ended after generating ending
-      expect(store.isSessionEnded(sessionId)).toBe(true);
+      expect(useNarrativeStore.getState().isSessionEnded(sessionId)).toBe(false);
+      await useNarrativeStore.getState().generateEnding('player-choice', defaultEndingContext);
+      expect(useNarrativeStore.getState().isSessionEnded(sessionId)).toBe(true);
     });
 
     it('should prevent adding segments to ended sessions', async () => {

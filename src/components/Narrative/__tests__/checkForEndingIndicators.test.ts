@@ -2,6 +2,7 @@
 
 import type { NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { createMockCheckForEndingIndicators, createMockAIResponse } from './fixtures/endingDetectionMocks';
 
 // Mock the AI client
 const mockGenerateContent = jest.fn();
@@ -11,90 +12,23 @@ jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   })
 }));
 
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+// Test helpers
+const createSegment = (id: string, content: string): NarrativeSegment => ({
+  id,
+  content,
+  type: 'scene',
+  timestamp: new Date(),
+  sessionId: 'test-session',
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
+  metadata: { tags: [] }
+});
 
-// We need to test the function directly since it's not exported
-// Let's create a wrapper function that simulates the checkForEndingIndicators logic
-const createMockCheckForEndingIndicators = () => {
-  return async (
-    segments: NarrativeSegment[], 
-    newSegment: NarrativeSegment,
-    onEndingSuggested: (reason: string, endingType: string) => void
-  ) => {
-    // Skip if we don't have enough narrative context (less than 3 segments)
-    const allSegments = [...segments, newSegment];
-    if (allSegments.length < 3) return;
-    
-    try {
-      const client = createDefaultGeminiClient();
-      
-      // Get recent narrative context (last 5 segments for analysis)
-      const recentSegments = allSegments.slice(-5);
-      const narrativeContext = recentSegments.map((segment, index) => 
-        `Segment ${index + 1}: ${segment.content}`
-      ).join('\n\n');
-      
-      // Get broader story context (all segments but condensed)
-      const fullStoryContext = allSegments.length > 10 
-        ? `Earlier story: ${allSegments.slice(0, -5).map(s => s.content).join(' ').substring(0, 500)}...\n\n`
-        : '';
-      
-      const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
-
-${fullStoryContext}Recent narrative developments:
-${narrativeContext}
-
-Analyze this story for natural ending points. Consider:
-
-STORY STRUCTURE:
-- Has the central conflict been resolved or reached climax?
-- Are character arcs showing completion or fulfillment?
-- Is there a sense of narrative closure or resolution?
-- Does the story feel like it has reached a satisfying conclusion?
-
-EMOTIONAL SATISFACTION:
-- Would ending here feel fulfilling to the reader?
-- Are loose threads tied up or at a natural pause?
-- Is there dramatic or emotional resolution?
-
-DO NOT:
-- Look for specific keywords or phrases
-- Use pattern matching
-- Apply rigid rules
-- Suggest ending just because of story length
-
-Respond with JSON format:
-{
-  "suggestEnding": true/false,
-  "confidence": "high" | "medium" | "low",
-  "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-  "reason": "Clear explanation of why this is/isn't a good ending point"
-}`;
-
-      const response = await client.generateContent(analysisPrompt);
-      
-      try {
-        const analysis = JSON.parse(response.content);
-        
-        // Only suggest ending if AI has medium or high confidence
-        if (analysis.suggestEnding && ['high', 'medium'].includes(analysis.confidence)) {
-          // Determine ending type based on AI analysis or default to story-complete
-          const endingType = ['story-complete', 'character-retirement', 'session-limit'].includes(analysis.endingType) 
-            ? analysis.endingType 
-            : 'story-complete';
-          
-          onEndingSuggested(analysis.reason, endingType);
-        }
-      } catch (parseError) {
-        console.error('Failed to parse AI ending analysis:', parseError);
-        // If JSON parsing fails, do not suggest ending
-      }
-    } catch (error) {
-      console.error('Failed to analyze ending indicators with AI:', error);
-      // Pure AI approach means no fallback - if AI fails, no ending suggestion
-    }
-  };
-};
+const createStandardSegments = () => [
+  createSegment('1', 'The hero begins their journey to save the kingdom.'),
+  createSegment('2', 'They meet a wise old mentor who gives them a magical sword.'),
+  createSegment('3', 'The hero faces their first challenge against dark forces.')
+];
 
 describe('Pure AI Ending Detection', () => {
   const mockOnEndingSuggested = jest.fn();
@@ -105,38 +39,15 @@ describe('Pure AI Ending Detection', () => {
     checkForEndingIndicators = createMockCheckForEndingIndicators();
   });
 
-  const createSegment = (id: string, content: string): NarrativeSegment => ({
-    id,
-    content,
-    type: 'scene',
-    timestamp: new Date(),
-    sessionId: 'test-session',
-    createdAt: getTimestamp(),
-    updatedAt: getTimestamp(),
-    metadata: {
-      tags: []
-    }
-  });
-
   describe('AI Analysis Without Keywords', () => {
     it('should suggest ending when AI detects natural story conclusion', async () => {
-      // Mock AI response for conclusive story
-      mockGenerateContent.mockResolvedValueOnce({
-        content: JSON.stringify({
-          suggestEnding: true,
-          confidence: 'high',
-          endingType: 'story-complete',
-          reason: 'The central conflict has been resolved with the villain defeated. The hero has achieved their goal and the kingdom is saved. This feels like a natural and satisfying conclusion point.'
-        })
-      });
+      const reason =
+        'The central conflict has been resolved with the villain defeated. The hero has achieved their goal and the kingdom is saved. This feels like a natural and satisfying conclusion point.';
+      mockGenerateContent.mockResolvedValueOnce(createMockAIResponse({ reason }));
 
-      const existingSegments = [
-        createSegment('1', 'The hero begins their journey to save the kingdom.'),
-        createSegment('2', 'They meet a wise old mentor who gives them a magical sword.'),
-        createSegment('3', 'The hero faces their first challenge against dark forces.')
-      ];
-
-      const conclusiveSegment = createSegment('4', 
+      const existingSegments = createStandardSegments();
+      const conclusiveSegment = createSegment(
+        '4',
         'With the dark sorcerer finally defeated, the hero stood victorious. The kingdom was saved, and peace returned to the land. The hero looked back on their incredible journey with satisfaction, knowing they had fulfilled their destiny.'
       );
 
@@ -145,79 +56,50 @@ describe('Pure AI Ending Detection', () => {
       expect(mockGenerateContent).toHaveBeenCalledWith(
         expect.stringContaining('You are a narrative expert analyzing a story in progress')
       );
-
-      expect(mockOnEndingSuggested).toHaveBeenCalledWith(
-        'The central conflict has been resolved with the villain defeated. The hero has achieved their goal and the kingdom is saved. This feels like a natural and satisfying conclusion point.',
-        'story-complete'
-      );
+      expect(mockOnEndingSuggested).toHaveBeenCalledWith(reason, 'story-complete');
     });
 
     it('should NOT suggest ending when AI detects ongoing story', async () => {
-      // Mock AI response for ongoing story
-      mockGenerateContent.mockResolvedValueOnce({
-        content: JSON.stringify({
+      mockGenerateContent.mockResolvedValueOnce(
+        createMockAIResponse({
           suggestEnding: false,
-          confidence: 'high',
           endingType: 'none',
           reason: 'The hero has gained new allies but the main quest is still unresolved. There are clear plot threads that need continuation.'
         })
-      });
+      );
 
-      const existingSegments = [
-        createSegment('1', 'The hero begins their journey to save the kingdom.'),
-        createSegment('2', 'They meet a wise old mentor who gives them a magical sword.'),
-        createSegment('3', 'The hero faces their first challenge against dark forces.')
-      ];
-
-      const ongoingSegment = createSegment('4',
+      const ongoingSegment = createSegment(
+        '4',
         'The hero discovers a new ally who reveals crucial information about the enemy. Together, they plan their next move toward the final confrontation that still lies ahead.'
       );
 
-      await checkForEndingIndicators(existingSegments, ongoingSegment, mockOnEndingSuggested);
+      await checkForEndingIndicators(createStandardSegments(), ongoingSegment, mockOnEndingSuggested);
 
       expect(mockGenerateContent).toHaveBeenCalled();
-      // Should NOT suggest ending
       expect(mockOnEndingSuggested).not.toHaveBeenCalled();
     });
 
     it('should reject low confidence AI suggestions', async () => {
-      // Mock AI response with low confidence
-      mockGenerateContent.mockResolvedValueOnce({
-        content: JSON.stringify({
-          suggestEnding: true,
-          confidence: 'low',
-          endingType: 'story-complete',
-          reason: 'Might be an ending but unclear'
-        })
-      });
-
-      const existingSegments = [
-        createSegment('1', 'The hero begins their journey.'),
-        createSegment('2', 'They meet a mentor.'),
-        createSegment('3', 'The hero faces a challenge.')
-      ];
+      mockGenerateContent.mockResolvedValueOnce(
+        createMockAIResponse({ confidence: 'low', reason: 'Might be an ending but unclear' })
+      );
 
       const ambiguousSegment = createSegment('4', 'The hero pauses to rest and reflect on their journey so far.');
 
-      await checkForEndingIndicators(existingSegments, ambiguousSegment, mockOnEndingSuggested);
+      await checkForEndingIndicators(createStandardSegments(), ambiguousSegment, mockOnEndingSuggested);
 
       expect(mockGenerateContent).toHaveBeenCalled();
-      // Should NOT suggest ending due to low confidence
       expect(mockOnEndingSuggested).not.toHaveBeenCalled();
     });
   });
 
   describe('No Keyword Dependency', () => {
     it('should detect endings without traditional ending words', async () => {
-      // Mock AI response that recognizes subtle emotional conclusion
-      mockGenerateContent.mockResolvedValueOnce({
-        content: JSON.stringify({
-          suggestEnding: true,
-          confidence: 'medium',
-          endingType: 'character-retirement',
-          reason: 'The character has achieved personal growth and found their place in the world. The emotional arc feels complete even though no explicit ending words were used.'
-        })
-      });
+      const reason =
+        'The character has achieved personal growth and found their place in the world. The emotional arc feels complete even though no explicit ending words were used.';
+      mockGenerateContent.mockResolvedValueOnce(
+        createMockAIResponse({ confidence: 'medium', endingType: 'character-retirement', reason })
+      );
 
       const existingSegments = [
         createSegment('1', 'A young woman leaves her village, feeling lost and purposeless.'),
@@ -225,17 +107,14 @@ describe('Pure AI Ending Detection', () => {
         createSegment('3', 'Through trials, she discovers her true strengths and values.')
       ];
 
-      // NO traditional ending keywords but emotionally conclusive
-      const subtleEndingSegment = createSegment('4',
+      const subtleEndingSegment = createSegment(
+        '4',
         'She smiled as she watched the sunrise paint the mountains gold. For the first time in years, she felt truly at home. The young woman who had left this village was gone, replaced by someone who understood what really mattered.'
       );
 
       await checkForEndingIndicators(existingSegments, subtleEndingSegment, mockOnEndingSuggested);
 
-      expect(mockOnEndingSuggested).toHaveBeenCalledWith(
-        'The character has achieved personal growth and found their place in the world. The emotional arc feels complete even though no explicit ending words were used.',
-        'character-retirement'
-      );
+      expect(mockOnEndingSuggested).toHaveBeenCalledWith(reason, 'character-retirement');
     });
 
     it('should NOT be fooled by ending keywords in non-conclusive context', async () => {
