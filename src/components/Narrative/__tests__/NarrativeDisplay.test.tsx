@@ -5,7 +5,7 @@ import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { useNPCStore } from '@/state/npcStore';
 import { NPC } from '@/types/npc.types';
-import { mockZustandStore, createMockNPCStore } from '@/lib/test-utils';
+import { mockZustandStore, createMockNPCStore, createMockNarrativeSegment } from '@/lib/test-utils';
 
 jest.mock('@/state/npcStore');
 
@@ -17,20 +17,17 @@ describe('NarrativeDisplay', () => {
   });
 
   it('displays narrative content appropriately', () => {
-    const segment = {
+    const segment = createMockNarrativeSegment({
       id: 'seg-1',
       content: 'The ancient forest whispered secrets in the moonlight.',
-      type: 'scene' as const,
-      timestamp: new Date(),
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
+      type: 'scene',
       metadata: {
         characterIds: [],
-        mood: 'mysterious' as const,
+        mood: 'mysterious',
         location: 'Dark Forest',
         tags: ['forest', 'night']
       }
-    };
+    });
 
     render(<NarrativeDisplay segment={segment} />);
 
@@ -72,18 +69,15 @@ describe('NarrativeDisplay', () => {
       }),
     }));
 
-    const segment = {
+    const segment = createMockNarrativeSegment({
       id: 'seg-characters',
       content: 'Eldria and Borin planned their next move.',
-      type: 'scene' as const,
-      timestamp: new Date(),
-      createdAt: now,
-      updatedAt: now,
+      type: 'scene',
       metadata: {
         characterIds: ['npc-1', 'npc-2'],
         tags: ['strategy'],
       },
-    };
+    });
 
     render(<NarrativeDisplay segment={segment} />);
 
@@ -120,18 +114,15 @@ describe('NarrativeDisplay', () => {
       }),
     }));
 
-    const segment = {
+    const segment = createMockNarrativeSegment({
       id: 'seg-dup',
       content: 'Marge polishes the counter while you wait.',
-      type: 'scene' as const,
-      timestamp: new Date(),
-      createdAt: now,
-      updatedAt: now,
+      type: 'scene',
       metadata: {
         characterIds: ['npc-1', 'npc-1 ', 'NPC-1'],
         tags: ['diner'],
       },
-    };
+    });
 
     render(<NarrativeDisplay segment={segment} />);
 
@@ -148,19 +139,15 @@ describe('NarrativeDisplay', () => {
   });
 
   it('handles malformed NPC IDs without crashing', () => {
-    const now = getTimestamp();
-    const segment = {
+    const segment = createMockNarrativeSegment({
       id: 'seg-malformed',
       content: 'An unnamed figure watches from afar.',
-      type: 'scene' as const,
-      timestamp: new Date(),
-      createdAt: now,
-      updatedAt: now,
+      type: 'scene',
       metadata: {
         characterIds: ['', '   ', 'npc-42'],
         tags: [],
       },
-    };
+    });
 
     render(<NarrativeDisplay segment={segment} />);
 
@@ -193,17 +180,14 @@ describe('NarrativeDisplay', () => {
       }),
     }));
 
-    const segment = {
+    const segment = createMockNarrativeSegment({
       id: 'seg-highlight',
       content:
         "Marge, the Waitress slides a chipped mug toward you. Moments later, Marge's voice drops to a whisper.",
-      type: 'scene' as const,
-      timestamp: new Date(),
-      createdAt: now,
-      updatedAt: now,
+      type: 'scene',
       metadata: {
         characterIds: ['npc-1'],
-        mood: 'neutral' as const,
+        mood: 'neutral',
         tags: ['diner'],
         characters: [
           {
@@ -212,7 +196,7 @@ describe('NarrativeDisplay', () => {
           },
         ],
       },
-    };
+    });
 
     render(<NarrativeDisplay segment={segment} />);
 
@@ -227,36 +211,30 @@ describe('NarrativeDisplay', () => {
   });
 
   it('renders different segment types with appropriate styling', () => {
-    const dialogueSegment = {
+    const dialogueSegment = createMockNarrativeSegment({
       id: 'seg-2',
       content: '"Hello there," said the mysterious stranger.',
-      type: 'dialogue' as const,
-      timestamp: new Date(),
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
+      type: 'dialogue',
       metadata: {
         characterIds: ['char-1'],
-        mood: 'neutral' as const,
+        mood: 'neutral',
         tags: ['conversation']
       }
-    };
+    });
 
     const { rerender } = render(<NarrativeDisplay segment={dialogueSegment} />);
     expect(screen.getByText(/Hello there/)).toBeInTheDocument();
 
-    const actionSegment = {
+    const actionSegment = createMockNarrativeSegment({
       id: 'seg-3',
       content: 'The hero leapt across the chasm.',
-      type: 'action' as const,
-      timestamp: new Date(),
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
+      type: 'action',
       metadata: {
         characterIds: ['hero'],
-        mood: 'action' as const,
+        mood: 'action',
         tags: ['action', 'movement']
       }
-    };
+    });
 
     rerender(<NarrativeDisplay segment={actionSegment} />);
     expect(screen.getByText(/hero leapt across/)).toBeInTheDocument();
