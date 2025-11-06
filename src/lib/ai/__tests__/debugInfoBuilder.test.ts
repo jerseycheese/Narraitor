@@ -15,6 +15,13 @@ describe('debugInfoBuilder', () => {
   });
 
   describe('isDebugInfoEnabled', () => {
+    beforeEach(() => {
+      // Clear localStorage before each test
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+    });
+
     it('should return true in development mode', () => {
       Object.defineProperty(process.env, 'NODE_ENV', {
         value: 'development',
@@ -39,6 +46,36 @@ describe('debugInfoBuilder', () => {
         writable: true,
         configurable: true,
       });
+      expect(isDebugInfoEnabled()).toBe(false);
+    });
+
+    it('should return true when DevTools showPromptDebugInfo is enabled, even in production', () => {
+      // Set production mode
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true,
+      });
+
+      // Mock localStorage with showPromptDebugInfo enabled
+      const mockSettings = { showPromptDebugInfo: true };
+      localStorage.setItem('narraitor-devtools-settings', JSON.stringify(mockSettings));
+
+      expect(isDebugInfoEnabled()).toBe(true);
+    });
+
+    it('should return false when DevTools showPromptDebugInfo is disabled in production', () => {
+      // Set production mode
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true,
+      });
+
+      // Mock localStorage with showPromptDebugInfo disabled
+      const mockSettings = { showPromptDebugInfo: false };
+      localStorage.setItem('narraitor-devtools-settings', JSON.stringify(mockSettings));
+
       expect(isDebugInfoEnabled()).toBe(false);
     });
   });

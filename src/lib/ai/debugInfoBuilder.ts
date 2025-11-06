@@ -221,7 +221,24 @@ function truncateText(text: string, maxLength: number): string {
  * Check if debug info capture is enabled
  */
 export function isDebugInfoEnabled(): boolean {
-  // Only enable in development mode
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined') {
+    // Check DevTools settings from localStorage
+    try {
+      const stored = localStorage.getItem('narraitor-devtools-settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        // If user has explicitly enabled debug info, return true regardless of NODE_ENV
+        if (settings.showPromptDebugInfo === true) {
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to check DevTools settings:', error);
+    }
+  }
+
+  // Fallback: only enable in development mode
   if (typeof process !== 'undefined') {
     return process.env.NODE_ENV === 'development';
   }
