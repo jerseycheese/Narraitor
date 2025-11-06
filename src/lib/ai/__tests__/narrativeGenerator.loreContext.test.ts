@@ -7,6 +7,7 @@ import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -45,18 +46,18 @@ describe('NarrativeGenerator lore context integration', () => {
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
     
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
-    });
+    )))
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: {}
-    });
+    )))
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
     );
-  });
+  )))
 
   it('should include lore context when generating narrative segments', async () => {
     const loreContext = `
@@ -76,7 +77,7 @@ rules: world_rule = Elven magic protects this realm
       })
       .mockResolvedValueOnce({
         content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
-      });
+      )))
 
     const request = {
       worldId: 'world-123',
@@ -99,7 +100,7 @@ rules: world_rule = Elven magic protects this realm
     expect(capturedPrompt).toContain('characters: mentor = Gandalf the Wise');
     expect(capturedPrompt).toContain('locations: current_location = Rivendell');
     expect(capturedPrompt).toContain('rules: world_rule = Elven magic protects this realm');
-  });
+  )))
 
   it('should include lore context in initial scene generation', async () => {
     const loreContext = `
@@ -118,7 +119,7 @@ rules: journey_rule = Every hero must start their journey at dawn
       })
       .mockResolvedValueOnce({
         content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
-      });
+      )))
 
     await narrativeGenerator.generateInitialScene('world-123', ['char-1']);
 
@@ -128,7 +129,7 @@ rules: journey_rule = Every hero must start their journey at dawn
     expect(capturedPrompt).toContain('Established World Facts:');
     expect(capturedPrompt).toContain('Hero of Legend');
     expect(capturedPrompt).toContain('Village of Beginnings');
-  });
+  )))
 
   it('should handle narrative generation with empty lore gracefully', async () => {
     mockGetLoreContextForPrompt.mockReturnValue('');
@@ -140,7 +141,7 @@ rules: journey_rule = Every hero must start their journey at dawn
       })
       .mockResolvedValueOnce({
         content: 'A new adventure begins in an unexplored realm...'
-      });
+      )))
 
     const request = {
       worldId: 'world-123',
@@ -156,7 +157,7 @@ rules: journey_rule = Every hero must start their journey at dawn
 
     expect(result.content).toBe('A new adventure begins in an unexplored realm...');
     expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
-  });
+  )))
 
   it('should generate narrative consistent with established lore', async () => {
     const loreContext = `
@@ -178,7 +179,7 @@ events: prophecy = The chosen one will bring balance
       })
       .mockResolvedValueOnce({
         content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
-      });
+      )))
 
     const request = {
       worldId: 'world-123',
@@ -208,7 +209,7 @@ events: prophecy = The chosen one will bring balance
     expect(result.content).toContain('Tower of Shadows');
     expect(result.content).toContain('light magic');
     expect(result.content).toContain('prophecy');
-  });
+  )))
 
   it('should preserve lore context order in AI prompts', async () => {
     const loreContext = `
@@ -228,7 +229,7 @@ events: ritual = Monthly blessing ceremony
       })
       .mockResolvedValueOnce({
         content: 'The narrative continues...'
-      });
+      )))
 
     const request = {
       worldId: 'world-123',
@@ -249,5 +250,5 @@ events: ritual = Monthly blessing ceremony
     
     expect(baseTemplateIndex).toBeLessThan(loreContextIndex);
     expect(loreContextIndex).toBeGreaterThan(-1);
-  });
-});
+  )))
+)))

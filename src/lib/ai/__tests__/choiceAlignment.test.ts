@@ -4,6 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { createMockWorldStore } from '@/lib/test-utils';
 
 // Mock the store
 jest.mock('@/state/worldStore');
@@ -53,9 +54,9 @@ describe('ChoiceGenerator - Alignment System', () => {
     };
 
     // Mock the store to return our test world
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'test-world': mockWorld }
-    });
+    }));
   });
 
   afterEach(() => {

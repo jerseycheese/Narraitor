@@ -12,6 +12,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { NarrativeGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -76,21 +77,21 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     const mockTemplate = jest.fn().mockReturnValue('Generated prompt');
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
 
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-test': mockWorld },
       currentWorldId: 'world-test'
-    });
+    )))
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-test': mockCharacter }
-    });
+    )))
 
     (useAiContextStore.getState as jest.Mock).mockReturnValue({
       buildContextForSession: jest.fn().mockReturnValue({
         activeGoals: []
       })
-    });
-  });
+    )))
+  )))
 
   it('generates narrative successfully with relevance system', async () => {
     // Record a test decision
@@ -135,7 +136,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     expect(result).toBeDefined();
     expect(result.content).toBe('The narrative continues...');
     expect(mockGeminiClient.generateContent).toHaveBeenCalled();
-  });
+  )))
 
   it('works without any decision history', async () => {
     // Don't record any decisions
@@ -158,7 +159,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     // Should work fine with no decisions
     expect(result).toBeDefined();
     expect(result.content).toBe('The story begins...');
-  });
+  )))
 
   it('omits decisions from other sessions when scoring relevance', async () => {
     playerDecisionTracker.recordDecision(
@@ -215,7 +216,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
 
     expect(promptLower).toContain('help the injured merchant');
     expect(promptLower).not.toContain('launch a surprise assault');
-  });
+  )))
 
   it('works with multiple relevant decisions', async () => {
     // Record multiple decisions
@@ -259,7 +260,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
 
     expect(result).toBeDefined();
     expect(result.content).toBe('Multiple decisions processed...');
-  });
+  )))
 
   it('builds relevance context using latest recent segment when location missing', async () => {
     const capturedContexts: CurrentNarrativeContext[] = [];
@@ -268,7 +269,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
       .mockImplementation((context: CurrentNarrativeContext) => {
         capturedContexts.push(context);
         return [];
-      });
+      )))
 
     const mockAIResponse = {
       content: 'Context test narrative...',
@@ -292,7 +293,7 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
       timestamp: new Date(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
-    });
+    )))
 
     const request: NarrativeGenerationRequest = {
       worldId: 'world-test',
@@ -317,5 +318,5 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     expect(capturedContexts[0]?.location).toBe('Shadow Alley');
 
     getRelevantDecisionsSpy.mockRestore();
-  });
-});
+  )))
+)))

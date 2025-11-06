@@ -6,6 +6,7 @@ import { ChoiceGenerator } from '../choiceGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { createMockWorldStore } from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -48,14 +49,14 @@ describe('ChoiceGenerator lore context integration', () => {
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
     
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
-    });
+    )))
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base prompt template')
     );
-  });
+  )))
 
   it('should include lore context when generating choices', async () => {
     // Setup lore context
@@ -71,7 +72,7 @@ rules: magic_rule = Magic requires concentration
     // Mock AI response
     mockAIClient.generateContent.mockResolvedValue({
       content: 'What will you do?\n\n1. Use magic to illuminate the path\n2. Search for tracks\n3. Call out for Sir Gareth'
-    });
+    )))
 
     const params = {
       worldId: 'world-123',
@@ -100,14 +101,14 @@ rules: magic_rule = Magic requires concentration
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
       expect.stringContaining('characters: hero = Sir Gareth the Brave')
     );
-  });
+  )))
 
   it('should handle empty lore context gracefully', async () => {
     mockGetLoreContextForPrompt.mockReturnValue('');
 
     mockAIClient.generateContent.mockResolvedValue({
       content: 'What will you do?\n\n1. Look around\n2. Move forward\n3. Wait'
-    });
+    )))
 
     const params = {
       worldId: 'world-123',
@@ -128,7 +129,7 @@ rules: magic_rule = Magic requires concentration
 
     expect(result.options).toHaveLength(3);
     expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
-  });
+  )))
 
   it('should generate choices consistent with established lore', async () => {
     const loreContext = `
@@ -147,7 +148,7 @@ rules: travel_rule = The marshlands cannot be crossed at night
 1. Ask Lady Elara for guidance about the marshlands
 2. Wait until morning to cross the Cursed Marshlands
 3. Find an alternative route around the forbidden zone`
-    });
+    )))
 
     const params = {
       worldId: 'world-123',
@@ -171,7 +172,7 @@ rules: travel_rule = The marshlands cannot be crossed at night
     expect(result.options[0].text).toContain('Lady Elara');
     expect(result.options[1].text).toContain('morning');
     expect(result.options[2].text).toContain('alternative route');
-  });
+  )))
 
   it('should include lore context in prompt enhancement', async () => {
     const loreContext = `
@@ -183,7 +184,7 @@ rules: combat_rule = Magic users become exhausted after casting spells
 
     mockAIClient.generateContent.mockResolvedValue({
       content: 'What will you do?\n\n1. Rest to recover from spell exhaustion\n2. Proceed carefully\n3. Look for help'
-    });
+    )))
 
     const params = {
       worldId: 'world-123',
@@ -207,5 +208,5 @@ rules: combat_rule = Magic users become exhausted after casting spells
     expect(capturedPrompt).toContain('Base prompt template');
     expect(capturedPrompt).toContain('Established World Facts:');
     expect(capturedPrompt).toContain('combat_rule = Magic users become exhausted');
-  });
-});
+  )))
+)))

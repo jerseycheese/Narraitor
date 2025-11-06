@@ -2,22 +2,18 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
-import { useNPCStore, NPCStore } from '@/state/npcStore';
+import { useNPCStore } from '@/state/npcStore';
+import { mockZustandStore, createMockNPCStore } from '@/lib/test-utils';
 
 jest.mock('@/state/npcStore');
-
-const mockUseNPCStore = useNPCStore as jest.MockedFunction<typeof useNPCStore>;
 
 describe('NarrativeDisplay - Dialogue with Speaker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    const defaultState: Partial<NPCStore> = {
+    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
       npcs: {},
-      getById: () => undefined,
-    };
-    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
-      return selector ? selector(defaultState as NPCStore) : defaultState;
-    });
+      getById: jest.fn(() => undefined),
+    }));
   });
 
   it('displays speaker name for dialogue segment with speakerId', () => {
@@ -31,25 +27,18 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       } : undefined
     );
 
-    // Mock the selector pattern - return the function directly
-    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
-      const state = {
-        npcs: {
-          'npc-1': {
-            id: 'npc-1',
-            name: 'Gandalf',
-            worldId: 'world-1',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
+    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
+      npcs: {
+        'npc-1': {
+          id: 'npc-1',
+          name: 'Gandalf',
+          worldId: 'world-1',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
-        getById: mockGetById,
-      };
-      if (selector) {
-        return selector(state as unknown as NPCStore);
-      }
-      return state;
-    });
+      },
+      getById: mockGetById,
+    }));
 
     const dialogueSegment: NarrativeSegment = {
       id: 'segment-1',
@@ -83,25 +72,19 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
       } : undefined
     );
 
-    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
-      const state = {
-        npcs: {
-          'npc-2': {
-            id: 'npc-2',
-            name: 'Aragorn',
-            worldId: 'world-1',
-            avatarUrl: 'https://example.com/aragorn.jpg',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
+    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
+      npcs: {
+        'npc-2': {
+          id: 'npc-2',
+          name: 'Aragorn',
+          worldId: 'world-1',
+          avatarUrl: 'https://example.com/aragorn.jpg',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
-        getById: mockGetById,
-      };
-      if (selector) {
-        return selector(state as unknown as NPCStore);
-      }
-      return state;
-    });
+      },
+      getById: mockGetById,
+    }));
 
     const dialogueSegment: NarrativeSegment = {
       id: 'segment-2',
@@ -145,16 +128,10 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
   it('handles missing NPC gracefully when speakerId does not match', () => {
     const mockGetById = jest.fn(() => undefined);
 
-    mockUseNPCStore.mockImplementation((selector?: (state: NPCStore) => unknown) => {
-      const state = {
-        npcs: {},
-        getById: mockGetById,
-      };
-      if (selector) {
-        return selector(state as unknown as NPCStore);
-      }
-      return state;
-    });
+    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
+      npcs: {},
+      getById: mockGetById,
+    }));
 
     const dialogueSegment: NarrativeSegment = {
       id: 'segment-4',
