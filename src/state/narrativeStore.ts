@@ -629,6 +629,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       endingId: metadata?.endingId,
       endingData: metadata?.endingData,
       tone: metadata?.tone,
+      debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 
     const newSegment: NarrativeSegment = {
@@ -1186,6 +1187,37 @@ export const useNarrativeStore = create<NarrativeStore>()(
   },
   onRehydrateStorage: () => (state) => {
     if (state) {
+      // Deserialize Date objects in debugInfo after rehydration
+      const deserializedSegments = Object.entries(state.segments).reduce(
+        (acc, [id, segment]) => {
+          if (segment.metadata?.debugInfo) {
+            // Convert ISO strings back to Date objects
+            const deserializedDebugInfo = {
+              ...segment.metadata.debugInfo,
+              generatedAt: new Date(segment.metadata.debugInfo.generatedAt),
+              recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision: any) => ({
+                ...decision,
+                timestamp: new Date(decision.timestamp),
+              })),
+            };
+            acc[id] = {
+              ...segment,
+              metadata: {
+                ...segment.metadata,
+                debugInfo: deserializedDebugInfo,
+              },
+            };
+          } else {
+            acc[id] = segment;
+          }
+          return acc;
+        },
+        {} as Record<EntityID, NarrativeSegment>
+      );
+
+      // Update state with deserialized segments
+      state.segments = deserializedSegments;
+
       // Use proper state setter to trigger subscriptions
       state.setHasHydrated(true);
     }

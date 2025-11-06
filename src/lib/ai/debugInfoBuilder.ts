@@ -228,7 +228,7 @@ export function isDebugInfoEnabled(): boolean {
     console.log('[DebugInfo] Running in browser environment');
     // Check DevTools settings from localStorage
     try {
-      const stored = localStorage.getItem('narraitor-devtools-state');
+      const stored = localStorage.getItem('narraitor-devtools-settings');
       console.log('[DebugInfo] localStorage value:', stored);
       if (stored) {
         const settings = JSON.parse(stored);
