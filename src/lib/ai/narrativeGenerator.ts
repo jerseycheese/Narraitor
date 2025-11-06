@@ -811,12 +811,7 @@ Return ONLY the rewritten narrative.`;
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
       // Capture debug info if enabled (dev mode only)
-      console.log('[NarrativeGenerator] About to check if debug info is enabled...');
-      const debugInfoEnabled = isDebugInfoEnabled();
-      console.log('[NarrativeGenerator] Debug info enabled:', debugInfoEnabled);
-
-      if (debugInfoEnabled) {
-        console.log('[NarrativeGenerator] Capturing debug info...');
+      if (isDebugInfoEnabled()) {
         const previousSegments = request.narrativeContext?.previousSegments || [];
         const previousSegment = previousSegments[previousSegments.length - 1];
         const segmentType = request.generationParameters?.segmentType || 'scene';
@@ -835,9 +830,6 @@ Return ONLY the rewritten narrative.`;
         };
 
         result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
-        console.log('[NarrativeGenerator] Debug info attached:', !!result.metadata.debugInfo);
-      } else {
-        console.log('[NarrativeGenerator] Debug info NOT enabled, skipping capture');
       }
 
       // Process any acquired items from the narrative

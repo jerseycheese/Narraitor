@@ -221,21 +221,15 @@ function truncateText(text: string, maxLength: number): string {
  * Check if debug info capture is enabled
  */
 export function isDebugInfoEnabled(): boolean {
-  console.log('[DebugInfo] isDebugInfoEnabled() called');
-
   // Check if we're in a browser environment
   if (typeof window !== 'undefined') {
-    console.log('[DebugInfo] Running in browser environment');
     // Check DevTools settings from localStorage
     try {
       const stored = localStorage.getItem('narraitor-devtools-settings');
-      console.log('[DebugInfo] localStorage value:', stored);
       if (stored) {
         const settings = JSON.parse(stored);
-        console.log('[DebugInfo] Parsed settings:', settings);
         // If user has explicitly enabled debug info, return true regardless of NODE_ENV
         if (settings.showPromptDebugInfo === true) {
-          console.log('[DebugInfo] showPromptDebugInfo is TRUE, returning true');
           return true;
         }
       }
@@ -246,12 +240,7 @@ export function isDebugInfoEnabled(): boolean {
 
   // Fallback: only enable in development mode
   if (typeof process !== 'undefined') {
-    const nodeEnv = process.env.NODE_ENV;
-    console.log('[DebugInfo] Checking NODE_ENV:', nodeEnv);
-    const result = nodeEnv === 'development';
-    console.log('[DebugInfo] Returning from NODE_ENV check:', result);
-    return result;
+    return process.env.NODE_ENV === 'development';
   }
-  console.log('[DebugInfo] No process defined, returning false');
   return false;
 }

@@ -230,15 +230,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         )}
 
         {/* Debug Information Section (dev mode only) */}
-        {(() => {
-          console.log('[NarrativeDisplay] Debug check:', {
-            showPromptDebugInfo: settings.showPromptDebugInfo,
-            hasMetadata: !!resolvedSegment.metadata,
-            hasDebugInfo: !!resolvedSegment.metadata?.debugInfo,
-            debugInfoKeys: resolvedSegment.metadata?.debugInfo ? Object.keys(resolvedSegment.metadata.debugInfo) : []
-          });
-          return null;
-        })()}
         {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
           <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
         )}
