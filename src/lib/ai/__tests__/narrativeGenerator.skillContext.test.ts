@@ -11,6 +11,7 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 describe('NarrativeGenerator - Skill Context Integration', () => {
   let narrativeGenerator: NarrativeGenerator;
@@ -23,14 +24,14 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     const mockWorld = createMockWorldWithSkills();
     const mockCharacter = createMockCharacterWithSkills();
 
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'skill-world': mockWorld },
       currentWorldId: 'skill-world'
-    });
+    }));
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-1': mockCharacter }
-    });
+    }));
 
     mockAIClient = createMockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAIClient);

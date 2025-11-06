@@ -12,6 +12,7 @@ import { NarrativeContext } from '@/types/narrative.types';
 import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils/mockStoreFactories';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {
@@ -41,14 +42,14 @@ describe('NarrativeGenerator - Skill Acknowledgment', () => {
     const mockWorld = createMockWorldWithSkills();
     const mockCharacter = createMockCharacterWithSkills();
 
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'skill-world': mockWorld },
       currentWorldId: 'skill-world'
-    });
+    }));
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-1': mockCharacter }
-    });
+    }));
 
     mockAIClient = createMockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAIClient);

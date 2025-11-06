@@ -3,6 +3,7 @@ import { GeminiClient } from '../geminiClient';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { createMockWorldStore } from '@/lib/test-utils';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -24,7 +25,9 @@ const mockWorld = {
   skills: [],
   settings: {
     maxAttributes: 10,
-    maxSkills: 20
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'
@@ -49,10 +52,10 @@ describe('NarrativeGenerator', () => {
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
     
     // Mock world store
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld },
       currentWorldId: 'world-123'
-    });
+    }));
   });
 
   describe('generateSegment', () => {

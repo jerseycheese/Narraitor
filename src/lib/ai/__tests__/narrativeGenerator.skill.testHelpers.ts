@@ -5,7 +5,7 @@
 
 import { AIClient } from '../types';
 import { World } from '@/types/world.types';
-import { Character } from '@/types/character.types';
+import { Character } from '@/state/characterStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 /**
@@ -82,6 +82,8 @@ export function createMockCharacterWithSkills(): Character {
     worldId: 'skill-world',
     name: 'Test Hero',
     description: 'A skilled adventurer ready for any challenge',
+    level: 5,
+    isPlayer: true,
     background: {
       history: 'Skilled adventurer with years of experience',
       personality: 'Brave and resourceful',
@@ -90,14 +92,14 @@ export function createMockCharacterWithSkills(): Character {
       relationships: []
     },
     attributes: [
-      { attributeId: 'strength', value: 16 },
-      { attributeId: 'intelligence', value: 14 },
-      { attributeId: 'dexterity', value: 12 }
+      { id: 'attr-1', characterId: 'char-1', worldAttributeId: 'strength', name: 'Strength', baseValue: 16, modifiedValue: 16 },
+      { id: 'attr-2', characterId: 'char-1', worldAttributeId: 'intelligence', name: 'Intelligence', baseValue: 14, modifiedValue: 14 },
+      { id: 'attr-3', characterId: 'char-1', worldAttributeId: 'dexterity', name: 'Dexterity', baseValue: 12, modifiedValue: 12 }
     ],
     skills: [
-      { skillId: 'athletics', level: 6, experience: 100, isActive: true },
-      { skillId: 'magic', level: 4, experience: 80, isActive: true },
-      { skillId: 'stealth', level: 3, experience: 60, isActive: true }
+      { id: 'skill-1', characterId: 'char-1', worldSkillId: 'athletics', name: 'Athletics', level: 6 },
+      { id: 'skill-2', characterId: 'char-1', worldSkillId: 'magic', name: 'Magic', level: 4 },
+      { id: 'skill-3', characterId: 'char-1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }
     ],
     inventory: {
       characterId: 'char-1',

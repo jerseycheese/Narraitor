@@ -6,6 +6,7 @@ import { ChoiceGenerator } from '../choiceGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { createMockWorldStore } from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -24,10 +25,20 @@ const mockWorld = {
   name: 'Fantasy Realm',
   description: 'A magical fantasy world',
   genre: 'fantasy',
+  attributes: [],
+  skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
+  },
+  createdAt: '2023-01-01',
+  updatedAt: '2023-01-01',
   toneSettings: {
-    contentRating: 'teen',
-    narrativeStyle: 'adventure',
-    languageComplexity: 'medium'
+    contentRating: 'PG-13' as const,
+    narrativeStyle: 'action-packed' as const,
+    languageComplexity: 'moderate' as const
   }
 };
 
@@ -48,9 +59,9 @@ describe('ChoiceGenerator lore context integration', () => {
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
     
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
-    });
+    }));
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base prompt template')

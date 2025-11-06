@@ -1,6 +1,7 @@
 import { useWorldStore, WorldStore } from '../../worldStore';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createMockWorld } from '@/lib/test-utils';
 
 // Create mock adapter functions
 const mockGetItem = jest.fn().mockResolvedValue(null);
@@ -36,13 +37,8 @@ jest.mock('zustand/middleware', () => ({
 }));
 
 // Test world factory
-const createTestWorld = (overrides = {}) => ({
+const createTestWorld = (overrides = {}) => createMockWorld({
   id: 'test-world-1',
-  name: 'Test World',
-  description: 'A test world for persistence testing',
-  genre: 'fantasy',
-  attributes: [],
-  skills: [],
   settings: {
     maxAttributes: 6,
     maxSkills: 8,

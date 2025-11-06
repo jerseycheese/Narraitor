@@ -2,7 +2,7 @@
 title: Testing Guide
 tags: [testing, development, best-practices, tdd, visual-testing]
 created: 2025-06-26
-updated: 2025-08-20
+updated: 2025-11-06
 ---
 
 # Testing Guide
@@ -347,6 +347,106 @@ test('component updates when store changes', () => {
   
   expect(screen.getByText(mockCharacter.name)).toBeInTheDocument();
 });
+```
+
+## Test Utilities
+
+The codebase has test utilities to make writing tests faster and more consistent. Use them instead of manually creating mocks.
+
+### Test Data Factory
+
+Use `createMock*` functions to create test objects with sensible defaults:
+
+```typescript
+import { createMockCharacter, createMockWorld, createMockInventoryItem } from '@/lib/test-utils';
+
+// Only specify what matters for your test
+const character = createMockCharacter({
+  name: 'Test Character',
+  worldId: 'world-1'
+});
+
+const item = createMockInventoryItem({
+  stackable: true,
+  quantity: 5
+});
+```
+
+Available factories:
+- `createMockWorld`, `createMockWorldAttribute`, `createMockWorldSkill`
+- `createMockCharacter`
+- `createMockInventoryItem`
+- `createMockSession`, `createMockNarrativeSegment`, `createMockDecision`
+- `createMockJournalEntry`
+- `createMockPlayerChoice`
+
+**When to use:**
+- Creating domain objects for tests
+- You only care about a few specific fields
+- Avoiding verbose manual object creation
+
+**When NOT to use:**
+- Testing validation (intentionally invalid data)
+- The defaults would be confusing for your specific test
+
+### Mock Store Factories
+
+Use store factories instead of manually mocking Zustand stores:
+
+```typescript
+import { mockZustandStore, createMockCharacterStore } from '@/lib/test-utils';
+import { useCharacterStore } from '@/state/characterStore';
+
+jest.mock('@/state/characterStore');
+
+beforeEach(() => {
+  const mockStore = createMockCharacterStore({
+    characters: { 'char-1': mockCharacter },
+    currentCharacterId: 'char-1'
+  });
+
+  mockZustandStore(useCharacterStore, mockStore);
+});
+```
+
+Available factories:
+- `createMockCharacterStore`, `createMockWorldStore`, `createMockSessionStore`
+- `createMockInventoryStore`, `createMockJournalStore`, `createMockNarrativeStore`
+- `createMockNPCStore`, `createMockGoalStore`, `createMockLoreStore`
+
+Each factory provides:
+- Empty collections for state
+- All methods as `jest.fn()` mocks
+- Sensible return values
+
+**Override specific methods:**
+```typescript
+const mockStore = createMockInventoryStore({
+  items: { 'item-1': mockItem },
+  removeItem: jest.fn(), // Track calls to this method
+  getCharacterItems: jest.fn(() => [mockItem, mockItem2])
+});
+```
+
+**Testing selectors:**
+```typescript
+// Component uses selector
+function MyComponent() {
+  const currentChar = useCharacterStore(state =>
+    state.characters[state.currentCharacterId]
+  );
+  return <div>{currentChar.name}</div>;
+}
+
+// Test works automatically
+const mockStore = createMockCharacterStore({
+  characters: { 'char-1': mockCharacter },
+  currentCharacterId: 'char-1'
+});
+
+mockZustandStore(useCharacterStore, mockStore);
+render(<MyComponent />);
+expect(screen.getByText(mockCharacter.name)).toBeInTheDocument();
 ```
 
 ## Test Organization

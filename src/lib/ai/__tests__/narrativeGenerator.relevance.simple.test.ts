@@ -12,6 +12,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { NarrativeGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -40,7 +41,9 @@ const mockWorld = {
   skills: [],
   settings: {
     maxAttributes: 10,
-    maxSkills: 20
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'
@@ -49,12 +52,31 @@ const mockWorld = {
 const mockCharacter = {
   id: 'char-test',
   name: 'Test Hero',
+  description: 'A brave adventurer',
   worldId: 'world-test',
+  level: 1,
+  isPlayer: true,
   background: {
-    summary: 'A brave adventurer'
+    history: 'A brave adventurer',
+    personality: 'Courageous',
+    goals: [],
+    fears: [],
+    relationships: []
   },
-  attributes: {},
+  attributes: [],
   skills: [],
+  inventory: {
+    characterId: 'char-test',
+    items: [],
+    capacity: 10,
+    categories: [],
+    itemOrder: []
+  },
+  status: {
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01'
 };
@@ -76,14 +98,14 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
     const mockTemplate = jest.fn().mockReturnValue('Generated prompt');
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
 
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-test': mockWorld },
       currentWorldId: 'world-test'
-    });
+    }));
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-test': mockCharacter }
-    });
+    }));
 
     (useAiContextStore.getState as jest.Mock).mockReturnValue({
       buildContextForSession: jest.fn().mockReturnValue({

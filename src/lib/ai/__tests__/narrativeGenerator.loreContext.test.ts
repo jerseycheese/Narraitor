@@ -7,6 +7,7 @@ import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -21,10 +22,18 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 20,
+    attributePointPool: 27,
+    skillPointPool: 20
+  },
+  createdAt: '2023-01-01',
+  updatedAt: '2023-01-01',
   toneSettings: {
-    contentRating: 'teen',
-    narrativeStyle: 'epic',
-    languageComplexity: 'moderate'
+    contentRating: 'PG' as const,
+    narrativeStyle: 'epic' as const,
+    languageComplexity: 'moderate' as const
   }
 };
 
@@ -45,13 +54,13 @@ describe('NarrativeGenerator lore context integration', () => {
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
     
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
-    });
+    }));
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: {}
-    });
+    }));
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
