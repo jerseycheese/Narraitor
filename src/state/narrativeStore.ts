@@ -1146,14 +1146,44 @@ export const useNarrativeStore = create<NarrativeStore>()(
   storage: createIndexedDBStorage(),
   version: 1,
   // Persist narrative data to maintain story progress across browser refreshes
-  partialize: (state) => ({
-    segments: state.segments,
-    sessionSegments: state.sessionSegments,
-    decisions: state.decisions,
-    sessionDecisions: state.sessionDecisions,
-    endedSessions: state.endedSessions,
-    currentEnding: state.currentEnding,
-  }),
+  partialize: (state) => {
+    // Convert Date objects in debugInfo to ISO strings for persistence
+    const segmentsWithSerializedDebug = Object.entries(state.segments).reduce(
+      (acc, [id, segment]) => {
+        if (segment.metadata?.debugInfo) {
+          // Serialize Date objects in debugInfo
+          const serializedDebugInfo = {
+            ...segment.metadata.debugInfo,
+            generatedAt: segment.metadata.debugInfo.generatedAt.toISOString(),
+            recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision) => ({
+              ...decision,
+              timestamp: decision.timestamp.toISOString(),
+            })),
+          };
+          acc[id] = {
+            ...segment,
+            metadata: {
+              ...segment.metadata,
+              debugInfo: serializedDebugInfo as any, // Type cast because we're converting Date to string
+            },
+          };
+        } else {
+          acc[id] = segment;
+        }
+        return acc;
+      },
+      {} as Record<EntityID, NarrativeSegment>
+    );
+
+    return {
+      segments: segmentsWithSerializedDebug,
+      sessionSegments: state.sessionSegments,
+      decisions: state.decisions,
+      sessionDecisions: state.sessionDecisions,
+      endedSessions: state.endedSessions,
+      currentEnding: state.currentEnding,
+    };
+  },
   onRehydrateStorage: () => (state) => {
     if (state) {
       // Use proper state setter to trigger subscriptions
