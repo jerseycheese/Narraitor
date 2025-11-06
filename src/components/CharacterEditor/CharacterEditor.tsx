@@ -252,19 +252,17 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           </Button>
         </div>
       </div>
-      
-      {editingCharacter && (
-        <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDelete}
-          title="Delete Character"
-          description={`Are you sure you want to delete "${editingCharacter.name}"? This action cannot be undone.`}
-          itemName={editingCharacter.name}
-          confirmButtonText="Delete"
-          cancelButtonText="Cancel"
-        />
-      )}
+
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title="Delete Character"
+        description={`Are you sure you want to delete "${editingCharacter.name}"? This action cannot be undone.`}
+        itemName={editingCharacter.name}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 };
