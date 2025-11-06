@@ -11,13 +11,13 @@ import { InventoryTable } from './InventoryTable';
 import { useInventoryStore } from '@/state/inventoryStore';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
-import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
+import { mockZustandStore, createMockInventoryStore, createMockInventoryItem } from '@/lib/test-utils';
 
 // Mock the inventory store
 jest.mock('@/state/inventoryStore');
 
 const mockInventoryItems: InventoryItem[] = [
-  {
+  createMockInventoryItem({
     id: 'item-1' as EntityID,
     name: 'Health Potion',
     description: 'A simple potion that restores a small amount of health.',
@@ -32,15 +32,10 @@ const mockInventoryItems: InventoryItem[] = [
         quantity: 5,
       },
     ],
-    categorization: {
-      categoryId: 'consumables',
-      source: 'manual',
-      classifiedAt: '2024-01-15T10:00:00Z',
-    },
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
-  },
-  {
+  }),
+  createMockInventoryItem({
     id: 'item-2' as EntityID,
     name: 'Iron Sword',
     description: 'A basic but reliable sword.',
@@ -54,15 +49,10 @@ const mockInventoryItems: InventoryItem[] = [
         quantity: 1,
       },
     ],
-    categorization: {
-      categoryId: 'equipment',
-      source: 'manual',
-      classifiedAt: '2024-01-10T12:00:00Z',
-    },
     createdAt: '2024-01-10T12:00:00Z',
     updatedAt: '2024-01-10T12:00:00Z',
-  },
-  {
+  }),
+  createMockInventoryItem({
     id: 'item-3' as EntityID,
     name: 'Ancient Map',
     description: 'A mysterious map with faded markings.',
@@ -76,14 +66,9 @@ const mockInventoryItems: InventoryItem[] = [
         quantity: 1,
       },
     ],
-    categorization: {
-      categoryId: 'documents',
-      source: 'manual',
-      classifiedAt: '2024-01-20T14:00:00Z',
-    },
     createdAt: '2024-01-20T14:00:00Z',
     updatedAt: '2024-01-20T14:00:00Z',
-  },
+  }),
 ];
 
 describe('InventoryTable', () => {
