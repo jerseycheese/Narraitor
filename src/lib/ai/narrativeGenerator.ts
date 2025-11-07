@@ -100,6 +100,14 @@ export class NarrativeGenerator {
   private personalizationEngine: PersonalizationEngine;
   private decisionFormatter: DecisionFormatter;
 
+  // Cache for static prompt content to reduce redundancy
+  private staticContentCache: {
+    itemAcquisitionInstructions?: string;
+    toneSettings?: Map<string, string>; // worldId -> tone instructions
+  } = {
+    toneSettings: new Map()
+  };
+
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
     this.templateGenerator = new TemplateGenerator(geminiClient);
@@ -141,20 +149,34 @@ export class NarrativeGenerator {
 
   /**
    * Enhances a prompt with detailed tone settings for consistent narrative style
+   * Uses caching to avoid regenerating tone instructions for the same world
    */
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
 
-    const detailedInstructions = getDetailedToneInstructions(
-      toneSettings.contentRating,
-      toneSettings.narrativeStyle,
-      toneSettings.languageComplexity,
-      toneSettings.customInstructions
-    );
+    // Create cache key from tone settings
+    const cacheKey = `${world.id}-${toneSettings.contentRating}-${toneSettings.narrativeStyle}-${toneSettings.languageComplexity}`;
 
-    const complexityAlert = COMPLEXITY_ALERTS[toneSettings.languageComplexity] ?? '';
+    // Check cache first
+    let toneInstructions = this.staticContentCache.toneSettings?.get(cacheKey);
 
-    return prompt + detailedInstructions + complexityAlert;
+    if (!toneInstructions) {
+      const detailedInstructions = getDetailedToneInstructions(
+        toneSettings.contentRating,
+        toneSettings.narrativeStyle,
+        toneSettings.languageComplexity,
+        toneSettings.customInstructions
+      );
+
+      const complexityAlert = COMPLEXITY_ALERTS[toneSettings.languageComplexity] ?? '';
+
+      toneInstructions = detailedInstructions + complexityAlert;
+
+      // Cache for future use
+      this.staticContentCache.toneSettings?.set(cacheKey, toneInstructions);
+    }
+
+    return prompt + toneInstructions;
   }
 
   /**
@@ -586,9 +608,12 @@ export class NarrativeGenerator {
   /**
    * Enhances a prompt with item acquisition instructions for the AI
    * Instructs the AI to return structured item data when describing acquisition
+   * Uses caching to avoid repeating static content
    */
   private enhancePromptWithItemAcquisitionInstructions(prompt: string): string {
-    const acquisitionInstructions = `
+    // Cache the static instructions - they never change
+    if (!this.staticContentCache.itemAcquisitionInstructions) {
+      this.staticContentCache.itemAcquisitionInstructions = `
 
 ITEM ACQUISITION INSTRUCTIONS:
 Only include entries in metadata.itemsAcquired when the player character ends the scene with a new, portable item in their ongoing possession (something they could realistically carry to the next location). Merely noticing, interacting with, or temporarily using environmental objects or stage dressing does NOT count as acquisition. If the character sets an object back down, leaves it behind, or otherwise does not keep it, do not add it. Likewise, if the narrative merely clarifies or renames an item the character already had, update the prose, not the metadata.
@@ -612,8 +637,9 @@ Important:
 - If the narrative mentions vague supplies, still include the best concrete description you can infer
 
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
+    }
 
-    return prompt + acquisitionInstructions;
+    return prompt + this.staticContentCache.itemAcquisitionInstructions;
   }
 
   private getEquippedItemIds(characterIds: string[] | undefined): string[] {

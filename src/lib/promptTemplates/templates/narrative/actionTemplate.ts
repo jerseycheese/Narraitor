@@ -14,7 +14,7 @@ export const actionTemplate = (context: any) => { // eslint-disable-line @typesc
 
   const recentSegments = narrativeContext?.recentSegments || [];
   const recentContent = recentSegments
-    .map((segment: NarrativeSegment, index: number) => `[Scene ${recentSegments.length - index}]: ${segment.content}`)
+    .map((segment: NarrativeSegment, index: number) => `[Scene ${index + 1}]: ${segment.content}`)
     .join('\n\n');
 
   const currentLocation = narrativeContext?.currentLocation;
