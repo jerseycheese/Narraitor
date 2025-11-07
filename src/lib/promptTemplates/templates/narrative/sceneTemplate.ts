@@ -16,9 +16,11 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
 
   const segmentType = generationParameters?.segmentType || 'scene';
   const recentSegments = narrativeContext?.recentSegments || [];
-  const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
-    `[Scene ${recentSegments.length - i}]: ${seg.content}`
-  ).join('\n\n');
+  // Only include the most recent scene to reduce prompt redundancy
+  // Full context is maintained through active goals and personalization systems
+  const recentContent = recentSegments.length > 0
+    ? `${recentSegments[recentSegments.length - 1].content}`
+    : '';
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `
@@ -32,7 +34,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 World: ${worldName}
 Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
 
-STORY SO FAR:
+PREVIOUS SCENE:
 ${recentContent}
 
 ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
