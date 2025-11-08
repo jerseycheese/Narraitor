@@ -119,9 +119,9 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
 
   // Optional property validation
   if (world.image !== undefined && world.image !== null) {
-    const imageValidation = validateWorldImage(world.image);
+    const imageValidation = validateGeneratedImage(world.image);
     if (!imageValidation.valid) {
-      errors.push(...imageValidation.errors.map(e => `WorldImage: ${e}`));
+      errors.push(...imageValidation.errors.map(e => `GeneratedImage: ${e}`));
     }
   }
 
@@ -299,12 +299,12 @@ export function validateWorldSettings(obj: unknown, partial: boolean = false): V
   return { valid: errors.length === 0, errors };
 }
 
-export function validateWorldImage(obj: unknown): ValidationResult {
+export function validateGeneratedImage(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validTypes = ['ai-generated', 'placeholder'];
 
   if (obj === null || obj === undefined) {
-    errors.push('WorldImage cannot be null or undefined');
+    errors.push('GeneratedImage cannot be null or undefined');
     return { valid: false, errors };
   }
 
