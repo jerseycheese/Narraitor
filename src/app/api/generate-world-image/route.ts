@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
+import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
 
@@ -12,47 +13,16 @@ interface GenerateWorldImageRequest {
 
 // Generate a detailed image prompt based on world characteristics
 function generateImagePrompt(world: World): string {
-  const genre = world.genre?.toLowerCase() || 'fantasy';
+  const genre = world.genre || 'fantasy';
   const name = world.name;
   const description = world.description;
-  
+
   // Create a detailed prompt for image generation
   const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
-  
-  // Add theme-specific style guidance
-  let styleGuidance = '';
-  switch(genre) {
-    case 'fantasy':
-      styleGuidance = 'Epic fantasy landscape with magical elements, mystical lighting, ancient architecture, floating islands or magical forests. Style: high fantasy art, detailed digital painting, dramatic lighting.';
-      break;
-    case 'sci-fi':
-    case 'science fiction':
-      styleGuidance = 'Futuristic sci-fi landscape with advanced technology, space stations, alien worlds, or cybernetic cities. Style: concept art, sleek futuristic design, neon lighting, technological elements.';
-      break;
-    case 'horror':
-      styleGuidance = 'Dark, ominous landscape with gothic architecture, twisted trees, fog, abandoned buildings, eerie atmosphere. Style: dark gothic art, horror atmosphere, dim lighting, unsettling mood.';
-      break;
-    case 'western':
-      styleGuidance = 'Wild west landscape with desert mesas, old towns, saloons, dusty trails, canyon landscapes. Style: classic western film aesthetic, warm desert colors, vintage atmosphere.';
-      break;
-    case 'cyberpunk':
-      styleGuidance = 'Neon-lit cyberpunk cityscape with towering skyscrapers, flying vehicles, holographic advertisements, rain-soaked streets. Style: cyberpunk aesthetic, neon colors, urban decay, high-tech low-life.';
-      break;
-    case 'steampunk':
-      styleGuidance = 'Victorian-era landscape with steam-powered machinery, brass and copper elements, airships, clockwork mechanisms. Style: steampunk aesthetic, brass and bronze tones, mechanical details.';
-      break;
-    case 'post-apocalyptic':
-      styleGuidance = 'Desolate post-apocalyptic landscape with ruined cities, overgrown vegetation, abandoned vehicles, wasteland atmosphere. Style: post-apocalyptic art, muted colors, decay and reclamation by nature.';
-      break;
-    case 'biopunk':
-    case 'gothic horror':
-    case 'biopunk/gothic horror':
-      styleGuidance = 'Bio-organic gothic landscape with mutated flora, twisted architecture, bio-mechanical elements, perpetual twilight atmosphere. Style: bio-horror aesthetic, organic and mechanical fusion, dark atmospheric lighting.';
-      break;
-    default:
-      styleGuidance = 'Epic landscape with dramatic lighting and detailed environment. Style: high-quality digital art, cinematic composition, professional concept art.';
-  }
-  
+
+  // Get genre-specific style guidance from shared utility
+  const styleGuidance = getGenreStyleGuidance(genre, 'landscape');
+
   return `${basePrompt}
 
 ${styleGuidance}
@@ -69,29 +39,8 @@ Requirements:
 
 // Generate fallback placeholder if AI generation fails
 function generateFallbackImage(world: World): string {
-  const genre = world.genre?.toLowerCase() || 'fantasy';
-  
-  // Use themed placeholder as fallback
-  switch(genre) {
-    case 'fantasy':
-      return `https://picsum.photos/seed/${world.name}/800/600?blur=1`;
-    case 'sci-fi':
-    case 'science fiction':
-      return `https://picsum.photos/seed/${world.name}/800/600?grayscale`;
-    case 'horror':
-    case 'biopunk':
-    case 'gothic horror':
-    case 'biopunk/gothic horror':
-      return `https://picsum.photos/seed/${world.name}/800/600?blur=2`;
-    case 'western':
-      return `https://picsum.photos/seed/${world.name}/800/600?sepia`;
-    case 'cyberpunk':
-      return `https://picsum.photos/seed/${world.name}/800/600`;
-    case 'post-apocalyptic':
-      return `https://picsum.photos/seed/${world.name}/800/600?grayscale&blur=1`;
-    default:
-      return `https://picsum.photos/seed/${world.name}/800/600`;
-  }
+  const genre = world.genre || 'fantasy';
+  return getGenreFallbackImage(genre, world.name);
 }
 
 export async function POST(request: NextRequest) {
