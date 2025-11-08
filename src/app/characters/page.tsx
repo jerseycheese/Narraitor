@@ -26,15 +26,11 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { PlayerCharacterThread } from '@/types/world-state.types';
 import { summarizeThreadHighlight } from '@/lib/utils/worldStateFormatters';
+import type { GeneratedImage } from '@/types/common.types';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
-  portrait: {
-    type: 'ai-generated' | 'placeholder';
-    url: string | null;
-    generatedAt?: string;
-    prompt?: string;
-  };
+  portrait: GeneratedImage;
 };
 
 // Helper function to transform generated data to character attributes

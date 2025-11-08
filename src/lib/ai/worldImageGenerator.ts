@@ -1,6 +1,7 @@
 // src/lib/ai/worldImageGenerator.ts
 
-import { World, WorldImage } from '../../types/world.types';
+import { World } from '../../types/world.types';
+import { GeneratedImage } from '../../types/common.types';
 import { AIClient } from './types';
 import { getTimestamp } from '@/lib/utils';
 
@@ -64,7 +65,7 @@ export class WorldImageGenerator {
    * @param world - The world to generate an image for
    * @param customPrompt - Optional custom prompt to override the auto-generated one
    */
-  async generateWorldImage(world: World, customPrompt?: string): Promise<WorldImage> {
+  async generateWorldImage(world: World, customPrompt?: string): Promise<GeneratedImage> {
     try {
       const prompt = customPrompt || this.buildPrompt(world);
       

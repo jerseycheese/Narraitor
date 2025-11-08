@@ -2,11 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
+import { GeneratedImage } from '@/types/common.types';
 import { cn } from '@/lib/utils/classNames';
 
 interface CharacterPortraitProps {
-  portrait: CharacterPortraitType;
+  portrait: GeneratedImage;
   characterName: string;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   isGenerating?: boolean;

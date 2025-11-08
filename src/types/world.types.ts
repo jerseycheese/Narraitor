@@ -1,19 +1,9 @@
 // src/types/world.types.ts
 
-import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
+import { EntityID, GeneratedImage, NamedEntity, TimestampedEntity } from './common.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { ToneSettings } from './tone-settings.types';
 import { GenreValue } from '@/lib/constants/genres';
-
-/**
- * World image data
- */
-export interface WorldImage {
-  type: 'ai-generated' | 'placeholder';
-  url: string | null;
-  generatedAt?: string;
-  prompt?: string;
-}
 
 /**
  * Represents a game world configuration
@@ -24,7 +14,7 @@ export interface World extends NamedEntity, TimestampedEntity {
   attributes: WorldAttribute[];
   skills: WorldSkill[];
   settings: WorldSettings;
-  image?: WorldImage;
+  image?: GeneratedImage;
   reference?: string;
   relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;

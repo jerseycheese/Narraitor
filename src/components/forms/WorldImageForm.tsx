@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { World, WorldImage } from '@/types/world.types';
+import { World } from '@/types/world.types';
+import { GeneratedImage } from '@/types/common.types';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
@@ -32,12 +33,12 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
   };
 
   const handleRemoveImage = () => {
-    const placeholderImage: WorldImage = {
+    const placeholderImage: GeneratedImage = {
       type: 'placeholder',
       url: null,
       generatedAt: getTimestamp()
     };
-    
+
     onChange({ image: placeholderImage });
   };
 

@@ -1,6 +1,7 @@
 // src/lib/ai/portraitGenerator.ts
 
-import { Character, CharacterPortrait } from '../../types/character.types';
+import { Character } from '../../types/character.types';
+import { GeneratedImage } from '../../types/common.types';
 import { AIClient } from './types';
 import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
@@ -94,7 +95,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
   async generatePortrait(
     character: Character,
     options: PortraitGenerationOptions = {}
-  ): Promise<CharacterPortrait> {
+  ): Promise<GeneratedImage> {
     if (!this.aiClient.generateImage) {
       throw new Error('AI client does not support image generation');
     }

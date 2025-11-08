@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { World, WorldImage } from '@/types/world.types';
+import { World } from '@/types/world.types';
+import { GeneratedImage } from '@/types/common.types';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { DataField } from '@/components/shared/DataField';
 import { ImageGenerationSection } from '@/components/shared';
@@ -83,13 +84,13 @@ export default function FinalizeStep({
 
   const handleRemoveImage = () => {
     if (!onUpdateWorldData) return;
-    
-    const placeholderImage: WorldImage = {
+
+    const placeholderImage: GeneratedImage = {
       type: 'placeholder',
       url: null,
       generatedAt: getTimestamp()
     };
-    
+
     onUpdateWorldData({ image: placeholderImage });
   };
 

@@ -1,6 +1,7 @@
 // src/lib/ai/__mocks__/worldImageGenerator.ts
 
-import { World, WorldImage } from '../../../types/world.types';
+import { World } from '../../../types/world.types';
+import { GeneratedImage } from '../../../types/common.types';
 import { AIClient } from '../types';
 import { getTimestamp } from '@/lib/utils';
 
@@ -110,7 +111,7 @@ export class WorldImageGenerator {
   /**
    * Generate an image for a world (mocked version)
    */
-  async generateWorldImage(world: World): Promise<WorldImage> {
+  async generateWorldImage(world: World): Promise<GeneratedImage> {
     // Simulate async delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
