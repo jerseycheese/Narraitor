@@ -8,6 +8,9 @@ import { DecisionOption, NarrativeSegment } from '../../../types/narrative.types
 import { ChoiceTypePreference } from '../../../types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
+// Re-export centralized timer utilities
+export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+
 /**
  * Type for segment data passed to addSegment
  */
@@ -38,14 +41,6 @@ export const resetNarrativeStore = () => {
     loading: false,
     error: null
   });
-};
-
-/**
- * Sets up fake timers with standard test time
- */
-export const setupTestTimers = () => {
-  jest.useFakeTimers();
-  jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 };
 
 /**
