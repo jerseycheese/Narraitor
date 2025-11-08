@@ -16,8 +16,6 @@ export { getTimestamp } from '@/lib/utils/timestamp';
 
 // Re-export centralized timer utilities
 export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
-// Alias for backward compatibility
-export { setupTestTimers as setupFakeTimers } from '@/lib/test-utils/testTimers';
 
 export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
 
