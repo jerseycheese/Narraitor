@@ -5,6 +5,7 @@ import type { World } from '@/types/world.types';
 import type { Character } from '@/types/character.types';
 import Logger from '@/lib/utils/logger';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('EndingImageAPI');
 
@@ -52,34 +53,8 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
       toneGuidance = 'Reflective ending atmosphere with dramatic lighting and emotional depth.';
   }
   
-  // Add genre-specific style guidance
-  let styleGuidance = '';
-  switch(genre) {
-    case 'fantasy':
-      styleGuidance = 'Epic fantasy setting with magical elements, ancient architecture, mystical lighting. Style: high fantasy art, detailed digital painting, cinematic composition.';
-      break;
-    case 'sci-fi':
-    case 'science fiction':
-      styleGuidance = 'Futuristic sci-fi setting with advanced technology, space stations, alien worlds. Style: concept art, sleek futuristic design, cinematic sci-fi aesthetic.';
-      break;
-    case 'horror':
-      styleGuidance = 'Gothic horror setting with dark atmosphere, but ending-appropriate mood. Style: atmospheric horror art, dramatic shadows, emotional depth.';
-      break;
-    case 'western':
-      styleGuidance = 'Wild west setting with desert landscapes, frontier towns, classic western imagery. Style: classic western film aesthetic, warm desert colors, cinematic composition.';
-      break;
-    case 'cyberpunk':
-      styleGuidance = 'Cyberpunk cityscape with neon lighting, urban environment, high-tech elements. Style: cyberpunk aesthetic, dramatic neon lighting, urban atmosphere.';
-      break;
-    case 'steampunk':
-      styleGuidance = 'Victorian steampunk setting with brass machinery, clockwork elements, industrial atmosphere. Style: steampunk aesthetic, warm brass tones, mechanical details.';
-      break;
-    case 'post-apocalyptic':
-      styleGuidance = 'Post-apocalyptic landscape with ruins and reclaimed nature, but showing the ending\'s emotional tone. Style: post-apocalyptic art, atmospheric depth.';
-      break;
-    default:
-      styleGuidance = 'Epic setting with dramatic lighting and detailed environment. Style: high-quality digital art, cinematic composition.';
-  }
+  // Get genre-specific style guidance from shared utility
+  const styleGuidance = getGenreStyleGuidance(genre, 'ending');
   
   // Include brief narrative context if available
   let narrativeContext = '';
@@ -116,22 +91,12 @@ Requirements:
 
 // Generate fallback placeholder if AI generation fails
 function generateFallbackImage(ending: StoryEnding, world?: World): string {
+  const genre = world?.genre || 'fantasy';
   const tone = ending.tone;
   const seed = `${world?.name || 'ending'}-${ending.id}`;
-  
-  // Use tone-themed placeholder as fallback
-  switch(tone) {
-    case 'triumphant':
-      return `https://picsum.photos/seed/${seed}/800/600?sepia`;
-    case 'mysterious':
-      return `https://picsum.photos/seed/${seed}/800/600?grayscale&blur=2`;
-    case 'tragic':
-      return `https://picsum.photos/seed/${seed}/800/600?grayscale`;
-    case 'hopeful':
-      return `https://picsum.photos/seed/${seed}/800/600`;
-    default:
-      return `https://picsum.photos/seed/${seed}/800/600`;
-  }
+
+  // Use tone-themed placeholder with genre fallback
+  return getGenreFallbackImage(genre, seed, tone);
 }
 
 export async function POST(request: NextRequest) {
