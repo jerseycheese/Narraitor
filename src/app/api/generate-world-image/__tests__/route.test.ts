@@ -1,21 +1,12 @@
 /**
  * @jest-environment node
  */
-import { NextRequest } from 'next/server';
-import { POST } from '../route';
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
-import type { World } from '@/types/world.types';
 
-// Mock the Gemini client
+// Mock modules first (before imports for proper hoisting)
 jest.mock('@/lib/ai/defaultGeminiClient');
-const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
-
-// Mock fetch for Gemini API calls
-global.fetch = jest.fn();
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
-
-// Mock Logger
+jest.mock('@/lib/ai/geminiImageGenerator', () => ({
+  generateImageWithGemini: jest.fn(),
+}));
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
     debug: jest.fn(),
@@ -23,8 +14,6 @@ jest.mock('@/lib/utils/logger', () => {
     warn: jest.fn(),
   }));
 });
-
-// Mock genre prompt guide utilities
 jest.mock('@/lib/utils/genrePromptGuide', () => ({
   getGenreStyleGuidance: jest.fn((genre: string, context: string) => {
     return `Mocked style guidance for ${genre} ${context}`;
@@ -34,10 +23,15 @@ jest.mock('@/lib/utils/genrePromptGuide', () => ({
   }),
 }));
 
-// Mock gemini image generator (uses global fetch mock)
-jest.mock('@/lib/ai/geminiImageGenerator', () => ({
-  generateImageWithGemini: jest.fn(),
-}));
+// Now import modules
+import { NextRequest } from 'next/server';
+import { POST } from '../route';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import type { World } from '@/types/world.types';
+
+// Create typed mocks
+const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
 const mockGenerateImageWithGemini = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
 
 describe('/api/generate-world-image', () => {
