@@ -343,10 +343,12 @@ const GameSession: React.FC<GameSessionProps> = ({
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
           <p className="text-gray-700 mb-4">No active game session.</p>
-          <div className="text-xs text-gray-500 mb-4">
-            Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
-          </div>
-          <Button 
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-xs text-gray-500 mb-4">
+              Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
+            </div>
+          )}
+          <Button
             variant="default"
             className="bg-blue-500 hover:bg-blue-700"
             onClick={startSession}
