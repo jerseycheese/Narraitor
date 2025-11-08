@@ -4,6 +4,7 @@
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import type { World } from '@/types/world.types';
 
 // Mock the Gemini client
@@ -32,6 +33,12 @@ jest.mock('@/lib/utils/genrePromptGuide', () => ({
     return `https://picsum.photos/seed/${seed}/800/600`;
   }),
 }));
+
+// Mock gemini image generator (uses global fetch mock)
+jest.mock('@/lib/ai/geminiImageGenerator', () => ({
+  generateImageWithGemini: jest.fn(),
+}));
+const mockGenerateImageWithGemini = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
 
 describe('/api/generate-world-image', () => {
   const mockWorld: World = {
@@ -98,32 +105,22 @@ describe('/api/generate-world-image', () => {
   describe('Custom Prompt Handling', () => {
     it('should use custom prompt when provided', async () => {
       const customPrompt = 'A dark and stormy castle on a hilltop';
-      
+
       mockGeminiClient.generateContent.mockResolvedValue({
-        content: 'Enhanced description based on custom prompt'
+        content: customPrompt // Use custom prompt directly when provided
       });
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          candidates: [{
-            content: {
-              parts: [{
-                inlineData: {
-                  mimeType: 'image/png',
-                  data: 'base64imagedata'
-                }
-              }]
-            }
-          }]
-        })
-      } as Response);
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,base64imagedata',
+        mimeType: 'image/png',
+        base64Data: 'base64imagedata'
+      });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           world: mockWorld,
-          customPrompt 
+          customPrompt
         }),
       });
 
@@ -142,21 +139,11 @@ describe('/api/generate-world-image', () => {
         content: 'AI-generated detailed description'
       });
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          candidates: [{
-            content: {
-              parts: [{
-                inlineData: {
-                  mimeType: 'image/jpeg',
-                  data: 'base64imagedata'
-                }
-              }]
-            }
-          }]
-        })
-      } as Response);
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/jpeg;base64,base64imagedata',
+        mimeType: 'image/jpeg',
+        base64Data: 'base64imagedata'
+      });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -204,21 +191,11 @@ describe('/api/generate-world-image', () => {
         content: 'Generated image description'
       });
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          candidates: [{
-            content: {
-              parts: [{
-                inlineData: {
-                  mimeType: 'image/png',
-                  data: 'base64encodedimagedata'
-                }
-              }]
-            }
-          }]
-        })
-      } as Response);
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,base64encodedimagedata',
+        mimeType: 'image/png',
+        base64Data: 'base64encodedimagedata'
+      });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -233,16 +210,7 @@ describe('/api/generate-world-image', () => {
       expect(data.placeholder).toBe(false);
       expect(data.imageUrl).toBe('data:image/png;base64,base64encodedimagedata');
       expect(data.service).toBe('gemini-image-generation');
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent',
-        expect.objectContaining({
-          method: 'POST',
-          headers: expect.objectContaining({
-            'Content-Type': 'application/json',
-            'x-goog-api-key': 'test-api-key',
-          }),
-        })
-      );
+      expect(mockGenerateImageWithGemini).toHaveBeenCalled();
     });
 
     it('should fallback to placeholder when Gemini API fails', async () => {
@@ -250,10 +218,7 @@ describe('/api/generate-world-image', () => {
         content: 'Generated description'
       });
 
-      mockFetch.mockResolvedValue({
-        ok: false,
-        text: () => Promise.resolve('API Error'),
-      } as Response);
+      mockGenerateImageWithGemini.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -274,18 +239,7 @@ describe('/api/generate-world-image', () => {
         content: 'Generated description'
       });
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          candidates: [{
-            content: {
-              parts: [{
-                text: 'Text response without image'
-              }]
-            }
-          }]
-        })
-      } as Response);
+      mockGenerateImageWithGemini.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -306,7 +260,7 @@ describe('/api/generate-world-image', () => {
         content: 'Generated description'
       });
 
-      mockFetch.mockRejectedValue(new Error('Network error'));
+      mockGenerateImageWithGemini.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -348,7 +302,7 @@ describe('/api/generate-world-image', () => {
         expect(response.status).toBe(200);
         expect(data.placeholder).toBe(true);
         expect(data.aiGenerated).toBe(false);
-        expect(mockFetch).not.toHaveBeenCalled();
+        expect(mockGenerateImageWithGemini).not.toHaveBeenCalled();
       }
     });
   });
