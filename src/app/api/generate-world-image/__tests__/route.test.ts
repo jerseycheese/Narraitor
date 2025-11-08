@@ -23,6 +23,16 @@ jest.mock('@/lib/utils/logger', () => {
   }));
 });
 
+// Mock genre prompt guide utilities
+jest.mock('@/lib/utils/genrePromptGuide', () => ({
+  getGenreStyleGuidance: jest.fn((genre: string, context: string) => {
+    return `Mocked style guidance for ${genre} ${context}`;
+  }),
+  getGenreFallbackImage: jest.fn((genre: string, seed: string) => {
+    return `https://picsum.photos/seed/${seed}/800/600`;
+  }),
+}));
+
 describe('/api/generate-world-image', () => {
   const mockWorld: World = {
     id: 'test-world',
