@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 
 const logger = new Logger('WorldImageAPI');
 
@@ -166,53 +167,16 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-goog-api-key': apiKey,
-              },
-              body: JSON.stringify({
-                contents: [{
-                  parts: [{ text: imagePromptForGemini }]
-                }],
-                generationConfig: {
-                  responseModalities: ["TEXT", "IMAGE"]
-                }
-              })
-            }
-          );
+          const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
 
-          if (response.ok) {
-            const data = await response.json();
-            
-            // Find the image part in the response
-            const parts = data.candidates?.[0]?.content?.parts || [];
-            const imagePart = parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) => 
-              part.inlineData && 
-              part.inlineData.mimeType && 
-              part.inlineData.mimeType.startsWith('image/')
-            );
-            
-            if (imagePart) {
-              // Return the generated image as base64 data URL
-              const mimeType = imagePart.inlineData.mimeType;
-              const base64Data = imagePart.inlineData.data;
-              
-              imageUrl = `data:${mimeType};base64,${base64Data}`;
-              aiGenerated = true;
-              placeholder = false;
-              
-              logger.debug('generate-world-image', 'Gemini image generated successfully');
-            } else {
-              logger.warn('generate-world-image', 'No image found in Gemini API response, using fallback');
-              imageUrl = generateFallbackImage(body.world);
-            }
+          if (generatedImage) {
+            imageUrl = generatedImage.url;
+            aiGenerated = true;
+            placeholder = false;
+
+            logger.debug('generate-world-image', 'Gemini image generated successfully');
           } else {
-            const errorText = await response.text();
-            logger.error('generate-world-image', 'Gemini API Error:', errorText);
+            logger.warn('generate-world-image', 'Image generation failed, using fallback');
             imageUrl = generateFallbackImage(body.world);
           }
 
