@@ -32,21 +32,21 @@ interface PortraitStepProps {
     characterData: CharacterFormData;
     worldId: string;
   };
-  onUpdate: (updates: { portrait: CharacterPortraitType }) => void;
+  onUpdate: (updates: { portrait: GeneratedImage }) => void;
   worldConfig: Partial<World>;
 }
 
 export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Local state for prompt-affecting fields
   const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
     data.characterData.background?.physicalDescription || ''
   );
   const [environmentHint, setEnvironmentHint] = useState('');
 
-  const portrait: CharacterPortraitType = data.characterData.portrait || {
+  const portrait: GeneratedImage = data.characterData.portrait || {
     type: 'placeholder',
     url: null
   };

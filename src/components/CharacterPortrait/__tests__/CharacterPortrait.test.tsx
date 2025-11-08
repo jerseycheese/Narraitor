@@ -28,7 +28,7 @@ describe('CharacterPortrait', () => {
     });
 
     it('should render placeholder when no portrait', () => {
-      const portrait: CharacterPortraitType = {
+      const portrait: GeneratedImage = {
         type: 'placeholder',
         url: null
       };
