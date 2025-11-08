@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
+import { GeneratedImage } from '@/types/common.types';
 // Removed direct AI client imports - using API routes instead
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
@@ -14,7 +14,7 @@ import { getTimestamp } from '@/lib/utils';
 interface CharacterFormData {
   name: string;
   description?: string;
-  portrait?: CharacterPortraitType;
+  portrait?: GeneratedImage;
   attributes: Array<{ attributeId: string; value: number }>;
   skills: Array<{ skillId: string; level: number; isSelected: boolean }>;
   background: {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 // Using API routes for secure AI operations - combines both approaches
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import type { WorldImage } from '@/types/world.types';
+import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
@@ -118,8 +118,8 @@ export const TestDataGeneratorSection: React.FC = () => {
           
           if (response.ok) {
             const { imageUrl, aiGenerated, service } = await response.json();
-            // Update the world with the generated image in WorldImage format (my enhancement)
-            const image: WorldImage = {
+            // Update the world with the generated image in GeneratedImage format (my enhancement)
+            const image: GeneratedImage = {
               type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
               url: imageUrl,
               generatedAt: getTimestamp()
@@ -252,8 +252,8 @@ export const TestDataGeneratorSection: React.FC = () => {
             
             if (response.ok) {
               const { imageUrl, aiGenerated, service } = await response.json();
-              // Update the world with the generated image in WorldImage format (my enhancement)
-              const image: WorldImage = {
+              // Update the world with the generated image in GeneratedImage format (my enhancement)
+              const image: GeneratedImage = {
                 type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
                 url: imageUrl,
                 generatedAt: getTimestamp()

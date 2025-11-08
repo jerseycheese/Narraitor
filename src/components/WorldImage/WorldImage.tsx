@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { WorldImage as WorldImageType } from '@/types/world.types';
+import { GeneratedImage } from '@/types/common.types';
 import { ImageOff, AlertCircle } from 'lucide-react';
 
 interface WorldImageProps {
-  image?: WorldImageType;
+  image?: GeneratedImage;
   worldName: string;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   className?: string;

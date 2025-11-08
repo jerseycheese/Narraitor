@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { World, WorldImage } from '@/types/world.types';
+import { World } from '@/types/world.types';
+import { GeneratedImage } from '@/types/common.types';
 import { WizardFormSection } from '@/components/shared/wizard';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
@@ -31,7 +32,7 @@ export default function ImageGenerationStep({
 }: ImageGenerationStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<WorldImage | null>(worldData.image || null);
+  const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(worldData.image || null);
 
   const generateImage = useCallback(async () => {
     setIsGenerating(true);
@@ -62,12 +63,12 @@ export default function ImageGenerationStep({
 
   const handleSkip = () => {
     // Set a placeholder image
-    const placeholderImage: WorldImage = {
+    const placeholderImage: GeneratedImage = {
       type: 'placeholder',
       url: null,
       generatedAt: getTimestamp()
     };
-    
+
     onUpdate({ image: placeholderImage });
     onComplete();
   };

@@ -3,13 +3,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CharacterPortrait } from '../CharacterPortrait';
-import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
+import { GeneratedImage } from '../../../types/common.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('CharacterPortrait', () => {
   describe('rendering states', () => {
     it('should render AI-generated portrait', () => {
-      const portrait: CharacterPortraitType = {
+      const portrait: GeneratedImage = {
         type: 'ai-generated',
         url: 'data:image/png;base64,abc123',
         generatedAt: getTimestamp(),

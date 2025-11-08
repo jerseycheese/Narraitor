@@ -29,3 +29,14 @@ export interface TimestampedEntity {
   updatedAt: ISODateString;
 }
 
+/**
+ * Generated image data
+ * Used for AI-generated images attached to entities (characters, worlds, etc.)
+ */
+export interface GeneratedImage {
+  type: 'ai-generated' | 'placeholder';
+  url: string | null;
+  generatedAt?: string;
+  prompt?: string;
+}
+

@@ -1,17 +1,7 @@
 // src/types/character.types.ts
 
-import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
+import { EntityID, GeneratedImage, NamedEntity, TimestampedEntity } from './common.types';
 import { Inventory } from './inventory.types';
-
-/**
- * Character portrait data
- */
-export interface CharacterPortrait {
-  type: 'ai-generated' | 'placeholder';
-  url: string | null;
-  generatedAt?: string;
-  prompt?: string;
-}
 
 /**
  * Represents a character in the game
@@ -23,7 +13,7 @@ export interface Character extends NamedEntity, TimestampedEntity {
   background: CharacterBackground;
   inventory: Inventory;
   status: CharacterStatus;
-  portrait?: CharacterPortrait;
+  portrait?: GeneratedImage;
 }
 
 /**

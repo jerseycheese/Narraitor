@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { DataField } from '@/components/shared/DataField';
-import { WorldImage } from '@/types/world.types';
+import { GeneratedImage } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
 
 interface WorldImageDisplayProps {
-  image?: WorldImage;
+  image?: GeneratedImage;
 }
 
 export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
