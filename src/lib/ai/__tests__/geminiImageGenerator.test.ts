@@ -1,16 +1,10 @@
 /**
+ * @jest-environment node
+ *
  * Tests for Gemini image generation utilities
  */
 
-import {
-  callGeminiImageAPI,
-  extractImageFromResponse,
-  generateImageWithGemini,
-  type GeminiImageResponse,
-  type GeneratedImage
-} from '../geminiImageGenerator';
-
-// Mock the logger
+// Mock the logger (must be before imports for proper hoisting)
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
     debug: jest.fn(),
@@ -19,6 +13,14 @@ jest.mock('@/lib/utils/logger', () => {
     error: jest.fn(),
   }));
 });
+
+import {
+  callGeminiImageAPI,
+  extractImageFromResponse,
+  generateImageWithGemini,
+  type GeminiImageResponse,
+  type GeneratedImage
+} from '../geminiImageGenerator';
 
 describe('Gemini Image Generator', () => {
   describe('extractImageFromResponse', () => {
