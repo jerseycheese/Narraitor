@@ -10,7 +10,7 @@ import { MockAIClient } from '../../__mocks__/mockAiClient';
 import { NarrativeGenerationRequest } from '@/types/narrative.types';
 import { PlayerDecision } from '@/types/personalization.types';
 import {
-  setupFakeTimers,
+  setupTestTimers,
   createPastDecisions,
   setupDecisionConsequencesMocks
 } from './narrativeGenerator.decisionConsequences.testHelpers';
@@ -59,7 +59,7 @@ describe('NarrativeGenerator - Decision Consequence Mapping', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    setupFakeTimers();
+    setupTestTimers();
 
     pastDecisions = createPastDecisions();
     mockAiClient = new MockAIClient();

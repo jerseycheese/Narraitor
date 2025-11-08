@@ -6,6 +6,9 @@
 import type { Character } from '../characterStore';
 import type { EntityID } from '@/types/common.types';
 
+// Re-export centralized timer utilities
+export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+
 // Type for creating test characters (omits fields added by store)
 type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -78,12 +81,4 @@ export function createSkillTestCharacter() {
       relationships: []
     }
   });
-}
-
-/**
- * Sets up fake timers with a standard test time
- */
-export function setupTestTimers() {
-  jest.useFakeTimers();
-  jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 }

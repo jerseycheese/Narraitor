@@ -9,6 +9,9 @@ import type { Character as StoreCharacter } from '@/state/characterStore';
 import type { JournalEntry } from '@/types/journal.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
+// Re-export centralized timer utilities
+export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+
 // Mock client for Gemini API
 export const mockGeminiClient = {
   generateContent: jest.fn()
@@ -129,21 +132,6 @@ export function createMockJournalEntries(): JournalEntry[] {
       updatedAt: getTimestamp()
     }
   ];
-}
-
-/**
- * Sets up fake timers with a standard test time
- */
-export function setupTestTimers() {
-  jest.useFakeTimers();
-  jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
-}
-
-/**
- * Cleans up after tests
- */
-export function cleanupTestTimers() {
-  jest.useRealTimers();
 }
 
 /**

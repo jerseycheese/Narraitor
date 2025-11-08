@@ -14,6 +14,9 @@ import { getTimestamp } from '@/lib/utils/timestamp';
 
 export { getTimestamp } from '@/lib/utils/timestamp';
 
+// Re-export centralized timer utilities
+export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+
 export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
 
 export const mockWorld = {
@@ -135,12 +138,4 @@ export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]):
 
   // Mock tone settings guidance
   (getDetailedToneInstructions as jest.Mock).mockReturnValue('');
-}
-
-/**
- * Sets up fake timers with the standard test time
- */
-export function setupFakeTimers(): void {
-  jest.useFakeTimers();
-  jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
 }
