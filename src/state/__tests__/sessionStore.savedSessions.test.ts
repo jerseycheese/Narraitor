@@ -1,5 +1,6 @@
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { useSessionStore } from '../sessionStore';
+import { setupTestTimers } from '@/lib/test-utils/testTimers';
 
 jest.mock('@/lib/utils/logger', () => ({
   __esModule: true,
@@ -128,7 +129,7 @@ describe('Session Persistence: savedSessions collection', () => {
       const worldId = 'test-world-id';
       const characterId = 'test-character-id';
 
-      jest.useFakeTimers();
+      setupTestTimers();
       const initialTime = new Date('2025-01-01T00:00:00.000Z');
       jest.setSystemTime(initialTime);
 
