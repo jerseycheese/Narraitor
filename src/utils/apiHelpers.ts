@@ -268,7 +268,7 @@ export interface GeminiTextOptions {
 export async function processGeminiTextRequest(
   request: NextRequest,
   options: GeminiTextOptions = {}
-): Promise<NextResponse> {
+): Promise<Response> {
   const {
     maxTokens = 1024,
     temperature = 0.7,
