@@ -1,4 +1,5 @@
 'use client';
+import { filterTruthy } from '@/lib/utils';
 
 import React, { useCallback, useMemo } from 'react';
 import { World } from '@/types/world.types';
@@ -44,7 +45,7 @@ export function WorldDetailsDisplay({
 
     return npcIds
       .map((id) => npcsById[id])
-      .filter((npc): npc is NonNullable<typeof npcsById[string]> => Boolean(npc));
+      .filter(filterTruthy);
   }, [npcIds, npcsById]);
 
   return (

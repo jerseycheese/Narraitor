@@ -1,4 +1,5 @@
 import {
+import { filterTruthy } from '@/lib/utils';
   Decision,
   ChoiceAlignment,
   DecisionRequirement,
@@ -128,7 +129,7 @@ export function normalizeDecisionOptions(
             }
             const requiredAmount = req.required > 0 ? `${req.current}/${req.required}` : `${req.current}`;
             return `${req.itemName}${req.required > 0 ? ` (${requiredAmount})` : ''}`;
-          }).filter((value): value is string => Boolean(value))
+          }).filter(filterTruthy)
         );
       if (missingItems.length > 0) {
         disabledReasonParts.push(`Items: ${missingItems.join(', ')}`);

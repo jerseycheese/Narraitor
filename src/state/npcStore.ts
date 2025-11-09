@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { normalizeText, NORM_NAME, NORM_DESC, filterTruthy } from '@/lib/utils';
 import { createStoreError } from '@/lib/utils/errorUtils';
 import { NPC } from '../types/npc.types';
 import { EntityID } from '../types/common.types';
@@ -162,7 +162,7 @@ export const useNPCStore = create<NPCStore>()(
         const npcIds = state.worldNpcs[worldId] || [];
         return npcIds
           .map((id) => state.npcs[id])
-          .filter((npc): npc is NPC => Boolean(npc));
+          .filter(filterTruthy);
       },
 
       clearWorldNPCs: (worldId) => {

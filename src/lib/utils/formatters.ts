@@ -615,3 +615,29 @@ export function formatForDebug(obj: unknown, options?: {
   }
 }
 
+// === ARRAY UTILITIES ===
+
+/**
+ * Type guard filter that removes null/undefined values from arrays
+ *
+ * Common pattern for filtering out falsy values while maintaining type safety.
+ * Use with array.filter() to narrow array types and remove null/undefined.
+ *
+ * @param item - Item to check
+ * @returns True if item is truthy (non-null, non-undefined)
+ *
+ * @example
+ * ```typescript
+ * import { filterTruthy } from '@/lib/utils';
+ *
+ * const items = [1, null, 2, undefined, 3];
+ * const valid = items.filter(filterTruthy); // [1, 2, 3] with type number[]
+ *
+ * const mixed: (string | null)[] = ['a', null, 'b'];
+ * const strings = mixed.filter(filterTruthy); // ['a', 'b'] with type string[]
+ * ```
+ */
+export function filterTruthy<T>(item: T): item is NonNullable<T> {
+  return Boolean(item);
+}
+

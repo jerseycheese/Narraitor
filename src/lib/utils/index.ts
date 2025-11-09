@@ -29,7 +29,8 @@ export {
   truncate,
   capitalize,
   titleCase,
-  safeTrim
+  safeTrim,
+  filterTruthy
 } from './formatters';
 
 /** Type definitions for formatting options */

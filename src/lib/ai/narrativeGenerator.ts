@@ -27,8 +27,8 @@ import { playerDecisionTracker } from './playerDecisionTracker';
 import { DecisionFormatter } from './decisionFormatter';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
-import { safeTrim } from '@/lib/utils';
-import { getTimestamp } from '@/lib/utils';
+import { safeTrim ,filterTruthy } from '@/lib/utils';
+import { getTimestamp ,filterTruthy } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
@@ -1216,7 +1216,7 @@ Return ONLY the rewritten narrative.`;
                         avatarUrl: raw?.avatarUrl ? safeTrim(String(raw.avatarUrl)) : undefined,
                       } as GeneratedCharacterMetadata;
                     })
-                    .filter((value: GeneratedCharacterMetadata | null | undefined): value is GeneratedCharacterMetadata => Boolean(value))
+                    .filter(filterTruthy)
                 : undefined,
             };
           }
@@ -1598,7 +1598,7 @@ ${content}
       const presentCharacterIds = Array.isArray(parsed.presentCharacterIds)
         ? parsed.presentCharacterIds
             .map((id) => id?.toString().trim())
-            .filter((id): id is string => Boolean(id))
+            .filter(filterTruthy)
             .filter((id) => allowed.has(id.toLowerCase()))
         : candidateIds;
 
@@ -1615,7 +1615,7 @@ ${content}
       ];
 
       const items = rawItems
-        .filter((item): item is Required<typeof item> => Boolean(item?.name))
+        .filter(filterTruthy)
         .map((item) => {
           const rawMethod =
             item.acquisitionMethod && typeof item.acquisitionMethod === 'string'

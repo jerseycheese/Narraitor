@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp, filterTruthy } from '@/lib/utils';
 import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
 import {
   NarrativeGoal,
@@ -200,7 +200,7 @@ export const useGoalStore = create<GoalStore>()(
         const goalIds = state.sessionGoals[sessionId] || [];
         return goalIds
           .map((id) => state.goals[id])
-          .filter((goal): goal is NarrativeGoal => Boolean(goal && goal.status === 'active'));
+          .filter(filterTruthy).filter((goal) => goal.status === 'active');
       },
 
       getGoalsByPriority: (priority) =>
@@ -269,7 +269,7 @@ export const useGoalStore = create<GoalStore>()(
           const goalState = get();
           const existingGoals = goalState.sessionGoals[sessionId]
             ?.map((id) => goalState.goals[id])
-            .filter((goal): goal is NarrativeGoal => Boolean(goal)) || [];
+            .filter(filterTruthy) || [];
 
           const extractionRequest: GoalExtractionRequest = {
             content: segment.content,

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp, filterTruthy } from '@/lib/utils';
 import {
   UserFriendlyError,
   ErrorType,
@@ -902,7 +902,7 @@ export const useInventoryStore = create<InventoryStore>()(
           const itemIds = ensureCharacterInventory(characterId, state);
           return itemIds
             .map((id) => state.items[id])
-            .filter((item): item is InventoryItem => Boolean(item));
+            .filter(filterTruthy);
         },
 
         clearCharacterInventory: (characterId) => {

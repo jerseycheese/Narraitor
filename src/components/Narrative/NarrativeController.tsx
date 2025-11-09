@@ -4,7 +4,7 @@ import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate, safeTrim ,filterTruthy } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -63,7 +63,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
     return npcIds
       .map((id) => npcs[id])
-      .filter((npc): npc is NonNullable<typeof npcs[string]> => Boolean(npc));
+      .filter(filterTruthy);
   }, [npcIds, npcs]);
 
   // Track if we've already generated a narrative for this session
@@ -561,7 +561,7 @@ Respond with JSON format:
                     ).toISOString(),
             } as NarrativeSegment;
           })
-          .filter((segment): segment is NarrativeSegment => Boolean(segment));
+          .filter(filterTruthy);
 
         if (seededSegments.length > 0) {
           useNarrativeStore.setState((state) => ({
