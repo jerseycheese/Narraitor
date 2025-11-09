@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { categorizeInventoryItem } from '@/lib/ai/inventoryCategorizer';
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils';
+import { handleAPIError, validateRequiredString } from '@/utils/apiHelpers';
 
 const logger = new Logger('InventoryCategorizeAPI');
 
@@ -15,11 +16,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CategorizeInventoryRequest;
 
-    if (!body.name || body.name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Item name is required for categorization' },
-        { status: 400 }
-      );
+    const validationError = validateRequiredString(body.name, 'Item name');
+    if (validationError) {
+      return validationError;
     }
 
     const result = await categorizeInventoryItem({
@@ -39,12 +38,6 @@ export async function POST(request: NextRequest) {
       classifiedAt,
     });
   } catch (error) {
-    logger.error('Failed to categorize inventory item', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to categorize inventory item',
-      },
-      { status: 500 }
-    );
+    return handleAPIError(error, logger, 'InventoryCategorizeAPI', 'Failed to categorize inventory item');
   }
 }

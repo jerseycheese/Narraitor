@@ -238,3 +238,49 @@ export async function makeGeminiRequest(
     throw err;
   }
 }
+
+/**
+ * Centralized API error handler
+ * Creates consistent error responses across all API routes
+ *
+ * @param error - The error that occurred
+ * @param logger - Logger instance for logging the error
+ * @param context - Context string for the logger (e.g., 'analyze-world API')
+ * @param userMessage - User-friendly error message
+ * @param status - HTTP status code (default: 500)
+ * @returns NextResponse with standardized error format
+ */
+export function handleAPIError(
+  error: unknown,
+  logger: { error: (context: string, message: string, error: unknown) => void },
+  context: string,
+  userMessage: string,
+  status: number = 500
+): NextResponse {
+  logger.error(context, `${userMessage}:`, error);
+
+  return NextResponse.json(
+    {
+      error: userMessage,
+      details: error instanceof Error ? error.message : 'Unknown error'
+    },
+    { status }
+  );
+}
+
+/**
+ * Validates required string field
+ * Returns error response if validation fails, null otherwise
+ */
+export function validateRequiredString(
+  value: unknown,
+  fieldName: string
+): NextResponse | null {
+  if (!value || typeof value !== 'string' || !value.trim()) {
+    return NextResponse.json(
+      { error: `${fieldName} is required` },
+      { status: 400 }
+    );
+  }
+  return null;
+}

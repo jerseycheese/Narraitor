@@ -201,10 +201,9 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
     }
 
   } catch (error) {
-    console.error('Error generating journal summary:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const { handleAPIError } = await import('@/utils/apiHelpers');
+    const Logger = (await import('@/lib/utils/logger')).default;
+    const logger = new Logger('NarrativeSummarizeAPI');
+    return handleAPIError(error, logger, 'NarrativeSummarizeAPI', 'Internal server error');
   }
 }
