@@ -11,22 +11,22 @@ TypeScript types for worlds, characters, narratives, and everything else. These 
 
 ## Base Types
 
-Everything in the app builds on these foundation types. Every world, character, and narrative entry extends from BaseEntity:
+Foundation types used throughout the app:
 
 ```typescript
 // Common types used throughout the app
 type EntityID = string;
-type Timestamp = string; // ISO 8601
+type ISODateString = string; // ISO 8601 datetime
 
-interface BaseEntity {
+interface NamedEntity {
   id: EntityID;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  name: string;
+  description: string;
 }
 
-interface NamedEntity extends BaseEntity {
-  name: string;
-  description?: string;
+interface TimestampedEntity {
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
 }
 ```
 
@@ -103,11 +103,15 @@ interface Portrait {
 These handle the actual storytelling content - the back-and-forth between AI and player that creates the story:
 
 ```typescript
-interface NarrativeEntry extends BaseEntity {
+interface NarrativeSegment extends TimestampedEntity {
+  id: EntityID;
   sessionId: EntityID;
+  worldId?: EntityID;
   content: string;
-  type: 'narrative' | 'player-action' | 'system-message';
-  characterId?: EntityID;
+  type: 'scene' | 'dialogue' | 'action' | 'transition' | 'ending';
+  characterIds?: EntityID[];
+  decisions?: Decision[];
+  metadata: NarrativeMetadata;
 }
 
 interface Decision {
@@ -135,39 +139,39 @@ interface NarrativeContext {
 ## Session Types
 
 ```typescript
-interface GameSession extends BaseEntity {
+interface GameSession extends TimestampedEntity {
+  id: EntityID;
   worldId: EntityID;
-  characterIds: EntityID[];
-  status: 'active' | 'paused' | 'completed';
-  currentLocation?: string;
-  metadata: SessionMetadata;
-}
-
-interface SessionMetadata {
-  totalEntries: number;
-  startTime: Timestamp;
-  endTime?: Timestamp;
-  pausedAt?: Timestamp;
+  characterId: EntityID;
+  state: SessionState;
+  narrativeHistory: EntityID[]; // NarrativeSegment IDs
+  currentContext: NarrativeContext;
 }
 ```
 
 ## Journal Types
 
 ```typescript
-interface JournalEntry extends BaseEntity {
+interface JournalEntry extends TimestampedEntity {
+  id: EntityID;
   sessionId: EntityID;
+  worldId: EntityID;
+  characterId: EntityID;
+  type: JournalEntryType;
   title: string;
   content: string;
-  tags: string[];
-  category: 'event' | 'character' | 'location' | 'item' | 'lore';
-  importance: 'low' | 'medium' | 'high';
+  detailedContent?: string;
+  significance: 'minor' | 'major' | 'critical';
+  isRead: boolean;
+  relatedEntities: RelatedEntity[];
+  metadata: JournalMetadata;
 }
 
 type JournalFilter = {
-  category?: JournalEntry['category'];
-  importance?: JournalEntry['importance'];
-  tags?: string[];
-  dateRange?: [Timestamp, Timestamp];
+  type?: JournalEntryType;
+  significance?: 'minor' | 'major' | 'critical';
+  isRead?: boolean;
+  dateRange?: [ISODateString, ISODateString];
 };
 ```
 
@@ -228,7 +232,7 @@ interface AIContext {
 interface AIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
-  timestamp: Timestamp;
+  timestamp: ISODateString;
 }
 
 interface PromptTemplate {
@@ -248,15 +252,15 @@ interface BaseStore<T> {
   entities: Record<EntityID, T>;
   currentEntityId: EntityID | null;
   loading: boolean;
-  error: string | null;
-  
-  create: (data: Omit<T, keyof BaseEntity>) => EntityID;
+  error: UserFriendlyError | null;
+
+  create: (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
   update: (id: EntityID, updates: Partial<T>) => void;
   delete: (id: EntityID) => void;
   setCurrent: (id: EntityID) => void;
-  
+
   setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   reset: () => void;
 }
 
@@ -284,9 +288,9 @@ type NarrativeStore = BaseStore<NarrativeEntry> & {
 
 ```typescript
 // Form data types (without IDs and timestamps)
-type CreateWorldData = Omit<World, keyof BaseEntity>;
-type CreateCharacterData = Omit<Character, keyof BaseEntity>;
-type CreateSessionData = Omit<GameSession, keyof BaseEntity | 'status'>;
+type CreateWorldData = Omit<World, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateCharacterData = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateSessionData = Omit<GameSession, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Update types (all fields optional)
 type UpdateWorldData = Partial<Omit<World, 'id' | 'createdAt'>>;
@@ -301,7 +305,7 @@ interface APIResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  timestamp: Timestamp;
+  timestamp: ISODateString;
 }
 
 // Pagination types

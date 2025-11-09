@@ -31,17 +31,17 @@ interface StoreInterface {
   // State
   entities: Record<EntityID, Entity>;
   currentEntityId: EntityID | null;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 
   // CRUD operations
   createEntity: (data: EntityData) => EntityID;
   updateEntity: (id: EntityID, updates: Partial<Entity>) => void;
   deleteEntity: (id: EntityID) => void;
-  
+
   // State management
   reset: () => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
 }
