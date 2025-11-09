@@ -79,12 +79,6 @@ export type {
   TestScenario
 } from './ai-testing.types';
 export type {
-  ExtractionPattern,
-  ExtractionMetadata,
-  ExtractionResult,
-  ExtractionConfig
-} from './response-extraction.types';
-export type {
   DecisionRelevanceScore,
   RelevanceScoringConfig,
   CurrentNarrativeContext,
