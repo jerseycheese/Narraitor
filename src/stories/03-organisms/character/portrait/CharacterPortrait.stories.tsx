@@ -3,7 +3,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { LoadingState } from '@/components/ui/LoadingState/LoadingState';
-// import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 
 const meta: Meta<typeof CharacterPortrait> = {
   title: '03-Organisms/character/portrait/CharacterPortrait',

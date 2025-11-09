@@ -1,4 +1,3 @@
-// import { PromptTemplate } from '../../types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
 export const transitionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any

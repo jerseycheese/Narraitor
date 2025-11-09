@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-// import userEvent from '@testing-library/user-event'; // Removed as not used in current tests
 import { Breadcrumbs } from '../Breadcrumbs';
 
 // Mock next/navigation
