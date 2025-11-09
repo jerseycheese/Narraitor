@@ -1,7 +1,7 @@
 // src/app/api/narrative/generate/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserFriendlyError } from '@/lib/utils/errorUtils';
+import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
 
 import { 
   handleRateLimiting, 
@@ -37,30 +37,18 @@ export async function POST(request: NextRequest) {
     // Validate request
     const requestData = await validateAIRequest(request);
     if (!requestData) {
-      const validationError = getUserFriendlyError(new Error('400 bad request: prompt is required'));
-      return NextResponse.json(
-        { 
-          error: validationError.message,
-          title: validationError.title,
-          type: validationError.type,
-          retryable: validationError.retryable
-        },
-        { status: 400 }
+      return createAPIErrorResponse(
+        new Error('400 bad request: prompt is required'),
+        400
       );
     }
 
     // Validate API key
     const apiKey = validateAPIKey();
     if (!apiKey) {
-      const serviceError = getUserFriendlyError(new Error('Service configuration error: API key not configured'));
-      return NextResponse.json(
-        { 
-          error: serviceError.message,
-          title: serviceError.title,
-          type: serviceError.type,
-          retryable: serviceError.retryable
-        },
-        { status: 500 }
+      return createAPIErrorResponse(
+        new Error('Service configuration error: API key not configured'),
+        500
       );
     }
     
@@ -91,22 +79,13 @@ export async function POST(request: NextRequest) {
       });
 
       // Create appropriate error based on status code
-      const apiError = response.status === 429 
-        ? getUserFriendlyError(new Error('429 rate limit exceeded'))
-        : response.status === 401 
-        ? getUserFriendlyError(new Error('401 unauthorized'))
-        : getUserFriendlyError(new Error(`Service error: ${response.status} ${response.statusText}`));
-      
-      return NextResponse.json(
-        { 
-          error: apiError.message,
-          title: apiError.title,
-          type: apiError.type,
-          retryable: apiError.retryable,
-          details: errorText
-        },
-        { status: response.status }
-      );
+      const apiError = response.status === 429
+        ? new Error('429 rate limit exceeded')
+        : response.status === 401
+        ? new Error('401 unauthorized')
+        : new Error(`Service error: ${response.status} ${response.statusText}`);
+
+      return createAPIErrorResponse(apiError, response.status, errorText);
     }
 
     const data = await response.json();
@@ -121,16 +100,10 @@ export async function POST(request: NextRequest) {
         hasParts: !!data.candidates?.[0]?.content?.parts
       });
 
-      const responseError = getUserFriendlyError(new Error('Service error: malformed API response'));
-      return NextResponse.json(
-        { 
-          error: responseError.message,
-          title: responseError.title,
-          type: responseError.type,
-          retryable: responseError.retryable,
-          details: 'Missing candidates, content, or parts in response'
-        },
-        { status: 500 }
+      return createAPIErrorResponse(
+        new Error('Service error: malformed API response'),
+        500,
+        'Missing candidates, content, or parts in response'
       );
     }
 
@@ -154,17 +127,11 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Narrative generation error:', error);
-    
-    const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Unknown error occurred'));
-    return NextResponse.json(
-      { 
-        error: friendlyError.message,
-        title: friendlyError.title,
-        type: friendlyError.type,
-        retryable: friendlyError.retryable,
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
+
+    return createAPIErrorResponse(
+      error instanceof Error ? error : new Error('Unknown error occurred'),
+      500,
+      error instanceof Error ? error.message : 'Unknown error'
     );
   }
 }
