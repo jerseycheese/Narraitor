@@ -208,7 +208,7 @@ export async function makeGeminiRequest(
 ): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -219,12 +219,12 @@ export async function makeGeminiRequest(
       body: JSON.stringify(payload),
       signal: controller.signal
     });
-    
+
     clearTimeout(timeoutId);
     return response;
   } catch (err) {
     clearTimeout(timeoutId);
-    
+
     // Enhanced error handling for common scenarios
     if (err instanceof Error) {
       if (err.name === 'AbortError') {
@@ -234,7 +234,155 @@ export async function makeGeminiRequest(
         throw new Error('Network error - please check your connection');
       }
     }
-    
+
     throw err;
+  }
+}
+
+/**
+ * Response structure for Gemini text generation
+ */
+export interface GeminiTextResponse {
+  content: string;
+  finishReason?: string;
+  promptTokens?: number;
+  completionTokens?: number;
+  error?: string;
+  details?: string;
+  code?: string;
+}
+
+/**
+ * Options for Gemini text generation
+ */
+export interface GeminiTextOptions {
+  maxTokens?: number;
+  temperature?: number;
+  errorContext?: string; // For logging context (e.g., 'Narrative generation', 'Choice generation')
+}
+
+/**
+ * Process a complete Gemini text generation request
+ * Handles rate limiting, validation, API call, and response parsing
+ */
+export async function processGeminiTextRequest(
+  request: NextRequest,
+  options: GeminiTextOptions = {}
+): Promise<Response> {
+  const {
+    maxTokens = 1024,
+    temperature = 0.7,
+    errorContext = 'Generation'
+  } = options;
+
+  // Lazy import to avoid circular dependency
+  const { createAPIErrorResponse } = await import('../lib/utils/errorUtils');
+
+  try {
+    // Rate limiting
+    const rateLimitResponse = handleRateLimiting(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
+    // Validate request
+    const requestData = await validateAIRequest(request);
+    if (!requestData) {
+      return createAPIErrorResponse(
+        new Error('400 bad request: prompt is required'),
+        400
+      );
+    }
+
+    // Validate API key
+    const apiKey = validateAPIKey();
+    if (!apiKey) {
+      return createAPIErrorResponse(
+        new Error('Service configuration error: API key not configured'),
+        500
+      );
+    }
+
+    // Call Google's Gemini API from the server using secure header authentication
+    const response = await makeGeminiRequest(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+      apiKey,
+      {
+        contents: [{
+          parts: [{ text: requestData.prompt }]
+        }],
+        generationConfig: {
+          temperature: requestData.config?.temperature || temperature,
+          topP: 1.0,
+          topK: 40,
+          maxOutputTokens: requestData.config?.maxTokens || maxTokens
+        },
+        safetySettings: getSafetySettingsFromPrompt(requestData.prompt)
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText: errorText
+      });
+
+      // Create appropriate error based on status code
+      const apiError = response.status === 429
+        ? new Error('429 rate limit exceeded')
+        : response.status === 401
+        ? new Error('401 unauthorized')
+        : new Error(`Service error: ${response.status} ${response.statusText}`);
+
+      return createAPIErrorResponse(apiError, response.status, errorText);
+    }
+
+    const data = await response.json();
+
+    // Extract content from response
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+      console.error('API Response structure issue:', {
+        hasCandidates: !!data.candidates,
+        candidatesLength: data.candidates?.length,
+        hasFirstCandidate: !!data.candidates?.[0],
+        hasContent: !!data.candidates?.[0]?.content,
+        hasParts: !!data.candidates?.[0]?.content?.parts
+      });
+
+      return createAPIErrorResponse(
+        new Error('Service error: malformed API response'),
+        500,
+        'Missing candidates, content, or parts in response'
+      );
+    }
+
+    const content = data.candidates[0].content.parts[0]?.text || '';
+    const finishReason = data.candidates[0].finishReason || 'STOP';
+
+    // Extract token usage if available
+    const promptTokens = data.usageMetadata?.promptTokenCount || undefined;
+    const completionTokens = data.usageMetadata?.candidatesTokenCount || undefined;
+
+    const responseData: GeminiTextResponse = {
+      content,
+      finishReason,
+      promptTokens,
+      completionTokens
+    };
+
+    return NextResponse.json(responseData, {
+      headers: createRateLimitHeaders(getClientIP(request))
+    });
+
+  } catch (error) {
+    console.error(`${errorContext} error:`, error);
+
+    return createAPIErrorResponse(
+      error instanceof Error ? error : new Error('Unknown error occurred'),
+      500,
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
 }
