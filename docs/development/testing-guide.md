@@ -564,21 +564,6 @@ test('handles API success', async () => {
 });
 ```
 
-### Router Testing
-```typescript
-import { MemoryRouter } from 'react-router-dom';
-
-test('navigates correctly', () => {
-  render(
-    <MemoryRouter initialEntries={['/characters']}>
-      <App />
-    </MemoryRouter>
-  );
-  
-  expect(screen.getByText('Character List')).toBeInTheDocument();
-});
-```
-
 ### Accessibility Testing
 ```typescript
 import { axe, toHaveNoViolations } from 'jest-axe';
