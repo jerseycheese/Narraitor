@@ -5,6 +5,7 @@ import Logger from '@/lib/utils/logger';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 
 const logger = new Logger('API');
 
@@ -161,29 +162,11 @@ export async function POST(request: NextRequest) {
     }
     
     // Call Google's Gemini API for image generation
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: prompt }]
-          }],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"]
-          }
-        })
-      }
-    );
+    const generatedImage = await generateImageWithGemini(prompt, apiKey);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('generate-portrait API', 'Gemini API Error:', errorText);
-      
+    if (!generatedImage) {
+      logger.warn('generate-portrait API', 'Image generation failed, using fallback');
+
       // Return mock portrait as fallback
       const fallbackPortrait = {
         type: 'ai-generated' as const,
@@ -191,56 +174,26 @@ export async function POST(request: NextRequest) {
         generatedAt: getTimestamp(),
         prompt: prompt
       };
-      
-      return NextResponse.json({ 
-        portrait: fallbackPortrait,
-        image: fallbackPortrait.url // For backward compatibility
-      });
-    }
 
-    const data = await response.json();
-    
-    // Find the image part in the response
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const imagePart = parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) => 
-      part.inlineData && 
-      part.inlineData.mimeType && 
-      part.inlineData.mimeType.startsWith('image/')
-    );
-    
-    if (!imagePart) {
-      logger.warn('generate-portrait API', 'No image found in API response, using fallback');
-      
-      // Return mock portrait as fallback
-      const fallbackPortrait = {
-        type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt
-      };
-      
-      return NextResponse.json({ 
+      return NextResponse.json({
         portrait: fallbackPortrait,
         image: fallbackPortrait.url // For backward compatibility
       });
     }
 
     // Return the generated portrait
-    const mimeType = imagePart.inlineData.mimeType;
-    const base64Data = imagePart.inlineData.data;
-    
     const portraitData = {
       type: 'ai-generated' as const,
-      url: `data:${mimeType};base64,${base64Data}`,
+      url: generatedImage.url,
       generatedAt: getTimestamp(),
       prompt: prompt
     };
-    
+
     logger.debug('generate-portrait API', 'Portrait generated successfully');
 
     return NextResponse.json({
       portrait: portraitData,
-      image: `data:${mimeType};base64,${base64Data}` // For backward compatibility
+      image: generatedImage.url // For backward compatibility
     });
 
   } catch (error) {
