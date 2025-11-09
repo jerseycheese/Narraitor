@@ -36,24 +36,42 @@ Worlds define the setting and rules for storytelling. They're like game systems 
 
 ```typescript
 interface World extends NamedEntity {
+  description: string;
+  genre: GenreValue;
   attributes: WorldAttribute[];
-  skills: string[];
-  theme: string;
+  skills: WorldSkill[];
   settings: WorldSettings;
+  image?: GeneratedImage;
+  reference?: string;
+  relationship?: 'set_within' | 'inspired_by';
+  toneSettings?: ToneSettings;
 }
 
-interface WorldAttribute {
-  name: string;
-  description?: string;
-  min: number;
-  max: number;
-  default: number;
+interface WorldAttribute extends NamedEntity {
+  worldId: EntityID;
+  description: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
+  category?: string;
+}
+
+interface WorldSkill extends NamedEntity {
+  worldId: EntityID;
+  description: string;
+  attributeIds?: EntityID[];
+  difficulty: SkillDifficulty;
+  category?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 interface WorldSettings {
-  toneSettings: ToneSettings;
-  difficultyLevel: 'easy' | 'medium' | 'hard';
-  allowCustomInput: boolean;
+  maxAttributes: number;
+  maxSkills: number;
+  attributePointPool: number;
+  skillPointPool: number;
 }
 ```
 
@@ -357,10 +375,36 @@ const { worlds, createWorld } = useWorldStore();
 const worldData: CreateWorldData = {
   name: 'Wild West',
   description: 'Frontier setting',
-  attributes: [{ name: 'Strength', min: 1, max: 10, default: 5 }],
-  skills: ['Gunslinging'],
-  theme: 'western',
-  settings: { /* ... */ }
+  genre: 'western',
+  attributes: [{
+    id: 'attr-str',
+    worldId: 'world-1',
+    name: 'Strength',
+    description: 'Physical power',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  }],
+  skills: [{
+    id: 'skill-gun',
+    worldId: 'world-1',
+    name: 'Gunslinging',
+    description: 'Quick draw and accurate shooting',
+    difficulty: 'medium',
+    baseValue: 1,
+    minValue: 1,
+    maxValue: 5,
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  }],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 12,
+    attributePointPool: 30,
+    skillPointPool: 10
+  }
 };
 const worldId = createWorld(worldData);
 
