@@ -243,189 +243,188 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Add skill
-        addSkill: (worldId, skillData) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createNotFoundError('World') });
-            return;
+      // Add skill
+      addSkill: (worldId, skillData) => {
+        const world = get().worlds[worldId];
+        if (!world) {
+          set({ error: createNotFoundError('World') });
+          return;
+        }
+
+        if ((world.skills?.length || 0) >= (world.settings?.maxSkills || 0)) {
+          set({ error: createStoreError('Maximum Skills Reached', 'This world has reached its maximum number of skills') });
+          return;
+        }
+
+        const skillId = generateUniqueId('skill');
+        const newSkill: WorldSkill = {
+          ...skillData,
+          name: normalizeText(skillData.name, NORM_NAME),
+          description: normalizeText(skillData.description, NORM_DESC),
+          id: skillId,
+          worldId,
+        };
+
+        get().update(worldId, {
+          ...world,
+          skills: [...world.skills, newSkill],
+        });
+      },
+
+      // Update skill
+      updateSkill: (worldId, skillId, updates) => {
+        const world = get().worlds[worldId];
+        if (!world) {
+          set({ error: createNotFoundError('World') });
+          return;
+        }
+
+        const updatedSkills = world.skills?.map((skill) =>
+          skill.id === skillId ? { ...skill, ...updates } : skill
+        ) || [];
+
+        get().update(worldId, {
+          ...world,
+          skills: updatedSkills,
+        });
+      },
+
+      // Remove skill
+      removeSkill: (worldId, skillId) => {
+        const world = get().worlds[worldId];
+        if (!world) {
+          set({ error: createNotFoundError('World') });
+          return;
+        }
+
+        const filteredSkills = world.skills?.filter(
+          (skill) => skill.id !== skillId
+        ) || [];
+
+        get().update(worldId, {
+          ...world,
+          skills: filteredSkills,
+        });
+      },
+
+      // Update settings
+      updateSettings: (worldId, settings) => {
+        const world = get().worlds[worldId];
+        if (!world) {
+          set({ error: createNotFoundError('World') });
+          return;
+        }
+
+        get().update(worldId, {
+          ...world,
+          settings: {
+            ...world.settings,
+            ...settings,
+          },
+        });
+      },
+
+      // Update tone settings
+      updateToneSettings: (worldId, toneSettings) => {
+        const world = get().worlds[worldId];
+        if (!world) {
+          set({ error: createNotFoundError('World') });
+          return;
+        }
+
+        const currentToneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+        get().update(worldId, {
+          ...world,
+          toneSettings: {
+            ...currentToneSettings,
+            ...toneSettings,
+          } as ToneSettings,
+        });
+      },
+
+      initializeWorldState: (worldId) => {
+        set(state => {
+          if (state.worldStates[worldId]) {
+            return {};
           }
 
-          if ((world.skills?.length || 0) >= (world.settings?.maxSkills || 0)) {
-            set({ error: createStoreError('Maximum Skills Reached', 'This world has reached its maximum number of skills') });
-            return;
-          }
-
-          const skillId = generateUniqueId('skill');
-          const newSkill: WorldSkill = {
-            ...skillData,
-            name: normalizeText(skillData.name, NORM_NAME),
-            description: normalizeText(skillData.description, NORM_DESC),
-            id: skillId,
-            worldId,
-          };
-
-          get().update(worldId, {
-            ...world,
-            skills: [...world.skills, newSkill],
-          });
-        },
-
-        // Update skill
-        updateSkill: (worldId, skillId, updates) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createNotFoundError('World') });
-            return;
-          }
-
-          const updatedSkills = world.skills?.map((skill) =>
-            skill.id === skillId ? { ...skill, ...updates } : skill
-          ) || [];
-
-          get().update(worldId, {
-            ...world,
-            skills: updatedSkills,
-          });
-        },
-
-        // Remove skill
-        removeSkill: (worldId, skillId) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createNotFoundError('World') });
-            return;
-          }
-
-          const filteredSkills = world.skills?.filter(
-            (skill) => skill.id !== skillId
-          ) || [];
-
-          get().update(worldId, {
-            ...world,
-            skills: filteredSkills,
-          });
-        },
-
-        // Update settings
-        updateSettings: (worldId, settings) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createNotFoundError('World') });
-            return;
-          }
-
-          get().update(worldId, {
-            ...world,
-            settings: {
-              ...world.settings,
-              ...settings,
-            },
-          });
-        },
-
-        // Update tone settings
-        updateToneSettings: (worldId, toneSettings) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createNotFoundError('World') });
-            return;
-          }
-
-          const currentToneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
-          get().update(worldId, {
-            ...world,
-            toneSettings: {
-              ...currentToneSettings,
-              ...toneSettings,
-            } as ToneSettings,
-          });
-        },
-
-        initializeWorldState: (worldId) => {
-          set(state => {
-            if (state.worldStates[worldId]) {
-              return {};
+          logger.debug('Initializing world state for world:', worldId);
+          return {
+            worldStates: {
+              ...state.worldStates,
+              [worldId]: createEmptyWorldState(worldId),
             }
+          };
+        });
+      },
 
-            logger.debug('Initializing world state for world:', worldId);
-            return {
-              worldStates: {
-                ...state.worldStates,
-                [worldId]: createEmptyWorldState(worldId),
-              }
-            };
+      updateWorldState: (worldId, stateUpdate, sessionId) => {
+        if (!get().worlds[worldId]) {
+          logger.warn('Attempted to update state for unknown world', { worldId, sessionId });
+          return;
+        }
+        logger.debug('Applying world state update', { worldId, sessionId, keys: Object.keys(stateUpdate ?? {}) });
+        set(state => {
+          const currentState = state.worldStates[worldId];
+          const nextState = applyWorldStateUpdate(worldId, currentState, stateUpdate, sessionId);
+
+          return {
+            worldStates: {
+              ...state.worldStates,
+              [worldId]: nextState,
+            }
+          };
+        });
+      },
+
+      mergeWorldState: (incomingState) => {
+        logger.debug('Merging external world state', { worldId: incomingState.worldId, version: incomingState.version });
+        set(state => {
+          const currentState = state.worldStates[incomingState.worldId];
+          const merged = currentState ? mergeState(currentState, incomingState) : incomingState;
+
+          return {
+            worldStates: {
+              ...state.worldStates,
+              [incomingState.worldId]: merged,
+            }
+          };
+        });
+      },
+
+      getWorldState: (worldId, options) => {
+        const includeEndedSessions = options?.includeEndedSessions ?? false;
+        const rawState = get().worldStates[worldId];
+
+        if (includeEndedSessions) {
+          return rawState ?? createEmptyWorldState(worldId);
+        }
+
+        return getActiveWorldState(worldId, rawState, resolveSessionStatus);
+      },
+
+      getRawWorldState: (worldId) => {
+        return get().worldStates[worldId];
+      },
+
+      // Fetch worlds action - loads from persisted state
+      fetchWorlds: async () => {
+        get().setLoading(true);
+        get().clearError();
+        try {
+          // In this architecture, worlds are automatically loaded from IndexedDB
+          // via Zustand persistence, so we just need to ensure the state is ready
+          await new Promise(resolve => setTimeout(resolve, 100));
+          get().setLoading(false);
+        } catch (error) {
+          get().setLoading(false);
+          get().setError({
+            title: 'Failed to Load Worlds',
+            message: getErrorMessage(error, 'Failed to fetch worlds'),
+            retryable: true,
+            type: ErrorType.SERVICE,
           });
-        },
-
-        updateWorldState: (worldId, stateUpdate, sessionId) => {
-          if (!get().worlds[worldId]) {
-            logger.warn('Attempted to update state for unknown world', { worldId, sessionId });
-            return;
-          }
-          logger.debug('Applying world state update', { worldId, sessionId, keys: Object.keys(stateUpdate ?? {}) });
-          set(state => {
-            const currentState = state.worldStates[worldId];
-            const nextState = applyWorldStateUpdate(worldId, currentState, stateUpdate, sessionId);
-
-            return {
-              worldStates: {
-                ...state.worldStates,
-                [worldId]: nextState,
-              }
-            };
-          });
-        },
-
-        mergeWorldState: (incomingState) => {
-          logger.debug('Merging external world state', { worldId: incomingState.worldId, version: incomingState.version });
-          set(state => {
-            const currentState = state.worldStates[incomingState.worldId];
-            const merged = currentState ? mergeState(currentState, incomingState) : incomingState;
-
-            return {
-              worldStates: {
-                ...state.worldStates,
-                [incomingState.worldId]: merged,
-              }
-            };
-          });
-        },
-
-        getWorldState: (worldId, options) => {
-          const includeEndedSessions = options?.includeEndedSessions ?? false;
-          const rawState = get().worldStates[worldId];
-
-          if (includeEndedSessions) {
-            return rawState ?? createEmptyWorldState(worldId);
-          }
-
-          return getActiveWorldState(worldId, rawState, resolveSessionStatus);
-        },
-
-        getRawWorldState: (worldId) => {
-          return get().worldStates[worldId];
-        },
-
-        // Fetch worlds action - loads from persisted state
-        fetchWorlds: async () => {
-          get().setLoading(true);
-          get().clearError();
-          try {
-            // In this architecture, worlds are automatically loaded from IndexedDB
-            // via Zustand persistence, so we just need to ensure the state is ready
-            await new Promise(resolve => setTimeout(resolve, 100));
-            get().setLoading(false);
-          } catch (error) {
-            get().setLoading(false);
-            get().setError({
-              title: 'Failed to Load Worlds',
-              message: getErrorMessage(error, 'Failed to fetch worlds'),
-              retryable: true,
-              type: ErrorType.SERVICE,
-            });
-          }
-        },
+        }
       },
     }),
 

@@ -364,165 +364,164 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       deleteCharacter: (id) => get().delete(id),
       setCurrentCharacter: (id) => get().setCurrent(id),
 
-        // Attribute management
-        addAttribute: (characterId, attributeData) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createNotFoundError('Character') });
-            return;
-          }
+      // Attribute management
+      addAttribute: (characterId, attributeData) => {
+        const character = get().characters[characterId];
+        if (!character) {
+          set({ error: createNotFoundError('Character') });
+          return;
+        }
 
-          const attributeId = generateUniqueId('attr');
-          const newAttribute: CharacterAttribute = {
-            ...attributeData,
-            id: attributeId,
-            characterId,
-          };
+        const attributeId = generateUniqueId('attr');
+        const newAttribute: CharacterAttribute = {
+          ...attributeData,
+          id: attributeId,
+          characterId,
+        };
 
-          get().update(characterId, {
-            attributes: [...character.attributes, newAttribute],
-          });
-        },
+        get().update(characterId, {
+          attributes: [...character.attributes, newAttribute],
+        });
+      },
 
-        updateAttribute: (characterId, attributeId, updates) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createNotFoundError('Character') });
-            return;
-          }
+      updateAttribute: (characterId, attributeId, updates) => {
+        const character = get().characters[characterId];
+        if (!character) {
+          set({ error: createNotFoundError('Character') });
+          return;
+        }
 
-          const updatedAttributes = character.attributes?.map((attr) =>
-            attr.id === attributeId ? { ...attr, ...updates } : attr
-          ) || [];
+        const updatedAttributes = character.attributes?.map((attr) =>
+          attr.id === attributeId ? { ...attr, ...updates } : attr
+        ) || [];
 
-          get().update(characterId, {
-            attributes: updatedAttributes,
-          });
-        },
+        get().update(characterId, {
+          attributes: updatedAttributes,
+        });
+      },
 
-        removeAttribute: (characterId, attributeId) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createNotFoundError('Character') });
-            return;
-          }
+      removeAttribute: (characterId, attributeId) => {
+        const character = get().characters[characterId];
+        if (!character) {
+          set({ error: createNotFoundError('Character') });
+          return;
+        }
 
-          const filteredAttributes = character.attributes?.filter(
-            (attr) => attr.id !== attributeId
-          ) || [];
+        const filteredAttributes = character.attributes?.filter(
+          (attr) => attr.id !== attributeId
+        ) || [];
 
-          get().update(characterId, {
-            attributes: filteredAttributes,
-          });
-        },
+        get().update(characterId, {
+          attributes: filteredAttributes,
+        });
+      },
 
-        // Skill management
-        addSkill: (characterId, skillData) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createNotFoundError('Character') });
-            return;
-          }
+      // Skill management
+      addSkill: (characterId, skillData) => {
+        const character = get().characters[characterId];
+        if (!character) {
+          set({ error: createNotFoundError('Character') });
+          return;
+        }
 
-          if ((character.skills?.length || 0) >= 2) {
-            set({ error: createStoreError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
-            return;
-          }
+        if ((character.skills?.length || 0) >= 2) {
+          set({ error: createStoreError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
+          return;
+        }
 
-          const skillId = generateUniqueId('skill');
-          const newSkill: CharacterSkill = {
-            ...skillData,
-            id: skillId,
-            characterId,
-          };
+        const skillId = generateUniqueId('skill');
+        const newSkill: CharacterSkill = {
+          ...skillData,
+          id: skillId,
+          characterId,
+        };
 
-          get().update(characterId, {
-            skills: [...character.skills, newSkill],
-          });
-        },
+        get().update(characterId, {
+          skills: [...character.skills, newSkill],
+        });
+      },
 
-        cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
-          set((state) => {
-            let charactersToProcess = Object.values(state.characters);
+      cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
+        set((state) => {
+          let charactersToProcess = Object.values(state.characters);
 
-            if (worldId) {
-              charactersToProcess = charactersToProcess.filter(char => char.worldId === worldId);
-            }
-
-            if (charactersToProcess.length <= keepRecentCount) {
-              return state;
-            }
-
-            const sortedCharacters = charactersToProcess
-              .sort(sortByDateDesc('createdAt'));
-
-            const removedCharacters = sortedCharacters.slice(keepRecentCount);
-            const idsToRemove = new Set(removedCharacters.map(char => char.id));
-
-            const newCharacters = Object.fromEntries(
-              Object.entries(state.characters).filter(([id]) => !idsToRemove.has(id))
-            );
-
-            return {
-              characters: newCharacters,
-              entities: newCharacters,
-              worldCharacterIds: buildWorldCharacterIds(newCharacters as Record<EntityID, Character>),
-              currentCharacterId: state.currentCharacterId && idsToRemove.has(state.currentCharacterId) ? null : state.currentCharacterId,
-              currentEntityId: state.currentEntityId && idsToRemove.has(state.currentEntityId) ? null : state.currentEntityId,
-            };
-          });
-        },
-
-        compactCharacterData: () => {
-          set((state) => {
-            const compactedCharacters: Record<EntityID, Character> = {};
-
-            Object.entries(state.characters).forEach(([id, character]) => {
-              compactedCharacters[id] = {
-                ...character,
-                attributes: character.attributes?.slice(0, 6) || [],
-                skills: character.skills?.slice(0, 5) || [],
-                background: {
-                  ...character.background,
-                  goals: character.background.goals?.slice(0, 3) || [],
-                  fears: character.background.fears?.slice(0, 3) || [],
-                  relationships: [],
-                },
-              };
-            });
-
-            return {
-              characters: compactedCharacters,
-              entities: compactedCharacters,
-              worldCharacterIds: buildWorldCharacterIds(compactedCharacters as Record<EntityID, Character>),
-            };
-          });
-        },
-
-        getCharactersCount: (worldId) => {
-          const { characters } = useCharacterStore.getState();
           if (worldId) {
-            return Object.values(characters).filter(char => char.worldId === worldId).length;
+            charactersToProcess = charactersToProcess.filter(char => char.worldId === worldId);
           }
-          return Object.keys(characters).length;
-        },
 
-        deleteCharactersInWorld: (worldId) => set((state) => {
-          const charactersToKeep = Object.fromEntries(
-            Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
+          if (charactersToProcess.length <= keepRecentCount) {
+            return state;
+          }
+
+          const sortedCharacters = charactersToProcess
+            .sort(sortByDateDesc('createdAt'));
+
+          const removedCharacters = sortedCharacters.slice(keepRecentCount);
+          const idsToRemove = new Set(removedCharacters.map(char => char.id));
+
+          const newCharacters = Object.fromEntries(
+            Object.entries(state.characters).filter(([id]) => !idsToRemove.has(id))
           );
 
-          const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+          return {
+            characters: newCharacters,
+            entities: newCharacters,
+            worldCharacterIds: buildWorldCharacterIds(newCharacters as Record<EntityID, Character>),
+            currentCharacterId: state.currentCharacterId && idsToRemove.has(state.currentCharacterId) ? null : state.currentCharacterId,
+            currentEntityId: state.currentEntityId && idsToRemove.has(state.currentEntityId) ? null : state.currentEntityId,
+          };
+        });
+      },
+
+      compactCharacterData: () => {
+        set((state) => {
+          const compactedCharacters: Record<EntityID, Character> = {};
+
+          Object.entries(state.characters).forEach(([id, character]) => {
+            compactedCharacters[id] = {
+              ...character,
+              attributes: character.attributes?.slice(0, 6) || [],
+              skills: character.skills?.slice(0, 5) || [],
+              background: {
+                ...character.background,
+                goals: character.background.goals?.slice(0, 3) || [],
+                fears: character.background.fears?.slice(0, 3) || [],
+                relationships: [],
+              },
+            };
+          });
 
           return {
-            characters: charactersToKeep,
-            entities: charactersToKeep,
-            worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
-            currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
-            currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
+            characters: compactedCharacters,
+            entities: compactedCharacters,
+            worldCharacterIds: buildWorldCharacterIds(compactedCharacters as Record<EntityID, Character>),
           };
-        }),
+        });
       },
+
+      getCharactersCount: (worldId) => {
+        const { characters } = useCharacterStore.getState();
+        if (worldId) {
+          return Object.values(characters).filter(char => char.worldId === worldId).length;
+        }
+        return Object.keys(characters).length;
+      },
+
+      deleteCharactersInWorld: (worldId) => set((state) => {
+        const charactersToKeep = Object.fromEntries(
+          Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
+        );
+
+        const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+
+        return {
+          characters: charactersToKeep,
+          entities: charactersToKeep,
+          worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
+          currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
+          currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
+        };
+      }),
     }),
 
     // Persistence configuration (keeping custom migrate for character validation)

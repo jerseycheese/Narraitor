@@ -1,10 +1,10 @@
 import {
-import { filterTruthy } from '@/lib/utils';
   Decision,
   ChoiceAlignment,
   DecisionRequirement,
   RequirementLogic,
 } from '@/types/narrative.types';
+import { filterTruthy } from '@/lib/utils';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
