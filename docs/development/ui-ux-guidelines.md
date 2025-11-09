@@ -98,12 +98,10 @@ Forms get proper labels and error associations. Errors say what's wrong, not jus
 The game session interface follows specific guidelines:
 
 ### Narrative Display
-Narrative text needs to be readable for long sessions without straining the eyes. The formatting should enhance the story, not get in the way.
-
-Typography stays clear and legible, with options for users to adjust size to their comfort. Paragraphs get enough space between them to feel distinct without breaking the flow of reading. Speech gets distinguished from descriptive text through indentation, italics, or other thematic styling depending on the world. The overall presentation adapts to the world's theme, but readability comes first.
+Readable for long sessions. Clear typography with size adjustment options. Paragraphs spaced distinctly. Speech distinguished from description. Readability over theme.
 
 #### Text Formatting Guidelines
-The formatting approach keeps things consistent and accessible. Paragraphs are separated by double line breaks in the source text, which translates to vertical spacing of at least `1.5rem`. Maximum width is constrained to `56rem` (896px) to keep line lengths comfortable.
+Paragraphs separated by double line breaks (`1.5rem` spacing minimum). Max width `56rem` for comfortable line lengths.
 
 For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>` tags. This ensures screen readers and assistive tech can interpret the meaning correctly. All formatted text meets WCAG 2.1 AA contrast standards and stays readable at 200% zoom.
 

@@ -7,9 +7,7 @@ updated: 2025-06-26
 
 # TypeScript Types Reference
 
-This is your complete guide to the TypeScript types that make the app work. Think of this as the data contract - these interfaces define how worlds, characters, narratives, and everything else is structured in memory and storage.
-
-If you're wondering "what properties does a Character have?" or "how do I create a new World?", this is where you'll find your answers.
+TypeScript types for worlds, characters, narratives, and everything else. These interfaces define how data is structured.
 
 ## Base Types
 
@@ -339,7 +337,7 @@ const isCharacter = (obj: any): obj is Character => {
 
 ## File Locations
 
-Types are split across domain-specific files to keep things organized. If you're looking for a specific type, check the most relevant domain:
+Types are split by domain:
 
 - `/src/types/common.types.ts` - Base and utility types
 - `/src/types/world.types.ts` - World-related types
