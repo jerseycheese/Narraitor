@@ -1,4 +1,3 @@
-// import { PromptTemplate } from '../../types';
 import { NarrativeSegment } from '../../../../types/narrative.types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 
