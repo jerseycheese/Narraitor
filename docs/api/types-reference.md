@@ -80,21 +80,44 @@ interface WorldSettings {
 Characters are player avatars with stats, skills, and personality. They're tied to a specific world and inherit that world's attribute system:
 
 ```typescript
-interface Character extends NamedEntity {
+interface Character extends NamedEntity, TimestampedEntity {
   worldId: EntityID;
-  attributes: Record<string, number>;
-  skills: string[];
-  background?: string;
-  portrait?: Portrait;
-  level: number;
-  experience: number;
+  attributes: CharacterAttribute[];
+  skills: CharacterSkill[];
+  background: CharacterBackground;
+  inventory: Inventory;
+  status: CharacterStatus;
+  portrait?: GeneratedImage;
 }
 
-interface Portrait {
-  type: 'ai-generated' | 'placeholder' | 'custom';
-  url?: string;
-  description?: string;
-  style?: 'realistic' | 'artistic' | 'cartoon';
+interface CharacterAttribute {
+  attributeId: EntityID;
+  value: number;
+}
+
+interface CharacterSkill {
+  skillId: EntityID;
+  level: number;
+  experience: number;
+  isActive: boolean;
+}
+
+interface CharacterBackground {
+  history: string;
+  personality: string;
+  physicalDescription?: string;
+  goals: string[];
+  fears: string[];
+  relationships: CharacterRelationship[];
+  isKnownFigure?: boolean;
+  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
+}
+
+interface CharacterStatus {
+  health: number;
+  maxHealth: number;
+  conditions: string[];
+  location?: string;
 }
 ```
 
@@ -105,34 +128,58 @@ These handle the actual storytelling content - the back-and-forth between AI and
 ```typescript
 interface NarrativeSegment extends TimestampedEntity {
   id: EntityID;
-  sessionId: EntityID;
   worldId?: EntityID;
+  sessionId?: EntityID;
   content: string;
   type: 'scene' | 'dialogue' | 'action' | 'transition' | 'ending';
   characterIds?: EntityID[];
   decisions?: Decision[];
   metadata: NarrativeMetadata;
+  timestamp: Date;
 }
 
 interface Decision {
   id: EntityID;
   prompt: string;
-  options: Choice[];
-  context: NarrativeContext;
+  options: DecisionOption[];
+  selectedOptionId?: EntityID;
+  selectedAt?: Date;
+  characterId?: EntityID;
+  consequences?: Consequence[];
+  contextSummary?: string;
+  decisionWeight?: DecisionWeight;
+  narrativeSegmentId?: EntityID;
 }
 
-interface Choice {
+interface DecisionOption {
   id: EntityID;
   text: string;
-  type: 'ai-generated' | 'custom-input';
-  metadata?: ChoiceMetadata;
+  requirements?: DecisionRequirement[];
+  requiredItems?: DecisionItemRequirements;
+  hint?: string;
+  isCustomInput?: boolean;
+  customText?: string;
+  alignment?: ChoiceAlignment;
 }
 
 interface NarrativeContext {
   worldId: EntityID;
+  currentSceneId: EntityID;
   characterIds: EntityID[];
-  recentEntries: NarrativeEntry[];
+  previousSegments: NarrativeSegment[];
+  currentTags: string[];
+  sessionId: EntityID;
+  recentSegments?: NarrativeSegment[];
   currentLocation?: string;
+  currentSituation?: string;
+  importantEntities?: Array<{
+    id: EntityID;
+    type: string;
+    name: string;
+    description?: string;
+    avatarUrl?: string | null;
+    role?: string;
+  }>;
 }
 ```
 
@@ -274,10 +321,10 @@ type CharacterStore = BaseStore<Character> & {
   levelUp: (characterId: EntityID) => void;
 };
 
-type NarrativeStore = BaseStore<NarrativeEntry> & {
+type NarrativeStore = BaseStore<NarrativeSegment> & {
   currentChoices: Decision | null;
   isGenerating: boolean;
-  
+
   generateNarrative: (context: NarrativeContext) => Promise<void>;
   selectChoice: (choiceId: EntityID) => void;
   submitCustomInput: (input: string) => void;

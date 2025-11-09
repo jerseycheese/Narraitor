@@ -141,7 +141,12 @@ const {
 } = useSessionStore();
 
 // Start or resume a session
-await initializeSession('world-1', 'char-1');
+await initializeSession(
+  'world-1',          // worldId
+  'char-1',           // characterId
+  () => {},           // onComplete callback (optional)
+  false               // force (optional, default: false)
+);
 
 // Session lifecycle metadata persists across reloads
 const lifecycle = getSessionLifecycle('session-abc');
