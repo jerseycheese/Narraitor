@@ -184,8 +184,9 @@ export function createAPIErrorResponse(
   status = 500,
   details?: string
 ): Response {
-  // Import NextResponse dynamically to avoid issues if used outside Next.js context
-  // This is safe because this function is only used in API routes
+  // Dynamic require is necessary to avoid importing Next.js server components in test environments
+  // where Request/Response globals are not available
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { NextResponse } = require('next/server');
 
   const errorObj = typeof error === 'string' ? new Error(error) : error;

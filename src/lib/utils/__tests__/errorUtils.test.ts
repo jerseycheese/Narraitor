@@ -83,7 +83,7 @@ describe('errorUtils', () => {
 
     it('should create error response from Error object', () => {
       const error = new Error('400 bad request: invalid data');
-      const response = createAPIErrorResponse(error, 400);
+      createAPIErrorResponse(error, 400);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -97,7 +97,7 @@ describe('errorUtils', () => {
     });
 
     it('should create error response from string message', () => {
-      const response = createAPIErrorResponse('Network error occurred', 500);
+      createAPIErrorResponse('Network error occurred', 500);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -113,7 +113,7 @@ describe('errorUtils', () => {
     it('should include optional details when provided', () => {
       const error = new Error('Service error');
       const details = 'Specific error details here';
-      const response = createAPIErrorResponse(error, 500, details);
+      createAPIErrorResponse(error, 500, details);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -125,7 +125,7 @@ describe('errorUtils', () => {
 
     it('should default to status 500 when not specified', () => {
       const error = new Error('Unknown error');
-      const response = createAPIErrorResponse(error);
+      createAPIErrorResponse(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.any(Object),
@@ -135,7 +135,7 @@ describe('errorUtils', () => {
 
     it('should include actionLabel when available', () => {
       const error = new Error('429 rate limit exceeded');
-      const response = createAPIErrorResponse(error, 429);
+      createAPIErrorResponse(error, 429);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -148,7 +148,7 @@ describe('errorUtils', () => {
 
     it('should handle authentication errors correctly', () => {
       const error = new Error('401 unauthorized');
-      const response = createAPIErrorResponse(error, 401);
+      createAPIErrorResponse(error, 401);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
