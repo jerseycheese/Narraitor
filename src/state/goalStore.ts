@@ -9,10 +9,14 @@ import {
   GoalExtractionResult,
 } from '../types/goal.types';
 import { EntityID } from '../types/common.types';
-import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { goalExtractor } from '../lib/ai/goalExtractor';
-import { CrudStore } from './createCrudStore';
+import {
+  CrudStore,
+  createCrudOperations,
+  createInitialState,
+  createPersistOptions,
+} from './createCrudStore';
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -42,15 +46,7 @@ export interface GoalStore extends CrudStore<NarrativeGoal> {
   processSegmentForGoals: (segmentId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
 }
 
-const getInitialState = () => ({
-  goals: {} as Record<EntityID, NarrativeGoal>,
-  entities: {} as Record<EntityID, NarrativeGoal>,
-  sessionGoals: {} as Record<EntityID, EntityID[]>,
-  activeGoalIds: [] as EntityID[],
-  currentEntityId: null as EntityID | null,
-  error: null as UserFriendlyError | null,
-  loading: false,
-});
+// Removed getInitialState - now using createInitialState() factory
 
 const validateGoalData = (data: Partial<NarrativeGoal>): void => {
   const normalizedTitle = normalizeText(data.title || '', NORM_NAME);
@@ -74,161 +70,127 @@ const updateActiveGoalIds = (goals: Record<EntityID, NarrativeGoal>): EntityID[]
 export const useGoalStore = create<GoalStore>()(
   persist(
     (set, get) => ({
-      ...getInitialState(),
+      // Initialize state using factory
+      ...createInitialState<NarrativeGoal, GoalStore>({
+        domainKey: 'goals',
+        additionalInitialState: {
+          sessionGoals: {} as Record<EntityID, EntityID[]>,
+          activeGoalIds: [] as EntityID[],
+        },
+      }),
 
-      create: (goalData) => {
-        validateGoalData(goalData);
+      // Create CRUD operations using factory
+      ...createCrudOperations<NarrativeGoal, GoalStore>({
+        entityPrefix: 'goal',
+        domainKey: 'goals',
 
-        const goalId = generateUniqueId('goal');
-        const now = getTimestamp();
-
-        const normalizedTitle = normalizeText(goalData.title, NORM_NAME);
-        const normalizedDescription = normalizeText(goalData.description, NORM_DESC);
-
-        const newGoal: NarrativeGoal = {
-          ...goalData,
-          id: goalId,
-          title: normalizedTitle,
-          description: normalizedDescription,
-          mentionCount: goalData.mentionCount ?? 0,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        set((state) => {
-          const sessionGoals = state.sessionGoals[newGoal.sessionId] || [];
-          const updatedGoals = { ...state.goals, [goalId]: newGoal };
-
+        // Hook: Validate and normalize before create
+        beforeCreate: (data) => {
+          validateGoalData(data);
           return {
-            goals: updatedGoals,
-            entities: { ...state.entities, [goalId]: newGoal },
-            sessionGoals: {
-              ...state.sessionGoals,
-              [newGoal.sessionId]: [...sessionGoals, goalId],
-            },
-            activeGoalIds: updateActiveGoalIds(updatedGoals),
-            error: null,
+            ...data,
+            title: normalizeText(data.title, NORM_NAME),
+            description: normalizeText(data.description, NORM_DESC),
+            mentionCount: data.mentionCount ?? 0,
           };
-        });
+        },
 
-        return goalId;
-      },
+        // Hook: Update sessionGoals and activeGoalIds after create
+        afterCreate: (goal, _set) => {
+          _set((state: GoalStore) => {
+            const sessionGoals = state.sessionGoals[goal.sessionId] || [];
+            const updatedGoals = { ...state.goals, [goal.id]: goal };
 
-      update: (goalId, updates) => {
-        const existingGoal = get().goals[goalId];
-        if (!existingGoal) {
-          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
-          return;
-        }
-
-        const normalizedUpdates: Partial<NarrativeGoal> = { ...updates };
-
-        if (updates.title) {
-          normalizedUpdates.title = normalizeText(updates.title, NORM_NAME);
-        }
-
-        if (updates.description) {
-          normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
-        }
-
-        const now = getTimestamp();
-        const previousStatus = existingGoal.status;
-        const previousSessionId = existingGoal.sessionId;
-        const nextSessionId = updates.sessionId ?? previousSessionId;
-
-        const updatedGoal: NarrativeGoal = {
-          ...existingGoal,
-          ...normalizedUpdates,
-          sessionId: nextSessionId,
-          updatedAt: now,
-        };
-
-        if (updates.status && updates.status !== previousStatus) {
-          if (updates.status === 'completed' || updates.status === 'abandoned') {
-            updatedGoal.completedAt = new Date(now);
-            updatedGoal.completionMethod = updates.status === 'completed' ? 'achieved' : 'abandoned';
-          }
-        }
-
-        set((state) => {
-          const updatedGoals = { ...state.goals, [goalId]: updatedGoal };
-          const nextEntities = { ...state.entities, [goalId]: updatedGoal };
-          const nextSessionGoals = { ...state.sessionGoals };
-
-          if (previousSessionId !== nextSessionId) {
-            const previousList = nextSessionGoals[previousSessionId] || [];
-            nextSessionGoals[previousSessionId] = previousList.filter((id) => id !== goalId);
-
-            const nextList = nextSessionGoals[nextSessionId] || [];
-            nextSessionGoals[nextSessionId] = [...nextList, goalId];
-          }
-
-          return {
-            goals: updatedGoals,
-            entities: nextEntities,
-            sessionGoals: nextSessionGoals,
-            activeGoalIds: updateActiveGoalIds(updatedGoals),
-            error: null,
-          };
-        });
-      },
-
-      delete: (goalId) => {
-        const existingGoal = get().goals[goalId];
-        if (!existingGoal) {
-          return;
-        }
-
-        set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [goalId]: _removedGoal, ...remainingGoals } = state.goals;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [goalId]: _removedEntity, ...remainingEntities } = state.entities;
-
-          const sessionGoals = state.sessionGoals[existingGoal.sessionId] || [];
-          const updatedSessionGoals = sessionGoals.filter((id) => id !== goalId);
-
-          const nextSessionGoals = {
-            ...state.sessionGoals,
-            [existingGoal.sessionId]: updatedSessionGoals,
-          };
-
-          if (nextSessionGoals[existingGoal.sessionId].length === 0) {
-            delete nextSessionGoals[existingGoal.sessionId];
-          }
-
-          return {
-            goals: remainingGoals,
-            entities: remainingEntities,
-            sessionGoals: nextSessionGoals,
-            activeGoalIds: updateActiveGoalIds(remainingGoals),
-            currentEntityId: state.currentEntityId === goalId ? null : state.currentEntityId,
-            error: null,
-          };
-        });
-      },
-
-      setCurrent: (id) => {
-        if (id && !get().goals[id]) {
-          set({
-            error: createStoreError('Goal Not Found', 'The specified goal could not be found.'),
-            currentEntityId: null,
+            return {
+              sessionGoals: {
+                ...state.sessionGoals,
+                [goal.sessionId]: [...sessionGoals, goal.id],
+              },
+              activeGoalIds: updateActiveGoalIds(updatedGoals),
+            };
           });
-          return;
-        }
+        },
 
-        set({ currentEntityId: id ?? null, error: null });
-      },
+        // Hook: Validate and normalize before update
+        beforeUpdate: (id, updates, currentGoal) => {
+          const normalizedUpdates: Partial<NarrativeGoal> = { ...updates };
 
-      getById: (id) => get().goals[id],
-      getAll: () => Object.values(get().goals),
+          if (updates.title !== undefined) {
+            normalizedUpdates.title = normalizeText(updates.title, NORM_NAME);
+          }
 
-      reset: () => set(getInitialState()),
+          if (updates.description !== undefined) {
+            normalizedUpdates.description = normalizeText(updates.description, NORM_DESC);
+          }
 
-      setError: (error) => set({ error }),
-      clearError: () => set({ error: null }),
-      setLoading: (loading) => set({ loading }),
+          // Handle status changes for completion
+          if (updates.status && updates.status !== currentGoal.status) {
+            if (updates.status === 'completed' || updates.status === 'abandoned') {
+              normalizedUpdates.completedAt = new Date(getTimestamp());
+              normalizedUpdates.completionMethod = updates.status === 'completed' ? 'achieved' : 'abandoned';
+            }
+          }
 
+          return normalizedUpdates;
+        },
+
+        // Hook: Update sessionGoals and activeGoalIds after update if session changed
+        afterUpdate: (goal, _set, _get) => {
+          const state = _get() as GoalStore;
+          const oldGoal = state.entities[goal.id];
+
+          _set((s: GoalStore) => {
+            const updatedGoals = { ...s.goals, [goal.id]: goal };
+            const nextSessionGoals = { ...s.sessionGoals };
+
+            // Handle session changes
+            if (oldGoal && oldGoal.sessionId !== goal.sessionId) {
+              const previousList = nextSessionGoals[oldGoal.sessionId] || [];
+              nextSessionGoals[oldGoal.sessionId] = previousList.filter((id) => id !== goal.id);
+
+              const nextList = nextSessionGoals[goal.sessionId] || [];
+              nextSessionGoals[goal.sessionId] = [...nextList, goal.id];
+            }
+
+            return {
+              sessionGoals: nextSessionGoals,
+              activeGoalIds: updateActiveGoalIds(updatedGoals),
+            };
+          });
+        },
+
+        // Hook: Update sessionGoals and activeGoalIds after delete
+        afterDelete: (id, _set, _get) => {
+          const state = _get() as GoalStore;
+          const goal = state.entities[id];
+
+          if (goal) {
+            _set((s: GoalStore) => {
+              const sessionGoals = s.sessionGoals[goal.sessionId] || [];
+              const updatedSessionGoals = sessionGoals.filter((goalId) => goalId !== id);
+
+              const nextSessionGoals = {
+                ...s.sessionGoals,
+                [goal.sessionId]: updatedSessionGoals,
+              };
+
+              if (nextSessionGoals[goal.sessionId].length === 0) {
+                delete nextSessionGoals[goal.sessionId];
+              }
+
+              const remainingGoals = { ...s.goals };
+              delete remainingGoals[id];
+
+              return {
+                sessionGoals: nextSessionGoals,
+                activeGoalIds: updateActiveGoalIds(remainingGoals),
+              };
+            });
+          }
+        },
+      })(set, get),
+
+      // Domain-specific aliases
       createGoal: (goalData) => get().create(goalData),
       updateGoal: (goalId, updates) => get().update(goalId, updates),
       deleteGoal: (goalId) => get().delete(goalId),
@@ -362,37 +324,15 @@ export const useGoalStore = create<GoalStore>()(
         }
       },
     }),
+
+    // Persistence configuration using factory
     {
-      name: 'narraitor-goal-store',
-      storage: createIndexedDBStorage(),
-      version: 1,
+      ...createPersistOptions<GoalStore>('goal', 'goals', createIndexedDBStorage(), 1),
       partialize: (state) => ({
         goals: state.goals,
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with goals after hydration
-        if (state && state.goals) {
-          state.entities = { ...state.goals };
-        }
-      },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'goals' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-          if (state.goals && typeof state.goals === 'object') {
-            state.entities = { ...state.goals };
-          }
-          if (typeof state.error === 'string') {
-            state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
-          }
-          if (typeof state.loading !== 'boolean') {
-            state.loading = false;
-          }
-        }
-        return persistedState as GoalStore;
-      },
     }
   )
 );
