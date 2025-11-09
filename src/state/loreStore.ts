@@ -9,12 +9,16 @@ import type {
   StructuredLoreExtraction,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
-import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
-import { CrudStore } from './createCrudStore';
+import {
+  CrudStore,
+  createCrudOperations,
+  createInitialState,
+  createPersistOptions,
+} from './createCrudStore';
 
 /**
  * Helper function to generate normalized lore keys
@@ -84,121 +88,61 @@ export interface LoreStore extends CrudStore<LoreFact> {
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
 }
 
-const getInitialState = () => ({
-  facts: {} as Record<EntityID, LoreFact>,
-  entities: {} as Record<EntityID, LoreFact>,
-  factHistory: {} as Record<EntityID, FactHistory>,
-  currentEntityId: null as EntityID | null,
-  error: null as UserFriendlyError | null,
-  loading: false,
-});
-
-const initialState = getInitialState();
+// Removed getInitialState - now using createInitialState() factory
 
 export const useLoreStore = create<LoreStore>()(
   persist(
-    (set, get) => {
-      return {
-        ...initialState,
+    (set, get) => ({
+      // Initialize state using factory
+      ...createInitialState<LoreFact, LoreStore>({
+        domainKey: 'facts',
+        additionalInitialState: {
+          factHistory: {} as Record<EntityID, FactHistory>,
+        },
+      }),
 
-        create: (factData) => {
-          const id = generateUniqueId();
-          const now = getTimestamp();
-          const newFact: LoreFact = {
-            ...factData,
-            id,
-            createdAt: now,
-            updatedAt: now,
-          };
+      // Create CRUD operations using factory
+      ...createCrudOperations<LoreFact, LoreStore>({
+        entityPrefix: 'lore',
+        domainKey: 'facts',
 
-          set((state) => ({
-            facts: { ...state.facts, [id]: newFact },
-            entities: { ...state.entities, [id]: newFact },
+        // Hook: Track fact creation in history
+        afterCreate: (fact, _set) => {
+          _set((state: LoreStore) => ({
             factHistory: {
               ...state.factHistory,
-              [id]: { factId: id, versions: [newFact] },
+              [fact.id]: { factId: fact.id, versions: [fact] },
             },
-            error: null,
           }));
-
-          return id;
         },
 
-        update: (id, updates) => {
-          const fact = get().facts[id];
-          if (!fact) {
-            set({ error: createStoreError('Lore Fact Not Found', 'The specified lore fact could not be found.') });
-            return;
-          }
+        // Hook: Track fact updates in history
+        afterUpdate: (fact, _set, _get) => {
+          const state = _get() as LoreStore;
+          const previousHistory = state.factHistory[fact.id]?.versions ?? [];
 
-          const updatedFact: LoreFact = {
-            ...fact,
-            ...updates,
-            id,
-            createdAt: fact.createdAt,
-            updatedAt: getTimestamp(),
-          };
-
-          const previousHistory = get().factHistory[id]?.versions ?? [];
-
-          set((state) => ({
-            facts: { ...state.facts, [id]: updatedFact },
-            entities: { ...state.entities, [id]: updatedFact },
+          _set((s: LoreStore) => ({
             factHistory: {
-              ...state.factHistory,
-              [id]: {
-                factId: id,
-                versions: [...previousHistory, updatedFact],
+              ...s.factHistory,
+              [fact.id]: {
+                factId: fact.id,
+                versions: [...previousHistory, fact],
               },
             },
-            error: null,
           }));
         },
 
-        delete: (id) => {
-          if (!get().facts[id]) {
-            return;
-          }
-
-          set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedFact, ...remainingFacts } = state.facts;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
+        // Hook: Remove fact from history after delete
+        afterDelete: (id, _set, _get) => {
+          _set((state: LoreStore) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedHistory, ...remainingHistory } = state.factHistory;
-            const shouldResetCurrent = state.currentEntityId === id;
-
             return {
-              facts: remainingFacts,
-              entities: remainingEntities,
               factHistory: remainingHistory,
-              currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
-              error: null,
             };
           });
         },
-
-        setCurrent: (id) => {
-          if (id && !get().facts[id]) {
-            set({
-              error: createStoreError('Lore Fact Not Found', 'The specified lore fact could not be found.'),
-              currentEntityId: null,
-            });
-            return;
-          }
-
-          set({ currentEntityId: id ?? null, error: null });
-        },
-
-        getById: (id) => get().facts[id],
-        getAll: () => Object.values(get().facts),
-
-        reset: () => set(getInitialState()),
-
-        setError: (error) => set({ error }),
-        clearError: () => set({ error: null }),
-        setLoading: (loading) => set({ loading }),
+      })(set, get),
 
         addFact: (key, value, category, source, worldId, sessionId, metadata) => {
           if (!get().validateFact({ key, value, category, worldId })) {
@@ -538,46 +482,15 @@ export const useLoreStore = create<LoreStore>()(
           }
           return Object.keys(facts).length;
         },
-      };
-    },
+    }),
+
+    // Persistence configuration using factory
     {
-      name: 'lore-store',
-      storage: createIndexedDBStorage(),
-      version: 1,
+      ...createPersistOptions<LoreStore>('lore', 'facts', createIndexedDBStorage(), 1),
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with facts after hydration
-        if (state && state.facts) {
-          state.entities = { ...state.facts };
-        }
-      },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'facts' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-          if (state.facts && typeof state.facts === 'object') {
-            state.entities = { ...state.facts };
-          }
-          if (state.currentEntityId && !(state.entities && state.entities[state.currentEntityId])) {
-            state.currentEntityId = null;
-          }
-          if (typeof state.error === 'string') {
-            state.error = {
-              title: state.error,
-              message: state.error,
-              retryable: false,
-              type: ErrorType.UNKNOWN,
-            };
-          }
-          if (typeof state.loading !== 'boolean') {
-            state.loading = false;
-          }
-        }
-        return persistedState as LoreStore;
-      },
     }
   )
 );
