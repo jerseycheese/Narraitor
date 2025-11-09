@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { CategorizedList } from '../shared/CategorizedList';
 
 interface CharacterAttribute {
   id: string;
@@ -18,49 +19,14 @@ interface CharacterAttributeDisplayProps {
 }
 
 export function CharacterAttributeDisplay({ attributes, showCategories = false }: CharacterAttributeDisplayProps) {
-  if (attributes.length === 0) {
-    return (
-      <div className="text-muted-foreground text-center py-4">
-        No attributes assigned to this character.
-      </div>
-    );
-  }
-
-  if (showCategories) {
-    // Group attributes by category
-    const categorizedAttributes = attributes.reduce((acc, attr) => {
-      const category = attr.category || 'general';
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(attr);
-      return acc;
-    }, {} as Record<string, CharacterAttribute[]>);
-
-    return (
-      <div className="space-y-6">
-        {Object.entries(categorizedAttributes).map(([category, attrs]) => (
-          <div key={category}>
-            <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
-              {category}
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {attrs.map((attr, index) => (
-                <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {attributes.map((attr, index) => (
-        <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
-      ))}
-    </div>
+    <CategorizedList
+      items={attributes}
+      emptyMessage="No attributes assigned to this character."
+      showCategories={showCategories}
+      renderItem={(attr) => <AttributeItem attribute={attr} />}
+      itemKeyPrefix="attr"
+    />
   );
 }
 
