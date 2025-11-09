@@ -157,6 +157,6 @@ test('character creation with world validation', () => {
 ```
 
 ## Related Documents
-- [Architecture Decisions](/users/jackhaas/projects/narraitor/docs/architecture/architecture-decisions.md)
-- [State Management](/users/jackhaas/projects/narraitor/docs/architecture/state-management.md)
-- [Technical Approach](/users/jackhaas/projects/narraitor/docs/architecture/technical-approach.md)
+- [Architecture Decisions](./architecture-decisions.md)
+- [State Management Guide](./state-management-guide.md)
+- [Technical Approach](./technical-approach.md)
