@@ -69,6 +69,3 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
 GenreSelector.displayName = 'GenreSelector';
 
 export { GenreSelector };
-
-// Legacy export for backward compatibility during migration
-export const ThemeSelector = GenreSelector;

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
-import { useWorldStore } from '@/state/useWorldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import type { EntityID } from '@/types';
 
