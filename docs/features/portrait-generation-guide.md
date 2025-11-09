@@ -9,7 +9,7 @@ updated: 2025-06-26
 
 Let's be honest - character portraits make everything better. There's something about seeing your character's face that makes the whole experience more immersive. This system generates AI-powered portraits that actually fit with your character's description and the world they live in.
 
-The challenge was making this work seamlessly with character creation while handling all the things that can go wrong with AI image generation - rate limits, failed generations, inappropriate content, and the like.
+The challenge was making this work with character creation while handling AI image generation issues - rate limits, failed generations, inappropriate content.
 
 ## Getting Started
 
@@ -66,7 +66,7 @@ interface Portrait {
 ## Smart Character Creation Integration
 
 ### How It Works During Character Creation
-The portrait system hooks into character creation seamlessly - no extra steps required:
+The portrait system hooks into character creation - no extra steps required:
 
 ```tsx
 import { useCharacterStore } from '@/state/characterStore';

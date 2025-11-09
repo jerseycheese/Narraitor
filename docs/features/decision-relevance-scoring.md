@@ -3,7 +3,7 @@
 ## The Problem This Solves
 Here's the challenge: your player has made 50 decisions during their adventure, but right now they're negotiating with the tavern keeper about room prices. The AI doesn't need to remember that time they chose oatmeal for breakfast three sessions ago - but it absolutely should remember when they helped that merchant earlier today, or when they had a heated argument with this same tavern keeper last week.
 
-The AI needs to be smart about which past decisions actually matter to the current moment. This system does the heavy lifting by scoring every past decision based on how relevant it is to what's happening right now. The result? The AI focuses on the decisions that matter instead of getting overwhelmed by irrelevant history.
+The AI needs to be smart about which past decisions matter to the current moment. This system scores every past decision based on relevance to what's happening now. The AI focuses on the decisions that matter instead of getting overwhelmed by irrelevant history.
 
 ## How It Works
 

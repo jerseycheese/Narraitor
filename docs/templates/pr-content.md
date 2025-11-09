@@ -50,7 +50,7 @@ The NarrativeDisplay and NarrativeController components were developed in Storyb
 
 2. **Deduplication System**: Implemented safeguards to prevent duplicate narrative generation, including initial scene tracking and choice-based generation tracking to ensure narrative consistency.
 
-3. **JSON Parsing**: Added robust JSON parsing with fallback mechanisms to handle different AI response formats, ensuring reliable content extraction even when responses contain unexpected formatting.
+3. **JSON Parsing**: Added JSON parsing with fallback for different AI response formats.
 
 4. **Component Lifecycle**: Careful management of React component lifecycle to prevent state updates after unmounting and avoid memory leaks.
 

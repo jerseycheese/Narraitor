@@ -15,7 +15,7 @@ This the tech stack here prioritizes maintainability and developer experience ov
 
 **TypeScript everywhere** - Static typing catches so many issues early, especially with complex state management and AI integrations. The IDE integration makes refactoring much safer, and types serve as documentation.
 
-**Tailwind CSS v4 + shadcn/ui** - Utility-first CSS for rapid development, but shadcn/ui provides consistent component patterns. The combination gives you speed without sacrificing design consistency. Plus Tailwind v4's approach to theming works well for world-specific styling.
+**Tailwind CSS v3 + shadcn/ui** - Utility-first CSS for rapid development, but shadcn/ui provides consistent component patterns. Sticking with v3 for now since Storybook compatibility matters more than having the latest Tailwind features. The combination gives you speed without sacrificing design consistency, and the theming approach works well for world-specific styling.
 
 **Zustand for state management** - Replaced React Context early on because it was getting unwieldy. Zustand is lightweight, has excellent TypeScript support, and makes testing much easier since stores are just functions. The IndexedDB persistence integration works smoothly.
 

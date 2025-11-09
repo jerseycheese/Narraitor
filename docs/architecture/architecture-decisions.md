@@ -23,7 +23,7 @@ So these are the key architectural decisions we made for Narraitor - basically w
 
 **IndexedDB Persistence**: We need to store complex world and character data, plus support offline use. LocalStorage maxes out too quickly, and we wanted something that scales.
 
-**Tailwind CSS v4**: Utility-first styling because it's faster to build with and the performance is great. The theme support makes dark mode trivial.
+**Tailwind CSS v3**: Utility-first styling because it's faster to build with and the performance is great. Sticking with v3 for Storybook compatibility, which matters more than having the latest features. The theme support makes dark mode trivial.
 
 **shadcn/ui Components**: These give us accessible, good-looking components without reinventing the wheel. Built on Radix UI so accessibility is handled properly.
 

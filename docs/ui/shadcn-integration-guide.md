@@ -13,7 +13,7 @@ npm install clsx tailwind-merge class-variance-authority lucide-react @radix-ui/
 ### 2. Tailwind Configuration
 - Created `tailwind.config.ts` with shadcn/ui compatibility
 - Added CSS variables for theming in `src/app/globals.css`
-- Maintains compatibility with Tailwind CSS v4
+- Uses Tailwind CSS v3 for Storybook compatibility
 
 ### 3. Utility Functions
 - Created `src/lib/utils/cn.ts` for className merging using `clsx` and `tailwind-merge`
@@ -162,7 +162,7 @@ Dark mode variables are included and can be activated with the `dark` class on t
 ### For Future Components
 When adding new shadcn/ui components:
 
-1. Install component using manual creation (adapted for Tailwind v4)
+1. Install component using manual creation (adapted for Tailwind v3)
 2. Create Storybook stories following naming convention
 3. Test integration with existing styles
 4. Document any custom modifications needed
@@ -197,7 +197,7 @@ src/
 ### Build Issues
 Common build problems and fixes:
 
-- Ensure Tailwind CSS v4 compatibility
+- Ensure Tailwind CSS v3 compatibility
 - Check that all dependencies are installed
 - Verify CSS variables are properly defined
 
@@ -229,5 +229,5 @@ shadcn/ui components come with good accessibility built-in, but there are still 
 
 ## Resources
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
-- [Tailwind CSS v4 Documentation](https://tailwindcss.com/docs)
+- [Tailwind CSS v3 Documentation](https://v3.tailwindcss.com/docs)
 - [Radix UI Documentation](https://www.radix-ui.com/)

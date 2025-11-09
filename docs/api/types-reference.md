@@ -7,28 +7,26 @@ updated: 2025-06-26
 
 # TypeScript Types Reference
 
-This is your complete guide to the TypeScript types that make the app work. Think of this as the data contract - these interfaces define how worlds, characters, narratives, and everything else is structured in memory and storage.
-
-If you're wondering "what properties does a Character have?" or "how do I create a new World?", this is where you'll find your answers.
+TypeScript types for worlds, characters, narratives, and everything else. These interfaces define how data is structured.
 
 ## Base Types
 
-Everything in the app builds on these foundation types. Every world, character, and narrative entry extends from BaseEntity:
+Foundation types used throughout the app:
 
 ```typescript
 // Common types used throughout the app
 type EntityID = string;
-type Timestamp = string; // ISO 8601
+type ISODateString = string; // ISO 8601 datetime
 
-interface BaseEntity {
+interface NamedEntity {
   id: EntityID;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  name: string;
+  description: string;
 }
 
-interface NamedEntity extends BaseEntity {
-  name: string;
-  description?: string;
+interface TimestampedEntity {
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
 }
 ```
 
@@ -38,24 +36,42 @@ Worlds define the setting and rules for storytelling. They're like game systems 
 
 ```typescript
 interface World extends NamedEntity {
+  description: string;
+  genre: GenreValue;
   attributes: WorldAttribute[];
-  skills: string[];
-  theme: string;
+  skills: WorldSkill[];
   settings: WorldSettings;
+  image?: GeneratedImage;
+  reference?: string;
+  relationship?: 'set_within' | 'inspired_by';
+  toneSettings?: ToneSettings;
 }
 
-interface WorldAttribute {
-  name: string;
-  description?: string;
-  min: number;
-  max: number;
-  default: number;
+interface WorldAttribute extends NamedEntity {
+  worldId: EntityID;
+  description: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
+  category?: string;
+}
+
+interface WorldSkill extends NamedEntity {
+  worldId: EntityID;
+  description: string;
+  attributeIds?: EntityID[];
+  difficulty: SkillDifficulty;
+  category?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 interface WorldSettings {
-  toneSettings: ToneSettings;
-  difficultyLevel: 'easy' | 'medium' | 'hard';
-  allowCustomInput: boolean;
+  maxAttributes: number;
+  maxSkills: number;
+  attributePointPool: number;
+  skillPointPool: number;
 }
 ```
 
@@ -64,21 +80,44 @@ interface WorldSettings {
 Characters are player avatars with stats, skills, and personality. They're tied to a specific world and inherit that world's attribute system:
 
 ```typescript
-interface Character extends NamedEntity {
+interface Character extends NamedEntity, TimestampedEntity {
   worldId: EntityID;
-  attributes: Record<string, number>;
-  skills: string[];
-  background?: string;
-  portrait?: Portrait;
-  level: number;
-  experience: number;
+  attributes: CharacterAttribute[];
+  skills: CharacterSkill[];
+  background: CharacterBackground;
+  inventory: Inventory;
+  status: CharacterStatus;
+  portrait?: GeneratedImage;
 }
 
-interface Portrait {
-  type: 'ai-generated' | 'placeholder' | 'custom';
-  url?: string;
-  description?: string;
-  style?: 'realistic' | 'artistic' | 'cartoon';
+interface CharacterAttribute {
+  attributeId: EntityID;
+  value: number;
+}
+
+interface CharacterSkill {
+  skillId: EntityID;
+  level: number;
+  experience: number;
+  isActive: boolean;
+}
+
+interface CharacterBackground {
+  history: string;
+  personality: string;
+  physicalDescription?: string;
+  goals: string[];
+  fears: string[];
+  relationships: CharacterRelationship[];
+  isKnownFigure?: boolean;
+  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
+}
+
+interface CharacterStatus {
+  health: number;
+  maxHealth: number;
+  conditions: string[];
+  location?: string;
 }
 ```
 
@@ -87,71 +126,99 @@ interface Portrait {
 These handle the actual storytelling content - the back-and-forth between AI and player that creates the story:
 
 ```typescript
-interface NarrativeEntry extends BaseEntity {
-  sessionId: EntityID;
+interface NarrativeSegment extends TimestampedEntity {
+  id: EntityID;
+  worldId?: EntityID;
+  sessionId?: EntityID;
   content: string;
-  type: 'narrative' | 'player-action' | 'system-message';
-  characterId?: EntityID;
+  type: 'scene' | 'dialogue' | 'action' | 'transition' | 'ending';
+  characterIds?: EntityID[];
+  decisions?: Decision[];
+  metadata: NarrativeMetadata;
+  timestamp: Date;
 }
 
 interface Decision {
   id: EntityID;
   prompt: string;
-  options: Choice[];
-  context: NarrativeContext;
+  options: DecisionOption[];
+  selectedOptionId?: EntityID;
+  selectedAt?: Date;
+  characterId?: EntityID;
+  consequences?: Consequence[];
+  contextSummary?: string;
+  decisionWeight?: DecisionWeight;
+  narrativeSegmentId?: EntityID;
 }
 
-interface Choice {
+interface DecisionOption {
   id: EntityID;
   text: string;
-  type: 'ai-generated' | 'custom-input';
-  metadata?: ChoiceMetadata;
+  requirements?: DecisionRequirement[];
+  requiredItems?: DecisionItemRequirements;
+  hint?: string;
+  isCustomInput?: boolean;
+  customText?: string;
+  alignment?: ChoiceAlignment;
 }
 
 interface NarrativeContext {
   worldId: EntityID;
+  currentSceneId: EntityID;
   characterIds: EntityID[];
-  recentEntries: NarrativeEntry[];
+  previousSegments: NarrativeSegment[];
+  currentTags: string[];
+  sessionId: EntityID;
+  recentSegments?: NarrativeSegment[];
   currentLocation?: string;
+  currentSituation?: string;
+  importantEntities?: Array<{
+    id: EntityID;
+    type: string;
+    name: string;
+    description?: string;
+    avatarUrl?: string | null;
+    role?: string;
+  }>;
 }
 ```
 
 ## Session Types
 
 ```typescript
-interface GameSession extends BaseEntity {
+interface GameSession extends TimestampedEntity {
+  id: EntityID;
   worldId: EntityID;
-  characterIds: EntityID[];
-  status: 'active' | 'paused' | 'completed';
-  currentLocation?: string;
-  metadata: SessionMetadata;
-}
-
-interface SessionMetadata {
-  totalEntries: number;
-  startTime: Timestamp;
-  endTime?: Timestamp;
-  pausedAt?: Timestamp;
+  characterId: EntityID;
+  state: SessionState;
+  narrativeHistory: EntityID[]; // NarrativeSegment IDs
+  currentContext: NarrativeContext;
 }
 ```
 
 ## Journal Types
 
 ```typescript
-interface JournalEntry extends BaseEntity {
+interface JournalEntry extends TimestampedEntity {
+  id: EntityID;
   sessionId: EntityID;
+  worldId: EntityID;
+  characterId: EntityID;
+  type: JournalEntryType;
   title: string;
   content: string;
-  tags: string[];
-  category: 'event' | 'character' | 'location' | 'item' | 'lore';
-  importance: 'low' | 'medium' | 'high';
+  detailedContent?: string;
+  significance: 'minor' | 'major' | 'critical';
+  isRead: boolean;
+  relatedEntities: RelatedEntity[];
+  metadata: JournalMetadata;
 }
 
 type JournalFilter = {
-  category?: JournalEntry['category'];
-  importance?: JournalEntry['importance'];
-  tags?: string[];
-  dateRange?: [Timestamp, Timestamp];
+  type?: JournalEntryType;
+  significance?: 'minor' | 'major' | 'critical';
+  isRead?: boolean;
+  dateRange?: [ISODateString, ISODateString];
 };
 ```
 
@@ -212,7 +279,7 @@ interface AIContext {
 interface AIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
-  timestamp: Timestamp;
+  timestamp: ISODateString;
 }
 
 interface PromptTemplate {
@@ -232,15 +299,15 @@ interface BaseStore<T> {
   entities: Record<EntityID, T>;
   currentEntityId: EntityID | null;
   loading: boolean;
-  error: string | null;
-  
-  create: (data: Omit<T, keyof BaseEntity>) => EntityID;
+  error: UserFriendlyError | null;
+
+  create: (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
   update: (id: EntityID, updates: Partial<T>) => void;
   delete: (id: EntityID) => void;
   setCurrent: (id: EntityID) => void;
-  
+
   setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   reset: () => void;
 }
 
@@ -254,10 +321,10 @@ type CharacterStore = BaseStore<Character> & {
   levelUp: (characterId: EntityID) => void;
 };
 
-type NarrativeStore = BaseStore<NarrativeEntry> & {
+type NarrativeStore = BaseStore<NarrativeSegment> & {
   currentChoices: Decision | null;
   isGenerating: boolean;
-  
+
   generateNarrative: (context: NarrativeContext) => Promise<void>;
   selectChoice: (choiceId: EntityID) => void;
   submitCustomInput: (input: string) => void;
@@ -268,9 +335,9 @@ type NarrativeStore = BaseStore<NarrativeEntry> & {
 
 ```typescript
 // Form data types (without IDs and timestamps)
-type CreateWorldData = Omit<World, keyof BaseEntity>;
-type CreateCharacterData = Omit<Character, keyof BaseEntity>;
-type CreateSessionData = Omit<GameSession, keyof BaseEntity | 'status'>;
+type CreateWorldData = Omit<World, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateCharacterData = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateSessionData = Omit<GameSession, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Update types (all fields optional)
 type UpdateWorldData = Partial<Omit<World, 'id' | 'createdAt'>>;
@@ -285,7 +352,7 @@ interface APIResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  timestamp: Timestamp;
+  timestamp: ISODateString;
 }
 
 // Pagination types
@@ -339,7 +406,7 @@ const isCharacter = (obj: any): obj is Character => {
 
 ## File Locations
 
-Types are split across domain-specific files to keep things organized. If you're looking for a specific type, check the most relevant domain:
+Types are split by domain:
 
 - `/src/types/common.types.ts` - Base and utility types
 - `/src/types/world.types.ts` - World-related types
@@ -359,10 +426,36 @@ const { worlds, createWorld } = useWorldStore();
 const worldData: CreateWorldData = {
   name: 'Wild West',
   description: 'Frontier setting',
-  attributes: [{ name: 'Strength', min: 1, max: 10, default: 5 }],
-  skills: ['Gunslinging'],
-  theme: 'western',
-  settings: { /* ... */ }
+  genre: 'western',
+  attributes: [{
+    id: 'attr-str',
+    worldId: 'world-1',
+    name: 'Strength',
+    description: 'Physical power',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  }],
+  skills: [{
+    id: 'skill-gun',
+    worldId: 'world-1',
+    name: 'Gunslinging',
+    description: 'Quick draw and accurate shooting',
+    difficulty: 'medium',
+    baseValue: 1,
+    minValue: 1,
+    maxValue: 5,
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  }],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 12,
+    attributePointPool: 30,
+    skillPointPool: 10
+  }
 };
 const worldId = createWorld(worldData);
 

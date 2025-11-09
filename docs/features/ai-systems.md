@@ -278,7 +278,7 @@ The testing harnesses let you try out different scenarios without having to set 
 
 ## Error Handling
 
-When AI service fails, the system degrades gracefully and continues without AI features. There's automatic retry logic with exponential backoff, and fallback content provides default options when AI is unavailable.
+When AI service fails, the app continues without AI features. There's automatic retry logic with exponential backoff, and fallback content provides default options when AI is unavailable.
 
 For network issues, there's a 15-second timeout on AI requests, clear error messages when rate limits are exceeded, and user-friendly error states for connection problems.
 

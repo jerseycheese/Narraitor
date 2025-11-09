@@ -13,71 +13,53 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 ## Documentation Sections
 
 ### Project Overview
-- [[project-overview|Project Overview]]
-- [[development-roadmap|Development Roadmap]]
-- [[mvp-implementation-plan|MVP Implementation Plan]]
-- [[user-stories|User Stories]]
-
-### Requirements
-- [[requirements/index|Requirements Documentation]]
-- [[summaries/refined-requirements-summary|Refined Requirements Summary]]
-- [[workflows/requirements-to-github|Requirements to GitHub Workflow]]
+- [Project Overview](./project-overview.md)
+- [Development Roadmap](./development/mvp-roadmap.md)
+- [Remaining MVP Work](./development/remaining-mvp-work.md)
 
 ### Architecture
-- [[architecture/repository-structure|Repository Structure]]
-- [[architecture/architecture-decisions|Architecture Decisions]]
-- [[architecture/state-management|State Management]]
-- [[architecture/technical-approach|Technical Approach]]
+- [Repository Structure](./architecture/repository-structure.md)
+- [Architecture Decisions](./architecture/architecture-decisions.md)
+- [State Management Guide](./architecture/state-management-guide.md)
+- [Technical Approach](./architecture/technical-approach.md)
 
 ### Core Systems
-- [[core-systems/world-system|World Configuration System]]
-- [[core-systems/character-system|Character System]]
-- [[core-systems/narrative-engine|Narrative Engine]]
-- [[core-systems/journal-system|Journal System]]
-- [[features/narrative-consistency-tracking|Goal Tracking System]]
+- [World Creation Wizard](./core-systems/world-creation-wizard.md)
+- [Narrative Generation](./core-systems/narrative-generation.md)
 
 ### Features
-- [[features/ai-systems|AI Systems Overview]]
-- [[features/narrative-consistency-tracking|Narrative Consistency Tracking]]
-- [[features/personalized-narrative-system|Personalized Narrative System]]
-- [[features/world-management|World Management]]
+- [AI Systems Overview](./features/ai-systems.md)
+- [Narrative Consistency Tracking](./features/narrative-consistency-tracking.md)
+- [Personalized Narrative System](./features/personalized-narrative-system.md)
+- [World Management](./features/world-management.md)
+- [Game Mechanics](./features/game-mechanics.md)
 
 ### API Documentation
-- [[api/goal-system-api|Goal System API Reference]]
-- [[api/character-creation-auto-save-api|Character Creation Auto-Save API Reference]]
-- [[api/types-reference|Types Reference]]
+- [Goal System API Reference](./api/goal-system-api.md)
+- [Character Creation Auto-Save API](./api/character-creation-auto-save-api.md)
+- [Types Reference](./api/types-reference.md)
 
 ### Technical Guides
-- [[technical-guides/goal-tracking-usage|Goal Tracking Usage Guide]]
-- [[technical-guides/goal-system-integration|Goal System Integration]]
-- [[technical-guides/lore-tracking-system|Lore Tracking System]]
-- [[technical-guides/state-management-usage|State Management Usage]]
-- [[technical-guides/character-creation-auto-save|Character Creation Auto-Save System]]
+- [Goal Tracking Usage](./technical-guides/goal-tracking-usage.md)
+- [Goal System Integration](./technical-guides/goal-system-integration.md)
+- [Lore Tracking System](./technical-guides/lore-tracking-system.md)
+- [State Management Usage](./technical-guides/state-management-usage.md)
+- [Character Creation Auto-Save](./technical-guides/character-creation-auto-save.md)
+- [Error Handling](./technical-guides/error-handling.md)
 
 ### Components
-- [[components/recovery-notification|RecoveryNotification Component]]
+- [Recovery Notification](./components/recovery-notification.md)
+- [Shared Wizard System](./components/shared-wizard-system.md)
 
 ### Development
-- [[development/tdd-with-kiss|Test-Driven Development with KISS]]
-- [[development/storybook-workflow|Storybook Workflow]]
-- [[development/feature-development-workflow|Feature Development Workflow]]
-- [[development/documentation-workflow|Documentation Workflow]]
+- [Testing Guide](./development/testing-guide.md)
+- [React Best Practices](./development/react-best-practices.md)
+- [UI/UX Guidelines](./development/ui-ux-guidelines.md)
+- [Visual Testing Best Practices](./development/visual-testing-best-practices.md)
 
 ### Security
-- [[security/README|Security Overview]]
-- [[security/SECURITY_TESTING_GUIDE|Security Testing Guide]]
-- [[technical-guides/ai-service-api|AI Service Security Documentation]]
-
-### Flows
-- [[flows/world-creation|World Creation Flow]]
-- [[flows/character-creation|Character Creation Flow]]
-- [[flows/game-session|Game Session Flow]]
-- [[flows/state-persistence|State Persistence Flow]]
-
-### Template Worlds
-- [[universes/western|Western World Template]]
-- [[universes/sitcom|Sitcom World Template]]
-- [[universes/fantasy|Fantasy World Template]]
+- [Security Overview](./security/README.md)
+- [Security Testing Guide](./security/SECURITY_TESTING_GUIDE.md)
 
 ## What I'm Building Toward
 

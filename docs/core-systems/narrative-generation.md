@@ -94,7 +94,7 @@ Different moments in the story need different approaches, so we have specialized
 
 ### Tone Settings System
 
-The narrative generator respects user-defined tone settings to keep the content consistent with what you want. The system actually enforces these settings instead of just suggesting them to the AI, which matters for maintaining consistent story quality.
+The narrative generator enforces tone settings instead of just suggesting them to the AI.
 
 Key settings include:
 
@@ -107,27 +107,15 @@ Key settings include:
 
 ### Inventory Integration
 
-The narrative generator can reference items from the character's inventory when it makes sense for the story. The system doesn't force item mentions into every paragraph - instead, it provides context about what the player is carrying and lets the AI naturally weave that into the narrative when appropriate.
+The generator references inventory items when relevant. It ranks items by significance - quest items and equipment rank highest, recently acquired items get a boost, unique items beat common ones.
 
-The prioritization algorithm ranks items by narrative significance. Quest items and equipment score highest since they're most likely to matter in the story. Recently acquired items (picked up in the last 24-72 hours) get a priority boost because they're fresh and relevant. Unique items are preferred over common ones, and items with detailed descriptions are considered more significant than generic ones.
-
-To avoid overwhelming the AI prompt with too much inventory data, the system limits context to the top 8 most significant items. This gives the AI enough to work with without cluttering the prompt. The AI is explicitly instructed to only mention items when they're contextually relevant and to vary how it references them to prevent repetition.
-
-Inventory context gets added to initial scene generation (so the AI knows what you start with), ongoing narrative segments (for natural references during the story), and skill acknowledgment narratives (so the AI can reference tools or items you're using).
+Limits to top 8 items to avoid prompt clutter. The AI only mentions items when contextually relevant.
 
 ### Item Usage Integration
 
-When players use items during gameplay, the system generates dedicated narrative segments describing what happens. This creates a direct narrative response to item usage that feels immediate and contextual rather than just updating inventory numbers.
+Item usage generates narrative segments instead of just updating numbers. The AI describes the action, sensory details, and effects. For stackable items, it incorporates remaining quantity naturally.
 
-The item usage flow works through the narrative generator with specific instructions. The AI gets told to describe the physical action of using the item, show sensory details, and demonstrate how it affects the current situation. The generator also receives context about whether the item was consumed and how many remain if it's stackable.
-
-For stackable items with multiple units, the AI naturally incorporates remaining quantity into the narrative. Use one healing potion from a stack of five and the narrative might say "You down one of your healing potions, the familiar warmth spreading through your body. Four more vials clink reassuringly in your pack." Use the last one and it emphasizes scarcity: "You uncork your final healing potion, knowing this is all you have left."
-
-The system creates these narratives as "action" type segments with `item-usage` tags, which helps track item usage moments in the narrative history. Significant items (quest items, equipment, documents, valuables) also generate journal entries so players have a permanent record of important usage moments.
-
-When AI generation fails or context is unavailable, the system falls back to simple descriptive text that still communicates what happened. This ensures players always get feedback about item usage even if the fancy AI-generated narrative isn't available.
-
-The narrative generation respects all the usual context - world tone settings, current location, recent story events - so item usage feels integrated into the ongoing story rather than disconnected game mechanic text.
+Creates "action" segments with `item-usage` tags. Significant items generate journal entries. Falls back to simple text if AI generation fails.
 
 ### Narrative Perspective
 

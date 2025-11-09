@@ -54,7 +54,7 @@ This is where the wizard gets smart. Describe a post-apocalyptic wasteland and i
 
 ### Context-Aware Guidance
 
-To make world building feel less intimidating, each step now surfaces genre-aware coaching:
+Each step surfaces genre-aware coaching:
 
 - Inline help text explains what to include in each field, with tailored prompts per genre.
 - Example world descriptions, attribute hooks, and skill ideas appear before you ever invoke the AI.
@@ -147,7 +147,7 @@ interface SkillSuggestion {
 
 ## Testing
 
-The wizard includes comprehensive test coverage:
+Test coverage:
 
 ### Unit Tests
 - Each step component has dedicated tests

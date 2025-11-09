@@ -196,7 +196,7 @@ const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedD
 
 ### ARIA Attributes
 
-The component implements proper dialog accessibility:
+Dialog accessibility:
 
 ```typescript
 <div
@@ -378,7 +378,7 @@ describe('RecoveryNotification', () => {
 
 ### Storybook Stories
 
-The component includes comprehensive Storybook stories:
+Storybook stories:
 
 - `Visible`: Standard dialog with recent save data
 - `VisibleWithOldSave`: Dialog with older timestamp

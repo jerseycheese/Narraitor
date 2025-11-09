@@ -40,14 +40,12 @@ The world creation wizard walks you through everything step by step, with AI ass
 ### AI Integration
 ```typescript
 // AI analyzes world description and generates suggestions
-const suggestions = await generateWorldSuggestions({
-  description: "A mystical fantasy realm with ancient magic",
-  genre: "fantasy",
-  worldType: "original"
-});
+const analysis = await analyzeWorldDescriptionClient(
+  "A mystical fantasy realm with ancient magic"
+);
 
 // User reviews and selects suggestions
-const selectedSuggestions = userReviewSuggestions(suggestions);
+const selectedSuggestions = userReviewSuggestions(analysis);
 
 // Create world with AI suggestions and user customizations
 const world = createWorld({

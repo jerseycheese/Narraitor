@@ -50,7 +50,7 @@ narraitor/
 ├── __tests__/                   # Jest tests
 ├── .storybook/                  # Storybook configuration
 ├── docs/                        # Documentation
-├── .eslintrc.js                 # ESLint configuration
+├── eslint.config.mjs            # ESLint configuration
 ├── .prettierrc                  # Prettier configuration
 ├── jest.config.cjs              # Jest configuration
 ├── next.config.ts               # Next.js configuration

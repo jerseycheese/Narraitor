@@ -31,17 +31,17 @@ interface StoreInterface {
   // State
   entities: Record<EntityID, Entity>;
   currentEntityId: EntityID | null;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 
   // CRUD operations
   createEntity: (data: EntityData) => EntityID;
   updateEntity: (id: EntityID, updates: Partial<Entity>) => void;
   deleteEntity: (id: EntityID) => void;
-  
+
   // State management
   reset: () => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -265,8 +265,7 @@ export const worldStore = create<WorldStore>()(
 
 ## Future Considerations
 
-1. **Persistence**: IndexedDB integration (issue #340)
-2. **Middleware**: Logging, validation, persistence
-3. **Optimistic Updates**: For better UX
-4. **State Sync**: Multi-device synchronization
-5. **Undo/Redo**: Time-travel functionality
+1. **Middleware**: Logging, validation middleware
+2. **Optimistic Updates**: For better UX
+3. **State Sync**: Multi-device synchronization
+4. **Undo/Redo**: Time-travel functionality

@@ -58,7 +58,7 @@ The lore system plugs into several places to maintain consistency:
 
 **Choice Generation** - Lore facts are included in choice generation prompts for context-aware options. So if you met Sir Gareth earlier, the AI can offer choices that reference him.
 
-**Goal System** - Works alongside goal tracking for comprehensive narrative consistency. Goals track what you're trying to do, lore tracks what's happened.
+**Goal System** - Works alongside goal tracking for narrative consistency. Goals track what you're trying to do, lore tracks what's happened.
 
 **Session Scoping** - Facts can be filtered by session or world-wide, depending on what context you need.
 
