@@ -7,6 +7,7 @@ import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 /**
  * Create logger instance for this store
@@ -295,7 +296,7 @@ export const useSessionStore = create<SessionStore>()(
       logger.error('Error initializing session:', error);
       set({ 
         status: 'initializing',
-        error: error instanceof Error ? error.message : 'Failed to initialize session',
+        error: getErrorMessage(error, 'Failed to initialize session'),
       });
     }
   },

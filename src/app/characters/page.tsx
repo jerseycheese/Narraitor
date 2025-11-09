@@ -27,6 +27,7 @@ import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSess
 import type { PlayerCharacterThread } from '@/types/world-state.types';
 import { summarizeThreadHighlight } from '@/lib/utils/worldStateFormatters';
 import type { GeneratedImage } from '@/types/common.types';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -344,7 +345,7 @@ export default function CharactersPage() {
       // Navigate to view the character
       router.push(`/characters/${characterId}`);
     } catch (error) {
-      setGenerateError(error instanceof Error ? error.message : 'Failed to generate character');
+      setGenerateError(getErrorMessage(error, 'Failed to generate character'));
     } finally {
       setIsGenerating(false);
       setGeneratingStatus('');

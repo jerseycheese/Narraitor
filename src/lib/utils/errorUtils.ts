@@ -4,6 +4,24 @@
  */
 
 /**
+ * Extracts error message from unknown error types
+ * Handles Error objects, strings, and unknown error types
+ *
+ * @param error - The error to extract message from
+ * @param fallback - Fallback message if error cannot be extracted (default: 'Unknown error')
+ * @returns The error message string
+ */
+export function getErrorMessage(error: unknown, fallback: string = 'Unknown error'): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return fallback;
+}
+
+/**
  * Error type categories for consistent error handling throughout the application
  */
 export enum ErrorType {

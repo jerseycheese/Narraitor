@@ -13,6 +13,7 @@ import { World } from '@/types/world.types';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 
 interface PortraitDebugSectionProps {
@@ -162,7 +163,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       setGeneratedPrompt(prompt);
       console.log('Prompt set successfully');
     } catch (error) {
-      setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Error generating prompt: ${getErrorMessage(error, 'Unknown error')}`);
     }
   };
 
@@ -183,7 +184,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       setLastGeneratedImage(result.url);
       setGeneratedPrompt(result.prompt || 'No prompt returned');
     } catch (error) {
-      setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Generation failed: ${getErrorMessage(error, 'Unknown error')}`);
     } finally {
       setIsGenerating(false);
     }

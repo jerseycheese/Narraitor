@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 export interface WizardStep {
   id: string;
@@ -180,7 +181,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
       setState(prev => ({
         ...prev,
         isProcessing: false,
-        errors: { ...prev.errors, submit: error instanceof Error ? error.message : 'An error occurred' },
+        errors: { ...prev.errors, submit: getErrorMessage(error, 'An error occurred') },
       }));
     }
   }, [state.data, steps.length, validateStep, onComplete, persistKey]);

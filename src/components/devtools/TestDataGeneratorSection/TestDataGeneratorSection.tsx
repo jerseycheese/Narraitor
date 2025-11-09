@@ -9,6 +9,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
@@ -138,7 +139,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       
     } catch (error) {
       console.error('[DevTools] Error generating test world:', error);
-      alert(`Error generating test world: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Error generating test world: ${getErrorMessage(error, 'Unknown error')}`);
     }
   };
 
@@ -277,7 +278,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       
     } catch (error) {
       console.error('[DevTools] Error generating test worlds:', error);
-      alert(`Error generating test worlds: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdWorlds.length} worlds before error.`);
+      alert(`Error generating test worlds: ${getErrorMessage(error, 'Unknown error')}\\n\\nGenerated ${createdWorlds.length} worlds before error.`);
     }
   };
   
@@ -538,7 +539,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       
     } catch (error) {
       console.error('[DevTools] Error generating AI characters:', error);
-      alert(`Error generating characters: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdCharacters.length} characters before error.`);
+      alert(`Error generating characters: ${getErrorMessage(error, 'Unknown error')}\\n\\nGenerated ${createdCharacters.length} characters before error.`);
     }
   };
 
@@ -580,7 +581,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       alert(`Successfully deleted all ${worldCount} worlds and their characters`);
     } catch (error) {
       console.error('[DevTools] Error deleting all worlds:', error);
-      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Error during deletion: ${getErrorMessage(error, 'Unknown error')}`);
     }
   };
 
@@ -615,7 +616,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       alert(`Successfully deleted ${worldCharacters.length} characters from "${currentWorld.name}"`);
     } catch (error) {
       console.error('[DevTools] Error deleting characters:', error);
-      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Error during deletion: ${getErrorMessage(error, 'Unknown error')}`);
     }
   };
 
@@ -668,7 +669,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       
     } catch (error) {
       console.error('[DevTools] Error during nuclear deletion:', error);
-      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nSome data may not have been deleted. Check console for details.`);
+      alert(`Error during deletion: ${getErrorMessage(error, 'Unknown error')}\\n\\nSome data may not have been deleted. Check console for details.`);
     }
   };
 

@@ -12,7 +12,7 @@ import type { EntityID } from '../types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
-import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
 import {
   CrudStore,
   createCrudOperations,
@@ -392,12 +392,12 @@ export const useLoreStore = create<LoreStore>()(
             set({
               error: createStoreError(
                 'Lore Import Failed',
-                error instanceof Error ? error.message : 'Unknown import error occurred.',
+                getErrorMessage(error, 'Unknown import error occurred.'),
                 ErrorType.SERVICE
               ),
             });
             throw new Error(
-              `Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`
+              `Failed to import facts for worldId "${worldId}": ${getErrorMessage(error, String(error))}`
             );
           }
         },

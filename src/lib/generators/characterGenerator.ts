@@ -2,6 +2,7 @@ import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { truncate } from '../utils';
 import { validateWorld } from '@/types/type-guards';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 const logger = new Logger('CharacterGenerator');
 
@@ -476,7 +477,7 @@ CRITICAL INSTRUCTIONS:
     
     // For known figures, we should never fall back to template generation
     if (generationType === 'known' || generationType === 'specific') {
-      throw new Error(`Failed to generate known character from ${world.reference || 'this world'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to generate known character from ${world.reference || 'this world'}: ${getErrorMessage(error, 'Unknown error')}`);
     }
     
     // Only fall back to template generation for original characters

@@ -3,6 +3,7 @@
 import { World } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { generateUniqueId } from './generateId';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 import { 
   ARCHETYPE_TEMPLATES, 
   PHYSICAL_DESCRIPTION_TEMPLATES, 
@@ -105,7 +106,7 @@ export async function generateCharacterArchetypes(
       archetypes.push(archetype);
     } catch (error) {
       console.error(`Failed to generate archetype for template ${template.name}:`, error);
-      throw new Error(`Failed to generate archetype for ${template.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to generate archetype for ${template.name}: ${getErrorMessage(error, 'Unknown error')}`);
     }
   }
   

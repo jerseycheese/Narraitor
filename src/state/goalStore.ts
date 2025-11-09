@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -314,7 +314,7 @@ export const useGoalStore = create<GoalStore>()(
         } catch (error) {
           const friendlyError = createStoreError(
             'Goal Processing Failed',
-            error instanceof Error ? error.message : 'Failed to process goals for the segment.',
+            getErrorMessage(error, 'Failed to process goals for the segment.'),
             ErrorType.SERVICE,
             true
           );

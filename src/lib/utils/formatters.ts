@@ -611,7 +611,7 @@ export function formatForDebug(obj: unknown, options?: {
       return JSON.stringify(processed, null, indent);
     }
   } catch (error) {
-    return `[Debug Format Error: ${error instanceof Error ? error.message : 'Unknown error'}]`;
+    return `[Debug Format Error: ${getErrorMessage(error, 'Unknown error')}]`;
   }
 }
 

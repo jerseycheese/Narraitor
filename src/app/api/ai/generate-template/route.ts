@@ -4,6 +4,7 @@ import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import Logger from '@/lib/utils/logger';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 
 const logger = new Logger('API');
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to generate template',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: getErrorMessage(error, 'Unknown error')
       },
       { status: 500 }
     );

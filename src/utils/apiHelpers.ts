@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter } from './rateLimiter';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 /**
  * Get client IP address from request headers
@@ -262,7 +263,7 @@ export function handleAPIError(
   return NextResponse.json(
     {
       error: userMessage,
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: getErrorMessage(error)
     },
     { status }
   );

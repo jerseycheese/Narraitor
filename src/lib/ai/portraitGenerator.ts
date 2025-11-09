@@ -5,6 +5,7 @@ import { GeneratedImage } from '../../types/common.types';
 import { AIClient } from './types';
 import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 interface PortraitGenerationOptions {
   worldGenre?: string;
@@ -168,7 +169,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       };
     } catch (error) {
       throw new Error(
-        `Failed to generate character portrait: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to generate character portrait: ${getErrorMessage(error, 'Unknown error')}`
       );
     }
   }

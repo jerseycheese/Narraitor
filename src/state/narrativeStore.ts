@@ -12,6 +12,7 @@ import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { createIndexedDBStorage } from './persistence';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 import {
   NPCRelationshipUpdate,
   WorldStateMajorEventInput,
@@ -194,7 +195,7 @@ async function applyWorldStateThreadUpdates({
     logger.debug(
       '[NarrativeStore]',
       'World state thread update skipped:',
-      error instanceof Error ? error.message : 'Unknown error'
+      getErrorMessage(error, 'Unknown error')
     );
   }
 }
@@ -690,7 +691,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       } catch (error) {
         // Silently fail goal processing if goalStore is not available
         // This is not critical for narrative functionality
-        logger.debug('[NarrativeStore]', 'Goal processing skipped:', error instanceof Error ? error.message : 'Unknown error');
+        logger.debug('[NarrativeStore]', 'Goal processing skipped:', getErrorMessage(error, 'Unknown error'));
       }
     });
 
@@ -1049,7 +1050,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       set({
         currentEnding: null,
         isGeneratingEnding: false,
-        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        endingError: `AI ending generation failed: ${getErrorMessage(error, 'Unknown error')}`,
       });
     }
   },

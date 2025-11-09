@@ -1,6 +1,7 @@
 // src/lib/hooks/useAIGeneration.ts
 
 import { useState, useCallback } from 'react';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 interface AIGenerationState<T> {
   isGenerating: boolean;
@@ -51,7 +52,7 @@ export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = 
       
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Generation failed';
+      const errorMessage = getErrorMessage(error, 'Generation failed');
       setState(prev => ({ ...prev, error: errorMessage, isGenerating: false }));
       options.onError?.(errorMessage);
       throw error;

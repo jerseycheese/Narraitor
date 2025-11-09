@@ -49,6 +49,7 @@ import { getTimestamp } from '@/lib/utils';
 import { useJournalStore } from '@/state/journalStore';
 import { AutoSaveService, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
 import { useToast } from '@/components/ui/toast';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 /**
  * Hook for managing auto-save functionality with toast notifications
@@ -197,7 +198,7 @@ export const useAutoSave = () => {
       try {
         await autoSaveServiceRef.current.triggerSave(reason);
       } catch (error) {
-        useSessionStore.getState().updateAutoSaveStatus('error', error instanceof Error ? error.message : 'Unknown error');
+        useSessionStore.getState().updateAutoSaveStatus('error', getErrorMessage(error, 'Unknown error'));
       } finally {
         clearTimeout(fallbackTimer);
         if (!wasRunning) {

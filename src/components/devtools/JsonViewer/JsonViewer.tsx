@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { sanitizeForSerialization } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 /**
  * JsonViewer props
@@ -38,7 +39,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
       // Format with indentation
       return JSON.stringify(sanitized, null, 2);
     } catch (error) {
-      return `Error formatting JSON: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      return `Error formatting JSON: ${getErrorMessage(error, 'Unknown error')}`;
     }
   }, [data]);
 

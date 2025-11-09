@@ -6,6 +6,7 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 const logger = new Logger('API');
 
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
     const { createMockImageResponse } = await import('@/lib/utils/imageGenerationHelpers');
     const fallbackPortrait = createMockImageResponse(
       `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
-      `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Portrait fallback due to error: ${getErrorMessage(error, 'Unknown error')}`
     );
 
     return NextResponse.json({

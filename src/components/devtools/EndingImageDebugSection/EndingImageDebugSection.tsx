@@ -11,6 +11,7 @@ import { capitalize, getTimestamp } from '@/lib/utils';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 export function EndingImageDebugSection() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -123,7 +124,7 @@ export function EndingImageDebugSection() {
       }
       
     } catch (error) {
-      setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Error generating prompt: ${getErrorMessage(error, 'Unknown error')}`);
     } finally {
       setIsGenerating(false);
     }
@@ -182,7 +183,7 @@ export function EndingImageDebugSection() {
       setLastGenerationResult(result);
       
     } catch (error) {
-      setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Generation failed: ${getErrorMessage(error, 'Unknown error')}`);
     } finally {
       setIsGenerating(false);
     }

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { endingGenerator } from '../../../../lib/ai/endingGenerator';
 import { logger } from '../../../../lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('Failed to generate story ending', { 
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: getErrorMessage(error, 'Unknown error')
     });
 
     // Return appropriate error response
