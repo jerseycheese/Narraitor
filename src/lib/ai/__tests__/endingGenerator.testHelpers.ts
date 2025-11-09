@@ -4,79 +4,20 @@
  */
 
 import { getTimestamp } from '@/lib/utils/timestamp';
-import type { World } from '@/types/world.types';
-import type { Character as StoreCharacter } from '@/state/characterStore';
 import type { JournalEntry } from '@/types/journal.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
+import { createMockWorld, createMockCharacter } from '@/lib/test-utils/testDataFactory';
 
 // Re-export centralized timer utilities
 export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+
+// Re-export factory functions
+export { createMockWorld, createMockCharacter };
 
 // Mock client for Gemini API
 export const mockGeminiClient = {
   generateContent: jest.fn()
 };
-
-/**
- * Creates a mock world for testing
- */
-export function createMockWorld(): World {
-  return {
-    id: 'world-123',
-    name: 'Epic Fantasy Realm',
-    description: 'A land of magic and adventure',
-    genre: 'fantasy',
-    settings: {
-      maxAttributes: 6,
-      maxSkills: 12,
-      attributePointPool: 27,
-      skillPointPool: 40
-    },
-    attributes: [],
-    skills: [],
-    createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
-  };
-}
-
-/**
- * Creates a mock character for testing
- */
-export function createMockCharacter(): StoreCharacter {
-  return {
-    id: 'char-456',
-    name: 'Aria Stormblade',
-    worldId: 'world-123',
-    description: 'A seasoned warrior with a noble heart',
-    level: 10,
-    attributes: [],
-    skills: [],
-    background: {
-      history: 'A seasoned warrior seeking redemption',
-      personality: 'Brave and honorable',
-      goals: ['Defeat the dark lord and restore peace', 'Find inner peace'],
-      fears: ['Failure', 'Losing allies'],
-      relationships: []
-    },
-    inventory: {
-      characterId: 'char-456',
-      items: [],
-      capacity: 100,
-      categories: [],
-      itemOrder: [],
-    },
-    isPlayer: true,
-    status: {
-      health: 100,
-      maxHealth: 100,
-      conditions: [],
-      location: 'Dark Castle'
-    },
-    portrait: undefined,
-    createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
-  };
-}
 
 /**
  * Creates mock narrative segments for testing

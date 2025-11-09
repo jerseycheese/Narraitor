@@ -267,3 +267,83 @@ export function createMockInventoryItem(overrides: Partial<InventoryItem> = {}):
   };
 }
 
+/**
+ * Creates a mock World object with skills pre-configured
+ */
+export function createMockWorldWithSkills(overrides: Partial<World> = {}): World {
+  const worldId = overrides.id || generateUniqueId('world');
+  return createMockWorld({
+    id: worldId,
+    name: 'Fantasy Realm',
+    description: 'A world with magic and combat',
+    skills: [
+      {
+        id: 'athletics',
+        name: 'Athletics',
+        description: 'Physical prowess and endurance',
+        attributeIds: ['strength'],
+        worldId,
+        difficulty: 'medium' as const,
+        baseValue: 0,
+        minValue: 0,
+        maxValue: 10
+      },
+      {
+        id: 'magic',
+        name: 'Magic',
+        description: 'Arcane knowledge and spellcasting',
+        attributeIds: ['intelligence'],
+        worldId,
+        difficulty: 'hard' as const,
+        baseValue: 0,
+        minValue: 0,
+        maxValue: 10
+      },
+      {
+        id: 'stealth',
+        name: 'Stealth',
+        description: 'Moving unseen and unheard',
+        attributeIds: ['dexterity'],
+        worldId,
+        difficulty: 'easy' as const,
+        baseValue: 0,
+        minValue: 0,
+        maxValue: 10
+      }
+    ],
+    ...overrides,
+  });
+}
+
+/**
+ * Creates a mock Character object with skills and attributes pre-configured
+ */
+export function createMockCharacterWithSkills(overrides: Partial<Character> = {}): Character {
+  const characterId = overrides.id || generateUniqueId('char');
+  return createMockCharacter({
+    id: characterId,
+    name: 'Test Hero',
+    description: 'A skilled adventurer ready for any challenge',
+    level: 5,
+    isPlayer: true,
+    background: {
+      history: 'Skilled adventurer with years of experience',
+      personality: 'Brave and resourceful',
+      goals: ['Master all skills'],
+      fears: ['Failure'],
+      relationships: []
+    },
+    attributes: [
+      { id: 'attr-1', characterId, worldAttributeId: 'strength', name: 'Strength', baseValue: 16, modifiedValue: 16 },
+      { id: 'attr-2', characterId, worldAttributeId: 'intelligence', name: 'Intelligence', baseValue: 14, modifiedValue: 14 },
+      { id: 'attr-3', characterId, worldAttributeId: 'dexterity', name: 'Dexterity', baseValue: 12, modifiedValue: 12 }
+    ],
+    skills: [
+      { id: 'skill-1', characterId, worldSkillId: 'athletics', name: 'Athletics', level: 6 },
+      { id: 'skill-2', characterId, worldSkillId: 'magic', name: 'Magic', level: 4 },
+      { id: 'skill-3', characterId, worldSkillId: 'stealth', name: 'Stealth', level: 3 }
+    ],
+    ...overrides,
+  });
+}
+

@@ -11,6 +11,7 @@ import { getLoreContextForPrompt } from '../loreContextHelper';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { createMockWorld, createMockCharacter } from '@/lib/test-utils/testDataFactory';
 
 export { getTimestamp } from '@/lib/utils/timestamp';
 
@@ -19,26 +20,26 @@ export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers'
 
 export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
 
-export const mockWorld = {
+export const mockWorld = createMockWorld({
   id: 'world-1',
   name: 'Test World',
-  theme: 'Fantasy Adventure',
   description: 'A magical realm',
-  attributes: [],
-  skills: [],
-  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
-};
+  genre: 'fantasy',
+});
 
-export const mockCharacter = {
+export const mockCharacter = createMockCharacter({
   id: 'char-1',
   name: 'Hero',
   worldId: 'world-1',
-  background: { description: 'A brave warrior', personality: 'Courageous', motivation: 'Save the kingdom' },
-  attributes: [],
-  skills: [],
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
+  description: 'A brave warrior',
+  background: {
+    history: 'A brave warrior',
+    personality: 'Courageous',
+    goals: ['Save the kingdom'],
+    fears: ['Failure'],
+    relationships: []
+  },
+});
 
 /**
  * Creates sample past decisions with deterministic timestamps
