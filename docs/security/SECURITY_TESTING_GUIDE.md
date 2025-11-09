@@ -166,7 +166,7 @@ GEMINI_API_KEY=your-actual-api-key
 
 ## Security Impact
 
-This implementation provides enterprise-grade security:
+This keeps API keys secure:
 
 1. **API Key Protection**: Keys never leave the server
 2. **Cost Control**: Rate limiting prevents abuse
