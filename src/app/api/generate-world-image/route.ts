@@ -93,19 +93,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Try to generate real AI image using Gemini's image generation model
-      let imageUrl = '';
-      let aiGenerated = false;
-      let placeholder = true;
-
-      // Check if we have Gemini API key for image generation
-      const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (apiKey && apiKey !== 'MOCK_API_KEY') {
-        try {
-          logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.0-flash-preview-image-generation');
-          
-          // Use the same approach as the portrait generation API
-          const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
+      const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
 
 Requirements:
 - Epic cinematic landscape
@@ -116,27 +104,18 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
-          const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
+      const fallbackUrl = generateFallbackImage(body.world);
+      const { generateImageOrFallback } = await import('@/lib/utils/imageGenerationHelpers');
 
-          if (generatedImage) {
-            imageUrl = generatedImage.url;
-            aiGenerated = true;
-            placeholder = false;
+      const result = await generateImageOrFallback(
+        imagePromptForGemini,
+        fallbackUrl,
+        'generate-world-image'
+      );
 
-            logger.debug('generate-world-image', 'Gemini image generated successfully');
-          } else {
-            logger.warn('generate-world-image', 'Image generation failed, using fallback');
-            imageUrl = generateFallbackImage(body.world);
-          }
-
-        } catch (imageGenError) {
-          logger.error('generate-world-image', 'Gemini image generation failed, using fallback:', imageGenError);
-          imageUrl = generateFallbackImage(body.world);
-        }
-      } else {
-        logger.debug('generate-world-image', 'No Gemini API key configured, using fallback');
-        imageUrl = generateFallbackImage(body.world);
-      }
+      const imageUrl = result.url;
+      const aiGenerated = result.aiGenerated ?? false;
+      const placeholder = result.placeholder ?? true;
       
       return NextResponse.json({ 
         imageUrl,

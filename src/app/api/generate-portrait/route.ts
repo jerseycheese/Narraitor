@@ -143,71 +143,35 @@ export async function POST(request: NextRequest) {
 
     logger.debug('generate-portrait API', 'Generating portrait with prompt:', truncate(prompt, 100));
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey || apiKey === 'MOCK_API_KEY') {
-      // Return a mock portrait for development
-      const mockPortrait = {
-        type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt
-      };
-      
-      logger.debug('generate-portrait API', 'Using mock portrait for development');
-      return NextResponse.json({ 
-        portrait: mockPortrait,
-        image: mockPortrait.url // For backward compatibility
-      });
-    }
-    
-    // Call Google's Gemini API for image generation
-    const generatedImage = await generateImageWithGemini(prompt, apiKey);
+    // Generate fallback URL for dicebear avatar
+    const fallbackUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`;
 
-    if (!generatedImage) {
-      logger.warn('generate-portrait API', 'Image generation failed, using fallback');
+    // Use shared helper for image generation
+    const { generateImageOrFallback } = await import('@/lib/utils/imageGenerationHelpers');
+    const portraitData = await generateImageOrFallback(
+      prompt,
+      fallbackUrl,
+      'generate-portrait API'
+    );
 
-      // Return mock portrait as fallback
-      const fallbackPortrait = {
-        type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt
-      };
-
-      return NextResponse.json({
-        portrait: fallbackPortrait,
-        image: fallbackPortrait.url // For backward compatibility
-      });
-    }
-
-    // Return the generated portrait
-    const portraitData = {
-      type: 'ai-generated' as const,
-      url: generatedImage.url,
-      generatedAt: getTimestamp(),
-      prompt: prompt
-    };
-
-    logger.debug('generate-portrait API', 'Portrait generated successfully');
+    logger.debug('generate-portrait API', 'Portrait generation completed');
 
     return NextResponse.json({
       portrait: portraitData,
-      image: generatedImage.url // For backward compatibility
+      image: portraitData.url // For backward compatibility
     });
 
   } catch (error) {
     logger.error('generate-portrait API', 'Portrait generation failed:', error);
-    
+
     // Return mock portrait as fallback
-    const fallbackPortrait = {
-      type: 'ai-generated' as const,
-      url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
-      generatedAt: getTimestamp(),
-      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
-    };
-    
-    return NextResponse.json({ 
+    const { createMockImageResponse } = await import('@/lib/utils/imageGenerationHelpers');
+    const fallbackPortrait = createMockImageResponse(
+      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
+      `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+
+    return NextResponse.json({
       portrait: fallbackPortrait,
       image: fallbackPortrait.url // For backward compatibility
     });

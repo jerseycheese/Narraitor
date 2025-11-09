@@ -144,22 +144,11 @@ export async function POST(request: NextRequest) {
       }
 
       // Try to generate real AI image using Gemini's image generation model
-      let imageUrl = '';
-      let aiGenerated = false;
-      let placeholder = true;
-
-      // Check if we have Gemini API key for image generation
-      const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (apiKey && apiKey !== 'MOCK_API_KEY') {
-        try {
-          logger.debug('generate-ending-image', 'Attempting Gemini image generation');
-          
-          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion. ${imageDescription}
+      const imagePromptForGemini = `Create a cinematic ending image for this story conclusion. ${imageDescription}
 
 Requirements:
 - Epic cinematic scene showing story conclusion
-- High quality digital art style  
+- High quality digital art style
 - Professional game/film concept art
 - Rich atmospheric lighting and emotional depth
 - ${body.ending.tone} tone and mood
@@ -168,27 +157,18 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for story ending imagery`;
 
-          const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
+      const fallbackUrl = generateFallbackImage(body.ending, body.world);
+      const { generateImageOrFallback } = await import('@/lib/utils/imageGenerationHelpers');
 
-          if (generatedImage) {
-            imageUrl = generatedImage.url;
-            aiGenerated = true;
-            placeholder = false;
+      const result = await generateImageOrFallback(
+        imagePromptForGemini,
+        fallbackUrl,
+        'generate-ending-image'
+      );
 
-            logger.debug('generate-ending-image', 'Gemini image generated successfully');
-          } else {
-            logger.warn('generate-ending-image', 'Image generation failed, using fallback');
-            imageUrl = generateFallbackImage(body.ending, body.world);
-          }
-
-        } catch (imageGenError) {
-          logger.error('generate-ending-image', 'Gemini image generation failed, using fallback:', imageGenError);
-          imageUrl = generateFallbackImage(body.ending, body.world);
-        }
-      } else {
-        logger.debug('generate-ending-image', 'No Gemini API key configured, using fallback');
-        imageUrl = generateFallbackImage(body.ending, body.world);
-      }
+      const imageUrl = result.url;
+      const aiGenerated = result.aiGenerated ?? false;
+      const placeholder = result.placeholder ?? true;
       
       return NextResponse.json({ 
         imageUrl,
