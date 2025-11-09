@@ -77,25 +77,21 @@ The application includes these template themes:
 
 ## Accessibility Requirements
 
+Accessibility isn't optional or a nice-to-have. It's about making sure everyone can use the app, regardless of how they interact with it. Screen readers, keyboard-only navigation, and visual accommodations should all work without extra effort.
+
 ### Keyboard Navigation
-- All interactive elements are keyboard accessible
-- Logical tab order through the interface
-- Skip links for navigation
-- Keyboard shortcuts for common actions
+
+Everything needs to work without a mouse. Tab through the interface in a logical order, use skip links to jump past repetitive navigation, and make sure there are keyboard shortcuts for common actions. If someone can't click a button with their mouse, they should be able to hit it with Enter or Space.
 
 ### Screen Reader Support
-- Semantic HTML structure with proper headings and landmarks
-- ARIA labels, roles, and properties for complex interactions
-- Meaningful alt text for images and icons
-- Live region announcements for dynamic content
-- Descriptive `aria-expanded`, `aria-controls`, and `aria-labelledby` attributes
-- Proper form labeling and error associations
+
+Use semantic HTML - proper headings, landmarks, and structure - so screen readers can navigate the page. Add ARIA labels and roles for complex interactions that HTML alone doesn't cover well. Every image and icon needs meaningful alt text (not "image" or "icon"). Dynamic content changes need live region announcements so screen reader users know something updated.
+
+Forms need proper labeling with clear error associations. If a field has an error, the screen reader should tell you what's wrong, not just "invalid."
 
 ### Visual Accessibility
-- Minimum contrast ratio of 4.5:1 for text
-- Focus indicators visible in all themes
-- No reliance on color alone for information
-- Resizable text without breaking layouts
+
+Text contrast needs to meet 4.5:1 minimum ratio. Focus indicators should be visible in all themes - people need to see where they are when tabbing. Don't rely on color alone to convey information (like red/green for success/failure). Text should resize without breaking layouts, up to 200% zoom at least.
 
 ## Game Session Interface
 
@@ -127,26 +123,23 @@ For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>
 
 ## Performance Guidelines
 
-### User Perception Optimizations
-- Implement skeleton screens for loading states
-- Use fade transitions for smoother content changes
-- Prioritize above-the-fold content rendering
-- Implement optimistic UI updates
-- Provide immediate feedback for user actions
+Performance is about perception as much as actual speed. Users tolerate loading times better when they know something's happening and the interface feels responsive.
 
-### Virtualization
-- Virtualize large lists (journal entries, character lists)
-- Load images progressively or lazily
-- Defer non-critical UI elements
-- Use pagination for large datasets
-- Apply efficient rendering for long content
+### Make Loading Feel Fast
 
-### Rendering Optimization
-- Use memoized components for complex UI elements
-- Implement efficient context window management
-- Apply batch processing for list operations
-- Implement lazy loading for historical content
-- Use performance monitoring during development
+Use skeleton screens instead of spinners when you can - seeing the layout load makes it feel faster than a blank screen with a spinner. Fade transitions between content changes feel smoother than instant swaps. Render above-the-fold content first, defer the stuff below the scroll.
+
+Optimistic UI updates make the app feel instant. When someone clicks "save character," update the UI immediately and only show an error if it actually fails. Most operations succeed, so waiting for confirmation every time makes everything feel sluggish.
+
+### Handle Large Lists Efficiently
+
+Virtualize large lists like journal entries or character rosters. Rendering 1000 items when the user can see 10 is wasteful. Load images progressively or lazily - don't block the initial render waiting for profile pictures. Defer non-critical UI elements and use pagination when it makes sense.
+
+### Optimize Rendering
+
+Memoize complex components so they don't re-render unnecessarily. Batch list operations instead of updating one item at a time. Lazy load historical content - old journal entries don't need to load until someone scrolls to them.
+
+Use performance monitoring during development to catch issues early. React DevTools Profiler shows you which components are re-rendering too often.
 
 ## Implementation Approach
 
