@@ -3,11 +3,15 @@ import { persist } from 'zustand/middleware';
 import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
-import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
-import { CrudStore } from './createCrudStore';
+import {
+  CrudStore,
+  createCrudOperations,
+  createInitialState,
+  createPersistOptions,
+} from './createCrudStore';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -183,104 +187,82 @@ export interface CharacterStore extends CrudStore<Character> {
   setLoading: (loading: boolean) => void;
 }
 
-// Initial state
-const getInitialState = () => ({
-    characters: {},
-    entities: {},
-    worldCharacterIds: {},
-    currentCharacterId: null,
-    currentEntityId: null,
-    error: null,
-    loading: false,
-});
+// Removed getInitialState - now using createInitialState() factory
 
 // Character Store implementation with persistence
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
   persist(
-    (set, get) => {
-      return {
-        characters: {},
-        entities: {},
-        worldCharacterIds: {},
-        currentCharacterId: null,
-        currentEntityId: null,
-        error: null,
-        loading: false,
+    (set, get) => ({
+      // Initialize state using factory
+      ...createInitialState<Character, CharacterStore>({
+        domainKey: 'characters',
+        currentIdKey: 'currentCharacterId',
+        additionalInitialState: {
+          worldCharacterIds: {} as Record<EntityID, EntityID[]>,
+        },
+      }),
 
-        create: (characterData) => {
-          if (!characterData.name || safeTrim(characterData.name) === '') {
+      // Create CRUD operations using factory
+      ...createCrudOperations<Character, CharacterStore>({
+        entityPrefix: 'char',
+        domainKey: 'characters',
+        currentIdKey: 'currentCharacterId',
+
+        // Hook: Validate and normalize before create
+        beforeCreate: (data) => {
+          if (!data.name || safeTrim(data.name) === '') {
             throw new Error('Character name is required');
           }
 
-          const characterId = generateUniqueId('char');
-          const now = getTimestamp();
+          const normalizedBackground = data.background ? {
+            ...data.background,
+            physicalDescription: data.background.physicalDescription ? normalizeText(data.background.physicalDescription, NORM_DESC) : undefined,
+            personality: normalizeText(data.background.personality || '', NORM_DESC),
+            history: normalizeText(data.background.history || '', NORM_DESC)
+          } : data.background;
 
-          const normalizedBackground = characterData.background ? {
-            ...characterData.background,
-            physicalDescription: characterData.background.physicalDescription ? normalizeText(characterData.background.physicalDescription, NORM_DESC) : undefined,
-            personality: normalizeText(characterData.background.personality || '', NORM_DESC),
-            history: normalizeText(characterData.background.history || '', NORM_DESC)
-          } : characterData.background;
-
-          const normalizedName = normalizeText(characterData.name, NORM_NAME);
-
-          const attributes = characterData.attributes?.map(attr => ({
-            ...attr,
-            characterId,
-          })) || [];
-
-          const skills = characterData.skills?.map(skill => ({
-            ...skill,
-            characterId,
-          })) || [];
-
-          const inventory = {
-            ...characterData.inventory,
-            characterId,
-          };
-
-          const newCharacter: Character = {
-            ...characterData,
-            id: characterId,
-            name: normalizedName,
+          return {
+            ...data,
+            name: normalizeText(data.name, NORM_NAME),
             background: normalizedBackground,
-            inventory,
-            attributes,
-            skills,
-            level: characterData.level || 1,
-            createdAt: now,
-            updatedAt: now,
+            level: data.level || 1,
           };
-
-          set((state) => ({
-            characters: {
-              ...state.characters,
-              [characterId]: newCharacter,
-            },
-            entities: {
-              ...state.entities,
-              [characterId]: newCharacter,
-            },
-            worldCharacterIds: addCharacterToRoster(
-              state.worldCharacterIds ?? {},
-              newCharacter.worldId,
-              characterId,
-            ),
-            error: null,
-          }));
-
-          return characterId;
         },
 
-        update: (id, updates) => {
-          const character = get().characters[id];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
+        // Hook: Fix characterId references and update roster after create
+        afterCreate: (character, _set) => {
+          _set((state: CharacterStore) => {
+            // Update nested fields with correct characterId
+            const updatedCharacter = {
+              ...character,
+              attributes: character.attributes?.map(attr => ({
+                ...attr,
+                characterId: character.id,
+              })) || [],
+              skills: character.skills?.map(skill => ({
+                ...skill,
+                characterId: character.id,
+              })) || [],
+              inventory: {
+                ...character.inventory,
+                characterId: character.id,
+              },
+            };
 
-          const previousWorldId = character.worldId;
+            return {
+              characters: { ...state.characters, [character.id]: updatedCharacter },
+              entities: { ...state.entities, [character.id]: updatedCharacter },
+              worldCharacterIds: addCharacterToRoster(
+                state.worldCharacterIds ?? {},
+                character.worldId,
+                character.id,
+              ),
+            };
+          });
+        },
 
+        // Hook: Normalize and merge complex fields before update
+        beforeUpdate: (id, updates, currentCharacter) => {
           const normalizedUpdates: Partial<Character> = { ...updates };
 
           if (updates?.name) {
@@ -289,7 +271,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
           if (updates?.background) {
             const mergedBackground = {
-              ...character.background,
+              ...currentCharacter.background,
               ...updates.background,
             };
 
@@ -303,133 +285,84 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
           if (updates?.inventory) {
             normalizedUpdates.inventory = {
-              ...character.inventory,
+              ...currentCharacter.inventory,
               ...updates.inventory,
               characterId: id,
             };
           }
 
-          const updatedCharacter: Character = {
-            ...character,
-            ...normalizedUpdates,
-            inventory: normalizedUpdates.inventory ?? character.inventory,
-            background: normalizedUpdates.background ?? character.background,
-            updatedAt: getTimestamp(),
-          };
-
-          set((state) => {
-            const nextCharacters = {
-              ...state.characters,
-              [id]: updatedCharacter,
-            };
-
-            let nextWorldCharacterIds = state.worldCharacterIds ?? {};
-            if (previousWorldId !== updatedCharacter.worldId) {
-              const withoutPrevious = removeCharacterFromRoster(
-                nextWorldCharacterIds,
-                previousWorldId,
-                id,
-              );
-              nextWorldCharacterIds = addCharacterToRoster(
-                withoutPrevious,
-                updatedCharacter.worldId,
-                id,
-              );
-            }
-
-            return {
-              characters: nextCharacters,
-              entities: {
-                ...state.entities,
-                [id]: updatedCharacter,
-              },
-              worldCharacterIds: nextWorldCharacterIds,
-              error: null,
-            };
-          });
+          return normalizedUpdates;
         },
 
-        delete: (id) => {
-          const character = get().characters[id];
-          if (!character) {
-            return;
+        // Hook: Update worldCharacterIds roster after update if world changed
+        afterUpdate: (character, _set, _get) => {
+          const state = _get() as CharacterStore;
+          const oldCharacter = state.entities[character.id];
+
+          if (oldCharacter && oldCharacter.worldId !== character.worldId) {
+            _set((s: CharacterStore) => {
+              const withoutPrevious = removeCharacterFromRoster(
+                s.worldCharacterIds ?? {},
+                oldCharacter.worldId,
+                character.id,
+              );
+              return {
+                worldCharacterIds: addCharacterToRoster(
+                  withoutPrevious,
+                  character.worldId,
+                  character.id,
+                ),
+              };
+            });
           }
+        },
 
-          set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedCharacter, ...remainingCharacters } = state.characters;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
-            const isCurrent = state.currentCharacterId === id || state.currentEntityId === id;
+        // Hook: Update worldCharacterIds roster after delete
+        afterDelete: (id, _set, _get) => {
+          const state = _get() as CharacterStore;
+          const character = state.entities[id];
 
-            return {
-              characters: remainingCharacters,
-              entities: remainingEntities,
+          if (character) {
+            _set((s: CharacterStore) => ({
               worldCharacterIds: removeCharacterFromRoster(
-                state.worldCharacterIds ?? {},
+                s.worldCharacterIds ?? {},
                 character.worldId,
                 id,
               ),
-              currentCharacterId: isCurrent ? null : state.currentCharacterId,
-              currentEntityId: isCurrent ? null : state.currentEntityId,
-              error: null,
-            };
-          });
-        },
-
-        setCurrent: (id) => {
-          if (id && !get().characters[id]) {
-            set({
-              error: createStoreError('Character Not Found', 'The specified character could not be found'),
-              currentCharacterId: null,
-              currentEntityId: null,
-            });
-            return;
+            }));
           }
-
-          set({
-            currentCharacterId: id,
-            currentEntityId: id,
-            error: null,
-          });
         },
+      })(set, get),
 
-        getById: (id) => get().characters[id],
-        getAll: () => Object.values(get().characters),
-        getCharactersByWorld: (worldId) => {
-          const { characters, worldCharacterIds } = get();
-          const roster = worldCharacterIds[worldId] ?? [];
-          return roster
-            .map((characterId) => characters[characterId])
-            .filter((char): char is Character => Boolean(char));
-        },
-        getWorldRoster: (worldId) => {
-          const { worldCharacterIds } = get();
-          return [...(worldCharacterIds[worldId] ?? [])];
-        },
+      // Domain-specific queries
+      getCharactersByWorld: (worldId) => {
+        const { characters, worldCharacterIds } = get();
+        const roster = worldCharacterIds[worldId] ?? [];
+        return roster
+          .map((characterId) => characters[characterId])
+          .filter((char): char is Character => Boolean(char));
+      },
+      getWorldRoster: (worldId) => {
+        const { worldCharacterIds } = get();
+        return [...(worldCharacterIds[worldId] ?? [])];
+      },
 
-        reset: () => set(getInitialState()),
+      syncDerivedState: () => {
+        const { createSyncDerivedStateHelper } = require('./storeHelpers');
+        createSyncDerivedStateHelper<Character, CharacterStore>({
+          entitiesKey: 'characters',
+          currentIdKey: 'currentCharacterId',
+          additionalTransform: (characters, hasCharacters) => ({
+            worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {}
+          })
+        })(set);
+      },
 
-        setError: (error) => set({ error }),
-
-        clearError: () => set({ error: null }),
-        setLoading: (loading) => set({ loading }),
-        syncDerivedState: () => {
-          const { createSyncDerivedStateHelper } = require('./storeHelpers');
-          createSyncDerivedStateHelper<Character, CharacterState>({
-            entitiesKey: 'characters',
-            currentIdKey: 'currentCharacterId',
-            additionalTransform: (characters, hasCharacters) => ({
-              worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {}
-            })
-          })(set);
-        },
-
-        // Domain-specific aliases
-        createCharacter: (characterData) => get().create(characterData),
-        updateCharacter: (id, updates) => get().update(id, updates),
-        deleteCharacter: (id) => get().delete(id),
-        setCurrentCharacter: (id) => get().setCurrent(id),
+      // Domain-specific aliases
+      createCharacter: (characterData) => get().create(characterData),
+      updateCharacter: (id, updates) => get().update(id, updates),
+      deleteCharacter: (id) => get().delete(id),
+      setCurrentCharacter: (id) => get().setCurrent(id),
 
         // Attribute management
         addAttribute: (characterId, attributeData) => {
@@ -589,12 +522,12 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
           };
         }),
-      };
-    },
+      },
+    }),
+
+    // Persistence configuration (keeping custom migrate for character validation)
     {
-      name: 'narraitor-character-store',
-      storage: createIndexedDBStorage(),
-      version: 2,
+      ...createPersistOptions<CharacterStore>('character', 'characters', createIndexedDBStorage(), 2),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[CharacterStore] Failed to rehydrate state', error);
@@ -602,12 +535,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
         state?.syncDerivedState?.();
       },
-      // Migration strategy for future schema updates
-      // Current implementation is minimal for MVP but will need expansion
-      // for handling complex migrations in future versions:
-      // - Add field transformations for new/changed fields
-      // - Add state structure upgrades between versions
-      // - Add validation of migrated data
+      // Custom migration with character validation
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
         // Validate persisted characters before restoring
