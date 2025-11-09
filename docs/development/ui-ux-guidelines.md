@@ -77,21 +77,21 @@ The application includes these template themes:
 
 ## Accessibility Requirements
 
-Accessibility isn't optional or a nice-to-have. It's about making sure everyone can use the app, regardless of how they interact with it. Screen readers, keyboard-only navigation, and visual accommodations should all work without extra effort.
+Accessibility isn't optional. Everyone needs to be able to use the app.
 
 ### Keyboard Navigation
 
-Everything needs to work without a mouse. Tab through the interface in a logical order, use skip links to jump past repetitive navigation, and make sure there are keyboard shortcuts for common actions. If someone can't click a button with their mouse, they should be able to hit it with Enter or Space.
+Everything works without a mouse. Logical tab order, skip links for navigation, keyboard shortcuts for common actions. Buttons respond to Enter or Space.
 
 ### Screen Reader Support
 
-Use semantic HTML - proper headings, landmarks, and structure - so screen readers can navigate the page. Add ARIA labels and roles for complex interactions that HTML alone doesn't cover well. Every image and icon needs meaningful alt text (not "image" or "icon"). Dynamic content changes need live region announcements so screen reader users know something updated.
+Use semantic HTML (headings, landmarks) for navigation. Add ARIA labels for complex interactions. Every image needs real alt text, not "image" or "icon". Dynamic updates need live region announcements.
 
-Forms need proper labeling with clear error associations. If a field has an error, the screen reader should tell you what's wrong, not just "invalid."
+Forms get proper labels and error associations. Errors say what's wrong, not just "invalid."
 
 ### Visual Accessibility
 
-Text contrast needs to meet 4.5:1 minimum ratio. Focus indicators should be visible in all themes - people need to see where they are when tabbing. Don't rely on color alone to convey information (like red/green for success/failure). Text should resize without breaking layouts, up to 200% zoom at least.
+4.5:1 minimum text contrast. Visible focus indicators in all themes. No color-only information (red/green for status). Text resizes to 200% without breaking.
 
 ## Game Session Interface
 
@@ -123,23 +123,23 @@ For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>
 
 ## Performance Guidelines
 
-Performance is about perception as much as actual speed. Users tolerate loading times better when they know something's happening and the interface feels responsive.
+Performance is about perception. Users tolerate loading when they see progress and the UI feels responsive.
 
 ### Make Loading Feel Fast
 
-Use skeleton screens instead of spinners when you can - seeing the layout load makes it feel faster than a blank screen with a spinner. Fade transitions between content changes feel smoother than instant swaps. Render above-the-fold content first, defer the stuff below the scroll.
+Skeleton screens beat spinners - seeing layout load feels faster. Fade transitions feel smoother than instant swaps. Render above-the-fold first.
 
-Optimistic UI updates make the app feel instant. When someone clicks "save character," update the UI immediately and only show an error if it actually fails. Most operations succeed, so waiting for confirmation every time makes everything feel sluggish.
+Optimistic updates make things feel instant. Update UI immediately, rollback on error. Waiting for confirmation makes everything sluggish.
 
-### Handle Large Lists Efficiently
+### Handle Large Lists
 
-Virtualize large lists like journal entries or character rosters. Rendering 1000 items when the user can see 10 is wasteful. Load images progressively or lazily - don't block the initial render waiting for profile pictures. Defer non-critical UI elements and use pagination when it makes sense.
+Virtualize lists. Rendering 1000 items when 10 are visible is wasteful. Lazy load images. Defer non-critical UI. Paginate when it makes sense.
 
 ### Optimize Rendering
 
-Memoize complex components so they don't re-render unnecessarily. Batch list operations instead of updating one item at a time. Lazy load historical content - old journal entries don't need to load until someone scrolls to them.
+Memoize complex components. Batch list operations. Lazy load historical content.
 
-Use performance monitoring during development to catch issues early. React DevTools Profiler shows you which components are re-rendering too often.
+Use React DevTools Profiler to catch re-render issues.
 
 ## Implementation Approach
 

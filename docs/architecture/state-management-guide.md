@@ -370,29 +370,29 @@ test('creates world successfully', () => {
 
 ### State Structure
 
-Keep state flat and normalized. Deeply nested objects are a nightmare to update and debug - you end up with spread operators three levels deep just to change one value. Instead, use IDs to link entities together, like `characterIds: string[]` pointing to entries in a `characters` map.
+Keep state flat and normalized. Deeply nested objects mean spread operators three levels deep just to change one value. Use IDs to link entities: `characterIds: string[]` pointing to a `characters` map.
 
-Store UI state separately from domain state. Things like "is the modal open" or "which tab is selected" shouldn't live in the same place as your actual data. Domain state belongs in domain stores, UI state can live in component state or a separate UI store.
+Store UI state separately from domain state. Modal open states and tab selections don't belong with your actual data.
 
 ### Actions
 
-Make actions atomic and predictable. Each action should do one clear thing - `createCharacter`, `updateCharacter`, `deleteCharacter`. If an action is doing three different things based on flags, split it up.
+Make actions atomic. Each does one thing: `createCharacter`, `updateCharacter`, `deleteCharacter`. If an action uses flags to do different things, split it.
 
-Handle loading and error states consistently across all stores. Every async action should follow the same pattern: set loading, try the operation, handle errors, clear loading. This makes the UI behavior predictable.
+Handle loading and error states consistently. Same pattern everywhere: set loading, try operation, handle errors, clear loading.
 
-Use optimistic updates when appropriate. For operations that usually succeed (like saving to localStorage), update the UI immediately and only rollback if it fails. For risky operations (like API calls), wait for confirmation.
+Use optimistic updates for reliable operations (localStorage). For risky operations (API calls), wait for confirmation.
 
 ### Performance
 
-Use selectors to prevent unnecessary re-renders. If a component only needs one field from the store, select just that field instead of the whole store. Otherwise the component re-renders every time anything in the store changes.
+Use selectors to prevent re-renders. Select just the field you need, not the whole store. Otherwise components re-render on every store change.
 
-Avoid storing derived data in state. If you can calculate it from existing state, don't store it. Storing `totalPoints` and `usedPoints` when you could just calculate `totalPoints - usedPoints` means you have to keep them in sync manually.
+Don't store derived data. Calculate `totalPoints - usedPoints` instead of storing both and keeping them in sync.
 
 ### Type Safety
 
-Define strict interfaces for all stores. TypeScript can't help you if your types are `any` or overly permissive. The more specific your types, the more bugs you catch at compile time instead of runtime.
+Define strict interfaces. TypeScript can't help with `any` types. Specific types catch bugs at compile time.
 
-Use branded types for IDs when it matters. If mixing up a `WorldID` and `CharacterID` would cause bugs, make them distinct types even if they're both strings under the hood. TypeScript will catch the mistakes.
+Use branded types for IDs when mixing them up would cause bugs. Make `WorldID` and `CharacterID` distinct types even if they're both strings.
 
 ## Persistence
 
