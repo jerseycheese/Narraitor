@@ -7,7 +7,7 @@ updated: 2025-11-06
 
 # Testing Guide
 
-This the testing approach here is pretty systematic - TDD with React Testing Library and component-driven development. The goal is to catch issues early and make refactoring safer.
+Testing approach: TDD with React Testing Library and component-driven development. Catch issues early, make refactoring safer.
 
 ## Testing Philosophy
 
@@ -503,10 +503,16 @@ npm run test -- --testNamePattern="character"
 ```
 
 ### CI/CD Requirements
-- All tests must pass before merge
-- Maintain 80%+ code coverage
-- No console errors or warnings
-- Tests run in under 30 seconds
+
+The CI pipeline enforces a few quality gates before code can merge. These aren't arbitrary - they're things that have caught real bugs in the past.
+
+**All tests must pass** - Obvious, but worth stating. If tests fail in CI, something's wrong. Don't bypass this by skipping tests.
+
+**80%+ code coverage** - Not about hitting a number, but ensuring critical paths are tested. If coverage drops, you probably added code without tests.
+
+**No console errors or warnings** - Clean console output matters. Warnings about deprecated APIs or prop type mismatches often indicate real issues.
+
+**Tests run fast** - If tests take too long, people stop running them locally. Keep the full suite under 30 seconds so there's no excuse to skip them.
 
 ## Component Development Workflow
 
@@ -555,21 +561,6 @@ test('handles API success', async () => {
   await waitFor(() => {
     expect(screen.getByText('Character')).toBeInTheDocument();
   });
-});
-```
-
-### Router Testing
-```typescript
-import { MemoryRouter } from 'react-router-dom';
-
-test('navigates correctly', () => {
-  render(
-    <MemoryRouter initialEntries={['/characters']}>
-      <App />
-    </MemoryRouter>
-  );
-  
-  expect(screen.getByText('Character List')).toBeInTheDocument();
 });
 ```
 

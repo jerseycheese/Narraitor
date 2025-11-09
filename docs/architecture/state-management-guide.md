@@ -141,7 +141,12 @@ const {
 } = useSessionStore();
 
 // Start or resume a session
-await initializeSession('world-1', 'char-1');
+await initializeSession(
+  'world-1',          // worldId
+  'char-1',           // characterId
+  () => {},           // onComplete callback (optional)
+  false               // force (optional, default: false)
+);
 
 // Session lifecycle metadata persists across reloads
 const lifecycle = getSessionLifecycle('session-abc');
@@ -369,28 +374,30 @@ test('creates world successfully', () => {
 ## Best Practices
 
 ### State Structure
-- Keep state flat and normalized
-- Use IDs for relationships between entities
-- Store UI state separately from domain state
-- Avoid deeply nested objects
+
+Keep state flat and normalized. Deeply nested objects mean spread operators three levels deep just to change one value. Use IDs to link entities: `characterIds: string[]` pointing to a `characters` map.
+
+Store UI state separately from domain state. Modal open states and tab selections don't belong with your actual data.
 
 ### Actions
-- Make actions atomic and predictable
-- Handle loading and error states consistently
-- Use optimistic updates when appropriate
-- Validate input data in actions
+
+Make actions atomic. Each does one thing: `createCharacter`, `updateCharacter`, `deleteCharacter`. If an action uses flags to do different things, split it.
+
+Handle loading and error states consistently. Same pattern everywhere: set loading, try operation, handle errors, clear loading.
+
+Use optimistic updates for reliable operations (localStorage). For risky operations (API calls), wait for confirmation.
 
 ### Performance
-- Use selectors to prevent unnecessary re-renders
-- Keep actions pure and predictable
-- Avoid storing derived data in state
-- Use subscriptions sparingly
+
+Use selectors to prevent re-renders. Select just the field you need, not the whole store. Otherwise components re-render on every store change.
+
+Don't store derived data. Calculate `totalPoints - usedPoints` instead of storing both and keeping them in sync.
 
 ### Type Safety
-- Define strict interfaces for all stores
-- Use branded types for IDs when needed
-- Type all action parameters and return values
-- Leverage TypeScript for compile-time checks
+
+Define strict interfaces. TypeScript can't help with `any` types. Specific types catch bugs at compile time.
+
+Use branded types for IDs when mixing them up would cause bugs. Make `WorldID` and `CharacterID` distinct types even if they're both strings.
 
 ## Persistence
 

@@ -9,7 +9,7 @@ updated: 2025-01-09
 
 # Design Token System
 
-The design token system provides a structured approach to managing colors, spacing, and other design properties across the entire application. Think of it as the foundation that everything else builds on - when you need a color or spacing value, you grab it from here instead of hardcoding values.
+Design tokens manage colors, spacing, and other properties across the app. When you need a color or spacing value, grab it from here instead of hardcoding.
 
 ## Architecture Overview
 

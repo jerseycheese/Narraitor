@@ -329,4 +329,12 @@ The item usage system is fully tested through the inventory store tests and inte
 
 ## Best Practices
 
-Let the AI determine decision weights rather than hardcoding them - it's better at judging what actually matters in the moment. Make sure all three alignments are viable options, not just chaotic being "the fun one." Set meaningful attribute defaults that make sense for your world's power level. Keep visual distinctions clear between different mechanics so players aren't confused. Always allow custom input alongside generated choices - player agency matters more than perfect AI suggestions.
+**Let the AI judge importance** - Don't hardcode decision weights. The AI is better at judging what actually matters in the moment based on the narrative context.
+
+**Balance the alignments** - All three alignments (Lawful, Neutral, Chaotic) should be viable choices, not just chaotic being "the fun one." Players should feel like any alignment fits their character concept.
+
+**Set sensible defaults** - Attribute defaults should make sense for your world's power level. A gritty noir setting and a superhero world need different baseline stats.
+
+**Keep mechanics visually distinct** - Players shouldn't have to guess whether something is a skill check, an alignment choice, or an item usage. Visual clarity prevents confusion.
+
+**Preserve player agency** - Always allow custom input alongside generated choices. Player agency matters more than perfect AI suggestions. Sometimes people want to do something the AI didn't think of.

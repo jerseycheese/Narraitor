@@ -8,7 +8,7 @@ updated: 2025-04-29
 
 # UI/UX Guidelines
 
-This the UI approach here is about creating immersive experiences that adapt to different fictional worlds while staying accessible and responsive. The challenge is balancing thematic consistency with usability.
+UI approach: create immersive experiences that adapt to different fictional worlds while staying accessible and responsive. Balance thematic consistency with usability.
 
 ## Design Philosophy
 
@@ -77,37 +77,31 @@ The application includes these template themes:
 
 ## Accessibility Requirements
 
+Accessibility isn't optional. Everyone needs to be able to use the app.
+
 ### Keyboard Navigation
-- All interactive elements are keyboard accessible
-- Logical tab order through the interface
-- Skip links for navigation
-- Keyboard shortcuts for common actions
+
+Everything works without a mouse. Logical tab order, skip links for navigation, keyboard shortcuts for common actions. Buttons respond to Enter or Space.
 
 ### Screen Reader Support
-- Semantic HTML structure with proper headings and landmarks
-- ARIA labels, roles, and properties for complex interactions
-- Meaningful alt text for images and icons
-- Live region announcements for dynamic content
-- Descriptive `aria-expanded`, `aria-controls`, and `aria-labelledby` attributes
-- Proper form labeling and error associations
+
+Use semantic HTML (headings, landmarks) for navigation. Add ARIA labels for complex interactions. Every image needs real alt text, not "image" or "icon". Dynamic updates need live region announcements.
+
+Forms get proper labels and error associations. Errors say what's wrong, not just "invalid."
 
 ### Visual Accessibility
-- Minimum contrast ratio of 4.5:1 for text
-- Focus indicators visible in all themes
-- No reliance on color alone for information
-- Resizable text without breaking layouts
+
+4.5:1 minimum text contrast. Visible focus indicators in all themes. No color-only information (red/green for status). Text resizes to 200% without breaking.
 
 ## Game Session Interface
 
 The game session interface follows specific guidelines:
 
 ### Narrative Display
-Narrative text needs to be readable for long sessions without straining the eyes. The formatting should enhance the story, not get in the way.
-
-Typography stays clear and legible, with options for users to adjust size to their comfort. Paragraphs get enough space between them to feel distinct without breaking the flow of reading. Speech gets distinguished from descriptive text through indentation, italics, or other thematic styling depending on the world. The overall presentation adapts to the world's theme, but readability comes first.
+Readable for long sessions. Clear typography with size adjustment options. Paragraphs spaced distinctly. Speech distinguished from description. Readability over theme.
 
 #### Text Formatting Guidelines
-The formatting approach keeps things consistent and accessible. Paragraphs are separated by double line breaks in the source text, which translates to vertical spacing of at least `1.5rem`. Maximum width is constrained to `56rem` (896px) to keep line lengths comfortable.
+Paragraphs separated by double line breaks (`1.5rem` spacing minimum). Max width `56rem` for comfortable line lengths.
 
 For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>` tags. This ensures screen readers and assistive tech can interpret the meaning correctly. All formatted text meets WCAG 2.1 AA contrast standards and stays readable at 200% zoom.
 
@@ -127,26 +121,23 @@ For emphasis, italic text gets wrapped in `<em>` tags and bold text in `<strong>
 
 ## Performance Guidelines
 
-### User Perception Optimizations
-- Implement skeleton screens for loading states
-- Use fade transitions for smoother content changes
-- Prioritize above-the-fold content rendering
-- Implement optimistic UI updates
-- Provide immediate feedback for user actions
+Performance is about perception. Users tolerate loading when they see progress and the UI feels responsive.
 
-### Virtualization
-- Virtualize large lists (journal entries, character lists)
-- Load images progressively or lazily
-- Defer non-critical UI elements
-- Use pagination for large datasets
-- Apply efficient rendering for long content
+### Make Loading Feel Fast
 
-### Rendering Optimization
-- Use memoized components for complex UI elements
-- Implement efficient context window management
-- Apply batch processing for list operations
-- Implement lazy loading for historical content
-- Use performance monitoring during development
+Skeleton screens beat spinners - seeing layout load feels faster. Fade transitions feel smoother than instant swaps. Render above-the-fold first.
+
+Optimistic updates make things feel instant. Update UI immediately, rollback on error. Waiting for confirmation makes everything sluggish.
+
+### Handle Large Lists
+
+Virtualize lists. Rendering 1000 items when 10 are visible is wasteful. Lazy load images. Defer non-critical UI. Paginate when it makes sense.
+
+### Optimize Rendering
+
+Memoize complex components. Batch list operations. Lazy load historical content.
+
+Use React DevTools Profiler to catch re-render issues.
 
 ## Implementation Approach
 

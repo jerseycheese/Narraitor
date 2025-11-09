@@ -7,11 +7,13 @@ updated: 2025-06-08
 
 # Prompt Context API
 
+**Note**: Most of this document describes planned features not yet implemented. The actual implementation currently only includes `inventoryContextBuilder.ts`, `tokenUtils.ts`, and `types.ts`. The `ContextBuilder`, `ContextPrioritizer`, and `PromptContextManager` classes described below are planned but do not exist in the codebase yet.
+
 The AI needs to understand your world and character to generate good stories, but it can only process so much information at once. The prompt context system handles the tricky job of deciding what information to include and how to format it for the AI.
 
 ## Core Components
 
-### ContextBuilder
+### ContextBuilder (Planned)
 Takes your world and character data and formats it into clean, structured markdown that AI models can understand easily.
 
 ```typescript
@@ -28,7 +30,7 @@ const combinedContext = builder.buildCombinedContext(worldData, characterData);
 - `buildCharacterContext(character: CharacterContext): string` - Formats character data  
 - `buildCombinedContext(world, character): string` - Creates combined context
 
-### ContextPrioritizer
+### ContextPrioritizer (Planned)
 When you have more information than the AI can handle, this decides what to keep and what to drop. It uses importance weights to make smart choices.
 
 ```typescript
@@ -61,7 +63,7 @@ const prioritized = prioritizer.prioritize(contextElements, tokenLimit);
 - `character.backstory`: 1
 - `world.history`: 1 (lowest)
 
-### PromptContextManager
+### PromptContextManager (Planned)
 The main class you'll use - it brings together the builder and prioritizer to create the final context for AI prompts.
 
 ```typescript
@@ -199,7 +201,7 @@ const result = await manager.generateContext({
 // }
 ```
 
-### buildInventoryContext(items: InventoryItem[], options?: InventoryContextOptions): InventoryContextResult
+### buildInventoryContext(items: InventoryItem[], options?: InventoryContextOptions): InventoryContextResult (Implemented)
 
 Takes a character's inventory and formats it for AI prompts. The system prioritizes items that matter to the story - equipped gear, quest artifacts, recently acquired items - and keeps the output within token limits so it doesn't overwhelm the AI with mundane junk.
 

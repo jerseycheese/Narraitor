@@ -1,26 +1,26 @@
 # AI Consistency Validation System
 
-## What This Actually Solves
+## What This Solves
 
 Ever wonder why the AI suddenly forgets that your medieval world doesn't have spaceships? Or why it starts talking about magic when you're running a hard sci-fi campaign? This debugging tool is for figuring out what's going wrong when the AI goes off the rails.
 
 The challenge with AI storytelling is that the AI needs constant reminders about your world's rules, and sometimes those reminders don't work as expected. This system lets you peek under the hood and see exactly how the AI is processing your lore facts and what consistency instructions it's generating for itself.
 
-## What You Can Actually See
+## What You See
 
 ### How Your Lore Gets Processed
-Watch in real-time as the system takes your lore facts and sorts them into buckets - characters, locations, world rules, historical events. You can see exactly which facts the AI thinks are important and which ones it's ignoring. Super helpful when you're wondering why the AI isn't paying attention to that crucial detail about your magic system.
+The system sorts lore facts into buckets - characters, locations, world rules, historical events. Shows which facts the AI thinks are important and which it's ignoring. Helpful when the AI misses crucial details.
 
 ### The Instructions the AI Gives Itself
-This is the really interesting part - you get to see the actual consistency instructions the AI generates based on your lore. It's basically the AI talking to itself, saying "remember, in this world, magic comes from crystals" or "don't let characters teleport because that's not how this universe works."
+Shows the consistency instructions the AI generates from your lore. The AI reminds itself about world rules: "remember, in this world, magic comes from crystals" or "don't let characters teleport."
 
 ### Numbers That Actually Matter
-The statistics dashboard shows you the practical stuff - how many lore facts you have per category, which ones are ranked as high-importance, and whether you've got decent coverage across different aspects of your world. It's not just pretty charts; it's actionable data about whether your lore setup is working.
+Statistics dashboard shows lore facts per category, which are high-importance, and coverage across your world. Data about whether your lore setup works.
 
-## How to Actually Use This Thing
+## How to Use This
 
 ### Getting Started
-You'll find this buried in the DevTools (development mode only) under "AI Tools & Validation" - expand the "Consistency Validation" section and you're in business. It's a developer tool, so don't expect your players to see this in the main interface.
+DevTools only (development mode) under "AI Tools & Validation" → "Consistency Validation". Developer tool, not visible to players.
 
 ### The Detective Work Process
 Here's the typical workflow when something's gone wrong with your AI:

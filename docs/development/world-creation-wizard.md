@@ -14,7 +14,7 @@ The World Creation Wizard is a multi-step interface for creating new game worlds
 ## Implementation
 
 ### Components
-- `WorldCreationWizard.tsx` - Main wizard controller (400 lines: needs refactoring)
+- `WorldCreationWizard.tsx` - Main wizard controller (needs refactoring)
 - `BasicInfoStep.tsx` - Collects world name and genre
 - `DescriptionStep.tsx` - Gathers world description and triggers AI analysis
 - `AttributeReviewStep.tsx` - Review and modify suggested attributes (max 6)
@@ -44,16 +44,12 @@ The World Creation Wizard is a multi-step interface for creating new game worlds
 12. Performance - Entertainment skills (Social)
 
 ### AI Integration
-Currently the AI integration is mocked. The actual implementation requires:
-- Gemini API integration for analyzing world descriptions
-- Prompt templates for extracting attributes and skills
-- Error handling for API failures
-- Fallback to defaults when AI is unavailable
+Uses Gemini API to analyze world descriptions and suggest attributes/skills. Has error handling for API failures and falls back to defaults when AI is unavailable.
 
 ### State Management
 - Zustand store for world persistence
 - Local React state for wizard progression
-- Temporary localStorage usage for MVP
+- localStorage for auto-save
 
 ## Testing
 - Unit tests for all steps

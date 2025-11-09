@@ -7,7 +7,7 @@ Accepted - Implemented
 So we had a problem with new users hitting Narraitor and just bouncing. The world creation process was asking too much of them upfront - they needed to understand attributes, skills, and settings before they could even get started. There wasn't a clear path for first-time users, and the cognitive load was just too high. People were dropping off before they got to experience what the app actually does.
 
 ## Decision
-We decided to build a comprehensive guided onboarding system that basically does the heavy lifting for new users:
+Built a guided onboarding system for new users:
 
 1. **Automatically detects first-time users** using session state analysis
 2. **Simplifies world creation** to just 2 essential steps (concept + details) instead of the full complex flow

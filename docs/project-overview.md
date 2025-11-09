@@ -21,7 +21,7 @@ The core functionality is working and stable. All the main systems (world creati
 - **Framework**: Next.js 15.5.6 with App Router (updated 2025-10-27)
 - **AI Integration**: Google Gemini (secure server-side)
 - **State Management**: Zustand stores with IndexedDB persistence
-- **UI**: Tailwind CSS v4 with shadcn/ui components
+- **UI**: Tailwind CSS v3 with shadcn/ui components (v3 for Storybook compatibility)
 - **Testing**: Jest, React Testing Library, Storybook
 - **Development**: TDD workflow with 300-line file limits
 
@@ -39,7 +39,7 @@ The core functionality is working and stable. All the main systems (world creati
 
 **Session Persistence**: Games save automatically using IndexedDB with graceful fallback to memory-only if storage fails. Pick up where you left off anytime.
 
-**Development Infrastructure**: Built comprehensive DevTools for debugging, Storybook for component development, and automated workflow scripts for repetitive tasks.
+**Development Infrastructure**: DevTools for debugging, Storybook for component development, and automated workflow scripts for repetitive tasks.
 
 ## Security & Performance
 API keys stay server-side with rate limiting (50 requests/hour per IP) to prevent abuse. All input gets sanitized and validated before hitting the AI service.
@@ -54,4 +54,4 @@ Built primarily for personal use: solo narrative RPG experiences when you want t
 Polishing the user experience: responsive design, performance optimization, edge case handling. The core functionality works well, so now it's about making it smooth and reliable for broader use.
 
 ## Technical Architecture
-Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with comprehensive validation.
+Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with validation.

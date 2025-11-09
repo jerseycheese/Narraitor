@@ -15,7 +15,7 @@ interface GoalStore {
   goals: Record<EntityID, NarrativeGoal>;
   sessionGoals: Record<EntityID, EntityID[]>; // Session -> Goal IDs
   activeGoalIds: EntityID[];
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 }
 ```
@@ -73,7 +73,7 @@ interface ProcessSegmentResult {
   newGoalsCreated: number;
   goalsUpdated: number;
   goalsCompleted: number;
-  error?: string;
+  error?: UserFriendlyError;
 }
 ```
 
@@ -115,12 +115,15 @@ interface ContextBuildOptions {
 }
 
 interface AISessionContext {
+  sessionId: EntityID;
   goalContext: string; // Formatted goal text for AI
+  contextText: string;
   activeGoals: NarrativeGoal[];
   criticalGoals: NarrativeGoal[];
   recentGoals: NarrativeGoal[];
   tokenCount: number;
   error: string | null;
+  timestamp: string;
 }
 ```
 
