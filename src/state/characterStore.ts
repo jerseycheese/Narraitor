@@ -4,7 +4,7 @@ import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, filterTruthy } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, filterTruthy ,sortByDateDesc } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import {
   CrudStore,
@@ -454,7 +454,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             }
 
             const sortedCharacters = charactersToProcess
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+              .sort(sortByDateDesc('createdAt'));
 
             const removedCharacters = sortedCharacters.slice(keepRecentCount);
             const idsToRemove = new Set(removedCharacters.map(char => char.id));

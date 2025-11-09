@@ -1,4 +1,5 @@
 // src/lib/ai/endingGenerator.ts
+import { sortByDateDesc } from '@/lib/utils';
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { buildEndingContext } from './contextManager';
@@ -112,7 +113,7 @@ class EndingGenerator {
   private extractRecentNarrative(segments: NarrativeSegment[]): string[] {
     // Get the last 5-10 segments for context
     const recentSegments = segments
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .sort(sortByDateDesc('timestamp'))
       .slice(0, 10);
 
     return recentSegments.map(segment => {

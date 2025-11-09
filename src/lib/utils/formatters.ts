@@ -641,3 +641,54 @@ export function filterTruthy<T>(item: T): item is NonNullable<T> {
   return Boolean(item);
 }
 
+/**
+ * Compare function for sorting objects by date field in descending order (newest first)
+ *
+ * Common pattern for sorting arrays of objects by timestamp or date fields.
+ * Use with array.sort() to order items with most recent first.
+ *
+ * @param dateField - Name of the date field to sort by
+ * @returns Compare function for array.sort()
+ *
+ * @example
+ * ```typescript
+ * import { sortByDateDesc } from '@/lib/utils';
+ *
+ * const items = [
+ *   { id: 1, createdAt: '2024-01-01' },
+ *   { id: 2, createdAt: '2024-01-03' },
+ *   { id: 3, createdAt: '2024-01-02' }
+ * ];
+ * items.sort(sortByDateDesc('createdAt')); // Newest first
+ * ```
+ */
+export function sortByDateDesc<T extends Record<string, any>>(dateField: keyof T) {
+  return (a: T, b: T) => {
+    const dateA = new Date(a[dateField]).getTime();
+    const dateB = new Date(b[dateField]).getTime();
+    return dateB - dateA; // Descending (newest first)
+  };
+}
+
+/**
+ * Compare function for sorting objects by date field in ascending order (oldest first)
+ *
+ * @param dateField - Name of the date field to sort by
+ * @returns Compare function for array.sort()
+ *
+ * @example
+ * ```typescript
+ * import { sortByDateAsc } from '@/lib/utils';
+ *
+ * const items = [{ createdAt: '2024-01-03' }, { createdAt: '2024-01-01' }];
+ * items.sort(sortByDateAsc('createdAt')); // Oldest first
+ * ```
+ */
+export function sortByDateAsc<T extends Record<string, any>>(dateField: keyof T) {
+  return (a: T, b: T) => {
+    const dateA = new Date(a[dateField]).getTime();
+    const dateB = new Date(b[dateField]).getTime();
+    return dateA - dateB; // Ascending (oldest first)
+  };
+}
+

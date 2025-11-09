@@ -9,7 +9,7 @@ import type {
   StructuredLoreExtraction,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp ,sortByDateDesc } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
@@ -197,7 +197,7 @@ export const useLoreStore = create<LoreStore>()(
             results = results.filter((fact) => fact.sessionId === options.sessionId);
           }
 
-          return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          return results.sort(sortByDateDesc('createdAt'));
         },
 
         clearFacts: (worldId) => {
@@ -334,7 +334,7 @@ export const useLoreStore = create<LoreStore>()(
             fact.metadata?.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))
           );
 
-          return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          return results.sort(sortByDateDesc('createdAt'));
         },
 
         exportFacts: (worldId) => {
@@ -431,7 +431,7 @@ export const useLoreStore = create<LoreStore>()(
 
           const worldFacts = Object.entries(facts)
             .filter(([, fact]) => fact.worldId === worldId)
-            .sort(([, a], [, b]) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            .sort(([, a], [, b]) => sortByDateDesc('createdAt')(a, b));
 
           if (worldFacts.length <= keepRecentCount) {
             return;
@@ -463,7 +463,7 @@ export const useLoreStore = create<LoreStore>()(
 
           Object.entries(factHistory).forEach(([factId, history]) => {
             const recentVersions = history.versions
-              .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+              .sort(sortByDateDesc('updatedAt'))
               .slice(0, maxVersionsPerFact);
 
             compactedHistory[factId] = {

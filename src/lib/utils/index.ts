@@ -30,7 +30,9 @@ export {
   capitalize,
   titleCase,
   safeTrim,
-  filterTruthy
+  filterTruthy,
+  sortByDateDesc,
+  sortByDateAsc
 } from './formatters';
 
 /** Type definitions for formatting options */

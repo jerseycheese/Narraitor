@@ -1,4 +1,5 @@
 /**
+import { sortByDateDesc } from '@/lib/utils';
  * Test helpers for narrativeContextExtractor tests
  */
 
@@ -211,7 +212,7 @@ export function extractDecisionContext(
 
   // Get the most recent segments for context
   const recentSegments = sessionSegments
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(sortByDateDesc('createdAt'))
     .slice(0, 5);
 
   // Extract location from metadata

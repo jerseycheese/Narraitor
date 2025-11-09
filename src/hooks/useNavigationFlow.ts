@@ -1,4 +1,5 @@
 import { usePathname } from 'next/navigation';
+import { sortByDateDesc } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -108,7 +109,7 @@ export function useNavigationFlow() {
         const character = characters[session.characterId];
         return world && character;
       })
-      .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime());
+      .sort(sortByDateDesc('lastPlayed'));
 
     if (validSessions.length === 0) {
       return null;
