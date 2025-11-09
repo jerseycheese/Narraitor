@@ -554,7 +554,7 @@ export const useInventoryStore = create<InventoryStore>()(
             validateNewItemData(itemData);
           } catch (error) {
             const errorMessage =
-              error instanceof Error ? error.message : 'Invalid item data';
+              getErrorMessage(error, 'Invalid item data');
             set({
               error: createStoreError(
                 'Validation Error',
@@ -749,7 +749,7 @@ export const useInventoryStore = create<InventoryStore>()(
             validateNewItemData(newItemPayload);
           } catch (error) {
             const errorMessage =
-              error instanceof Error ? error.message : 'Invalid item data';
+              getErrorMessage(error, 'Invalid item data');
             set({
               error: createStoreError(
                 'Validation Error',

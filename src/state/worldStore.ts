@@ -420,7 +420,7 @@ export const useWorldStore = create<WorldStore>()(
             get().setLoading(false);
             get().setError({
               title: 'Failed to Load Worlds',
-              message: error instanceof Error ? error.message : 'Failed to fetch worlds',
+              message: getErrorMessage(error, 'Failed to fetch worlds'),
               retryable: true,
               type: ErrorType.SERVICE,
             });

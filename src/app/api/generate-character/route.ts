@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Character generation failed'),
       500,
-      error instanceof Error ? error.message : 'Character generation failed'
+      getErrorMessage(error)
     );
   }
 }

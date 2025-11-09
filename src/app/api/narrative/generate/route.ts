@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Unknown error occurred'),
       500,
-      error instanceof Error ? error.message : 'Unknown error'
+      getErrorMessage(error)
     );
   }
 }

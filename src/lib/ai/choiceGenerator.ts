@@ -92,7 +92,7 @@ export class ChoiceGenerator {
       return decision;
     } catch (error) {
       const errorDetails = {
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
         stack: error instanceof Error ? error.stack : undefined,
         worldId: params.worldId,
         hasNarrativeContext: !!params.narrativeContext,
