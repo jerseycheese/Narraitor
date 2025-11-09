@@ -13,7 +13,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, createStoreError, createNotFoundError } from '@/lib/utils/errorUtils';
 
 
 /**
@@ -100,7 +100,7 @@ export const useJournalStore = create<JournalStore>()(
   // Update entry
   updateEntry: (entryId, updates) => set((state) => {
     if (!state.entries[entryId]) {
-      return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
+      return { error: createNotFoundError('Entry') };
     }
 
     const updatedEntry: JournalEntry = {
@@ -145,7 +145,7 @@ export const useJournalStore = create<JournalStore>()(
   // Mark as read
   markAsRead: (entryId) => set((state) => {
     if (!state.entries[entryId]) {
-      return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
+      return { error: createNotFoundError('Entry') };
     }
 
     const updatedEntry: JournalEntry = {

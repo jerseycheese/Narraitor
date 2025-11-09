@@ -12,7 +12,7 @@ import {
   createInitialState,
   createPersistOptions,
 } from './createCrudStore';
-import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
+import { createStoreError, ErrorType, createNotFoundError } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
 import Logger from '@/lib/utils/logger';
@@ -183,7 +183,7 @@ export const useWorldStore = create<WorldStore>()(
         addAttribute: (worldId, attributeData) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -211,7 +211,7 @@ export const useWorldStore = create<WorldStore>()(
         updateAttribute: (worldId, attributeId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -229,7 +229,7 @@ export const useWorldStore = create<WorldStore>()(
         removeAttribute: (worldId, attributeId) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -247,7 +247,7 @@ export const useWorldStore = create<WorldStore>()(
         addSkill: (worldId, skillData) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -275,7 +275,7 @@ export const useWorldStore = create<WorldStore>()(
         updateSkill: (worldId, skillId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -293,7 +293,7 @@ export const useWorldStore = create<WorldStore>()(
         removeSkill: (worldId, skillId) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -311,7 +311,7 @@ export const useWorldStore = create<WorldStore>()(
         updateSettings: (worldId, settings) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 
@@ -328,7 +328,7 @@ export const useWorldStore = create<WorldStore>()(
         updateToneSettings: (worldId, toneSettings) => {
           const world = get().worlds[worldId];
           if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
+            set({ error: createNotFoundError('World') });
             return;
           }
 

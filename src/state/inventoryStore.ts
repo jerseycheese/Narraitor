@@ -5,6 +5,7 @@ import {
   UserFriendlyError,
   ErrorType,
   createStoreError,
+  createNotFoundError,
 } from '@/lib/utils/errorUtils';
 import {
   logInventoryGuardSanitized,
@@ -366,11 +367,7 @@ export const useInventoryStore = create<InventoryStore>()(
           const existingItem = get().items[itemId];
           if (!existingItem) {
             set({
-              error: createStoreError(
-                'Item Not Found',
-                'The specified item could not be found.',
-                ErrorType.VALIDATION
-              ),
+              error: createNotFoundError('Item'),
             });
             return;
           }
@@ -527,11 +524,7 @@ export const useInventoryStore = create<InventoryStore>()(
         setCurrent: (id) => {
           if (id && !get().items[id]) {
             set({
-              error: createStoreError(
-                'Item Not Found',
-                'The specified item could not be found.',
-                ErrorType.VALIDATION
-              ),
+              error: createNotFoundError('Item'),
               currentEntityId: null,
             });
             return;
@@ -815,11 +808,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
           if (!item) {
             set({
-              error: createStoreError(
-                'Item Not Found',
-                'The specified item could not be found.',
-                ErrorType.VALIDATION
-              ),
+              error: createNotFoundError('Item'),
             });
             return;
           }
@@ -863,11 +852,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
           if (!item) {
             set({
-              error: createStoreError(
-                'Item Not Found',
-                'The specified item could not be found.',
-                ErrorType.VALIDATION
-              ),
+              error: createNotFoundError('Item'),
             });
             return;
           }
@@ -916,11 +901,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
           // Validate item exists
           if (!item) {
-            const error = createStoreError(
-              'Item Not Found',
-              'The specified item could not be found.',
-              ErrorType.VALIDATION
-            );
+            const error = createNotFoundError('Item');
             set({ error });
             return {
               success: false,

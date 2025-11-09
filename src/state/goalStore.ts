@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, getTimestamp, filterTruthy } from '@/lib/utils';
-import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage, createNotFoundError } from '@/lib/utils/errorUtils';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -219,7 +219,7 @@ export const useGoalStore = create<GoalStore>()(
       incrementMentionCount: (goalId) => {
         const goal = get().goals[goalId];
         if (!goal) {
-          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
+          set({ error: createNotFoundError('Goal') });
           return;
         }
 
@@ -232,7 +232,7 @@ export const useGoalStore = create<GoalStore>()(
       addProgressNote: (goalId, note) => {
         const goal = get().goals[goalId];
         if (!goal) {
-          set({ error: createStoreError('Goal Not Found', 'The specified goal could not be found.') });
+          set({ error: createNotFoundError('Goal') });
           return;
         }
 

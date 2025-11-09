@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, filterTruthy ,sortByDateDesc } from '@/lib/utils';
-import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, createStoreError, createNotFoundError } from '@/lib/utils/errorUtils';
 import {
   CrudStore,
   createCrudOperations,
@@ -368,7 +368,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         addAttribute: (characterId, attributeData) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createNotFoundError('Character') });
             return;
           }
 
@@ -387,7 +387,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         updateAttribute: (characterId, attributeId, updates) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createNotFoundError('Character') });
             return;
           }
 
@@ -403,7 +403,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         removeAttribute: (characterId, attributeId) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createNotFoundError('Character') });
             return;
           }
 
@@ -420,7 +420,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         addSkill: (characterId, skillData) => {
           const character = get().characters[characterId];
           if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
+            set({ error: createNotFoundError('Character') });
             return;
           }
 

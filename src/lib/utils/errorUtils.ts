@@ -170,6 +170,33 @@ export function createStoreError(
 }
 
 /**
+ * Creates a standardized "not found" error for store operations
+ *
+ * Consolidates 21 duplicate "not found" error creation patterns across all stores.
+ * Generates consistent error titles and messages for entity lookup failures.
+ *
+ * @param entityType - Type of entity (e.g., "World", "Character", "Goal", "Item", "NPC", "Entry")
+ * @returns UserFriendlyError object with standardized "not found" message
+ *
+ * @example
+ * ```ts
+ * // In a store
+ * if (!get().worlds[worldId]) {
+ *   set({ error: createNotFoundError('World') });
+ *   return;
+ * }
+ * ```
+ */
+export function createNotFoundError(entityType: string): UserFriendlyError {
+  return createStoreError(
+    `${entityType} Not Found`,
+    `The specified ${entityType.toLowerCase()} could not be found.`,
+    ErrorType.VALIDATION,
+    false
+  );
+}
+
+/**
  * Creates a standardized API error response using NextResponse
  *
  * Consolidates duplicate error response formatting across all API routes.

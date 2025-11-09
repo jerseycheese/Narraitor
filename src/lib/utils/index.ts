@@ -65,7 +65,8 @@ export type {
 // Error handling utilities
 export {
   isRetryableError,
-  getUserFriendlyError
+  getUserFriendlyError,
+  createNotFoundError
 } from './errorUtils';
 export type { UserFriendlyError } from './errorUtils';
 
