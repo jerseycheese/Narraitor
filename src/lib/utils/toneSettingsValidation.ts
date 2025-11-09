@@ -1,5 +1,6 @@
 import { ToneSettings } from '@/types/tone-settings.types';
-import { validators, validateField, ValidationResult } from '@/components/shared/wizard/utils/validation';
+import { validators, validateField } from '@/components/shared/wizard/utils/validation';
+import { ValidationResult } from '@/lib/utils/validationUtils';
 
 /**
  * Validates tone settings configuration

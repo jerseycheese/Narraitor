@@ -111,6 +111,3 @@ export const patterns = {
   alphanumericWithSpaces: /^[a-zA-Z0-9\s]+$/,
   noSpecialChars: /^[a-zA-Z0-9\s\-_]+$/,
 };
-
-// Re-export ValidationResult for backward compatibility
-export type { ValidationResult };
