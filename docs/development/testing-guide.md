@@ -7,7 +7,7 @@ updated: 2025-11-06
 
 # Testing Guide
 
-This the testing approach here is pretty systematic - TDD with React Testing Library and component-driven development. The goal is to catch issues early and make refactoring safer.
+Testing approach: TDD with React Testing Library and component-driven development. Catch issues early, make refactoring safer.
 
 ## Testing Philosophy
 
