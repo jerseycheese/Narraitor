@@ -2,12 +2,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '../types/world.types';
 import { EntityID } from '../types/common.types';
-import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
-import { CrudStore } from './createCrudStore';
+import {
+  CrudStore,
+  createCrudOperations,
+  createInitialState,
+  createPersistOptions,
+} from './createCrudStore';
 import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
@@ -73,64 +77,46 @@ export interface WorldStore extends CrudStore<World> {
 // World Store implementation with persistence
 export const useWorldStore = create<WorldStore>()(
   persist(
-    (set, get) => {
-      return {
-        // State
-        worlds: {},
-        entities: {},
-        worldStates: {},
-        currentWorldId: null,
-        currentEntityId: null,
-        error: null,
-        loading: false,
+    (set, get) => ({
+      // Initialize state using factory
+      ...createInitialState<World, WorldStore>({
+        domainKey: 'worlds',
+        currentIdKey: 'currentWorldId',
+        additionalInitialState: {
+          worldStates: {} as Record<EntityID, WorldState>,
+        },
+      }),
 
-        // CRUD Operations
-        create: (worldData) => {
-          // Validate
-          if (!worldData.name || safeTrim(worldData.name) === '') {
+      // Create CRUD operations using factory
+      ...createCrudOperations<World, WorldStore>({
+        entityPrefix: 'world',
+        domainKey: 'worlds',
+        currentIdKey: 'currentWorldId',
+
+        // Hook: Validate and normalize before create
+        beforeCreate: (data) => {
+          if (!data.name || safeTrim(data.name) === '') {
             throw new Error('World name is required');
           }
-
-          const worldId = generateUniqueId('world');
-          const now = getTimestamp();
-
-          // Normalize and create
-          const newWorld: World = {
-            ...worldData,
-            name: normalizeText(worldData.name, NORM_NAME),
-            description: normalizeText(worldData.description, NORM_DESC),
-            id: worldId,
-            createdAt: now,
-            updatedAt: now,
+          return {
+            ...data,
+            name: normalizeText(data.name, NORM_NAME),
+            description: normalizeText(data.description, NORM_DESC),
           };
-
-          set((state) => ({
-            worlds: {
-              ...state.worlds,
-              [worldId]: newWorld,
-            },
-            entities: {
-              ...state.entities,
-              [worldId]: newWorld,
-            },
-            worldStates: {
-              ...state.worldStates,
-              [worldId]: createEmptyWorldState(worldId),
-            },
-            error: null,
-          }));
-
-          return worldId;
         },
 
-        update: (id, updates) => {
-          const world = get().worlds[id];
-          if (!world) {
-            set({ error: createStoreError('World Not Found', 'The specified world could not be found') });
-            return;
-          }
+        // Hook: Initialize worldState after create
+        afterCreate: (world, _set) => {
+          _set((state: WorldStore) => ({
+            worldStates: {
+              ...state.worldStates,
+              [world.id]: createEmptyWorldState(world.id),
+            },
+          }));
+        },
 
-          // Normalize text fields in updates
+        // Hook: Normalize text fields before update
+        beforeUpdate: (id, updates) => {
           const normalized = { ...updates };
           if (updates.name) {
             normalized.name = normalizeText(updates.name, NORM_NAME);
@@ -138,30 +124,11 @@ export const useWorldStore = create<WorldStore>()(
           if (updates.description) {
             normalized.description = normalizeText(updates.description, NORM_DESC);
           }
-
-          const updatedWorld = {
-            ...world,
-            ...normalized,
-            updatedAt: getTimestamp(),
-          };
-
-          set((state) => ({
-            worlds: {
-              ...state.worlds,
-              [id]: updatedWorld,
-            },
-            entities: {
-              ...state.entities,
-              [id]: updatedWorld,
-            },
-            error: null,
-          }));
+          return normalized;
         },
 
-        delete: (id) => {
-          const world = get().worlds[id];
-          if (!world) return;
-
+        // Hook: Cascade delete to characters and remove worldState
+        afterDelete: (id, _set) => {
           // Delete all characters in the world
           try {
             const { useCharacterStore } = eval('require("./characterStore")');
@@ -171,72 +138,46 @@ export const useWorldStore = create<WorldStore>()(
             // Handle import errors silently (e.g., in test environments)
           }
 
-          set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedWorld, ...remainingWorlds } = state.worlds;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
+          // Remove worldState
+          _set((state: WorldStore) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedState, ...remainingStates } = state.worldStates;
-            const currentIsDeleted = state.currentEntityId === id || state.currentWorldId === id;
             return {
-              worlds: remainingWorlds,
-              entities: remainingEntities,
               worldStates: remainingStates,
-              currentEntityId: currentIsDeleted ? null : state.currentEntityId,
-              currentWorldId: currentIsDeleted ? null : state.currentWorldId,
-              error: null,
             };
           });
         },
+      })(set, get),
 
-        setCurrent: (id) => {
-          if (id && !get().worlds[id]) {
-            set({
-              error: createStoreError('World Not Found', 'The specified world could not be found'),
-              currentEntityId: null,
-              currentWorldId: null,
-            });
-            return;
-          }
-          set({ currentEntityId: id, currentWorldId: id, error: null });
-        },
+      syncDerivedState: () => {
+        const { createSyncDerivedStateHelper } = require('./storeHelpers');
+        createSyncDerivedStateHelper<World, WorldStore>({
+          entitiesKey: 'worlds',
+          currentIdKey: 'currentWorldId',
+          additionalTransform: (worlds, hasWorlds, state) => {
+            const existingWorldStates =
+              state.worldStates && typeof state.worldStates === 'object' ? state.worldStates : {};
 
-        getById: (id) => get().worlds[id],
-        getAll: () => Object.values(get().worlds),
-        reset: () => set({ worlds: {}, entities: {}, worldStates: {}, currentEntityId: null, currentWorldId: null, error: null, loading: false }),
-        setError: (error) => set({ error }),
-        clearError: () => set({ error: null }),
-        setLoading: (loading) => set({ loading }),
-        syncDerivedState: () => {
-          const { createSyncDerivedStateHelper } = require('./storeHelpers');
-          createSyncDerivedStateHelper<World, WorldStoreState>({
-            entitiesKey: 'worlds',
-            currentIdKey: 'currentWorldId',
-            additionalTransform: (worlds, hasWorlds, state) => {
-              const existingWorldStates =
-                state.worldStates && typeof state.worldStates === 'object' ? state.worldStates : {};
+            const nextWorldStates: Record<EntityID, WorldState> = {};
 
-              const nextWorldStates: Record<EntityID, WorldState> = {};
-
-              if (hasWorlds) {
-                for (const worldId of Object.keys(worlds)) {
-                  nextWorldStates[worldId] = existingWorldStates[worldId] ?? createEmptyWorldState(worldId);
-                }
+            if (hasWorlds) {
+              for (const worldId of Object.keys(worlds)) {
+                nextWorldStates[worldId] = existingWorldStates[worldId] ?? createEmptyWorldState(worldId);
               }
-
-              return {
-                worldStates: hasWorlds ? nextWorldStates : {}
-              };
             }
-          })(set);
-        },
 
-        // Domain-specific method aliases
-        createWorld: (worldData) => get().create(worldData),
-        updateWorld: (id, updates) => get().update(id, updates),
-        deleteWorld: (id) => get().delete(id),
-        setCurrentWorld: (id) => get().setCurrent(id),
+            return {
+              worldStates: hasWorlds ? nextWorldStates : {}
+            };
+          }
+        })(set);
+      },
+
+      // Domain-specific method aliases
+      createWorld: (worldData) => get().create(worldData),
+      updateWorld: (id, updates) => get().update(id, updates),
+      deleteWorld: (id) => get().delete(id),
+      setCurrentWorld: (id) => get().setCurrent(id),
 
         // Add attribute
         addAttribute: (worldId, attributeData) => {
@@ -485,12 +426,12 @@ export const useWorldStore = create<WorldStore>()(
             });
           }
         },
-      };
-    },
+      },
+    }),
+
+    // Persistence configuration (keeping custom migrate for world validation)
     {
-      name: 'narraitor-world-store',
-      storage: createIndexedDBStorage(),
-      version: 2,
+      ...createPersistOptions<WorldStore>('world', 'worlds', createIndexedDBStorage(), 2),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
@@ -498,12 +439,7 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
-      // Migration strategy for future schema updates
-      // Current implementation is minimal for MVP but will need expansion
-      // for handling complex migrations in future versions:
-      // - Add field transformations for new/changed fields
-      // - Add state structure upgrades between versions
-      // - Add validation of migrated data
+      // Custom migration with world validation and worldStates handling
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
         if (!persistedState || typeof persistedState !== 'object') {
