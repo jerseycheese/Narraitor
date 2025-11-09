@@ -492,29 +492,7 @@ export function safeTrim(text: string | null | undefined): string {
   return text.trim();
 }
 
-/**
- * Checks if a string is empty, null, undefined, or contains only whitespace
- *
- * Consolidates 7 duplicate validation patterns: `!str || str.trim() === ''`
- *
- * @param text - String to check
- * @returns true if empty/null/undefined/whitespace, false otherwise
- *
- * @example
- * ```ts
- * isEmpty(null)        // true
- * isEmpty(undefined)   // true
- * isEmpty('')          // true
- * isEmpty('   ')       // true
- * isEmpty('hello')     // false
- *
- * // Before (duplicate pattern):
- * if (!name || name.trim() === '') { throw new Error('Name required'); }
- *
- * // After (consolidated):
- * if (isEmpty(name)) { throw new Error('Name required'); }
- * ```
- */
+/** Checks if a string is empty, null, undefined, or only whitespace */
 export function isEmpty(text: string | null | undefined): boolean {
   return !text || text.trim() === '';
 }
@@ -668,54 +646,21 @@ export function filterTruthy<T>(item: T): item is NonNullable<T> {
   return Boolean(item);
 }
 
-/**
- * Compare function for sorting objects by date field in descending order (newest first)
- *
- * Common pattern for sorting arrays of objects by timestamp or date fields.
- * Use with array.sort() to order items with most recent first.
- *
- * @param dateField - Name of the date field to sort by
- * @returns Compare function for array.sort()
- *
- * @example
- * ```typescript
- * import { sortByDateDesc } from '@/lib/utils';
- *
- * const items = [
- *   { id: 1, createdAt: '2024-01-01' },
- *   { id: 2, createdAt: '2024-01-03' },
- *   { id: 3, createdAt: '2024-01-02' }
- * ];
- * items.sort(sortByDateDesc('createdAt')); // Newest first
- * ```
- */
+/** Sort objects by date field, newest first */
 export function sortByDateDesc<T extends Record<string, any>>(dateField: keyof T) {
   return (a: T, b: T) => {
     const dateA = new Date(a[dateField]).getTime();
     const dateB = new Date(b[dateField]).getTime();
-    return dateB - dateA; // Descending (newest first)
+    return dateB - dateA;
   };
 }
 
-/**
- * Compare function for sorting objects by date field in ascending order (oldest first)
- *
- * @param dateField - Name of the date field to sort by
- * @returns Compare function for array.sort()
- *
- * @example
- * ```typescript
- * import { sortByDateAsc } from '@/lib/utils';
- *
- * const items = [{ createdAt: '2024-01-03' }, { createdAt: '2024-01-01' }];
- * items.sort(sortByDateAsc('createdAt')); // Oldest first
- * ```
- */
+/** Sort objects by date field, oldest first */
 export function sortByDateAsc<T extends Record<string, any>>(dateField: keyof T) {
   return (a: T, b: T) => {
     const dateA = new Date(a[dateField]).getTime();
     const dateB = new Date(b[dateField]).getTime();
-    return dateA - dateB; // Ascending (oldest first)
+    return dateA - dateB;
   };
 }
 
