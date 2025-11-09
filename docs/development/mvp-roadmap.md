@@ -112,7 +112,7 @@ This is about getting ready for broader use beyond just personal development.
 - Optimize bundle size and performance
 - Enhance error boundaries and recovery
 - Improve TypeScript strictness
-- Add comprehensive logging/monitoring
+- Add logging/monitoring
 
 ## Post-MVP Features (Deferred)
 - Inventory system UI (backend complete, deferred from MVP)

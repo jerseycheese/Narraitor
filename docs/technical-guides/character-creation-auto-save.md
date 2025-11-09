@@ -1,12 +1,12 @@
 # Character Creation Auto-Save System
 
-So you're working on character creation and wondering how the auto-save works - this guide covers the implementation that keeps users from losing their progress when they accidentally close their browser or navigate away mid-creation.
+Auto-save keeps users from losing character creation progress when they close their browser or navigate away.
 
-## The Problem This Solves
+## The Problem
 
-Character creation can take a while. Users fill out multiple steps with attributes, skills, background info - the whole deal. Before this was added, if someone's browser crashed or they accidentally hit the back button, all that work disappeared. Pretty frustrating, especially when you've just spent 10 minutes getting your character's backstory just right.
+Character creation takes time - attributes, skills, background info across multiple steps. Browser crash or accidental back button meant losing all that work.
 
-The auto-save implementation handles this by quietly saving progress in the background and offering to restore it when users return. Nothing fancy - just saves the headache of starting over.
+Auto-save quietly saves progress and offers to restore it when users return.
 
 Here's what it does:
 
