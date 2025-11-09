@@ -415,38 +415,14 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
         syncDerivedState: () => {
-          set((state) => {
-            const characters =
-              state.characters && typeof state.characters === 'object' ? state.characters : {};
-
-            const hasCharacters = Object.keys(characters).length > 0;
-
-            const isValidCharacterId = (id: EntityID | null | undefined) =>
-              Boolean(id && characters[id]);
-
-            const validCurrentCharacterId = isValidCharacterId(state.currentCharacterId)
-              ? state.currentCharacterId
-              : null;
-
-            const validCurrentEntityId = isValidCharacterId(state.currentEntityId)
-              ? state.currentEntityId
-              : null;
-
-            const fallbackId = validCurrentCharacterId ?? validCurrentEntityId ?? null;
-
-            const nextCurrentCharacterId = validCurrentCharacterId ?? fallbackId;
-            const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
-
-            return {
-              characters: hasCharacters ? characters : {},
-              entities: { ...characters },
-              worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {},
-              currentCharacterId: hasCharacters ? nextCurrentCharacterId : null,
-              currentEntityId: hasCharacters ? nextCurrentEntityId : null,
-              error: state.error ?? null,
-              loading: state.loading ?? false,
-            };
-          });
+          const { createSyncDerivedStateHelper } = require('./storeHelpers');
+          createSyncDerivedStateHelper<Character, CharacterState>({
+            entitiesKey: 'characters',
+            currentIdKey: 'currentCharacterId',
+            additionalTransform: (characters, hasCharacters) => ({
+              worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {}
+            })
+          })(set);
         },
 
         // Domain-specific aliases
@@ -674,7 +650,5 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 );
 
 // Expose store globally in development for testing and debugging
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useCharacterStore = useCharacterStore;
-}
+import { exposeStoreInDev } from './storeHelpers';
+exposeStoreInDev('useCharacterStore', useCharacterStore);

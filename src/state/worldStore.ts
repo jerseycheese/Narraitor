@@ -209,48 +209,27 @@ export const useWorldStore = create<WorldStore>()(
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
         syncDerivedState: () => {
-          set((state) => {
-            const worlds =
-              state.worlds && typeof state.worlds === 'object' ? state.worlds : {};
+          const { createSyncDerivedStateHelper } = require('./storeHelpers');
+          createSyncDerivedStateHelper<World, WorldStoreState>({
+            entitiesKey: 'worlds',
+            currentIdKey: 'currentWorldId',
+            additionalTransform: (worlds, hasWorlds, state) => {
+              const existingWorldStates =
+                state.worldStates && typeof state.worldStates === 'object' ? state.worldStates : {};
 
-            const hasWorlds = Object.keys(worlds).length > 0;
+              const nextWorldStates: Record<EntityID, WorldState> = {};
 
-            const existingWorldStates =
-              state.worldStates && typeof state.worldStates === 'object' ? state.worldStates : {};
-
-            const nextWorldStates: Record<EntityID, WorldState> = {};
-
-            if (hasWorlds) {
-              for (const worldId of Object.keys(worlds)) {
-                nextWorldStates[worldId] = existingWorldStates[worldId] ?? createEmptyWorldState(worldId);
+              if (hasWorlds) {
+                for (const worldId of Object.keys(worlds)) {
+                  nextWorldStates[worldId] = existingWorldStates[worldId] ?? createEmptyWorldState(worldId);
+                }
               }
+
+              return {
+                worldStates: hasWorlds ? nextWorldStates : {}
+              };
             }
-
-            const isValidWorldId = (id: EntityID | null | undefined) => Boolean(id && worlds[id]);
-
-            const validCurrentWorldId = isValidWorldId(state.currentWorldId)
-              ? state.currentWorldId
-              : null;
-
-            const validCurrentEntityId = isValidWorldId(state.currentEntityId)
-              ? state.currentEntityId
-              : null;
-
-            const fallbackId = validCurrentWorldId ?? validCurrentEntityId ?? null;
-
-            const nextCurrentWorldId = validCurrentWorldId ?? fallbackId;
-            const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
-
-            return {
-              worlds: hasWorlds ? worlds : {},
-              entities: { ...worlds },
-              worldStates: hasWorlds ? nextWorldStates : {},
-              currentWorldId: hasWorlds ? nextCurrentWorldId : null,
-              currentEntityId: hasWorlds ? nextCurrentEntityId : null,
-              error: state.error ?? null,
-              loading: state.loading ?? false,
-            };
-          });
+          })(set);
         },
 
         // Domain-specific method aliases
@@ -620,7 +599,5 @@ export const useWorldStore = create<WorldStore>()(
 
 // Expose store globally in development to support test data seeding
 // and debugging via window.useWorldStore in dev tools.
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useWorldStore = useWorldStore;
-}
+import { exposeStoreInDev } from './storeHelpers';
+exposeStoreInDev('useWorldStore', useWorldStore);
