@@ -21,7 +21,7 @@ The core functionality is working and stable. All the main systems (world creati
 - **Framework**: Next.js 15.5.6 with App Router (updated 2025-10-27)
 - **AI Integration**: Google Gemini (secure server-side)
 - **State Management**: Zustand stores with IndexedDB persistence
-- **UI**: Tailwind CSS v4 with shadcn/ui components
+- **UI**: Tailwind CSS v3 with shadcn/ui components (v3 for Storybook compatibility)
 - **Testing**: Jest, React Testing Library, Storybook
 - **Development**: TDD workflow with 300-line file limits
 

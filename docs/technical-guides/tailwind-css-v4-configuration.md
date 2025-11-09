@@ -1,15 +1,28 @@
 ---
-title: "Tailwind CSS v4 Configuration Guide"
+title: "Tailwind CSS v4 Configuration Guide [OUTDATED]"
 type: guide
 category: styling
-tags: [tailwind, css, configuration, styling]
+tags: [tailwind, css, configuration, styling, deprecated]
 created: 2025-05-16
 updated: 2025-06-08
+deprecated: true
 ---
 
 # Tailwind CSS v4 Configuration Guide
 
+> **⚠️ OUTDATED DOCUMENTATION**
+>
+> This document describes a Tailwind CSS v4 setup that's no longer in use. The project currently uses **Tailwind CSS v3** for Storybook compatibility.
+>
+> This doc is kept for historical reference in case we revisit v4 migration later, but if you're working on the project now, you should be using v3 syntax and configuration.
+>
+> See the actual Tailwind config at `tailwind.config.ts` and `globals.css` for current setup.
+
+---
+
 Getting Tailwind CSS v4 to work with Next.js 15 and the App Router required some specific PostCSS configuration changes. This guide documents the setup so you don't have to figure it out again.
+
+**Note**: This was an experimental setup that got rolled back. Keeping this around for reference.
 
 ## Why v4 and Configuration Notes
 
