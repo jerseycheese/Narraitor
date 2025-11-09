@@ -2,12 +2,12 @@
 
 import { useNarrativeStore } from '../narrativeStore';
 import { DecisionOption } from '../../types/narrative.types';
+import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
 describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () => {
   beforeEach(() => {
     // Use fake timers for deterministic timestamp generation
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+    setupTestTimers();
 
     // Reset store state before each test
     useNarrativeStore.setState({
@@ -25,7 +25,7 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    cleanupTestTimers();
   });
 
   describe('Core Acceptance Criteria', () => {

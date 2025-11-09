@@ -1,6 +1,7 @@
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
+import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
 const resetSessionStore = () => {
   useSessionStore.setState(() => ({
@@ -28,7 +29,7 @@ const resetSessionStore = () => {
 
 describe('Narrative store world state integration', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    setupTestTimers();
     jest.setSystemTime(new Date('2025-02-01T12:00:00.000Z'));
     useWorldStore.getState().reset();
     useNarrativeStore.getState().reset();
@@ -36,7 +37,7 @@ describe('Narrative store world state integration', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    cleanupTestTimers();
     useNarrativeStore.getState().reset();
     useWorldStore.getState().reset();
     resetSessionStore();

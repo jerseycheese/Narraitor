@@ -11,6 +11,7 @@ import type {
   InventoryAcquisitionRecord,
   StandardInventoryCategory,
 } from '@/types/inventory.types';
+import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
 const buildCategorization = (
   categoryId: StandardInventoryCategory,
@@ -61,14 +62,13 @@ const buildAddPayload = (
 
 describe('useInventoryStore', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+    setupTestTimers();
     useInventoryStore.getState().reset();
   });
 
   afterEach(() => {
     jest.clearAllTimers();
-    jest.useRealTimers();
+    cleanupTestTimers();
   });
 
   describe('createItem', () => {

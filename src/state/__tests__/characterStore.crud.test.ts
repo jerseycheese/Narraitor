@@ -5,7 +5,7 @@
  */
 
 import { useCharacterStore } from '../characterStore';
-import { createTestCharacterData, setupTestTimers } from './characterStore.testHelpers';
+import { createTestCharacterData, setupTestTimers, cleanupTestTimers } from './characterStore.testHelpers';
 
 describe('useCharacterStore - CRUD Operations', () => {
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('useCharacterStore - CRUD Operations', () => {
 
   afterEach(() => {
     jest.clearAllTimers();
-    jest.useRealTimers();
+    cleanupTestTimers();
   });
 
   describe('createCharacter', () => {
