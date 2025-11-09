@@ -2,7 +2,7 @@
 console.log('[__mocks__/worldStore.ts] Mock module loading');
 
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
-import { formatForDebug, getTimestamp } from '@/lib/utils';
+import { formatForDebug, getTimestamp, isEmpty } from '@/lib/utils';
 import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '@/types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
@@ -94,7 +94,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   console.log('[__mocks__/worldStore.ts] Checking validation - name is:', worldData.name ? `"${worldData.name}"` : 'empty/null');
   
   // Validate required fields - THROW on validation failure
-  if (!worldData.name || worldData.name.trim() === '') {
+  if (isEmpty(worldData.name)) {
     console.log('[__mocks__/worldStore.ts] VALIDATION FAILURE: World name is required!');
     console.log('[__mocks__/worldStore.ts] Throwing exception...');
     throw new Error('World name is required');

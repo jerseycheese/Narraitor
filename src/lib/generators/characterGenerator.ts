@@ -1,6 +1,6 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
-import { truncate } from '../utils';
+import { truncate, isEmpty } from '../utils';
 import { validateWorld } from '@/types/type-guards';
 import { getErrorMessage } from '@/lib/utils/errorUtils';
 
@@ -412,7 +412,7 @@ CRITICAL INSTRUCTIONS:
     }
     
     // Validate the generated character
-    if (!characterData.name || typeof characterData.name !== 'string' || characterData.name.trim() === '') {
+    if (typeof characterData.name !== 'string' || isEmpty(characterData.name)) {
       throw new Error('Generated character has no valid name');
     }
     

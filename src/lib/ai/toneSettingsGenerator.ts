@@ -2,6 +2,7 @@ import { AIClient } from './types';
 import { ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
 import { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
+import { isEmpty } from '@/lib/utils';
 
 /**
  * World data subset used for tone analysis
@@ -130,7 +131,7 @@ Consider the world's genre conventions, target audience, thematic content, and t
   private parseResponse(content: string): ToneAnalysisResult {
     try {
       // Handle empty response
-      if (!content || content.trim() === '') {
+      if (isEmpty(content)) {
         throw new Error('AI service returned empty response');
       }
 

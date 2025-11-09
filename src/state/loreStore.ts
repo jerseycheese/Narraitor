@@ -9,7 +9,7 @@ import type {
   StructuredLoreExtraction,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
-import { getTimestamp ,sortByDateDesc } from '@/lib/utils';
+import { getTimestamp, sortByDateDesc, isEmpty } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
@@ -409,10 +409,10 @@ export const useLoreStore = create<LoreStore>()(
 
         validateFact: (fact) => {
           const validCategories: LoreCategory[] = ['characters', 'locations', 'events', 'rules'];
-          if (!fact.key || fact.key.trim() === '') return false;
-          if (!fact.value || fact.value.trim() === '') return false;
+          if (isEmpty(fact.key)) return false;
+          if (isEmpty(fact.value)) return false;
           if (!fact.category || !validCategories.includes(fact.category)) return false;
-          if (!fact.worldId || fact.worldId.trim() === '') return false;
+          if (isEmpty(fact.worldId)) return false;
           return true;
         },
 

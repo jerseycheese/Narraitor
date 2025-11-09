@@ -492,6 +492,33 @@ export function safeTrim(text: string | null | undefined): string {
   return text.trim();
 }
 
+/**
+ * Checks if a string is empty, null, undefined, or contains only whitespace
+ *
+ * Consolidates 7 duplicate validation patterns: `!str || str.trim() === ''`
+ *
+ * @param text - String to check
+ * @returns true if empty/null/undefined/whitespace, false otherwise
+ *
+ * @example
+ * ```ts
+ * isEmpty(null)        // true
+ * isEmpty(undefined)   // true
+ * isEmpty('')          // true
+ * isEmpty('   ')       // true
+ * isEmpty('hello')     // false
+ *
+ * // Before (duplicate pattern):
+ * if (!name || name.trim() === '') { throw new Error('Name required'); }
+ *
+ * // After (consolidated):
+ * if (isEmpty(name)) { throw new Error('Name required'); }
+ * ```
+ */
+export function isEmpty(text: string | null | undefined): boolean {
+  return !text || text.trim() === '';
+}
+
 // =============================================================================
 // SERIALIZATION AND DEBUGGING UTILITIES
 // =============================================================================

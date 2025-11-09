@@ -30,6 +30,7 @@ export {
   capitalize,
   titleCase,
   safeTrim,
+  isEmpty,
   filterTruthy,
   sortByDateDesc,
   sortByDateAsc

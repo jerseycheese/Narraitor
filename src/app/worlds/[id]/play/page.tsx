@@ -11,6 +11,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
+import { isEmpty } from '@/lib/utils';
 
 /**
  * Play page component that initializes a game session with a worldId
@@ -68,7 +69,7 @@ export default function PlayPage() {
   }
   
   // Validate worldId - client-side only
-  if (!worldId || worldId.trim() === '') {
+  if (isEmpty(worldId)) {
     notFound();
   }
 
