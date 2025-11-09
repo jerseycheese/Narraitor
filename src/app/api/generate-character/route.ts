@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserFriendlyError } from '@/lib/utils/errorUtils';
+import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/types/type-guards';
@@ -13,31 +13,19 @@ export async function POST(request: NextRequest) {
     const worldData = body?.world;
     
     if (!worldData) {
-      const validationError = getUserFriendlyError(new Error('400 bad request: world data is required'));
-      return NextResponse.json(
-        { 
-          error: validationError.message,
-          title: validationError.title,
-          type: validationError.type,
-          retryable: validationError.retryable
-        },
-        { status: 400 }
+      return createAPIErrorResponse(
+        new Error('400 bad request: world data is required'),
+        400
       );
     }
 
     // Validate world data structure
     const worldValidation = validateWorld(worldData);
     if (!worldValidation.valid) {
-      const validationError = getUserFriendlyError(new Error(`400 bad request: invalid world data - ${worldValidation.errors[0]}`));
-      return NextResponse.json(
-        { 
-          error: validationError.message,
-          title: validationError.title,
-          type: validationError.type,
-          retryable: validationError.retryable,
-          details: worldValidation.errors[0]
-        },
-        { status: 400 }
+      return createAPIErrorResponse(
+        new Error(`400 bad request: invalid world data - ${worldValidation.errors[0]}`),
+        400,
+        worldValidation.errors[0]
       );
     }
     
@@ -54,17 +42,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(generatedCharacter);
   } catch (error) {
     console.error('Character generation error:', error);
-    
-    const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Character generation failed'));
-    return NextResponse.json(
-      { 
-        error: friendlyError.message,
-        title: friendlyError.title,
-        type: friendlyError.type,
-        retryable: friendlyError.retryable,
-        details: error instanceof Error ? error.message : 'Character generation failed'
-      },
-      { status: 500 }
+
+    return createAPIErrorResponse(
+      error instanceof Error ? error : new Error('Character generation failed'),
+      500,
+      error instanceof Error ? error.message : 'Character generation failed'
     );
   }
 }
