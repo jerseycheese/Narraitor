@@ -1,9 +1,9 @@
 # Narraitor MVP Roadmap
 
 ## Where We Are
-**Major Milestone Achieved**: So we actually hit a big milestone - core MVP functionality is complete! All the primary systems (AI storytelling, world creation, character building, session persistence, navigation) are fully operational and tested. Character editing, narrative ending detection, decision presentation, and navigation improvements have all been successfully implemented.
+**Major Milestone**: Core MVP is done. AI storytelling, world creation, character building, session persistence, and navigation all work.
 
-**Current Status**: We're in the advanced polish phase now - focusing on user experience refinements, developer tooling infrastructure, and getting ready for production. There are 30 high-priority polish items left, mostly around completing the journal system, building developer debugging tools, and adding depth to existing features.
+**Current Status**: Advanced polish phase. 30 high-priority items left - journal system, developer tools, feature depth.
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -30,7 +30,7 @@ Basically, it's a complete solo narrative RPG experience where you can:
 - [x] Character Creation Auto-Save and Recovery
 
 ### Phase 2: UI/UX Polish (Current Focus)
-So this is about making the user experience smooth and intuitive. Navigation improvements are done: mobile works well, loading states are responsive, and state persists properly. 
+Making the experience smooth. Navigation done: mobile works, loading states are responsive, state persists. 
 
 **Current focus areas**:
 - Journal system completeness (entry viewing, choice tracking, session boundaries)
@@ -38,9 +38,7 @@ So this is about making the user experience smooth and intuitive. Navigation imp
 - World configuration enhancements (custom attributes, suggestion workflows)
 
 ### Phase 2.5: Developer Infrastructure (New Phase)
-This is about building the tooling and debugging capabilities we need for sustainable development and production support. Turns out we need this stuff more than we initially thought.
-
-**Major focus area**: About 30% of remaining high-priority work is developer tooling
+Building debugging and tooling for production support. 30% of remaining work.
 - Error reporting and monitoring systems
 - AI service request/response debugging tools
 - Application state debugging interfaces
