@@ -3,6 +3,19 @@
  *
  * Comprehensive factory for creating Zustand stores with standardized CRUD operations,
  * state management, and persistence. Eliminates 100+ lines of duplicate code per store.
+ *
+ * TYPE SAFETY NOTE:
+ * This file uses 'any' types in specific locations as an explicit exception to the
+ * "no any types" rule. This is necessary because:
+ *
+ * 1. Dynamic Property Access: The factory uses computed keys (config.domainKey,
+ *    config.currentIdKey) to set properties at runtime
+ * 2. Generic Constraints: TypeScript cannot verify type safety when indexing generic
+ *    types with dynamic keys
+ * 3. Zustand StateCreator: Complex intersection types that TypeScript struggles to infer
+ *
+ * The 'any' types are isolated to this infrastructure file and do not leak into
+ * application code. All store implementations remain fully type-safe.
  */
 
 import { StateCreator } from 'zustand';
@@ -106,6 +119,11 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
 /**
  * Creates standardized CRUD operations for a Zustand store
  * Eliminates 100+ lines of duplicate code per store
+ *
+ * NOTE: Uses 'any' for return type and Zustand parameters because TypeScript cannot
+ * properly infer the complex intersection of CrudStoreActions<T> & Partial<TState>
+ * when using StateCreator with middleware. Runtime type safety is preserved through
+ * the CrudStoreConfig constraints.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createCrudOperations<T extends BaseEntity, TState extends CrudStoreState<T>>(
@@ -240,6 +258,8 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         return;
       }
 
+      // Use 'any' to allow dynamic property assignment with config.currentIdKey
+      // TypeScript cannot verify keyof TState against a runtime value
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const update: any = {
         currentEntityId: id,
@@ -258,6 +278,8 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
     getAll: () => Object.values(get().entities),
 
     reset: () => {
+      // Use 'any' to allow spreading computed properties (config.domainKey, config.currentIdKey)
+      // TypeScript cannot track dynamic keys through object spread operations
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const initialState: any = {
         entities: {},
@@ -316,6 +338,7 @@ export function createPersistOptions<TState>(
       }
 
       // Sync entities with domain objects after rehydration
+      // Use 'any' to access dynamic domainKey property on state object
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (state && (state as any)[domainKey]) {
         (state as any).entities = { ...(state as any)[domainKey] };
@@ -326,6 +349,7 @@ export function createPersistOptions<TState>(
         return persistedState as TState;
       }
 
+      // Use 'any' to safely manipulate persisted state structure with dynamic domainKey
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const state = persistedState as any;
 

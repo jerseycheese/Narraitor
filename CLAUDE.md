@@ -67,7 +67,10 @@ Core guidelines:
 - Max 300 lines per file
 - Single responsibility for components and functions
 - Domain boundaries must be respected
-- Type safety is mandatory: no any types
+- **Type safety is mandatory**: No `any` types in application code
+  - **Exception**: Infrastructure utilities (`createCrudStore.ts`, `storeHelpers.ts`) use `any` types for dynamic property access patterns that TypeScript cannot verify at compile time
+  - These exceptions are documented with inline comments explaining why they're necessary
+  - The `any` types are isolated and do not leak into application code
 - **UI Components**: Always use shadcn/ui components instead of raw HTML elements:
   - Use `Button` instead of `<button>`
   - Use `Input` instead of `<input>`

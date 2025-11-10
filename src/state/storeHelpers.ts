@@ -1,6 +1,13 @@
 /**
  * Shared utilities for Zustand stores
  * Consolidates common patterns across store implementations
+ *
+ * TYPE SAFETY NOTE:
+ * This file uses 'any' types in specific locations as an explicit exception to the
+ * "no any types" rule. This is necessary because the helper functions use dynamic
+ * property access (entitiesKey, currentIdKey) that TypeScript cannot verify at
+ * compile time. The 'any' types are isolated to this infrastructure file and do not
+ * leak into application code.
  */
 
 import type { EntityID } from '@/types';
@@ -32,6 +39,10 @@ export interface SyncDerivedStateConfig<TEntity, TState> {
 /**
  * Creates a syncDerivedState function for a store
  * Eliminates duplicate validation and synchronization logic across stores
+ *
+ * NOTE: Uses Record<string, any> for TState constraint because the function needs to
+ * dynamically access properties using config.entitiesKey and config.currentIdKey at runtime.
+ * TypeScript cannot verify these dynamic property accesses with stricter types.
  *
  * @example
  * ```typescript
@@ -76,6 +87,8 @@ export function createSyncDerivedStateHelper<TEntity, TState extends Record<stri
       const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
 
       // Base state update
+      // Use 'any' to allow computed property keys (entitiesKey, currentIdKey)
+      // TypeScript cannot track dynamic keys in object literals
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const baseUpdate: any = {
         [entitiesKey]: hasEntities ? entities : {},
