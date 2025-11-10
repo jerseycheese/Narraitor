@@ -3,6 +3,8 @@
  * Provides date, string, and number formatting with locale support
  */
 
+import { getErrorMessage } from './errorUtils';
+
 /**
  * Date formatting options interface
  * 
