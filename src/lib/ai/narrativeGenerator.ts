@@ -1212,6 +1212,13 @@ Return ONLY the rewritten narrative.`;
       ? [...characterIds, speakerId]
       : characterIds;
 
+    // CRITICAL FALLBACK: Second AI call validates metadata for inventory-gated decisions
+    // Why this exists:
+    // - Inventory-gated decisions require items in player inventory (e.g., "Use lockpick" requires lockpick)
+    // - If first AI forgets itemsAcquired metadata, those decisions become unavailable even if narrative mentions the item
+    // - This extracts items from narrative text as fallback to prevent broken gameplay
+    // - Also validates character presence for NPC avatar consistency (#774)
+    // See: #756, #763 (inventory gating), #774 (NPC avatars)
     const metadataAnalysis = await this.analyzeSegmentMetadata(
       normalizedContent,
       extractedMetadata.characters,
@@ -1298,6 +1305,21 @@ Return ONLY the rewritten narrative.`;
     return normalized;
   }
 
+  /**
+   * CRITICAL FALLBACK: Makes second AI call to extract metadata from narrative text
+   *
+   * Purpose:
+   * 1. Extract items when first AI forgets itemsAcquired metadata (prevents broken inventory-gated decisions)
+   * 2. Validate which NPCs are physically present (ensures accurate NPC avatar display)
+   *
+   * Why we can't just trust the first AI call:
+   * - Inventory-gated decisions require accurate item metadata (#756, #763)
+   * - If narrative says "you pick up a sword" but AI forgets itemsAcquired metadata,
+   *   player can't select "Attack with sword" choice even though they should have it
+   * - This extracts "sword" from narrative text as critical fallback
+   *
+   * Cost: Extra AI call on every narrative generation (acceptable for game-breaking bug prevention)
+   */
   private async analyzeSegmentMetadata(
     content: string,
     characters: GeneratedCharacterMetadata[] | undefined,
