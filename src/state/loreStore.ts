@@ -9,7 +9,7 @@ import type {
   StructuredLoreExtraction,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
-import { getTimestamp, sortByDateDesc, isEmpty } from '@/lib/utils';
+import { getTimestamp, isEmpty } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError, getErrorMessage } from '@/lib/utils/errorUtils';
@@ -197,7 +197,11 @@ export const useLoreStore = create<LoreStore>()(
             results = results.filter((fact) => fact.sessionId === options.sessionId);
           }
 
-          return results.sort(sortByDateDesc('createdAt'));
+          return results.sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA; // Descending (newest first)
+          });
         },
 
         clearFacts: (worldId) => {
@@ -334,7 +338,11 @@ export const useLoreStore = create<LoreStore>()(
             fact.metadata?.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))
           );
 
-          return results.sort(sortByDateDesc('createdAt'));
+          return results.sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA; // Descending (newest first)
+          });
         },
 
         exportFacts: (worldId) => {
@@ -467,7 +475,11 @@ export const useLoreStore = create<LoreStore>()(
 
           Object.entries(factHistory).forEach(([factId, history]) => {
             const recentVersions = history.versions
-              .sort(sortByDateDesc('updatedAt'))
+              .sort((a, b) => {
+                const dateA = new Date(a.updatedAt).getTime();
+                const dateB = new Date(b.updatedAt).getTime();
+                return dateB - dateA; // Descending (newest first)
+              })
               .slice(0, maxVersionsPerFact);
 
             compactedHistory[factId] = {

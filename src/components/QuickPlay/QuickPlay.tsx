@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { formatRelativeTime ,sortByDateDesc } from '@/lib/utils';
+import { formatRelativeTime } from '@/lib/utils';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
@@ -49,7 +49,11 @@ export function QuickPlay() {
       const character = actualCharacters[session.characterId];
       return world && character;
     })
-    .sort(sortByDateDesc('lastPlayed'));
+    .sort((a, b) => {
+      const dateA = new Date(a.lastPlayed).getTime();
+      const dateB = new Date(b.lastPlayed).getTime();
+      return dateB - dateA; // Descending (newest first)
+    });
 
   const mostRecentSession = validSessions[0];
   const hasValidSession = Boolean(mostRecentSession);
