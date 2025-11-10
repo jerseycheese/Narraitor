@@ -1115,74 +1115,43 @@ Return ONLY the rewritten narrative.`;
       characters?: GeneratedCharacterMetadata[];
     } = {};
 
-    // Try to parse JSON response if present
+    // Parse JSON response if present
     if (
       actualContent.includes('```json') ||
       actualContent.startsWith('{') ||
       actualContent.includes('"content":')
     ) {
       try {
-        let jsonStr = safeTrim(actualContent);
+        // Strip markdown code blocks if present
+        let jsonStr = safeTrim(actualContent)
+          .replace(/```json\s*/, '')
+          .replace(/```\s*/, '')
+          .replace(/\s*```/g, '');
 
-        // Handle markdown code blocks
-        if (jsonStr.includes('```json')) {
-          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
-        } else if (jsonStr.includes('```')) {
-          jsonStr = jsonStr.replace(/```\s*/, '').replace(/\s*```/, '');
-        }
-
-        // Clean up any surrounding text that might interfere
-        jsonStr = safeTrim(jsonStr);
-
-        // Find JSON object boundaries if there's surrounding text
+        // Extract JSON object if there's surrounding text
         const jsonStart = jsonStr.indexOf('{');
         const jsonEnd = jsonStr.lastIndexOf('}');
         if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
           jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
-        } else if (jsonStart !== -1) {
-          // Handle incomplete JSON by extracting content field directly
-          const contentMatch = jsonStr.match(
-            /"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/
-          );
-          if (contentMatch && contentMatch[1]) {
-            actualContent = contentMatch[1]
-              .replace(/\\"/g, '"')
-              .replace(/\\n/g, '\n');
-            // Skip JSON.parse and continue with extracted content
-          } else {
-            throw new Error('Incomplete JSON without extractable content');
-          }
-        } else {
-          throw new Error('No JSON structure found');
-        }
 
-        // Only parse if we have a complete JSON structure
-        if (jsonEnd !== -1) {
           const parsed = JSON.parse(jsonStr);
+
+          // Extract content
           if (parsed.content) {
             actualContent = parsed.content;
           }
+
+          // Extract metadata with validation
           if (parsed.metadata) {
             extractedMetadata = {
-              location: parsed?.metadata?.location,
-              mood: this.validateMood(parsed?.metadata?.mood),
-              tags: Array.isArray(parsed?.metadata?.tags)
-                ? parsed?.metadata?.tags
-                : [],
-              characterIds: Array.isArray(parsed?.metadata?.characterIds)
-                ? parsed?.metadata?.characterIds
-                : [],
-              speakerId: typeof parsed?.metadata?.speakerId === 'string'
-                ? parsed?.metadata?.speakerId
-                : undefined,
-              itemsAcquired: Array.isArray(parsed?.metadata?.itemsAcquired)
-                ? parsed?.metadata?.itemsAcquired.map((item: unknown) => {
-                    const rawItem = item as {
-                      name: string;
-                      description?: string;
-                      quantity?: number;
-                      acquisitionMethod?: string;
-                    };
+              location: parsed.metadata.location,
+              mood: this.validateMood(parsed.metadata.mood),
+              tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
+              characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : [],
+              speakerId: typeof parsed.metadata.speakerId === 'string' ? parsed.metadata.speakerId : undefined,
+              itemsAcquired: Array.isArray(parsed.metadata.itemsAcquired)
+                ? parsed.metadata.itemsAcquired.map((item: unknown) => {
+                    const rawItem = item as { name: string; description?: string; quantity?: number; acquisitionMethod?: string };
                     return {
                       name: rawItem.name,
                       description: rawItem.description,
@@ -1191,22 +1160,13 @@ Return ONLY the rewritten narrative.`;
                     };
                   })
                 : undefined,
-              characters: Array.isArray(parsed?.metadata?.characters)
+              characters: Array.isArray(parsed.metadata.characters)
                 ? parsed.metadata.characters
                     .map((character: unknown) => {
-                      const raw = character as {
-                        id?: string;
-                        name?: string;
-                        description?: string;
-                        role?: string;
-                        avatarPrompt?: string;
-                        avatarUrl?: string;
-                      };
+                      const raw = character as { id?: string; name?: string; description?: string; role?: string; avatarPrompt?: string; avatarUrl?: string };
                       const id = raw?.id ? safeTrim(String(raw.id)) : '';
                       const name = raw?.name ? safeTrim(String(raw.name)) : '';
-                      if (!id || !name) {
-                        return null;
-                      }
+                      if (!id || !name) return null;
                       return {
                         id,
                         name,
@@ -1221,64 +1181,10 @@ Return ONLY the rewritten narrative.`;
             };
           }
         }
-      } catch {
-        // Try regex extraction as fallback for malformed JSON
-        try {
-          // Look for content field - handle malformed JSON with unescaped quotes
-          // Find content field and extract everything until the next field or end
-          const contentStartMatch = actualContent.match(
-            /"content"\s*:\s*"(.+?)"\s*,\s*"/
-          );
-          if (contentStartMatch && contentStartMatch[1]) {
-            actualContent = contentStartMatch[1]
-              .replace(/\\"/g, '"')
-              .replace(/\\n/g, '\n')
-              .replace(/\\\\/g, '\\');
-          } else {
-            // Try alternative extraction: find content field and extract until next JSON field
-            const altContentMatch = actualContent.match(
-              /"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/
-            );
-            if (altContentMatch && altContentMatch[1]) {
-              actualContent = altContentMatch[1];
-            } else {
-              // Final attempt: extract everything between "content": " and the next field pattern
-              const finalContentMatch = actualContent.match(
-                /"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/
-              );
-              if (finalContentMatch && finalContentMatch[1]) {
-                actualContent = finalContentMatch[1];
-              }
-            }
-          }
-
-          // Try to extract location from metadata
-          const locationMatch = actualContent.match(
-            /"location"\s*:\s*"((?:[^"\\]|\\.)*)"/
-          );
-          if (locationMatch && locationMatch[1]) {
-            extractedMetadata.location = locationMatch[1].replace(/\\"/g, '"');
-          }
-
-          const speakerMatch = actualContent.match(
-            /"speakerId"\s*:\s*"((?:[^"\\]|\\.)*)"/
-          );
-          if (speakerMatch && speakerMatch[1]) {
-            extractedMetadata.speakerId = speakerMatch[1].replace(/\\"/g, '"');
-          }
-
-          // Try to extract mood
-          const moodMatch = actualContent.match(
-            /"mood"\s*:\s*"((?:[^"\\]|\\.)*)"/
-          );
-          if (moodMatch && moodMatch[1]) {
-            extractedMetadata.mood = this.validateMood(moodMatch[1]);
-          }
-
-          // metadata.characters not extracted in fallback path
-        } catch {
-          // Fallback extraction failed - use default content
-        }
+      } catch (error) {
+        // JSON parsing failed - treat entire response as plain text
+        // actualContent already contains the raw response, metadata will use defaults
+        logger.warn('Failed to parse AI response as JSON, using plain text', { error });
       }
     }
 
