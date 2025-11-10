@@ -431,7 +431,11 @@ export const useLoreStore = create<LoreStore>()(
 
           const worldFacts = Object.entries(facts)
             .filter(([, fact]) => fact.worldId === worldId)
-            .sort(([, a], [, b]) => sortByDateDesc('createdAt')(a, b));
+            .sort(([, a], [, b]) => {
+              const dateA = new Date(a.createdAt).getTime();
+              const dateB = new Date(b.createdAt).getTime();
+              return dateB - dateA; // Descending (newest first)
+            });
 
           if (worldFacts.length <= keepRecentCount) {
             return;
