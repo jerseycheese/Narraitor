@@ -31,9 +31,7 @@ export {
   titleCase,
   safeTrim,
   isEmpty,
-  filterTruthy,
-  sortByDateDesc,
-  sortByDateAsc
+  filterTruthy
 } from './formatters';
 
 /** Type definitions for formatting options */

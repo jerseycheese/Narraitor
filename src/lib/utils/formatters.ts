@@ -646,21 +646,4 @@ export function filterTruthy<T>(item: T): item is NonNullable<T> {
   return Boolean(item);
 }
 
-/** Sort objects by date field, newest first */
-export function sortByDateDesc<T extends Record<string, any>>(dateField: keyof T) {
-  return (a: T, b: T) => {
-    const dateA = new Date(a[dateField]).getTime();
-    const dateB = new Date(b[dateField]).getTime();
-    return dateB - dateA;
-  };
-}
-
-/** Sort objects by date field, oldest first */
-export function sortByDateAsc<T extends Record<string, any>>(dateField: keyof T) {
-  return (a: T, b: T) => {
-    const dateA = new Date(a[dateField]).getTime();
-    const dateB = new Date(b[dateField]).getTime();
-    return dateA - dateB;
-  };
-}
 
