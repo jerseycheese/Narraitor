@@ -18,12 +18,10 @@
  * application code. All store implementations remain fully type-safe.
  */
 
-import { StateCreator } from 'zustand';
 import { PersistOptions, PersistStorage } from 'zustand/middleware';
 import { generateUniqueId } from '@/lib/utils';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { UserFriendlyError, createStoreError, ErrorType } from '@/lib/utils/errorUtils';
-import type { EntityID } from '@/types';
 
 export interface BaseEntity {
   id: string;
@@ -125,7 +123,7 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
  * when using StateCreator with middleware. Runtime type safety is preserved through
  * the CrudStoreConfig constraints.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 export function createCrudOperations<T extends BaseEntity, TState extends CrudStoreState<T>>(
   config: CrudStoreConfig<T, TState>
 ): any {
@@ -300,6 +298,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
     setLoading: (loading) => set({ loading } as Partial<TState>),
   });
 }
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 
 /**
  * Creates initial state for a CRUD store
@@ -339,10 +338,11 @@ export function createPersistOptions<TState>(
 
       // Sync entities with domain objects after rehydration
       // Use 'any' to access dynamic domainKey property on state object
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       if (state && (state as any)[domainKey]) {
         (state as any).entities = { ...(state as any)[domainKey] };
       }
+      /* eslint-enable @typescript-eslint/no-explicit-any */
     },
     migrate: (persistedState: unknown) => {
       if (!persistedState || typeof persistedState !== 'object') {

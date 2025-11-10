@@ -117,11 +117,11 @@ export const useLoreStore = create<LoreStore>()(
         },
 
         // Hook: Track fact updates in history
-        afterUpdate: (fact, _set, _get) => {
-          const state = _get() as LoreStore;
+        afterUpdate: (fact, set, get) => {
+          const state = get() as LoreStore;
           const previousHistory = state.factHistory[fact.id]?.versions ?? [];
 
-          _set((s: LoreStore) => ({
+          set((s: LoreStore) => ({
             factHistory: {
               ...s.factHistory,
               [fact.id]: {

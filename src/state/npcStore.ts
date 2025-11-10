@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeText, NORM_NAME, NORM_DESC, filterTruthy } from '@/lib/utils';
-import { createStoreError } from '@/lib/utils/errorUtils';
 import { NPC } from '../types/npc.types';
 import { EntityID } from '../types/common.types';
 import { createIndexedDBStorage } from './persistence';
@@ -79,7 +78,7 @@ export const useNPCStore = create<NPCStore>()(
         },
 
         // Hook: Validate and normalize before update
-        beforeUpdate: (id, updates, currentNPC) => {
+        beforeUpdate: (id, updates, _currentNPC) => {
           const normalizedUpdates: Partial<NPC> = { ...updates };
 
           if (updates.name !== undefined) {

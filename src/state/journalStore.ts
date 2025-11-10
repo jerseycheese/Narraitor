@@ -13,7 +13,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, getTimestamp } from '@/lib/utils';
-import { UserFriendlyError, createStoreError, createNotFoundError } from '@/lib/utils/errorUtils';
+import { UserFriendlyError, createNotFoundError } from '@/lib/utils/errorUtils';
 
 
 /**
