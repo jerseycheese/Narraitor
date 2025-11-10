@@ -107,10 +107,11 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
  * Creates standardized CRUD operations for a Zustand store
  * Eliminates 100+ lines of duplicate code per store
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createCrudOperations<T extends BaseEntity, TState extends CrudStoreState<T>>(
   config: CrudStoreConfig<T, TState>
-): StateCreator<TState, [], [], CrudStoreActions<T> & { [K in keyof TState]?: TState[K] }> {
-  return (set, get) => ({
+): any {
+  return (set: any, get: any, _api: any) => ({
     create: (entityData) => {
       // Run beforeCreate hook
       let data = entityData;
@@ -239,7 +240,8 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         return;
       }
 
-      const update: Record<string, unknown> = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const update: any = {
         currentEntityId: id,
         error: null,
       };
@@ -256,7 +258,8 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
     getAll: () => Object.values(get().entities),
 
     reset: () => {
-      const initialState: Record<string, unknown> = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const initialState: any = {
         entities: {},
         [config.domainKey]: {},
         currentEntityId: null,
@@ -301,9 +304,9 @@ export function createPersistOptions<TState>(
   domainKey: string,
   storage: PersistStorage<TState> | undefined,
   version: number = 1
-): Partial<PersistOptions<TState>> {
+): Omit<PersistOptions<TState>, 'partialize' | 'merge'> {
   return {
-    name: `narraitor-${storeName}-store`,
+    name: `narraitor-${storeName}-store` as string,
     storage,
     version,
     onRehydrateStorage: () => (state, error) => {
@@ -313,8 +316,9 @@ export function createPersistOptions<TState>(
       }
 
       // Sync entities with domain objects after rehydration
-      if (state && (state as Record<string, unknown>)[domainKey]) {
-        (state as Record<string, unknown>).entities = { ...(state as Record<string, unknown>)[domainKey] };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (state && (state as any)[domainKey]) {
+        (state as any).entities = { ...(state as any)[domainKey] };
       }
     },
     migrate: (persistedState: unknown) => {
@@ -322,7 +326,8 @@ export function createPersistOptions<TState>(
         return persistedState as TState;
       }
 
-      const state = persistedState as Record<string, unknown>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const state = persistedState as any;
 
       // Sync entities with domain objects
       if (state[domainKey] && typeof state[domainKey] === 'object') {

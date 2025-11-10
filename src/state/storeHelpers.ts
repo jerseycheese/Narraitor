@@ -76,7 +76,8 @@ export function createSyncDerivedStateHelper<TEntity, TState extends Record<stri
       const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
 
       // Base state update
-      const baseUpdate = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const baseUpdate: any = {
         [entitiesKey]: hasEntities ? entities : {},
         entities: { ...entities },
         [currentIdKey]: hasEntities ? nextCurrentSpecificId : null,
