@@ -4,7 +4,7 @@ import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, filterTruthy } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, filterTruthy, generateUniqueId } from '@/lib/utils';
 import { UserFriendlyError, createStoreError, createNotFoundError } from '@/lib/utils/errorUtils';
 import {
   CrudStore,

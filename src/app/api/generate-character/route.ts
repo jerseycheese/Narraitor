@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
+import { createAPIErrorResponse, getErrorMessage } from '@/lib/utils/errorUtils';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/types/type-guards';

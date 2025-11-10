@@ -5,7 +5,6 @@ import React, { ReactNode } from 'react';
 interface CategorizedItem {
   id: string;
   category?: string;
-  [key: string]: unknown;
 }
 
 interface CategorizedListProps<T extends CategorizedItem> {

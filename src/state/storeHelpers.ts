@@ -44,7 +44,8 @@ export interface SyncDerivedStateConfig<TEntity, TState> {
  * })
  * ```
  */
-export function createSyncDerivedStateHelper<TEntity, TState extends Record<string, unknown>>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createSyncDerivedStateHelper<TEntity, TState extends Record<string, any>>(
   config: SyncDerivedStateConfig<TEntity, TState>
 ) {
   return (set: (fn: (state: TState) => Partial<TState>) => void) => {

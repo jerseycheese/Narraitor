@@ -6,6 +6,7 @@ import {
   ErrorType,
   createStoreError,
   createNotFoundError,
+  getErrorMessage,
 } from '@/lib/utils/errorUtils';
 import {
   logInventoryGuardSanitized,

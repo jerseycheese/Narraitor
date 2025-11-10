@@ -6,7 +6,7 @@
  */
 
 import { StateCreator } from 'zustand';
-import { PersistOptions, StateStorage } from 'zustand/middleware';
+import { PersistOptions, PersistStorage } from 'zustand/middleware';
 import { generateUniqueId } from '@/lib/utils';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { UserFriendlyError, createStoreError, ErrorType } from '@/lib/utils/errorUtils';
@@ -155,7 +155,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
     update: (id, updates) => {
       const currentEntity = get().entities[id];
       if (!currentEntity) {
-        set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.NOT_FOUND) } as Partial<TState>);
+        set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.VALIDATION) } as Partial<TState>);
         return;
       }
 
@@ -235,7 +235,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
 
     setCurrent: (id) => {
       if (id && !get().entities[id]) {
-        set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.NOT_FOUND) } as Partial<TState>);
+        set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.VALIDATION) } as Partial<TState>);
         return;
       }
 
@@ -299,7 +299,7 @@ export function createInitialState<T extends BaseEntity, TState extends CrudStor
 export function createPersistOptions<TState>(
   storeName: string,
   domainKey: string,
-  storage: StateStorage,
+  storage: PersistStorage<TState> | undefined,
   version: number = 1
 ): Partial<PersistOptions<TState>> {
   return {

@@ -4,7 +4,7 @@ import { World, WorldAttribute, WorldSkill, WorldSettings } from '../types/world
 import { EntityID } from '../types/common.types';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils';
+import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, generateUniqueId } from '@/lib/utils';
 import { validateWorld } from '../types/type-guards';
 import {
   CrudStore,
@@ -13,7 +13,7 @@ import {
   createPersistOptions,
 } from './createCrudStore';
 import { createSyncDerivedStateHelper } from './storeHelpers';
-import { createStoreError, ErrorType, createNotFoundError } from '@/lib/utils/errorUtils';
+import { createStoreError, ErrorType, createNotFoundError, getErrorMessage } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
 import Logger from '@/lib/utils/logger';

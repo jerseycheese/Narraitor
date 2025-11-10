@@ -9,6 +9,7 @@ import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
+import { getErrorMessage } from '@/lib/utils/errorUtils';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 
