@@ -6,7 +6,7 @@
  */
 
 import { StateCreator } from 'zustand';
-import { PersistOptions } from 'zustand/middleware';
+import { PersistOptions, StateStorage } from 'zustand/middleware';
 import { generateUniqueId } from '@/lib/utils';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { UserFriendlyError, createStoreError, ErrorType } from '@/lib/utils/errorUtils';
@@ -75,7 +75,7 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
   /**
    * Custom logic to run after create
    */
-  afterCreate?: (entity: T, set: any, get: any) => void;
+  afterCreate?: (entity: T, set: (partial: Partial<TState> | ((state: TState) => Partial<TState>)) => void, get: () => TState) => void;
 
   /**
    * Custom logic to run before update
@@ -85,7 +85,7 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
   /**
    * Custom logic to run after update
    */
-  afterUpdate?: (entity: T, set: any, get: any) => void;
+  afterUpdate?: (entity: T, set: (partial: Partial<TState> | ((state: TState) => Partial<TState>)) => void, get: () => TState) => void;
 
   /**
    * Custom logic to run before delete
@@ -95,7 +95,7 @@ export interface CrudStoreConfig<T extends BaseEntity, TState extends CrudStoreS
   /**
    * Custom logic to run after delete
    */
-  afterDelete?: (id: string, set: any, get: any) => void;
+  afterDelete?: (id: string, set: (partial: Partial<TState> | ((state: TState) => Partial<TState>)) => void, get: () => TState) => void;
 
   /**
    * Additional state transformations during create/update/delete
@@ -239,7 +239,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         return;
       }
 
-      const update: any = {
+      const update: Record<string, unknown> = {
         currentEntityId: id,
         error: null,
       };
@@ -256,7 +256,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
     getAll: () => Object.values(get().entities),
 
     reset: () => {
-      const initialState: any = {
+      const initialState: Record<string, unknown> = {
         entities: {},
         [config.domainKey]: {},
         currentEntityId: null,
@@ -299,7 +299,7 @@ export function createInitialState<T extends BaseEntity, TState extends CrudStor
 export function createPersistOptions<TState>(
   storeName: string,
   domainKey: string,
-  storage: any,
+  storage: StateStorage,
   version: number = 1
 ): Partial<PersistOptions<TState>> {
   return {
@@ -313,8 +313,8 @@ export function createPersistOptions<TState>(
       }
 
       // Sync entities with domain objects after rehydration
-      if (state && (state as any)[domainKey]) {
-        (state as any).entities = { ...(state as any)[domainKey] };
+      if (state && (state as Record<string, unknown>)[domainKey]) {
+        (state as Record<string, unknown>).entities = { ...(state as Record<string, unknown>)[domainKey] };
       }
     },
     migrate: (persistedState: unknown) => {
@@ -322,7 +322,7 @@ export function createPersistOptions<TState>(
         return persistedState as TState;
       }
 
-      const state = persistedState as any;
+      const state = persistedState as Record<string, unknown>;
 
       // Sync entities with domain objects
       if (state[domainKey] && typeof state[domainKey] === 'object') {

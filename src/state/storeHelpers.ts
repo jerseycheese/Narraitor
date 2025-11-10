@@ -44,7 +44,7 @@ export interface SyncDerivedStateConfig<TEntity, TState> {
  * })
  * ```
  */
-export function createSyncDerivedStateHelper<TEntity, TState extends Record<string, any>>(
+export function createSyncDerivedStateHelper<TEntity, TState extends Record<string, unknown>>(
   config: SyncDerivedStateConfig<TEntity, TState>
 ) {
   return (set: (fn: (state: TState) => Partial<TState>) => void) => {

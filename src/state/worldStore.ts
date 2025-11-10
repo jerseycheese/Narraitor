@@ -12,6 +12,7 @@ import {
   createInitialState,
   createPersistOptions,
 } from './createCrudStore';
+import { createSyncDerivedStateHelper } from './storeHelpers';
 import { createStoreError, ErrorType, createNotFoundError } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
@@ -150,7 +151,6 @@ export const useWorldStore = create<WorldStore>()(
       })(set, get),
 
       syncDerivedState: () => {
-        const { createSyncDerivedStateHelper } = require('./storeHelpers');
         createSyncDerivedStateHelper<World, WorldStore>({
           entitiesKey: 'worlds',
           currentIdKey: 'currentWorldId',

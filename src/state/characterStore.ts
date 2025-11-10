@@ -12,6 +12,7 @@ import {
   createInitialState,
   createPersistOptions,
 } from './createCrudStore';
+import { createSyncDerivedStateHelper } from './storeHelpers';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -348,7 +349,6 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       },
 
       syncDerivedState: () => {
-        const { createSyncDerivedStateHelper } = require('./storeHelpers');
         createSyncDerivedStateHelper<Character, CharacterStore>({
           entitiesKey: 'characters',
           currentIdKey: 'currentCharacterId',
