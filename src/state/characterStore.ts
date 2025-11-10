@@ -530,7 +530,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
     // Persistence configuration (keeping custom migrate for character validation)
     {
-      ...createPersistOptions<CharacterStore>('character', 'characters', createIndexedDBStorage(), 2),
+      ...createPersistOptions<CharacterStore>('character', 'characters', createIndexedDBStorage() as any, 2),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[CharacterStore] Failed to rehydrate state', error);

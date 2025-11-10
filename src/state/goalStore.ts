@@ -327,7 +327,7 @@ export const useGoalStore = create<GoalStore>()(
 
     // Persistence configuration using factory
     {
-      ...createPersistOptions<GoalStore>('goal', 'goals', createIndexedDBStorage(), 1),
+      ...createPersistOptions<GoalStore>('goal', 'goals', createIndexedDBStorage() as any, 1),
       partialize: (state) => ({
         goals: state.goals,
         sessionGoals: state.sessionGoals,

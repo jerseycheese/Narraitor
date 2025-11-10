@@ -172,7 +172,7 @@ export const useNPCStore = create<NPCStore>()(
 
     // Persistence configuration using factory
     {
-      ...createPersistOptions<NPCStore>('npc', 'npcs', createIndexedDBStorage(), 1),
+      ...createPersistOptions<NPCStore>('npc', 'npcs', createIndexedDBStorage() as any, 1),
       partialize: (state) => ({
         npcs: state.npcs,
         worldNpcs: state.worldNpcs,

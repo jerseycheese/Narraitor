@@ -502,7 +502,7 @@ export const useLoreStore = create<LoreStore>()(
 
     // Persistence configuration using factory
     {
-      ...createPersistOptions<LoreStore>('lore', 'facts', createIndexedDBStorage(), 1),
+      ...createPersistOptions<LoreStore>('lore', 'facts', createIndexedDBStorage() as any, 1),
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,

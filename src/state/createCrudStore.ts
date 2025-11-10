@@ -128,7 +128,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
   config: CrudStoreConfig<T, TState>
 ): any {
   return (set: any, get: any, _api: any) => ({
-    create: (entityData) => {
+    create: (entityData: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => {
       // Run beforeCreate hook
       let data = entityData;
       if (config.beforeCreate) {
@@ -147,7 +147,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         updatedAt: now,
       } as T;
 
-      set((state) => {
+      set((state: TState) => {
         const baseUpdate = {
           entities: { ...state.entities, [entityId]: newEntity },
           [config.domainKey]: { ...state[config.domainKey] as Record<string, T>, [entityId]: newEntity },
@@ -169,7 +169,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
       return entityId;
     },
 
-    update: (id, updates) => {
+    update: (id: string, updates: Partial<Omit<T, 'id' | 'createdAt' | 'updatedAt'>>) => {
       const currentEntity = get().entities[id];
       if (!currentEntity) {
         set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.VALIDATION) } as Partial<TState>);
@@ -190,7 +190,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         updatedAt: getTimestamp(),
       };
 
-      set((state) => {
+      set((state: TState) => {
         const baseUpdate = {
           entities: { ...state.entities, [id]: updatedEntity },
           [config.domainKey]: { ...state[config.domainKey] as Record<string, T>, [id]: updatedEntity },
@@ -210,7 +210,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
       }
     },
 
-    delete: (id) => {
+    delete: (id: string) => {
       const entity = get().entities[id];
       if (!entity) return;
 
@@ -220,7 +220,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
         if (!shouldDelete) return;
       }
 
-      set((state) => {
+      set((state: TState) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [id]: _removedEntity, ...remainingEntities } = state.entities;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -250,7 +250,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
       }
     },
 
-    setCurrent: (id) => {
+    setCurrent: (id: string | null) => {
       if (id && !get().entities[id]) {
         set({ error: createStoreError('Entity Not Found', `${config.entityPrefix} with ID ${id} not found`, ErrorType.VALIDATION) } as Partial<TState>);
         return;
@@ -271,7 +271,7 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
       set(update as Partial<TState>);
     },
 
-    getById: (id) => get().entities[id],
+    getById: (id: string) => get().entities[id],
 
     getAll: () => Object.values(get().entities),
 
@@ -291,11 +291,11 @@ export function createCrudOperations<T extends BaseEntity, TState extends CrudSt
       set(initialState as Partial<TState>);
     },
 
-    setError: (error) => set({ error } as Partial<TState>),
+    setError: (error: UserFriendlyError | null) => set({ error } as Partial<TState>),
 
     clearError: () => set({ error: null } as Partial<TState>),
 
-    setLoading: (loading) => set({ loading } as Partial<TState>),
+    setLoading: (loading: boolean) => set({ loading } as Partial<TState>),
   });
 }
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */

@@ -105,7 +105,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   const newWorld: World = {
     id: worldId,
     name: worldData.name,
-    description: worldData.description || '',
+    description: worldData.description ?? '',
     genre: worldData.genre || '',
     attributes: worldData.attributes || [],
     skills: worldData.skills || [],

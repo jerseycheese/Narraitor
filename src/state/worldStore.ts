@@ -430,7 +430,7 @@ export const useWorldStore = create<WorldStore>()(
 
     // Persistence configuration (keeping custom migrate for world validation)
     {
-      ...createPersistOptions<WorldStore>('world', 'worlds', createIndexedDBStorage(), 2),
+      ...createPersistOptions<WorldStore>('world', 'worlds', createIndexedDBStorage() as any, 2),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
