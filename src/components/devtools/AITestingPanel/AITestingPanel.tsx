@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import type { AITestConfig, AIResponse } from '@/types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '@/lib/ai/contextOverride';
-import { requestLogger } from '@/lib/ai/requestLogger';
+import { startRequest, completeRequest } from '@/lib/ai/requestLogger';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
@@ -122,7 +122,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       );
 
       // Start request logging
-      const logId = requestLogger.startRequest(
+      const logId = startRequest(
         'test-template',
         'Test prompt for narrative generation',
         testContext.narrativeContext,
@@ -183,7 +183,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       const responseTime = Date.now() - startTime;
 
       // Complete request log
-      requestLogger.completeRequest(logId, response, responseTime);
+      completeRequest(logId, response, responseTime);
 
       setResult(response);
     } catch (err) {
