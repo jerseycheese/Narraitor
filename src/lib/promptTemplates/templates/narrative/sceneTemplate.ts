@@ -16,8 +16,8 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
 
   const segmentType = generationParameters?.segmentType || 'scene';
   const recentSegments = narrativeContext?.recentSegments || [];
-  const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) =>
-    `[Scene ${i + 1}]: ${seg.content}`
+  const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
+    `[Scene ${recentSegments.length - i}]: ${seg.content}`
   ).join('\n\n');
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0

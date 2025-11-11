@@ -13,7 +13,7 @@ import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react'
 import { truncate, safeTrim } from '@/lib/utils';
 
 interface CharacterContextSummary {
-  threadSummary?: string;
+  recentEvent?: string;
   relationships?: Array<{
     characterId: string;
     characterName: string;
@@ -162,10 +162,11 @@ export function CharacterCard({
               </div>
             </div>
           )}
-          {context?.threadSummary && (
+          {context?.recentEvent && (
             <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Recent Event</h4>
               <p className="text-sm text-gray-700">
-                {context.threadSummary}
+                {context.recentEvent}
               </p>
             </div>
           )}

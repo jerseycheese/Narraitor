@@ -208,6 +208,8 @@ export interface NarrativeMetadata {
   tone?: EndingTone;
   // Item acquisition metadata
   itemsAcquired?: AcquiredItemMetadata[];
+  // Major event tracking
+  majorEvent?: string;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }
