@@ -96,46 +96,6 @@ export async function hideDynamicContent(page: Page): Promise<void> {
 }
 
 /**
- * Smart wait for element interactions that replaces fixed timeouts.
- */
-export async function waitForInteraction(
-  page: Page,
-  action: () => Promise<void>,
-  options: {
-    waitFor?: 'navigation' | 'response' | 'networkidle' | 'custom';
-    customWait?: () => Promise<void>;
-    timeout?: number;
-  } = {}
-): Promise<void> {
-  const { waitFor = 'networkidle', timeout = 5000 } = options;
-
-  if (waitFor === 'navigation') {
-    await Promise.all([
-      page.waitForLoadState('networkidle', { timeout }),
-      action()
-    ]);
-  } else if (waitFor === 'response') {
-    await Promise.all([
-      page.waitForResponse(response => response.status() === 200, { timeout }),
-      action()
-    ]);
-  } else if (waitFor === 'custom' && options.customWait) {
-    await Promise.all([
-      options.customWait(),
-      action()
-    ]);
-  } else {
-    // Default: wait for network idle
-    await action();
-    try {
-      await page.waitForLoadState('networkidle', { timeout: timeout / 2 });
-    } catch (e) {
-      // Continue if network idle times out
-    }
-  }
-}
-
-/**
  * Expand all CollapsibleSection components on the page for consistent visual testing.
  * This ensures all collapsible content is visible in screenshots.
  */

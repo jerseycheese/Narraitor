@@ -175,15 +175,10 @@ export default function SkillReviewStep({
   const [localSuggestions, setLocalSuggestions] = useState<ExtendedSkillSuggestion[]>(() => {
     // Start with all suggestions accepted by default for better UX
     return suggestions.map((suggestion, index) => {
-      // If we have existing skills in worldData, match them to suggestions
-      // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-      
       // Use the suggestion's accepted value, defaulting to true if not specified
       const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
       const showDetails = index === 0; // Show details only for the first one
-      
+
       return initializeSuggestionWithTracking(suggestion, accepted, showDetails);
     });
   });
@@ -195,9 +190,6 @@ export default function SkillReviewStep({
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
       const newSuggestions = suggestions.map((suggestion, index) => {
-        // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
         // Use the suggestion's accepted value, defaulting to true if not specified
         const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
         const showDetails = index === 0; // Show details for the first one

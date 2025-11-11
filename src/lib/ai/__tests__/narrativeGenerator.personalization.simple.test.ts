@@ -147,7 +147,6 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     // Use in personalization
     const behaviorAnalysis = personalizationEngine.analyzePlayerBehavior(
       convertToPersonalizationCharacter(mockCharacter),
-      mockWorld,
       decisions,
       [],
       []

@@ -6,7 +6,6 @@ import type { InventoryItem } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
 
 describe('createAcquisitionJournalEntry', () => {
-  const mockSessionId: EntityID = 'session-123';
   const mockWorldId: EntityID = 'world-456';
   const mockCharacterId: EntityID = 'char-789';
 
@@ -41,7 +40,6 @@ describe('createAcquisitionJournalEntry', () => {
   it('creates journal entry with item name and category', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -53,7 +51,6 @@ describe('createAcquisitionJournalEntry', () => {
   it('includes acquisition context in entry content', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -65,7 +62,6 @@ describe('createAcquisitionJournalEntry', () => {
   it('links back to acquired item via relatedEntities', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -84,7 +80,6 @@ describe('createAcquisitionJournalEntry', () => {
 
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -97,7 +92,6 @@ describe('createAcquisitionJournalEntry', () => {
 
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -110,7 +104,6 @@ describe('createAcquisitionJournalEntry', () => {
 
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -121,7 +114,6 @@ describe('createAcquisitionJournalEntry', () => {
   it('sets entry type to item_acquisition', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -132,7 +124,6 @@ describe('createAcquisitionJournalEntry', () => {
   it('marks entry as automatic', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -145,7 +136,6 @@ describe('createAcquisitionJournalEntry', () => {
 
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
@@ -161,7 +151,6 @@ describe('createAcquisitionJournalEntry', () => {
 
     const entry = createAcquisitionJournalEntry(
       mockItem,
-      mockSessionId,
       mockWorldId,
       mockCharacterId
     );
