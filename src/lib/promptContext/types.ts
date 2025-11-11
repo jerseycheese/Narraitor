@@ -54,25 +54,3 @@ export interface InventoryItem {
   equipped?: boolean;
   quantity?: number;
 }
-
-export interface ContextElement {
-  type: string;
-  content: string;
-  tokens?: number;
-  weight?: number;
-  timestamp?: number;
-  truncated?: boolean;
-}
-
-export interface ContextOptions {
-  promptType?: string;
-  world?: WorldContext | null;
-  character?: CharacterContext | null;
-  recentEvents?: string[];
-  currentSituation?: string;
-  tokenLimit?: number;
-}
-
-export interface PriorityWeights {
-  [key: string]: number;
-}

@@ -109,7 +109,6 @@ const itemId = generateUniqueId('item');
 - Tracks items per character with acquisition history
 - Performs automatic stack merging with max-stack enforcement
 - Stores AI/manual categorization metadata per item
-- Provides helpers for programmatic additions via `addItemToInventory`
 - Handles item usage through `useItem()` method with consumption logic
 - Returns usage results including narrative content and remaining quantities
 
