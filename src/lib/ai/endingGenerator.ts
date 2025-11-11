@@ -143,7 +143,7 @@ class EndingGenerator {
     });
 
     // Handle conditionals
-    rendered = rendered.replace(/{{#if (\w+)}}([\s\S]*?){{\/if}}/g, (match, variable, content) => {
+    rendered = rendered.replace(/{{#if (\w+)}}([\s\S]*?){{\/if}}/g, (_, variable, content) => {
       return variables[variable] ? content : '';
     });
 

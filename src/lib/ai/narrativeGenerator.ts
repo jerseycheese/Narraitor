@@ -180,21 +180,6 @@ export class NarrativeGenerator {
   }
 
   /**
-   * Extract session ID from decisions for goal context
-   */
-  private extractSessionId(
-    decisions: Array<{ sessionId?: string }>
-  ): string | null {
-    // Try to find a session ID from the decision history
-    for (const decision of decisions) {
-      if (decision.sessionId) {
-        return decision.sessionId;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Convert NarrativeGoal to CharacterGoal for personalization engine
    */
   private convertToCharacterGoals(
@@ -1722,7 +1707,6 @@ ${content}
   }
 
   private getCharacterAvatarUrl(
-    worldId: string,
     character: GeneratedCharacterMetadata
   ): string | undefined {
     if (character.avatarUrl && safeTrim(character.avatarUrl)) {
@@ -1770,7 +1754,7 @@ ${content}
           character.role ||
           'Supporting character encountered during the narrative.';
 
-        const avatarUrl = this.getCharacterAvatarUrl(worldId, character);
+        const avatarUrl = this.getCharacterAvatarUrl(character);
 
         if (existing) {
           const updates: Partial<NPC> = {};

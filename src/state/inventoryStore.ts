@@ -287,7 +287,6 @@ const createJournalEntryForAcquisition = async (
     // Create journal entry using the helper
     const journalEntry = createAcquisitionJournalEntry(
       item,
-      sessionId,
       worldId,
       characterId
     );

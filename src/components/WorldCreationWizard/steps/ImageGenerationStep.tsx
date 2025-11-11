@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
 import { WizardFormSection } from '@/components/shared/wizard';
-import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { Image as ImageIcon } from 'lucide-react';
@@ -39,9 +38,8 @@ export default function ImageGenerationStep({
     setError(null);
 
     try {
-      const aiClient = createAIClient();
-      const imageGenerator = new WorldImageGenerator(aiClient);
-      
+      const imageGenerator = new WorldImageGenerator();
+
       const image = await imageGenerator.generateWorldImage(worldData as World);
       
       setGeneratedImage(image);
