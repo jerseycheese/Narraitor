@@ -79,7 +79,15 @@ test.describe('Character roster context', () => {
           version: 1,
           lastModified: now,
           npcRelationships: {},
-          majorEvents: [],
+          majorEvents: [
+            {
+              id: 'event-alpha-discovery',
+              description: 'Hero Alpha discovered ancient artifacts in the flooded ruins, uncovering evidence of the lost civilization',
+              timestamp: now,
+              characterId: alpha.id,
+              sessionId: 'session-alpha',
+            },
+          ],
           playerCharacterThreads: {
             [`thread-${alpha.id}`]: {
               id: `thread-${alpha.id}`,
@@ -254,10 +262,11 @@ test.describe('Character roster context', () => {
     const cards = page.locator('.component-character-card');
     await expect(cards).toHaveCount(2);
 
-    await expect(cards.first().locator('text=Investigating the ruins near the falls.')).toBeVisible();
+    // Hero Alpha card should show the major event and connection to Envoy Beta
+    await expect(cards.first().locator('text=Hero Alpha discovered ancient artifacts in the flooded ruins')).toBeVisible();
     await expect(cards.first().locator('text=Envoy Beta')).toBeVisible();
 
-    await expect(cards.nth(1).locator('text=Monitoring the northern pass for unrest.')).toBeVisible();
+    // Envoy Beta card should show connection to Hero Alpha (no major event for Beta)
     await expect(cards.nth(1).locator('text=Hero Alpha')).toBeVisible();
 
     await expect(page).toHaveScreenshot('characters-roster.png', {
