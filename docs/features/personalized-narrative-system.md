@@ -126,7 +126,7 @@ console.log(patterns.dominantChoiceTypes); // ['diplomatic', 'helpful']
 console.log(patterns.patternStrength); // 75
 
 // Lightweight behavior analysis (for UI display)
-const analysis = engine.analyzePlayerBehavior(character, world, decisions);
+const analysis = engine.analyzePlayerBehavior(character, decisions);
 console.log(analysis.detectedTraits); // ['diplomatic', 'empathetic', 'logical']
 console.log(analysis.preferences.preferredChoiceTypes); // ['diplomatic', 'helpful']
 ```
@@ -230,7 +230,7 @@ Currently uses client-side storage; planned abstractions for:
 
 ### PersonalizationEngine Methods
 
-#### `analyzePlayerBehavior(character, world, decisions, relationships?, goals?): PersonalizationAnalysis`
+#### `analyzePlayerBehavior(character, decisions, relationships?, goals?): PersonalizationAnalysis`
 Performs basic aggregation of player decisions and detects top 3 personality traits.
 
 #### `createPersonalizedContext(character, world, decisions, relationships?, goals?, narrativeHistory?): PersonalizedNarrativeContext`
