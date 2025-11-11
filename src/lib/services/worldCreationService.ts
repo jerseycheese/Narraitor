@@ -9,6 +9,7 @@ import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
 import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { logger } from '@/lib/utils/logger';
+import { npcPortraitService } from './npcPortraitService';
 
 export interface CreateWorldFromGenerationParams {
   generatedData: GeneratedWorldData;
@@ -313,6 +314,17 @@ export const worldCreationService = {
         }
 
         npcStore.createNPC(payload);
+
+        // Generate portrait in background if NPC doesn't have one
+        if (!avatarUrl) {
+          npcPortraitService.generateForNPC(finalId, world).catch((error) => {
+            logger.warn('NPC portrait generation failed, using initials fallback', {
+              npcId: finalId,
+              worldId: world.id,
+              error
+            });
+          });
+        }
       } catch (error) {
         logger.warn('Failed to seed NPC', { worldId: world.id, finalId, error });
       }
