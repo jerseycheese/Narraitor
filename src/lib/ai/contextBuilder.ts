@@ -151,7 +151,7 @@ export class ContextBuilder {
       {
         worldId,
         characterIds,
-        sessionId,
+        ...(sessionId && { sessionId }),
       },
       'initialScene'
     );
