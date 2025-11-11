@@ -54,6 +54,16 @@ export interface SafetySetting {
 }
 
 /**
+ * Configuration interface for AI integration
+ */
+export interface AIConfig {
+  geminiApiKey: string;
+  modelName: string;
+  maxRetries: number;
+  timeout: number;
+}
+
+/**
  * Response from AI image generation
  */
 export interface AIImageResponse {
