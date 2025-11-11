@@ -6,11 +6,32 @@
 // Mock stores at module level (before imports)
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
+jest.mock('@/state/aiContextStore', () => ({
+  useAiContextStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('@/state/npcStore', () => ({
+  useNPCStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('../loreContextHelper', () => ({
+  getLoreContextForPrompt: jest.fn().mockReturnValue('')
+}));
 
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 describe('NarrativeGenerator - Skill Context Integration', () => {
@@ -32,6 +53,21 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
       characters: { 'char-1': mockCharacter }
     }));
+
+    (useAiContextStore.getState as jest.Mock).mockReturnValue({
+      buildContextForSession: jest.fn().mockReturnValue({
+        activeGoals: [],
+        goalContext: ''
+      })
+    });
+
+    (useInventoryStore.getState as jest.Mock).mockReturnValue({
+      getCharacterItems: jest.fn().mockReturnValue([])
+    });
+
+    (useNPCStore.getState as jest.Mock).mockReturnValue({
+      getNPCsByWorld: jest.fn().mockReturnValue([])
+    });
 
     mockAIClient = createMockAIClient();
     narrativeGenerator = new NarrativeGenerator(mockAIClient);

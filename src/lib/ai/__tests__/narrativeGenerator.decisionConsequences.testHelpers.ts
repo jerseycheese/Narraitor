@@ -6,6 +6,8 @@ import { playerDecisionTracker } from '../playerDecisionTracker';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
@@ -22,22 +24,50 @@ export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<ty
 export const mockWorld = {
   id: 'world-1',
   name: 'Test World',
-  theme: 'Fantasy Adventure',
+  genre: 'fantasy',
   description: 'A magical realm',
   attributes: [],
   skills: [],
-  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 },
+  toneSettings: {
+    contentRating: 'teen' as const,
+    narrativeStyle: 'balanced' as const,
+    languageComplexity: 'moderate' as const
+  },
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:00.000Z'
 };
 
 export const mockCharacter = {
   id: 'char-1',
   name: 'Hero',
   worldId: 'world-1',
-  background: { description: 'A brave warrior', personality: 'Courageous', motivation: 'Save the kingdom' },
+  description: 'A brave warrior',
+  level: 1,
+  isPlayer: true,
+  background: {
+    history: 'A brave warrior',
+    personality: 'Courageous',
+    goals: [],
+    fears: [],
+    relationships: []
+  },
   attributes: [],
   skills: [],
-  createdAt: new Date(),
-  updatedAt: new Date()
+  inventory: {
+    characterId: 'char-1',
+    items: [],
+    capacity: 10,
+    categories: [],
+    itemOrder: []
+  },
+  status: {
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:00.000Z'
 };
 
 /**
@@ -83,29 +113,40 @@ export function createPastDecisions(): PlayerDecision[] {
  * Sets up all mocks for decision-consequences tests
  */
 export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]): void {
-  // Mock world store
-  (useWorldStore.getState as jest.Mock).mockReturnValue({
+  // Mock world store with implementation to ensure it persists
+  (useWorldStore.getState as jest.Mock).mockImplementation(() => ({
     worlds: { 'world-1': mockWorld },
+    worldStates: {},  // Add worldStates to prevent undefined access
     currentWorldId: 'world-1',
     error: null,
     loading: false
-  });
+  }));
 
   // Mock character store
-  (useCharacterStore.getState as jest.Mock).mockReturnValue({
+  (useCharacterStore.getState as jest.Mock).mockImplementation(() => ({
     characters: { 'char-1': mockCharacter },
     currentCharacterId: 'char-1',
     error: null,
     loading: false
-  });
+  }));
 
   // Mock aiContext store for goal context
-  (useAiContextStore as unknown as { getState: jest.Mock }).getState.mockReturnValue({
+  (useAiContextStore.getState as jest.Mock).mockImplementation(() => ({
     buildContextForSession: jest.fn().mockReturnValue({
       goalContext: null,
       activeGoals: []
     })
-  });
+  }));
+
+  // Mock inventory store
+  (useInventoryStore.getState as jest.Mock).mockImplementation(() => ({
+    getCharacterItems: jest.fn().mockReturnValue([])
+  }));
+
+  // Mock NPC store
+  (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
+    getNPCsByWorld: jest.fn().mockReturnValue([])
+  }));
 
   mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);
   mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(pastDecisions);

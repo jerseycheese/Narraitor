@@ -10,6 +10,8 @@ import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplat
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { NarrativeGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
@@ -30,6 +32,19 @@ jest.mock('@/state/aiContextStore', () => ({
   useAiContextStore: {
     getState: jest.fn()
   }
+}));
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('@/state/npcStore', () => ({
+  useNPCStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('../loreContextHelper', () => ({
+  getLoreContextForPrompt: jest.fn().mockReturnValue('')
 }));
 
 const mockWorld = {
@@ -109,8 +124,17 @@ describe('NarrativeGenerator - Simple Relevance Integration', () => {
 
     (useAiContextStore.getState as jest.Mock).mockReturnValue({
       buildContextForSession: jest.fn().mockReturnValue({
-        activeGoals: []
+        activeGoals: [],
+        goalContext: ''
       })
+    });
+
+    (useInventoryStore.getState as jest.Mock).mockReturnValue({
+      getCharacterItems: jest.fn().mockReturnValue([])
+    });
+
+    (useNPCStore.getState as jest.Mock).mockReturnValue({
+      getNPCsByWorld: jest.fn().mockReturnValue([])
     });
   });
 
