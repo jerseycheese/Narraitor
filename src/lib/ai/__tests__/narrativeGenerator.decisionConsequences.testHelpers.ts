@@ -6,6 +6,8 @@ import { playerDecisionTracker } from '../playerDecisionTracker';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
@@ -105,6 +107,16 @@ export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]):
       goalContext: null,
       activeGoals: []
     })
+  });
+
+  // Mock inventory store
+  (useInventoryStore as unknown as { getState: jest.Mock }).getState.mockReturnValue({
+    getCharacterItems: jest.fn().mockReturnValue([])
+  });
+
+  // Mock NPC store
+  (useNPCStore as unknown as { getState: jest.Mock }).getState.mockReturnValue({
+    getNPCsByWorld: jest.fn().mockReturnValue([])
   });
 
   mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);
