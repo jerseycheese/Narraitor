@@ -71,14 +71,14 @@ export class NarrativeGenerator {
       }
 
       // Build result
-      let result = this.buildResult(parsed.content, parsed.metadata, segmentType, response.tokenUsage, context);
+      let result = this.buildResult(parsed.content, parsed.metadata, segmentType, response, context);
 
       // Enforce language complexity
       result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
 
       // Add debug info if enabled
       if (isDebugInfoEnabled()) {
-        result = this.addDebugInfo(result, fullyEnhancedPrompt, context, response.tokenUsage);
+        result = this.addDebugInfo(result, fullyEnhancedPrompt, context, response);
       }
 
       // Process items (async, don't block)
@@ -128,7 +128,7 @@ export class NarrativeGenerator {
       }
 
       const parsed = this.responseProcessor.parse(response.content || '');
-      let result = this.buildResult(parsed.content, parsed.metadata, 'scene', response.tokenUsage, context);
+      let result = this.buildResult(parsed.content, parsed.metadata, 'scene', response, context);
 
       result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
 
@@ -183,11 +183,11 @@ export class NarrativeGenerator {
           mood: 'neutral',
           tags: ['transition'],
         },
-        tokenUsage: response.tokenUsage
+        tokenUsage: response.promptTokens || response.completionTokens
           ? {
-              promptTokens: 0,
-              completionTokens: 0,
-              totalTokens: response.tokenUsage as number,
+              promptTokens: response.promptTokens || 0,
+              completionTokens: response.completionTokens || 0,
+              totalTokens: (response.promptTokens || 0) + (response.completionTokens || 0),
             }
           : undefined,
       };
@@ -236,7 +236,7 @@ export class NarrativeGenerator {
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
       const parsed = this.responseProcessor.parse(response.content || '');
-      let result = this.buildResult(parsed.content, parsed.metadata, 'action', response.tokenUsage, context);
+      let result = this.buildResult(parsed.content, parsed.metadata, 'action', response, context);
 
       result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
 
@@ -341,11 +341,16 @@ export class NarrativeGenerator {
       toneSettings: context.toneSettings,
       npcRoster: context.npcRoster,
       characterSkillContext: '',
-      worldSkills: context.world.skills?.map((skill: { id: string; name: string; description: string }) => ({
-        id: skill.id,
-        name: skill.name,
-        description: skill.description,
-      })) || [],
+      worldSkills: Array.isArray(context.world.skills)
+        ? context.world.skills.map((skill: unknown) => {
+            const s = skill as { id: string; name: string; description: string };
+            return {
+              id: s.id,
+              name: s.name,
+              description: s.description,
+            };
+          })
+        : [],
     };
   }
 
@@ -353,7 +358,7 @@ export class NarrativeGenerator {
     content: string,
     metadata: ReturnType<ResponseProcessor['parse']>['metadata'],
     segmentType: string,
-    tokenUsage: number | undefined,
+    response: { promptTokens?: number; completionTokens?: number },
     context: ReturnType<ContextBuilder['buildContext']> extends Promise<infer T> ? T : never
   ): NarrativeGenerationResult {
     const fallbackMood = this.getMoodForGenre(context.world.genre);
@@ -377,12 +382,13 @@ export class NarrativeGenerator {
         itemsAcquired: metadata.itemsAcquired && metadata.itemsAcquired.length > 0 ? metadata.itemsAcquired : undefined,
         characters: metadata.characters,
       },
-      tokenUsage:
-        tokenUsage && typeof tokenUsage === 'object'
-          ? tokenUsage
-          : tokenUsage
-            ? { promptTokens: 0, completionTokens: 0, totalTokens: tokenUsage as number }
-            : undefined,
+      tokenUsage: response.promptTokens || response.completionTokens
+        ? {
+            promptTokens: response.promptTokens || 0,
+            completionTokens: response.completionTokens || 0,
+            totalTokens: (response.promptTokens || 0) + (response.completionTokens || 0),
+          }
+        : undefined,
     };
   }
 
@@ -390,7 +396,7 @@ export class NarrativeGenerator {
     result: NarrativeGenerationResult,
     fullPrompt: string,
     context: ReturnType<ContextBuilder['buildContext']> extends Promise<infer T> ? T : never,
-    tokenUsage: number | undefined
+    response: { promptTokens?: number; completionTokens?: number }
   ): NarrativeGenerationResult {
     const previousSegments = context.narrativeContext?.previousSegments || [];
     const previousSegment = previousSegments[previousSegments.length - 1];
@@ -398,7 +404,7 @@ export class NarrativeGenerator {
     const debugInfoContext: DebugInfoContext = {
       fullPrompt,
       templateName: this.getTemplateName(context.templateType),
-      world: context.world,
+      world: context.world as unknown as DebugInfoContext['world'],
       toneSettings: context.toneSettings,
       loreContext: context.loreContext,
       characterIds: context.characterIds,

@@ -7,7 +7,7 @@
 
 import { EntityID } from '@/types/common.types';
 import { NarrativeGenerationRequest, NarrativeContext } from '@/types/narrative.types';
-import { ToneSettings } from '@/types/tone-settings.types';
+import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { PlayerDecision } from '@/types/personalization.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -41,7 +41,7 @@ export interface NarrativeGenerationContext {
   npcRoster: Array<{ id: string; name: string; description?: string; avatarUrl?: string }>;
   toneSettings: ToneSettings;
   relevantDecisions: PlayerDecision[];
-  goals: Array<Record<string, unknown>>;
+  goals: unknown[];
   goalContext?: string;
   inventoryItems: Array<unknown>;
   equippedItemIds: string[];
@@ -117,7 +117,7 @@ export class ContextBuilder {
         genre: world.genre,
         attributes: world.attributes,
         skills: world.skills,
-        toneSettings: world.toneSettings || { contentRating: 'teen', narrativeStyle: 'balanced', languageComplexity: 'moderate' },
+        toneSettings: world.toneSettings || DEFAULT_TONE_SETTINGS,
       },
       worldId: request.worldId,
       characters,
@@ -126,14 +126,14 @@ export class ContextBuilder {
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
       npcRoster,
-      toneSettings: world.toneSettings || { contentRating: 'teen', narrativeStyle: 'balanced', languageComplexity: 'moderate' },
+      toneSettings: world.toneSettings || DEFAULT_TONE_SETTINGS,
       relevantDecisions,
-      goals: aiContext.activeGoals || [],
-      goalContext: aiContext.goalContext,
+      goals: (aiContext.activeGoals || []) as unknown[],
+      goalContext: 'goalContext' in aiContext ? aiContext.goalContext : undefined,
       inventoryItems,
       equippedItemIds,
       otherCharacterContext,
-      loreContext: getLoreContextForPrompt(request.worldId),
+      loreContext: getLoreContextForPrompt(request.worldId) || '',
       generationParameters: request.generationParameters,
       templateType,
     };

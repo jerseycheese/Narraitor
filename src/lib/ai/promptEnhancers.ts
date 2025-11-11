@@ -82,15 +82,18 @@ export function enhanceWithPersonalization(prompt: string, context: NarrativeGen
     const decisionFormatter = new DecisionFormatter();
 
     // Convert goals
-    const characterGoals = context.goals.map((goal): CharacterGoal => ({
-      id: goal.id as string,
-      description: (goal.description || goal.title) as string,
-      priority: (goal.priority === 'critical' || goal.priority === 'high') ? 'primary' :
-                (goal.priority === 'medium') ? 'secondary' : 'minor',
-      progress: goal.status === 'completed' ? 100 : goal.status === 'abandoned' ? 0 : 20,
-      establishedAt: goal.createdAt as string,
-      isActive: goal.status === 'active',
-    }));
+    const characterGoals = context.goals.map((goal): CharacterGoal => {
+      const g = goal as Record<string, unknown>;
+      return {
+        id: g.id as string,
+        description: (g.description || g.title) as string,
+        priority: (g.priority === 'critical' || g.priority === 'high') ? 'primary' :
+                  (g.priority === 'medium') ? 'secondary' : 'minor',
+        progress: g.status === 'completed' ? 100 : g.status === 'abandoned' ? 0 : 20,
+        establishedAt: g.createdAt as string,
+        isActive: g.status === 'active',
+      };
+    });
 
     // Convert player character
     const char = context.playerCharacter as Record<string, unknown>;
@@ -107,7 +110,7 @@ export function enhanceWithPersonalization(prompt: string, context: NarrativeGen
     // Create personalized context
     const personalizedContext = personalizationEngine.createPersonalizedContext(
       playerCharacter,
-      context.world,
+      context.world as unknown as Parameters<typeof personalizationEngine.createPersonalizedContext>[1],
       context.relevantDecisions,
       [],
       characterGoals,
@@ -156,7 +159,7 @@ export function enhanceWithInventory(prompt: string, context: NarrativeGeneratio
 
   try {
     const { context: inventorySection } = buildInventoryContext(
-      context.inventoryItems,
+      context.inventoryItems as unknown as Parameters<typeof buildInventoryContext>[0],
       { equippedItemIds: context.equippedItemIds }
     );
 
