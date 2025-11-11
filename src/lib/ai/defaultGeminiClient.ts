@@ -223,6 +223,36 @@ Options:
         return `As you continue your journey, the landscape transforms around you, revealing new wonders and challenges that test your resolve. Each step takes you further from the familiar and deeper into the unknown, where the rules you once knew may no longer apply. A sense of both anticipation and caution fills you as you survey the path ahead, knowing that choices made now will echo throughout your adventure.`;
     }
   }
+  
+  // Get appropriate mood for genre
+  private getMoodForGenre(genre?: string): string {
+    switch(genre?.toLowerCase()) {
+      case 'horror': return 'tense';
+      case 'fantasy': return 'mysterious';
+      case 'sci-fi': 
+      case 'science fiction': return 'mysterious';
+      case 'western': return 'tense';
+      case 'cyberpunk': return 'tense';
+      case 'post-apocalyptic': return 'tense';
+      case 'steampunk': return 'mysterious';
+      default: return 'neutral';
+    }
+  }
+  
+  // Get appropriate location for genre
+  private getLocationForGenre(genre?: string): string {
+    switch(genre?.toLowerCase()) {
+      case 'fantasy': return 'Enchanted Forest';
+      case 'sci-fi': 
+      case 'science fiction': return 'Space Station';
+      case 'western': return 'Frontier Town';
+      case 'horror': return 'Abandoned Mansion';
+      case 'cyberpunk': return 'Neon City';
+      case 'post-apocalyptic': return 'Ruins';
+      case 'steampunk': return 'Victorian Metropolis';
+      default: return 'Starting Location';
+    }
+  }
 
   // Generate goal extraction response based on narrative content
   private generateGoalExtractionResponse(prompt: string): string {

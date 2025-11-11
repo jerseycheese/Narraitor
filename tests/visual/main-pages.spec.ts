@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForInteraction, expandAllCollapsibleSections } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**

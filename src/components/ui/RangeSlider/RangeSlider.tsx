@@ -59,6 +59,11 @@ export interface RangeSliderProps {
   showLevelDescription?: boolean;
   
   /**
+   * Custom formatter for the displayed value
+   */
+  valueFormatter?: (value: number) => string;
+  
+  /**
    * Test ID for the component
    */
   testId?: string;
@@ -98,6 +103,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   labelText = "Default Value",
   levelDescriptions = [],
   showLevelDescription = false,
+  valueFormatter, // eslint-disable-line @typescript-eslint/no-unused-vars
   testId = "range-slider",
   isConstrained = false,
   effectiveMax,

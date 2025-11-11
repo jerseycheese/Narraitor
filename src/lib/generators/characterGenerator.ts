@@ -280,7 +280,7 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
     
     // Ensure proper escaping of quotes inside strings
-    jsonString = jsonString.replace(/"([^"]*)":/g, (_: string, key: string) => {
+    jsonString = jsonString.replace(/"([^"]*)":/g, (match: string, key: string) => {
       // Escape any unescaped quotes inside the key
       const escapedKey = key.replace(/\\"/g, '"').replace(/"/g, '\\"');
       return `"${escapedKey}":`;

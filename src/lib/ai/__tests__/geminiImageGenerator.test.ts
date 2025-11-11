@@ -18,7 +18,8 @@ import {
   callGeminiImageAPI,
   extractImageFromResponse,
   generateImageWithGemini,
-  type GeminiImageResponse
+  type GeminiImageResponse,
+  type GeneratedImage
 } from '../geminiImageGenerator';
 
 describe('Gemini Image Generator', () => {

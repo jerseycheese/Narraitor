@@ -62,6 +62,7 @@ export class PersonalizationEngine {
    */
   analyzePlayerBehavior(
     character: PersonalizationCharacter,
+    world: World,
     decisions: PlayerDecision[],
     relationships: CharacterRelationship[] = [],
     goals: CharacterGoal[] = []
@@ -116,7 +117,7 @@ export class PersonalizationEngine {
     goals: CharacterGoal[] = [],
     narrativeHistory: string[] = []
   ): PersonalizedNarrativeContext {
-    const analysis = this.analyzePlayerBehavior(character, decisions, relationships, goals);
+    const analysis = this.analyzePlayerBehavior(character, world, decisions, relationships, goals);
 
     return {
       character: {

@@ -2,10 +2,11 @@
 
 import { World } from '../../types/world.types';
 import { GeneratedImage } from '../../types/common.types';
+import { AIClient } from './types';
 import { getTimestamp } from '@/lib/utils';
 
 export class WorldImageGenerator {
-  constructor() {}
+  constructor(private aiClient: AIClient) {}
 
   /**
    * Generate a prompt for a world environment image

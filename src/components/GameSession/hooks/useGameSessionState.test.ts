@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameSessionState } from './useGameSessionState';
+import { getTimestamp } from '@/lib/utils/timestamp';
 import { createMockWorld, createMockCharacter, createMockWorldStore, createMockCharacterStore, createMockSessionStore } from '@/lib/test-utils';
 
 // Create test fixtures

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
+import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
@@ -18,8 +19,9 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
     setIsGenerating(true);
 
     try {
-      const imageGenerator = new WorldImageGenerator();
-
+      const aiClient = createAIClient();
+      const imageGenerator = new WorldImageGenerator(aiClient);
+      
       const image = await imageGenerator.generateWorldImage(world, customPrompt);
       
       onChange({ image });

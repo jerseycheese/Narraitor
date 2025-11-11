@@ -76,12 +76,14 @@ function formatAcquisitionContext(item: InventoryItem): string {
  * - Appropriate significance level
  *
  * @param item - The acquired inventory item
+ * @param sessionId - Current game session ID
  * @param worldId - Current world ID
  * @param characterId - Character who acquired the item
  * @returns Journal entry data (without id, sessionId, createdAt)
  */
 export function createAcquisitionJournalEntry(
   item: InventoryItem,
+  sessionId: EntityID,
   worldId: EntityID,
   characterId: EntityID
 ): Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> {

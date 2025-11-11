@@ -43,6 +43,12 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
     label: level.label,
     description: level.description
   }));
+  
+  // Custom formatter to display value with level
+  const valueFormatter = (value: number): string => {
+    const level = levelDescriptions.find(level => level.value === value);
+    return level ? `${value} - ${level.label}` : `${value}`;
+  };
 
   return (
     <RangeSlider
@@ -55,6 +61,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
       labelText="Default Value"
       levelDescriptions={levelDescriptions}
       showLevelDescription={showLevelDescriptions}
+      valueFormatter={valueFormatter}
       testId="skill-range-editor"
     />
   );

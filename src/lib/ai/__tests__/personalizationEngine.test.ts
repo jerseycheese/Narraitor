@@ -124,6 +124,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
 
       const analysis = engine.analyzePlayerBehavior(
         convertToPersonalizationCharacter(mockCharacter),
+        mockWorld,
         aggressiveDecisions,
         [],
         []
@@ -175,6 +176,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
 
       const analysis = engine.analyzePlayerBehavior(
         convertToPersonalizationCharacter(mockCharacter),
+        mockWorld,
         decisions,
         [],
         []
