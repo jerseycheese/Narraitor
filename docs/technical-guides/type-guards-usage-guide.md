@@ -202,8 +202,6 @@ if (!formResult.valid) {
 - `isJournalEntry`
 - `isPlayerDecision`
 
-**Note**: Previously available type guards `isWorld`, `isInventoryItem`, `isPersonalityTrait`, and `isSafeStringArray` have been removed. Use the `validateWorld` function for world validation instead.
-
 ## Migration from Basic Type Checking
 
 If you've been doing manual property checking, the type guards are much more reliable:
