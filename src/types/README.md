@@ -35,13 +35,15 @@ interface GameState {
 There are also type guards available for runtime validation, which is useful when you're dealing with data from external sources or local storage:
 
 ```typescript
-import { isWorld, isCharacter } from '@/types';
+import { validateWorld } from '@/types';
 
 // Validate unknown data
 const data = JSON.parse(localStorage.getItem('savedGame'));
-if (isWorld(data.world)) {
+const validation = validateWorld(data.world);
+if (validation.valid) {
   // TypeScript knows data.world is a World
-  console.log(data.world.theme);
+  const world = data.world as World;
+  console.log(world.theme);
 }
 ```
 
@@ -186,20 +188,24 @@ This pattern makes it easy to look up entities by ID and ensures the store metho
 
 ## Type Guards
 
-When you're dealing with data from external sources - localStorage, API responses, user uploads - you can use type guards to validate the shape:
+When you're dealing with data from external sources - localStorage, API responses, user uploads - you can use validation functions to validate the shape:
 
 ```typescript
-import { isWorld, isCharacter } from '@/types';
+import { validateWorld, isNarrativeSegment, isJournalEntry } from '@/types';
 
-const handleFileUpload = (file: File) => {
+const handleFileUpload = async (file: File) => {
   const data = JSON.parse(await file.text());
-  
-  if (isWorld(data)) {
+
+  const worldValidation = validateWorld(data);
+  if (worldValidation.valid) {
     // Safe to use as World
-    importWorld(data);
-  } else if (isCharacter(data)) {
-    // Safe to use as Character
-    importCharacter(data);
+    importWorld(data as World);
+  } else if (isNarrativeSegment(data)) {
+    // Safe to use as NarrativeSegment
+    importNarrative(data);
+  } else if (isJournalEntry(data)) {
+    // Safe to use as JournalEntry
+    importJournalEntry(data);
   } else {
     throw new Error('Unknown file format');
   }

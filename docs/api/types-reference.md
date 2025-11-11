@@ -394,13 +394,13 @@ interface ValidationResult {
   errors: ValidationError[];
 }
 
-// Type guards
-const isWorld = (obj: any): obj is World => {
-  return obj && typeof obj.id === 'string' && Array.isArray(obj.attributes);
+// Type guards for runtime validation
+const isNarrativeSegment = (obj: any): obj is NarrativeSegment => {
+  return obj && typeof obj.id === 'string' && typeof obj.content === 'string';
 };
 
-const isCharacter = (obj: any): obj is Character => {
-  return obj && typeof obj.worldId === 'string' && typeof obj.attributes === 'object';
+const isJournalEntry = (obj: any): obj is JournalEntry => {
+  return obj && typeof obj.id === 'string' && typeof obj.type === 'string';
 };
 ```
 
