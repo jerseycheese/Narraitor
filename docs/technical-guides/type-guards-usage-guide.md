@@ -18,19 +18,18 @@ World validation supports partial validation, which is perfect for form inputs w
 ### World Validation
 
 ```typescript
-import { isWorld, validateWorld } from '@/types/type-guards';
-
-// Basic type guard - fast boolean check
-const unknownData: unknown = getUserInput();
-if (isWorld(unknownData)) {
-  // TypeScript now knows this is a World
-  console.log(unknownData.name); // Safe to access
-  console.log(unknownData.genre);
-}
+import { validateWorld } from '@/types/type-guards';
 
 // Detailed validation with error messages
+const unknownData: unknown = getUserInput();
 const result = validateWorld(unknownData);
-if (!result.valid) {
+
+if (result.valid) {
+  // Validation passed - safe to use as World
+  const world = unknownData as World;
+  console.log(world.name);
+  console.log(world.genre);
+} else {
   console.log('Validation failed:');
   result.errors.forEach(error => console.log(`- ${error}`));
 }
@@ -51,15 +50,10 @@ const partialWorld = {
 };
 
 // Partial validation - only checks present properties
-if (isWorld(partialWorld, { partial: true })) {
-  // Valid for this stage of form completion
-  saveFormProgress(partialWorld);
-}
-
-// Detailed partial validation
-const result = validateWorld(partialWorld, { partial: true });
+const result = validateWorld(partialWorld, true); // true = partial mode
 if (result.valid) {
   console.log('Form stage is valid');
+  saveFormProgress(partialWorld);
 } else {
   // Show specific errors for present properties
   showValidationErrors(result.errors);
@@ -71,11 +65,9 @@ if (result.valid) {
 ### World Components
 
 ```typescript
-import { 
-  isWorldAttribute, 
+import {
   validateWorldAttribute,
-  isWorldSkill,
-  validateWorldSkill 
+  validateWorldSkill
 } from '@/types/type-guards';
 
 // Validate world attributes with range checking
@@ -89,17 +81,18 @@ const attribute = {
   maxValue: 20
 };
 
-if (isWorldAttribute(attribute)) {
-  // Range validation is included
+const attrResult = validateWorldAttribute(attribute);
+if (attrResult.valid) {
+  // Range validation passed
   console.log(`${attribute.name}: ${attribute.baseValue}`);
 }
 
 // Get specific range validation errors
-const attrResult = validateWorldAttribute({
+const invalidAttr = validateWorldAttribute({
   ...attribute,
   baseValue: 25 // Exceeds maxValue
 });
-// attrResult.errors: ["Property baseValue must be less than or equal to maxValue"]
+// invalidAttr.errors: ["Property baseValue must be less than or equal to maxValue"]
 ```
 
 
@@ -109,8 +102,8 @@ const attrResult = validateWorldAttribute({
 
 ```typescript
 function validateWorldForm(formData: unknown): { isValid: boolean; errors: string[] } {
-  const result = validateWorld(formData, { partial: true });
-  
+  const result = validateWorld(formData, true); // true = partial mode
+
   return {
     isValid: result.valid,
     errors: result.errors
@@ -130,12 +123,13 @@ if (!isValid) {
 ```typescript
 async function fetchWorld(id: string): Promise<World> {
   const response = await api.get(`/worlds/${id}`);
-  
-  if (!isWorld(response.data)) {
+  const validation = validateWorld(response.data);
+
+  if (!validation.valid) {
     throw new Error('Invalid world data received from API');
   }
-  
-  return response.data; // TypeScript knows this is World
+
+  return response.data as World;
 }
 
 // With detailed error logging
@@ -174,41 +168,41 @@ function importWorldData(jsonData: unknown[]): { success: World[]; errors: Array
 
 ## Performance Considerations
 
-So there's a trade-off here: **Type Guards** like `isWorld` and `isCharacter` are optimized for speed - use these in hot paths where you just need to know "is this valid or not?"
+The **ValidationResult API** (like `validateWorld`) provides detailed error messages which is helpful when you need to show users what's wrong or debug validation issues.
 
-**ValidationResult API** like `validateWorld` and `validateCharacter` provides detailed error messages but is slower - use these when you need to show users what's wrong.
-
-Partial validation is faster than full validation because it skips missing properties - use it when appropriate.
+Partial validation is faster than full validation because it skips missing properties - use it when appropriate (e.g., form validation).
 
 ```typescript
-// Fast path - use type guards
-if (isWorld(data)) {
-  processWorld(data);
-}
-
-// Detailed validation - use when errors need to be shown
+// Full validation - use for complete data structures
 const result = validateWorld(data);
 if (!result.valid) {
   showUserErrors(result.errors);
+}
+
+// Partial validation - faster for form inputs
+const formResult = validateWorld(partialData, true);
+if (!formResult.valid) {
+  showFieldErrors(formResult.errors);
 }
 ```
 
 ## Available Type Guards
 
 ### Core Objects
-- `isWorld` / `validateWorld`
+- `validateWorld` - Comprehensive world validation with detailed errors
 
 ### World Components
 - `validateWorldAttribute`
 - `validateWorldSkill`
 - `validateWorldSettings`
-- `validateWorldImage`
+- `validateGeneratedImage`
 
 ### Other Domain Objects
-- `isInventoryItem`
 - `isNarrativeSegment`
 - `isJournalEntry`
 - `isPlayerDecision`
+
+**Note**: Previously available type guards `isWorld`, `isInventoryItem`, `isPersonalityTrait`, and `isSafeStringArray` have been removed. Use the `validateWorld` function for world validation instead.
 
 ## Migration from Basic Type Checking
 
@@ -222,11 +216,14 @@ function isValidWorld(obj: any): boolean {
          typeof obj.name === 'string';
 }
 
-// After - comprehensive type guard
-import { isWorld } from '@/types/type-guards';
+// After - comprehensive validation
+import { validateWorld } from '@/types/type-guards';
 
-if (isWorld(data)) {
+const result = validateWorld(data);
+if (result.valid) {
   // Full validation including nested objects and ranges
+  const world = data as World;
+  processWorld(world);
 }
 ```
 

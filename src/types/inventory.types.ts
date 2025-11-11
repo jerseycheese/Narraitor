@@ -105,15 +105,3 @@ export interface ItemUsageResult {
     message: string;
   };
 }
-
-/**
- * Context for item usage
- */
-export interface ItemUsageContext {
-  characterId: EntityID;
-  itemId: EntityID;
-  sessionId?: EntityID;
-  worldId?: EntityID;
-  currentLocation?: string;
-  currentSituation?: string;
-}

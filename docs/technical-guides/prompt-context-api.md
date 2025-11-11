@@ -7,7 +7,7 @@ updated: 2025-06-08
 
 # Prompt Context API
 
-**Note**: Most of this document describes planned features not yet implemented. The actual implementation currently only includes `inventoryContextBuilder.ts`, `tokenUtils.ts`, and `types.ts`. The `ContextBuilder`, `ContextPrioritizer`, and `PromptContextManager` classes described below are planned but do not exist in the codebase yet.
+**Note**: Most of this document describes planned features not yet implemented. The actual implementation currently only includes `inventoryContextBuilder.ts`, `tokenUtils.ts`, and `types.ts`. The `ContextBuilder`, `ContextPrioritizer`, and `PromptContextManager` classes described below are planned but do not exist in the codebase. Previous experimental implementations of these classes were removed as dead code.
 
 The AI needs to understand your world and character to generate good stories, but it can only process so much information at once. The prompt context system handles the tricky job of deciding what information to include and how to format it for the AI.
 

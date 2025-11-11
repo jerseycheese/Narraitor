@@ -2,10 +2,7 @@
 
 /**
  * Utility functions for parsing AI responses across different features
- * Enhanced with type guard validation for runtime type safety
  */
-
-import { ValidationResult } from '@/lib/utils/validationUtils';
 
 export interface AIResponse {
   content?: string;
@@ -119,31 +116,6 @@ export function validateArrayFields(
       throw new Error(`Invalid ${objectName}: ${field} must be an array`);
     }
   }
-}
-
-/**
- * Enhanced validation using type guards for runtime type safety
- */
-export function validateWithTypeGuard<T>(
-  data: unknown,
-  validator: (data: unknown) => ValidationResult,
-  objectName: string = 'object',
-  fallbackData?: T
-): T {
-  const validation = validator(data);
-  
-  if (!validation.valid) {
-    const errorMessage = `Invalid ${objectName}: ${validation.errors[0]}`;
-    
-    if (fallbackData) {
-      console.warn(`${errorMessage}, using fallback data`);
-      return fallbackData;
-    }
-    
-    throw new Error(errorMessage);
-  }
-  
-  return data as T;
 }
 
 /**

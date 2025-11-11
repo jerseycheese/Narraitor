@@ -1,0 +1,1053 @@
+next.config.ts:67 - default
+playwright.config.ts:9 - default
+tailwind.config.ts:84 - default
+vite.config.ts:5 - default
+.next/types/routes.d.ts:67 - ParamsOf
+.next/types/routes.d.ts:75 - PageRoutes (used in module)
+.next/types/routes.d.ts:75 - RedirectRoutes (used in module)
+.next/types/routes.d.ts:75 - RewriteRoutes (used in module)
+src/app/error.tsx:5 - default
+src/app/loading.tsx:3 - default
+src/app/page.tsx:7 - default
+src/hooks/useKeyboardShortcuts.ts:4 - KeyboardShortcut (used in module)
+src/hooks/useNavigationFlow.ts:6 - NextStep (used in module)
+src/hooks/useNavigationFlow.ts:14 - QuickStartInfo (used in module)
+src/hooks/useNavigationFlow.ts:22 - FlowStep (used in module)
+src/hooks/useNavigationLoading.ts:4 - NavigationLoadingState (used in module)
+src/hooks/usePointPoolManager.ts:3 - PointPoolItem (used in module)
+src/hooks/usePointPoolManager.ts:10 - PointPool (used in module)
+src/hooks/usePointPoolManager.ts:16 - UsePointPoolManagerOptions (used in module)
+src/hooks/usePointPoolManager.ts:22 - UsePointPoolManagerReturn (used in module)
+src/hooks/usePointPoolManager.ts:186 - SkillPointPoolItem (used in module)
+src/hooks/usePointPoolManager.ts:190 - UseSkillPointPoolOptions (used in module)
+src/hooks/usePointPoolManager.ts:195 - UseSkillPointPoolReturn (used in module)
+src/hooks/useWizardState.ts:15 - WizardState (used in module)
+src/hooks/useWizardState.ts:23 - UseWizardStateOptions (used in module)
+src/hooks/useWizardState.ts:31 - UseWizardStateReturn (used in module)
+src/state/createCrudStore.ts:11 - BaseEntity (used in module)
+src/state/createCrudStore.ts:17 - CrudStoreState (used in module)
+src/state/createCrudStore.ts:24 - CrudStoreActions (used in module)
+src/state/navigationStore.ts:115 - NavigationHistoryEntry (used in module)
+src/state/navigationStore.ts:125 - NavigationPreferences (used in module)
+src/state/navigationStore.ts:136 - NavigationState (used in module)
+src/types/ai-suggestions.types.ts:6 - AISuggestionBase (used in module)
+src/types/game.types.ts:8 - PlayerChoice (used in module)
+src/types/game.types.ts:51 - AutoSaveState (used in module)
+src/types/index.ts:6 - EntityID
+src/types/index.ts:6 - ISODateString
+src/types/index.ts:6 - TimestampedEntity
+src/types/index.ts:6 - NamedEntity
+src/types/index.ts:6 - GeneratedImage
+src/types/index.ts:7 - WorldAttribute
+src/types/index.ts:7 - WorldSkill
+src/types/index.ts:7 - WorldSettings
+src/types/index.ts:10 - CharacterAttribute
+src/types/index.ts:11 - CharacterSkill
+src/types/index.ts:12 - CharacterBackground
+src/types/index.ts:13 - CharacterRelationship
+src/types/index.ts:14 - CharacterStatus
+src/types/index.ts:16 - NPC
+src/types/index.ts:18 - Inventory
+src/types/index.ts:19 - InventoryItem
+src/types/index.ts:20 - InventoryCategory
+src/types/index.ts:21 - StandardInventoryCategory
+src/types/index.ts:22 - InventoryAcquisitionRecord
+src/types/index.ts:23 - InventoryAcquisitionMethod
+src/types/index.ts:24 - InventoryItemCategorization
+src/types/index.ts:25 - InventoryCategorizationSource
+src/types/index.ts:28 - NarrativeSegment
+src/types/index.ts:29 - Decision
+src/types/index.ts:30 - DecisionOption
+src/types/index.ts:31 - DecisionRequirement
+src/types/index.ts:32 - DecisionItemRequirementGroup
+src/types/index.ts:33 - DecisionItemRequirements
+src/types/index.ts:34 - RequirementLogic
+src/types/index.ts:35 - Consequence
+src/types/index.ts:36 - NarrativeMetadata
+src/types/index.ts:39 - JournalEntry
+src/types/index.ts:40 - JournalEntryType
+src/types/index.ts:41 - RelatedEntity
+src/types/index.ts:42 - JournalMetadata
+src/types/index.ts:45 - LoreFact
+src/types/index.ts:46 - LoreCategory
+src/types/index.ts:47 - LoreSource
+src/types/index.ts:48 - LoreSearchOptions
+src/types/index.ts:49 - LoreContext
+src/types/index.ts:52 - GameSession
+src/types/index.ts:53 - SessionState
+src/types/index.ts:54 - SavePoint
+src/types/index.ts:56 - SessionLifecycleMetadata
+src/types/index.ts:57 - SessionLifecycleStatus
+src/types/index.ts:58 - SessionStatus
+src/types/index.ts:61 - WorldState
+src/types/index.ts:62 - WorldStateUpdate
+src/types/index.ts:63 - NPCRelationshipState
+src/types/index.ts:64 - NPCRelationshipUpdate
+src/types/index.ts:65 - WorldStateMajorEvent
+src/types/index.ts:66 - WorldStateMajorEventInput
+src/types/index.ts:67 - SessionLifecycleSnapshot
+src/types/index.ts:70 - AIContext
+src/types/index.ts:71 - AIPromptContext
+src/types/index.ts:72 - AIConstraint
+src/types/index.ts:75 - AITestConfig
+src/types/index.ts:76 - AIRequestLog
+src/types/index.ts:77 - AIResponse
+src/types/index.ts:78 - TokenUsage
+src/types/index.ts:79 - TestScenario
+src/types/index.ts:82 - DecisionRelevanceScore
+src/types/index.ts:83 - RelevanceScoringConfig
+src/types/index.ts:84 - CurrentNarrativeContext
+src/types/index.ts:85 - DecisionRelevanceResult
+src/types/index.ts:90 - RuntimeError
+src/types/index.ts:91 - ErrorSeverity
+src/types/index.ts:92 - ErrorCategory
+src/types/index.ts:93 - ErrorComponentContext
+src/types/index.ts:94 - ErrorStateSnapshot
+src/types/index.ts:95 - ErrorFilter
+src/types/index.ts:96 - ErrorStatistics
+src/types/index.ts:101 - validateWorld
+src/types/index.ts:102 - isInventoryItem
+src/types/index.ts:103 - isNarrativeSegment
+src/types/index.ts:104 - isJournalEntry
+src/types/inventory.types.ts:112 - ItemUsageContext
+src/types/narrative.types.ts:256 - GenerationParameters (used in module)
+src/types/personalization.types.ts:19 - RelationshipType (used in module)
+src/types/personalization.types.ts:26 - NarrativeStylePreference (used in module)
+src/types/personalization.types.ts:150 - PersonalizationConfig
+src/types/type-guards.ts:302 - validateGeneratedImage (used in module)
+src/types/type-guards.ts:340 - isWorld
+src/types/type-guards.ts:417 - isPersonalityTrait
+src/types/type-guards.ts:425 - isChoiceTypePreference (used in module)
+src/types/type-guards.ts:432 - isPlayerDecision (used in module)
+src/types/type-guards.ts:447 - isSafeString (used in module)
+src/types/type-guards.ts:468 - isSafeStringArray
+src/utils/apiHelpers.ts:9 - getClientIP (used in module)
+src/utils/apiHelpers.ts:24 - handleRateLimiting (used in module)
+src/utils/apiHelpers.ts:51 - validateAIRequest (used in module)
+src/utils/apiHelpers.ts:74 - validateAPIKey (used in module)
+src/utils/apiHelpers.ts:87 - createRateLimitHeaders (used in module)
+src/utils/apiHelpers.ts:203 - makeGeminiRequest (used in module)
+src/utils/apiHelpers.ts:245 - GeminiTextResponse (used in module)
+src/utils/apiHelpers.ts:258 - GeminiTextOptions (used in module)
+src/utils/skillCheckEvaluator.ts:185 - findWorldSkill (used in module)
+tests/factories/index.ts:16 - worldFactory
+tests/factories/index.ts:17 - worldAttributeFactory
+tests/factories/index.ts:18 - worldSkillFactory
+tests/factories/index.ts:22 - characterFactory
+tests/factories/index.ts:23 - characterAttributeFactory
+tests/factories/index.ts:24 - characterSkillFactory
+tests/factories/index.ts:27 - sessionFactory
+tests/fixtures/index.ts:12 - SAMPLE_WORLDS
+tests/fixtures/index.ts:13 - SAMPLE_CHARACTERS
+tests/fixtures/index.ts:14 - SAMPLE_GAME_SESSIONS
+tests/fixtures/index.ts:14 - GameSessionFixture
+tests/fixtures/index.ts:15 - SAMPLE_NARRATIVE_SEGMENTS
+tests/fixtures/index.ts:15 - SAMPLE_DECISIONS
+tests/visual/global.setup.ts:393 - default
+.next/types/app/layout.ts:54 - PageProps
+.next/types/app/layout.ts:58 - LayoutProps (used in module)
+src/app/about/page.tsx:1 - default
+src/app/dev/layout.tsx:6 - default
+src/app/dev/page.tsx:5 - default
+src/app/play/page.tsx:13 - default
+src/app/worlds/page.tsx:18 - default
+src/components/CharacterCard/index.ts:1 - CharacterCard
+src/components/CharacterCreationWizard/index.ts:1 - CharacterCreationWizard
+src/components/CharacterEditor/index.ts:1 - CharacterEditor
+src/components/CharacterEditor/index.ts:2 - default (used in module)
+src/components/CharacterPortrait/index.ts:3 - CharacterPortrait
+src/components/ConfirmationDialog/index.ts:1 - ConfirmationDialog
+src/components/ConfirmationDialog/index.ts:2 - ConfirmationDialogProps
+src/components/ConfirmationDialog/index.ts:2 - ConfirmationVariant
+src/components/DeleteConfirmationDialog/index.ts:1 - default
+src/components/forms/ToneSettingsForm.tsx:23 - ToneSettingsFormProps (used in module)
+src/components/GameStartWizard/index.ts:1 - GameStartWizard
+src/components/GameStartWizard/index.ts:2 - GameStartWizardProps
+src/components/GenerateCharacterDialog/index.ts:1 - GenerateCharacterDialog
+src/components/GuidedFirstTimeExperience/index.ts:1 - GuidedFirstTimeExperience
+src/components/LoreViewer/index.ts:1 - LoreViewer
+src/components/Narrative/useNarrativeParticipants.ts:5 - NarrativeParticipant (used in module)
+src/components/Narrative/useNarrativeParticipants.ts:11 - NAME_STOP_WORDS (used in module)
+src/components/Narrative/useNarrativeParticipants.ts:38 - NarrativeParticipantsResult (used in module)
+src/components/Navigation/Breadcrumbs.tsx:15 - BreadcrumbsProps (used in module)
+src/components/Navigation/index.ts:1 - Navigation
+src/components/Navigation/index.ts:2 - Breadcrumbs
+src/components/Navigation/index.ts:3 - MobileNavigationMenu
+src/components/QuickPlay/index.ts:1 - QuickPlay
+src/components/QuickPlay/QuickPlay.stories.helpers.tsx:8 - mockWorld (used in module)
+src/components/QuickPlay/QuickPlay.stories.helpers.tsx:25 - mockCharacter (used in module)
+src/components/QuickStartCharacters/QuickStartCharacters.tsx:23 - QuickStartCharactersProps (used in module)
+src/components/shared/ActionButtonGroup.tsx:6 - ActionButton (used in module)
+src/components/shared/index.ts:1 - DataField
+src/components/shared/index.ts:2 - ChoiceSelector
+src/components/shared/index.ts:3 - PointPoolManager
+src/components/shared/index.ts:4 - PortraitCustomizationSection
+src/components/shared/index.ts:5 - ImageGenerationSection
+src/components/shared/index.ts:6 - BackNavigation
+src/components/shared/index.ts:7 - NotFoundState
+src/components/shared/index.ts:8 - ActionButtonGroup
+src/components/shared/index.ts:9 - SectionWrapper
+src/components/shared/index.ts:10 - PageLayout
+src/components/shared/index.ts:11 - PageLayoutProps
+src/components/shared/index.ts:12 - LoadingOverlay
+src/components/shared/index.ts:13 - LoadingOverlayProps
+src/components/shared/index.ts:14 - NavigationLoadingProvider
+src/components/shared/index.ts:14 - useNavigationLoadingContext
+src/components/shared/index.ts:17 - ErrorBlock
+src/components/shared/index.ts:18 - InlineError
+src/components/shared/PageLayout.tsx:94 - default
+src/components/StoryEndingDialog/index.ts:1 - StoryEndingDialog
+src/components/StoryEndingDialog/index.ts:2 - StoryEndingDialogProps
+src/components/StoryEndingDialog/index.ts:2 - EndingType
+src/components/ui/badge.tsx:48 - BadgeProps (used in module)
+src/components/ui/badge.tsx:71 - badgeVariants (used in module)
+src/components/ui/button.tsx:4 - ButtonProps (used in module)
+src/components/ui/button.tsx:47 - buttonVariants (used in module)
+src/components/ui/checkbox.tsx:4 - CheckboxProps (used in module)
+src/components/ui/data-table.tsx:30 - DataTableProps (used in module)
+src/components/ui/dialog.tsx:117 - DialogPortal (used in module)
+src/components/ui/dialog.tsx:118 - DialogOverlay (used in module)
+src/components/ui/dialog.tsx:120 - DialogTrigger (used in module)
+src/components/ui/dialog.tsx:122 - DialogHeader (used in module)
+src/components/ui/dialog.tsx:123 - DialogFooter (used in module)
+src/components/ui/dialog.tsx:125 - DialogDescription (used in module)
+src/components/ui/input.tsx:4 - InputProps (used in module)
+src/components/ui/label.tsx:4 - LabelProps (used in module)
+src/components/ui/radio-group.tsx:4 - RadioGroupProps (used in module)
+src/components/ui/radio-group.tsx:12 - RadioGroupItemProps (used in module)
+src/components/ui/scroll-area.tsx:56 - ScrollBar (used in module)
+src/components/ui/select.tsx:4 - SelectProps (used in module)
+src/components/ui/select.tsx:72 - SelectContent (used in module)
+src/components/ui/select.tsx:72 - SelectItem (used in module)
+src/components/ui/select.tsx:72 - SelectTrigger (used in module)
+src/components/ui/select.tsx:72 - SelectValue (used in module)
+src/components/ui/table.tsx:116 - TableFooter (used in module)
+src/components/ui/table.tsx:120 - TableCaption (used in module)
+src/components/ui/textarea.tsx:4 - TextareaProps (used in module)
+src/components/WorldCreationWizard/WizardState.ts:6 - WizardState
+src/components/WorldCreationWizard/WorldCreationWizard.tsx:76 - WorldCreationWizardProps (used in module)
+src/components/WorldImage/index.ts:1 - WorldImage
+src/components/WorldImage/index.ts:2 - default
+src/lib/ai/choiceGenerator.ts:18 - ChoiceGenerationParams (used in module)
+src/lib/ai/contextBuilder.ts:54 - ContextBuilder
+src/lib/ai/contextManager.ts:12 - EndingContext (used in module)
+src/lib/ai/geminiImageGenerator.ts:13 - GeminiImagePart (used in module)
+src/lib/ai/goalExtractor.ts:16 - GoalExtractor (used in module)
+src/lib/ai/index.ts:4 - createAIClient
+src/lib/ai/inventoryCategorizer.ts:10 - InventoryCategorizationResult (used in module)
+src/lib/ai/promptEnhancers.ts:46 - enhanceWithToneSettings (used in module)
+src/lib/ai/promptEnhancers.ts:60 - enhanceWithLore (used in module)
+src/lib/ai/promptEnhancers.ts:67 - enhanceWithGoals (used in module)
+src/lib/ai/promptEnhancers.ts:77 - enhanceWithPersonalization (used in module)
+src/lib/ai/promptEnhancers.ts:155 - enhanceWithInventory (used in module)
+src/lib/ai/promptEnhancers.ts:178 - enhanceWithItemAcquisition (used in module)
+src/lib/ai/promptEnhancers.ts:185 - composePrompt
+src/lib/ai/promptEnhancers.ts:204 - DEFAULT_ENHANCERS
+src/lib/ai/promptEnhancers.ts:216 - INITIAL_SCENE_ENHANCERS
+src/lib/ai/promptEnhancers.ts:227 - SKILL_ENHANCERS
+src/lib/ai/relevanceDebugger.ts:14 - ContextParams (used in module)
+src/lib/ai/requestLogger.ts:7 - RequestLogger (used in module)
+src/lib/ai/requestLogger.ts:94 - AIRequestLog (used in module)
+src/lib/ai/responseProcessor.ts:46 - ParsedResponse (used in module)
+src/lib/ai/responseProcessor.ts:59 - ResponseProcessor
+src/lib/ai/toneSettingsGenerator.ts:20 - ToneAnalysisResult (used in module)
+src/lib/ai/toneSettingsGuidance.ts:51 - NARRATIVE_STYLE_GUIDANCE (used in module)
+src/lib/ai/toneSettingsGuidance.ts:155 - CONTENT_RATING_GUIDANCE (used in module)
+src/lib/ai/userFriendlyErrors.ts:16 - getUserFriendlyError (used in module)
+src/lib/ai/userFriendlyErrors.ts:9 - UserFriendlyError (used in module)
+src/lib/api/worldApi.ts:3 - GenerateWorldParams (used in module)
+src/lib/api/worldApi.ts:19 - WorldImageResponse (used in module)
+src/lib/constants/genres.ts:10 - GenreOption (used in module)
+src/lib/constants/genres.ts:54 - LEGACY_GENRE_MAPPING (used in module)
+src/lib/constants/skillDifficultyLevels.ts:11 - SkillDifficultyDescription (used in module)
+src/lib/constants/skillDifficultyLevels.ts:48 - getSkillDifficultyDescription
+src/lib/constants/skillLevelDescriptions.ts:8 - SkillLevelDescription (used in module)
+src/lib/constants/worldGuidance.ts:5 - WorldGuidance (used in module)
+src/lib/design-tokens/index.ts:6 - primitiveColors
+src/lib/design-tokens/index.ts:7 - semanticColors
+src/lib/design-tokens/index.ts:7 - semanticColorsDark
+src/lib/design-tokens/index.ts:8 - componentTokens
+src/lib/design-tokens/index.ts:9 - endingTones
+src/lib/design-tokens/index.ts:9 - loreCategories
+src/lib/devtools/sectionVisibilityStorage.ts:105 - saveSectionVisibility (used in module)
+src/lib/devtools/sectionVisibilityStorage.ts:36 - DEFAULT_SECTION_VISIBILITY (used in module)
+src/lib/generators/characterGenerator.ts:30 - CharacterGenerationMethod (used in module)
+src/lib/generators/characterGenerator.ts:31 - CharacterGenerationType (used in module)
+src/lib/generators/characterGenerator.ts:33 - CharacterGenerationOptions (used in module)
+src/lib/inventory/categories.ts:22 - CategoryMetadata (used in module)
+src/lib/inventory/categorizeInventoryItemClient.ts:6 - InventoryCategorizationResponse (used in module)
+src/lib/inventory/categorizeInventoryItemClient.ts:15 - CategorizeInventoryItemRequest (used in module)
+src/lib/promptContext/inventoryContextBuilder.ts:24 - InventoryContextOptions (used in module)
+src/lib/promptContext/inventoryContextBuilder.ts:29 - InventoryContextResult (used in module)
+src/lib/promptContext/types.ts:10 - AttributeDefinition (used in module)
+src/lib/promptContext/types.ts:19 - SkillDefinition (used in module)
+src/lib/promptContext/types.ts:39 - CharacterAttribute (used in module)
+src/lib/promptContext/types.ts:45 - CharacterSkill (used in module)
+src/lib/promptContext/types.ts:51 - InventoryItem (used in module)
+src/lib/promptTemplates/types.ts:16 - PromptVariable (used in module)
+src/lib/services/autoSaveService.ts:24 - StateProvider (used in module)
+src/lib/services/autoSaveService.ts:28 - SaveResult (used in module)
+src/lib/services/autoSaveService.ts:38 - AutoSaveOptions (used in module)
+src/lib/services/worldCreationService.ts:13 - CreateWorldFromGenerationParams (used in module)
+src/lib/services/worldCreationService.ts:23 - CreateWorldResult (used in module)
+src/lib/storage/exportService.ts:18 - GameStateExport (used in module)
+src/lib/storage/exportService.ts:28 - ExportResult (used in module)
+src/lib/storage/exportService.ts:34 - ImportResult (used in module)
+src/lib/storage/resilientStorage.ts:32 - StorageError (used in module)
+src/lib/storage/resilientStorage.ts:46 - ResilientStorageConfig (used in module)
+src/lib/templates/worldTemplates.ts:20 - AttributeTemplate (used in module)
+src/lib/templates/worldTemplates.ts:28 - SkillTemplate (used in module)
+src/lib/test-utils/index.ts:72 - mockZustandStore
+src/lib/test-utils/index.ts:95 - createMockCharacterStore
+src/lib/test-utils/index.ts:133 - createMockSessionStore
+src/lib/test-utils/index.ts:190 - createMockJournalStore
+src/lib/test-utils/index.ts:215 - createMockNarrativeStore
+src/lib/test-utils/index.ts:259 - createMockInventoryStore
+src/lib/test-utils/index.ts:293 - createMockNPCStore
+src/lib/test-utils/index.ts:323 - createMockWorldStore
+src/lib/test-utils/index.ts:363 - createMockGoalStore
+src/lib/test-utils/index.ts:403 - createMockLoreStore
+src/lib/test-utils/index.ts:35 - createMockWorld
+src/lib/test-utils/index.ts:58 - createMockWorldAttribute
+src/lib/test-utils/index.ts:75 - createMockWorldSkill
+src/lib/test-utils/index.ts:93 - createMockCharacter
+src/lib/test-utils/index.ts:135 - createMockSession
+src/lib/test-utils/index.ts:161 - createMockNarrativeSegment
+src/lib/test-utils/index.ts:184 - createMockDecision
+src/lib/test-utils/index.ts:201 - createMockPlayerChoice
+src/lib/test-utils/index.ts:213 - createMockJournalEntry
+src/lib/test-utils/index.ts:238 - createMockInventoryItem
+src/lib/utils/aiResponseParser.ts:127 - validateWithTypeGuard
+src/lib/utils/aiResponseParser.ts:10 - AIResponse (used in module)
+src/lib/utils/characterArchetypes.ts:36 - ArchetypeTemplate (used in module)
+src/lib/utils/genrePromptGuide.ts:8 - ImageContext (used in module)
+src/lib/utils/index.ts:4 - generateUniqueId
+src/lib/utils/index.ts:7 - getTimestamp
+src/lib/utils/index.ts:10 - formatAIResponse
+src/lib/utils/index.ts:11 - FormattingOptions
+src/lib/utils/index.ts:14 - cn
+src/lib/utils/index.ts:23 - formatRelativeTime
+src/lib/utils/index.ts:24 - formatDate
+src/lib/utils/index.ts:25 - formatTime
+src/lib/utils/index.ts:26 - formatDateTime
+src/lib/utils/index.ts:27 - formatNumericScore
+src/lib/utils/index.ts:28 - formatStringList
+src/lib/utils/index.ts:29 - truncate
+src/lib/utils/index.ts:30 - capitalize
+src/lib/utils/index.ts:31 - titleCase
+src/lib/utils/index.ts:36 - DateFormatOptions
+src/lib/utils/index.ts:36 - DateTimeFormatOptions
+src/lib/utils/index.ts:36 - NumberFormatOptions
+src/lib/utils/index.ts:40 - normalizeText
+src/lib/utils/index.ts:41 - normalizeTextWithDetails
+src/lib/utils/index.ts:42 - normalizeWhitespace
+src/lib/utils/index.ts:43 - normalizeLineEndings
+src/lib/utils/index.ts:44 - normalizeQuotationMarks
+src/lib/utils/index.ts:45 - normalizeSpecialCharacters
+src/lib/utils/index.ts:46 - analyzeText
+src/lib/utils/index.ts:47 - getWhitespaceStats
+src/lib/utils/index.ts:48 - NORM_NAME
+src/lib/utils/index.ts:49 - NORM_DESC
+src/lib/utils/index.ts:54 - TextNormalizationOptions
+src/lib/utils/index.ts:55 - NormalizationResult
+src/lib/utils/index.ts:56 - NormalizationChange
+src/lib/utils/index.ts:57 - NormalizationStats
+src/lib/utils/index.ts:58 - TextAnalysis
+src/lib/utils/index.ts:59 - WhitespaceStats
+src/lib/utils/index.ts:64 - isRetryableError
+src/lib/utils/index.ts:65 - getUserFriendlyError
+src/lib/utils/index.ts:67 - UserFriendlyError
+src/lib/utils/index.ts:71 - validateName
+src/lib/utils/index.ts:72 - validateText
+src/lib/utils/index.ts:73 - validatePointDistribution
+src/lib/utils/index.ts:74 - validateSelectionCount
+src/lib/utils/index.ts:75 - ValidationResult
+src/lib/utils/index.ts:79 - debounce
+src/lib/utils/index.ts:80 - DebouncedFunction
+src/lib/utils/index.ts:83 - descriptionsToSelectOptions
+src/lib/utils/index.ts:84 - SelectOptionWithDescription
+src/lib/utils/index.ts:85 - createFormUpdater
+src/lib/utils/index.ts:86 - validateToneSettings
+src/lib/utils/index.ts:91 - sanitizeForSerialization
+src/lib/utils/index.ts:92 - formatForDebug
+src/lib/utils/index.ts:101 - parseNarrativeContent
+src/lib/utils/languageComplexity.ts:53 - LanguageComplexityLevel (used in module)
+src/lib/utils/languageComplexity.ts:55 - ComplexityEvaluation (used in module)
+src/lib/utils/logger.ts:6 - LogLevel (used in module)
+src/lib/utils/logger.ts:26 - Logger (used in module)
+src/lib/utils/requirementEvaluator.ts:19 - RequirementEvaluationResult (used in module)
+src/lib/utils/requirementNormalizer.ts:13 - isDecisionItemRequirementGroup (used in module)
+src/lib/utils/requirementNormalizer.ts:28 - ensureItemRequirementGroup (used in module)
+src/lib/utils/table-utils.ts:65 - getTotalPages
+src/lib/utils/table-utils.ts:116 - getPageRange
+src/lib/utils/table-utils.ts:5 - SortDirection (used in module)
+src/lib/utils/wizardValidation.ts:3 - ValidationRule (used in module)
+src/lib/utils/wizardValidation.ts:9 - FieldValidationRules (used in module)
+src/lib/utils/wizardValidation.ts:13 - WizardStepValidatorConfig (used in module)
+src/lib/utils/wizardValidation.ts:155 - WizardStepValidatorBuilder (used in module)
+src/state/__mocks__/characterStore.ts:50 - characterStore (used in module)
+src/state/__mocks__/characterStore.ts:51 - useCharacterStore
+src/state/__mocks__/narrativeStore.ts:58 - narrativeStore (used in module)
+src/state/__mocks__/narrativeStore.ts:59 - useNarrativeStore
+src/state/__mocks__/sessionStore.ts:2 - useSessionStore
+src/state/__mocks__/sessionStore.ts:36 - default
+src/state/__mocks__/worldStore.ts:476 - worldStore (used in module)
+src/state/__mocks__/worldStore.ts:517 - useWorldStore
+src/state/__tests__/loreStore.testHelpers.ts:26 - addFact (used in module)
+src/state/__tests__/loreStore.testHelpers.ts:42 - addMultipleFacts
+src/state/__tests__/loreStore.testHelpers.ts:62 - createCharacterFacts
+src/state/__tests__/loreStore.testHelpers.ts:72 - createLocationFacts
+src/state/__tests__/loreStore.testHelpers.ts:82 - createRuleFacts
+src/state/__tests__/navigationStore.testHelpers.ts:25 - createMockStorage (used in module)
+src/stories/00-foundation/DesignSystemShowcase.stories.tsx:29 - default
+src/stories/00-foundation/DesignSystemShowcase.stories.tsx:47 - CompleteShowcase
+src/stories/00-foundation/DesignSystemShowcase.stories.tsx:449 - ComponentMatrix
+src/stories/00-foundation/DesignTokens.stories.tsx:12 - default (used in module)
+src/stories/00-foundation/DesignTokens.stories.tsx:43 - PrimitiveTokens
+src/stories/00-foundation/DesignTokens.stories.tsx:63 - SemanticTokens
+src/stories/00-foundation/DesignTokens.stories.tsx:117 - ContextualTokens
+src/stories/00-foundation/DesignTokens.stories.tsx:168 - TokenUsageExamples
+tests/visual/utils/mockApi.ts:169 - mockNarrativeResponse
+tests/visual/utils/mockApi.ts:193 - mockApiError
+tests/visual/utils/playwright-fixtures.ts:30 - test (used in module)
+tests/visual/utils/playwright-fixtures.ts:50 - expect
+tests/visual/utils/wait-helpers.ts:170 - takeStableScreenshot
+.next/types/app/characters/page.ts:54 - PageProps (used in module)
+.next/types/app/characters/page.ts:58 - LayoutProps
+src/app/api/debug/route.ts:3 - GET
+src/app/api/generate-character/route.ts:7 - POST
+src/app/api/generate-ending-image/route.ts:102 - POST
+src/app/api/generate-portrait/route.ts:82 - POST
+src/app/api/generate-world/route.ts:15 - POST
+src/app/characters/create/page.tsx:15 - default
+src/app/dev/attribute-editor/page.tsx:9 - default
+src/app/dev/character-creation/page.tsx:70 - default
+src/app/dev/character-editing/page.tsx:9 - default
+src/app/dev/character-generation/page.tsx:8 - default
+src/app/dev/choice-alignment/page.tsx:13 - default
+src/app/dev/ending-screen/page.tsx:187 - default
+src/app/dev/ending-system/page.tsx:11 - default
+src/app/dev/game-session/page.tsx:210 - default
+src/app/dev/game-session-components/page.tsx:9 - default
+src/app/dev/guided-first-time-experience/page.tsx:7 - default
+src/app/dev/journal-access/page.tsx:23 - default
+src/app/dev/lore-viewer/page.tsx:11 - default
+src/app/dev/narrative-system/page.tsx:60 - default
+src/app/dev/navigation-flow/page.tsx:13 - default
+src/app/dev/skill-editor/page.tsx:74 - default
+src/app/dev/smart-templates/page.tsx:10 - default
+src/app/dev/template-selector/page.tsx:8 - default
+src/app/dev/test-world-generation/page.tsx:7 - default
+src/app/dev/world-creation-wizard/page.tsx:7 - default
+src/app/dev/world-generation/page.tsx:9 - default
+src/app/dev/world-list-screen/page.tsx:5 - default
+src/app/worlds/[id]/page.tsx:15 - default
+src/app/worlds/create/page.tsx:7 - default
+src/components/CharacterCreationWizard/utils/skillAllocation.ts:20 - SkillPointPool (used in module)
+src/components/CharacterCreationWizard/utils/skillAllocation.ts:26 - SkillBounds (used in module)
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:59 - default
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:65 - LiveMode
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:87 - MockModeWithScenarios
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:116 - CustomResponseConfiguration
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:148 - ErrorSimulationSetup
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:178 - MixedSuccessFailure
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:207 - PersistentSettings
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:240 - CompactLayout
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:280 - InteractiveWorkflow
+src/components/devtools/AIMockingSection/AIMockingSection.stories.tsx:310 - DevToolsIntegration
+src/components/devtools/AIMockingSection/index.ts:3 - AIMockingSection
+src/components/devtools/AIMockingSection/index.ts:4 - MockScenario
+src/components/devtools/AIMockingSection/index.ts:5 - MockConfiguration
+src/components/devtools/AITestingPanel/index.ts:1 - AITestingPanel
+src/components/devtools/ConsistencyValidationSection/index.ts:1 - ConsistencyValidationSection
+src/components/devtools/DevToolsContext/index.ts:52 - DevToolsContext
+src/components/devtools/DevToolsContext/index.ts:69 - DevToolsProvider
+src/components/devtools/DevToolsContext/index.ts:150 - useDevTools
+src/components/devtools/DevToolsPanel/index.ts:71 - DevToolsPanel
+src/components/devtools/EndingImageDebugSection/index.ts:1 - EndingImageDebugSection
+src/components/devtools/ErrorBoundary/index.ts:1 - ErrorBoundary
+src/components/devtools/ErrorSection/index.ts:1 - ErrorSection
+src/components/devtools/JsonViewer/index.ts:25 - JsonViewer
+src/components/devtools/LoreManagementSection/index.ts:1 - LoreManagementSection
+src/components/devtools/PortraitDebugSection/index.ts:3 - PortraitDebugSection
+src/components/devtools/RelevanceDebuggerSection/index.ts:21 - RelevanceDebuggerSection
+src/components/devtools/RelevanceDebuggerSection/RelevanceDebuggerSection.stories.tsx:18 - default
+src/components/devtools/RelevanceDebuggerSection/RelevanceDebuggerSection.stories.tsx:138 - Default
+src/components/devtools/SectionVisibilityControls/index.ts:1 - SectionVisibilityControls
+src/components/devtools/StateSection/index.ts:34 - StateSection
+src/components/devtools/TestDataGeneratorSection/index.ts:1 - TestDataGeneratorSection
+src/components/devtools/TextNormalizationSection/index.ts:6 - TextNormalizationSection
+src/components/devtools/TextNormalizationSection/index.ts:6 - TextNormalizationSectionProps
+src/components/devtools/TextNormalizationSection/index.ts:7 - default
+src/components/GameSession/__tests__/SessionBoundaryLogging.testHelpers.tsx:8 - mockUseSessionStore (used in module)
+src/components/GameSession/__tests__/SessionBoundaryLogging.testHelpers.tsx:14 - createMockSessionStore (used in module)
+src/components/GameSession/__tests__/SessionBoundaryLogging.testHelpers.tsx:57 - createMockJournalStore (used in module)
+src/components/GameSession/__tests__/SessionBoundaryLogging.testHelpers.tsx:95 - createTestSession
+src/components/GameStartWizard/steps/CharacterSelectionStep.tsx:9 - CharacterSelectionStepProps (used in module)
+src/components/GameStartWizard/steps/GameReadyStep.tsx:8 - GameReadyStepProps (used in module)
+src/components/GameStartWizard/steps/WorldSelectionStep.tsx:8 - WorldSelectionStepProps (used in module)
+src/components/shared/cards/ActiveStateCard.tsx:111 - default
+src/components/shared/cards/ActiveStateIndicator.tsx:42 - default
+src/components/shared/cards/CardActionGroup.tsx:159 - default
+src/components/shared/cards/index.ts:2 - ActiveStateCard
+src/components/shared/cards/index.ts:3 - ActiveStateCardProps
+src/components/shared/cards/index.ts:5 - ActiveStateIndicator
+src/components/shared/cards/index.ts:6 - ActiveStateIndicatorProps
+src/components/shared/cards/index.ts:8 - CardActionGroup
+src/components/shared/cards/index.ts:9 - CardActionGroupProps
+src/components/shared/cards/index.ts:9 - CardAction
+src/components/shared/ChoiceSelector/index.ts:1 - ChoiceSelector
+src/components/shared/ChoiceSelector/index.ts:2 - SimpleChoice
+src/components/shared/ChoiceSelector/optionNormalizer.ts:14 - NormalizedOption (used in module)
+src/components/shared/DataField/index.ts:1 - DataField
+src/components/shared/forms/index.ts:10 - TextField
+src/components/shared/forms/index.ts:11 - TextArea
+src/components/shared/forms/index.ts:12 - Select
+src/components/shared/forms/index.ts:13 - FormGroup
+src/components/shared/forms/index.ts:14 - FormSection
+src/components/shared/forms/index.ts:15 - FormError
+src/components/shared/forms/index.ts:22 - FormFieldProps
+src/components/shared/forms/index.ts:38 - validators (used in module)
+src/components/shared/forms/index.ts:16 - WizardFormGroup
+src/components/shared/forms/index.ts:54 - WizardTextField
+src/components/shared/forms/index.ts:93 - WizardTextArea
+src/components/shared/forms/index.ts:130 - WizardSelect
+src/components/shared/forms/index.ts:165 - WizardFieldError
+src/components/shared/forms/index.ts:179 - WizardFormSection
+src/components/shared/PointPoolManager/index.ts:1 - PointPoolManager
+src/components/shared/PointPoolManager/index.ts:2 - PointPoolConfig
+src/components/shared/PointPoolManager/index.ts:2 - PointAllocation
+src/components/shared/PointPoolManager/index.ts:2 - PointPoolManagerProps
+src/components/shared/RecentTemplates/index.ts:1 - RecentTemplates
+src/components/shared/TabNavigation/index.ts:3 - TabNavigation
+src/components/shared/TabNavigation/index.ts:4 - TabOption
+src/components/shared/wizard/index.ts:2 - WizardContainer
+src/components/shared/wizard/index.ts:3 - WizardProgress
+src/components/shared/wizard/index.ts:4 - WizardNavigation
+src/components/shared/wizard/index.ts:5 - WizardStep
+src/components/shared/wizard/index.ts:6 - wizardStyles
+src/components/shared/wizard/index.ts:10 - WizardFormGroup
+src/components/shared/wizard/index.ts:11 - WizardTextField
+src/components/shared/wizard/index.ts:12 - WizardTextArea
+src/components/shared/wizard/index.ts:13 - WizardSelect
+src/components/shared/wizard/index.ts:14 - WizardFieldError
+src/components/shared/wizard/index.ts:15 - WizardFormSection
+src/components/shared/wizard/index.ts:19 - ToggleButton
+src/components/shared/wizard/index.ts:20 - ToggleButtonProps
+src/components/shared/wizard/index.ts:25 - useWizardState
+src/components/shared/wizard/index.ts:8 - BaseWizardStepProps
+src/components/shared/wizard/index.ts:38 - ValidatedWizardStepProps
+src/components/shared/wizard/index.ts:59 - AutoSaveWizardStepProps
+src/components/shared/wizard/index.ts:69 - AIWizardStepProps
+src/components/shared/wizard/index.ts:94 - WizardStepMeta
+src/components/shared/wizard/index.ts:104 - StepValidationResult
+src/components/shared/wizard/index.ts:113 - WizardStepComponent
+src/components/shared/wizard/index.ts:118 - ValidatedWizardStepComponent
+src/components/shared/wizard/index.ts:70 - validateField
+src/components/shared/wizard/index.ts:82 - validateFields
+src/components/shared/wizard/index.ts:102 - createValidationResult
+src/components/shared/wizard/index.ts:1 - ValidationResult
+src/components/shared/wizard/index.ts:6 - FieldValidation
+src/components/shared/wizard/index.ts:15 - validators
+src/components/shared/wizard/index.ts:111 - patterns
+src/components/shared/WorldFormFields/index.ts:2 - WorldNameInput
+src/components/shared/WorldFormFields/index.ts:3 - GenreSelect
+src/components/shared/WorldFormFields/index.ts:4 - DescriptionTextArea
+src/components/shared/WorldFormFields/index.ts:5 - LoadingState
+src/components/shared/WorldFormFields/index.ts:6 - ErrorDisplay
+src/components/shared/WorldFormFields/index.ts:7 - WorldFormFields
+src/components/shared/WorldFormFields/index.ts:11 - WorldNameInputProps
+src/components/shared/WorldFormFields/index.ts:12 - GenreSelectProps
+src/components/shared/WorldFormFields/index.ts:13 - DescriptionTextAreaProps
+src/components/shared/WorldFormFields/index.ts:14 - LoadingStateProps
+src/components/shared/WorldFormFields/index.ts:15 - ErrorDisplayProps
+src/components/shared/WorldTypeSelector/index.ts:1 - WorldTypeSelector
+src/components/shared/WorldTypeSelector/index.ts:1 - WORLD_TYPE_OPTIONS
+src/components/shared/WorldTypeSelector/index.ts:2 - validateWorldTypeData
+src/components/shared/WorldTypeSelector/index.ts:2 - convertToGenerationParams
+src/components/shared/WorldTypeSelector/index.ts:2 - createInitialWorldTypeData
+src/components/shared/WorldTypeSelector/index.ts:2 - isWorldTypeDataValid
+src/components/shared/WorldTypeSelector/index.ts:3 - WorldType
+src/components/shared/WorldTypeSelector/index.ts:3 - WorldTypeData
+src/components/shared/WorldTypeSelector/index.ts:3 - WorldTypeOption
+src/components/shared/WorldTypeSelector/index.ts:3 - WorldGenerationParams
+src/components/shared/WorldTypeSelector/utils.ts:33 - ExtendedWorldGenerationParams (used in module)
+src/components/shared/WorldTypeSelector/WorldTypeSelector.tsx:10 - WorldTypeSelectorProps (used in module)
+src/components/shared/WorldTypeSelector/WorldTypeSelector.tsx:198 - WorldTypeOption (used in module)
+src/components/shared/WorldTypeSelector/WorldTypeSelector.tsx:198 - WorldTypeData (used in module)
+src/components/ui/EmptyState/EmptyState.tsx:4 - EmptyStateProps (used in module)
+src/components/ui/ErrorDisplay/index.ts:2 - ErrorDisplay
+src/components/ui/ErrorDisplay/index.ts:3 - InlineError
+src/components/ui/ErrorDisplay/index.ts:4 - SectionError
+src/components/ui/ErrorDisplay/index.ts:5 - PageError
+src/components/ui/ErrorDisplay/index.ts:6 - ToastError
+src/components/ui/ErrorDisplay/index.ts:7 - ErrorVariant
+src/components/ui/ErrorDisplay/index.ts:8 - ErrorSeverity
+src/components/ui/FloatingActionButton/FloatingActionButton.tsx:7 - FloatingActionButtonProps (used in module)
+src/components/ui/LoadingState/index.ts:2 - LoadingState
+src/components/ui/LoadingState/index.ts:3 - LoadingSkeleton
+src/components/ui/LoadingState/index.ts:4 - LoadingPulse
+src/components/ui/LoadingState/index.ts:5 - LoadingVariant
+src/components/ui/LoadingState/index.ts:6 - LoadingSize
+src/components/ui/LoadingState/LoadingState.tsx:6 - LoadingTheme (used in module)
+src/components/ui/RangeSlider/index.ts:1 - default
+src/components/ui/RangeSlider/index.ts:6 - LevelDescription
+src/components/ui/RangeSlider/index.ts:15 - RangeSliderProps
+src/components/ui/SaveIndicator/index.ts:1 - SaveIndicator
+src/components/ui/SaveIndicator/index.ts:2 - SaveIndicatorProps
+src/components/ui/StatusBadge/index.ts:1 - default
+src/components/ui/StatusBadge/index.ts:4 - StatusBadgeProps
+src/components/ui/toast/index.ts:57 - Toast
+src/components/ui/toast/index.ts:58 - Toaster
+src/components/ui/toast/index.ts:58 - ToastProvider
+src/components/ui/toast/index.ts:58 - useToast
+src/components/ui/toast/index.ts:61 - ToastProps
+src/components/ui/toast/index.ts:62 - ToastData
+src/components/ui/toast/index.ts:62 - ToasterProps
+src/components/world/AttributeEditor/index.ts:1 - AttributeEditor
+src/components/world/AttributeEditor/index.ts:2 - AttributeEditorProps
+src/components/world/SkillEditor/index.ts:1 - SkillEditor
+src/components/world/SkillEditor/index.ts:2 - SkillEditorProps
+src/components/world/SmartTemplates/index.ts:3 - SmartTemplates
+src/components/world/SmartTemplates/index.ts:4 - TemplatePreview
+src/components/world/TemplateSelector/index.tsx:3 - default
+src/components/world/TemplateSelector/index.tsx:4 - TemplateSelectorProps
+src/components/WorldCreationWizard/steps/QuickStartStep.tsx:15 - QuickStartStepProps (used in module)
+src/lib/ai/__mocks__/config.ts:3 - getAIConfig
+src/lib/ai/__mocks__/config.ts:10 - getGenerationConfig
+src/lib/ai/__mocks__/config.ts:11 - getSafetySettings
+src/lib/ai/__mocks__/geminiClient.image.ts:10 - MockGeminiImageClient
+src/lib/ai/__mocks__/geminiClient.ts:3 - GeminiClient
+src/lib/ai/__mocks__/mockScenarios.ts:36 - PREDEFINED_SCENARIOS (used in module)
+src/lib/ai/__mocks__/mockUtils.ts:25 - createMockError (used in module)
+src/lib/ai/__mocks__/mockUtils.ts:34 - mockResponses
+src/lib/ai/__mocks__/mockUtils.ts:46 - mockErrors
+src/lib/ai/__mocks__/worldImageGenerator.ts:17 - WorldImageGenerator
+src/lib/ai/__tests__/decisionFormatter.testHelpers.ts:8 - TestDecisionInput (used in module)
+src/lib/ai/__tests__/decisionFormatter.testHelpers.ts:19 - TestScoreInput (used in module)
+src/lib/ai/__tests__/endingGenerator.testHelpers.ts:140 - createMockEndingResponse
+src/lib/ai/__tests__/narrativeGenerator.decisionConsequences.testHelpers.ts:20 - cleanupTestTimers
+src/lib/ai/__tests__/narrativeGenerator.decisionConsequences.testHelpers.ts:24 - mockWorld (used in module)
+src/lib/ai/__tests__/narrativeGenerator.decisionConsequences.testHelpers.ts:41 - mockCharacter (used in module)
+src/lib/ai/__tests__/narrativeGenerator.skill.testHelpers.ts:124 - mockWorld
+src/lib/ai/__tests__/narrativeGenerator.skill.testHelpers.ts:125 - mockCharacter
+src/lib/design-tokens/tokens/components.ts:127 - ComponentTokens
+src/lib/design-tokens/tokens/contextual.ts:57 - EndingTones
+src/lib/design-tokens/tokens/contextual.ts:58 - LoreCategories
+src/lib/design-tokens/tokens/primitives.ts:52 - PrimitiveColor
+src/lib/design-tokens/tokens/semantic.ts:207 - SemanticColors
+src/lib/design-tokens/tokens/semantic.ts:208 - SemanticColorsDark
+src/lib/promptContext/__tests__/test-helpers.ts:3 - createMockWorld
+src/lib/promptContext/__tests__/test-helpers.ts:17 - createMockCharacter
+src/lib/promptTemplates/examples/index.ts:11 - PromptCategory
+src/lib/promptTemplates/examples/index.ts:25 - ExamplePriority
+src/lib/promptTemplates/examples/index.ts:30 - PromptExample
+src/lib/promptTemplates/examples/index.ts:59 - ExampleSelectionOptions
+src/lib/promptTemplates/examples/index.ts:79 - ExampleSelectionResult
+src/lib/promptTemplates/examples/index.ts:96 - ExampleLibraryConfig
+src/lib/promptTemplates/examples/index.ts:43 - ExampleManager
+src/lib/promptTemplates/examples/index.ts:304 - exampleManager
+src/lib/promptTemplates/examples/index.ts:210 - getExamplesByCategory
+src/lib/promptTemplates/examples/index.ts:221 - getExamplesByTags
+src/lib/promptTemplates/examples/index.ts:14 - emphasisExamples
+src/lib/promptTemplates/examples/index.ts:41 - perspectiveExamples
+src/lib/promptTemplates/examples/index.ts:74 - skillAcknowledgmentExamples
+src/lib/promptTemplates/examples/index.ts:107 - choiceExamples
+src/lib/promptTemplates/examples/index.ts:153 - npcMetadataExamples
+src/lib/promptTemplates/examples/index.ts:182 - sensoryExamples
+src/lib/promptTemplates/examples/index.ts:198 - allExamples
+src/lib/promptTemplates/examples/index.ts:16 - initializeExampleLibrary
+src/lib/promptTemplates/examples/index.ts:32 - getExamplesForPrompt
+src/lib/promptTemplates/examples/index.ts:55 - getExamplesWithManager
+src/lib/promptTemplates/examples/index.ts:82 - shouldIncludeExamples
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:6 - MockRequest (used in module)
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:12 - MockStore (used in module)
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:18 - MockTransaction (used in module)
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:24 - MockDB (used in module)
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:53 - createMockTransaction (used in module)
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:91 - setupFailedOpen
+src/lib/storage/__tests__/indexedDBAdapter.testHelpers.ts:125 - triggerError
+src/lib/utils/__mocks__/logger.ts:11 - logger
+src/lib/utils/__mocks__/logger.ts:13 - Logger
+src/lib/utils/__mocks__/logger.ts:39 - default
+src/state/__tests__/integration/narrativeStore.playerDecisionTracker.testHelpers.ts:12 - cleanupTestTimers
+src/stories/01-atoms/buttons/Button.stories.tsx:52 - default
+src/stories/01-atoms/buttons/Button.stories.tsx:55 - Default
+src/stories/01-atoms/buttons/Button.stories.tsx:61 - Variants
+src/stories/01-atoms/buttons/Button.stories.tsx:75 - Sizes
+src/stories/01-atoms/buttons/Button.stories.tsx:86 - States
+src/stories/01-atoms/buttons/Button.stories.tsx:95 - WithIcons
+src/stories/01-atoms/buttons/FloatingActionButton.stories.tsx:50 - default
+src/stories/01-atoms/buttons/FloatingActionButton.stories.tsx:89 - JournalButton
+src/stories/01-atoms/buttons/FloatingActionButton.stories.tsx:106 - AddButton
+src/stories/01-atoms/buttons/FloatingActionButton.stories.tsx:123 - Positions
+src/stories/01-atoms/buttons/FloatingActionButton.stories.tsx:148 - Sizes
+src/stories/01-atoms/display/Badge.stories.tsx:24 - default
+src/stories/01-atoms/display/Badge.stories.tsx:27 - Default
+src/stories/01-atoms/display/Badge.stories.tsx:33 - Variants
+src/stories/01-atoms/display/Badge.stories.tsx:47 - Sizes
+src/stories/01-atoms/display/Badge.stories.tsx:57 - WithCounts
+src/stories/01-atoms/display/Badge.stories.tsx:68 - SkillRequirements
+src/stories/01-atoms/display/Badge.stories.tsx:78 - EntityTypes
+src/stories/01-atoms/display/Logo.stories.tsx:17 - default
+src/stories/01-atoms/display/Logo.stories.tsx:19 - Default
+src/stories/01-atoms/display/Logo.stories.tsx:23 - Sizes
+src/stories/01-atoms/display/Logo.stories.tsx:51 - IconOnly
+src/stories/01-atoms/display/Logo.stories.tsx:79 - TextOnly
+src/stories/01-atoms/display/Logo.stories.tsx:111 - Usage
+src/stories/01-atoms/display/Logo.stories.tsx:151 - OnDarkBackground
+src/stories/01-atoms/display/Typography.stories.tsx:16 - default
+src/stories/01-atoms/display/Typography.stories.tsx:18 - Default
+src/stories/01-atoms/display/Typography.stories.tsx:22 - Headings
+src/stories/01-atoms/display/Typography.stories.tsx:38 - BodyText
+src/stories/01-atoms/display/Typography.stories.tsx:69 - Links
+src/stories/01-atoms/display/Typography.stories.tsx:93 - Colors
+src/stories/01-atoms/display/Typography.stories.tsx:122 - NarraitorLogo
+src/stories/01-atoms/feedback/EmptyState.stories.tsx:44 - default
+src/stories/01-atoms/feedback/EmptyState.stories.tsx:66 - JournalEmpty
+src/stories/01-atoms/feedback/EmptyState.stories.tsx:82 - WithAction
+src/stories/01-atoms/feedback/EmptyState.stories.tsx:100 - Compact
+src/stories/01-atoms/feedback/EmptyState.stories.tsx:115 - TitleOnly
+src/stories/01-atoms/feedback/ErrorDisplay.stories.tsx:51 - default
+src/stories/01-atoms/feedback/ErrorDisplay.stories.tsx:55 - AllVariants
+src/stories/01-atoms/feedback/ErrorDisplay.stories.tsx:124 - FormValidation
+src/stories/01-atoms/feedback/ErrorDisplay.stories.tsx:166 - Playground
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:46 - default
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:49 - Idle
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:56 - Saving
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:63 - Saved
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:71 - SavedWithTimestamp
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:79 - Error
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:89 - WithManualSave
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:98 - ManualSaveWhileSaving
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:106 - LongErrorMessage
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:117 - CompactMode
+src/stories/01-atoms/feedback/SaveIndicator.stories.tsx:127 - NonRetryableError
+src/stories/02-molecules/character-display/CharacterAttributeDisplay.stories.tsx:24 - default
+src/stories/02-molecules/character-display/CharacterAttributeDisplay.stories.tsx:75 - Default
+src/stories/02-molecules/character-display/CharacterAttributeDisplay.stories.tsx:82 - WithCategories
+src/stories/02-molecules/character-display/CharacterAttributeDisplay.stories.tsx:89 - ModifiedValues
+src/stories/02-molecules/character-display/CharacterBackgroundDisplay.stories.tsx:18 - default
+src/stories/02-molecules/character-display/CharacterBackgroundDisplay.stories.tsx:41 - Complete
+src/stories/02-molecules/character-display/CharacterBackgroundDisplay.stories.tsx:47 - WithoutPhysicalDescription
+src/stories/02-molecules/character-display/CharacterBackgroundDisplay.stories.tsx:53 - DetailedCharacter
+src/stories/02-molecules/character-display/CharacterSkillDisplay.stories.tsx:24 - default
+src/stories/02-molecules/character-display/CharacterSkillDisplay.stories.tsx:78 - Default
+src/stories/02-molecules/character-display/CharacterSkillDisplay.stories.tsx:85 - WithCategories
+src/stories/02-molecules/character-display/CharacterSkillDisplay.stories.tsx:92 - VariedLevels
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:28 - default
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:32 - Default
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:47 - EmptyContent
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:53 - WithCustomStyling
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:63 - LongText
+src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx:77 - WithHighlights
+src/stories/02-molecules/ui-components/DataTable.stories.tsx:79 - default
+src/stories/02-molecules/ui-components/DataTable.stories.tsx:85 - Default
+src/stories/02-molecules/ui-components/DataTable.stories.tsx:96 - WithSearchAndPagination
+src/stories/02-molecules/ui-components/DataTable.stories.tsx:115 - LargeDataset
+src/stories/02-molecules/world-forms/WorldAttributesForm.stories.tsx:46 - default
+src/stories/02-molecules/world-forms/WorldAttributesForm.stories.tsx:49 - Default
+src/stories/02-molecules/world-forms/WorldAttributesForm.stories.tsx:57 - Empty
+src/stories/02-molecules/world-forms/WorldAttributesForm.stories.tsx:65 - CompleteExample
+src/stories/02-molecules/world-forms/WorldAttributesForm.stories.tsx:96 - LimitReached
+src/stories/02-molecules/world-forms/WorldBasicInfoForm.stories.tsx:39 - default
+src/stories/02-molecules/world-forms/WorldBasicInfoForm.stories.tsx:42 - Default
+src/stories/02-molecules/world-forms/WorldBasicInfoForm.stories.tsx:49 - LongDescription
+src/stories/02-molecules/world-forms/WorldSettingsForm.stories.tsx:29 - default
+src/stories/02-molecules/world-forms/WorldSettingsForm.stories.tsx:32 - Default
+src/stories/02-molecules/world-forms/WorldSettingsForm.stories.tsx:38 - MinimalSettings
+src/stories/02-molecules/world-forms/WorldSettingsForm.stories.tsx:49 - HighLimits
+src/stories/02-molecules/world-forms/WorldSettingsForm.stories.tsx:60 - BalancedSettings
+src/stories/02-molecules/world-forms/WorldSkillsForm.stories.tsx:71 - default
+src/stories/02-molecules/world-forms/WorldSkillsForm.stories.tsx:74 - Default
+src/stories/02-molecules/world-forms/WorldSkillsForm.stories.tsx:82 - Empty
+src/stories/03-organisms/dialogs/ConfirmationDialog.stories.tsx:35 - default
+src/stories/03-organisms/dialogs/ConfirmationDialog.stories.tsx:38 - DeleteCharacter
+src/stories/03-organisms/dialogs/ConfirmationDialog.stories.tsx:49 - DeleteWorld
+src/stories/03-organisms/dialogs/ConfirmationDialog.stories.tsx:60 - EndSession
+src/stories/03-organisms/dialogs/StoryEndingDialog.stories.tsx:31 - default
+src/stories/03-organisms/dialogs/StoryEndingDialog.stories.tsx:34 - Triumphant
+src/stories/03-organisms/dialogs/StoryEndingDialog.stories.tsx:46 - Tragic
+src/stories/03-organisms/editor-components/SkillEditor.stories.tsx:102 - default
+src/stories/03-organisms/editor-components/SkillEditor.stories.tsx:105 - CreateMode
+src/stories/03-organisms/editor-components/SkillEditor.stories.tsx:111 - EditMode
+src/stories/03-organisms/editor-components/SkillEditor.stories.tsx:119 - EditComplexSkill
+src/stories/03-organisms/journal/JournalFloatingButton.stories.tsx:28 - default
+src/stories/03-organisms/journal/JournalFloatingButton.stories.tsx:31 - Default
+src/stories/03-organisms/journal/JournalFloatingButton.stories.tsx:42 - CustomPosition
+src/stories/03-organisms/journal/JournalFloatingButton.stories.tsx:55 - Interactive
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:155 - default
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:166 - SessionStartOnly
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:198 - SessionEndOnly
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:229 - CompleteSessionWithNarrative
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:271 - MultipleSessionBoundaries
+src/stories/03-organisms/journal/JournalModal.sessionBoundary.stories.tsx:321 - SessionBoundaryAccessibility
+src/stories/03-organisms/journal/JournalModal.stories.tsx:34 - default
+src/stories/03-organisms/journal/JournalModal.stories.tsx:133 - Default
+src/stories/03-organisms/journal/JournalModal.stories.tsx:141 - EmptyJournal
+src/stories/03-organisms/journal/JournalModal.stories.tsx:149 - SingleEntry
+src/stories/03-organisms/journal/JournalModal.stories.tsx:157 - ManyEntries
+src/stories/03-organisms/navigation/MobileNavigationMenu.stories.tsx:78 - default
+src/stories/03-organisms/navigation/MobileNavigationMenu.stories.tsx:240 - Open
+src/stories/03-organisms/navigation/MobileNavigationMenu.stories.tsx:255 - WithWorlds
+src/stories/03-organisms/navigation/MobileNavigationMenu.stories.tsx:277 - WithActiveWorld
+src/stories/03-organisms/navigation/Navigation.stories.tsx:66 - default
+src/stories/03-organisms/navigation/Navigation.stories.tsx:228 - NoWorlds
+src/stories/03-organisms/navigation/Navigation.stories.tsx:238 - WithWorlds
+src/stories/03-organisms/navigation/Navigation.stories.tsx:255 - WithActiveWorld
+src/stories/03-organisms/navigation/Navigation.stories.tsx:273 - WorldSwitcherOpen
+src/stories/03-organisms/navigation/Navigation.stories.tsx:301 - MobileView
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:44 - default
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:97 - Default
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:136 - EmptyState
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:154 - DisabledInPreferences
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:181 - LongTitlesAndPaths
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:215 - ManyRecentPages
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:240 - VariousTimestamps
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:289 - PagesWithoutTitles
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:324 - CustomStyling
+src/stories/03-organisms/navigation/RecentPagesDropdown.stories.tsx:355 - InteractiveDemo
+src/stories/04-templates/layouts/PageLayout.stories.tsx:47 - default
+src/stories/04-templates/layouts/PageLayout.stories.tsx:78 - Default
+src/stories/04-templates/layouts/PageLayout.stories.tsx:87 - NoActions
+src/stories/04-templates/layouts/PageLayout.stories.tsx:95 - NoDescription
+src/stories/04-templates/layouts/PageLayout.stories.tsx:103 - MinimalPage
+src/stories/04-templates/layouts/PageLayout.stories.tsx:115 - WorldsPageExample
+src/stories/04-templates/layouts/PageLayout.stories.tsx:158 - CharactersPageExample
+src/stories/04-templates/layouts/PageLayout.stories.tsx:213 - ConsistentWidth
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:96 - default
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:99 - Default
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:114 - Loading
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:123 - EmptyState
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:132 - WithError
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:151 - SingleWorld
+src/stories/04-templates/layouts/WorldListScreen.stories.tsx:164 - ManyWorlds
+src/stories/05-pages/game-session/ActiveGameSession.stories.tsx:91 - default
+src/stories/05-pages/game-session/ActiveGameSession.stories.tsx:289 - ActiveGameplay
+src/stories/05-pages/game-session/ActiveGameSession.stories.tsx:325 - NoChoicesAvailable
+src/stories/05-pages/game-session/ActiveGameSession.stories.tsx:363 - MajorDecision
+src/stories/05-pages/game-session/EndingScreen.stories.tsx:25 - default
+src/stories/05-pages/game-session/EndingScreen.stories.tsx:188 - Triumphant
+src/stories/05-pages/game-session/EndingScreen.stories.tsx:203 - Mysterious
+src/stories/05-pages/game-session/EndingScreen.stories.tsx:235 - Tragic
+src/stories/05-pages/game-session/EndingScreen.stories.tsx:267 - Hopeful
+src/stories/05-pages/game-session/GameSessionError.stories.tsx:16 - default
+src/stories/05-pages/game-session/GameSessionError.stories.tsx:19 - Default
+src/stories/05-pages/game-session/GameSessionError.stories.tsx:25 - WithDismissOption
+src/stories/05-pages/game-session/GameSessionLoading.stories.tsx:12 - default
+src/stories/05-pages/game-session/GameSessionLoading.stories.tsx:15 - Default
+src/stories/05-pages/game-session/GameSessionLoading.stories.tsx:19 - WithCustomMessage
+src/stories/05-pages/standalone/QuickPlay.stories.tsx:25 - default
+src/stories/05-pages/standalone/QuickPlay.stories.tsx:28 - NoSavedSessions
+src/stories/05-pages/standalone/QuickPlay.stories.tsx:33 - WithSavedSession
+src/stories/05-pages/standalone/SettingsPage.stories.tsx:18 - default
+src/stories/05-pages/standalone/SettingsPage.stories.tsx:21 - Default
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:20 - default
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:89 - Default
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:101 - Loading
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:113 - Empty
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:125 - Error
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:138 - AttributesOnly
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:150 - SkillsOnly
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:162 - AllAccepted
+src/stories/06-patterns/ai-integration/AISuggestions.stories.tsx:174 - Interactive
+src/stories/06-patterns/ai-integration/SmartTemplates.stories.tsx:274 - default
+src/stories/06-patterns/ai-integration/SmartTemplates.stories.tsx:277 - Interactive
+src/stories/06-patterns/ai-integration/SmartTemplates.stories.tsx:291 - WithTemplateHistory
+src/stories/06-patterns/ai-integration/SmartTemplates.stories.tsx:327 - PreviewScreen
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:37 - default
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:64 - SmartTemplatesExample
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:83 - DisabledStates
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:102 - MobileWrap
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:125 - MobileScroll
+src/stories/06-patterns/navigation/TabNavigation.stories.tsx:150 - OverflowHandling
+src/stories/06-patterns/ui-patterns/ButtonSizes.stories.tsx:19 - default
+src/stories/06-patterns/ui-patterns/ButtonSizes.stories.tsx:22 - ButtonSizeComparison
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:71 - default
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:75 - WorldDetailPageButtons
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:110 - CharacterPageButtons
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:142 - DestructiveActionPattern
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:167 - IncorrectHardcodedColors
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:202 - IncorrectButtonOrdering
+src/stories/06-patterns/ui-patterns/ButtonStyling.stories.tsx:276 - QuickReference
+src/stories/06-patterns/ui-patterns/GuidedFirstTimeExperience.stories.tsx:195 - default
+src/stories/06-patterns/ui-patterns/GuidedFirstTimeExperience.stories.tsx:198 - Default
+src/stories/06-patterns/ui-patterns/GuidedFirstTimeExperience.stories.tsx:200 - WelcomeStep
+src/stories/06-patterns/ui-patterns/GuidedFirstTimeExperience.stories.tsx:204 - ConceptStep
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:47 - default
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:73 - Default (used in module)
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:83 - Small
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:91 - Large
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:99 - HorizontalLayout
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:107 - WithoutLabels
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:115 - Disabled
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:149 - InspiredByExample
+src/stories/06-patterns/ui-patterns/WorldTypeSelector.stories.tsx:185 - SetWithinExample
+src/app/api/ai/analyze-world/route.ts:11 - POST
+src/app/api/ai/generate-template/route.ts:17 - POST
+src/app/api/inventory/categorize/route.ts:14 - POST
+src/app/api/narrative/choices/route.ts:6 - POST
+src/app/api/narrative/ending/route.ts:8 - POST
+src/app/api/narrative/ending/route.ts:109 - GET
+src/app/api/narrative/generate/route.ts:6 - POST
+src/app/api/narrative/summarize/route.ts:4 - POST
+src/app/characters/[id]/edit/page.tsx:10 - default
+src/components/shared/wizard/hooks/useWizardState.ts:4 - WizardStep (used in module)
+src/components/shared/wizard/hooks/useWizardState.ts:9 - WizardState (used in module)
+src/components/shared/wizard/hooks/useWizardState.ts:17 - ValidationState (used in module)
+src/components/shared/wizard/hooks/useWizardState.ts:23 - WizardConfig (used in module)
+src/components/shared/wizard/hooks/useWizardState.ts:33 - WizardHandlers (used in module)
+src/lib/promptTemplates/templates/narrative/choiceTypeTemplates.ts:92 - default
+src/lib/promptTemplates/templates/narrative/index.ts:12 - narrativeTemplates
+src/lib/promptTemplates/templates/narrative/playerChoiceTemplate.ts:165 - default
+src/lib/promptTemplates/templates/narrative/skillAcknowledgmentTemplate.ts:147 - default
+src/stories/01-atoms/forms/controls/RangeSlider.stories.tsx:30 - default
+src/stories/01-atoms/forms/controls/RangeSlider.stories.tsx:43 - WithLevelDescriptions
+src/stories/01-atoms/forms/controls/RangeSlider.stories.tsx:57 - CustomValueFormatter
+src/stories/01-atoms/forms/controls/RangeSlider.stories.tsx:71 - AllLevels
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:27 - default
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:30 - Default
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:36 - Checked
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:42 - WithLabel
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:49 - CheckedWithLabel
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:56 - Disabled
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:64 - DisabledChecked
+src/stories/01-atoms/forms/inputs/Checkbox.stories.tsx:72 - MultipleOptions
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:35 - default
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:38 - Default
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:44 - WithLabel
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:56 - WithError
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:74 - Disabled
+src/stories/01-atoms/forms/inputs/Input.stories.tsx:82 - Types
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:23 - default
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:44 - Default
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:67 - Horizontal
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:90 - Disabled
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:141 - WorldTypeExample
+src/stories/01-atoms/forms/inputs/RadioGroup.stories.tsx:163 - SimpleOptions
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:35 - default
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:38 - Default
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:44 - WithLabel
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:57 - WithError
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:76 - WithHelpText
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:93 - Disabled
+src/stories/01-atoms/forms/inputs/Textarea.stories.tsx:102 - LargeTextarea
+src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx:28 - default
+src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx:41 - Default
+src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx:49 - Disabled
+src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx:57 - InteractiveExample
+src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx:25 - default
+src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx:40 - Default
+src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx:49 - SkillLevels
+src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx:83 - Disabled
+src/stories/02-molecules/forms/managers/PointPoolManager.stories.tsx:20 - default
+src/stories/02-molecules/forms/managers/PointPoolManager.stories.tsx:46 - AttributePoints
+src/stories/02-molecules/forms/managers/PointPoolManager.stories.tsx:112 - SkillPoints
+src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx:44 - default
+src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx:47 - Default
+src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx:59 - InitiallyCollapsed
+src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx:71 - WithNestedContent
+src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx:88 - WithDevToolsContent
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:42 - default
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:46 - Default
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:55 - WithCancel
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:65 - ErrorState
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:75 - InteractiveDemo
+src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx:107 - KeyboardSupport
+src/stories/02-molecules/ui-components/selectors/TemplateSelector.stories.tsx:21 - default
+src/stories/02-molecules/ui-components/selectors/TemplateSelector.stories.tsx:25 - Default
+src/stories/02-molecules/ui-components/selectors/TemplateSelector.stories.tsx:39 - PreSelected
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:29 - default
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:35 - AIGenerated
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:49 - Placeholder
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:61 - Generating
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:76 - Error
+src/stories/03-organisms/character/portrait/CharacterPortrait.stories.tsx:89 - SizeComparison
+src/stories/03-organisms/devtools/panels/AITestingPanel.stories.tsx:47 - default
+src/stories/03-organisms/devtools/panels/AITestingPanel.stories.tsx:53 - Default
+src/stories/03-organisms/devtools/panels/AITestingPanel.stories.tsx:68 - InteractiveExample
+src/stories/03-organisms/devtools/panels/AITestingPanel.stories.tsx:91 - Compact
+src/stories/03-organisms/devtools/panels/DevToolsPanel.stories.tsx:51 - default
+src/stories/03-organisms/devtools/panels/DevToolsPanel.stories.tsx:54 - Default
+src/stories/03-organisms/devtools/panels/DevToolsPanel.stories.tsx:58 - InitiallyOpen
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:20 - default
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:41 - Empty
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:50 - WithErrors
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:84 - HighSeverityOnly
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:108 - WithDismissedErrors
+src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx:134 - Interactive
+src/stories/03-organisms/devtools/sections/StateSection.stories.tsx:86 - default
+src/stories/03-organisms/devtools/sections/StateSection.stories.tsx:89 - Default
+src/stories/03-organisms/game-session/controls/SessionControls.stories.tsx:17 - default
+src/stories/03-organisms/game-session/controls/SessionControls.stories.tsx:20 - ActiveSession
+src/stories/03-organisms/game-session/controls/SessionControls.stories.tsx:34 - WithAllControls
+src/stories/03-organisms/game-session/setup/QuickStartCharacters.stories.tsx:15 - default
+src/stories/03-organisms/game-session/setup/QuickStartCharacters.stories.tsx:43 - Default
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:18 - default
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:50 - BasicChoices
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:56 - WithCustomInput
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:106 - AlignedChoices
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:264 - WithSkillRequirements
+src/stories/03-organisms/narrative/controls/ChoiceSelector.stories.tsx:281 - WithItemRequirements
+src/stories/03-organisms/narrative/core/Narrative.stories.tsx:30 - default
+src/stories/03-organisms/narrative/core/Narrative.stories.tsx:34 - CompleteNarrativeSystem
+src/stories/03-organisms/narrative/display/LoreViewer.stories.tsx:33 - default
+src/stories/03-organisms/narrative/display/LoreViewer.stories.tsx:58 - WithFacts
+src/stories/03-organisms/narrative/display/LoreViewer.stories.tsx:89 - Empty
+src/stories/03-organisms/narrative/display/LoreViewer.stories.tsx:123 - SessionFiltered
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:157 - default
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:161 - Default
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:173 - ActiveWorld
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:191 - NoImage
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:211 - SetInWorld
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:235 - InspiredByWorld
+src/stories/03-organisms/world/display/WorldCard.stories.tsx:258 - NoCharacters
+src/stories/03-organisms/world/editor/WorldEditor.stories.tsx:110 - default
+src/stories/03-organisms/world/editor/WorldEditor.stories.tsx:113 - Default
+src/stories/03-organisms/world/editor/WorldEditor.stories.tsx:119 - DifferentWorld
+src/stories/03-organisms/world/editor/WorldEditor.stories.tsx:125 - NonExistentWorld
+src/stories/03-organisms/world/lists/WorldList.stories.tsx:89 - default
+src/stories/03-organisms/world/lists/WorldList.stories.tsx:92 - Default
+src/stories/03-organisms/world/lists/WorldList.stories.tsx:98 - EmptyList
+src/stories/04-templates/wizards/character/BackgroundStep.stories.tsx:35 - default
+src/stories/04-templates/wizards/character/BackgroundStep.stories.tsx:77 - Empty
+src/stories/04-templates/wizards/character/BackgroundStep.stories.tsx:86 - WithData
+src/stories/04-templates/wizards/character/BackgroundStep.stories.tsx:110 - WithValidationErrors
+src/stories/04-templates/wizards/character/CharacterCreationWizard.stories.tsx:15 - default
+src/stories/04-templates/wizards/character/CharacterCreationWizard.stories.tsx:62 - FullWizard
+src/stories/04-templates/wizards/character/CharacterCreationWizard.stories.tsx:80 - StartAtPortraitStep
+src/stories/04-templates/wizards/character/CharacterCreationWizard.stories.tsx:98 - WithGeneratedCharacter
+src/stories/04-templates/wizards/character/PortraitStep.stories.tsx:38 - default
+src/stories/04-templates/wizards/character/PortraitStep.stories.tsx:69 - Default
+src/stories/04-templates/wizards/character/PortraitStep.stories.tsx:77 - WithGeneratedPortrait
+src/stories/04-templates/wizards/game/BasicInfoStep.stories.tsx:35 - default
+src/stories/04-templates/wizards/game/BasicInfoStep.stories.tsx:78 - Empty
+src/stories/04-templates/wizards/game/BasicInfoStep.stories.tsx:87 - WithData
+src/stories/04-templates/wizards/game/BasicInfoStep.stories.tsx:103 - WithValidationError
+src/stories/04-templates/wizards/game/GameStartWizard.stories.tsx:39 - default
+src/stories/04-templates/wizards/game/GameStartWizard.stories.tsx:42 - DefaultFlow
+src/stories/04-templates/wizards/game/GameStartWizard.stories.tsx:47 - NoWorlds
+src/stories/04-templates/wizards/game/GameStartWizard.stories.tsx:52 - NoCharacters
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:27 - default
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:45 - Default
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:56 - WithExistingImage
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:82 - Generating
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:107 - WithError
+src/stories/04-templates/wizards/game/ImageGenerationStep.stories.tsx:125 - SkipGeneration
+src/stories/04-templates/wizards/world/AttributesStep.stories.tsx:35 - default
+src/stories/04-templates/wizards/world/AttributesStep.stories.tsx:139 - Default
+src/stories/04-templates/wizards/world/AttributesStep.stories.tsx:148 - FullyAllocated
+src/stories/04-templates/wizards/world/AttributesStep.stories.tsx:172 - WithValidationError
+src/stories/04-templates/wizards/world/SkillsStep.stories.tsx:35 - default
+src/stories/04-templates/wizards/world/SkillsStep.stories.tsx:201 - NoSelection
+src/stories/04-templates/wizards/world/SkillsStep.stories.tsx:210 - WithSelection
+src/stories/04-templates/wizards/world/SkillsStep.stories.tsx:233 - MaxSelection
+src/stories/04-templates/wizards/world/SkillsStep.stories.tsx:258 - WithValidationError
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:22 - default
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:26 - Default
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:31 - TemplateSelectionStep
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:45 - BasicInfoStep
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:68 - DescriptionStep
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:92 - AttributeReviewStep
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:128 - SkillReviewStep
+src/stories/04-templates/wizards/world/WorldCreationWizard.stories.tsx:175 - FinalizeStep

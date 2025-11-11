@@ -10,9 +10,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
-import { formatTableDate } from '@/lib/utils/table-utils';
 import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
+
+// Helper function for formatting dates in tables
+function formatTableDate(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 interface InventoryTableProps {
   characterId: EntityID;
