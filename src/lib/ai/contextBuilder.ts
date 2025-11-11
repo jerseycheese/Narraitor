@@ -132,7 +132,7 @@ export class ContextBuilder {
       goalContext: 'goalContext' in aiContext ? aiContext.goalContext : undefined,
       inventoryItems,
       equippedItemIds,
-      otherCharacterContext,
+      otherCharacterContext: otherCharacterContext ?? undefined,
       loreContext: getLoreContextForPrompt(request.worldId) || '',
       generationParameters: request.generationParameters,
       templateType,
