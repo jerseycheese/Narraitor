@@ -39,14 +39,3 @@ export const SKILL_DIFFICULTIES: SkillDifficultyDescription[] = [
     description: 'Requires extensive practice and natural talent to master'
   }
 ];
-
-/**
- * Get the skill difficulty description for a given difficulty value
- * @param difficulty The difficulty value (easy, medium, hard)
- * @returns The corresponding difficulty description or undefined if not found
- */
-export const getSkillDifficultyDescription = (
-  difficulty: SkillDifficulty
-): SkillDifficultyDescription | undefined => {
-  return SKILL_DIFFICULTIES.find(level => level.value === difficulty);
-};

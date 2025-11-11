@@ -145,24 +145,6 @@ export interface PersonalizedNarrativeContext {
 }
 
 /**
- * Configuration for personalization engine
- */
-export interface PersonalizationConfig {
-  /** How far back to look for decision patterns (in days) */
-  decisionHistoryDays: number;
-  /** Minimum decisions needed to establish preferences */
-  minDecisionsForPreferences: number;
-  /** Weight given to recent vs historical decisions */
-  recentDecisionWeight: number;
-  /** Whether to include relationship context in narratives */
-  includeRelationships: boolean;
-  /** Whether to reference character goals in narratives */
-  includeGoals: boolean;
-  /** Maximum number of personality traits to include */
-  maxPersonalityTraits: number;
-}
-
-/**
  * Result of personalization analysis
  */
 export interface PersonalizationAnalysis {

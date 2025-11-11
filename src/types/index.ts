@@ -99,7 +99,6 @@ export type {
 // Export validation functions and remaining type guards
 export {
   validateWorld,
-  isInventoryItem,
   isNarrativeSegment,
   isJournalEntry
 } from './type-guards';

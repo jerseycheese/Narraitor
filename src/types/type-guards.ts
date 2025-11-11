@@ -1,11 +1,9 @@
 // src/types/type-guards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { World } from './world.types';
-import { InventoryItem } from './inventory.types';
 import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';
-import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './personalization.types';
+import { PlayerDecision, ChoiceTypePreference } from './personalization.types';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { ValidationResult } from '../lib/utils/validationUtils';
@@ -337,28 +335,6 @@ export function validateGeneratedImage(obj: unknown): ValidationResult {
 // Boolean type guards for TypeScript type narrowing
 // These provide runtime type checking with narrowed return types for compatibility
 
-export function isWorld(obj: unknown): obj is World {
-  const result = validateWorld(obj);
-  return result.valid;
-}
-
-export function isInventoryItem(obj: unknown): obj is InventoryItem {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const candidate = obj as Partial<InventoryItem>;
-  return (
-    typeof candidate.id === 'string' &&
-    typeof candidate.name === 'string' &&
-    typeof candidate.categoryId === 'string' &&
-    typeof candidate.quantity === 'number' &&
-    Array.isArray(candidate.acquisitionHistory) &&
-    candidate.categorization !== undefined &&
-    typeof candidate.categorization === 'object'
-  );
-}
-
 export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
   return obj !== null &&
     obj !== undefined &&
@@ -414,14 +390,6 @@ export function isJournalEntry(obj: unknown): obj is JournalEntry {
     typeof (obj as any).metadata === 'object';
 }
 
-export function isPersonalityTrait(value: unknown): value is PersonalityTrait {
-  const validTraits: PersonalityTrait[] = [
-    'diplomatic', 'patient', 'empathetic', 'direct', 'impulsive', 'brave',
-    'cautious', 'logical', 'loyal', 'optimistic', 'independent', 'ambitious'
-  ];
-  return typeof value === 'string' && validTraits.includes(value as PersonalityTrait);
-}
-
 export function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
   const validChoiceTypes: ChoiceTypePreference[] = [
     'diplomatic', 'aggressive', 'stealthy', 'helpful', 'selfish', 'lawful', 'chaotic', 'neutral'
@@ -463,10 +431,4 @@ export function sanitizeString(value: unknown, maxLength: number = 200): string 
     .substring(0, maxLength));
     
   return sanitized.length > 0 ? sanitized : undefined;
-}
-
-export function isSafeStringArray(value: unknown, maxItems: number = 10, maxLength: number = 100): value is string[] {
-  return Array.isArray(value) && 
-         value.length <= maxItems &&
-         value.every(item => isSafeString(item, maxLength));
 }
