@@ -147,14 +147,14 @@ export class ContextBuilder {
     characterIds: EntityID[],
     sessionId?: EntityID
   ): Promise<NarrativeGenerationContext> {
-    return this.buildContext(
-      {
-        worldId,
-        characterIds,
-        ...(sessionId && { sessionId }),
-      },
-      'initialScene'
-    );
+    const request: NarrativeGenerationRequest = {
+      worldId,
+      characterIds,
+    };
+    if (sessionId) {
+      request.sessionId = sessionId;
+    }
+    return this.buildContext(request, 'initialScene');
   }
 
   private async getRelevantDecisions(
