@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import {
