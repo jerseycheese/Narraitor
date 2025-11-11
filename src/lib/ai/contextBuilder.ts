@@ -1,22 +1,57 @@
 /**
  * ContextBuilder
  *
- * Builds complete NarrativeGenerationContext from requests
- * Uses NarrativeContextGateway to fetch data from stores
+ * Builds complete context for narrative generation from stores.
+ * Consolidates context plumbing without excessive wrapper methods.
  */
 
 import { EntityID } from '@/types/common.types';
-import { NarrativeGenerationRequest } from '@/types/narrative.types';
-import { NarrativeGenerationContext } from './narrativeGenerationContext';
-import { NarrativeContextGateway } from './narrativeContextGateway';
+import { NarrativeGenerationRequest, NarrativeContext } from '@/types/narrative.types';
+import { ToneSettings } from '@/types/tone-settings.types';
+import { PlayerDecision } from '@/types/personalization.types';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useAiContextStore } from '@/state/aiContextStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { getTimestamp } from '@/lib/utils';
 import { CurrentNarrativeContext } from '@/types/relevance.types';
 
-export class ContextBuilder {
-  constructor(private gateway: NarrativeContextGateway) {}
+/**
+ * Complete context for narrative generation
+ */
+export interface NarrativeGenerationContext {
+  world: {
+    id: string;
+    name: string;
+    description: string;
+    genre: string;
+    attributes: unknown[];
+    skills?: unknown[];
+    toneSettings: ToneSettings;
+  };
+  worldId: EntityID;
+  characters: Record<EntityID, unknown>;
+  characterIds: EntityID[];
+  playerCharacter: unknown;
+  sessionId?: EntityID;
+  narrativeContext?: NarrativeContext;
+  npcRoster: Array<{ id: string; name: string; description?: string; avatarUrl?: string }>;
+  toneSettings: ToneSettings;
+  relevantDecisions: PlayerDecision[];
+  goals: Array<Record<string, unknown>>;
+  goalContext?: string;
+  inventoryItems: Array<unknown>;
+  equippedItemIds: string[];
+  otherCharacterContext?: string;
+  loreContext: string;
+  generationParameters?: NarrativeGenerationRequest['generationParameters'];
+  templateType: string;
+}
 
+export class ContextBuilder {
   /**
    * Build complete context from a generation request
    */
@@ -24,25 +59,31 @@ export class ContextBuilder {
     request: NarrativeGenerationRequest,
     templateType: string
   ): Promise<NarrativeGenerationContext> {
-    const world = this.gateway.getWorld(request.worldId);
+    const { worlds } = useWorldStore.getState();
+    const world = worlds[request.worldId];
     if (!world) {
       throw new Error(`World not found: ${request.worldId}`);
     }
 
-    // Get all characters
-    const allCharacters = this.gateway.getAllCharacters();
+    const { characters } = useCharacterStore.getState();
     const characterIds = request.characterIds || [];
     const playerCharacterId = characterIds[0];
-    const playerCharacter = playerCharacterId
-      ? this.gateway.getCharacter(playerCharacterId)
-      : null;
+    const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
 
     // Get NPC roster
-    const npcRoster = this.gateway.buildNpcRoster(request.worldId);
+    const npcState = useNPCStore.getState();
+    const npcRoster = typeof npcState.getNPCsByWorld === 'function'
+      ? (npcState.getNPCsByWorld(request.worldId) || []).map(npc => ({
+          id: npc.id,
+          name: npc.name,
+          description: npc.description,
+          avatarUrl: npc.avatarUrl,
+        }))
+      : [];
 
     // Get AI context
     const aiContext = request.sessionId
-      ? this.gateway.getAIContextForSession(request.sessionId)
+      ? useAiContextStore.getState().buildContextForSession(request.sessionId)
       : { activeGoals: [] };
 
     // Get relevant decisions
@@ -52,41 +93,47 @@ export class ContextBuilder {
       request.narrativeContext
     );
 
-    // Get inventory items
+    // Get inventory
     const inventoryItems = playerCharacterId
-      ? this.gateway.getCharacterItems(playerCharacterId)
+      ? useInventoryStore.getState().getCharacterItems(playerCharacterId) || []
       : [];
 
-    // Get equipped item IDs
-    const equippedItemIds = playerCharacterId
-      ? this.gateway.getEquippedItemIds(playerCharacterId)
+    const equippedItemIds = playerCharacterId && playerCharacter?.inventory
+      ? ((playerCharacter.inventory as { items: Array<{ id: string; equipped?: boolean }> }).items || [])
+          .filter(item => item?.equipped)
+          .map(item => item.id)
       : [];
 
-    // Get other character context for multi-character worlds
+    // Other character context
     const otherCharacterContext = playerCharacterId
       ? this.buildOtherCharacterContext(request.worldId, playerCharacterId)
       : undefined;
 
-    // Get lore context
-    const loreContext = getLoreContextForPrompt(request.worldId);
-
     return {
-      world,
+      world: {
+        id: world.id,
+        name: world.name,
+        description: world.description,
+        genre: world.genre,
+        attributes: world.attributes,
+        skills: world.skills,
+        toneSettings: world.toneSettings || { contentRating: 'teen', narrativeStyle: 'balanced', languageComplexity: 'moderate' },
+      },
       worldId: request.worldId,
-      characters: allCharacters,
+      characters,
       characterIds,
       playerCharacter,
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
       npcRoster,
-      toneSettings: world.toneSettings,
+      toneSettings: world.toneSettings || { contentRating: 'teen', narrativeStyle: 'balanced', languageComplexity: 'moderate' },
       relevantDecisions,
-      goals: aiContext.activeGoals,
+      goals: aiContext.activeGoals || [],
       goalContext: aiContext.goalContext,
       inventoryItems,
       equippedItemIds,
       otherCharacterContext,
-      loreContext,
+      loreContext: getLoreContextForPrompt(request.worldId),
       generationParameters: request.generationParameters,
       templateType,
     };
@@ -100,88 +147,31 @@ export class ContextBuilder {
     characterIds: EntityID[],
     sessionId?: EntityID
   ): Promise<NarrativeGenerationContext> {
-    const world = this.gateway.getWorld(worldId);
-    if (!world) {
-      throw new Error(`World not found: ${worldId}`);
-    }
-
-    const allCharacters = this.gateway.getAllCharacters();
-    const playerCharacterId = characterIds[0];
-    const playerCharacter = playerCharacterId
-      ? this.gateway.getCharacter(playerCharacterId)
-      : null;
-
-    const npcRoster = this.gateway.buildNpcRoster(worldId);
-
-    const aiContext = sessionId
-      ? this.gateway.getAIContextForSession(sessionId)
-      : { activeGoals: [] };
-
-    // Get relevant decisions (may have some from other sessions)
-    const relevantDecisions = await this.getRelevantDecisions(
-      worldId,
-      sessionId,
-      undefined
+    return this.buildContext(
+      {
+        worldId,
+        characterIds,
+        sessionId,
+      },
+      'initialScene'
     );
-
-    const inventoryItems = playerCharacterId
-      ? this.gateway.getCharacterItems(playerCharacterId)
-      : [];
-
-    const equippedItemIds = playerCharacterId
-      ? this.gateway.getEquippedItemIds(playerCharacterId)
-      : [];
-
-    const otherCharacterContext = playerCharacterId
-      ? this.buildOtherCharacterContext(worldId, playerCharacterId)
-      : undefined;
-
-    const loreContext = getLoreContextForPrompt(worldId);
-
-    return {
-      world,
-      worldId,
-      characters: allCharacters,
-      characterIds,
-      playerCharacter,
-      sessionId,
-      narrativeContext: undefined,
-      npcRoster,
-      toneSettings: world.toneSettings,
-      relevantDecisions,
-      goals: aiContext.activeGoals,
-      goalContext: aiContext.goalContext,
-      inventoryItems,
-      equippedItemIds,
-      otherCharacterContext,
-      loreContext,
-      generationParameters: undefined,
-      templateType: 'initialScene',
-    };
   }
 
-  /**
-   * Get relevant decisions using the relevance system
-   */
   private async getRelevantDecisions(
     worldId: EntityID,
     sessionId?: EntityID,
-    narrativeContext?: NarrativeGenerationRequest['narrativeContext']
+    narrativeContext?: NarrativeContext
   ) {
     if (!sessionId) {
-      // Fallback: get recent world decisions if no session ID
-      const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
-      return allWorldDecisions.slice(0, 15);
+      return playerDecisionTracker.getWorldDecisions(worldId).slice(0, 15);
     }
 
-    // Build current narrative context for relevance scoring
     const currentContext = this.buildCurrentNarrativeContext(
       worldId,
       sessionId,
       narrativeContext
     );
 
-    // Use relevance system to get most important decisions with scores (max 15)
     let decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
       currentContext,
       15,
@@ -196,109 +186,61 @@ export class ContextBuilder {
       );
     }
 
-    // Extract decisions for personalization engine
     return decisionsWithScores.map(item => item.decision);
   }
 
-  /**
-   * Build CurrentNarrativeContext from narrative generation request context
-   */
   private buildCurrentNarrativeContext(
     worldId: EntityID,
     sessionId: EntityID,
-    narrativeContext?: NarrativeGenerationRequest['narrativeContext']
+    narrativeContext?: NarrativeContext
   ): CurrentNarrativeContext {
-    // Extract location from narrative context
-    const latestRecentSegment =
-      narrativeContext?.recentSegments &&
-      narrativeContext.recentSegments.length > 0
-        ? narrativeContext.recentSegments[narrativeContext.recentSegments.length - 1]
-        : undefined;
+    const latestRecentSegment = narrativeContext?.recentSegments?.[narrativeContext.recentSegments.length - 1];
+    const location = narrativeContext?.currentLocation || latestRecentSegment?.metadata?.location;
 
-    const location = narrativeContext?.currentLocation ||
-                     latestRecentSegment?.metadata?.location;
-
-    // Extract characters present from narrative context
     const charactersPresent: string[] = [];
     if (narrativeContext?.characterIds) {
       charactersPresent.push(...narrativeContext.characterIds);
     }
-    // Add characters from recent segments
-    if (narrativeContext?.recentSegments) {
-      narrativeContext.recentSegments.forEach(segment => {
-        if (segment.metadata.characterIds) {
-          segment.metadata.characterIds.forEach(charId => {
-            if (!charactersPresent.includes(charId)) {
-              charactersPresent.push(charId);
-            }
-          });
+    narrativeContext?.recentSegments?.forEach(segment => {
+      segment.metadata.characterIds?.forEach(charId => {
+        if (!charactersPresent.includes(charId)) {
+          charactersPresent.push(charId);
         }
       });
-    }
+    });
 
-    // Extract situation from narrative context
-    const situation = narrativeContext?.currentSituation;
-
-    // Extract recent events from recent segments
-    const recentEvents: string[] = [];
-    if (narrativeContext?.recentSegments) {
-      narrativeContext.recentSegments.forEach(segment => {
-        if (segment.content) {
-          const summary = segment.content.substring(0, 100).trim();
-          if (summary) {
-            recentEvents.push(summary);
-          }
-        }
-      });
-    }
-
-    // Extract active tags from narrative context
-    const activeTags = narrativeContext?.currentTags || [];
+    const recentEvents = narrativeContext?.recentSegments?.map(s =>
+      s.content.substring(0, 100).trim()
+    ).filter(Boolean) || [];
 
     return {
       location,
       charactersPresent,
-      situation,
+      situation: narrativeContext?.currentSituation,
       recentEvents,
-      activeTags,
+      activeTags: narrativeContext?.currentTags || [],
       worldId,
       sessionId,
       timestamp: getTimestamp()
     };
   }
 
-  /**
-   * Build other character context for multi-character worlds
-   */
-  private buildOtherCharacterContext(
-    worldId: EntityID,
-    activeCharacterId: EntityID
-  ): string | null {
-    const contextData = this.gateway.getOtherCharacterContext(
-      worldId,
-      activeCharacterId,
-      3, // MAX_OTHER_CHARACTER_THREADS
-      2, // MAX_CROSS_CHARACTER_REFERENCES
-      160 // PROMPT_THREAD_SUMMARY_LENGTH
-    );
+  private buildOtherCharacterContext(worldId: EntityID, activeCharacterId: EntityID): string | null {
+    const { worldStates } = useWorldStore.getState();
+    const worldState = worldStates[worldId];
+    if (!worldState?.playerCharacterThreads) return null;
 
-    if (!contextData || contextData.threads.length === 0) {
-      return null;
-    }
+    const threads = Object.values(worldState.playerCharacterThreads)
+      .filter(t => t.characterId !== activeCharacterId)
+      .sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated))
+      .slice(0, 3);
 
-    const lines = contextData.threads.map((thread) => {
-      const relationshipDescriptor = thread.relationship
-        ? ` Relationship: ${thread.relationship}.`
-        : '';
+    if (threads.length === 0) return null;
 
-      const referenceDescriptor =
-        thread.recentReferences.length > 0
-          ? ` Recent cross-over: ${thread.recentReferences
-              .map((ref) => ref.summary)
-              .join('; ')}.`
-          : '';
-
-      return `- ${thread.name}: ${thread.highlight}.${relationshipDescriptor}${referenceDescriptor}`;
+    const { characters } = useCharacterStore.getState();
+    const lines = threads.map(thread => {
+      const name = characters[thread.characterId]?.name ?? `Character ${thread.characterId}`;
+      return `- ${name}: Recent activity recorded.`;
     });
 
     return `OTHER PLAYER CHARACTERS (SHARED WORLD CONTEXT):\n${lines.join('\n')}`;

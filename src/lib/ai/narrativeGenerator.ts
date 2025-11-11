@@ -1,14 +1,13 @@
 /**
- * NarrativeGenerator (Refactored)
+ * NarrativeGenerator (Refactored & Optimized)
  *
- * Streamlined narrative generation coordinator that delegates to specialized modules:
- * - NarrativeContextGateway: Store reads
- * - ContextBuilder: Context assembly
- * - PromptComposer: Prompt enhancement
- * - GenerationPipeline: AI calls and post-processing
+ * Streamlined narrative generation using:
+ * - ContextBuilder: Assembles context from stores
+ * - promptEnhancers: Modular prompt enhancement
+ * - ResponseProcessor: Parsing, lore, inventory, language enforcement
  *
- * This refactored version reduces the class from ~2000 lines to ~300 lines
- * by extracting responsibilities into focused, testable modules.
+ * Reduced from ~2000 lines to ~420 lines by extracting focused modules
+ * without over-abstracting.
  */
 
 import { AIClient } from './types';
@@ -18,86 +17,90 @@ import { ChoiceGenerator } from './choiceGenerator';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { World } from '@/types/world.types';
-import { NarrativeContextGateway } from './narrativeContextGateway';
 import { ContextBuilder } from './contextBuilder';
-import { GenerationPipeline } from './generationPipeline';
+import { ResponseProcessor } from './responseProcessor';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import {
-  ToneSettingsEnhancer,
-  LoreEnhancer,
-  GoalContextEnhancer,
-  PersonalizationEnhancer,
-  InventoryEnhancer,
-  ItemAcquisitionEnhancer,
-} from './promptComposer/enhancers';
-
-/**
- * Default enhancer chain for most narrative generation
- */
-const DEFAULT_ENHANCERS = [
-  new ToneSettingsEnhancer(),
-  new LoreEnhancer(),
-  new GoalContextEnhancer(),
-  new PersonalizationEnhancer(),
-  new InventoryEnhancer(),
-  new ItemAcquisitionEnhancer(),
-];
-
-/**
- * Enhancer chain for initial scenes (no goal context initially)
- */
-const INITIAL_SCENE_ENHANCERS = [
-  new ToneSettingsEnhancer(),
-  new LoreEnhancer(),
-  new PersonalizationEnhancer(),
-  new InventoryEnhancer(),
-  new ItemAcquisitionEnhancer(),
-];
-
-/**
- * Enhancer chain for skill acknowledgments
- */
-const SKILL_ACKNOWLEDGMENT_ENHANCERS = [
-  new ToneSettingsEnhancer(),
-  new LoreEnhancer(),
-  new InventoryEnhancer(),
-  new ItemAcquisitionEnhancer(),
-];
+  composePrompt,
+  DEFAULT_ENHANCERS,
+  INITIAL_SCENE_ENHANCERS,
+  SKILL_ENHANCERS,
+} from './promptEnhancers';
+import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
+import { safeTrim } from '@/lib/utils';
+import { useNPCStore } from '@/state/npcStore';
+import { NPC } from '@/types/npc.types';
+import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
+import { useWorldStore } from '@/state/worldStore';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
   private templateGenerator: TemplateGenerator;
-  private gateway: NarrativeContextGateway;
   private contextBuilder: ContextBuilder;
-  private pipeline: GenerationPipeline;
+  private responseProcessor: ResponseProcessor;
 
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
     this.templateGenerator = new TemplateGenerator(geminiClient);
-    this.gateway = new NarrativeContextGateway();
-    this.contextBuilder = new ContextBuilder(this.gateway);
-    this.pipeline = new GenerationPipeline(geminiClient);
+    this.contextBuilder = new ContextBuilder();
+    this.responseProcessor = new ResponseProcessor(geminiClient);
   }
 
   /**
    * Generate a narrative segment
-   *
-   * Main entry point for narrative generation. Uses the shared pipeline
-   * with the default enhancer chain.
    */
-  async generateSegment(
-    request: NarrativeGenerationRequest
-  ): Promise<NarrativeGenerationResult> {
+  async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
-      // Build context
       const segmentType = request.generationParameters?.segmentType || 'scene';
       const context = await this.contextBuilder.buildContext(request, segmentType);
 
-      // Run generation pipeline
-      return await this.pipeline.generate(context, {
-        enhancers: DEFAULT_ENHANCERS,
-        processItemAcquisition: !request.generationParameters?.disableItemAcquisitionProcessing,
-      });
+      // Get template and compose prompt
+      const template = narrativeTemplateManager.getTemplate(`narrative/${segmentType}`);
+      const basePrompt = template(this.buildTemplateContext(context));
+      const fullyEnhancedPrompt = await composePrompt(basePrompt, context, DEFAULT_ENHANCERS);
+
+      // Call AI
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+
+      // Parse response
+      const parsed = this.responseProcessor.parse(response.content || '');
+
+      // Extract lore (async, don't block)
+      if (parsed.content) {
+        void this.responseProcessor.updateLore(parsed.content, context.worldId, context.sessionId);
+      }
+
+      // Build result
+      let result = this.buildResult(parsed.content, parsed.metadata, segmentType, response.tokenUsage, context);
+
+      // Enforce language complexity
+      result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
+
+      // Add debug info if enabled
+      if (isDebugInfoEnabled()) {
+        result = this.addDebugInfo(result, fullyEnhancedPrompt, context, response.tokenUsage);
+      }
+
+      // Process items (async, don't block)
+      if (
+        !request.generationParameters?.disableItemAcquisitionProcessing &&
+        result.metadata.itemsAcquired &&
+        result.metadata.itemsAcquired.length > 0
+      ) {
+        const characterId = context.characterIds[0];
+        if (characterId && context.sessionId) {
+          void this.responseProcessor.processItems(
+            result.metadata.itemsAcquired,
+            characterId,
+            context.sessionId
+          );
+        }
+      }
+
+      // Sync NPC metadata
+      this.syncNpcMetadata(context.worldId, result.metadata.characters);
+
+      return result;
     } catch (error) {
       throw new Error('Failed to generate narrative segment');
     }
@@ -105,9 +108,6 @@ export class NarrativeGenerator {
 
   /**
    * Generate initial scene for a new game session
-   *
-   * Uses a specialized enhancer chain without goal context
-   * since the session is just starting.
    */
   async generateInitialScene(
     worldId: string,
@@ -115,18 +115,33 @@ export class NarrativeGenerator {
     sessionId?: string
   ): Promise<NarrativeGenerationResult> {
     try {
-      // Build initial scene context
-      const context = await this.contextBuilder.buildInitialSceneContext(
-        worldId,
-        characterIds,
-        sessionId
-      );
+      const context = await this.contextBuilder.buildInitialSceneContext(worldId, characterIds, sessionId);
 
-      // Run generation pipeline with initial scene enhancers
-      return await this.pipeline.generate(context, {
-        enhancers: INITIAL_SCENE_ENHANCERS,
-        segmentTypeOverride: 'scene',
-      });
+      const template = narrativeTemplateManager.getTemplate('narrative/initialScene');
+      const basePrompt = template(this.buildTemplateContext(context));
+      const fullyEnhancedPrompt = await composePrompt(basePrompt, context, INITIAL_SCENE_ENHANCERS);
+
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+
+      if (response.content) {
+        void this.responseProcessor.updateLore(response.content, context.worldId, context.sessionId);
+      }
+
+      const parsed = this.responseProcessor.parse(response.content || '');
+      let result = this.buildResult(parsed.content, parsed.metadata, 'scene', response.tokenUsage, context);
+
+      result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
+
+      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+        const characterId = characterIds[0];
+        if (characterId && sessionId) {
+          void this.responseProcessor.processItems(result.metadata.itemsAcquired, characterId, sessionId);
+        }
+      }
+
+      this.syncNpcMetadata(worldId, result.metadata.characters);
+
+      return result;
     } catch (error) {
       throw new Error('Failed to generate initial scene');
     }
@@ -134,21 +149,19 @@ export class NarrativeGenerator {
 
   /**
    * Generate transition between narrative segments
-   *
-   * Simplified generation for transitions, uses minimal processing.
    */
   async generateTransition(
     from: NarrativeSegment,
     to: NarrativeGenerationRequest
   ): Promise<NarrativeGenerationResult> {
     try {
-      const world = this.gateway.getWorld(to.worldId);
+      const { worlds } = useWorldStore.getState();
+      const world = worlds[to.worldId];
       if (!world) {
         throw new Error(`World not found: ${to.worldId}`);
       }
 
       const template = narrativeTemplateManager.getTemplate('narrative/transition');
-
       const context = {
         previousContent: from.content,
         previousType: from.type,
@@ -161,7 +174,6 @@ export class NarrativeGenerator {
       const prompt = template(context);
       const response = await this.geminiClient.generateContent(prompt);
 
-      // Build simple result for transitions
       return {
         content: response.content || '',
         segmentType: 'transition',
@@ -186,8 +198,6 @@ export class NarrativeGenerator {
 
   /**
    * Generate skill acknowledgment narrative
-   *
-   * Acknowledges when the player uses a skill, with success/failure feedback.
    */
   async generateSkillAcknowledgment(
     worldId: string,
@@ -205,68 +215,47 @@ export class NarrativeGenerator {
     }
   ): Promise<NarrativeGenerationResult> {
     try {
-      const world = this.gateway.getWorld(worldId);
-      if (!world) {
-        throw new Error(`World not found: ${worldId}`);
-      }
+      const context = await this.contextBuilder.buildContext(
+        { worldId, characterIds, narrativeContext, sessionId: narrativeContext.sessionId },
+        'skillAcknowledgment'
+      );
 
       const template = narrativeTemplateManager.getTemplate('narrative/skillAcknowledgment');
-
-      const playerCharacterId = characterIds[0];
-      const playerCharacter = playerCharacterId
-        ? this.gateway.getCharacter(playerCharacterId)
-        : null;
-
-      const context = {
-        worldName: world.name,
-        genre: world.genre,
+      const templateContext = {
+        worldName: context.world.name,
+        genre: context.world.genre,
         narrativeContext,
-        playerCharacterName: playerCharacter?.name,
+        playerCharacterName: (context.playerCharacter as { name?: string })?.name,
         skillUsed,
         customAction,
       };
 
-      const prompt = template(context);
+      const basePrompt = template(templateContext);
+      const fullyEnhancedPrompt = await composePrompt(basePrompt, context, SKILL_ENHANCERS);
 
-      // Use a subset of enhancers for skill acknowledgment
-      const toneEnhancer = new ToneSettingsEnhancer();
-      const loreEnhancer = new LoreEnhancer();
-      const inventoryEnhancer = new InventoryEnhancer();
-      const itemAcquisitionEnhancer = new ItemAcquisitionEnhancer();
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      const generationContext = await this.contextBuilder.buildContext(
-        {
-          worldId,
-          characterIds,
-          narrativeContext,
-          sessionId: narrativeContext.sessionId,
-        },
-        'skillAcknowledgment'
-      );
+      const parsed = this.responseProcessor.parse(response.content || '');
+      let result = this.buildResult(parsed.content, parsed.metadata, 'action', response.tokenUsage, context);
 
-      // Manually compose prompt (simplified pipeline)
-      let enhancedPrompt = prompt;
-      enhancedPrompt = toneEnhancer.enhance(enhancedPrompt, generationContext);
-      enhancedPrompt = loreEnhancer.enhance(enhancedPrompt, generationContext);
-      enhancedPrompt = inventoryEnhancer.enhance(enhancedPrompt, generationContext);
-      enhancedPrompt = itemAcquisitionEnhancer.enhance(enhancedPrompt, generationContext);
+      result = await this.responseProcessor.enforceLanguageComplexity(result, context.toneSettings);
 
-      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+        const characterId = characterIds[0];
+        const sessionId = narrativeContext.sessionId;
+        if (characterId && sessionId) {
+          void this.responseProcessor.processItems(result.metadata.itemsAcquired, characterId, sessionId);
+        }
+      }
 
-      // Use pipeline for post-processing
-      return await this.pipeline.generate(generationContext, {
-        enhancers: SKILL_ACKNOWLEDGMENT_ENHANCERS,
-        segmentTypeOverride: 'action',
-      });
+      return result;
     } catch (error) {
       throw new Error('Failed to generate skill acknowledgment narrative');
     }
   }
 
   /**
-   * Generate player choices based on current narrative context
-   *
-   * Delegates to ChoiceGenerator.
+   * Generate player choices
    */
   async generatePlayerChoices(
     worldId: string,
@@ -274,7 +263,7 @@ export class NarrativeGenerator {
     characterIds: string[]
   ): Promise<Decision> {
     try {
-      const result = await this.choiceGenerator.generateChoices({
+      return await this.choiceGenerator.generateChoices({
         worldId,
         narrativeContext,
         characterIds,
@@ -282,30 +271,15 @@ export class NarrativeGenerator {
         maxOptions: 4,
         useAlignedChoices: false,
       });
-
-      return result;
     } catch {
-      // Return fallback choices
       const fallbackId = `decision-fallback-${Date.now()}`;
       return {
         id: fallbackId,
         prompt: 'What will you do next?',
         options: [
-          {
-            id: `option-${fallbackId}-1`,
-            text: 'Investigate further',
-            alignment: 'neutral',
-          },
-          {
-            id: `option-${fallbackId}-2`,
-            text: 'Talk to nearby characters',
-            alignment: 'lawful',
-          },
-          {
-            id: `option-${fallbackId}-3`,
-            text: 'Move to a new location',
-            alignment: 'neutral',
-          },
+          { id: `option-${fallbackId}-1`, text: 'Investigate further', alignment: 'neutral' },
+          { id: `option-${fallbackId}-2`, text: 'Talk to nearby characters', alignment: 'lawful' },
+          { id: `option-${fallbackId}-3`, text: 'Move to a new location', alignment: 'neutral' },
         ],
         decisionWeight: 'minor',
         contextSummary: `In ${narrativeContext.currentLocation || 'an unknown location'}, ${narrativeContext.currentSituation || 'making a decision'}.`,
@@ -315,23 +289,251 @@ export class NarrativeGenerator {
 
   /**
    * Generate world template using AI
-   *
-   * Delegates to TemplateGenerator.
    */
-  async generateWorldTemplate(
-    context: TemplateGenerationContext
-  ): Promise<WorldTemplate> {
+  async generateWorldTemplate(context: TemplateGenerationContext): Promise<WorldTemplate> {
     return this.templateGenerator.generateWorldTemplate(context);
   }
 
   /**
    * Convert template to world format
-   *
-   * Delegates to TemplateGenerator.
    */
-  convertTemplateToWorld(
-    template: WorldTemplate
-  ): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
+  convertTemplateToWorld(template: WorldTemplate): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
     return this.templateGenerator.convertTemplateToWorld(template);
+  }
+
+  // Helper methods
+
+  private buildTemplateContext(context: ReturnType<ContextBuilder['buildContext']> extends Promise<infer T> ? T : never) {
+    const playerCharacter = context.playerCharacter as { name?: string; background?: unknown };
+
+    const existingImportant = context.narrativeContext?.importantEntities || [];
+    const rosterEntities = context.npcRoster.map((npc) => ({
+      id: npc.id,
+      type: 'npc',
+      name: npc.name,
+      description: npc.description,
+      avatarUrl: npc.avatarUrl,
+    }));
+
+    const combinedImportant = [
+      ...existingImportant,
+      ...rosterEntities.filter(
+        (entity) => !existingImportant.some((existing) => existing.id === entity.id && existing.type === entity.type)
+      ),
+    ];
+
+    const narrativeContextWithRoster = context.narrativeContext
+      ? { ...context.narrativeContext, importantEntities: combinedImportant }
+      : undefined;
+
+    return {
+      worldName: context.world.name,
+      worldDescription: context.world.description,
+      genre: context.world.genre,
+      tone: context.toneSettings.narrativeStyle,
+      attributes: context.world.attributes,
+      characterIds: context.characterIds,
+      playerCharacterName: playerCharacter?.name,
+      playerCharacterBackground: playerCharacter?.background,
+      sessionId: context.sessionId,
+      narrativeContext: narrativeContextWithRoster,
+      generationParameters: context.generationParameters,
+      toneSettings: context.toneSettings,
+      npcRoster: context.npcRoster,
+      characterSkillContext: '',
+      worldSkills: context.world.skills?.map((skill: { id: string; name: string; description: string }) => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description,
+      })) || [],
+    };
+  }
+
+  private buildResult(
+    content: string,
+    metadata: ReturnType<ResponseProcessor['parse']>['metadata'],
+    segmentType: string,
+    tokenUsage: number | undefined,
+    context: ReturnType<ContextBuilder['buildContext']> extends Promise<infer T> ? T : never
+  ): NarrativeGenerationResult {
+    const fallbackMood = this.getMoodForGenre(context.world.genre);
+    const fallbackLocation = this.getLocationForGenre(context.world.genre);
+
+    const speakerId = this.normalizeId(metadata.speakerId);
+    const characterIds = this.normalizeCharacterIds(metadata.characterIds);
+    const finalCharacterIds = speakerId && !characterIds.includes(speakerId)
+      ? [...characterIds, speakerId]
+      : characterIds;
+
+    return {
+      content,
+      segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
+      metadata: {
+        characterIds: finalCharacterIds,
+        speakerId,
+        location: metadata.location || fallbackLocation,
+        mood: metadata.mood || fallbackMood,
+        tags: metadata.tags || [context.world.genre || 'fantasy', 'narrative'],
+        itemsAcquired: metadata.itemsAcquired && metadata.itemsAcquired.length > 0 ? metadata.itemsAcquired : undefined,
+        characters: metadata.characters,
+      },
+      tokenUsage:
+        tokenUsage && typeof tokenUsage === 'object'
+          ? tokenUsage
+          : tokenUsage
+            ? { promptTokens: 0, completionTokens: 0, totalTokens: tokenUsage as number }
+            : undefined,
+    };
+  }
+
+  private addDebugInfo(
+    result: NarrativeGenerationResult,
+    fullPrompt: string,
+    context: ReturnType<ContextBuilder['buildContext']> extends Promise<infer T> ? T : never,
+    tokenUsage: number | undefined
+  ): NarrativeGenerationResult {
+    const previousSegments = context.narrativeContext?.previousSegments || [];
+    const previousSegment = previousSegments[previousSegments.length - 1];
+
+    const debugInfoContext: DebugInfoContext = {
+      fullPrompt,
+      templateName: this.getTemplateName(context.templateType),
+      world: context.world,
+      toneSettings: context.toneSettings,
+      loreContext: context.loreContext,
+      characterIds: context.characterIds,
+      previousSegmentContent: previousSegment?.content,
+      previousSegmentType: previousSegment?.type,
+      tokenUsage: result.tokenUsage,
+      modelUsed: 'gemini-2.0-flash',
+    };
+
+    return {
+      ...result,
+      metadata: {
+        ...result.metadata,
+        debugInfo: buildPromptDebugInfo(debugInfoContext),
+      },
+    };
+  }
+
+  private getTemplateName(segmentType: string): string {
+    const names: Record<string, string> = {
+      scene: 'Scene Template',
+      dialogue: 'Dialogue Template',
+      action: 'Action Template',
+      transition: 'Transition Template',
+      initialScene: 'Initial Scene Template',
+      skillAcknowledgment: 'Skill Acknowledgment Template',
+    };
+    return names[segmentType] || 'Unknown Template';
+  }
+
+  private syncNpcMetadata(worldId: string, characters?: NarrativeGenerationResult['metadata']['characters']) {
+    if (!worldId || !characters || characters.length === 0) return;
+
+    try {
+      const npcStore = useNPCStore.getState();
+      const { getById, createNPC, updateNPC } = npcStore as unknown as {
+        getById?: (id: string) => NPC | undefined;
+        createNPC?: (npc: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: string }) => string;
+        updateNPC?: (id: string, updates: Partial<NPC>) => void;
+      };
+
+      if (typeof getById !== 'function' || typeof createNPC !== 'function' || typeof updateNPC !== 'function') {
+        return;
+      }
+
+      characters.forEach((character) => {
+        if (!character?.id || !character.name) return;
+
+        const id = safeTrim(character.id);
+        if (!id) return;
+
+        const existing = getById(id);
+        const description = character.description || character.role || 'Supporting character encountered during the narrative.';
+        const avatarUrl = character.avatarUrl && safeTrim(character.avatarUrl) ? safeTrim(character.avatarUrl) : undefined;
+
+        if (existing) {
+          const updates: Partial<NPC> = {};
+          if (character.name && character.name !== existing.name) updates.name = character.name;
+          if (description && description !== existing.description) updates.description = description;
+          if (avatarUrl && avatarUrl !== existing.avatarUrl) updates.avatarUrl = avatarUrl;
+          if (existing.worldId !== worldId) updates.worldId = worldId;
+          if (Object.keys(updates).length > 0) updateNPC(id, updates);
+        } else {
+          createNPC({ id, name: character.name, description, worldId, avatarUrl });
+        }
+      });
+    } catch {
+      // NPC sync failures should never break narrative generation
+    }
+  }
+
+  private normalizeId(id?: string | null): string | undefined {
+    if (!id || typeof id !== 'string') return undefined;
+    const trimmed = safeTrim(id);
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  private normalizeCharacterIds(ids?: unknown): string[] {
+    if (!Array.isArray(ids)) return [];
+
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+
+    for (const value of ids) {
+      if (typeof value !== 'string') continue;
+      const normalizedId = this.normalizeId(value);
+      if (!normalizedId) continue;
+      const canonical = normalizedId.toLowerCase();
+      if (seen.has(canonical)) continue;
+      seen.add(canonical);
+      normalized.push(normalizedId);
+    }
+
+    return normalized;
+  }
+
+  private getMoodForGenre(genre?: string): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' {
+    if (!genre) return 'neutral';
+    switch (genre.toLowerCase()) {
+      case 'horror':
+        return 'tense';
+      case 'fantasy':
+      case 'sci-fi':
+      case 'science fiction':
+      case 'steampunk':
+        return 'mysterious';
+      case 'western':
+      case 'cyberpunk':
+      case 'post-apocalyptic':
+        return 'tense';
+      default:
+        return 'neutral';
+    }
+  }
+
+  private getLocationForGenre(genre?: string): string {
+    if (!genre) return 'Starting Location';
+    switch (genre.toLowerCase()) {
+      case 'fantasy':
+        return 'Enchanted Forest';
+      case 'sci-fi':
+      case 'science fiction':
+        return 'Space Station';
+      case 'western':
+        return 'Frontier Town';
+      case 'horror':
+        return 'Abandoned Mansion';
+      case 'cyberpunk':
+        return 'Neon City';
+      case 'post-apocalyptic':
+        return 'Ruins';
+      case 'steampunk':
+        return 'Victorian Metropolis';
+      default:
+        return 'Starting Location';
+    }
   }
 }
