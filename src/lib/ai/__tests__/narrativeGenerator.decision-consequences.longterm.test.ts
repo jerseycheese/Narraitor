@@ -31,6 +31,16 @@ jest.mock('@/state/aiContextStore', () => ({
     getState: jest.fn()
   }
 }));
+jest.mock('@/state/inventoryStore', () => ({
+  useInventoryStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('@/state/npcStore', () => ({
+  useNPCStore: {
+    getState: jest.fn()
+  }
+}));
 jest.mock('../playerDecisionTracker');
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {

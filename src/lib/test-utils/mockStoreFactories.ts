@@ -324,6 +324,7 @@ export function createMockWorldStore(overrides?: Partial<WorldStore>): WorldStor
   return {
     worlds: {},
     entities: {},
+    worldStates: {},
     currentWorldId: null,
     currentEntityId: null,
     error: null,
