@@ -54,33 +54,6 @@ export interface SafetySetting {
 }
 
 /**
- * Processed prompt ready for AI service
- */
-export interface ProcessedPrompt {
-  content: string;
-  templateId: string;
-  variables: Record<string, string>;
-}
-
-/**
- * Configuration interface for AI integration
- */
-export interface AIConfig {
-  geminiApiKey: string;
-  modelName: string;
-  maxRetries: number;
-  timeout: number;
-}
-
-/**
- * Options for AIPromptProcessor
- */
-export interface AIPromptProcessorOptions {
-  templateManager: import('../promptTemplates/promptTemplateManager').PromptTemplateManager;
-  config: AIConfig;
-}
-
-/**
  * Response from AI image generation
  */
 export interface AIImageResponse {

@@ -80,19 +80,3 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
     }
   }
 });
-
-/**
- * Persistence configuration for stores
- */
-export const persistConfig = { 
-  name: 'narraitor-state',
-  storage: createIndexedDBStorage()
-};
-
-/**
- * Get the current resilient storage instance for status monitoring
- */
-export const getResilientStorageInstance = async (): Promise<ResilientStorageMiddleware> => {
-  return await getResilientStorage();
-};
-

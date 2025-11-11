@@ -5,7 +5,17 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 
 // Import all stores
-import * as stores from '@/state';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useNPCStore } from '@/state/npcStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useJournalStore } from '@/state/journalStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { aiContextStore, useAiContextStore } from '@/state/aiContextStore';
+import { useLoreStore } from '@/state/loreStore';
+import { useNavigationStore } from '@/state/navigationStore';
+import { useGoalStore } from '@/state/goalStore';
+import { useInventoryStore } from '@/state/inventoryStore';
 
 /**
  * StateSection props
@@ -26,10 +36,25 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
   const storeStates = useMemo(() => {
     // Create an object to hold all store states
     const states: Record<string, unknown> = {};
-    
+
+    // Map of store names to store instances
+    const storeMap = {
+      useWorldStore,
+      useCharacterStore,
+      useNPCStore,
+      useNarrativeStore,
+      useJournalStore,
+      useSessionStore,
+      aiContextStore,
+      useAiContextStore,
+      useLoreStore,
+      useNavigationStore,
+      useGoalStore,
+      useInventoryStore,
+    };
+
     // Extract the state from each store
-    Object.entries(stores).forEach(([name, store]) => {
-      // Skip non-store exports like 'persistConfig'
+    Object.entries(storeMap).forEach(([name, store]) => {
       if (typeof store === 'function' && store.getState) {
         try {
           states[name] = store.getState();
@@ -39,7 +64,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
         }
       }
     });
-    
+
     return states;
   }, []);
 
