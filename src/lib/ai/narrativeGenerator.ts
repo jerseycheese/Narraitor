@@ -102,7 +102,8 @@ export class NarrativeGenerator {
 
       return result;
     } catch (error) {
-      throw new Error('Failed to generate narrative segment');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to generate narrative segment: ${errorMessage}`);
     }
   }
 
@@ -143,7 +144,8 @@ export class NarrativeGenerator {
 
       return result;
     } catch (error) {
-      throw new Error('Failed to generate initial scene');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to generate initial scene: ${errorMessage}`);
     }
   }
 
@@ -192,7 +194,8 @@ export class NarrativeGenerator {
           : undefined,
       };
     } catch (error) {
-      throw new Error('Failed to generate transition');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to generate transition: ${errorMessage}`);
     }
   }
 
@@ -250,7 +253,8 @@ export class NarrativeGenerator {
 
       return result;
     } catch (error) {
-      throw new Error('Failed to generate skill acknowledgment narrative');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to generate skill acknowledgment narrative: ${errorMessage}`);
     }
   }
 
