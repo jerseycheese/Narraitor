@@ -23,7 +23,6 @@ import FinalizeStep from './steps/FinalizeStep';
 import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
-import { createAIClient } from '@/lib/ai';
 import { getTimestamp } from '@/lib/utils';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
@@ -360,9 +359,8 @@ export default function WorldCreationWizard({
       if (!data.image?.url) {
         const generateWorldImage = async () => {
           try {
-            const aiClient = createAIClient();
-            const imageGenerator = new WorldImageGenerator(aiClient);
-            
+            const imageGenerator = new WorldImageGenerator();
+
             // Get the created world from store
             const world = useWorldStore.getState().worlds[worldId];
             

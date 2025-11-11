@@ -61,10 +61,9 @@ export const CustomValueFormatter: Story = {
     max: 100,
     showLabel: true,
     labelText: 'Percentage',
-    valueFormatter: (value) => `${value}%`,
     disabled: false,
   },
-  name: 'Custom Value Formatter',
+  name: 'Simple Percentage',
 };
 
 // All levels example

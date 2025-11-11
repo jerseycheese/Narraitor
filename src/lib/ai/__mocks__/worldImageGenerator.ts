@@ -2,7 +2,6 @@
 
 import { World } from '../../../types/world.types';
 import { GeneratedImage } from '../../../types/common.types';
-import { AIClient } from '../types';
 import { getTimestamp } from '@/lib/utils';
 
 // Mock SVG data for different world themes
@@ -15,7 +14,7 @@ const mockWorldImages: Record<string, string> = {
 };
 
 export class WorldImageGenerator {
-  constructor(private aiClient: AIClient) {}
+  constructor() {}
 
   /**
    * Generate a prompt for a world environment image

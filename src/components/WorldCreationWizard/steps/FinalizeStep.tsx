@@ -7,7 +7,6 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { DataField } from '@/components/shared/DataField';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
-import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
@@ -44,9 +43,8 @@ export default function FinalizeStep({
     
     setIsGeneratingImage(true);
     try {
-      const aiClient = createAIClient();
-      const imageGenerator = new WorldImageGenerator(aiClient);
-      
+      const imageGenerator = new WorldImageGenerator();
+
       // Create a temporary world object for image generation
       const tempWorld = {
         id: 'temp',
