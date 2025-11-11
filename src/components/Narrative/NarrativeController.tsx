@@ -770,8 +770,8 @@ Respond with JSON format:
     setError(null);
     
     try {
-      // Use recent segments for context (last 3-5 segments)
-      const recentSegments = segments.slice(-5);
+      // Use recent segments for context (last 3 segments for efficiency)
+      const recentSegments = segments.slice(-3);
       
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore.getState().getSessionDecisions(sessionId);

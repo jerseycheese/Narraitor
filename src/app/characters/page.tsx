@@ -24,8 +24,6 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
-import type { PlayerCharacterThread } from '@/types/world-state.types';
-import { summarizeThreadHighlight } from '@/lib/utils/worldStateFormatters';
 import type { GeneratedImage } from '@/types/common.types';
 
 // Type for character portrait update
@@ -166,23 +164,14 @@ export default function CharactersPage() {
   const characterContextById = useMemo(() => {
     if (!worldState) {
       return {} as Record<string, {
-        threadSummary?: string;
+        recentEvent?: string;
         relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
       }>;
     }
 
-    const threadsByCharacter = Object.values(worldState.playerCharacterThreads ?? {}).reduce(
-      (acc, thread) => {
-        acc[thread.characterId] = thread;
-        return acc;
-      },
-      {} as Record<string, PlayerCharacterThread>
-    );
-
     const relationshipByCharacter = worldState.characterRelationships ?? {};
 
     return worldCharacters.reduce((acc, character) => {
-      const thread = threadsByCharacter[character.id];
       const relationshipEntries = relationshipByCharacter[character.id] ?? {};
 
       const relationships = Object.entries(relationshipEntries)
@@ -198,14 +187,21 @@ export default function CharactersPage() {
           };
         });
 
+      // Find the most recent major event for this character
+      const characterEvents = (worldState.majorEvents ?? [])
+        .filter(event => event.characterId === character.id)
+        .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+      const recentEvent = characterEvents.length > 0 ? characterEvents[0].description : undefined;
+
       acc[character.id] = {
-        threadSummary: summarizeThreadHighlight(thread, 220),
+        recentEvent,
         relationships,
       };
 
       return acc;
     }, {} as Record<string, {
-      threadSummary?: string;
+      recentEvent?: string;
       relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
     }>);
   }, [worldState, worldCharacters, characters]);

@@ -179,6 +179,7 @@ async function applyWorldStateThreadUpdates({
     const updatePayload: {
       playerCharacterThreads: Record<EntityID, PlayerCharacterThreadUpdate>;
       characterRelationships?: Record<EntityID, Record<EntityID, CharacterRelationshipUpdate>>;
+      majorEvents?: WorldStateMajorEventInput[];
     } = {
       playerCharacterThreads: {
         [threadId]: threadUpdate,
@@ -187,6 +188,16 @@ async function applyWorldStateThreadUpdates({
 
     if (relationshipUpdates) {
       updatePayload.characterRelationships = relationshipUpdates;
+    }
+
+    // Add major event if AI identified one
+    if (finalMetadata.majorEvent) {
+      updatePayload.majorEvents = [{
+        id: generateUniqueId('event'),
+        description: finalMetadata.majorEvent,
+        timestamp: getTimestamp(),
+        characterId: activeCharacterId,
+      }];
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
@@ -642,6 +653,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       endingId: metadata?.endingId,
       endingData: metadata?.endingData,
       tone: metadata?.tone,
+      majorEvent: metadata?.majorEvent,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 
