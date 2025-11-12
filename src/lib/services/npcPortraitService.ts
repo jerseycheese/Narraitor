@@ -4,7 +4,6 @@ import { World } from '@/types/world.types';
 import { useNPCStore } from '@/state/npcStore';
 import { useWorldStore } from '@/state/worldStore';
 import Logger from '@/lib/utils/logger';
-import { getTimestamp } from '@/lib/utils';
 
 const logger = new Logger('NPCPortraitService');
 

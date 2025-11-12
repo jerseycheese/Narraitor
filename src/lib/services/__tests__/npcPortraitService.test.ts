@@ -14,7 +14,10 @@ jest.mock('@/lib/utils/logger');
 global.fetch = jest.fn();
 
 describe('npcPortraitService', () => {
-  let mockNPCStore: any;
+  let mockNPCStore: {
+    npcs: Record<string, NPC>;
+    updateNPC: jest.Mock;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,9 +64,9 @@ describe('npcPortraitService', () => {
     createdAt: getTimestamp(),
     updatedAt: getTimestamp(),
     toneSettings: {
-      narrativeStyle: 'descriptive',
-      languageComplexity: 'moderate',
-      pacing: 'balanced'
+      contentRating: 'PG',
+      narrativeStyle: 'balanced',
+      languageComplexity: 'moderate'
     },
     ...overrides
   });
@@ -145,9 +148,9 @@ describe('npcPortraitService', () => {
       const npc = createMockNPC();
       const world = createMockWorld({
         toneSettings: {
-          narrativeStyle: 'pulp-action',
-          languageComplexity: 'simple',
-          pacing: 'fast'
+          contentRating: 'PG-13',
+          narrativeStyle: 'action-packed',
+          languageComplexity: 'simple'
         }
       });
 
@@ -172,9 +175,9 @@ describe('npcPortraitService', () => {
       const body = JSON.parse(callArgs[1].body);
 
       expect(body.world.toneSettings).toEqual({
-        narrativeStyle: 'pulp-action',
-        languageComplexity: 'simple',
-        pacing: 'fast'
+        contentRating: 'PG-13',
+        narrativeStyle: 'action-packed',
+        languageComplexity: 'simple'
       });
     });
 

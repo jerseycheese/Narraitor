@@ -34,7 +34,7 @@ const SEED_PAYLOAD = {
 test.describe('World details NPC portraits', () => {
   test('shows NPC portraits when available and initials fallback when not', async ({ page, baseURL }) => {
     await page.addInitScript(
-      ({ getTimestampSource, seed }) => {
+      async ({ getTimestampSource, seed }) => {
         const instantiateGetTimestamp = (source: string) =>
           new Function(`return (${source});`)() as () => string;
         const getTs = instantiateGetTimestamp(getTimestampSource);
@@ -142,8 +142,10 @@ test.describe('World details NPC portraits', () => {
           version: 2,
         } as const;
 
-        void put('narraitor-world-store', worldPersist);
-        void put('narraitor-npc-store', npcPersist);
+        await Promise.all([
+          put('narraitor-world-store', worldPersist),
+          put('narraitor-npc-store', npcPersist)
+        ]);
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE, seed: SEED_PAYLOAD }
     );
