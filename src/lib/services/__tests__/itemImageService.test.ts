@@ -43,12 +43,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
@@ -101,12 +121,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
@@ -180,12 +220,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
@@ -245,12 +305,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
@@ -308,12 +388,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
@@ -357,12 +457,32 @@ describe('ItemImageService', () => {
         description: 'A test world',
         attributes: [],
         skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 20,
+        },
       });
 
       const characterId = useCharacterStore.getState().create({
         name: 'Test Character',
         description: 'A test character',
         worldId: worldId,
+        level: 1,
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: [],
+          itemOrder: [],
+        },
         background: {
           physicalDescription: '',
           history: '',
