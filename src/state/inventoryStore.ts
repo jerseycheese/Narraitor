@@ -493,6 +493,10 @@ export const useInventoryStore = create<InventoryStore>()(
             normalizedUpdates.acquisitionHistory = updates.acquisitionHistory;
           }
 
+          if ('image' in updates) {
+            normalizedUpdates.image = updates.image;
+          }
+
           const now = getTimestamp();
           const updatedItem: InventoryItem = {
             ...existingItem,
@@ -789,6 +793,7 @@ export const useInventoryStore = create<InventoryStore>()(
             quantity: quantityToAdd,
             categorization: itemData.categorization,
             acquisition,
+            ...(itemData.image && { image: itemData.image }), // Include image if present
           };
 
           try {
@@ -829,6 +834,7 @@ export const useInventoryStore = create<InventoryStore>()(
             categoryId: categorization.categoryId,
             acquisitionHistory: [acquisitionRecord],
             categorization,
+            ...(newItemPayload.image && { image: newItemPayload.image }), // Include image if present
           };
 
           const itemId = get().create(itemDraft);
