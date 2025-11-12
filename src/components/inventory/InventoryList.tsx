@@ -168,6 +168,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                   className="p-4 border border-border hover:border-border/80 transition-colors inventory-item"
                   role="listitem"
                 >
+                  {/* Item Image (if available) */}
+                  {item.image?.url && (
+                    <div className="mb-3 flex justify-center">
+                      <img
+                        src={item.image.url}
+                        alt={item.name}
+                        className="w-24 h-24 object-contain rounded-md item-image"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
                   {/* Item Header: Name and Quantity */}
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium text-foreground flex-1 item-name">
