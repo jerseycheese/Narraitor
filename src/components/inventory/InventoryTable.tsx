@@ -63,6 +63,24 @@ export function InventoryTable({
   const columns: ColumnDef<InventoryItem>[] = React.useMemo(
     () => [
       {
+        id: 'image',
+        header: '',
+        cell: ({ row }) => {
+          const image = row.original.image;
+          if (!image?.url) return null;
+          return (
+            <img
+              src={image.url}
+              alt={row.original.name}
+              className="w-8 h-8 object-contain rounded item-image"
+              loading="lazy"
+            />
+          );
+        },
+        enableSorting: false,
+        size: 48,
+      },
+      {
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (

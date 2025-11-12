@@ -6,6 +6,7 @@ import { getTimestamp, titleCase } from '@/lib/utils';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItemCategorization } from '@/types/inventory.types';
+import { itemImageService } from '@/lib/services/itemImageService';
 
 /**
  * Processes items acquired during narrative generation and adds them to character inventory.
@@ -32,7 +33,8 @@ export async function processAcquiredItems(
   const inventoryStore = useInventoryStore.getState();
   const now = getTimestamp();
 
-  for (const item of items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     try {
       const normalizedName = normalizeItemName(item.name);
       const existingItems = inventoryStore.getCharacterItems(characterId);
@@ -74,7 +76,7 @@ export async function processAcquiredItems(
       if (!stackable && quantity > 1) {
         // Add each equipment item separately
         for (let i = 0; i < quantity; i++) {
-          inventoryStore.addItem(characterId, {
+          const itemId = inventoryStore.addItem(characterId, {
             name: normalizedName,
             description: item.description,
             quantity: 1,
@@ -87,6 +89,18 @@ export async function processAcquiredItems(
               acquiredAt: now,
             },
           });
+
+          // Trigger background image generation (fire and forget)
+          if (itemId) {
+            itemImageService.generateForItem(itemId, characterId).catch((error) => {
+              console.warn(`Background image generation failed for item: ${normalizedName}`, error);
+            });
+
+            // Small delay between items to prevent rate limiting
+            if (i < items.length - 1) {
+              await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+          }
         }
       } else {
         if (stackable && existingMatch) {
@@ -96,7 +110,7 @@ export async function processAcquiredItems(
         }
 
         // Add item normally for stackable items or single equipment
-        inventoryStore.addItem(characterId, {
+        const itemId = inventoryStore.addItem(characterId, {
           name: normalizedName,
           description: item.description,
           quantity,
@@ -109,6 +123,18 @@ export async function processAcquiredItems(
             acquiredAt: now,
           },
         });
+
+        // Trigger background image generation (fire and forget)
+        if (itemId) {
+          itemImageService.generateForItem(itemId, characterId).catch((error) => {
+            console.warn(`Background image generation failed for item: ${normalizedName}`, error);
+          });
+
+          // Small delay between items to prevent rate limiting
+          if (i < items.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 200));
+          }
+        }
       }
     } catch (err) {
       // Log error but continue processing remaining items

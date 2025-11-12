@@ -16,7 +16,7 @@ import {
   InventoryAcquisitionRecord,
   ItemUsageResult,
 } from '@/types/inventory.types';
-import { EntityID } from '../types/common.types';
+import { EntityID, GeneratedImage } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { CrudStore } from './createCrudStore';
@@ -28,6 +28,8 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   characterInventories: Record<EntityID, EntityID[]>;
   error: UserFriendlyError | null;
   loading: boolean;
+  generatingImageFor: Set<EntityID>; // Track items with images being generated
+  imageGenerationErrors: Map<EntityID, string>; // Track generation errors by item ID
 
   // Core CRUD operations
   createItem: (itemData: InventoryItemCreatePayload) => EntityID;
@@ -49,6 +51,10 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   clearCharacterInventory: (characterId: EntityID) => void;
   useItem: (characterId: EntityID, itemId: EntityID) => ItemUsageResult;
 
+  // Image generation tracking
+  setGeneratingImage: (itemId: EntityID, isGenerating: boolean) => void;
+  setImageGenerationError: (itemId: EntityID, error: string | null) => void;
+
   // State management
   reset: () => void;
   setError: (error: UserFriendlyError | null) => void;
@@ -64,6 +70,7 @@ export interface InventoryItemCreatePayload {
   maxStack?: number;
   categorization: InventoryItemCategorization;
   acquisition: InventoryAcquisitionRecord;
+  image?: GeneratedImage; // Optional AI-generated visual asset
 }
 
 export type InventoryItemAddPayload = Omit<
@@ -82,6 +89,8 @@ const getInitialState = () => ({
   currentEntityId: null as EntityID | null,
   error: null as UserFriendlyError | null,
   loading: false,
+  generatingImageFor: new Set<EntityID>(),
+  imageGenerationErrors: new Map<EntityID, string>(),
 });
 
 export const INVENTORY_STORE_VERSION = 2;
@@ -255,6 +264,19 @@ const validateNewItemData = (data: InventoryItemCreatePayload): void => {
 
   if (data.maxStack !== undefined && data.maxStack <= 0) {
     throw new Error('Max stack size must be greater than zero');
+  }
+
+  // Validate optional image field if present
+  if (data.image !== undefined) {
+    if (typeof data.image !== 'object' || data.image === null) {
+      throw new Error('Image must be a GeneratedImage object');
+    }
+    if (!data.image.type || (data.image.type !== 'ai-generated' && data.image.type !== 'placeholder')) {
+      throw new Error('Image type must be "ai-generated" or "placeholder"');
+    }
+    if (data.image.url !== null && typeof data.image.url !== 'string') {
+      throw new Error('Image URL must be a string or null');
+    }
   }
 };
 
@@ -471,6 +493,10 @@ export const useInventoryStore = create<InventoryStore>()(
             normalizedUpdates.acquisitionHistory = updates.acquisitionHistory;
           }
 
+          if ('image' in updates) {
+            normalizedUpdates.image = updates.image;
+          }
+
           const now = getTimestamp();
           const updatedItem: InventoryItem = {
             ...existingItem,
@@ -548,6 +574,30 @@ export const useInventoryStore = create<InventoryStore>()(
         clearError: () => set({ error: null }),
         setLoading: (loading) => set({ loading }),
 
+        setGeneratingImage: (itemId, isGenerating) => {
+          set((state) => {
+            const newGeneratingSet = new Set(state.generatingImageFor);
+            if (isGenerating) {
+              newGeneratingSet.add(itemId);
+            } else {
+              newGeneratingSet.delete(itemId);
+            }
+            return { generatingImageFor: newGeneratingSet };
+          });
+        },
+
+        setImageGenerationError: (itemId, error) => {
+          set((state) => {
+            const newErrorsMap = new Map(state.imageGenerationErrors);
+            if (error) {
+              newErrorsMap.set(itemId, error);
+            } else {
+              newErrorsMap.delete(itemId);
+            }
+            return { imageGenerationErrors: newErrorsMap };
+          });
+        },
+
         createItem: (itemData) => {
           try {
             validateNewItemData(itemData);
@@ -588,6 +638,7 @@ export const useInventoryStore = create<InventoryStore>()(
             categoryId: categorization.categoryId,
             acquisitionHistory: [acquisitionRecord],
             categorization,
+            ...(itemData.image && { image: itemData.image }), // Include image if present
           };
 
           return get().create(itemDraft);
@@ -742,6 +793,7 @@ export const useInventoryStore = create<InventoryStore>()(
             quantity: quantityToAdd,
             categorization: itemData.categorization,
             acquisition,
+            ...(itemData.image && { image: itemData.image }), // Include image if present
           };
 
           try {
@@ -782,6 +834,7 @@ export const useInventoryStore = create<InventoryStore>()(
             categoryId: categorization.categoryId,
             acquisitionHistory: [acquisitionRecord],
             categorization,
+            ...(newItemPayload.image && { image: newItemPayload.image }), // Include image if present
           };
 
           const itemId = get().create(itemDraft);

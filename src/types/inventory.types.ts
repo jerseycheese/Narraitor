@@ -1,6 +1,6 @@
 // src/types/inventory.types.ts
 
-import { EntityID, NamedEntity, TimestampedEntity, ISODateString } from './common.types';
+import { EntityID, NamedEntity, TimestampedEntity, ISODateString, GeneratedImage } from './common.types';
 
 /**
  * Standard inventory category types for organizing items in any narrative genre.
@@ -76,6 +76,7 @@ export interface InventoryItem extends NamedEntity, TimestampedEntity {
   maxStack?: number;
   acquisitionHistory: InventoryAcquisitionRecord[];
   categorization: InventoryItemCategorization;
+  image?: GeneratedImage; // AI-generated visual asset for the item
 }
 
 /**
