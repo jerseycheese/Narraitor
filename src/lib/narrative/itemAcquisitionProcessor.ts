@@ -33,7 +33,8 @@ export async function processAcquiredItems(
   const inventoryStore = useInventoryStore.getState();
   const now = getTimestamp();
 
-  for (const item of items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     try {
       const normalizedName = normalizeItemName(item.name);
       const existingItems = inventoryStore.getCharacterItems(characterId);
@@ -94,6 +95,11 @@ export async function processAcquiredItems(
             itemImageService.generateForItem(itemId, characterId).catch((error) => {
               console.warn(`Background image generation failed for item: ${normalizedName}`, error);
             });
+
+            // Small delay between items to prevent rate limiting
+            if (i < items.length - 1) {
+              await new Promise((resolve) => setTimeout(resolve, 200));
+            }
           }
         }
       } else {
@@ -123,6 +129,11 @@ export async function processAcquiredItems(
           itemImageService.generateForItem(itemId, characterId).catch((error) => {
             console.warn(`Background image generation failed for item: ${normalizedName}`, error);
           });
+
+          // Small delay between items to prevent rate limiting
+          if (i < items.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 200));
+          }
         }
       }
     } catch (err) {

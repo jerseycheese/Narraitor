@@ -70,6 +70,10 @@ class ItemImageService {
     const world = worldStore.worlds[character.worldId];
     const genre = world?.genre;
 
+    // Set generating status and clear any stale errors
+    inventoryStore.setGeneratingImage(itemId, true);
+    inventoryStore.setImageGenerationError(itemId, null);
+
     // Create promise and cache it immediately to prevent duplicate requests
     const imagePromise = this._generateImageInternal(item, genre);
     this.cache.set(itemId, imagePromise);
@@ -162,7 +166,10 @@ class ItemImageService {
 
     const inventoryStore = useInventoryStore.getState();
     const characterItems = inventoryStore.getCharacterItems(characterId);
-    const itemsNeedingImages = characterItems.filter((item) => !item.image);
+    // Include items without images OR with placeholder images (for upgrade path)
+    const itemsNeedingImages = characterItems.filter(
+      (item) => !item.image || item.image.type === 'placeholder'
+    );
 
     if (itemsNeedingImages.length === 0) {
       logger.debug(
