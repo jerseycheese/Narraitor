@@ -146,12 +146,74 @@ const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
 const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
 ```
 
+### Choice Generator Integration
+The system also integrates with `ChoiceGenerator` to create personalized player options:
+
+```typescript
+// In choiceGenerator.ts
+// Automatically uses relevance-scored past decisions when sessionId is provided
+await choiceGenerator.generateChoices({
+  worldId,
+  narrativeContext,
+  characterIds,
+  sessionId, // Enables decision history integration
+  includeDecisionHistory: true // Default: true
+});
+```
+
+**How Decision-Aware Choices Work:**
+1. ChoiceGenerator builds `CurrentNarrativeContext` from current game state (location, situation, characters, tags)
+2. Uses `DecisionRelevanceCalculator` to score past decisions by relevance (top 15 selected)
+3. Formats decisions with `DecisionFormatter` using 500 token budget with adaptive detail levels:
+   - High relevance (≥0.7): Full context with location, characters, situation
+   - Medium relevance (0.4-0.69): Compact format with location and action
+   - Low relevance (<0.4): Minimal format with action and type only
+4. Injects decision history into AI prompt with instructions to:
+   - Reflect player's established decision-making patterns
+   - Create natural callbacks to relevant past decisions
+   - Align options with demonstrated personality
+   - Acknowledge consequences of previous choices
+
+**Token Budget Strategy:**
+- Narrative generation: 1000 tokens for decision history (richer context)
+- Choice generation: 500 tokens for decision history (tighter budget)
+- If budget exceeded: drops lowest-scoring decisions first
+- Tiebreaker logic: uses recency + decision type priority
+- Fallback: gracefully handles empty decision history
+
+**Example Decision-Influenced Choices:**
+
+If player has made 5 diplomatic choices recently:
+```
+Past decisions show: negotiated with guards, talked down merchant, avoided combat
+↓
+Generated choices include more diplomatic options:
+1. Try to negotiate with the dragon
+2. Offer the dragon a trade instead of fighting
+3. Call for backup (diplomatic approach to combat)
+```
+
+If player has made aggressive choices:
+```
+Past decisions show: attacked bandits, threatened merchant, challenged guards
+↓
+Generated choices acknowledge reputation:
+1. Attack immediately before they recognize you
+2. Draw your weapon and demand answers
+3. Try to talk (harder due to your reputation)
+```
+
 ### Data Flow
 1. Player makes choices during gameplay
 2. `PlayerDecisionTracker` records and validates decisions
-3. `PersonalizationEngine` analyzes patterns and creates context
-4. Enhanced context informs AI narrative generation
-5. Resulting narrative reflects player preferences
+3. During narrative generation:
+   - `PersonalizationEngine` analyzes patterns and creates context
+   - Enhanced context informs AI narrative generation
+4. During choice generation:
+   - `DecisionRelevanceCalculator` scores past decisions by current context
+   - `DecisionFormatter` creates token-efficient decision history
+   - Enhanced prompt generates personalized player options
+5. Resulting narrative AND choices reflect player preferences
 
 ## Performance Characteristics
 
