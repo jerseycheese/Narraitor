@@ -266,6 +266,7 @@ interface NarrativeStore {
   }) => Promise<void>;
   clearEnding: () => void;
   setCurrentEnding: (ending: StoryEnding | null) => void;
+  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) => void;
   saveEndingToHistory: () => void;
   hasActiveEnding: () => boolean;
   getEndingForSession: (sessionId: EntityID) => StoryEnding | null;
@@ -1000,19 +1001,22 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
     try {
       // Get narrative segments and journal entries for this session
+      // Only send the last 10 segments and 5 journal entries to avoid payload size issues
       const state = get();
-      const narrativeSegments = Object.values(state.segments)
+      const allSegments = Object.values(state.segments)
         .filter(segment => segment.sessionId === params.sessionId)
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const narrativeSegments = allSegments.slice(-10); // Last 10 segments only
 
       // Lazy load journal store to avoid circular dependencies
       if (!journalStoreModule) {
         journalStoreModule = await import('./journalStore');
       }
       const journalState = journalStoreModule.useJournalStore.getState();
-      const journalEntries = journalState.entries
+      const allJournalEntries = journalState.entries
         ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
         : [];
+      const journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
 
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await fetch('/api/narrative/ending', {
@@ -1085,9 +1089,14 @@ export const useNarrativeStore = create<NarrativeStore>()(
   },
   
   clearEnding: () => set({ currentEnding: null, endingError: null }),
-  
+
   setCurrentEnding: (ending) => set({ currentEnding: ending, endingError: null }),
-  
+
+  updateCurrentEnding: (updater) => set((state) => ({
+    currentEnding: updater(state.currentEnding),
+    endingError: null
+  })),
+
   saveEndingToHistory: () => {
     const state = get();
     const ending = state.currentEnding;

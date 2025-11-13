@@ -30,7 +30,7 @@ export function EndingScreen() {
     endingError,
     // clearEnding, // Not currently used
     getSessionSegments,
-    setCurrentEnding
+    updateCurrentEnding
   } = useNarrativeStore();
   
   const { characters } = useCharacterStore();
@@ -94,9 +94,17 @@ export function EndingScreen() {
       setEndingImage(data.imageUrl);
 
       // Update the ending in the store with the image URL
-      setCurrentEnding({
-        ...currentEnding,
-        imageUrl: data.imageUrl
+      // Use functional update to avoid race conditions with stale closures
+      const endingIdToUpdate = currentEnding.id;
+      updateCurrentEnding((current) => {
+        // Only update if this is still the same ending
+        if (!current || current.id !== endingIdToUpdate) {
+          return current;
+        }
+        return {
+          ...current,
+          imageUrl: data.imageUrl
+        };
       });
     } catch (error) {
       console.error('Failed to generate ending image:', error);
@@ -105,7 +113,7 @@ export function EndingScreen() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, setCurrentEnding]);
+  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, updateCurrentEnding]);
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
