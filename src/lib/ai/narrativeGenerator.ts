@@ -1928,13 +1928,15 @@ ${content}
   async generatePlayerChoices(
     worldId: string,
     narrativeContext: NarrativeContext,
-    characterIds: string[]
+    characterIds: string[],
+    sessionId?: EntityID
   ): Promise<Decision> {
     try {
       const result = await this.choiceGenerator.generateChoices({
         worldId,
         narrativeContext,
         characterIds,
+        sessionId: sessionId || narrativeContext.sessionId, // Use explicit sessionId or extract from context
         minOptions: 3,
         maxOptions: 4,
         useAlignedChoices: false, // Use enhanced playerChoice template with hints and requirements
