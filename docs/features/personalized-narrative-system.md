@@ -147,7 +147,7 @@ const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
 ```
 
 ### Choice Generator Integration
-The system also integrates with `ChoiceGenerator` to create personalized player options:
+The choice generator taps into the same decision history system to personalize player options. When you pass a sessionId, it automatically pulls in relevant past decisions and uses them to shape the choices it generates.
 
 ```typescript
 // In choiceGenerator.ts
@@ -161,47 +161,15 @@ await choiceGenerator.generateChoices({
 });
 ```
 
-**How Decision-Aware Choices Work:**
-1. ChoiceGenerator builds `CurrentNarrativeContext` from current game state (location, situation, characters, tags)
-2. Uses `DecisionRelevanceCalculator` to score past decisions by relevance (top 15 selected)
-3. Formats decisions with `DecisionFormatter` using 500 token budget with adaptive detail levels:
-   - High relevance (≥0.7): Full context with location, characters, situation
-   - Medium relevance (0.4-0.69): Compact format with location and action
-   - Low relevance (<0.4): Minimal format with action and type only
-4. Injects decision history into AI prompt with instructions to:
-   - Reflect player's established decision-making patterns
-   - Create natural callbacks to relevant past decisions
-   - Align options with demonstrated personality
-   - Acknowledge consequences of previous choices
+The mechanics work like this: first, the generator builds a snapshot of the current situation - where you are, who's around, what's happening, what tags are active. Then it scores your past decisions by relevance using the same calculator that powers narrative generation. Location matches, similar situations, characters you've interacted with - all of these factor into the relevance score. The system grabs the top 15 decisions and formats them with adaptive detail levels. High-relevance decisions (score ≥0.7) get full context with location, characters, and situation. Medium-relevance ones (0.4-0.69) get a more compact format. Low-relevance decisions (under 0.4) get compressed down to just the action and type.
 
-**Token Budget Strategy:**
-- Narrative generation: 1000 tokens for decision history (richer context)
-- Choice generation: 500 tokens for decision history (tighter budget)
-- If budget exceeded: drops lowest-scoring decisions first
-- Tiebreaker logic: uses recency + decision type priority
-- Fallback: gracefully handles empty decision history
+That formatted history gets injected into the AI prompt along with specific instructions: reflect the player's established patterns, create natural callbacks to relevant past decisions, align options with their demonstrated personality, and acknowledge consequences of previous choices.
 
-**Example Decision-Influenced Choices:**
+The token budget here is tighter than in narrative generation - 500 tokens versus 1000 - since choices need room for the actual option descriptions. If the decision history exceeds the budget, the system drops the lowest-scoring decisions first. When there's a tie in relevance scores, it uses recency as the tiebreaker (more recent decisions win). The whole thing degrades gracefully if there's no decision history at all, so new players get generic choices until they've made a few decisions.
 
-If player has made 5 diplomatic choices recently:
-```
-Past decisions show: negotiated with guards, talked down merchant, avoided combat
-↓
-Generated choices include more diplomatic options:
-1. Try to negotiate with the dragon
-2. Offer the dragon a trade instead of fighting
-3. Call for backup (diplomatic approach to combat)
-```
+Here's what this looks like in practice. Say you've been making diplomatic choices - negotiating with guards, talking down merchants, avoiding fights. The generator will offer more diplomatic options: "Try to negotiate with the dragon" instead of just "attack" or "flee." Maybe "Offer the dragon a trade instead of fighting" or "Call for backup" (framing combat as a diplomatic solution). The choices naturally reflect how you've been playing.
 
-If player has made aggressive choices:
-```
-Past decisions show: attacked bandits, threatened merchant, challenged guards
-↓
-Generated choices acknowledge reputation:
-1. Attack immediately before they recognize you
-2. Draw your weapon and demand answers
-3. Try to talk (harder due to your reputation)
-```
+On the flip side, if you've been aggressive - attacking bandits, threatening merchants, challenging guards - the choices acknowledge your reputation. "Attack immediately before they recognize you" (your aggressive history is known). "Draw your weapon and demand answers" (intimidation as your go-to). Even "Try to talk" might show up, but with a note that it's harder now because of how you've acted before. The game remembers.
 
 ### Data Flow
 1. Player makes choices during gameplay
