@@ -3,6 +3,7 @@ import { AIClient } from '../types';
 import { EntityID } from '@/types/common.types';
 import { NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
+import { DecisionRelevanceScore } from '@/types/relevance.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { playerDecisionTracker } from '../playerDecisionTracker';
 
@@ -95,7 +96,10 @@ const createMockDecision = (
   id: string,
   choiceType: ChoiceTypePreference,
   prompt: string,
-  choiceText: string
+  choiceText: string,
+  location: string = 'Forest',
+  situation: string = 'Exploring',
+  charactersPresent: string[] = []
 ): PlayerDecision => ({
   id: id as EntityID,
   sessionId: 'session-1' as EntityID,
@@ -103,10 +107,27 @@ const createMockDecision = (
   prompt,
   choiceText,
   choiceType,
-  selectedAt: getTimestamp(),
-  location: 'Forest',
-  situation: 'Exploring',
-  charactersPresent: []
+  timestamp: getTimestamp(),
+  context: {
+    location,
+    situation,
+    charactersPresent
+  }
+});
+
+// Helper to create mock relevance score
+const createMockRelevanceScore = (
+  decisionId: string,
+  overallScore: number
+): DecisionRelevanceScore => ({
+  decisionId: decisionId as EntityID,
+  overallScore,
+  recencyScore: overallScore * 0.9,
+  contextScore: overallScore * 0.8,
+  impactScore: overallScore * 0.7,
+  tagMatchScore: overallScore * 0.6,
+  characterScore: overallScore * 0.5,
+  calculatedAt: getTimestamp()
 });
 
 describe('ChoiceGenerator - Decision History Integration', () => {
@@ -134,8 +155,8 @@ Options:
       ];
 
       mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue([
-        { decision: mockDecisions[0], relevanceScore: 0.8 },
-        { decision: mockDecisions[1], relevanceScore: 0.6 }
+        { decision: mockDecisions[0], relevanceScore: createMockRelevanceScore('decision-1', 0.8) },
+        { decision: mockDecisions[1], relevanceScore: createMockRelevanceScore('decision-2', 0.6) }
       ]);
 
       const narrativeContext = createMockNarrativeContext();
@@ -220,7 +241,7 @@ Options:
         .mockReturnValueOnce([
           {
             decision: createMockDecision('decision-world-1', 'aggressive', 'Fight?', 'Attack'),
-            relevanceScore: 0.7
+            relevanceScore: createMockRelevanceScore('decision-world-1', 0.7)
           }
         ]);
 
@@ -267,7 +288,7 @@ Options:
       mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue(
         manyDecisions.slice(0, 15).map((decision, i) => ({
           decision,
-          relevanceScore: 1 - i * 0.05 // Decreasing relevance
+          relevanceScore: createMockRelevanceScore(decision.id, 1 - i * 0.05) // Decreasing relevance
         }))
       );
 

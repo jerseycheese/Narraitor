@@ -607,10 +607,19 @@ CHOICE DESIGN RULES:
     if (narrativeContext.characterIds) {
       charactersPresent.push(...narrativeContext.characterIds);
     }
-    // Add characters from recent segments
+    // Add characters from recent segments (check both top-level and metadata.characterIds)
     if (narrativeContext.recentSegments) {
       narrativeContext.recentSegments.forEach(segment => {
-        if (segment.metadata.characterIds) {
+        // Check top-level characterIds (used by narrativeStore)
+        if (segment.characterIds) {
+          segment.characterIds.forEach(charId => {
+            if (!charactersPresent.includes(charId)) {
+              charactersPresent.push(charId);
+            }
+          });
+        }
+        // Also check metadata.characterIds for compatibility
+        if (segment.metadata?.characterIds) {
           segment.metadata.characterIds.forEach(charId => {
             if (!charactersPresent.includes(charId)) {
               charactersPresent.push(charId);
