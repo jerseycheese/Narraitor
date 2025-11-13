@@ -147,29 +147,30 @@ const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
 ```
 
 ### Choice Generator Integration
-The choice generator taps into the same decision history system to personalize player options. When you pass a sessionId, it automatically pulls in relevant past decisions and uses them to shape the choices it generates.
+The choice generator uses decision history to personalize player options. Pass a sessionId and it automatically pulls relevant past decisions to shape the choices it generates.
 
 ```typescript
-// In choiceGenerator.ts
-// Automatically uses relevance-scored past decisions when sessionId is provided
 await choiceGenerator.generateChoices({
   worldId,
   narrativeContext,
   characterIds,
-  sessionId, // Enables decision history integration
-  includeDecisionHistory: true // Default: true
+  sessionId, // Enables decision history
+  includeDecisionHistory: true // Default
 });
 ```
 
-The mechanics work like this: first, the generator builds a snapshot of the current situation - where you are, who's around, what's happening, what tags are active. Then it scores your past decisions by relevance using the same calculator that powers narrative generation. Location matches, similar situations, characters you've interacted with - all of these factor into the relevance score. The system grabs the top 15 decisions and formats them with adaptive detail levels. High-relevance decisions (score ≥0.7) get full context with location, characters, and situation. Medium-relevance ones (0.4-0.69) get a more compact format. Low-relevance decisions (under 0.4) get compressed down to just the action and type.
+**How it works:**
+- Builds snapshot of current situation (location, characters, tags)
+- Scores past decisions by relevance (location matches, similar situations, character overlap)
+- Gets top 15 decisions and formats them with adaptive detail levels:
+  - High relevance (≥0.7): full context
+  - Medium (0.4-0.69): compact format
+  - Low (<0.4): minimal format
+- Injects formatted history into AI prompt with instructions to match player patterns
 
-That formatted history gets injected into the AI prompt along with specific instructions: reflect the player's established patterns, create natural callbacks to relevant past decisions, align options with their demonstrated personality, and acknowledge consequences of previous choices.
+**Token budget:** 500 tokens for choices vs 1000 for narrative (choices need room for option descriptions). If budget exceeded, drops lowest-scoring decisions first.
 
-The token budget here is tighter than in narrative generation - 500 tokens versus 1000 - since choices need room for the actual option descriptions. If the decision history exceeds the budget, the system drops the lowest-scoring decisions first. When there's a tie in relevance scores, it uses recency as the tiebreaker (more recent decisions win). The whole thing degrades gracefully if there's no decision history at all, so new players get generic choices until they've made a few decisions.
-
-Here's what this looks like in practice. Say you've been making diplomatic choices - negotiating with guards, talking down merchants, avoiding fights. The generator will offer more diplomatic options: "Try to negotiate with the dragon" instead of just "attack" or "flee." Maybe "Offer the dragon a trade instead of fighting" or "Call for backup" (framing combat as a diplomatic solution). The choices naturally reflect how you've been playing.
-
-On the flip side, if you've been aggressive - attacking bandits, threatening merchants, challenging guards - the choices acknowledge your reputation. "Attack immediately before they recognize you" (your aggressive history is known). "Draw your weapon and demand answers" (intimidation as your go-to). Even "Try to talk" might show up, but with a note that it's harder now because of how you've acted before. The game remembers.
+**Example:** If you've been diplomatic (negotiating, talking down merchants), the generator offers options like "Try to negotiate with the dragon" instead of just "attack" or "flee." If you've been aggressive, choices acknowledge your reputation: "Attack before they recognize you" or "Draw your weapon and demand answers."
 
 ### Data Flow
 1. Player makes choices during gameplay
