@@ -92,6 +92,7 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       worldId: 'skill-world',
       narrativeContext,
       characterIds: ['char-1'],
+      sessionId: 'session-1', // Now includes sessionId from narrativeContext
       minOptions: 3,
       maxOptions: 4,
       useAlignedChoices: false

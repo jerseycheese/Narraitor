@@ -3,14 +3,18 @@ import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateMa
 import { useWorldStore } from '@/state/worldStore';
 import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
+import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
+import { playerDecisionTracker } from './playerDecisionTracker';
+import { DecisionFormatter } from './decisionFormatter';
+import { CurrentNarrativeContext } from '@/types/relevance.types';
 
 /**
  * Parameters for choice generation
@@ -19,9 +23,11 @@ export interface ChoiceGenerationParams {
   worldId: string;
   narrativeContext: NarrativeContext;
   characterIds: string[];
+  sessionId?: EntityID;
   maxOptions?: number;
   minOptions?: number;
   useAlignedChoices?: boolean;
+  includeDecisionHistory?: boolean;
 }
 
 /**
@@ -29,15 +35,19 @@ export interface ChoiceGenerationParams {
  * based on the current narrative context, character attributes, and world settings.
  */
 export class ChoiceGenerator {
-  constructor(private aiClient: AIClient) {}
+  private decisionFormatter: DecisionFormatter;
+
+  constructor(private aiClient: AIClient) {
+    this.decisionFormatter = new DecisionFormatter();
+  }
   
   /**
    * Generate player choices based on narrative context
    */
   async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
-    
+
     try {
-      const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3, useAlignedChoices = false } = params;
+      const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
       
       console.log('🔄 Generating choices - Step 1: Getting world', { worldId });
       const world = this.getWorld(worldId);
@@ -58,8 +68,12 @@ export class ChoiceGenerator {
       const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId);
       
       console.log('🔄 Generating choices - Step 6: Enhancing with tone settings');
-      const prompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
 
+      console.log('🔄 Generating choices - Step 7: Enhancing with decision history');
+      const prompt = includeDecisionHistory && sessionId
+        ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId, narrativeContext)
+        : toneEnhancedPrompt;
 
       const response = await this.aiClient.generateContent(prompt);
       
@@ -570,5 +584,144 @@ CHOICE DESIGN RULES:
     }
 
     return finalOption;
+  }
+
+  /**
+   * Builds CurrentNarrativeContext from narrative context for relevance scoring
+   */
+  private buildCurrentNarrativeContext(
+    worldId: EntityID,
+    sessionId: EntityID,
+    narrativeContext: NarrativeContext
+  ): CurrentNarrativeContext {
+    // Extract location from narrative context
+    const latestRecentSegment =
+      narrativeContext.recentSegments && narrativeContext.recentSegments.length > 0
+        ? narrativeContext.recentSegments[narrativeContext.recentSegments.length - 1]
+        : undefined;
+
+    const location = narrativeContext.currentLocation || latestRecentSegment?.metadata?.location;
+
+    // Extract characters present from narrative context
+    const charactersPresent: string[] = [];
+    if (narrativeContext.characterIds) {
+      charactersPresent.push(...narrativeContext.characterIds);
+    }
+    // Add characters from recent segments (check both top-level and metadata.characterIds)
+    if (narrativeContext.recentSegments) {
+      narrativeContext.recentSegments.forEach(segment => {
+        // Check top-level characterIds (used by narrativeStore)
+        if (segment.characterIds) {
+          segment.characterIds.forEach(charId => {
+            if (!charactersPresent.includes(charId)) {
+              charactersPresent.push(charId);
+            }
+          });
+        }
+        // Also check metadata.characterIds for compatibility
+        if (segment.metadata?.characterIds) {
+          segment.metadata.characterIds.forEach(charId => {
+            if (!charactersPresent.includes(charId)) {
+              charactersPresent.push(charId);
+            }
+          });
+        }
+      });
+    }
+
+    // Extract situation from narrative context
+    const situation = narrativeContext.currentSituation;
+
+    // Extract recent events from recent segments
+    const recentEvents: string[] = [];
+    if (narrativeContext.recentSegments) {
+      narrativeContext.recentSegments.forEach(segment => {
+        if (segment.content) {
+          // Use first 100 chars of each segment as event summary
+          const summary = segment.content.substring(0, 100).trim();
+          if (summary) {
+            recentEvents.push(summary);
+          }
+        }
+      });
+    }
+
+    // Extract active tags from narrative context
+    const activeTags = narrativeContext.currentTags || [];
+
+    return {
+      location,
+      charactersPresent,
+      situation,
+      recentEvents,
+      activeTags,
+      worldId,
+      sessionId,
+      timestamp: getTimestamp()
+    };
+  }
+
+  /**
+   * Enhances a prompt with past decision history to generate personalized choices
+   * Uses relevance scoring to select the most important decisions
+   */
+  private enhancePromptWithDecisionHistory(
+    prompt: string,
+    worldId: EntityID,
+    sessionId: EntityID,
+    narrativeContext: NarrativeContext
+  ): string {
+    try {
+      // Build current narrative context for relevance scoring
+      const currentContext = this.buildCurrentNarrativeContext(
+        worldId,
+        sessionId,
+        narrativeContext
+      );
+
+      // Use relevance system to get most important decisions with scores (max 10-15)
+      let decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+        currentContext,
+        15,
+        { worldId, sessionId }
+      );
+
+      // Fallback to world-level decisions if no session-specific decisions exist
+      if (decisionsWithScores.length === 0) {
+        decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+          currentContext,
+          15,
+          { worldId }
+        );
+      }
+
+      // If no decisions at all, return prompt unchanged
+      if (decisionsWithScores.length === 0) {
+        return prompt;
+      }
+
+      // Format decisions with adaptive detail based on relevance scores (500 token budget for choices)
+      const decisions = decisionsWithScores.map(item => item.decision);
+      const scores = decisionsWithScores.map(item => item.relevanceScore);
+      const decisionHistory = this.decisionFormatter.formatDecisions(decisions, scores, 500);
+
+      // Add decision history context with instructions for choice generation
+      const decisionGuidance = `
+
+## Past Decision History
+${decisionHistory}
+
+CHOICE GENERATION INSTRUCTIONS:
+- Generate choices that reflect the player's established decision-making patterns
+- Create natural callbacks to relevant past decisions when appropriate
+- Align options with the character's demonstrated personality
+- Acknowledge consequences of previous choices where relevant
+- Ensure choices feel consistent with the player's history`;
+
+      return `${prompt}${decisionGuidance}`;
+    } catch (error) {
+      console.error('Error enhancing prompt with decision history:', error);
+      return prompt;
+    }
   }
 }

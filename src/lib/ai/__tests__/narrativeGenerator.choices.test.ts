@@ -99,6 +99,7 @@ describe('NarrativeGenerator - Player Choices', () => {
         worldId: 'world-1',
         narrativeContext: mockNarrativeContext,
         characterIds: ['character-1'],
+        sessionId: 'session-1', // Now includes sessionId from narrativeContext
         minOptions: 3,
         maxOptions: 4,
         useAlignedChoices: false

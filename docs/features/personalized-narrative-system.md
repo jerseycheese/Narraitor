@@ -146,12 +146,43 @@ const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
 const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
 ```
 
+### Choice Generator Integration
+The choice generator uses decision history to personalize player options. Pass a sessionId and it automatically pulls relevant past decisions to shape the choices it generates.
+
+```typescript
+await choiceGenerator.generateChoices({
+  worldId,
+  narrativeContext,
+  characterIds,
+  sessionId, // Enables decision history
+  includeDecisionHistory: true // Default
+});
+```
+
+**How it works:**
+- Builds snapshot of current situation (location, characters, tags)
+- Scores past decisions by relevance (location matches, similar situations, character overlap)
+- Gets top 15 decisions and formats them with adaptive detail levels:
+  - High relevance (≥0.7): full context
+  - Medium (0.4-0.69): compact format
+  - Low (<0.4): minimal format
+- Injects formatted history into AI prompt with instructions to match player patterns
+
+**Token budget:** 500 tokens for choices vs 1000 for narrative (choices need room for option descriptions). If budget exceeded, drops lowest-scoring decisions first.
+
+**Example:** If you've been diplomatic (negotiating, talking down merchants), the generator offers options like "Try to negotiate with the dragon" instead of just "attack" or "flee." If you've been aggressive, choices acknowledge your reputation: "Attack before they recognize you" or "Draw your weapon and demand answers."
+
 ### Data Flow
 1. Player makes choices during gameplay
 2. `PlayerDecisionTracker` records and validates decisions
-3. `PersonalizationEngine` analyzes patterns and creates context
-4. Enhanced context informs AI narrative generation
-5. Resulting narrative reflects player preferences
+3. During narrative generation:
+   - `PersonalizationEngine` analyzes patterns and creates context
+   - Enhanced context informs AI narrative generation
+4. During choice generation:
+   - `DecisionRelevanceCalculator` scores past decisions by current context
+   - `DecisionFormatter` creates token-efficient decision history
+   - Enhanced prompt generates personalized player options
+5. Resulting narrative AND choices reflect player preferences
 
 ## Performance Characteristics
 
