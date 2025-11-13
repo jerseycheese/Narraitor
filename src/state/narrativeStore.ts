@@ -22,6 +22,7 @@ import {
 let worldStoreModule: typeof import('./worldStore') | null = null;
 let sessionStoreModule: typeof import('./sessionStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
+let journalStoreModule: typeof import('./journalStore') | null = null;
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
 
@@ -998,6 +999,21 @@ export const useNarrativeStore = create<NarrativeStore>()(
     set({ isGeneratingEnding: true, endingError: null });
 
     try {
+      // Get narrative segments and journal entries for this session
+      const state = get();
+      const narrativeSegments = Object.values(state.segments)
+        .filter(segment => segment.sessionId === params.sessionId)
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+      // Lazy load journal store to avoid circular dependencies
+      if (!journalStoreModule) {
+        journalStoreModule = await import('./journalStore');
+      }
+      const journalState = journalStoreModule.useJournalStore.getState();
+      const journalEntries = journalState.entries
+        ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
+        : [];
+
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await fetch('/api/narrative/ending', {
         method: 'POST',
@@ -1011,6 +1027,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
           customPrompt: params.customPrompt,
           world: params.world, // Pass the world data from client
           character: params.character, // Pass the character data from client
+          narrativeSegments, // Pass narrative segments from client
+          journalEntries, // Pass journal entries from client
         })
       });
 

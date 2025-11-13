@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Globe, Plus, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
+import { Star, Globe, Plus, Play, Image as ImageIcon, ImageOff, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -24,12 +24,13 @@ import { Button } from '@/components/ui/button';
  */
 export function EndingScreen() {
   const router = useRouter();
-  const { 
-    currentEnding, 
-    isGeneratingEnding, 
-    endingError, 
+  const {
+    currentEnding,
+    isGeneratingEnding,
+    endingError,
     // clearEnding, // Not currently used
-    getSessionSegments 
+    getSessionSegments,
+    setCurrentEnding
   } = useNarrativeStore();
   
   const { characters } = useCharacterStore();
@@ -41,27 +42,37 @@ export function EndingScreen() {
   const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
 
+  // State for narrative review collapsible
+  const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(false);
+
 
 
   const generateEndingImage = useCallback(async () => {
     if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
       return; // Prevent multiple simultaneous requests or duplicate generation
     }
-    
+
+    // Check if image URL already exists on the ending
+    if (currentEnding.imageUrl) {
+      setEndingImage(currentEnding.imageUrl);
+      generatedForEndingRef.current = currentEnding.id;
+      return;
+    }
+
     generatedForEndingRef.current = currentEnding.id; // Mark this ending as being processed
     setIsGeneratingImage(true);
     setImageError(null);
-    
+
     try {
       const character = characters[currentEnding.characterId];
       const world = worlds[currentEnding.worldId];
-      
+
       // Get recent narrative segments for context
       const recentSegments = getSessionSegments(currentEnding.sessionId);
       const recentNarrative = recentSegments
         .slice(-5)
         .map(segment => segment.content);
-      
+
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
         headers: {
@@ -81,6 +92,12 @@ export function EndingScreen() {
 
       const data = await response.json();
       setEndingImage(data.imageUrl);
+
+      // Update the ending in the store with the image URL
+      setCurrentEnding({
+        ...currentEnding,
+        imageUrl: data.imageUrl
+      });
     } catch (error) {
       console.error('Failed to generate ending image:', error);
       setImageError('Failed to generate ending image');
@@ -88,7 +105,7 @@ export function EndingScreen() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments]);
+  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, setCurrentEnding]);
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
@@ -368,6 +385,78 @@ export function EndingScreen() {
                 {currentEnding.worldImpact}
               </div>
             </SectionWrapper>
+          </section>
+
+          {/* Narrative Review - Collapsible Section */}
+          <section>
+            <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg overflow-hidden">
+              <button
+                onClick={() => setIsNarrativeExpanded(!isNarrativeExpanded)}
+                className="w-full p-6 flex items-center justify-between hover:bg-accent/50 transition-colors"
+                aria-expanded={isNarrativeExpanded}
+                aria-controls="narrative-review-content"
+              >
+                <div className="flex items-center gap-3">
+                  <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <h2 className="text-2xl font-bold text-card-foreground">Review Your Journey</h2>
+                </div>
+                {isNarrativeExpanded ? (
+                  <ChevronUp className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                )}
+              </button>
+
+              {isNarrativeExpanded && (
+                <div
+                  id="narrative-review-content"
+                  className="px-6 pb-6 space-y-4 max-h-96 overflow-y-auto"
+                >
+                  {(() => {
+                    const narrativeSegments = getSessionSegments(currentEnding.sessionId);
+
+                    if (!narrativeSegments || narrativeSegments.length === 0) {
+                      return (
+                        <p className="text-muted-foreground italic">
+                          No narrative segments available for this session.
+                        </p>
+                      );
+                    }
+
+                    return narrativeSegments.map((segment, index) => (
+                      <div
+                        key={segment.id}
+                        className="border-l-2 border-primary/30 pl-4 py-2"
+                      >
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                          <span className="font-mono">#{index + 1}</span>
+                          <span className="capitalize">{segment.type}</span>
+                          {segment.timestamp && (
+                            <span>• {new Date(segment.timestamp).toLocaleTimeString()}</span>
+                          )}
+                        </div>
+                        <p className="text-card-foreground leading-relaxed">
+                          {segment.content}
+                        </p>
+                        {segment.decisions && segment.decisions.length > 0 && (
+                          <div className="mt-2 pl-4 border-l border-muted">
+                            {segment.decisions.map((decision) => (
+                              <div key={decision.id} className="text-sm">
+                                {decision.selectedOptionId && (
+                                  <p className="text-primary font-medium">
+                                    Choice: {decision.options.find(opt => opt.id === decision.selectedOptionId)?.text}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ));
+                  })()}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Next Steps */}
