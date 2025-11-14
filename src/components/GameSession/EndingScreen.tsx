@@ -9,6 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useJournalStore } from '@/state/journalStore';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
@@ -35,6 +36,7 @@ export function EndingScreen() {
   
   const { characters } = useCharacterStore();
   const { worlds } = useWorldStore();
+  const { entries: journalEntries } = useJournalStore();
   
   // State for ending image generation
   const [endingImage, setEndingImage] = useState<string | null>(null);
@@ -45,7 +47,12 @@ export function EndingScreen() {
   // State for narrative review collapsible
   const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(false);
 
-
+  // Initialize image from currentEnding if available
+  useEffect(() => {
+    if (currentEnding?.imageUrl && !endingImage) {
+      setEndingImage(currentEnding.imageUrl);
+    }
+  }, [currentEnding?.imageUrl, endingImage]);
 
   const generateEndingImage = useCallback(async () => {
     if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
@@ -172,7 +179,7 @@ export function EndingScreen() {
       <div className="text-center space-y-8">
         <header>
           <h1 className="text-4xl font-bold mb-4">No Ending Available</h1>
-          <p className="opacity-90">It looks like the story ending wasn&apos;t generated properly.</p>
+          <p className="text-muted-foreground">It looks like the story ending wasn&apos;t generated properly.</p>
         </header>
         <CardActionGroup 
           primaryActions={[{
@@ -275,67 +282,89 @@ export function EndingScreen() {
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <div className="pb-0" data-testid="ending-screen">
-        {/* Ending Header with tone-based background */}
-        <div className={`p-4 sm:py-8 ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)} rounded-lg shadow-lg mb-8`}>
-          <header>
-            <h1 className="text-4xl font-bold mb-4">
-              The End
-            </h1>
-            <p className="opacity-90">
-              {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-            </p>
-          </header>
-        </div>
-        <div className="space-y-8">
-          {/* Ending Image */}
-          <section 
-            className="rounded-lg overflow-hidden shadow-lg" 
-            aria-label="Story ending illustration"
-          >
-            {isGeneratingImage ? (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
-                <div className="text-center">
-                  <LoadingState message="Generating ending image..." />
-                  <p className="text-muted-foreground mt-2 text-sm">
-                    Creating a visual representation of your story&apos;s conclusion...
-                  </p>
-                </div>
+      <div className="pb-0 ending-screen-container" data-testid="ending-screen">
+        {/* Hero Section: Combined Header with Image */}
+        <section
+          className="rounded-lg overflow-hidden shadow-lg mb-8 relative"
+          aria-label="Story ending"
+        >
+          {isGeneratingImage ? (
+            <div className="w-full h-96 md:h-[32rem] lg:h-[40rem] bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
+              <div className="text-center">
+                <LoadingState message="Generating ending image..." />
+                <p className="text-muted-foreground mt-2 text-sm">
+                  Creating a visual representation of your story&apos;s conclusion...
+                </p>
               </div>
-            ) : endingImage ? (
-              <Image 
-                src={endingImage} 
+            </div>
+          ) : endingImage ? (
+            <div className="relative">
+              <Image
+                src={endingImage}
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
-                width={800}
-                height={400}
-                className="w-full h-48 md:h-64 lg:h-80 object-cover"
+                width={1280}
+                height={720}
+                className="w-full h-auto"
                 priority
               />
-            ) : imageError ? (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
-                  <p className="text-sm">Unable to generate ending image</p>
-                  <Button 
-                    onClick={generateEndingImage}
-                    variant="link"
-                    size="sm"
-                    className="mt-2 text-sm"
-                    aria-label="Retry generating ending image"
-                  >
-                    Try Again
-                  </Button>
-                </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                <header className="w-full px-4 py-6">
+                  <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">
+                    The End
+                  </h1>
+                  <p className="text-white">
+                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                  </p>
+                </header>
               </div>
-            ) : (
-              <div className="w-full h-48 md:h-64 lg:h-80 bg-muted flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
-                  <p className="text-sm">Ending image</p>
-                </div>
+            </div>
+          ) : imageError ? (
+            <div className={`w-full h-96 md:h-[32rem] lg:h-[40rem] ending-${currentEnding.tone} flex flex-col items-center justify-center relative`}>
+              <div className="text-center text-muted-foreground z-10">
+                <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
+                <p className="text-sm">Unable to generate ending image</p>
+                <Button
+                  onClick={generateEndingImage}
+                  variant="link"
+                  size="sm"
+                  className="mt-2 text-sm"
+                  aria-label="Retry generating ending image"
+                >
+                  Try Again
+                </Button>
               </div>
-            )}
-          </section>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                <header className="w-full px-4 py-6">
+                  <h2 className="text-4xl md:text-5xl font-bold mb-2 text-white">
+                    The End
+                  </h2>
+                  <p className="text-white">
+                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                  </p>
+                </header>
+              </div>
+            </div>
+          ) : (
+            <div className={`w-full h-96 md:h-[32rem] lg:h-[40rem] ending-${currentEnding.tone} flex items-center justify-center relative`}>
+              <div className="text-center text-muted-foreground z-10">
+                <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
+                <p className="text-sm">Ending image</p>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                <header className="w-full px-4 py-6">
+                  <h2 className="text-4xl md:text-5xl font-bold mb-2 text-white">
+                    The End
+                  </h2>
+                  <p className="text-white">
+                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                  </p>
+                </header>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <div className="space-y-8">
 
           {/* Epilogue */}
           <section>
@@ -403,6 +432,7 @@ export function EndingScreen() {
                 className="w-full p-6 flex items-center justify-between hover:bg-accent/50 transition-colors"
                 aria-expanded={isNarrativeExpanded}
                 aria-controls="narrative-review-content"
+                aria-label={isNarrativeExpanded ? "Collapse narrative review" : "Expand narrative review"}
               >
                 <div className="flex items-center gap-3">
                   <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
@@ -431,36 +461,42 @@ export function EndingScreen() {
                       );
                     }
 
-                    return narrativeSegments.map((segment, index) => (
-                      <div
-                        key={segment.id}
-                        className="border-l-2 border-primary/30 pl-4 py-2"
-                      >
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                          <span className="font-mono">#{index + 1}</span>
-                          <span className="capitalize">{segment.type}</span>
-                          {segment.timestamp && (
-                            <span>• {new Date(segment.timestamp).toLocaleTimeString()}</span>
+                    // Get decision journal entries for this session
+                    const decisionEntries = journalEntries
+                      ? Object.values(journalEntries)
+                          .filter(entry => entry.sessionId === currentEnding.sessionId && entry.type === 'decision')
+                          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                      : [];
+
+                    return narrativeSegments.map((segment, index) => {
+                      // Find decision entry that comes after this segment but before the next
+                      const segmentTime = new Date(segment.timestamp).getTime();
+                      const nextSegmentTime = index < narrativeSegments.length - 1
+                        ? new Date(narrativeSegments[index + 1].timestamp).getTime()
+                        : Infinity;
+
+                      const relatedDecision = decisionEntries.find(entry => {
+                        const entryTime = new Date(entry.createdAt).getTime();
+                        return entryTime >= segmentTime && entryTime < nextSegmentTime;
+                      });
+
+                      return (
+                        <div key={segment.id} className="space-y-3">
+                          <div className="border-l-2 border-primary/30 pl-4 py-2">
+                            <p className="text-card-foreground leading-relaxed">
+                              {segment.content}
+                            </p>
+                          </div>
+                          {relatedDecision && (
+                            <div className="pl-4">
+                              <p className="text-sm text-primary/80 italic">
+                                → {relatedDecision.metadata?.choiceText || relatedDecision.content}
+                              </p>
+                            </div>
                           )}
                         </div>
-                        <p className="text-card-foreground leading-relaxed">
-                          {segment.content}
-                        </p>
-                        {segment.decisions && segment.decisions.length > 0 && (
-                          <div className="mt-2 pl-4 border-l border-muted">
-                            {segment.decisions.map((decision) => (
-                              <div key={decision.id} className="text-sm">
-                                {decision.selectedOptionId && (
-                                  <p className="text-primary font-medium">
-                                    Choice: {decision.options.find(opt => opt.id === decision.selectedOptionId)?.text}
-                                  </p>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ));
+                      );
+                    });
                   })()}
                 </div>
               )}
