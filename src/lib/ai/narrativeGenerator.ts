@@ -24,7 +24,8 @@ import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
-import { DecisionFormatter } from './decisionFormatter';
+import { formatDecisions } from './simpleDecisionFormatter';
+import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
@@ -34,7 +35,6 @@ import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { NPC } from '@/types/npc.types';
-import { CurrentNarrativeContext } from '@/types/relevance.types';
 import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
@@ -98,7 +98,6 @@ export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
   private templateGenerator: TemplateGenerator;
   private personalizationEngine: PersonalizationEngine;
-  private decisionFormatter: DecisionFormatter;
 
   // Cache for static prompt content to reduce redundancy
   private staticContentCache: {
@@ -112,7 +111,6 @@ export class NarrativeGenerator {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
     this.templateGenerator = new TemplateGenerator(geminiClient);
     this.personalizationEngine = new PersonalizationEngine();
-    this.decisionFormatter = new DecisionFormatter();
   }
 
   /**
@@ -388,56 +386,36 @@ export class NarrativeGenerator {
       const playerCharacter =
         this.convertToPersonalizationCharacter(storeCharacter);
 
-      // Build current narrative context for relevance scoring
+      // Get recent relevant decisions using simple filtering
       let relevantDecisions: PlayerDecision[] = [];
       let decisionHistory = '';
 
       if (sessionId) {
-        const currentContext = this.buildCurrentNarrativeContext(
-          worldId,
-          sessionId,
-          narrativeContext
-        );
+        // Simple context - just need worldId and sessionId for filtering
+        const currentContext: SimpleNarrativeContext = { worldId, sessionId };
 
-        // Use relevance system to get most important decisions with scores (max 15)
-        let decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+        // Get most recent decisions (max 15)
+        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
           currentContext,
           15,
           { worldId, sessionId }
         );
 
-        if (decisionsWithScores.length === 0) {
-          decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+        if (relevantDecisions.length === 0) {
+          relevantDecisions = playerDecisionTracker.getRelevantDecisions(
             currentContext,
             15,
             { worldId }
           );
         }
 
-        // Extract decisions for personalization engine
-        relevantDecisions = decisionsWithScores.map(item => item.decision);
-
-        // Format decisions with adaptive detail based on relevance scores
-        const decisions = decisionsWithScores.map(item => item.decision);
-        const scores = decisionsWithScores.map(item => item.relevanceScore);
-        decisionHistory = this.decisionFormatter.formatDecisions(decisions, scores, 1000);
+        // Format decisions (all use same detailed format)
+        decisionHistory = formatDecisions(relevantDecisions);
       } else {
         // Fallback: get recent world decisions if no session ID
         const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
         relevantDecisions = allWorldDecisions.slice(0, 15);
-
-        // Format without relevance scores (fallback to default scores)
-        const fallbackScores = relevantDecisions.map(decision => ({
-          decisionId: decision.id,
-          overallScore: 0.5,
-          recencyScore: 0.5,
-          contextScore: 0.5,
-          impactScore: 0.5,
-          tagMatchScore: 0.5,
-          characterScore: 0.5,
-          calculatedAt: getTimestamp()
-        }));
-        decisionHistory = this.decisionFormatter.formatDecisions(relevantDecisions, fallbackScores, 1000);
+        decisionHistory = formatDecisions(relevantDecisions);
       }
 
       // Create personalized context

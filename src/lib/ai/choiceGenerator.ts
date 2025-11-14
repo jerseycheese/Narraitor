@@ -13,8 +13,8 @@ import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalizati
 import { useInventoryStore } from '@/state/inventoryStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { playerDecisionTracker } from './playerDecisionTracker';
-import { DecisionFormatter } from './decisionFormatter';
-import { CurrentNarrativeContext } from '@/types/relevance.types';
+import { formatDecisions } from './simpleDecisionFormatter';
+import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
 
 /**
  * Parameters for choice generation
@@ -35,11 +35,7 @@ export interface ChoiceGenerationParams {
  * based on the current narrative context, character attributes, and world settings.
  */
 export class ChoiceGenerator {
-  private decisionFormatter: DecisionFormatter;
-
-  constructor(private aiClient: AIClient) {
-    this.decisionFormatter = new DecisionFormatter();
-  }
+  constructor(private aiClient: AIClient) {}
   
   /**
    * Generate player choices based on narrative context
@@ -663,7 +659,7 @@ CHOICE DESIGN RULES:
 
   /**
    * Enhances a prompt with past decision history to generate personalized choices
-   * Uses relevance scoring to select the most important decisions
+   * Uses simple recency-based filtering
    */
   private enhancePromptWithDecisionHistory(
     prompt: string,
@@ -672,23 +668,19 @@ CHOICE DESIGN RULES:
     narrativeContext: NarrativeContext
   ): string {
     try {
-      // Build current narrative context for relevance scoring
-      const currentContext = this.buildCurrentNarrativeContext(
-        worldId,
-        sessionId,
-        narrativeContext
-      );
+      // Simple context - just need worldId and sessionId for filtering
+      const currentContext: SimpleNarrativeContext = { worldId, sessionId };
 
-      // Use relevance system to get most important decisions with scores (max 10-15)
-      let decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+      // Get most recent decisions (max 15)
+      let decisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
         15,
         { worldId, sessionId }
       );
 
       // Fallback to world-level decisions if no session-specific decisions exist
-      if (decisionsWithScores.length === 0) {
-        decisionsWithScores = playerDecisionTracker.getRelevantDecisionsWithScores(
+      if (decisions.length === 0) {
+        decisions = playerDecisionTracker.getRelevantDecisions(
           currentContext,
           15,
           { worldId }
@@ -696,14 +688,12 @@ CHOICE DESIGN RULES:
       }
 
       // If no decisions at all, return prompt unchanged
-      if (decisionsWithScores.length === 0) {
+      if (decisions.length === 0) {
         return prompt;
       }
 
-      // Format decisions with adaptive detail based on relevance scores (500 token budget for choices)
-      const decisions = decisionsWithScores.map(item => item.decision);
-      const scores = decisionsWithScores.map(item => item.relevanceScore);
-      const decisionHistory = this.decisionFormatter.formatDecisions(decisions, scores, 500);
+      // Format decisions (all use same detailed format)
+      const decisionHistory = formatDecisions(decisions);
 
       // Add decision history context with instructions for choice generation
       const decisionGuidance = `
