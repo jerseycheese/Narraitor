@@ -320,7 +320,7 @@
 @layer components {
   .card {
     background-color: theme('colors.white');
-    border: 1px solid theme('colors.gray.200');
+    border: 1px solid theme('colors.gray.300');
     border-radius: theme('borderRadius.lg');
     padding: theme('spacing.4');
     box-shadow: theme('boxShadow.md');
