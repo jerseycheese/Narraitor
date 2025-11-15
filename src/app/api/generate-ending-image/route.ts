@@ -82,7 +82,8 @@ Requirements:
 - Emotional depth matching the ${tone} tone
 - Rich detail and atmospheric depth
 - Professional game/film concept art style
-- Landscape orientation (16:9 or similar)
+- Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner)
+- Horizontal panoramic composition
 - Show the end of a journey, conclusion, or resolution
 - Focus on ${characterName} or the aftermath of their actions
 - No text, logos, or watermarks
@@ -159,14 +160,15 @@ export async function POST(request: NextRequest) {
 
 Requirements:
 - Epic cinematic scene showing story conclusion
-- High quality digital art style  
+- High quality digital art style
 - Professional game/film concept art
 - Rich atmospheric lighting and emotional depth
 - ${body.ending.tone} tone and mood
 - ${body.world?.genre || 'fantasy'} genre elements
 - Focus on the end of the journey or its aftermath
 - No text, logos, or watermarks
-- Landscape orientation suitable for story ending imagery`;
+- Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format)
+- Horizontal panoramic composition suitable for wide hero display`;
 
           const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
 
