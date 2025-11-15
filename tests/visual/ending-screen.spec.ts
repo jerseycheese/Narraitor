@@ -21,7 +21,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await mockApiEndpoints(page);
 
     // Mock the image generation API to return a consistent test image
-    await page.route('**/api/ai/generate-image', async (route) => {
+    await page.route('**/api/generate-ending-image', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -148,25 +148,18 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    
-    // Wait for content to stabilize
-    await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-tragic.png', {
@@ -307,23 +300,18 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {

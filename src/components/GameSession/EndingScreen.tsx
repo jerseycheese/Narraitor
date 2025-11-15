@@ -129,7 +129,7 @@ export function EndingScreen() {
       (window.location.port === '6006' || window.location.hostname.includes('storybook'));
     const isTest = process.env.NODE_ENV === 'test';
     const isDevHarness = typeof window !== 'undefined' && window.location.pathname.includes('/dev/ending-screen');
-    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__playwright);
+    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
     
     if (currentEnding && 
         !endingImage && 
