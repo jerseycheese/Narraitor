@@ -162,37 +162,39 @@ function calculateAttributeBonus(attributeValue: number): number {
 
 /**
  * Finds a world skill definition by ID or name.
- * 
+ *
  * This helper implements the standard lookup pattern used throughout the codebase:
  * ID lookup is preferred for performance and reliability, with name lookup as fallback.
- * 
+ *
  * @param skillIdentifier - Object containing either skillId or skillName
  * @param worldSkills - Array of world skill definitions to search
  * @returns The matching WorldSkill if found, null otherwise
- * 
+ *
  * @example
  * ```typescript
  * // Preferred: lookup by ID
  * const skill1 = findWorldSkill({ skillId: 'athletics' }, worldSkills);
- * 
+ *
  * // Fallback: lookup by name
  * const skill2 = findWorldSkill({ skillName: 'Athletics' }, worldSkills);
- * 
+ *
  * // Invalid: no identifier
  * const skill3 = findWorldSkill({}, worldSkills); // Returns null
  * ```
+ *
+ * @internal This function is only used internally within this module
  */
-export function findWorldSkill(
-  skillIdentifier: { skillId?: string; skillName?: string }, 
+function findWorldSkill(
+  skillIdentifier: { skillId?: string; skillName?: string },
   worldSkills: WorldSkill[]
 ): WorldSkill | null {
   if (skillIdentifier.skillId) {
     return worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
   }
-  
+
   if (skillIdentifier.skillName) {
     return worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
   }
-  
+
   return null;
 }
