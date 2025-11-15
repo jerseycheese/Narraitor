@@ -8,6 +8,7 @@ import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
+import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { safeTrim } from '@/lib/utils';
 import { normalizeDecisionOptions, normalizeSimpleChoices } from './optionNormalizer';
 import { SkillRequirementBadges, ItemRequirementBadges } from './RequirementBadges';
@@ -50,6 +51,13 @@ interface ChoiceSelectorProps {
     category?: string;
   }>;
   inventoryItems?: InventoryItem[];
+
+  // Ending suggestion props
+  endingSuggestion?: {
+    reason: string;
+    onAccept: () => void;
+    onDismiss: () => void;
+  };
 }
 
 /**
@@ -70,6 +78,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
+  endingSuggestion,
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -169,9 +178,18 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     >
       <div className="p-4">
 
+      {/* Ending Suggestion Banner */}
+      {endingSuggestion && (
+        <EndingSuggestionBanner
+          reason={endingSuggestion.reason}
+          onAccept={endingSuggestion.onAccept}
+          onDismiss={endingSuggestion.onDismiss}
+        />
+      )}
+
       {/* Context Summary */}
       {isDecisionMode && decision.contextSummary && (
-        <div 
+        <div
           data-testid="context-summary"
           className="mb-4 p-3 bg-white/50 rounded border border-gray-200"
         >

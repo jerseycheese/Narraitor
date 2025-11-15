@@ -20,6 +20,18 @@ test.describe('EndingScreen Visual Tests', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
+    // Mock the image generation API to return a consistent test image
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
+        }
+      });
+    });
+
     // Mock the narrative ending API to return a triumphant ending
     await page.route('**/api/narrative/ending', async (route) => {
       await route.fulfill({
@@ -33,7 +45,8 @@ test.describe('EndingScreen Visual Tests', () => {
             worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
-            playTime: 1234
+            playTime: 1234,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
           }
         }
       });
@@ -56,21 +69,19 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
-    // Hide dynamic content that could cause flakiness  
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+
+    // Give extra time for image rendering
+    await page.waitForTimeout(1000);
+
+    // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
     
     // Wait for content to stabilize
@@ -91,6 +102,18 @@ test.describe('EndingScreen Visual Tests', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
+    // Mock the image generation API to return a consistent test image
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2RjMjYyNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+VHJhZ2ljIEVuZGluZzwvdGV4dD48L3N2Zz4='
+        }
+      });
+    });
+
     // Mock the narrative ending API to return a tragic ending
     await page.route('**/api/narrative/ending', async (route) => {
       await route.fulfill({
@@ -104,7 +127,8 @@ test.describe('EndingScreen Visual Tests', () => {
             worldImpact: 'The power vacuum sparks turmoil before a fragile hope emerges from the chaos.',
             tone: 'tragic',
             achievements: ['Last Stand: Protected the weak', 'Unseen Hero: Faded into legend'],
-            playTime: 987
+            playTime: 987,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2RjMjYyNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+VHJhZ2ljIEVuZGluZzwvdGV4dD48L3N2Zz4='
           }
         }
       });
@@ -124,25 +148,18 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    
-    // Wait for content to stabilize
-    await page.waitForTimeout(100);
     
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-tragic.png', {
@@ -159,6 +176,18 @@ test.describe('EndingScreen Visual Tests', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
+    // Mock the image generation API to return a consistent test image
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzM3NDE1ZiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNhOGE4YjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5NeXN0ZXJpb3VzIEVuZGluZzwvdGV4dD48L3N2Zz4='
+        }
+      });
+    });
+
     // Mock the narrative ending API to return a mysterious ending
     await page.route('**/api/narrative/ending', async (route) => {
       await route.fulfill({
@@ -172,7 +201,8 @@ test.describe('EndingScreen Visual Tests', () => {
             worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city\'s fate.',
             tone: 'mysterious',
             achievements: ['Ghost In The Wires', 'Whispers of the Grid'],
-            playTime: 456
+            playTime: 456,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzM3NDE1ZiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNhOGE4YjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5NeXN0ZXJpb3VzIEVuZGluZzwvdGV4dD48L3N2Zz4='
           }
         }
       });
@@ -192,21 +222,19 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
-    // Hide dynamic content that could cause flakiness  
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+
+    // Give extra time for image rendering
+    await page.waitForTimeout(1000);
+
+    // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
     // Small settle for style application
     await page.waitForTimeout(150);
@@ -226,6 +254,18 @@ test.describe('EndingScreen Visual Tests', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
+    // Mock the image generation API to return a consistent test image
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzIyYzU1ZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SG9wZWZ1bCBFbmRpbmc8L3RleHQ+PC9zdmc+'
+        }
+      });
+    });
+
     // Mock the narrative ending API to return a hopeful ending
     await page.route('**/api/narrative/ending', async (route) => {
       await route.fulfill({
@@ -239,7 +279,8 @@ test.describe('EndingScreen Visual Tests', () => {
             worldImpact: 'Community hubs and open protocols flourish; the city dreams again.',
             tone: 'hopeful',
             achievements: ['Beacon of Hope', 'Architect of Freedom'],
-            playTime: 321
+            playTime: 321,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzIyYzU1ZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SG9wZWZ1bCBFbmRpbmc8L3RleHQ+PC9zdmc+'
           }
         }
       });
@@ -259,23 +300,18 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
-    
-    // Hide the ending image section to prevent variability
-    await page.evaluate(() => {
-      const imageSection = document.querySelector('[data-testid="ending-screen"] section[aria-label="Story ending illustration"]');
-      if (imageSection) {
-        (imageSection as HTMLElement).style.display = 'none';
-      }
-      
-      const images = document.querySelectorAll('[data-testid="ending-screen"] img');
-      images.forEach(img => {
-        (img as HTMLElement).style.display = 'none';
-      });
-    });
-    
+
+    // Wait for the ending image to load (optional - may not appear immediately)
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      // Image may still be loading, continue anyway
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {

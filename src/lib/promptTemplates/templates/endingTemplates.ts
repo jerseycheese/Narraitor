@@ -41,9 +41,22 @@ Additional instructions:
 Generate a complete story ending with the following components:
 
 1. CHOOSE AN APPROPRIATE TONE:
-   - Analyze the story context and choose the most fitting emotional tone
-   - Available tones: triumphant, mysterious, tragic, hopeful
-   - Base your choice on the character's journey and recent events
+   Analyze the story context and recent events, then choose the most fitting emotional tone:
+
+   - TRIUMPHANT: Use when the character achieved major victories, completed significant quests,
+     overcame great challenges, or had clear positive outcomes. The journey ended in success.
+
+   - HOPEFUL: Use when results are mixed, there's potential for future success, or the outcome
+     is bittersweet but optimistic. Not complete victory, but progress was made.
+
+   - MYSTERIOUS: Use when there are unresolved questions, ambiguous outcomes, enigmatic events,
+     or the story leaves mysteries unsolved. The ending raises new questions.
+
+   - TRAGIC: Use when the character suffered major losses, failed important quests, made heavy
+     sacrifices, or faced somber outcomes. The journey had a high cost or ended in failure.
+
+   IMPORTANT: Don't default to "hopeful" - carefully evaluate the actual story events and choose
+   the tone that honestly reflects what happened in the narrative.
 
 2. EPILOGUE (2-3 paragraphs):
    - Describe how the story concludes for {{characterName}}

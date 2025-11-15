@@ -144,7 +144,7 @@ describe('EndingGenerator - Advanced Features', () => {
     mockPromptTemplateManager.getTemplate.mockReturnValue({
       id: 'test-template',
       type: PromptType.NARRATIVE,
-      content: 'Generate ending...',
+      content: 'Compose ending...',
       variables: []
     });
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });

@@ -123,7 +123,7 @@ describe('EndingGenerator - Error Handling and Retry', () => {
       );
 
       await expect(endingGenerator.generateEnding(mockRequest)).rejects.toThrow(
-        'Failed to generate ending'
+        'Failed to create ending'
       );
     });
   });
@@ -152,7 +152,7 @@ describe('EndingGenerator - Error Handling and Retry', () => {
       mockPromptTemplateManager.getTemplate.mockReturnValue({
         id: 'test-template',
         type: PromptType.NARRATIVE,
-        content: 'Generate ending...',
+        content: 'Compose ending...',
         variables: []
       });
 

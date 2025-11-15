@@ -22,6 +22,7 @@ import {
 let worldStoreModule: typeof import('./worldStore') | null = null;
 let sessionStoreModule: typeof import('./sessionStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
+let journalStoreModule: typeof import('./journalStore') | null = null;
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
 
@@ -265,6 +266,7 @@ interface NarrativeStore {
   }) => Promise<void>;
   clearEnding: () => void;
   setCurrentEnding: (ending: StoryEnding | null) => void;
+  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) => void;
   saveEndingToHistory: () => void;
   hasActiveEnding: () => boolean;
   getEndingForSession: (sessionId: EntityID) => StoryEnding | null;
@@ -998,6 +1000,24 @@ export const useNarrativeStore = create<NarrativeStore>()(
     set({ isGeneratingEnding: true, endingError: null });
 
     try {
+      // Get narrative segments and journal entries for this session
+      // Only send the last 10 segments and 5 journal entries to avoid payload size issues
+      const state = get();
+      const allSegments = Object.values(state.segments)
+        .filter(segment => segment.sessionId === params.sessionId)
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const narrativeSegments = allSegments.slice(-10); // Last 10 segments only
+
+      // Lazy load journal store to avoid circular dependencies
+      if (!journalStoreModule) {
+        journalStoreModule = await import('./journalStore');
+      }
+      const journalState = journalStoreModule.useJournalStore.getState();
+      const allJournalEntries = journalState.entries
+        ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
+        : [];
+      const journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
+
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await fetch('/api/narrative/ending', {
         method: 'POST',
@@ -1011,12 +1031,14 @@ export const useNarrativeStore = create<NarrativeStore>()(
           customPrompt: params.customPrompt,
           world: params.world, // Pass the world data from client
           character: params.character, // Pass the character data from client
+          narrativeSegments, // Pass narrative segments from client
+          journalEntries, // Pass journal entries from client
         })
       });
 
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
-        throw new Error(`API error ${response.status}: ${errText || 'Failed to generate ending'}`);
+        throw new Error(`API error ${response.status}: ${errText || 'Failed to load ending'}`);
       }
 
       const json = await response.json();
@@ -1056,20 +1078,25 @@ export const useNarrativeStore = create<NarrativeStore>()(
       // Mark the session as ended to prevent further generation
       get().markSessionEnded(params.sessionId);
     } catch (error) {
-      logger.error('Failed to generate ending', { error, endingType, params });
+      logger.error('Failed to load ending', { error, endingType, params });
 
       set({
         currentEnding: null,
         isGeneratingEnding: false,
-        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        endingError: `Unable to load ending: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
   },
   
   clearEnding: () => set({ currentEnding: null, endingError: null }),
-  
+
   setCurrentEnding: (ending) => set({ currentEnding: ending, endingError: null }),
-  
+
+  updateCurrentEnding: (updater) => set((state) => ({
+    currentEnding: updater(state.currentEnding),
+    endingError: null
+  })),
+
   saveEndingToHistory: () => {
     const state = get();
     const ending = state.currentEnding;

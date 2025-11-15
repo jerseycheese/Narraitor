@@ -36,19 +36,21 @@ export async function buildEndingContext(
     throw new Error(`Character not found: ${request.characterId}`);
   }
 
-  const narrativeSegments = Object.values(useNarrativeStore.getState().segments)
-    .filter(segment => segment.sessionId === request.sessionId)
-    .sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+  const narrativeSegments = request.narrativeSegments ||
+    Object.values(useNarrativeStore.getState().segments)
+      .filter(segment => segment.sessionId === request.sessionId)
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
 
   const journalState = useJournalStore.getState();
-  const journalEntries = journalState.entries
-    ? Object.values(journalState.entries).filter(
-        entry => entry.sessionId === request.sessionId
-      )
-    : [];
+  const journalEntries = request.journalEntries ||
+    (journalState.entries
+      ? Object.values(journalState.entries).filter(
+          entry => entry.sessionId === request.sessionId
+        )
+      : []);
 
   const session = useSessionStore.getState().savedSessions[request.sessionId];
   const sessionStartTime = session?.lastPlayed

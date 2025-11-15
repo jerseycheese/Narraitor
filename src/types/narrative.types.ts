@@ -340,6 +340,8 @@ export interface StoryEnding extends TimestampedEntity {
   journalSummary?: string;
   achievements?: string[];
   playTime?: number;
+  imageUrl?: string;
+  narrativeSegments?: string[];
 }
 
 /**
@@ -354,6 +356,8 @@ export interface EndingGenerationRequest {
   customPrompt?: string;
   world?: World; // Optional world data passed from client
   character?: Character; // Optional character data passed from client
+  narrativeSegments?: NarrativeSegment[]; // Optional narrative segments from client
+  journalEntries?: import('./journal.types').JournalEntry[]; // Optional journal entries from client
 }
 
 /**

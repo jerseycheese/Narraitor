@@ -61,9 +61,12 @@ class EndingGenerator {
       const renderedPrompt = this.renderTemplate(promptTemplate.content, templateVariables);
 
       // Add custom prompt if provided
-      const finalPrompt = request.customPrompt 
+      let finalPrompt = request.customPrompt
         ? `${renderedPrompt}\n\nAdditional instruction: ${request.customPrompt}`
         : renderedPrompt;
+
+      // Add JSON-only instruction to ensure clean response
+      finalPrompt += '\n\nIMPORTANT: Return ONLY valid JSON with no additional text, markdown formatting, or commentary. The response must be parseable JSON.';
 
       // Generate with retries
       let lastError: Error | null = null;
@@ -96,16 +99,16 @@ class EndingGenerator {
         }
       }
 
-      throw new Error(`Failed to generate ending after ${this.maxRetries + 1} attempts: ${lastError?.message}`);
+      throw new Error(`Failed to create ending after ${this.maxRetries + 1} attempts: ${lastError?.message}`);
     } catch (error) {
-      logger.error('Failed to generate ending', { 
+      logger.error('Failed to create ending', { 
         error,
         requestType: request.endingType,
         tone: request.desiredTone,
         characterId: request.characterId,
         worldId: request.worldId 
       });
-      throw new Error('Failed to generate ending: ' + (error as Error).message);
+      throw new Error('Failed to create ending: ' + (error as Error).message);
     }
   }
 
@@ -152,46 +155,81 @@ class EndingGenerator {
 
   private parseResponse(response: string): EndingGenerationResult {
     try {
-      // Try to parse as JSON first
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        
-        // Validate required fields
-        if (!parsed.epilogue || !parsed.characterLegacy || !parsed.worldImpact) {
-          throw new Error('Missing required fields in response');
-        }
+      // Clean up the response - remove markdown code blocks if present
+      let cleanResponse = response.trim();
+      cleanResponse = cleanResponse.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
 
-        // Validate and clean the tone value
-        const validTones: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
-        let cleanTone: EndingTone = 'hopeful'; // default
-        
-        if (parsed.tone) {
-          const toneString = parsed.tone.toLowerCase().trim();
-          // Check if the tone contains any of the valid tones
-          const foundTone = validTones.find(tone => toneString.includes(tone));
-          if (foundTone) {
-            cleanTone = foundTone;
-          }
+      // Try to parse the entire response as JSON first
+      try {
+        const parsed = JSON.parse(cleanResponse);
+        return this.validateAndCleanParsedResult(parsed);
+      } catch {
+        // If that fails, try to extract JSON with more precise regex
+        // Match from first { to last } with proper nesting
+        const jsonMatch = this.extractJsonFromText(cleanResponse);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch);
+          return this.validateAndCleanParsedResult(parsed);
         }
-
-        return {
-          epilogue: parsed.epilogue,
-          characterLegacy: parsed.characterLegacy,
-          worldImpact: parsed.worldImpact,
-          tone: cleanTone,
-          achievements: parsed.achievements || [],
-          playTime: parsed.playTime
-        };
       }
 
       throw new Error('No valid JSON found in response');
     } catch (error) {
-      logger.error('Failed to parse ending response', { error, response });
-      
+      logger.error('Failed to parse ending response', {
+        error,
+        response: response.substring(0, 200) + '...' // Log only first 200 chars
+      });
+
       // Fallback: try to extract content from response
       return this.extractFromPlainText(response);
     }
+  }
+
+  private extractJsonFromText(text: string): string | null {
+    // Find the first { and last } to handle nested objects properly
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+      return null;
+    }
+
+    return text.substring(firstBrace, lastBrace + 1);
+  }
+
+  private validateAndCleanParsedResult(parsed: unknown): EndingGenerationResult {
+    if (typeof parsed !== 'object' || parsed === null) {
+      throw new Error('Parsed result is not an object');
+    }
+
+    const data = parsed as Record<string, unknown>;
+
+    // Validate required fields
+    if (!data.epilogue || !data.characterLegacy || !data.worldImpact) {
+      throw new Error('Missing required fields in response');
+    }
+
+    // Validate and clean the tone value
+    const validTones: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
+    let cleanTone: EndingTone = 'hopeful'; // default
+
+    if (data.tone && typeof data.tone === 'string') {
+      const toneString = data.tone.toLowerCase().trim();
+      // Check if the tone contains any of the valid tones
+      const foundTone = validTones.find(tone => toneString.includes(tone));
+      if (foundTone) {
+        cleanTone = foundTone;
+      }
+    }
+
+    return {
+      epilogue: String(data.epilogue),
+      characterLegacy: String(data.characterLegacy),
+      worldImpact: String(data.worldImpact),
+      tone: cleanTone,
+      achievements: Array.isArray(data.achievements) ? data.achievements.map(String) : [],
+      playTime: typeof data.playTime === 'number' ? data.playTime : undefined
+    };
   }
 
   private extractFromPlainText(response: string): EndingGenerationResult {

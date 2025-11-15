@@ -12,7 +12,6 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
-import { StoryEndingDialog } from '@/components/StoryEndingDialog';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -640,7 +639,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         character: character  // Pass the full character object
       });
     } catch (error) {
-      console.error('Failed to generate ending:', error);
+      console.error('Failed to load ending:', error);
     }
   };
   
@@ -665,7 +664,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         character: character  // Pass the full character object
       });
     } catch (error) {
-      console.error('Failed to generate ending:', error);
+      console.error('Failed to load ending:', error);
     }
   };
   
@@ -823,6 +822,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 worldSkills={world?.skills || []}
                 characterSkills={characterSkills}
                 inventoryItems={inventoryItems}
+                endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
+                  reason: endingSuggestionReason,
+                  onAccept: handleAcceptEndingSuggestion,
+                  onDismiss: handleRejectEndingSuggestion,
+                } : undefined}
               />
             ) : (
               <div className="space-y-4 p-4">
@@ -881,27 +885,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         />
       </div>
 
-      {/* Ending Suggestion Dialog */}
-      <StoryEndingDialog
-        isOpen={showEndingSuggestion}
-        onClose={handleRejectEndingSuggestion}
-        onContinue={handleAcceptEndingSuggestion}
-        title="Story Ending Suggested"
-        content={
-          <div className="space-y-3">
-            <p>The AI has detected that your story might be ready to conclude based on natural story progression.</p>
-            {endingSuggestionReason && (
-              <p className="text-sm text-gray-700 italic">
-                Reason: {endingSuggestionReason}
-              </p>
-            )}
-            <p>Would you like to generate an ending now, or continue your adventure?</p>
-          </div>
-        }
-        endingType="default"
-        continueText="Generate Ending"
-        closeText="Continue Playing"
-      />
 
       {/* Manual End Story Confirmation */}
       <ConfirmationDialog

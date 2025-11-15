@@ -99,7 +99,7 @@ export function StoryEndingDialog({
             className="w-full sm:w-auto bg-blue-700 hover:bg-blue-900 text-white border-0 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             variant="default"
             type="button"
-            aria-label={`${continueText} - this will generate the story ending`}
+            aria-label={`${continueText} - this will show the story ending`}
           >
             {continueText}
           </Button>

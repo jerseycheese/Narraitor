@@ -46,7 +46,7 @@ export async function callGeminiImageAPI(
   logger.debug('callGeminiImageAPI', 'Calling Gemini image generation API');
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
     {
       method: 'POST',
       headers: {
@@ -58,7 +58,10 @@ export async function callGeminiImageAPI(
           parts: [{ text: prompt }]
         }],
         generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"]
+          responseModalities: ["IMAGE"],
+          imageConfig: {
+            aspectRatio: "21:9"
+          }
         }
       })
     }

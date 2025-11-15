@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
       desiredTone: body.desiredTone,
       customPrompt: body.customPrompt,
       world: body.world, // Pass world data from client
-      character: body.character // Pass character data from client
+      character: body.character, // Pass character data from client
+      narrativeSegments: body.narrativeSegments, // Pass narrative segments from client
+      journalEntries: body.journalEntries // Pass journal entries from client
     };
 
     logger.info('Generating story ending', { 
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Internal server error', details: 'Failed to generate ending' },
+      { error: 'Internal server error', details: 'Unable to load ending' },
       { status: 500 }
     );
   }
