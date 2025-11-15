@@ -58,7 +58,10 @@ export async function callGeminiImageAPI(
           parts: [{ text: prompt }]
         }],
         generationConfig: {
-          responseModalities: ["IMAGE"]
+          responseModalities: ["IMAGE"],
+          outputOptions: {
+            aspectRatio: "3:1"
+          }
         }
       })
     }
