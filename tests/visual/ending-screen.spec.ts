@@ -103,7 +103,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await mockApiEndpoints(page);
 
     // Mock the image generation API to return a consistent test image
-    await page.route('**/api/ai/generate-image', async (route) => {
+    await page.route('**/api/generate-ending-image', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -177,7 +177,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await mockApiEndpoints(page);
 
     // Mock the image generation API to return a consistent test image
-    await page.route('**/api/ai/generate-image', async (route) => {
+    await page.route('**/api/generate-ending-image', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -255,7 +255,7 @@ test.describe('EndingScreen Visual Tests', () => {
     await mockApiEndpoints(page);
 
     // Mock the image generation API to return a consistent test image
-    await page.route('**/api/ai/generate-image', async (route) => {
+    await page.route('**/api/generate-ending-image', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
