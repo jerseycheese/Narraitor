@@ -1424,7 +1424,8 @@ Return ONLY the rewritten narrative.`;
       normalizedContent = normalizedContent
         .replace(/[ \t]+([,;:.!?])/g, '$1')
         .replace(/[ \t]{2,}/g, ' ')
-        .replace(/\s*\[[a-z0-9-]+\]/gi, '');
+        .replace(/\s*\[[a-z0-9-]+\]/gi, '')
+        .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, ''); // Remove metadata syntax like [metadata.characterIds: npc-id]
     }
 
     const speakerId = this.normalizeId(extractedMetadata.speakerId);
