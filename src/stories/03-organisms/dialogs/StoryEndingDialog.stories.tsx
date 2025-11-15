@@ -37,7 +37,7 @@ export const Triumphant: Story = {
     title: 'Victory Achieved',
     content: 'Your choices led to a positive outcome. The characters you helped are now thriving, and the world is a better place because of your decisions.',
     endingType: 'triumphant',
-    continueText: 'Generate Ending',
+    continueText: 'View Ending',
     closeText: 'Continue Playing',
   },
 };
@@ -49,7 +49,7 @@ export const Tragic: Story = {
     title: 'A Heavy Price',
     content: 'Despite your best efforts, things did not turn out as hoped. Your decisions led to unforeseen consequences, but even in failure, there are lessons to be learned.',
     endingType: 'tragic',
-    continueText: 'Generate Ending',
+    continueText: 'View Ending',
     closeText: 'Continue Playing',
   },
 };

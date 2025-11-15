@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Internal server error', details: 'Failed to generate ending' },
+      { error: 'Internal server error', details: 'Unable to load ending' },
       { status: 500 }
     );
   }

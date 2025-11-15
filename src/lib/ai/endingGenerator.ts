@@ -99,16 +99,16 @@ class EndingGenerator {
         }
       }
 
-      throw new Error(`Failed to generate ending after ${this.maxRetries + 1} attempts: ${lastError?.message}`);
+      throw new Error(`Failed to create ending after ${this.maxRetries + 1} attempts: ${lastError?.message}`);
     } catch (error) {
-      logger.error('Failed to generate ending', { 
+      logger.error('Failed to create ending', { 
         error,
         requestType: request.endingType,
         tone: request.desiredTone,
         characterId: request.characterId,
         worldId: request.worldId 
       });
-      throw new Error('Failed to generate ending: ' + (error as Error).message);
+      throw new Error('Failed to create ending: ' + (error as Error).message);
     }
   }
 

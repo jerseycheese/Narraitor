@@ -639,7 +639,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         character: character  // Pass the full character object
       });
     } catch (error) {
-      console.error('Failed to generate ending:', error);
+      console.error('Failed to load ending:', error);
     }
   };
   
@@ -664,7 +664,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         character: character  // Pass the full character object
       });
     } catch (error) {
-      console.error('Failed to generate ending:', error);
+      console.error('Failed to load ending:', error);
     }
   };
   

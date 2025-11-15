@@ -222,7 +222,7 @@ Requirements:
   } catch (error) {
     logger.error('generate-ending-image', 'Ending image generation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to generate ending image. Please try again.' },
+      { error: 'Unable to load ending image. Please try again.' },
       { status: 500 }
     );
   }

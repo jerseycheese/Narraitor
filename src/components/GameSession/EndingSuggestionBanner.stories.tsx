@@ -15,7 +15,7 @@ const meta = {
       description: 'AI-generated reason for suggesting the story ending',
     },
     onAccept: {
-      description: 'Callback when user clicks Generate Ending',
+      description: 'Callback when the player chooses to view the ending',
     },
     onDismiss: {
       description: 'Callback when user clicks Continue Playing',

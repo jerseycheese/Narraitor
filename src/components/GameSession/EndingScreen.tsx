@@ -94,7 +94,7 @@ export function EndingScreen() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate ending image');
+        throw new Error('Failed to load ending image');
       }
 
       const data = await response.json();
@@ -114,15 +114,15 @@ export function EndingScreen() {
         };
       });
     } catch (error) {
-      console.error('Failed to generate ending image:', error);
-      setImageError('Failed to generate ending image');
+      console.error('Failed to load ending image:', error);
+      setImageError('Failed to load ending image');
       generatedForEndingRef.current = null; // Reset on error so user can retry
     } finally {
       setIsGeneratingImage(false);
     }
   }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, updateCurrentEnding]);
 
-  // Generate ending image when ending is available (but not in Storybook or test environment)
+  // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
     // Skip image generation in Storybook, test environment, or dev harness
     const isStorybook = typeof window !== 'undefined' && 
@@ -151,7 +151,7 @@ export function EndingScreen() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background" role="main" aria-live="polite">
         <div className="text-center space-y-4">
-          <LoadingState message="Generating your story ending..." />
+          <LoadingState message="Loading your story ending..." />
           <p className="text-muted-foreground">
             Please wait while we craft the perfect conclusion to your journey...
           </p>
@@ -165,7 +165,7 @@ export function EndingScreen() {
     return (
       <ErrorDisplay 
         variant="page"
-        title="Failed to generate story ending"
+        title="Unable to load story ending"
         message={endingError || "An unknown error occurred"}
         showRetry={true}
         onRetry={() => router.back()}
@@ -179,7 +179,7 @@ export function EndingScreen() {
       <div className="text-center space-y-8">
         <header>
           <h1 className="text-4xl font-bold mb-4">No Ending Available</h1>
-          <p className="text-muted-foreground">It looks like the story ending wasn&apos;t generated properly.</p>
+          <p className="text-muted-foreground">It looks like the story ending isn&apos;t available right now.</p>
         </header>
         <CardActionGroup 
           primaryActions={[{
@@ -281,11 +281,11 @@ export function EndingScreen() {
           aria-label="Story ending"
         >
           {isGeneratingImage ? (
-            <div className="w-full h-64 md:h-96 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
+            <div className="w-full h-64 md:h-96 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Loading ending image">
               <div className="text-center">
-                <LoadingState message="Generating ending image..." />
+                <LoadingState message="Loading ending image..." />
                 <p className="text-muted-foreground mt-2 text-sm">
-                  Creating a visual representation of your story&apos;s conclusion...
+                  Preparing a visual representation of your story&apos;s conclusion...
                 </p>
               </div>
             </div>
@@ -314,13 +314,13 @@ export function EndingScreen() {
             <div className={`w-full h-64 md:h-96 ending-${currentEnding.tone} flex flex-col items-center justify-center relative`}>
               <div className="text-center text-muted-foreground z-10">
                 <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
-                <p className="text-sm">Unable to generate ending image</p>
+                <p className="text-sm">Unable to load ending image</p>
                 <Button
                   onClick={generateEndingImage}
                   variant="link"
                   size="sm"
                   className="mt-2 text-sm"
-                  aria-label="Retry generating ending image"
+                  aria-label="Retry loading ending image"
                 >
                   Try Again
                 </Button>

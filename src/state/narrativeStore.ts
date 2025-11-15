@@ -1038,7 +1038,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
-        throw new Error(`API error ${response.status}: ${errText || 'Failed to generate ending'}`);
+        throw new Error(`API error ${response.status}: ${errText || 'Failed to load ending'}`);
       }
 
       const json = await response.json();
@@ -1078,12 +1078,12 @@ export const useNarrativeStore = create<NarrativeStore>()(
       // Mark the session as ended to prevent further generation
       get().markSessionEnded(params.sessionId);
     } catch (error) {
-      logger.error('Failed to generate ending', { error, endingType, params });
+      logger.error('Failed to load ending', { error, endingType, params });
 
       set({
         currentEnding: null,
         isGeneratingEnding: false,
-        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        endingError: `Unable to load ending: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
   },

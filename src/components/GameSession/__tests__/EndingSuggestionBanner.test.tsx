@@ -24,7 +24,7 @@ describe('EndingSuggestionBanner', () => {
     expect(screen.getByText('The protagonist has achieved their goal')).toBeInTheDocument();
   });
 
-  it('calls onAccept when Generate Ending button is clicked', async () => {
+  it('calls onAccept when View Ending button is clicked', async () => {
     const user = userEvent.setup();
 
     render(
@@ -35,7 +35,7 @@ describe('EndingSuggestionBanner', () => {
       />
     );
 
-    const acceptButton = screen.getByRole('button', { name: /generate ending/i });
+    const acceptButton = screen.getByRole('button', { name: /view ending/i });
     await user.click(acceptButton);
 
     expect(mockOnAccept).toHaveBeenCalledTimes(1);

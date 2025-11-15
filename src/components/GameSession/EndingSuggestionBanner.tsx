@@ -25,7 +25,7 @@ export function EndingSuggestionBanner({
       </AlertDescription>
       <div className="flex gap-2 mt-4">
         <Button size="sm" onClick={onAccept}>
-          Generate Ending
+          View Ending
         </Button>
         <Button size="sm" variant="secondary" onClick={onDismiss}>
           Continue Playing
