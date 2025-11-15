@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Globe, Plus, Play, Image as ImageIcon, ImageOff, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Star, Globe, Play, Image as ImageIcon, ImageOff, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -235,14 +235,6 @@ export function EndingScreen() {
       icon: (<Globe className="w-4 h-4" aria-hidden="true" />)
     },
     {
-      key: 'new-character', 
-      text: 'New Character',
-      onClick: () => router.push(`/characters/create?worldId=${currentEnding.worldId}`),
-      variant: 'primary',
-      flex: true,
-      icon: (<Plus className="w-4 h-4" aria-hidden="true" />)
-    },
-    {
       key: 'new-story',
       text: 'New Story',
       onClick: async () => {
@@ -250,16 +242,16 @@ export function EndingScreen() {
         const { setCurrentCharacter } = useCharacterStore.getState();
         const { clearEnding, clearSessionSegments, clearSessionDecisions } = useNarrativeStore.getState();
         const { endSession } = useSessionStore.getState();
-        
+
         // End the current session if it exists
         if (currentEnding.sessionId) {
           clearSessionSegments(currentEnding.sessionId);
           clearSessionDecisions(currentEnding.sessionId);
         }
-        
+
         // End the current session to save it
         await endSession();
-        
+
         setCurrentCharacter(currentEnding.characterId);
         clearEnding();
         router.push(`/worlds/${currentEnding.worldId}/play?fresh=true`);

@@ -26,8 +26,9 @@ export default function PlayPage() {
   // Check for test data to support visual regression tests (guarded for SSR)
   // Always call hooks and use persisted store data
   const world = useWorldStore((state) => state.worlds[worldId]);
+  const sessionStatus = useSessionStore((state) => state.status);
   const currentSessionId = useSessionStore((state) => state.id);
-  const { getSessionSegments } = useNarrativeStore();
+  const { getSessionSegments, currentEnding } = useNarrativeStore();
 
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';
@@ -91,20 +92,23 @@ export default function PlayPage() {
             height="h-20 sm:h-24"
             titleElement="h1"
             actions={
-              <div className="hidden sm:flex flex-row gap-2">
-                <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
-                  Switch Character
-                </Button>
-                <Button size="sm" variant="default" onClick={handleStartNewClick}>
-                  Start New
-                </Button>
-                <Button size="sm" variant="secondary" onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}>
-                  End Story
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}>
-                  End Session
-                </Button>
-              </div>
+              // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)
+              !currentEnding && (sessionStatus === 'active' || sessionStatus === 'paused' || sessionStatus === 'loading') ? (
+                <div className="hidden sm:flex flex-row gap-2">
+                  <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
+                    Switch Character
+                  </Button>
+                  <Button size="sm" variant="default" onClick={handleStartNewClick}>
+                    Start New
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}>
+                    End Story
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}>
+                    End Session
+                  </Button>
+                </div>
+              ) : undefined
             }
           />
         </div>
