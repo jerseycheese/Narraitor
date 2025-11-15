@@ -289,7 +289,7 @@ export function EndingScreen() {
           aria-label="Story ending"
         >
           {isGeneratingImage ? (
-            <div className="w-full h-96 md:h-[32rem] lg:h-[40rem] bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
+            <div className="w-full h-64 md:h-96 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Generating ending image">
               <div className="text-center">
                 <LoadingState message="Generating ending image..." />
                 <p className="text-muted-foreground mt-2 text-sm">
@@ -298,13 +298,13 @@ export function EndingScreen() {
               </div>
             </div>
           ) : endingImage ? (
-            <div className="relative">
+            <div className="relative h-64 md:h-96">
               <Image
                 src={endingImage}
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={1280}
                 height={720}
-                className="w-full h-auto"
+                className="w-full h-full object-cover"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
@@ -319,7 +319,7 @@ export function EndingScreen() {
               </div>
             </div>
           ) : imageError ? (
-            <div className={`w-full h-96 md:h-[32rem] lg:h-[40rem] ending-${currentEnding.tone} flex flex-col items-center justify-center relative`}>
+            <div className={`w-full h-64 md:h-96 ending-${currentEnding.tone} flex flex-col items-center justify-center relative`}>
               <div className="text-center text-muted-foreground z-10">
                 <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                 <p className="text-sm">Unable to generate ending image</p>
@@ -345,7 +345,7 @@ export function EndingScreen() {
               </div>
             </div>
           ) : (
-            <div className={`w-full h-96 md:h-[32rem] lg:h-[40rem] ending-${currentEnding.tone} flex items-center justify-center relative`}>
+            <div className={`w-full h-64 md:h-96 ending-${currentEnding.tone} flex items-center justify-center relative`}>
               <div className="text-center text-muted-foreground z-10">
                 <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                 <p className="text-sm">Ending image</p>
