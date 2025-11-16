@@ -1,348 +1,237 @@
 /**
  * Test suite for resilient storage middleware
- * Tests retry logic, fallback mechanisms, and recovery detection
+ * Tests basic fallback to memory when IndexedDB fails
  */
 
 import { ResilientStorageMiddleware, StorageStatus } from '../resilientStorage';
 import { IndexedDBAdapter } from '../indexedDBAdapter';
-import { handleStorageError } from '../../../utils/storageHelpers';
 
 // Mock IndexedDBAdapter
 jest.mock('../indexedDBAdapter');
-jest.mock('../../../utils/storageHelpers');
 
 const mockIndexedDBAdapter = IndexedDBAdapter as jest.MockedClass<typeof IndexedDBAdapter>;
-const mockHandleStorageError = handleStorageError as jest.MockedFunction<typeof handleStorageError>;
 
 describe('ResilientStorageMiddleware', () => {
-  let resilientStorage: ResilientStorageMiddleware;
   let mockAdapter: jest.Mocked<IndexedDBAdapter>;
   let mockNotificationCallback: jest.Mock;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
     mockAdapter = {
       initialize: jest.fn(),
       getItem: jest.fn(),
       setItem: jest.fn(),
       removeItem: jest.fn(),
+      isInitialized: true, // Mock as initialized by default
       dbName: 'test-db',
       version: 1,
       storeName: 'test-store',
       db: null
     } as unknown as jest.Mocked<IndexedDBAdapter>;
-    
-    // Ensure the static create method returns our mock adapter
-    mockIndexedDBAdapter.create = jest.fn().mockResolvedValue(mockAdapter);
-    
+
+    mockIndexedDBAdapter.mockImplementation(() => mockAdapter);
     mockNotificationCallback = jest.fn();
-    
-    resilientStorage = new ResilientStorageMiddleware({
-      onStatusChange: mockNotificationCallback,
-      retryAttempts: 3,
-      baseDelay: 100, // Shorter delays for testing
-    });
-    
-    // Wait for initialization to complete
-    await new Promise(resolve => setTimeout(resolve, 10));
   });
 
-  describe('Retry Logic', () => {
-    it('should retry operations with exponential backoff on failure', async () => {
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem
-        .mockRejectedValueOnce(quotaError)
-        .mockRejectedValueOnce(quotaError)
-        .mockResolvedValueOnce(undefined);
+  describe('Initialization', () => {
+    it('should start in HEALTHY status when IndexedDB is available', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
 
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
       });
 
-      const startTime = Date.now();
-      await resilientStorage.setItem('test-key', 'test-value');
-      const endTime = Date.now();
+      // Wait for initialization
+      await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should have made 3 attempts (2 failures + 1 success)
-      expect(mockAdapter.setItem).toHaveBeenCalledTimes(3);
-      
-      // Should have waited for retries (100ms + 200ms = ~300ms minimum)
-      expect(endTime - startTime).toBeGreaterThan(200);
+      expect(storage.getStorageStatus()).toBe(StorageStatus.HEALTHY);
+      expect(mockNotificationCallback).not.toHaveBeenCalled();
     });
 
-    it('should fall back to memory-only mode after max retries', async () => {
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
+    it('should switch to UNAVAILABLE when IndexedDB initialization fails', async () => {
+      mockAdapter.initialize.mockRejectedValue(new Error('IndexedDB unavailable'));
 
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
       });
 
-      await resilientStorage.setItem('test-key', 'test-value');
+      // Wait for initialization to fail
+      await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should have attempted max retries
-      expect(mockAdapter.setItem).toHaveBeenCalledTimes(3);
-      
-      // Should notify about fallback to memory-only mode
+      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
       expect(mockNotificationCallback).toHaveBeenCalledWith(
         StorageStatus.UNAVAILABLE,
         expect.objectContaining({
-          userMessage: expect.stringContaining('memory-only'),
+          shouldNotify: true,
+          userMessage: expect.stringContaining('will not persist'),
         })
       );
     });
 
-    it('should not retry on non-recoverable errors', async () => {
-      const securityError = new DOMException('SecurityError');
-      mockAdapter.setItem.mockRejectedValue(securityError);
+    it('should switch to UNAVAILABLE when IndexedDB is not initialized', async () => {
+      // Create a new mock adapter with isInitialized = false
+      const uninitializedAdapter = {
+        ...mockAdapter,
+        isInitialized: false,
+      } as unknown as jest.Mocked<IndexedDBAdapter>;
+      mockIndexedDBAdapter.mockImplementationOnce(() => uninitializedAdapter);
 
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage unavailable in private browsing',
-        technicalMessage: 'SecurityError',
-        isRecoverable: false,
-        shouldNotify: true,
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
       });
 
-      await resilientStorage.setItem('test-key', 'test-value');
+      // Wait for initialization
+      await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should only attempt once for non-recoverable errors
-      expect(mockAdapter.setItem).toHaveBeenCalledTimes(1);
-      
-      // Should immediately fall back to memory-only mode
+      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
       expect(mockNotificationCallback).toHaveBeenCalledWith(
         StorageStatus.UNAVAILABLE,
         expect.objectContaining({
-          isRecoverable: false,
+          shouldNotify: true,
+          userMessage: expect.stringContaining('will not persist'),
+          technicalMessage: 'IndexedDB not available in this environment',
         })
       );
+    });
+  });
+
+  describe('Storage Operations', () => {
+    it('should use IndexedDB when available', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.setItem.mockResolvedValue(undefined);
+      mockAdapter.getItem.mockResolvedValue('test-value');
+
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await storage.setItem('test-key', 'test-value');
+      const result = await storage.getItem('test-key');
+
+      expect(mockAdapter.setItem).toHaveBeenCalledWith('test-key', 'test-value');
+      expect(mockAdapter.getItem).toHaveBeenCalledWith('test-key');
+      expect(result).toBe('test-value');
+    });
+
+    it('should fall back to memory when IndexedDB write fails', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.setItem.mockRejectedValue(new Error('Quota exceeded'));
+
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await storage.setItem('test-key', 'test-value');
+
+      // Should have switched to memory fallback
+      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
+
+      // Should still be able to retrieve from memory
+      const result = await storage.getItem('test-key');
+      expect(result).toBe('test-value');
+    });
+
+    it('should fall back to memory when IndexedDB read fails', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.getItem.mockRejectedValue(new Error('Read failed'));
+
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // First operation fails and switches to memory
+      const result = await storage.getItem('test-key');
+      expect(result).toBeNull();
+      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
+
+      // Now store in memory
+      await storage.setItem('test-key', 'memory-value');
+      const memoryResult = await storage.getItem('test-key');
+      expect(memoryResult).toBe('memory-value');
     });
   });
 
   describe('Memory Fallback', () => {
-    beforeEach(() => {
-      // Set up storage to fail
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
-      mockAdapter.getItem.mockRejectedValue(quotaError);
-      
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-      });
+    it('should maintain data across operations in memory-only mode', async () => {
+      mockAdapter.initialize.mockRejectedValue(new Error('No IndexedDB'));
+
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Store multiple items
+      await storage.setItem('key1', 'value1');
+      await storage.setItem('key2', 'value2');
+
+      // Should retrieve correct values
+      expect(await storage.getItem('key1')).toBe('value1');
+      expect(await storage.getItem('key2')).toBe('value2');
+
+      // Should handle removal
+      await storage.removeItem('key1');
+      expect(await storage.getItem('key1')).toBeNull();
+      expect(await storage.getItem('key2')).toBe('value2');
     });
 
-    it('should store data in memory when storage fails', async () => {
-      await resilientStorage.setItem('test-key', 'test-value');
-      
-      // Storage should have failed, falling back to memory
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
-      
-      // Should still be able to retrieve from memory
-      const result = await resilientStorage.getItem('test-key');
+    it('should save to both IndexedDB and memory when IndexedDB works', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.setItem.mockResolvedValue(undefined);
+      mockAdapter.getItem.mockResolvedValue(null);
+
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await storage.setItem('test-key', 'test-value');
+
+      // Should have written to IndexedDB
+      expect(mockAdapter.setItem).toHaveBeenCalledWith('test-key', 'test-value');
+
+      // Now if IndexedDB fails, should still have it in memory
+      mockAdapter.getItem.mockRejectedValue(new Error('IndexedDB failed'));
+      const result = await storage.getItem('test-key');
       expect(result).toBe('test-value');
     });
+  });
 
-    it('should maintain functionality across multiple operations in memory-only mode', async () => {
-      // Store multiple items
-      await resilientStorage.setItem('key1', 'value1');
-      await resilientStorage.setItem('key2', 'value2');
-      
-      // Should retrieve correct values
-      expect(await resilientStorage.getItem('key1')).toBe('value1');
-      expect(await resilientStorage.getItem('key2')).toBe('value2');
-      
-      // Should handle removal
-      await resilientStorage.removeItem('key1');
-      expect(await resilientStorage.getItem('key1')).toBeNull();
-      expect(await resilientStorage.getItem('key2')).toBe('value2');
+  describe('Backward Compatibility', () => {
+    it('should accept health monitoring calls without error', () => {
+      const storage = new ResilientStorageMiddleware();
+
+      // These are no-ops now but shouldn't throw
+      expect(() => storage.startHealthMonitoring(30000)).not.toThrow();
+      expect(() => storage.stopHealthMonitoring()).not.toThrow();
     });
   });
 
-  describe('Recovery Detection', () => {
-    it('should detect when storage becomes available again', async () => {
-      // Start with failing storage
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
-      
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-      });
-
-      // Fail storage and fall back to memory
-      await resilientStorage.setItem('test-key', 'test-value');
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
-
-      // Now make storage work again
-      let lastSetValue: string | undefined;
-      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
-        if (key === '__narraitor_health_check__') {
-          lastSetValue = value;
-        }
-        return Promise.resolve();
-      });
-      mockAdapter.getItem.mockImplementation((key: string) => {
-        if (key === '__narraitor_health_check__') {
-          return Promise.resolve(lastSetValue || null);
-        }
-        return Promise.resolve('test-value');
-      });
+  describe('Remove Operations', () => {
+    it('should remove from both IndexedDB and memory', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.setItem.mockResolvedValue(undefined);
       mockAdapter.removeItem.mockResolvedValue(undefined);
+      mockAdapter.getItem.mockResolvedValue(null);
 
-      // Trigger recovery check
-      await resilientStorage.checkStorageHealth();
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should detect recovery
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.HEALTHY);
-      expect(mockNotificationCallback).toHaveBeenCalledWith(
-        StorageStatus.HEALTHY,
-        expect.objectContaining({
-          userMessage: expect.stringContaining('restored'),
-        })
-      );
+      await storage.setItem('test-key', 'test-value');
+      await storage.removeItem('test-key');
+
+      expect(mockAdapter.removeItem).toHaveBeenCalledWith('test-key');
+      expect(await storage.getItem('test-key')).toBeNull();
     });
 
-    it('should sync memory data to storage when recovering', async () => {
-      // Set up initial failure
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
-      
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-      });
+    it('should remove from memory even if IndexedDB remove fails', async () => {
+      mockAdapter.initialize.mockResolvedValue(undefined);
+      mockAdapter.setItem.mockResolvedValue(undefined);
+      mockAdapter.removeItem.mockRejectedValue(new Error('Remove failed'));
+      // After remove fails, IndexedDB might still have the value, but we're testing memory fallback
+      mockAdapter.getItem.mockRejectedValue(new Error('IndexedDB unavailable'));
 
-      // Store data in memory-only mode
-      await resilientStorage.setItem('key1', 'value1');
-      await resilientStorage.setItem('key2', 'value2');
+      const storage = new ResilientStorageMiddleware();
+      await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Enable storage recovery
-      let lastSetValue: string | undefined;
-      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
-        if (key === '__narraitor_health_check__') {
-          lastSetValue = value;
-        }
-        return Promise.resolve();
-      });
-      mockAdapter.getItem.mockImplementation((key: string) => {
-        if (key === '__narraitor_health_check__') {
-          return Promise.resolve(lastSetValue || null);
-        }
-        return Promise.resolve(null);
-      });
-      mockAdapter.removeItem.mockResolvedValue(undefined);
+      await storage.setItem('test-key', 'test-value');
+      await storage.removeItem('test-key');
 
-      // Trigger recovery
-      await resilientStorage.checkStorageHealth();
-
-      // Should have synced memory data to storage
-      expect(mockAdapter.setItem).toHaveBeenCalledWith('key1', 'value1');
-      expect(mockAdapter.setItem).toHaveBeenCalledWith('key2', 'value2');
-    });
-  });
-
-  describe('Storage Status Tracking', () => {
-    it('should track storage status transitions', async () => {
-      // Start healthy
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.HEALTHY);
-
-      // Cause storage failure
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
-      
-      mockHandleStorageError.mockReturnValue({
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-      });
-
-      await resilientStorage.setItem('test-key', 'test-value');
-
-      // Should transition to unavailable
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
-
-      // Restore storage
-      let lastSetValue: string | undefined;
-      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
-        if (key === '__narraitor_health_check__') {
-          lastSetValue = value;
-        }
-        return Promise.resolve();
-      });
-      mockAdapter.getItem.mockImplementation((key: string) => {
-        if (key === '__narraitor_health_check__') {
-          return Promise.resolve(lastSetValue || null);
-        }
-        return Promise.resolve('test-value');
-      });
-      mockAdapter.removeItem.mockResolvedValue(undefined);
-      await resilientStorage.checkStorageHealth();
-
-      // Should transition back to healthy
-      expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.HEALTHY);
-    });
-
-    it('should provide storage error information', async () => {
-      const quotaError = new DOMException('QuotaExceededError');
-      mockAdapter.setItem.mockRejectedValue(quotaError);
-      
-      const mockError = {
-        userMessage: 'Storage quota exceeded',
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-      };
-      mockHandleStorageError.mockReturnValue(mockError);
-
-      await resilientStorage.setItem('test-key', 'test-value');
-
-      expect(resilientStorage.getLastError()).toEqual(expect.objectContaining({
-        technicalMessage: 'QuotaExceededError',
-        isRecoverable: true,
-        shouldNotify: true,
-        userMessage: expect.stringContaining('temporarily unavailable')
-      }));
-    });
-  });
-
-  describe('Health Monitoring', () => {
-    it('should periodically check storage health', async () => {
-      const healthCheck = jest.spyOn(resilientStorage, 'checkStorageHealth');
-      resilientStorage.startHealthMonitoring(50); // 50ms intervals for testing
-
-      // Wait for a few health checks
-      await new Promise(resolve => setTimeout(resolve, 150));
-
-      expect(healthCheck.mock.calls.length).toBeGreaterThan(1);
-
-      resilientStorage.stopHealthMonitoring();
-    });
-
-    it('should stop health monitoring when requested', async () => {
-      const healthCheck = jest.spyOn(resilientStorage, 'checkStorageHealth');
-      resilientStorage.startHealthMonitoring(50);
-
-      await new Promise(resolve => setTimeout(resolve, 75));
-      resilientStorage.stopHealthMonitoring();
-      
-      const callCountAfterStop = healthCheck.mock.calls.length;
-      
-      // Wait additional time and verify no new calls
-      await new Promise(resolve => setTimeout(resolve, 75));
-      expect(healthCheck).toHaveBeenCalledTimes(callCountAfterStop);
+      // Should still be removed from memory (even though IndexedDB remove failed)
+      const result = await storage.getItem('test-key');
+      expect(result).toBeNull();
     });
   });
 });

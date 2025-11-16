@@ -6,26 +6,26 @@ jest.mock('../../../lib/storage/indexedDBAdapter', () => {
   const mockGetItem = jest.fn().mockResolvedValue(null);
   const mockSetItem = jest.fn().mockResolvedValue(undefined);
   const mockRemoveItem = jest.fn().mockResolvedValue(undefined);
+  const mockInitialize = jest.fn().mockResolvedValue(undefined);
 
-  const mockAdapterInstance = {
-    initialize: jest.fn().mockResolvedValue(undefined),
+  const MockIndexedDBAdapter = jest.fn().mockImplementation(() => ({
+    initialize: mockInitialize,
     getItem: mockGetItem,
     setItem: mockSetItem,
     removeItem: mockRemoveItem,
-  };
-
-  const mockCreate = jest.fn().mockResolvedValue(mockAdapterInstance);
+    isInitialized: true, // Mock as initialized by default
+  }));
 
   return {
-    IndexedDBAdapter: {
-      create: mockCreate,
+    IndexedDBAdapter: Object.assign(MockIndexedDBAdapter, {
       mockFunctions: {
         getItem: mockGetItem,
         setItem: mockSetItem,
         removeItem: mockRemoveItem,
-        create: mockCreate,
+        initialize: mockInitialize,
+        create: jest.fn(), // Keep for backward compatibility
       },
-    },
+    }),
   };
 });
 
@@ -36,6 +36,7 @@ interface MockFunctions {
   getItem: jest.Mock;
   setItem: jest.Mock;
   removeItem: jest.Mock;
+  initialize: jest.Mock;
   create: jest.Mock;
 }
 // Cast to properly typed mock functions
@@ -55,16 +56,19 @@ describe('MVP IndexedDB Persistence', () => {
 
   describe('Storage Helper Integration', () => {
     test('should integrate with Zustand storage interface', async () => {
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 20));
+
       // Test getItem
       mockFunctions.getItem.mockResolvedValueOnce('{"test": "data"}');
       const result = await storage.getItem('test-key');
       expect(result).toEqual({"test": "data"});
       expect(mockFunctions.getItem).toHaveBeenCalledWith('test-key');
-      
+
       // Test setItem
       await storage.setItem('test-key', {"state": "test-value", "version": 0});
       expect(mockFunctions.setItem).toHaveBeenCalledWith('test-key', JSON.stringify({"state": "test-value", "version": 0}));
-      
+
       // Test removeItem
       await storage.removeItem('test-key');
       expect(mockFunctions.removeItem).toHaveBeenCalledWith('test-key');

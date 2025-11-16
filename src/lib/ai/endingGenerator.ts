@@ -2,7 +2,6 @@
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { buildEndingContext } from './contextManager';
-import { promptTemplateManager } from '../promptTemplates/promptTemplateManager';
 import { endingTemplate, prepareEndingTemplateVariables } from '../promptTemplates/templates/endingTemplates';
 import { logger } from '../utils/logger';
 import type {
@@ -47,18 +46,8 @@ class EndingGenerator {
         request.customPrompt
       );
 
-      // Register the ending template if not already registered
-      if (!promptTemplateManager.getTemplate('ending')) {
-        promptTemplateManager.addTemplate(endingTemplate);
-      }
-      
-      // Get the prompt template
-      const promptTemplate = promptTemplateManager.getTemplate('ending');
-      if (!promptTemplate) {
-        throw new Error('Ending template not found');
-      }
-      
-      const renderedPrompt = this.renderTemplate(promptTemplate.content, templateVariables);
+      // Render the template with variables
+      const renderedPrompt = this.renderTemplate(endingTemplate.content, templateVariables);
 
       // Add custom prompt if provided
       let finalPrompt = request.customPrompt
