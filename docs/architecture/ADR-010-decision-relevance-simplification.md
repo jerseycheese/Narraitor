@@ -6,7 +6,10 @@ tags: [simplification, ai, decision-tracking, kiss]
 created: 2025-11-14
 ---
 
-# Decision Relevance System Simplification
+# ADR-010: Decision Relevance System Simplification
+
+## Status
+Accepted - Implemented
 
 ## Context
 

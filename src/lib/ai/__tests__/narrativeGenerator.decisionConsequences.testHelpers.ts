@@ -151,23 +151,6 @@ export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]):
   mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);
   mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(pastDecisions);
 
-  // Mock getRelevantDecisionsWithScores to return decisions with high relevance scores
-  mockPlayerDecisionTracker.getRelevantDecisionsWithScores.mockReturnValue(
-    pastDecisions.map(decision => ({
-      decision,
-      relevanceScore: {
-        decisionId: decision.id,
-        overallScore: 0.8,
-        recencyScore: 0.8,
-        contextScore: 0.8,
-        impactScore: 0.8,
-        tagMatchScore: 0.8,
-        characterScore: 0.8,
-        calculatedAt: getTimestamp()
-      }
-    }))
-  );
-
   // Mock template manager
   (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
     (context: { worldName: string; characterIds?: string[] }) =>

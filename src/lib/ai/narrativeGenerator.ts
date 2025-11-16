@@ -291,77 +291,8 @@ export class NarrativeGenerator {
   }
 
   /**
-   * Builds CurrentNarrativeContext from narrative generation request context
-   */
-  private buildCurrentNarrativeContext(
-    worldId: EntityID,
-    sessionId: EntityID,
-    narrativeContext?: NarrativeContext
-  ): CurrentNarrativeContext {
-    // Extract location from narrative context
-    const latestRecentSegment =
-      narrativeContext?.recentSegments &&
-      narrativeContext.recentSegments.length > 0
-        ? narrativeContext.recentSegments[narrativeContext.recentSegments.length - 1]
-        : undefined;
-
-    const location = narrativeContext?.currentLocation ||
-                     latestRecentSegment?.metadata?.location;
-
-    // Extract characters present from narrative context
-    const charactersPresent: string[] = [];
-    if (narrativeContext?.characterIds) {
-      charactersPresent.push(...narrativeContext.characterIds);
-    }
-    // Add characters from recent segments
-    if (narrativeContext?.recentSegments) {
-      narrativeContext.recentSegments.forEach(segment => {
-        if (segment.metadata.characterIds) {
-          segment.metadata.characterIds.forEach(charId => {
-            if (!charactersPresent.includes(charId)) {
-              charactersPresent.push(charId);
-            }
-          });
-        }
-      });
-    }
-
-    // Extract situation from narrative context
-    const situation = narrativeContext?.currentSituation;
-
-    // Extract recent events from recent segments
-    const recentEvents: string[] = [];
-    if (narrativeContext?.recentSegments) {
-      narrativeContext.recentSegments.forEach(segment => {
-        if (segment.content) {
-          // Use first 100 chars of each segment as event summary
-          const summary = segment.content.substring(0, 100).trim();
-          if (summary) {
-            recentEvents.push(summary);
-          }
-        }
-      });
-    }
-
-    // Extract active tags from narrative context
-    const activeTags = narrativeContext?.currentTags || [];
-
-    return {
-      location,
-      charactersPresent,
-      situation,
-      recentEvents,
-      activeTags,
-      worldId,
-      sessionId,
-      timestamp: getTimestamp()
-    };
-  }
-
-
-  /**
    * Enhances a prompt with personalized character context
-   * Now uses relevance system to select most important decisions
+   * Uses simple recency-based filtering for decisions
    */
   private enhancePromptWithPersonalization(
     prompt: string,
