@@ -361,8 +361,15 @@ describe('Item Usage Service', () => {
       description: 'Restores vitality',
       categoryId: 'consumables',
       quantity: 5,
-      isEquipped: false,
-      effects: [],
+      stackable: true,
+      acquisitionHistory: [],
+      categorization: {
+        categoryId: 'consumables',
+        source: 'manual',
+        classifiedAt: new Date().toISOString(),
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     describe('simple tone', () => {
@@ -399,7 +406,7 @@ describe('Item Usage Service', () => {
       });
 
       it('should handle item without description', () => {
-        const itemNoDesc = { ...mockItem, description: undefined };
+        const itemNoDesc = { ...mockItem, description: '' };
         const result = buildUsageNarrative(
           itemNoDesc,
           { wasConsumed: false, previousQuantity: 1 },
@@ -407,7 +414,7 @@ describe('Item Usage Service', () => {
         );
 
         expect(result).toContain('You use the Health Potion.');
-        expect(result).not.toContain('undefined');
+        expect(result).not.toContain('Restores vitality');
       });
     });
 
