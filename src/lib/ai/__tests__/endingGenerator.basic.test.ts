@@ -24,9 +24,7 @@ jest.mock('../../../state/journalStore', () => ({
 
 import { endingGenerator } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
-import { promptTemplateManager } from '../../promptTemplates/promptTemplateManager';
 import type { EndingGenerationRequest } from '../../../types/narrative.types';
-import { PromptType } from '../../promptTemplates/types';
 import {
   mockGeminiClient,
   createMockWorld,
@@ -83,13 +81,6 @@ jest.mock('../contextManager', () => ({
   buildEndingContext: jest.fn()
 }));
 
-jest.mock('../../promptTemplates/promptTemplateManager', () => ({
-  promptTemplateManager: {
-    getTemplate: jest.fn(),
-    addTemplate: jest.fn()
-  }
-}));
-
 jest.mock('../../../state/sessionStore');
 jest.mock('../../../state/journalStore');
 
@@ -131,15 +122,7 @@ describe('EndingGenerator - Basic Generation', () => {
       "achievements": ["Dragon Slayer", "Savior of the Realm", "Master Warrior"]
     }`;
 
-    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-
     mockBuildEndingContext.mockResolvedValue(mockContext);
-    mockPromptTemplateManager.getTemplate.mockReturnValue({
-      id: 'test-template',
-      type: PromptType.NARRATIVE,
-      content: 'Generate an epic ending...',
-      variables: []
-    });
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
     const result = await endingGenerator.generateEnding(mockRequest);
@@ -153,7 +136,6 @@ describe('EndingGenerator - Basic Generation', () => {
     });
 
     expect(mockBuildEndingContext).toHaveBeenCalledWith(mockRequest);
-    expect(mockPromptTemplateManager.getTemplate).toHaveBeenCalledWith('ending');
     expect(mockGeminiClient.generateContent).toHaveBeenCalled();
   });
 
@@ -181,15 +163,7 @@ describe('EndingGenerator - Basic Generation', () => {
       "achievements": ["Pyrrhic Victory", "The Sacrifice"]
     }`;
 
-    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-
     mockBuildEndingContext.mockResolvedValue(mockContext);
-    mockPromptTemplateManager.getTemplate.mockReturnValue({
-      id: 'test-template',
-      type: PromptType.NARRATIVE,
-      content: 'Generate triumphant ending...',
-      variables: []
-    });
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
     const result = await endingGenerator.generateEnding(mockRequest);

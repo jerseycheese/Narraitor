@@ -17,8 +17,6 @@ const mockResilientStorage = {
   StorageStatus: {
     HEALTHY: 'HEALTHY',
     UNAVAILABLE: 'UNAVAILABLE',
-    DEGRADED: 'DEGRADED',
-    RECOVERING: 'RECOVERING',
   },
   ResilientStorageMiddleware: jest.fn(),
 };
@@ -101,29 +99,18 @@ describe('Storage Resilience Core', () => {
   describe('Storage Status Tracking', () => {
     test('should track different storage status states', () => {
       const { StorageStatus } = mockResilientStorage;
-      
+
       expect(StorageStatus.HEALTHY).toBe('HEALTHY');
       expect(StorageStatus.UNAVAILABLE).toBe('UNAVAILABLE');
-      expect(StorageStatus.DEGRADED).toBe('DEGRADED');
-      expect(StorageStatus.RECOVERING).toBe('RECOVERING');
     });
 
     test('should handle status transitions', () => {
       const { StorageStatus } = mockResilientStorage;
-      
-      // Test status transitions make sense
-      const validTransitions = [
-        [StorageStatus.HEALTHY, StorageStatus.DEGRADED],
-        [StorageStatus.DEGRADED, StorageStatus.UNAVAILABLE],
-        [StorageStatus.UNAVAILABLE, StorageStatus.RECOVERING],
-        [StorageStatus.RECOVERING, StorageStatus.HEALTHY],
-      ];
 
-      validTransitions.forEach(([from, to]) => {
-        expect(from).toBeDefined();
-        expect(to).toBeDefined();
-        expect(from).not.toBe(to);
-      });
+      // Test simple status transitions (HEALTHY <-> UNAVAILABLE)
+      expect(StorageStatus.HEALTHY).toBeDefined();
+      expect(StorageStatus.UNAVAILABLE).toBeDefined();
+      expect(StorageStatus.HEALTHY).not.toBe(StorageStatus.UNAVAILABLE);
     });
   });
 

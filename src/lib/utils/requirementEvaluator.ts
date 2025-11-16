@@ -24,6 +24,21 @@ export interface RequirementEvaluationResult {
   itemName?: string;
 }
 
+/**
+ * Compare two values using a comparison operator
+ */
+const compareValues = (current: number, required: number, operator: string): boolean => {
+  switch (operator) {
+    case 'gte': return current >= required;
+    case 'gt': return current > required;
+    case 'lte': return current <= required;
+    case 'lt': return current < required;
+    case 'eq': return current === required;
+    case 'neq': return current !== required;
+    default: return false;
+  }
+};
+
 export const evaluateRequirement = (
   requirement: DecisionRequirement,
   character: Character
@@ -37,30 +52,8 @@ export const evaluateRequirement = (
     const currentLevel = skill ? skill.level : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
 
-    let success = false;
-    switch (requirement.operator) {
-      case 'gte':
-        success = currentLevel >= requiredValue;
-        break;
-      case 'gt':
-        success = currentLevel > requiredValue;
-        break;
-      case 'lte':
-        success = currentLevel <= requiredValue;
-        break;
-      case 'lt':
-        success = currentLevel < requiredValue;
-        break;
-      case 'eq':
-        success = currentLevel === requiredValue;
-        break;
-      case 'neq':
-        success = currentLevel !== requiredValue;
-        break;
-    }
-
     return {
-      success,
+      success: compareValues(currentLevel, requiredValue, requirement.operator),
       current: currentLevel,
       required: requiredValue
     };
@@ -76,30 +69,8 @@ export const evaluateRequirement = (
     const currentQuantity = item ? item.quantity : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
 
-    let success = false;
-    switch (requirement.operator) {
-      case 'gte':
-        success = currentQuantity >= requiredValue;
-        break;
-      case 'gt':
-        success = currentQuantity > requiredValue;
-        break;
-      case 'lte':
-        success = currentQuantity <= requiredValue;
-        break;
-      case 'lt':
-        success = currentQuantity < requiredValue;
-        break;
-      case 'eq':
-        success = currentQuantity === requiredValue;
-        break;
-      case 'neq':
-        success = currentQuantity !== requiredValue;
-        break;
-    }
-
     return {
-      success,
+      success: compareValues(currentQuantity, requiredValue, requirement.operator),
       current: currentQuantity,
       required: requiredValue,
       itemName: item?.name

@@ -24,9 +24,7 @@ jest.mock('../../../state/journalStore', () => ({
 
 import { endingGenerator } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
-import { promptTemplateManager } from '../../promptTemplates/promptTemplateManager';
 import type { EndingGenerationRequest } from '../../../types/narrative.types';
-import { PromptType } from '../../promptTemplates/types';
 import {
   mockGeminiClient,
   createMockWorld,
@@ -83,13 +81,6 @@ jest.mock('../contextManager', () => ({
   buildEndingContext: jest.fn()
 }));
 
-jest.mock('../../promptTemplates/promptTemplateManager', () => ({
-  promptTemplateManager: {
-    getTemplate: jest.fn(),
-    addTemplate: jest.fn()
-  }
-}));
-
 jest.mock('../../../state/sessionStore');
 jest.mock('../../../state/journalStore');
 
@@ -139,14 +130,7 @@ describe('EndingGenerator - Advanced Features', () => {
       "achievements": ["Quick Victory"]
     }`;
 
-    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
     mockBuildEndingContext.mockResolvedValue(mockContext);
-    mockPromptTemplateManager.getTemplate.mockReturnValue({
-      id: 'test-template',
-      type: PromptType.NARRATIVE,
-      content: 'Compose ending...',
-      variables: []
-    });
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
     const result = await endingGenerator.generateEnding(mockRequest);
@@ -171,15 +155,7 @@ describe('EndingGenerator - Advanced Features', () => {
       journalEntries: []
     };
 
-    const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-
     mockBuildEndingContext.mockResolvedValue(mockContext);
-    mockPromptTemplateManager.getTemplate.mockReturnValue({
-      id: 'test-template',
-      type: PromptType.NARRATIVE,
-      content: 'Base prompt',
-      variables: []
-    });
     mockGeminiClient.generateContent.mockImplementation((prompt) => {
       expect(prompt).toContain('cottage');
       return Promise.resolve({ content: `{
@@ -219,15 +195,7 @@ describe('EndingGenerator - Advanced Features', () => {
         journalEntries: []
       };
 
-      const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-
       mockBuildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({
-        id: 'test-template',
-        type: PromptType.NARRATIVE,
-        content: `Generate ${type} ending...`,
-        variables: []
-      });
       mockGeminiClient.generateContent.mockResolvedValue({ content: `{
         "epilogue": "The hero ${expectedContent}...",
         "characterLegacy": "Remembered well...",

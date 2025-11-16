@@ -8,8 +8,7 @@ import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
 
 /**
  * Single resilient storage promise with lazy initialization pattern.
- * This avoids race conditions during initialization and provides
- * retry logic, fallback mechanisms, and recovery detection.
+ * Avoids race conditions during initialization.
  */
 let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
 
@@ -22,23 +21,17 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
   if (!resilientStoragePromise) {
     resilientStoragePromise = (async () => {
       const storage = new ResilientStorageMiddleware({
-        retryAttempts: 3,
-        baseDelay: 1000,
-        maxDelay: 8000,
         onStatusChange: (status, error) => {
-          // Notify user about storage status changes
           if (error?.shouldNotify) {
             console.error('[Persistence] Storage status changed:', status, error);
           }
         },
       });
-      
-      // Start health monitoring
-      storage.startHealthMonitoring(30000); // Check every 30 seconds
+
       return storage;
     })();
   }
-  
+
   return resilientStoragePromise;
 };
 
@@ -67,7 +60,7 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       // Convert the StorageValue object to a JSON string
       await storage.setItem(name, JSON.stringify(value));
     } catch {
-      // Resilient storage handles errors internally with retry logic and fallback
+      // Resilient storage handles errors internally
     }
   },
   
