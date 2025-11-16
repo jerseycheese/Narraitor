@@ -172,16 +172,6 @@ export function usePointPoolManager({
   };
 }
 
-// Specialized hook for character attributes
-export function useAttributePointPool(options: UsePointPoolManagerOptions) {
-  return usePointPoolManager({
-    ...options,
-    calculateSpent: options.calculateSpent || ((items) => 
-      items.reduce((sum, item) => sum + item.value, 0)
-    ),
-  });
-}
-
 // Specialized hook for character skills with selection state
 export interface SkillPointPoolItem extends PointPoolItem {
   isSelected: boolean;

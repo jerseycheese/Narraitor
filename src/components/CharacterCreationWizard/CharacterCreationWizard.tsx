@@ -6,7 +6,7 @@ import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
-import { useAttributePointPool } from '@/hooks/usePointPoolManager';
+import { usePointPoolManager } from '@/hooks/usePointPoolManager';
 import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { 
   WizardContainer, 
@@ -227,7 +227,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   });
 
   // Point pool managers
-  const attributePool = useAttributePointPool({
+  const attributePool = usePointPoolManager({
     totalPoints: world?.settings.attributePointPool || 0,
     items: wizard.state.data.attributes.map(attr => ({
       id: attr.attributeId,

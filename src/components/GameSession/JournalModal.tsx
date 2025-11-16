@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
-import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { 
   capitalize, 
   formatRelativeTime, 
@@ -36,6 +35,21 @@ const sanitizeFormattedContent = (html: string): string => {
     .replace(/<(p|br|em)([^>]*?)>/gi, '<$1>')
     // Remove any other HTML tags while preserving their text content
     .replace(/<(?!\/?(?:p|br|em)\b)[^>]*>/gi, '');
+};
+
+/**
+ * Maps journal entry significance levels to badge variants
+ */
+const getSignificanceBadgeVariant = (significance: string): 'destructive' | 'warning' | 'secondary' => {
+  switch (significance) {
+    case 'critical':
+      return 'destructive';
+    case 'major':
+      return 'warning';
+    case 'minor':
+    default:
+      return 'secondary';
+  }
 };
 
 interface JournalModalProps {
@@ -73,11 +87,12 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           {entry.title || titleCase(entry.type.replace('_', ' '))}
         </h3>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <StatusBadge
-            variant="significance"
-            state={entry.significance as 'critical' | 'major' | 'minor'}
-            label={capitalize(entry.significance)}
-          />
+          <Badge
+            variant={getSignificanceBadgeVariant(entry.significance)}
+            size="sm"
+          >
+            {capitalize(entry.significance)}
+          </Badge>
           <Badge 
             variant={isSystemEvent ? "secondary" : "info"} 
             size="sm"
@@ -278,11 +293,12 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                         </p>
                         
                         <div className="flex items-center justify-between">
-                          <StatusBadge
-                            variant="significance"
-                            state={entry.significance as 'critical' | 'major' | 'minor'}
-                            label={capitalize(entry.significance)}
-                          />
+                          <Badge
+                            variant={getSignificanceBadgeVariant(entry.significance)}
+                            size="sm"
+                          >
+                            {capitalize(entry.significance)}
+                          </Badge>
                           <span className={`text-xs ${
                             isSystemEvent ? 'text-gray-500' : 'text-amber-500'
                           }`}>

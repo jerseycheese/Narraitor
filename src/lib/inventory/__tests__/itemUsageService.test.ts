@@ -1,7 +1,7 @@
 // Test item usage service
 // Verifies narrative generation and journal integration for item usage
 
-import { processItemUsage, generateItemUsageNarrative, isNarrativelySignificant } from '../itemUsageService';
+import { processItemUsage, generateItemUsageNarrative, isNarrativelySignificant, buildUsageNarrative } from '../itemUsageService';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -351,6 +351,154 @@ describe('Item Usage Service', () => {
       expect(result.segmentId).toBeTruthy();
       expect(result.narrative).toBeTruthy();
       expect(result.previousQuantity).toBe(5);
+    });
+  });
+
+  describe('buildUsageNarrative', () => {
+    const mockItem: InventoryItem = {
+      id: 'test-item',
+      name: 'Health Potion',
+      description: 'Restores vitality',
+      categoryId: 'consumables',
+      quantity: 5,
+      isEquipped: false,
+      effects: [],
+    };
+
+    describe('simple tone', () => {
+      it('should generate narrative for consumed item with remaining quantity', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 5, remainingQuantity: 4 },
+          'simple'
+        );
+
+        expect(result).toContain('You use one of the Health Potion');
+        expect(result).toContain('4 remaining');
+      });
+
+      it('should generate narrative for last consumed item', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 1, remainingQuantity: 0 },
+          'simple'
+        );
+
+        expect(result).toContain('You use the last of the Health Potion');
+      });
+
+      it('should generate narrative for non-consumed item', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: false, previousQuantity: 3, remainingQuantity: 3 },
+          'simple'
+        );
+
+        expect(result).toContain('You use the Health Potion');
+        expect(result).toContain('Restores vitality');
+      });
+
+      it('should handle item without description', () => {
+        const itemNoDesc = { ...mockItem, description: undefined };
+        const result = buildUsageNarrative(
+          itemNoDesc,
+          { wasConsumed: false, previousQuantity: 1 },
+          'simple'
+        );
+
+        expect(result).toContain('You use the Health Potion.');
+        expect(result).not.toContain('undefined');
+      });
+    });
+
+    describe('detailed tone', () => {
+      it('should generate detailed narrative for consumed item with remaining quantity', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 5, remainingQuantity: 4 },
+          'detailed'
+        );
+
+        expect(result).toContain('You use one of the Health Potion');
+        expect(result).toContain('4 remaining pieces to draw upon');
+      });
+
+      it('should generate detailed narrative for last consumed item', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 1, remainingQuantity: 0 },
+          'detailed'
+        );
+
+        expect(result).toContain('You use the Health Potion');
+        expect(result).toContain('That was the last of this item');
+      });
+
+      it('should use singular form when one remains', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 2, remainingQuantity: 1 },
+          'detailed'
+        );
+
+        expect(result).toContain('1 remaining');
+        expect(result).not.toContain('remaining pieces');
+      });
+
+      it('should use plural form when multiple remain', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 5, remainingQuantity: 3 },
+          'detailed'
+        );
+
+        expect(result).toContain('3 remaining pieces');
+      });
+
+      it('should generate narrative for non-consumed item', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: false, previousQuantity: 3, remainingQuantity: 3 },
+          'detailed'
+        );
+
+        expect(result).toContain('You use one of the Health Potion');
+        expect(result).toContain('The item remains firmly in your grasp');
+      });
+    });
+
+    describe('edge cases', () => {
+      it('should handle missing previousQuantity by using item.quantity', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true },
+          'simple'
+        );
+
+        expect(result).toBeTruthy();
+        expect(result).toContain('Health Potion');
+      });
+
+      it('should calculate remainingQuantity when not provided', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: true, previousQuantity: 3 },
+          'detailed'
+        );
+
+        expect(result).toContain('2 remaining pieces');
+      });
+
+      it('should default to simple tone when not specified', () => {
+        const result = buildUsageNarrative(
+          mockItem,
+          { wasConsumed: false, previousQuantity: 2 }
+        );
+
+        // Simple tone doesn't include "firmly in your grasp"
+        expect(result).not.toContain('firmly in your grasp');
+        expect(result).toContain('You use the Health Potion');
+      });
     });
   });
 });
