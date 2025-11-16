@@ -69,6 +69,7 @@ export function InventoryTable({
           const image = row.original.image;
           if (!image?.url) return null;
           return (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={image.url}
               alt={row.original.name}

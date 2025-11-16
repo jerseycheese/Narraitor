@@ -1,17 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
-import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
-import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
-import { usePointPoolManager } from '@/hooks/usePointPoolManager';
-import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
-import { 
-  WizardContainer, 
-  WizardProgress, 
-  WizardNavigation, 
+import { useCharacterCreationWizard, CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
+import { useCharacterPointPools } from '@/hooks/useCharacterPointPools';
+import { finalizeCharacterCreation } from '@/lib/utils/characterFinalization';
+import {
+  WizardContainer,
+  WizardProgress,
+  WizardNavigation,
   WizardStep
 } from '@/components/shared/wizard';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
@@ -21,8 +19,7 @@ import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
-import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from './utils/validation';
-import { normalizeSkillBounds, calculateSkillPointPool } from './utils/skillAllocation';
+import { normalizeSkillBounds } from './utils/skillAllocation';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -34,89 +31,21 @@ interface CharacterCreationWizardProps {
   initialStep?: number;
 }
 
-/**
- * Complete character data structure for creation wizard
- */
-interface CharacterCreationData {
-  /** World ID for the character being created */
-  worldId: EntityID;
-  /** Character's display name */
-  name: string;
-  /** Character description (legacy field) */
-  description: string;
-  /** Placeholder text for portrait selection */
-  portraitPlaceholder: string;
-  /** Character portrait configuration */
-  portrait?: {
-    type: 'ai-generated' | 'placeholder';
-    url: string | null;
-    generatedAt?: string;
-    prompt?: string;
-  };
-  /** Character attributes with allocated point values */
-  attributes: Array<{
-    attributeId: EntityID;
-    name: string;
-    description?: string;
-    value: number;
-    minValue: number;
-    maxValue: number;
-  }>;
-  /** Character skills with selection and level data */
-  skills: Array<{
-    skillId: EntityID;
-    name: string;
-    description?: string;
-    level: number;
-    minLevel: number;
-    maxLevel: number;
-    /** Multi-attribute support */
-    attributeIds?: EntityID[];
-    /** Legacy support */
-    linkedAttributeId?: EntityID;
-    isSelected: boolean;
-  }>;
-  /** Character background and roleplay information */
-  background: {
-    history: string;
-    personality: string;
-    physicalDescription?: string;
-    goals: string[];
-    motivation: string;
-    isKnownFigure?: boolean;
-    knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
-  };
-}
-
-const steps: WizardStepType[] = [
-  { id: 'basic-info', label: 'Basic Info' },
-  { id: 'attributes', label: 'Attributes' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'background', label: 'Background' },
-  { id: 'portrait', label: 'Portrait' }
-];
-
 export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId, initialStep = 0 }) => {
   const router = useRouter();
   const { worlds } = useWorldStore();
-  const { createCharacter } = useCharacterStore();
   const world = worlds[worldId];
-  
+
   // Auto-save integration
   const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
-  /** Controls visibility of the recovery data dialog */
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
-  /**
-   * Show recovery dialog when recovery data is detected
-   * Only shows once per detection to avoid repeated prompts
-   */
   React.useEffect(() => {
     if (hasRecoveryData) {
       setShowRecoveryDialog(true);
     }
   }, [hasRecoveryData]);
-  
+
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
     if (data?.characterData) {
@@ -129,10 +58,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       return {
         ...(data.characterData as CharacterCreationData),
         skills: skillsWithBounds,
-        worldId, // Ensure worldId is correct
+        worldId,
       };
     }
-    
+
     return {
       worldId,
       name: '',
@@ -158,8 +87,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           level: skill.minValue,
           minLevel: skill.minValue,
           maxLevel: skill.maxValue,
-          attributeIds: skill.attributeIds || [], // Preserve full multi-attribute support
-          linkedAttributeId: skill.attributeIds?.[0], // Keep legacy field for backward compatibility
+          attributeIds: skill.attributeIds || [],
+          linkedAttributeId: skill.attributeIds?.[0],
           isSelected: false,
         })) || [],
         world
@@ -173,79 +102,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     };
   }, [data, worldId, world]);
 
-  // Create step validators
-  const stepValidators = useMemo((): Record<number, WizardStepValidator<CharacterCreationData>> => {
-    return {
-      0: createWizardValidator<CharacterCreationData>()
-        .field('name')
-        .required('Character name is required')
-        .minLength(2, 'Character name must be at least 2 characters')
-        .custom((name) => {
-          const result = validateCharacterName(name, worldId);
-          return result.valid;
-        }, 'A character with this name already exists in this world')
-        .build(),
-      1: createWizardValidator<CharacterCreationData>()
-        .customValidation((data) => {
-          const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
-          return { ...result, touched: true };
-        })
-        .build(),
-      2: createWizardValidator<CharacterCreationData>()
-        .customValidation((data) => {
-          const result = validateSkills(
-            data.skills,
-            world?.settings.skillPointPool || 0,
-            world?.skills?.map(skill => ({
-              id: skill.id,
-              minValue: skill.minValue,
-              maxValue: skill.maxValue,
-            })) || []
-          );
-          return { ...result, touched: true };
-        })
-        .build(),
-      3: createWizardValidator<CharacterCreationData>()
-        .customValidation((data) => {
-          const result = validateBackground(data.background);
-          return { ...result, touched: true };
-        })
-        .build(),
-      4: createWizardValidator<CharacterCreationData>().build(), // Portrait is optional
-    };
-  }, [worldId, world]);
-
   // Wizard state management
-  const wizard = useWizardState<CharacterCreationData>({
+  const { wizard, steps, stepValidators } = useCharacterCreationWizard({
     initialData: initialCharacterData,
     initialStep: data?.currentStep || initialStep,
-    steps,
-    onStepValidation: (stepIndex, data) => {
-      const validator = stepValidators[stepIndex];
-      return validator ? validator.validate(data) : { valid: true, errors: [], touched: true };
-    },
+    worldId,
+    world
   });
 
   // Point pool managers
-  const attributePool = usePointPoolManager({
-    totalPoints: world?.settings.attributePointPool || 0,
-    items: wizard.state.data.attributes.map(attr => ({
-      id: attr.attributeId,
-      value: attr.value,
-      minValue: attr.minValue,
-      maxValue: attr.maxValue,
-    })),
+  const { attributePool, skillPool } = useCharacterPointPools({
+    world,
+    characterData: wizard.state.data
   });
 
-  const skillPool = React.useMemo(() => {
-    const totalPoints = world?.settings.skillPointPool || 0;
-    return calculateSkillPointPool(wizard.state.data.skills, world, totalPoints);
-  }, [wizard.state.data.skills, world]);
-
-  // Navigation handlers
-  const handleNext = () => {
-    // Manual save before navigation (avoid useEffect with setData)
-    const newData = { 
+  // Auto-save helper
+  const saveWizardState = () => {
+    const newData = {
       characterData: wizard.state.data,
       currentStep: wizard.state.currentStep,
       worldId: wizard.state.data.worldId,
@@ -256,22 +129,16 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
     };
     setData(newData);
+  };
+
+  // Navigation handlers
+  const handleNext = () => {
+    saveWizardState();
     wizard.goNext();
   };
 
   const handleBack = () => {
-    // Manual save before navigation (avoid useEffect with setData)
-    const newData = { 
-      characterData: wizard.state.data,
-      currentStep: wizard.state.currentStep,
-      worldId: wizard.state.data.worldId,
-      validation: wizard.state.validation,
-      pointPools: {
-        attributes: attributePool.pool,
-        skills: skillPool,
-      },
-    };
-    setData(newData);
+    saveWizardState();
     wizard.goBack();
   };
 
@@ -279,10 +146,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     router.push('/characters');
   };
 
-  /**
-   * Handles user choice in the recovery dialog
-   * @param choice - 'recover' to keep data, 'dismiss' to clear it
-   */
   const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
     if (choice === 'dismiss') {
       clearAutoSave();
@@ -312,92 +175,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       }
     }
 
-    // Create character
-    const data = wizard.state.data;
-    const characterId = createCharacter({
-      name: data.name,
-      description: data.background.history,
-      worldId,
-      level: 1,
-      attributes: data.attributes.map(attr => {
-        const worldAttr = world?.attributes.find(wa => wa.id === attr.attributeId);
-        return {
-          id: generateUniqueId('attr'),
-          characterId: '', // Will be set by store
-          worldAttributeId: attr.attributeId, // Store reference to world attribute ID
-          name: worldAttr?.name || 'Unknown',
-          baseValue: attr.value,
-          modifiedValue: attr.value,
-          category: worldAttr?.category
-        };
-      }),
-      skills: data.skills
-        .filter(skill => skill.isSelected)
-        .map(skill => {
-          const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
-          return {
-            id: generateUniqueId('skill'),
-            characterId: '', // Will be set by store
-            worldSkillId: skill.skillId, // Store reference to world skill ID
-            name: worldSkill?.name || 'Unknown',
-            level: skill.level,
-            category: worldSkill?.category
-          };
-        }),
-      background: {
-        history: data.background.history,
-        personality: data.background.personality,
-        goals: data.background.motivation ? [data.background.motivation] : [],
-        fears: [],
-        physicalDescription: data.background.physicalDescription || '',
-        relationships: [],
-      },
-      portrait: data.portrait || {
-        type: 'placeholder',
-        url: null
-      },
-      isPlayer: true,
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-      },
-      inventory: {
-        characterId: '', // Will be set by the store
-        items: [],
-        capacity: 20,
-        categories: [],
-        itemOrder: []
-      },
-    });
+    // Finalize character creation
+    finalizeCharacterCreation(wizard.state.data, world);
 
-    // Set as current character
-    useCharacterStore.getState().setCurrentCharacter(characterId);
-    
-    // Verify the character was set as current
-    const currentCharacterId = useCharacterStore.getState().currentCharacterId;
-    
-    if (currentCharacterId !== characterId) {
-      console.error('[CharacterCreationWizard] Failed to set current character!', {
-        expectedId: characterId,
-        actualId: currentCharacterId,
-        charactersInStore: Object.keys(useCharacterStore.getState().characters)
-      });
-    }
     // Clear auto-save
     clearAutoSave();
 
-    // Navigate to game session with the world
+    // Navigate to game session
     router.push(`/worlds/${worldId}/play`);
   };
 
   if (!world) {
     return (
       <div className="p-8 text-center">
-        <p className="text-red-500">World not found</p>
+        <p className="text-destructive">World not found</p>
         <button
           onClick={() => router.push('/worlds')}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+          className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
         >
           Go to Worlds
         </button>

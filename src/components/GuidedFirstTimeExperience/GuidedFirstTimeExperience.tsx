@@ -212,7 +212,7 @@ export function GuidedFirstTimeExperience() {
       {wizard.stepValidation?.errors.length > 0 && (
         <div className="space-y-1">
           {wizard.stepValidation.errors.map((error, index) => (
-            <p key={index} className="text-sm text-red-500">{error}</p>
+            <p key={index} className="text-sm text-destructive">{error}</p>
           ))}
         </div>
       )}
@@ -246,7 +246,7 @@ export function GuidedFirstTimeExperience() {
             <input
               id="world-name"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="E.g., Neo-Tokyo..."
               value={wizard.state.data.name}
               onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
@@ -260,7 +260,7 @@ export function GuidedFirstTimeExperience() {
               </label>
               <select
                 id="world-genre"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={wizard.state.data.genre}
                 onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
               >
@@ -275,11 +275,11 @@ export function GuidedFirstTimeExperience() {
           ) : (
             <div>
               <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
-                Genre <span className="text-red-500">*</span>
+                Genre <span className="text-destructive">*</span>
               </label>
               <select
                 id="world-genre"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={wizard.state.data.genre}
                 onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
               >
@@ -292,9 +292,9 @@ export function GuidedFirstTimeExperience() {
               </select>
             </div>
           )}
-          
+
           {wizard.stepValidation?.errors.length > 0 && (
-            <div className="text-sm text-red-500">
+            <div className="text-sm text-destructive">
               {wizard.stepValidation.errors.map((error, index) => (
                 <p key={index}>{error}</p>
               ))}
@@ -353,7 +353,7 @@ export function GuidedFirstTimeExperience() {
               <button
                 onClick={wizard.handlers.handleNext}
                 disabled={!wizard.stepValidation?.valid}
-                className="min-h-12 px-6 py-2 bg-blue-500 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
+                className="min-h-12 px-6 py-2 bg-primary hover:bg-primary/90 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
                 Next
               </button>
@@ -372,8 +372,8 @@ export function GuidedFirstTimeExperience() {
         </div>
         
         {wizard.currentError && (
-          <div className="bg-red-200 border border-red-500 rounded-md p-3">
-            <p className="text-sm text-red-500">{wizard.currentError}</p>
+          <div className="bg-destructive/10 border border-destructive rounded-md p-3">
+            <p className="text-sm text-destructive">{wizard.currentError}</p>
           </div>
         )}
       </div>

@@ -14,7 +14,7 @@ const badgeVariants = cva(
         secondary:
           "border-transparent bg-gray-100 text-gray-900 hover:bg-gray-300",
         destructive:
-          "border-transparent bg-red-700 text-white hover:bg-red-900",
+          "border-transparent bg-destructive text-white hover:bg-destructive/90",
         outline: "text-gray-900 border border-gray-300 bg-white hover:bg-gray-100",
         // Entity badge variants
         success: "border-transparent bg-green-500 text-white hover:bg-green-700",
@@ -25,11 +25,11 @@ const badgeVariants = cva(
         "info-static": "border-transparent bg-blue-700 text-white",
         "default-static": "border-transparent bg-gray-700 text-white",
         "warning-static": "border-transparent bg-amber-500 text-white",
-        "destructive-static": "border-transparent bg-red-700 text-white",
+        "destructive-static": "border-transparent bg-destructive text-white",
         "secondary-static": "border-transparent bg-gray-100 text-gray-900",
         // Skill requirement variants
         available: "border-transparent bg-green-200 text-green-700 hover:bg-green-500",
-        unavailable: "border-transparent bg-red-200 text-red-700 hover:bg-red-500",
+        unavailable: "border-transparent bg-destructive/10 text-destructive hover:bg-destructive/20",
         "skill-requirement": "border border-gray-300 bg-gray-100 text-gray-700",
       },
       size: {

@@ -48,7 +48,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
               p-3 rounded-lg text-sm font-medium transition-all duration-200
               border-2 text-center
               ${isSelected
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                ? 'border-primary bg-primary/10 text-primary'
                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-100'
               }
               ${isDisabled

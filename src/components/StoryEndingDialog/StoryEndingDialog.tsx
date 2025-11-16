@@ -23,7 +23,7 @@ export interface StoryEndingDialogProps {
 const endingTypeClasses: Record<EndingType, string> = {
   triumphant: 'ending-triumphant border-amber-300',
   mysterious: 'ending-mysterious border-gray-300',
-  tragic: 'ending-tragic border-red-300',
+  tragic: 'ending-tragic border-destructive',
   default: 'ending-default border-gray-300',
 };
 

@@ -198,7 +198,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         actualRouter.push(`/characters/${char.id}`);
                       }
                     }}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 transition-colors rounded-full text-sm font-medium text-blue-700 border border-blue-200 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 transition-colors rounded-full text-sm font-medium text-primary border border-primary/20 cursor-pointer"
                     title={`Play as ${char.name} - Level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
@@ -211,7 +211,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex-shrink-0 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/90 flex-shrink-0 flex items-center justify-center">
                         <span className="text-white text-sm font-bold leading-none">
                           {char.name.charAt(0).toUpperCase()}
                         </span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PointPool {
   total: number;
@@ -26,8 +27,12 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
 
   return (
     <div
-      className="component-point-pool-display bg-gray-100 rounded-lg p-3 border transition-colors duration-300"
-      style={pool.remaining === 0 ? { backgroundColor: 'rgb(240 253 244)', borderColor: 'rgb(134 239 172)' } : undefined}
+      className={cn(
+        "component-point-pool-display rounded-lg p-3 border transition-colors duration-300",
+        pool.remaining === 0
+          ? "bg-green-50 border-green-300"
+          : "bg-gray-100 border-gray-300"
+      )}
       role="status"
       aria-live="polite"
       aria-atomic="true"

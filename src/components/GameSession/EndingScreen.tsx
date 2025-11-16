@@ -208,22 +208,6 @@ export function EndingScreen() {
     return `${minutes} minutes`;
   };
 
-  // Determine header text color based on tone for better contrast and accessibility
-  const getHeaderTextColor = (tone: string) => {
-    switch (tone) {
-      case 'triumphant': // Amber background - needs dark text for proper contrast
-        return 'text-foreground'; // Use semantic foreground color
-      case 'hopeful': // Green background - needs light text
-        return 'text-primary-foreground'; // Use primary foreground for contrast
-      case 'mysterious': // Dark gray background - needs light text
-        return 'text-primary-foreground'; // Use primary foreground for contrast
-      case 'tragic': // Red background - needs light text
-        return 'text-primary-foreground'; // Use primary foreground for contrast
-      default:
-        return 'text-primary-foreground'; // Default to high contrast text
-    }
-  };
-
   // Navigation actions using shared CardAction format
   const navigationActions: CardAction[] = [
     {

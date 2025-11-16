@@ -63,8 +63,8 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
     <div className={`space-y-4 ${className}`}>
       {/* Point Pool Summary */}
       <div className={`${wizardStyles.card.base} ${
-        remaining === 0 
-          ? 'bg-green-50 border-green-300' 
+        remaining === 0
+          ? 'bg-green-50 border-green-300'
           : 'bg-gray-100'
       } transition-colors duration-300`}>
         <h3 className={wizardStyles.subheading}>
@@ -76,10 +76,10 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
               Total: {poolConfig.total}
             </span>
             <span className={`text-base font-bold ${
-              remaining === 0 
-                ? 'text-green-500' 
+              remaining === 0
+                ? 'text-green-500'
                 : remaining < 0
-                ? 'text-red-500'
+                ? 'text-destructive'
                 : 'text-amber-500'
             }`}>
               Remaining: {remaining}
@@ -107,7 +107,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
           >
             <div className="flex items-center justify-between mb-4">
               <span className="font-medium text-lg">{allocation.name}</span>
-              <span className="text-2xl font-bold text-blue-700">
+              <span className="text-2xl font-bold text-primary">
                 {allocation.value}
               </span>
             </div>

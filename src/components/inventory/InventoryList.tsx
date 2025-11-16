@@ -171,6 +171,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                   {/* Item Image (if available) */}
                   {item.image?.url && (
                     <div className="mb-3 flex justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image.url}
                         alt={item.name}

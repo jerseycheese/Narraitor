@@ -256,10 +256,10 @@ export function Navigation() {
                     Play
                   </Button>
                 ) : (!hasWorldsStore ? (
-                  <Button 
+                  <Button
                     type="button"
                     onClick={() => navigateWithLoading('/worlds/create', 'Setting up world creation...')}
-                    className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium"
+                    className="inline-flex items-center bg-primary hover:bg-primary/90 text-white text-sm font-medium"
                   >
                     Create Your First World
                   </Button>

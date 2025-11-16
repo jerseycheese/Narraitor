@@ -282,7 +282,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                             {entry.title || titleCase(entry.type.replace('_', ' '))}
                           </h4>
                           {!entry.isRead && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
+                            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1"></div>
                           )}
                         </div>
                         
