@@ -8,7 +8,6 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
-import { TextNormalizationSection } from '../TextNormalizationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
 import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
@@ -194,7 +193,6 @@ export const DevToolsPanel = () => {
               {(isSectionVisible(SectionId.AI_TESTING) ||
                 isSectionVisible(SectionId.AI_MOCKING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
-                isSectionVisible(SectionId.TEXT_NORMALIZATION) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
                 <div className="bg-white p-4 rounded-lg border border-gray-300 shadow-sm">
                   <h3 className="text-lg font-semibold mb-3 text-gray-900 border-b border-gray-300 pb-2">
@@ -218,13 +216,7 @@ export const DevToolsPanel = () => {
                         <ConsistencyValidationSection />
                       </CollapsibleSection>
                     )}
-                    
-                    {isSectionVisible(SectionId.TEXT_NORMALIZATION) && (
-                      <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
-                        <TextNormalizationSection />
-                      </CollapsibleSection>
-                    )}
-                    
+
                     {isSectionVisible(SectionId.LORE_MANAGEMENT) && (
                     <CollapsibleSection title="Lore Management" initialCollapsed={true}>
                       <LoreManagementSection />

@@ -58,7 +58,7 @@ describe('Client Factory Mock Integration', () => {
 
   describe('Client Factory Behavior', () => {
     test('creates a client successfully', () => {
-      const client = createAIClient({ apiKey: 'test-key' });
+      const client = createAIClient();
 
       // Should create some kind of client
       expect(client).toBeDefined();
@@ -67,7 +67,7 @@ describe('Client Factory Mock Integration', () => {
     });
 
     test('client implements AIClient interface', async () => {
-      const client = createAIClient({ apiKey: 'test-key' });
+      const client = createAIClient();
 
       // Should implement required methods
       expect(typeof client.generateContent).toBe('function');
@@ -92,7 +92,7 @@ describe('Client Factory Mock Integration', () => {
       });
 
       // Should not throw when accessing mock state
-      expect(() => createAIClient({ apiKey: 'test-key' })).not.toThrow();
+      expect(() => createAIClient()).not.toThrow();
     });
   });
 
