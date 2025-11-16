@@ -92,7 +92,7 @@ export class MockGeminiClient {
       "sessionId": "${sessionId}",
       "characterId": "${characterId}",
       "worldId": "${worldId}",
-      "title": "Investigate the mysterious hole",
+      "title": "investigate the mysterious hole",
       "description": "Found a hole in the wall that needs investigation",
       "type": "exploration",
       "priority": "medium",
@@ -240,13 +240,13 @@ export class MockGeminiClient {
 \`\`\``;
     }
 
-    // Default empty response
+    // Default empty response for unrecognized content
     return `\`\`\`json
 {
   "newGoals": [],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0.5
+  "confidence": 0
 }
 \`\`\``;
   }
