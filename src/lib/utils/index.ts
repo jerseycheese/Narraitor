@@ -35,28 +35,20 @@ export {
 /** Type definitions for formatting options */
 export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } from './formatters';
 
-/** Text normalization utilities for developer tools and debugging */
+/** Text normalization utilities for consistent text formatting */
 export {
   normalizeText,
-  normalizeTextWithDetails,
   normalizeWhitespace,
   normalizeLineEndings,
   normalizeQuotationMarks,
   normalizeSpecialCharacters,
-  analyzeText,
-  getWhitespaceStats,
   NORM_NAME,
   NORM_DESC
 } from './textNormalization';
 
 /** Type definitions for text normalization */
 export type {
-  TextNormalizationOptions,
-  NormalizationResult,
-  NormalizationChange,
-  NormalizationStats,
-  TextAnalysis,
-  WhitespaceStats
+  TextNormalizationOptions
 } from './textNormalization';
 
 // Error handling utilities
