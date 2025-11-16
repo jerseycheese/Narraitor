@@ -14,6 +14,13 @@ export class IndexedDBAdapter {
   private db: IDBDatabase | null = null;
 
   /**
+   * Check if the database is initialized
+   */
+  get isInitialized(): boolean {
+    return this.db !== null;
+  }
+
+  /**
    * Static factory method for creating adapter instances
    * Uses async initialization to prevent race conditions
    * @returns Promise resolving to an initialized IndexedDBAdapter

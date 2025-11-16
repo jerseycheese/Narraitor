@@ -56,6 +56,21 @@ export class ResilientStorageMiddleware {
     try {
       this.adapter = new IndexedDBAdapter();
       await this.adapter.initialize();
+
+      // Check if IndexedDB is actually available (not just that initialize didn't throw)
+      if (!this.adapter.isInitialized) {
+        console.warn('[Storage] IndexedDB not available, using memory storage');
+        this.adapter = null;
+        this.status = StorageStatus.UNAVAILABLE;
+        this.onStatusChange(StorageStatus.UNAVAILABLE, {
+          userMessage: 'Game progress will not persist between sessions',
+          technicalMessage: 'IndexedDB not available in this environment',
+          isRecoverable: false,
+          shouldNotify: true
+        });
+        return;
+      }
+
       this.status = StorageStatus.HEALTHY;
     } catch (error) {
       console.warn('[Storage] IndexedDB unavailable, using memory storage:', error);
@@ -82,6 +97,12 @@ export class ResilientStorageMiddleware {
         console.warn('[Storage] IndexedDB read failed, switching to memory:', error);
         this.adapter = null;
         this.status = StorageStatus.UNAVAILABLE;
+        this.onStatusChange(StorageStatus.UNAVAILABLE, {
+          userMessage: 'Storage issues detected, using temporary session storage',
+          technicalMessage: `IndexedDB read failed: ${error}`,
+          isRecoverable: false,
+          shouldNotify: true
+        });
       }
     }
 
@@ -104,6 +125,12 @@ export class ResilientStorageMiddleware {
         console.warn('[Storage] IndexedDB write failed, switching to memory:', error);
         this.adapter = null;
         this.status = StorageStatus.UNAVAILABLE;
+        this.onStatusChange(StorageStatus.UNAVAILABLE, {
+          userMessage: 'Storage issues detected, using temporary session storage',
+          technicalMessage: `IndexedDB write failed: ${error}`,
+          isRecoverable: false,
+          shouldNotify: true
+        });
       }
     }
 
