@@ -22,6 +22,7 @@ describe('ResilientStorageMiddleware', () => {
       getItem: jest.fn(),
       setItem: jest.fn(),
       removeItem: jest.fn(),
+      isInitialized: true, // Mock as initialized by default
       dbName: 'test-db',
       version: 1,
       storeName: 'test-store',
@@ -63,6 +64,32 @@ describe('ResilientStorageMiddleware', () => {
         expect.objectContaining({
           shouldNotify: true,
           userMessage: expect.stringContaining('will not persist'),
+        })
+      );
+    });
+
+    it('should switch to UNAVAILABLE when IndexedDB is not initialized', async () => {
+      // Create a new mock adapter with isInitialized = false
+      const uninitializedAdapter = {
+        ...mockAdapter,
+        isInitialized: false,
+      };
+      mockIndexedDBAdapter.mockImplementationOnce(() => uninitializedAdapter as any);
+
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
+      });
+
+      // Wait for initialization
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
+      expect(mockNotificationCallback).toHaveBeenCalledWith(
+        StorageStatus.UNAVAILABLE,
+        expect.objectContaining({
+          shouldNotify: true,
+          userMessage: expect.stringContaining('will not persist'),
+          technicalMessage: 'IndexedDB not available in this environment',
         })
       );
     });

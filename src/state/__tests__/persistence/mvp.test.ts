@@ -13,6 +13,7 @@ jest.mock('../../../lib/storage/indexedDBAdapter', () => {
     getItem: mockGetItem,
     setItem: mockSetItem,
     removeItem: mockRemoveItem,
+    isInitialized: true, // Mock as initialized by default
   }));
 
   return {
