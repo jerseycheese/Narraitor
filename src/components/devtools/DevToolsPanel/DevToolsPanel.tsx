@@ -17,7 +17,6 @@ import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
-import { RelevanceDebuggerSection } from '../RelevanceDebuggerSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -229,12 +228,6 @@ export const DevToolsPanel = () => {
                     {isSectionVisible(SectionId.LORE_MANAGEMENT) && (
                     <CollapsibleSection title="Lore Management" initialCollapsed={true}>
                       <LoreManagementSection />
-                    </CollapsibleSection>
-                  )}
-
-                  {isSectionVisible(SectionId.RELEVANCE_DEBUGGER) && (
-                    <CollapsibleSection title="Decision Relevance Debugger" initialCollapsed={true}>
-                      <RelevanceDebuggerSection />
                     </CollapsibleSection>
                   )}
                 </div>

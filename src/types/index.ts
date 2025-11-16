@@ -78,12 +78,6 @@ export type {
   TokenUsage,
   TestScenario
 } from './ai-testing.types';
-export type {
-  DecisionRelevanceScore,
-  RelevanceScoringConfig,
-  CurrentNarrativeContext,
-  DecisionRelevanceResult
-} from './relevance.types';
 
 // Export runtime error types
 export type {

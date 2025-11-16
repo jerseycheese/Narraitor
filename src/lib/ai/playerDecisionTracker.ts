@@ -20,18 +20,17 @@
  * @since 1.0.0
  */
 
-import { 
-  PlayerDecision, 
-  ChoiceTypePreference 
+import {
+  PlayerDecision,
+  ChoiceTypePreference
 } from '@/types/personalization.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
-import { DecisionRelevanceCalculator } from './decisionRelevanceCalculator';
-import { 
-  CurrentNarrativeContext, 
-  DecisionRelevanceScore 
-} from '@/types/relevance.types';
+import {
+  getMostRelevantDecisions as getSimpleMostRelevantDecisions,
+  type SimpleNarrativeContext
+} from './simpleDecisionRelevance';
 
 /**
  * Interface for decision tracking configuration
@@ -69,11 +68,9 @@ const DEFAULT_CONFIG: DecisionTrackerConfig = {
 export class PlayerDecisionTracker {
   private config: DecisionTrackerConfig;
   private decisions: PlayerDecision[] = [];
-  private relevanceCalculator: DecisionRelevanceCalculator;
 
   constructor(config: Partial<DecisionTrackerConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    this.relevanceCalculator = new DecisionRelevanceCalculator();
     this.loadDecisions();
   }
 
@@ -298,9 +295,10 @@ export class PlayerDecisionTracker {
 
   /**
    * Gets most relevant decisions based on current narrative context
+   * Uses simple recency-based filtering
    */
   getRelevantDecisions(
-    currentContext: CurrentNarrativeContext,
+    currentContext: SimpleNarrativeContext,
     maxDecisions: number = 10,
     filters?: {
       worldId?: EntityID;
@@ -313,62 +311,13 @@ export class PlayerDecisionTracker {
       return [];
     }
 
-    return this.relevanceCalculator.getMostRelevantDecisions(
+    return getSimpleMostRelevantDecisions(
       candidates,
       currentContext,
       maxDecisions
     );
   }
 
-  /**
-   * Gets decisions with their calculated relevance scores for debugging
-   */
-  getDecisionsWithRelevanceScores(
-    currentContext: CurrentNarrativeContext
-  ): Array<{ decision: PlayerDecision; relevanceScore: DecisionRelevanceScore }> {
-    const scores = this.relevanceCalculator.scoreDecisions(this.decisions, currentContext);
-
-    const decisionsWithScores = this.decisions.map((decision, index) => ({
-      decision,
-      relevanceScore: scores[index]
-    }));
-
-    // Sort by relevance score descending
-    decisionsWithScores.sort((a, b) => b.relevanceScore.overallScore - a.relevanceScore.overallScore);
-
-    return decisionsWithScores;
-  }
-
-  /**
-   * Gets relevant decisions with their relevance scores for AI context formatting
-   */
-  getRelevantDecisionsWithScores(
-    currentContext: CurrentNarrativeContext,
-    maxDecisions: number = 10,
-    filters?: {
-      worldId?: EntityID;
-      sessionId?: EntityID;
-    }
-  ): Array<{ decision: PlayerDecision; relevanceScore: DecisionRelevanceScore }> {
-    const candidates = this.getFilteredDecisionsForRelevance(filters);
-
-    if (candidates.length === 0) {
-      return [];
-    }
-
-    const scores = this.relevanceCalculator.scoreDecisions(candidates, currentContext);
-
-    const decisionsWithScores = candidates.map((decision, index) => ({
-      decision,
-      relevanceScore: scores[index]
-    }));
-
-    // Sort by relevance score descending
-    decisionsWithScores.sort((a, b) => b.relevanceScore.overallScore - a.relevanceScore.overallScore);
-
-    // Return top N decisions
-    return decisionsWithScores.slice(0, Math.min(maxDecisions, decisionsWithScores.length));
-  }
 
   /**
    * Calculates choice distribution
