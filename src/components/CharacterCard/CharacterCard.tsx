@@ -140,7 +140,7 @@ export function CharacterCard({
                 {context.relationships.map((relation) => (
                   <div
                     key={relation.characterId}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-sm font-medium text-blue-700"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary"
                   >
                     {relation.portraitUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -150,7 +150,7 @@ export function CharacterCard({
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center">
                         <span className="text-white text-xs font-bold">
                           {relation.characterName.charAt(0).toUpperCase()}
                         </span>

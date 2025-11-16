@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { World } from '@/types/world.types';
 import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
-import { useAttributePointPool } from '@/hooks/usePointPoolManager';
+import { usePointPoolManager } from '@/hooks/usePointPoolManager';
 import { PointPoolDisplay } from './PointPoolDisplay';
 
 interface CharacterAttribute {
@@ -26,7 +26,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
     items: managedAttributes,
     canIncrease,
     setValue,
-  } = useAttributePointPool({
+  } = usePointPoolManager({
     totalPoints: world.settings.attributePointPool,
     items: attributes.map(attr => {
       const worldAttr = world.attributes.find(wa => wa.id === attr.attributeId);

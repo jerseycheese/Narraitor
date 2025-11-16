@@ -69,9 +69,9 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         description="Create your character by providing their name and basic details."
       >
       {/* Helpful tip */}
-      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-900">
-          Choose a unique name for your character. The name should be between 3 and 50 characters 
+      <div className="border rounded-lg p-4 bg-muted mb-6">
+        <p className="text-sm text-muted-foreground">
+          Choose a unique name for your character. The name should be between 3 and 50 characters
           and must be unique within this world.
         </p>
       </div>
@@ -86,7 +86,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         <div className="flex-1 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="character-name">
-              Character Name <span className="text-red-500">*</span>
+              Character Name <span className="text-destructive">*</span>
             </Label>
             <Input
               id="character-name"

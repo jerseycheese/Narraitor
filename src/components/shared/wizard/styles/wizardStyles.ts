@@ -22,10 +22,10 @@ export const wizardStyles = {
     group: "space-y-2",
     label: "block text-sm font-medium text-gray-700 mb-2",
     input: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500",
-    inputError: "border-red-500 focus:ring-red-500 focus:border-red-500",
+    inputError: "border-destructive focus:ring-destructive focus:border-destructive",
     textarea: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-vertical",
     select: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500",
-    error: "text-red-700 text-sm mt-1",
+    error: "text-destructive text-sm mt-1",
     helpText: "text-gray-500 text-sm mt-1",
   },
   
@@ -34,7 +34,7 @@ export const wizardStyles = {
     container: "flex justify-between mt-8 pt-6 border-t border-gray-300",
     primaryButton: "px-4 py-2 font-medium rounded-md transition-colors bg-blue-500 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed",
     secondaryButton: "px-4 py-2 font-medium rounded-md transition-colors bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed",
-    cancelButton: "px-4 py-2 font-medium rounded-md transition-colors bg-white text-red-700 border border-red-500 hover:bg-red-200",
+    cancelButton: "px-4 py-2 font-medium rounded-md transition-colors bg-white text-destructive border border-destructive hover:bg-destructive/10",
     buttonGroup: "flex gap-2",
   },
   
@@ -67,7 +67,7 @@ export const wizardStyles = {
     secondary: "bg-gray-100 text-gray-700",
     success: "bg-green-200 text-green-700",
     warning: "bg-amber-200 text-amber-700",
-    danger: "bg-red-200 text-red-700",
+    danger: "bg-destructive/10 text-destructive",
   },
   
   // Toggle styles
@@ -80,7 +80,7 @@ export const wizardStyles = {
   // Utility styles
   divider: "border-t border-gray-300 pt-6",
   subheading: "text-lg font-semibold mb-4",
-  errorContainer: "p-4 bg-red-200 border border-red-500 rounded-lg",
+  errorContainer: "p-4 bg-destructive/10 border border-destructive rounded-lg",
 };
 
 // Utility function for combining classes (similar to clsx)

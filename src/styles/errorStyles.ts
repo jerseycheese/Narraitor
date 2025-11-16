@@ -3,21 +3,21 @@
  */
 export const errorStyles = {
   // Block-level error containers
-  container: 'p-4 bg-red-200 border border-red-500 rounded-lg',
-  
+  container: 'p-4 bg-destructive/10 border border-destructive rounded-lg',
+
   // Individual error messages
-  message: 'text-red-700 text-sm mt-1',
-  
+  message: 'text-destructive text-sm mt-1',
+
   // Form input error states
   input: {
     border: 'border-destructive',
     focus: 'focus-visible:ring-destructive',
     combined: 'border-destructive focus-visible:ring-destructive'
   },
-  
+
   // Error list styling
   list: {
     container: 'space-y-1',
-    item: 'text-red-700 text-sm'
+    item: 'text-destructive text-sm'
   }
 } as const;

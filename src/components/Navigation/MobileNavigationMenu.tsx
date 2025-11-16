@@ -218,7 +218,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           ) : Object.keys(worlds).length === 0 ? (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 text-white text-lg font-medium"
            >
               <Plus className="w-5 h-5" aria-hidden="true" />
               Create Your First World
@@ -226,7 +226,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           ) : (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 text-white text-lg font-medium"
            >
               <Plus className="w-5 h-5" aria-hidden="true" />
               Create New World

@@ -13,18 +13,18 @@ interface WizardFormGroupProps {
   children: React.ReactNode;
 }
 
-export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({ 
-  label, 
-  error, 
-  required = false, 
+export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
+  label,
+  error,
+  required = false,
   helpText,
-  children 
+  children
 }) => {
   return (
     <div className="space-y-2">
       <Label>
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {helpText && (
         <p className={wizardStyles.form.helpText} data-testid="wizard-form-help-text">

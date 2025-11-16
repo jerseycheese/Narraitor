@@ -72,16 +72,16 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         description="Provide details about your character's history, personality, and motivations."
       >
       {/* Helpful tip */}
-      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-900">
-          A compelling backstory helps bring your character to life and 
+      <div className="border rounded-lg p-4 bg-muted mb-6">
+        <p className="text-sm text-muted-foreground">
+          A compelling backstory helps bring your character to life and
           provides context for their actions and decisions in the game.
         </p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="character-history">
-          Character History <span className="text-red-500">*</span>
+          Character History <span className="text-destructive">*</span>
         </Label>
         <Textarea
           id="character-history"
@@ -97,7 +97,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="character-personality">
-          Personality <span className="text-red-500">*</span>
+          Personality <span className="text-destructive">*</span>
         </Label>
         <Textarea
           id="character-personality"

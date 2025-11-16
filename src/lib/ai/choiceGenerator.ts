@@ -8,7 +8,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
-import { truncate, safeTrim, getTimestamp } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
@@ -68,7 +68,7 @@ export class ChoiceGenerator {
 
       console.log('🔄 Generating choices - Step 7: Enhancing with decision history');
       const prompt = includeDecisionHistory && sessionId
-        ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId, narrativeContext)
+        ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
         : toneEnhancedPrompt;
 
       const response = await this.aiClient.generateContent(prompt);
@@ -589,8 +589,7 @@ CHOICE DESIGN RULES:
   private enhancePromptWithDecisionHistory(
     prompt: string,
     worldId: EntityID,
-    sessionId: EntityID,
-    narrativeContext: NarrativeContext
+    sessionId: EntityID
   ): string {
     try {
       // Simple context - just need worldId and sessionId for filtering

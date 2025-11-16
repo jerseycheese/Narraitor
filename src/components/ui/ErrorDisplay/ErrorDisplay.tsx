@@ -30,10 +30,10 @@ interface ErrorDisplayProps {
 
 const severityStyles = {
   error: {
-    container: 'bg-red-200 border-red-500 text-red-700',
-    title: 'text-red-700',
-    message: 'text-red-500',
-    button: 'bg-red-100 hover:bg-red-200 text-red-700',
+    container: 'bg-destructive/10 border-destructive text-destructive',
+    title: 'text-destructive',
+    message: 'text-destructive',
+    button: 'bg-destructive/10 hover:bg-destructive/20 text-destructive',
   },
   warning: {
     container: 'bg-amber-200 border-amber-200 text-amber-700',

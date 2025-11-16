@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { usePointPoolManager, useAttributePointPool, useSkillPointPool } from '../usePointPoolManager';
+import { usePointPoolManager, useSkillPointPool } from '../usePointPoolManager';
 
 describe('usePointPoolManager', () => {
   const initialItems = [
@@ -189,25 +189,6 @@ describe('usePointPoolManager', () => {
     );
 
     expect(minResult.current.canDecrease('test')).toBe(false);
-  });
-});
-
-describe('useAttributePointPool', () => {
-  it('should work as a specialized usePointPoolManager', () => {
-    const items = [
-      { id: 'str', value: 5, minValue: 1, maxValue: 10 },
-      { id: 'int', value: 3, minValue: 1, maxValue: 10 },
-    ];
-
-    const { result } = renderHook(() =>
-      useAttributePointPool({
-        totalPoints: 15,
-        items,
-      })
-    );
-
-    expect(result.current.pool.spent).toBe(8);
-    expect(result.current.items).toEqual(items);
   });
 });
 

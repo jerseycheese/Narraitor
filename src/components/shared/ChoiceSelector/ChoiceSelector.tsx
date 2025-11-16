@@ -153,10 +153,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
   // Calculate character count styling
   const characterCount = customInputText.length;
-  const characterCountClass = characterCount >= maxCustomLength 
-    ? 'text-red-500' 
-    : characterCount >= maxCustomLength * 0.8 
-    ? 'text-amber-500' 
+  const characterCountClass = characterCount >= maxCustomLength
+    ? 'text-destructive'
+    : characterCount >= maxCustomLength * 0.8
+    ? 'text-amber-500'
     : 'text-gray-500';
 
   // Don't render if no options and custom input is disabled
@@ -256,7 +256,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   data-disabled-reason={isOptionDisabled ? option.disabledReason : undefined}
                   className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
                     option.isSelected
-                      ? 'bg-blue-100 border-blue-500 font-bold'
+                      ? 'bg-primary/10 border-primary font-bold'
                       : getAlignmentClasses(option.alignment, isOptionDisabled)
                   } ${isOptionDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   onClick={() => handleOptionSelect(option.id, option.isDisabledByRequirements ?? false)}

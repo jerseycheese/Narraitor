@@ -326,9 +326,9 @@ const GameSession: React.FC<GameSessionProps> = ({
             <p className="text-gray-700 mb-4">
               You need to create a character before you can start playing in this world.
             </p>
-            <Button 
+            <Button
               variant="default"
-              className="bg-blue-500 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90"
               onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
             >
               Create Character
@@ -350,7 +350,7 @@ const GameSession: React.FC<GameSessionProps> = ({
           )}
           <Button
             variant="default"
-            className="bg-blue-500 hover:bg-blue-700"
+            className="bg-primary hover:bg-primary/90"
             onClick={startSession}
           >
             Start Session

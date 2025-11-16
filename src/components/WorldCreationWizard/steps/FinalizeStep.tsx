@@ -215,7 +215,7 @@ export default function FinalizeStep({
                 </div>
                 <div className="text-sm">{skill.description}</div>
                 {skill.attributeIds && skill.attributeIds.length > 0 && (
-                  <div className="text-sm text-blue-700 mt-1">
+                  <div className="text-sm text-primary mt-1">
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)

@@ -35,6 +35,61 @@ export function isNarrativelySignificant(item: InventoryItem): boolean {
 }
 
 /**
+ * Builds fallback narrative text for item usage.
+ * Centralizes the logic for constructing narrative based on consumption state.
+ *
+ * @param item - The item being used
+ * @param usageDetails - Details about the usage (consumption, quantities)
+ * @param tone - 'detailed' for longer descriptions, 'simple' for concise ones
+ * @returns Narrative text describing the item usage
+ */
+export function buildUsageNarrative(
+  item: InventoryItem,
+  usageDetails: ItemUsageNarrativeDetails,
+  tone: 'detailed' | 'simple' = 'simple'
+): string {
+  const previousQuantity = usageDetails.previousQuantity ?? item.quantity;
+  const remainingQuantity =
+    usageDetails.remainingQuantity ??
+    (usageDetails.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
+
+  const narrativeParts: string[] = [];
+
+  // Opening line
+  if (tone === 'detailed') {
+    narrativeParts.push(
+      `You use ${previousQuantity === 1 ? 'the' : 'one of the'} ${item.name}${item.description ? `. ${item.description}` : '.'}`
+    );
+  } else {
+    if (usageDetails.wasConsumed) {
+      if (remainingQuantity > 0) {
+        narrativeParts.push(`You use one of the ${item.name}, leaving ${remainingQuantity} remaining.`);
+      } else {
+        narrativeParts.push(`You use the last of the ${item.name}.`);
+      }
+    } else {
+      narrativeParts.push(`You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`);
+    }
+    return narrativeParts.map(part => safeTrim(part)).join(' ');
+  }
+
+  // Consumption details (detailed tone only)
+  if (usageDetails.wasConsumed) {
+    if (remainingQuantity > 0) {
+      narrativeParts.push(
+        `You still have ${remainingQuantity} ${remainingQuantity === 1 ? 'remaining' : 'remaining pieces'} to draw upon.`
+      );
+    } else {
+      narrativeParts.push('That was the last of this item.');
+    }
+  } else {
+    narrativeParts.push('The item remains firmly in your grasp as the moment passes.');
+  }
+
+  return narrativeParts.map(part => safeTrim(part)).join(' ');
+}
+
+/**
  * Generates narrative text describing the effects of using an item.
  * Uses AI to create contextual, world-appropriate descriptions.
  */
@@ -134,26 +189,8 @@ export async function generateItemUsageNarrative(
     });
   } catch {
     // Fallback narrative if AI generation fails or context unavailable
-    const previousQuantity = usageDetails.previousQuantity ?? item.quantity;
-    const remainingQuantity =
-      usageDetails.remainingQuantity ??
-      (usageDetails.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
-    const narrativeParts: string[] = [
-      `You use ${previousQuantity === 1 ? 'the' : 'one of the'} ${item.name}${item.description ? `. ${item.description}` : '.'}`,
-    ];
-
-    if (usageDetails.wasConsumed) {
-      if (remainingQuantity > 0) {
-        narrativeParts.push(`You still have ${remainingQuantity} ${remainingQuantity === 1 ? 'remaining' : 'remaining pieces'} to draw upon.`);
-      } else {
-        narrativeParts.push('That was the last of this item.');
-      }
-    } else {
-      narrativeParts.push('The item remains firmly in your grasp as the moment passes.');
-    }
-
     return {
-      content: narrativeParts.map((part) => safeTrim(part)).join(' '),
+      content: buildUsageNarrative(item, usageDetails, 'detailed'),
       segmentType: 'action',
       metadata: {
         characterIds: [characterId],
@@ -279,33 +316,10 @@ export async function processItemUsage(
         journalStore.addEntry(resolvedSessionId, journalEntry);
       }
     } catch {
-      const previousQuantity = usageResult.previousQuantity ?? item.quantity;
-      const remainingQuantity =
-        usageResult.remainingQuantity ??
-        (usageResult.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
-
-      if (usageResult.wasConsumed) {
-        if (remainingQuantity > 0) {
-          narrative = `You use one of the ${item.name}, leaving ${remainingQuantity} remaining.`;
-        } else {
-          narrative = `You use the last of the ${item.name}.`;
-        }
-      } else {
-        narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
-      }
+      narrative = buildUsageNarrative(item, usageResult, 'simple');
     }
   } else {
-    const previousQuantity = usageResult.previousQuantity ?? item.quantity;
-    const remainingQuantity = usageResult.remainingQuantity ?? (usageResult.wasConsumed ? Math.max(previousQuantity - 1, 0) : previousQuantity);
-    if (usageResult.wasConsumed) {
-      if (remainingQuantity > 0) {
-        narrative = `You use one of the ${item.name}, leaving ${remainingQuantity} remaining.`;
-      } else {
-        narrative = `You use the last of the ${item.name}.`;
-      }
-    } else {
-      narrative = `You use the ${item.name}${item.description ? `. ${item.description}` : '.'}`;
-    }
+    narrative = buildUsageNarrative(item, usageResult, 'simple');
   }
 
   return {

@@ -514,7 +514,7 @@ export default function WorldCreationWizard({
           // Fallback if world not found
           return (
             <div className="text-center py-12">
-              <p className="text-red-500">Error: World not found. Please try creating the world again.</p>
+              <p className="text-destructive">Error: World not found. Please try creating the world again.</p>
               <Button onClick={handleBack} variant="link" className="mt-4 p-0 h-auto">
                 Go Back
               </Button>

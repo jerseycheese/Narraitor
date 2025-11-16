@@ -29,7 +29,6 @@ import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { safeTrim } from '@/lib/utils';
-import { getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
@@ -298,8 +297,7 @@ export class NarrativeGenerator {
     prompt: string,
     worldId: EntityID,
     characterIds: string[],
-    sessionId?: EntityID,
-    narrativeContext?: NarrativeContext
+    sessionId?: EntityID
   ): string {
     try {
       const world = this.getWorld(worldId);
@@ -697,8 +695,7 @@ Return ONLY the rewritten narrative.`;
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
-        request.sessionId,
-        request.narrativeContext
+        request.sessionId
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
@@ -833,8 +830,7 @@ Return ONLY the rewritten narrative.`;
         loreEnhancedPrompt,
         worldId,
         characterIds,
-        sessionId,
-        undefined // No narrative context for initial scene
+        sessionId
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
