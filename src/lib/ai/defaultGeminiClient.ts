@@ -9,7 +9,7 @@ import { getDefaultConfig } from './config';
  * - Test environment: Uses mock from __mocks__
  * - Browser (client-side): Uses secure proxy
  * - Server-side with API key: Uses real client
- * - Fallback: Error-throwing client
+ * - Server-side without API key: Uses mock (for local development)
  */
 export const createDefaultGeminiClient = () => {
   // In test environment, Jest will automatically use the mock from __mocks__/geminiClient.mock.ts
@@ -32,7 +32,9 @@ export const createDefaultGeminiClient = () => {
     return new GeminiClient(getDefaultConfig());
   }
 
-  // Fallback: error-throwing client for development without API key
-  console.warn("No API key available - AI features will not work");
-  return new ClientGeminiClient(); // Will throw errors when called
+  // Server-side fallback: use mock for local development without API key
+  console.log("Using mock Gemini client (no API key - local development)");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { MockGeminiClient } = require('./__mocks__/geminiClient.mock');
+  return new MockGeminiClient();
 };
