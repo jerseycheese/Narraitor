@@ -155,8 +155,9 @@ export class ResilientStorageMiddleware {
   /**
    * Start health monitoring (no-op for backward compatibility)
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   startHealthMonitoring(_intervalMs: number = 30000): void {
-    // No-op
+    // No-op - method kept for backward compatibility
   }
 
   /**

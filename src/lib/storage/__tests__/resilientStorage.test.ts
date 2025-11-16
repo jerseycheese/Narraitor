@@ -73,8 +73,8 @@ describe('ResilientStorageMiddleware', () => {
       const uninitializedAdapter = {
         ...mockAdapter,
         isInitialized: false,
-      };
-      mockIndexedDBAdapter.mockImplementationOnce(() => uninitializedAdapter as any);
+      } as unknown as jest.Mocked<IndexedDBAdapter>;
+      mockIndexedDBAdapter.mockImplementationOnce(() => uninitializedAdapter);
 
       const storage = new ResilientStorageMiddleware({
         onStatusChange: mockNotificationCallback,
