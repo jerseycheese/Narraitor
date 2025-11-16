@@ -1,7 +1,6 @@
 // src/lib/ai/clientFactory.ts
 
-import { AIClient, AIServiceConfig } from './types';
-import { getDefaultConfig } from './config';
+import { AIClient } from './types';
 
 /**
  * Creates an AI client with image generation support
@@ -9,12 +8,7 @@ import { getDefaultConfig } from './config';
  * For testing: Use the mock from __mocks__/geminiClient.image.ts (Jest auto-mocking)
  * For browser: Returns error-throwing client (use API routes instead)
  */
-export function createAIClient(config?: Partial<AIServiceConfig>): AIClient {
-  const fullConfig = {
-    ...getDefaultConfig(),
-    ...config
-  };
-
+export function createAIClient(): AIClient {
   // In test environment, use the proper mock
   if (process.env.NODE_ENV === 'test') {
     // Dynamic import for test environment only

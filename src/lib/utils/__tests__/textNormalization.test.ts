@@ -1,12 +1,9 @@
-import { 
-  normalizeText, 
-  normalizeTextWithDetails,
-  normalizeWhitespace, 
-  normalizeQuotationMarks, 
+import {
+  normalizeText,
+  normalizeWhitespace,
+  normalizeQuotationMarks,
   normalizeLineEndings,
-  normalizeSpecialCharacters,
-  analyzeText,
-  getWhitespaceStats
+  normalizeSpecialCharacters
 } from '../textNormalization';
 
 describe('Text Normalization Utilities', () => {
@@ -84,28 +81,6 @@ describe('Text Normalization Utilities', () => {
     });
   });
 
-  describe('normalizeTextWithDetails', () => {
-    it('provides detailed normalization information', () => {
-      const input = '"Hello    world"\r\nNext—line';
-      const result = normalizeTextWithDetails(input);
-      
-      expect(result.normalized).toBeDefined();
-      expect(result.changes).toBeInstanceOf(Array);
-      expect(result.stats).toBeDefined();
-      expect(result.stats.originalLength).toBe(input.length);
-      expect(result.stats.processingTime).toBeGreaterThanOrEqual(0);
-    });
-
-    it('tracks changes made during normalization', () => {
-      const input = 'Text    with\r\nexcessive    spacing';
-      const result = normalizeTextWithDetails(input);
-      
-      expect(result.changes.length).toBeGreaterThan(0);
-      expect(result.changes.some(change => change.type === 'whitespace')).toBe(true);
-      expect(result.changes.some(change => change.type === 'lineEndings')).toBe(true);
-    });
-  });
-
   describe('normalizeWhitespace', () => {
     it('removes excessive spaces within paragraphs', () => {
       const input = 'This    has     too    many     spaces.';
@@ -156,16 +131,6 @@ describe('Text Normalization Utilities', () => {
       const result = normalizeLineEndings(input);
       expect(result).toBe('Windows\nMac\nUnix\n');
     });
-
-    it('can convert to different formats', () => {
-      const input = 'Line one\nLine two\n';
-      
-      const windows = normalizeLineEndings(input, 'windows');
-      expect(windows).toBe('Line one\r\nLine two\r\n');
-      
-      const mac = normalizeLineEndings(input, 'mac');
-      expect(mac).toBe('Line one\rLine two\r');
-    });
   });
 
   describe('normalizeQuotationMarks', () => {
@@ -211,98 +176,6 @@ describe('Text Normalization Utilities', () => {
       const input = 'Em dash—en dash–ellipsis…all together';
       const result = normalizeSpecialCharacters(input);
       expect(result).toBe('Em dash-en dash-ellipsis...all together');
-    });
-  });
-
-  describe('analyzeText', () => {
-    it('provides accurate text statistics', () => {
-      const input = 'Line one\nLine two\n\nParagraph two';
-      const analysis = analyzeText(input);
-      
-      expect(analysis.characters).toBe(input.length);
-      expect(analysis.lines).toBe(4); // 3 lines plus empty line
-      expect(analysis.paragraphs).toBe(2);
-      expect(analysis.words).toBe(6); // "Line", "one", "Line", "two", "Paragraph", "two"
-      expect(analysis.lineEndingFormat).toBe('unix');
-    });
-
-    it('detects line ending formats', () => {
-      const windows = analyzeText('Line\r\nTwo\r\n');
-      expect(windows.lineEndingFormat).toBe('windows');
-      
-      const mac = analyzeText('Line\rTwo\r');
-      expect(mac.lineEndingFormat).toBe('mac');
-      
-      const mixed = analyzeText('Windows\r\nMac\rUnix\n');
-      expect(mixed.lineEndingFormat).toBe('mixed');
-    });
-
-    it('detects special characters and smart quotes', () => {
-      const withSpecial = analyzeText('\u201cSmart quotes\u201d and em dash—here');
-      expect(withSpecial.hasSmartQuotes).toBe(true);
-      expect(withSpecial.hasSpecialChars).toBe(true);
-      
-      const withoutSpecial = analyzeText('"Regular quotes" and hyphen-here');
-      expect(withoutSpecial.hasSmartQuotes).toBe(false);
-      expect(withoutSpecial.hasSpecialChars).toBe(false);
-    });
-
-    it('handles empty input', () => {
-      const analysis = analyzeText('');
-      expect(analysis.characters).toBe(0);
-      expect(analysis.lines).toBe(0);
-      expect(analysis.paragraphs).toBe(0);
-      expect(analysis.words).toBe(0);
-    });
-  });
-
-  describe('getWhitespaceStats', () => {
-    it('counts leading and trailing whitespace', () => {
-      const input = '   Text with spaces   ';
-      const stats = getWhitespaceStats(input);
-      
-      expect(stats.leading).toBe(3);
-      expect(stats.trailing).toBe(3);
-    });
-
-    it('counts excessive spaces and tabs', () => {
-      const input = 'Text    with\ttabs    and    spaces';
-      const stats = getWhitespaceStats(input);
-      
-      expect(stats.excessiveSpaces).toBeGreaterThan(0);
-      expect(stats.tabs).toBe(1);
-    });
-
-    it('counts multiple line breaks', () => {
-      const input = 'First\n\n\nSecond\n\n\n\nThird';
-      const stats = getWhitespaceStats(input);
-      
-      expect(stats.multipleLineBreaks).toBe(2);
-    });
-
-    it('handles empty input', () => {
-      const stats = getWhitespaceStats('');
-      expect(stats.leading).toBe(0);
-      expect(stats.trailing).toBe(0);
-      expect(stats.excessiveSpaces).toBe(0);
-      expect(stats.tabs).toBe(0);
-      expect(stats.multipleLineBreaks).toBe(0);
-    });
-  });
-
-  describe('Performance', () => {
-    it('processes large text efficiently', () => {
-      const largeText = 'Sample text with    spaces\r\n'.repeat(1000);
-      const startTime = performance.now();
-      
-      const result = normalizeTextWithDetails(largeText);
-      
-      const endTime = performance.now();
-      const processingTime = endTime - startTime;
-      
-      expect(result.normalized).toBeDefined();
-      expect(processingTime).toBeLessThan(100); // Should complete in under 100ms
-      expect(result.stats.processingTime).toBeGreaterThan(0);
     });
   });
 

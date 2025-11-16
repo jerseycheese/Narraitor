@@ -217,7 +217,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
   buildContextForSession: (sessionId, options = {}) => {
     try {
       const goalStore = useGoalStore.getState();
-      let activeGoals = goalStore.getActiveGoalsBySession(sessionId);
+      const activeGoals = goalStore.getActiveGoalsBySession(sessionId);
 
       // Include goals by default unless explicitly disabled
       const shouldIncludeGoals = options.includeGoals !== false;
