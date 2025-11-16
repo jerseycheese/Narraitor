@@ -8,7 +8,6 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
-import { TextNormalizationSection } from '../TextNormalizationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
 import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
@@ -218,13 +217,7 @@ export const DevToolsPanel = () => {
                         <ConsistencyValidationSection />
                       </CollapsibleSection>
                     )}
-                    
-                    {isSectionVisible(SectionId.TEXT_NORMALIZATION) && (
-                      <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
-                        <TextNormalizationSection />
-                      </CollapsibleSection>
-                    )}
-                    
+
                     {isSectionVisible(SectionId.LORE_MANAGEMENT) && (
                     <CollapsibleSection title="Lore Management" initialCollapsed={true}>
                       <LoreManagementSection />

@@ -19,7 +19,6 @@ export enum DevToolsSection {
   ENDING_IMAGE_DEBUG = 'endingImageDebug',
   CONSISTENCY_VALIDATION = 'consistencyValidation',
   RELEVANCE_DEBUGGER = 'relevanceDebugger',
-  TEXT_NORMALIZATION = 'textNormalization',
   LORE_MANAGEMENT = 'loreManagement',
   ERROR_SECTION = 'errorSection'
 }
@@ -41,7 +40,6 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.ENDING_IMAGE_DEBUG]: true,
   [DevToolsSection.CONSISTENCY_VALIDATION]: true,
   [DevToolsSection.RELEVANCE_DEBUGGER]: true,
-  [DevToolsSection.TEXT_NORMALIZATION]: true,
   [DevToolsSection.LORE_MANAGEMENT]: true,
   [DevToolsSection.ERROR_SECTION]: true,
 };

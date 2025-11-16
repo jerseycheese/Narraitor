@@ -4,6 +4,5 @@ export * from './JsonViewer';
 export * from './StateSection';
 export * from './AITestingPanel';
 export * from './ConsistencyValidationSection';
-export * from './TextNormalizationSection';
 export * from './ErrorSection';
 export * from './ErrorBoundary';
