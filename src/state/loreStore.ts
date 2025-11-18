@@ -15,6 +15,7 @@ import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
+import { syncEntitiesFromSlice, normalizeErrorState, normalizeLoadingState } from './migrationHelpers';
 
 /**
  * Helper function to generate normalized lore keys
@@ -551,30 +552,24 @@ export const useLoreStore = create<LoreStore>()(
       onRehydrateStorage: () => (state) => {
         // Ensure entities is always in sync with facts after hydration
         if (state && state.facts) {
-          state.entities = { ...state.facts };
+          syncEntitiesFromSlice<LoreFact>(state, 'facts');
         }
       },
       migrate: (persistedState: unknown) => {
         if (persistedState && typeof persistedState === 'object' && 'facts' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const state = persistedState as any;
-          if (state.facts && typeof state.facts === 'object') {
-            state.entities = { ...state.facts };
-          }
+
+          // Use centralized helpers for common migration patterns
+          syncEntitiesFromSlice<LoreFact>(state, 'facts');
+
+          // Clean up invalid currentEntityId references
           if (state.currentEntityId && !(state.entities && state.entities[state.currentEntityId])) {
             state.currentEntityId = null;
           }
-          if (typeof state.error === 'string') {
-            state.error = {
-              title: state.error,
-              message: state.error,
-              retryable: false,
-              type: ErrorType.UNKNOWN,
-            };
-          }
-          if (typeof state.loading !== 'boolean') {
-            state.loading = false;
-          }
+
+          normalizeErrorState(state);
+          normalizeLoadingState(state);
         }
         return persistedState as LoreStore;
       },

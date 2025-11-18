@@ -13,6 +13,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { goalExtractor } from '../lib/ai/goalExtractor';
 import { CrudStore } from './createCrudStore';
+import { syncEntitiesFromSlice, normalizeCommonStates } from './migrationHelpers';
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -374,22 +375,17 @@ export const useGoalStore = create<GoalStore>()(
       onRehydrateStorage: () => (state) => {
         // Ensure entities is always in sync with goals after hydration
         if (state && state.goals) {
-          state.entities = { ...state.goals };
+          syncEntitiesFromSlice<NarrativeGoal>(state, 'goals');
         }
       },
       migrate: (persistedState: unknown) => {
         if (persistedState && typeof persistedState === 'object' && 'goals' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const state = persistedState as any;
-          if (state.goals && typeof state.goals === 'object') {
-            state.entities = { ...state.goals };
-          }
-          if (typeof state.error === 'string') {
-            state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
-          }
-          if (typeof state.loading !== 'boolean') {
-            state.loading = false;
-          }
+
+          // Use centralized helpers for common migration patterns
+          syncEntitiesFromSlice<NarrativeGoal>(state, 'goals');
+          normalizeCommonStates(state);
         }
         return persistedState as GoalStore;
       },

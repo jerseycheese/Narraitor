@@ -3,10 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
 import type { InventoryItem } from '@/types/inventory.types';
-import type { GeneratedImage } from '@/types/common.types';
-import { getTimestamp } from '@/lib/utils';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import { ItemImageGenerator } from '@/lib/ai/itemImageGenerator';
+import { generateImageWithFallback } from '@/lib/api/imageGenerationHelpers';
 
 const logger = new Logger('API');
 
@@ -42,49 +40,16 @@ export async function POST(request: NextRequest) {
 
     logger.debug('generate-item-image API', 'Generated prompt:', prompt.substring(0, 100) + '...');
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    // Development mode - return mock image
-    if (!apiKey || apiKey === 'MOCK_API_KEY') {
-      const mockImage: GeneratedImage = {
-        type: 'placeholder',
-        url: `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt,
-      };
-
-      logger.debug('generate-item-image API', 'Using mock image for development');
-      return NextResponse.json({ image: mockImage });
-    }
-
-    // Call Gemini API for actual image generation
-    const generatedImage = await generateImageWithGemini(prompt, apiKey);
-
-    if (!generatedImage) {
-      logger.warn('generate-item-image API', 'Image generation failed, using fallback');
-
-      // Return placeholder fallback
-      const fallbackImage: GeneratedImage = {
-        type: 'placeholder',
-        url: `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}-fallback`,
-        generatedAt: getTimestamp(),
-        prompt: prompt,
-      };
-
-      return NextResponse.json({ image: fallbackImage });
-    }
-
-    // Return the generated image
-    const imageData: GeneratedImage = {
-      type: 'ai-generated',
-      url: generatedImage.url,
-      generatedAt: getTimestamp(),
-      prompt: prompt,
-    };
-
-    logger.debug('generate-item-image API', 'Image generated successfully');
-
-    return NextResponse.json({ image: imageData });
+    // Use centralized helper for image generation with fallback
+    return generateImageWithFallback({
+      prompt,
+      fallback: {
+        variant: 'shapes',
+        seed: item.name,
+        imageType: 'placeholder',
+      },
+      loggerContext: 'generate-item-image API',
+    });
 
   } catch (error) {
     logger.error('generate-item-image API', 'Error:', error);
