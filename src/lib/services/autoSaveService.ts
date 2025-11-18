@@ -40,7 +40,6 @@ export type AutoSaveOptions = {
   onSaveStart?: (reason: SaveTriggerReason) => void;
   onError?: (error: Error) => void;
   debounceMs?: number;
-  compressionEnabled?: boolean;
 };
 
 /**
@@ -55,7 +54,6 @@ export class AutoSaveService {
   private storage = createIndexedDBStorage();
   private debouncedSave: DebouncedFunction<(reason: SaveTriggerReason) => Promise<void>> | null = null;
   private readonly debounceMs: number;
-  private readonly compressionEnabled: boolean;
   private logger: Logger;
   private retryCount = new Map<string, number>();
   private readonly maxRetries = 3;
@@ -64,7 +62,6 @@ export class AutoSaveService {
     this.stateProvider = stateProvider;
     this.options = options;
     this.debounceMs = options.debounceMs ?? 500; // Default 500ms debounce
-    this.compressionEnabled = options.compressionEnabled ?? false;
     this.logger = new Logger('AutoSaveService');
     
     // Create debounced save function
@@ -180,34 +177,14 @@ export class AutoSaveService {
       const duration = endTime - startTime;
       const gameStateStr = JSON.stringify(gameState);
       const size = gameStateStr.length;
-      
+
       this.logger.debug('Saving game state:', { size, reason, sessionId: gameState.session.id });
-      
+
       // Save game state to IndexedDB
       const saveKey = `auto-save-${gameState.session.id}-${Date.now()}`;
-      
-      // Optimize large state objects
-      let stateToSave = gameState;
-      if (this.compressionEnabled && size > 100000) { // 100KB threshold
-        this.logger.info('Compressing large state object:', size, 'bytes');
-        // For large states, only save essential data
-        stateToSave = {
-          session: gameState.session,
-          world: gameState.world ? { id: gameState.world.id, name: gameState.world.name } : undefined,
-          character: gameState.character,
-          // Truncate narrative entries to last 10 for performance
-          narrative: gameState.narrative ? {
-            ...gameState.narrative,
-            entries: Array.isArray(gameState.narrative.entries) 
-              ? gameState.narrative.entries.slice(-10)
-              : gameState.narrative.entries
-          } : undefined,
-          journal: gameState.journal,
-        };
-      }
-      
+
       await this.storage.setItem(saveKey, {
-        state: stateToSave,
+        state: gameState,
         version: 1,
       });
       
