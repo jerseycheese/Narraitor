@@ -149,7 +149,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   }
 
   // Get decision weight styling
-  const decisionWeight = isDecisionMode ? decision.decisionWeight : undefined;
+  const decisionWeight = decision.decisionWeight;
   const weightStyling = getDecisionWeightStyling(decisionWeight);
   
 
@@ -172,7 +172,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       )}
 
       {/* Context Summary */}
-      {isDecisionMode && decision.contextSummary && (
+      {decision.contextSummary && (
         <div
           data-testid="context-summary"
           className="mb-4 p-3 bg-white/50 rounded border border-gray-200"

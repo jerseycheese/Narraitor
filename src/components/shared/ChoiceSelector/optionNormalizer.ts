@@ -73,10 +73,7 @@ export function normalizeDecisionOptions(
     }) || [];
 
     // Process item requirements (normalized groups)
-    const normalizedGroups = getNormalizedItemRequirementGroups(
-      opt.requiredItems,
-      opt.requirements
-    );
+    const normalizedGroups = getNormalizedItemRequirementGroups(opt.requiredItems);
     const itemRequirementGroups = normalizedGroups.map(group => {
       const logic: RequirementLogic = group.logic ?? 'all';
       const evaluatedRequirements = group.requirements.map(req => {

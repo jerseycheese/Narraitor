@@ -79,6 +79,6 @@ export const getNormalizedItemRequirementGroups = (
     return group ? [group] : [];
   }
 
-  const fallbackGroup = ensureItemRequirementGroup(fallbackRequirements);
-  return fallbackGroup ? [fallbackGroup] : [];
+  // Unknown format, return empty array
+  return [];
 };
