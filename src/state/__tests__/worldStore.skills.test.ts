@@ -45,7 +45,4 @@ describe('useWorldStore - Skills and Settings', () => {
       expect(state.error?.message).toBe('Maximum skills limit reached');
     });
   });
-
-  describe('settings management', () => {
-  });
 });

@@ -22,9 +22,6 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
     jest.useRealTimers();
   });
 
-  describe('attribute management', () => {
-  });
-
   describe('skill management', () => {
     let characterId: string;
 

@@ -62,13 +62,4 @@ describe('navigationStore - Routing', () => {
       expect(state.history[2].path).toBe('/path-3');
     });
   });
-
-  describe('history management', () => {
-  });
-
-  describe('breadcrumb management', () => {
-  });
-
-  describe('utility functions', () => {
-  });
 });
