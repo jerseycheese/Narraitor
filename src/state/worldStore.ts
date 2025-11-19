@@ -511,7 +511,6 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
-      version: 2,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
@@ -519,101 +518,6 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
-      // Migration strategy for future schema updates
-      // Current implementation is minimal for MVP but will need expansion
-      // for handling complex migrations in future versions:
-      // - Add field transformations for new/changed fields
-      // - Add state structure upgrades between versions
-      // - Add validation of migrated data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      migrate: (persistedState: unknown, version: number) => {
-        if (!persistedState || typeof persistedState !== 'object') {
-          return persistedState as WorldStore;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const state = persistedState as any;
-
-        // Ensure entities matches worlds
-        if (state.worlds && !state.entities) {
-          state.entities = { ...state.worlds };
-        }
-
-        // Validate persisted worlds before restoring
-        if (state.worlds && typeof state.worlds === 'object') {
-          const invalidWorlds: Record<string, unknown> = {};
-          for (const [worldId, world] of Object.entries(state.worlds)) {
-            const validation = validateWorld(world);
-            if (!validation.valid) {
-              console.warn(`Invalid world data in storage for ${worldId}:`, validation.errors[0]);
-              // Backup invalid world before removal
-              invalidWorlds[worldId] = world;
-              // Remove invalid world to prevent crashes
-              delete state.worlds[worldId];
-            }
-          }
-
-          // Sync entities with worlds
-          state.entities = { ...state.worlds };
-
-          if (typeof state.currentWorldId === 'string' && !state.currentEntityId) {
-            state.currentEntityId = state.currentWorldId;
-          }
-
-          if (typeof state.currentEntityId === 'string' && !state.currentWorldId) {
-            state.currentWorldId = state.currentEntityId;
-          }
-
-          // If any invalid worlds, backup to localStorage and set error state
-          if (Object.keys(invalidWorlds).length > 0) {
-            try {
-              if (typeof window !== 'undefined' && window.localStorage) {
-                window.localStorage.setItem(
-                  'narraitor-world-store-backup-invalid-worlds',
-                  JSON.stringify(invalidWorlds)
-                );
-              }
-            } catch (e) {
-              console.error('Failed to backup invalid worlds:', e);
-            }
-            // Set error state to notify user
-            state.error = {
-              title: 'Invalid Worlds Removed',
-              message: `${Object.keys(invalidWorlds).length} invalid world(s) were found and removed to prevent crashes. A backup has been saved. Please check the console for details.`,
-              retryable: false,
-              type: ErrorType.VALIDATION,
-            };
-          }
-
-          if (state.worldStates && typeof state.worldStates === 'object') {
-            for (const [worldId, rawWorldState] of Object.entries(state.worldStates)) {
-              if (!rawWorldState || typeof rawWorldState !== 'object') {
-                state.worldStates[worldId] = createEmptyWorldState(worldId);
-                continue;
-              }
-
-              const existingState = rawWorldState as Partial<WorldState>;
-
-              if (!existingState.playerCharacterThreads || typeof existingState.playerCharacterThreads !== 'object') {
-                existingState.playerCharacterThreads = {};
-              }
-
-              if (!existingState.characterRelationships || typeof existingState.characterRelationships !== 'object') {
-                existingState.characterRelationships = {};
-              }
-
-              state.worldStates[worldId] = {
-                ...createEmptyWorldState(worldId),
-                ...existingState,
-                playerCharacterThreads: existingState.playerCharacterThreads,
-                characterRelationships: existingState.characterRelationships,
-              };
-            }
-          }
-        }
-
-        return persistedState as WorldStore;
-      }
     }
   )
 );

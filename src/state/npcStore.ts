@@ -7,7 +7,6 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { CrudStore } from './createCrudStore';
-import { syncEntitiesFromSlice, normalizeCommonStates } from './migrationHelpers';
 
 export interface NPCStore extends CrudStore<NPC> {
   npcs: Record<EntityID, NPC>;
@@ -229,28 +228,10 @@ export const useNPCStore = create<NPCStore>()(
     {
       name: 'narraitor-npc-store',
       storage: createIndexedDBStorage(),
-      version: 1,
       partialize: (state) => ({
         npcs: state.npcs,
         worldNpcs: state.worldNpcs,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with npcs after hydration
-        if (state && state.npcs) {
-          syncEntitiesFromSlice<NPC>(state, 'npcs');
-        }
-      },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'npcs' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-
-          // Use centralized helpers for common migration patterns
-          syncEntitiesFromSlice<NPC>(state, 'npcs');
-          normalizeCommonStates(state);
-        }
-        return persistedState as NPCStore;
-      },
     }
   )
 );

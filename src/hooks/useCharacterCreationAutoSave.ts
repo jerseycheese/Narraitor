@@ -210,17 +210,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
   const setData = (newData: CharacterCreationState | undefined) => {
     setDataInternal(newData);
   };
-  
-  
-  /**
-   * Legacy field blur handler for API compatibility
-   * Auto-save now happens automatically when data changes
-   * @deprecated Use automatic saving via setData instead
-   */
-  const handleFieldBlur = useCallback(() => {
-    // No-op: Auto-save happens automatically when data changes
-  }, []);
-  
+
   // Restore on mount and when worldId changes
   useEffect(() => {
     // Only load once per worldId
@@ -288,8 +278,6 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     data,
     /** Function to update character data (triggers auto-save) */
     setData,
-    /** @deprecated Legacy field blur handler - auto-save is now automatic */
-    handleFieldBlur,
     /** Function to clear all auto-save data */
     clearAutoSave,
     /** Whether recovery data was detected on mount */

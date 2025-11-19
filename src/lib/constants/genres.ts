@@ -49,22 +49,6 @@ export function getGenreLabel(value: string): string {
 }
 
 /**
- * Legacy genre mappings for backward compatibility with old theme naming
- */
-export const LEGACY_GENRE_MAPPING: Record<string, string> = {
-  'Fantasy': 'fantasy',
-  'Sci-Fi': 'sci-fi',
-  'Science Fiction': 'sci-fi',
-  'Horror': 'horror',
-  'Western': 'western',
-  'Comedy': 'comedy',
-  'modern': 'modern',
-  'Historical': 'historical',
-  'Post-Apocalyptic': 'post-apocalyptic',
-  'Cyberpunk': 'cyberpunk',
-};
-
-/**
  * Normalize genre value to standard format
  */
 export function normalizeGenre(value: string): string {
@@ -73,13 +57,7 @@ export function normalizeGenre(value: string): string {
   if (isValid) {
     return value;
   }
-  
-  // Check legacy mappings
-  const legacyMapping = LEGACY_GENRE_MAPPING[value];
-  if (legacyMapping) {
-    return legacyMapping;
-  }
-  
+
   // Convert to lowercase and replace spaces with hyphens
   return value.toLowerCase().replace(/\s+/g, '-');
 }
@@ -89,5 +67,3 @@ export function normalizeGenre(value: string): string {
  * Excludes 'other' since it requires specific definition to be useful for blending
  */
 export const MIXABLE_GENRES = GENRES.filter(genre => genre.value !== 'other');
-
-// Note: Removed legacy theme exports - applications should use genre terminology directly

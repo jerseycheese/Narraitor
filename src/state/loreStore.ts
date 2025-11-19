@@ -15,7 +15,6 @@ import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
-import { syncEntitiesFromSlice, normalizeErrorState, normalizeLoadingState } from './migrationHelpers';
 
 /**
  * Helper function to generate normalized lore keys
@@ -544,35 +543,10 @@ export const useLoreStore = create<LoreStore>()(
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
-      version: 1,
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with facts after hydration
-        if (state && state.facts) {
-          syncEntitiesFromSlice<LoreFact>(state, 'facts');
-        }
-      },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'facts' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-
-          // Use centralized helpers for common migration patterns
-          syncEntitiesFromSlice<LoreFact>(state, 'facts');
-
-          // Clean up invalid currentEntityId references
-          if (state.currentEntityId && !(state.entities && state.entities[state.currentEntityId])) {
-            state.currentEntityId = null;
-          }
-
-          normalizeErrorState(state);
-          normalizeLoadingState(state);
-        }
-        return persistedState as LoreStore;
-      },
     }
   )
 );

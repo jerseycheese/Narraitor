@@ -395,23 +395,3 @@ Make the world interesting and playable with concepts appropriate to the setting
   console.error('Failed to generate world after all retries:', lastError);
   throw new Error('Failed to generate world configuration. Please try again.');
 }
-
-// Convenience functions for backward compatibility
-export async function generateTestWorld(): Promise<GeneratedWorldData> {
-  // Pick a random TV/movie universe for test generation
-  const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
-  return generateWithAI({ method: 'ai', reference: randomReference });
-}
-
-export async function generateAIWorld(
-  worldReference: string,
-  existingWorldNames: string[],
-  suggestedName?: string
-): Promise<GeneratedWorldData> {
-  return generateWithAI({
-    method: 'ai',
-    reference: worldReference,
-    existingNames: existingWorldNames,
-    suggestedName
-  });
-}

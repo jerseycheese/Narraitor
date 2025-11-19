@@ -14,18 +14,8 @@ import { normalizeDecisionOptions, normalizeSimpleChoices } from './optionNormal
 import { SkillRequirementBadges, ItemRequirementBadges } from './RequirementBadges';
 import { getAlignmentIcon, getAlignmentClasses, getDecisionWeightStyling } from './choiceStyling';
 
-// Simple choice interface for backwards compatibility
-export interface SimpleChoice {
-  id: string;
-  text: string;
-  isSelected?: boolean;
-}
-
-// Unified props that can accept either simple choices or a Decision
 interface ChoiceSelectorProps {
-  // Either simple choices or a decision object
-  choices?: SimpleChoice[];
-  decision?: Decision;
+  decision: Decision;
   
   // Common props
   prompt?: string; // Override prompt text
@@ -61,10 +51,9 @@ interface ChoiceSelectorProps {
 }
 
 /**
- * Unified choice selector component that handles both simple choices and complex decisions
+ * Choice selector component for handling complex decisions
  */
 const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
-  choices,
   decision,
   prompt,
   onSelect,
@@ -83,12 +72,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  
+
   // Ref for auto-focusing input
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Determine what data we're working with
-  const isDecisionMode = !!decision;
 
   // Create character object for requirement evaluation
   const requirementEvaluationContext = {
@@ -99,15 +85,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   };
 
   // Normalize the data into a common format
-  const normalizedOptions = isDecisionMode
-    ? normalizeDecisionOptions(decision, selectedOptionId, worldSkills, requirementEvaluationContext)
-    : normalizeSimpleChoices(choices || [], selectedOptionId);
+  const normalizedOptions = normalizeDecisionOptions(decision, selectedOptionId, worldSkills, requirementEvaluationContext);
 
   // Use normalized options without custom input option
   const allOptions = normalizedOptions;
 
   // Determine the prompt text
-  const displayPrompt = prompt || (isDecisionMode ? decision.prompt : 'What will you do?');
+  const displayPrompt = prompt || decision.prompt;
 
   // Auto-focus input when custom input is enabled
   useEffect(() => {

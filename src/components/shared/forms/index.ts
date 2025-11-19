@@ -15,9 +15,6 @@ export {
   WizardFieldError as FormError,
 } from '../wizard/components/FormComponents';
 
-// Export original names for backward compatibility
-export * from '../wizard/components/FormComponents';
-
 // Additional form utilities
 export interface FormFieldProps {
   label: string;
