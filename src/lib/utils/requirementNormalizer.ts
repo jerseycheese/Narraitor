@@ -47,15 +47,12 @@ export const ensureItemRequirementGroup = (
  * - Flat arrays of requirements
  * - Arrays of requirement groups
  * - Single requirement groups
- * - Fallback to legacy requirements array
  */
 export const getNormalizedItemRequirementGroups = (
-  requiredItems: DecisionItemRequirements | undefined,
-  fallbackRequirements: DecisionRequirement[] | undefined
+  requiredItems: DecisionItemRequirements | undefined
 ): DecisionItemRequirementGroup[] => {
   if (!requiredItems) {
-    const fallbackGroup = ensureItemRequirementGroup(fallbackRequirements);
-    return fallbackGroup ? [fallbackGroup] : [];
+    return [];
   }
 
   if (Array.isArray(requiredItems)) {
@@ -82,6 +79,6 @@ export const getNormalizedItemRequirementGroups = (
     return group ? [group] : [];
   }
 
-  const fallbackGroup = ensureItemRequirementGroup(fallbackRequirements);
-  return fallbackGroup ? [fallbackGroup] : [];
+  // Unknown format, return empty array
+  return [];
 };

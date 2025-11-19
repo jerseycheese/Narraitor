@@ -41,7 +41,7 @@ export interface CharacterGenerationOptions {
 /**
  * Generate character from predefined templates
  */
-function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {
+export function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {
   const { world } = options;
   
   // Simple template-based character generation
@@ -494,52 +494,6 @@ CRITICAL INSTRUCTIONS:
       throw error; // Throw the original AI error
     }
   }
-}
-
-// Convenience functions for backward compatibility
-export function generateTestCharacter(world: World): {
-  name: string;
-  attributes: Array<{ attributeId: string; value: number }>;
-  skills: Array<{ skillId: string; level: number; experience: number; isActive: boolean }>;
-  background: {
-    history: string;
-    personality: string;
-    goals: string[];
-    motivation: string;
-    physicalDescription?: string;
-    isKnownFigure?: boolean;
-  };
-} {
-  const templateData = generateFromTemplate({ method: 'template', world });
-  
-  // Convert to the format expected by devtools
-  return {
-    name: templateData.name,
-    attributes: world.attributes.map(attr => {
-      const generated = templateData.attributes.find(a => a.id === attr.id);
-      return {
-        attributeId: attr.id,
-        value: generated?.value || Math.floor(Math.random() * (attr.maxValue - attr.minValue + 1)) + attr.minValue
-      };
-    }),
-    skills: world.skills.map(skill => {
-      const generated = templateData.skills.find(s => s.id === skill.id);
-      return {
-        skillId: skill.id,
-        level: generated?.level || Math.floor(Math.random() * 5) + 1,
-        experience: 0,
-        isActive: !!generated // Only active if in generated skills
-      };
-    }),
-    background: {
-      history: templateData.background.description,
-      personality: templateData.background.personality,
-      goals: [templateData.background.motivation],
-      motivation: templateData.background.motivation,
-      physicalDescription: templateData.background.physicalDescription,
-      isKnownFigure: templateData.isKnownFigure
-    }
-  };
 }
 
 export async function generateAICharacter(

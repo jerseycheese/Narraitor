@@ -389,33 +389,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Helper function to create journal entries from narrative segments
   const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
     if (!characterId) return;
-    
-    // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
-    let cleanContent = segment.content;
-    let actualLocation = segment.metadata?.location;
-    
-    // Fallback: handle any remaining JSON-formatted content that wasn't parsed by the generator
-    if (segment.content.includes('```json') || segment.content.startsWith('{')) {
-      try {
-        let jsonStr = segment.content;
-        if (jsonStr.includes('```json')) {
-          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
-        }
-        
-        const parsed = JSON.parse(jsonStr);
-        if (parsed.content) {
-          cleanContent = parsed.content;
-        }
-        if (parsed.metadata?.location && !actualLocation) {
-          actualLocation = parsed?.metadata?.location;
-          // Update segment metadata if it wasn't already set by the generator
-          segment.metadata = { ...segment.metadata, ...parsed.metadata };
-        }
-      } catch (parseError) {
-        console.warn('Could not parse JSON content, using original:', parseError);
-      }
-    }
-    
+
+    const cleanContent = segment.content;
+    const actualLocation = segment.metadata?.location;
+
     // Generate AI summary, type, and significance for journal entry (async)
     generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
       try {

@@ -49,23 +49,8 @@ export function getGenreLabel(value: string): string {
 }
 
 /**
- * Legacy genre mappings for backward compatibility with old theme naming
- */
-export const LEGACY_GENRE_MAPPING: Record<string, string> = {
-  'Fantasy': 'fantasy',
-  'Sci-Fi': 'sci-fi',
-  'Science Fiction': 'sci-fi',
-  'Horror': 'horror',
-  'Western': 'western',
-  'Comedy': 'comedy',
-  'modern': 'modern',
-  'Historical': 'historical',
-  'Post-Apocalyptic': 'post-apocalyptic',
-  'Cyberpunk': 'cyberpunk',
-};
-
-/**
  * Normalize genre value to standard format
+ * Maps common variations to canonical genre values
  */
 export function normalizeGenre(value: string): string {
   // Check if it's already a valid genre
@@ -73,15 +58,24 @@ export function normalizeGenre(value: string): string {
   if (isValid) {
     return value;
   }
-  
-  // Check legacy mappings
-  const legacyMapping = LEGACY_GENRE_MAPPING[value];
-  if (legacyMapping) {
-    return legacyMapping;
+
+  // Map common variations to canonical values (only for known alternate names)
+  const normalized = value.toLowerCase().trim();
+  const commonMappings: Record<string, string> = {
+    'science fiction': 'sci-fi',
+    'scifi': 'sci-fi',
+    'science-fiction': 'sci-fi',
+  };
+
+  if (commonMappings[normalized]) {
+    return commonMappings[normalized];
   }
-  
-  // Convert to lowercase and replace spaces with hyphens
-  return value.toLowerCase().replace(/\s+/g, '-');
+
+  // Convert to lowercase and replace spaces with hyphens as fallback
+  const converted = normalized.replace(/\s+/g, '-');
+
+  // Return the converted/normalized value (preserves mixed genres like "cyberpunk-western")
+  return converted;
 }
 
 /**
@@ -89,5 +83,3 @@ export function normalizeGenre(value: string): string {
  * Excludes 'other' since it requires specific definition to be useful for blending
  */
 export const MIXABLE_GENRES = GENRES.filter(genre => genre.value !== 'other');
-
-// Note: Removed legacy theme exports - applications should use genre terminology directly

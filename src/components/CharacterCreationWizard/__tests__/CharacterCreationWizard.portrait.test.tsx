@@ -19,8 +19,11 @@ jest.mock('../../../hooks/useCharacterCreationAutoSave', () => ({
   useCharacterCreationAutoSave: () => ({
     data: null,
     setData: jest.fn(),
-    handleFieldBlur: jest.fn(),
-    clearAutoSave: jest.fn()
+    clearAutoSave: jest.fn(),
+    hasRecoveryData: false,
+    recoveryPreview: null,
+    hasCurrentData: false,
+    saveStatus: 'idle' as const,
   })
 }));
 

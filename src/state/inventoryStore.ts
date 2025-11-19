@@ -82,8 +82,6 @@ export type InventoryItemAddPayload = Omit<
 
 const getInitialState = () => ({
   items: {} as Record<EntityID, InventoryItem>,
-  // `entities` mirrors `items` so stores sharing the CrudStore interface keep IndexedDB migrations intact.
-  // See migrate() below where we recompute entities after persistence rehydration.
   entities: {} as Record<EntityID, InventoryItem>,
   characterInventories: {} as Record<EntityID, EntityID[]>,
   currentEntityId: null as EntityID | null,
@@ -92,9 +90,6 @@ const getInitialState = () => ({
   generatingImageFor: new Set<EntityID>(),
   imageGenerationErrors: new Map<EntityID, string>(),
 });
-
-export const INVENTORY_STORE_VERSION = 2;
-// v2 drops pre-array inventory payloads outright and enforces Record<EntityID, EntityID[]>
 
 export const createInventoryInitialState = (): ReturnType<
   typeof getInitialState
@@ -165,65 +160,6 @@ const normalizeCharacterInventories = (
     }
     return acc;
   }, {});
-};
-
-type PersistedInventorySlice = Partial<
-  Pick<
-    InventoryStore,
-    'items' | 'characterInventories' | 'error' | 'loading' | 'currentEntityId'
-  >
->;
-
-export const migrateInventoryState = (
-  persistedState: unknown,
-  version: number | undefined
-): InventoryStore => {
-  if (!persistedState || typeof persistedState !== 'object') {
-    return createInventoryInitialState() as InventoryStore;
-  }
-
-  const incoming = persistedState as PersistedInventorySlice;
-
-  if (!version || version < INVENTORY_STORE_VERSION) {
-    const characterInventories = incoming.characterInventories;
-    const characterCount =
-      characterInventories && typeof characterInventories === 'object'
-        ? Object.keys(characterInventories).length
-        : 0;
-
-    logInventoryStateReset({
-      reason: 'schema-reset',
-      characterCount,
-    });
-
-    return createInventoryInitialState() as InventoryStore;
-  }
-
-  const items =
-    incoming.items && typeof incoming.items === 'object'
-      ? (incoming.items as Record<EntityID, InventoryItem>)
-      : {};
-
-  const normalizedInventories = normalizeCharacterInventories(
-    incoming.characterInventories as Record<EntityID, unknown> | undefined
-  );
-
-  return {
-    ...createInventoryInitialState(),
-    ...incoming,
-    items,
-    entities: { ...items },
-    characterInventories: normalizedInventories,
-    error:
-      incoming.error && typeof incoming.error === 'object'
-        ? incoming.error
-        : null,
-    loading: typeof incoming.loading === 'boolean' ? incoming.loading : false,
-    currentEntityId:
-      typeof incoming.currentEntityId === 'string'
-        ? incoming.currentEntityId
-        : null,
-  } as InventoryStore;
 };
 
 const validateNewItemData = (data: InventoryItemCreatePayload): void => {
@@ -1058,20 +994,13 @@ export const useInventoryStore = create<InventoryStore>()(
     {
       name: 'narraitor-inventory-store',
       storage: createIndexedDBStorage(),
-      version: INVENTORY_STORE_VERSION,
+      version: 3, // Incremented to clear old migrated data
       partialize: (state) => ({
         items: state.items,
         entities: state.entities,
         characterInventories: state.characterInventories,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with items after hydration
-        if (state && state.items) {
-          state.entities = { ...state.items };
-        }
-      },
-      migrate: (persistedState: unknown, version: number | undefined) =>
-        migrateInventoryState(persistedState, version),
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );

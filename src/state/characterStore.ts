@@ -618,7 +618,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
     {
       name: 'narraitor-character-store',
       storage: createIndexedDBStorage(),
-      version: 2,
+      version: 3, // Incremented to clear old migrated data
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[CharacterStore] Failed to rehydrate state', error);
@@ -626,49 +626,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
         state?.syncDerivedState?.();
       },
-      // Migration strategy for future schema updates
-      // Current implementation is minimal for MVP but will need expansion
-      // for handling complex migrations in future versions:
-      // - Add field transformations for new/changed fields
-      // - Add state structure upgrades between versions
-      // - Add validation of migrated data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      migrate: (persistedState: unknown, version: number) => {
-        // Validate persisted characters before restoring
-        if (persistedState && typeof persistedState === 'object' && 'characters' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-          if (state.characters && typeof state.characters === 'object') {
-            // Validate each character in storage has required properties
-            for (const [characterId, character] of Object.entries(state.characters)) {
-              if (!character || typeof character !== 'object') {
-                console.warn(`Invalid character data in storage for ${characterId}: not an object`);
-                delete state.characters[characterId];
-                continue;
-              }
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const char = character as any;
-              if (!char.id || !char.name || !char.worldId || !char.createdAt) {
-                console.warn(`Invalid character data in storage for ${characterId}: missing required fields`);
-                delete state.characters[characterId];
-              }
-            }
-
-            state.entities = { ...state.characters };
-
-            if (typeof state.currentCharacterId === 'string' && !state.currentEntityId) {
-              state.currentEntityId = state.currentCharacterId;
-            }
-
-            if (typeof state.currentEntityId === 'string' && !state.currentCharacterId) {
-              state.currentCharacterId = state.currentEntityId;
-            }
-
-            state.worldCharacterIds = buildWorldCharacterIds(state.characters as Record<EntityID, Character>);
-          }
-        }
-        return persistedState as CharacterStore;
-      }
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );

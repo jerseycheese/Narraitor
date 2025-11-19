@@ -5,16 +5,22 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
 import GameSessionError from '@/components/GameSession/GameSessionError';
+import { Decision } from '@/types/narrative.types';
 
 export default function GameSessionComponentsTestPage() {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
 
-  const mockChoices = [
-    { id: 'choice-1', text: 'Talk to the mysterious figure', isSelected: selectedChoiceId === 'choice-1' },
-    { id: 'choice-2', text: 'Order a drink from the bartender', isSelected: selectedChoiceId === 'choice-2' },
-    { id: 'choice-3', text: 'Leave the tavern', isSelected: selectedChoiceId === 'choice-3' },
-  ];
+  const mockDecision: Decision = {
+    id: 'test-decision',
+    prompt: 'What do you do?',
+    options: [
+      { id: 'choice-1', text: 'Talk to the mysterious figure' },
+      { id: 'choice-2', text: 'Order a drink from the bartender' },
+      { id: 'choice-3', text: 'Leave the tavern' },
+    ],
+    selectedOptionId: selectedChoiceId || undefined,
+  };
 
   const handleChoiceSelected = (choiceId: string) => {
     setSelectedChoiceId(choiceId);
@@ -52,7 +58,7 @@ export default function GameSessionComponentsTestPage() {
         <section className="border rounded p-4">
           <h2 className="text-xl font-semibold mb-4">ChoiceSelector Component</h2>
           <ChoiceSelector
-            choices={mockChoices}
+            decision={mockDecision}
             onSelect={handleChoiceSelected}
           />
           <p className="mt-2 text-sm text-gray-700">
@@ -109,7 +115,7 @@ export default function GameSessionComponentsTestPage() {
         <section className="border rounded p-4">
           <h2 className="text-xl font-semibold mb-4">Disabled ChoiceSelector</h2>
           <ChoiceSelector
-            choices={mockChoices}
+            decision={mockDecision}
             onSelect={handleChoiceSelected}
             isDisabled={true}
           />

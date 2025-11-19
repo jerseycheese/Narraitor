@@ -155,9 +155,8 @@ export async function POST(request: NextRequest) {
       };
       
       logger.debug('generate-portrait API', 'Using mock portrait for development');
-      return NextResponse.json({ 
-        portrait: mockPortrait,
-        image: mockPortrait.url // For backward compatibility
+      return NextResponse.json({
+        portrait: mockPortrait
       });
     }
     
@@ -176,8 +175,7 @@ export async function POST(request: NextRequest) {
       };
 
       return NextResponse.json({
-        portrait: fallbackPortrait,
-        image: fallbackPortrait.url // For backward compatibility
+        portrait: fallbackPortrait
       });
     }
 
@@ -192,8 +190,7 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-portrait API', 'Portrait generated successfully');
 
     return NextResponse.json({
-      portrait: portraitData,
-      image: generatedImage.url // For backward compatibility
+      portrait: portraitData
     });
 
   } catch (error) {
@@ -207,9 +204,8 @@ export async function POST(request: NextRequest) {
       prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
     
-    return NextResponse.json({ 
-      portrait: fallbackPortrait,
-      image: fallbackPortrait.url // For backward compatibility
+    return NextResponse.json({
+      portrait: fallbackPortrait
     });
   }
 }

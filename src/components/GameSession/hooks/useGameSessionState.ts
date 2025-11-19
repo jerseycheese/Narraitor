@@ -5,15 +5,14 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { GameSessionState } from '@/types/game.types';
+import { GameSessionState, PlayerChoice } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
-import type { SimpleChoice } from '@/components/shared/ChoiceSelector/ChoiceSelector';
 
 /**
  * Efficiently compare two arrays of player choices without JSON.stringify
  * Only compares essential fields to avoid performance issues with large lists
  */
-const arePlayerChoicesEqual = (choices1?: SimpleChoice[], choices2?: SimpleChoice[]): boolean => {
+const arePlayerChoicesEqual = (choices1?: PlayerChoice[], choices2?: PlayerChoice[]): boolean => {
   if (!choices1 && !choices2) return true;
   if (!choices1 || !choices2) return false;
   if (choices1.length !== choices2.length) return false;

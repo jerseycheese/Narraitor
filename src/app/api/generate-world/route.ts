@@ -28,21 +28,11 @@ export async function POST(request: NextRequest) {
 
     logger.debug('generate-world API', 'Generating world for reference:', body.worldReference);
 
-    // Map old relationship values to new ones for backward compatibility
-    let relationship: 'inspired_by' | 'set_within' | undefined;
-    if (body.worldRelationship === 'inspired_by') {
-      relationship = 'inspired_by';
-    } else if (body.worldRelationship === 'set_within') {
-      relationship = 'set_within';
-    } else {
-      relationship = body.worldRelationship as 'inspired_by' | 'set_within' | undefined;
-    }
-
     // Generate the world using the generator
     const generatedWorld = await generateWorld({
       method: 'ai',
       reference: body.worldReference,
-      relationship: relationship || 'inspired_by',
+      relationship: body.worldRelationship || 'inspired_by',
       existingNames: body.existingNames,
       suggestedName: body.suggestedName
     });

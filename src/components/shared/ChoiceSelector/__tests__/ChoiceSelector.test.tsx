@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ChoiceSelector, { SimpleChoice } from '../ChoiceSelector';
+import ChoiceSelector from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
 
@@ -42,12 +42,6 @@ describe('ChoiceSelector', () => {
       category: 'Physical'
     }));
   };
-
-  const simpleChoices: SimpleChoice[] = [
-    { id: 'choice-1', text: 'Go north' },
-    { id: 'choice-2', text: 'Go south' },
-    { id: 'choice-3', text: 'Rest here' },
-  ];
 
   const decision: Decision = {
     id: 'decision-1',
@@ -145,16 +139,6 @@ describe('ChoiceSelector', () => {
   };
 
   describe('Basic Choice Selection', () => {
-    it('displays all choices and handles selection', async () => {
-      const user = userEvent.setup();
-      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect});
-
-      assertChoicesVisible(['Go north', 'Go south', 'Rest here']);
-
-      await user.click(screen.getByText('Go north'));
-      expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
-    });
-
     it('displays decisions with hints when enabled', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect});
       assertChoicesVisible(['Attack', 'Requires courage', 'Defend', 'Safe option']);
@@ -163,19 +147,19 @@ describe('ChoiceSelector', () => {
 
   describe('Custom Input', () => {
     it('shows custom input field when enabled', () => {
-      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
-      
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+
       expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
     });
 
     it('submits custom input when entered', async () => {
       const user = userEvent.setup();
-      renderChoiceSelector({choices: simpleChoices, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
-      
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+
       const input = screen.getByPlaceholderText('Type your custom response...');
       await user.type(input, 'Custom action');
       await user.keyboard('{Enter}');
-      
+
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('Custom action');
     });
   });

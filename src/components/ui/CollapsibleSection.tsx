@@ -10,8 +10,6 @@ interface CollapsibleSectionProps {
   title: string;
   /** Section content */
   children: ReactNode;
-  /** Whether the section is initially expanded (legacy prop) */
-  initiallyExpanded?: boolean;
   /** Whether the section is initially collapsed */
   initialCollapsed?: boolean;
   /** Optional additional class names */
@@ -20,7 +18,7 @@ interface CollapsibleSectionProps {
 
 /**
  * CollapsibleSection Component
- * 
+ *
  * A reusable component for creating collapsible sections with a title
  * and toggle functionality. Used throughout the application for organizing
  * content into expandable/collapsible sections.
@@ -28,16 +26,10 @@ interface CollapsibleSectionProps {
 export const CollapsibleSection = ({
   title,
   children,
-  initiallyExpanded = true,
   initialCollapsed,
   className = ''
 }: CollapsibleSectionProps) => {
-  // If initialCollapsed is provided, it takes precedence over initiallyExpanded
-  const startExpanded = initialCollapsed !== undefined 
-    ? !initialCollapsed 
-    : initiallyExpanded;
-    
-  const [isExpanded, setIsExpanded] = useState(startExpanded);
+  const [isExpanded, setIsExpanded] = useState(!initialCollapsed);
 
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev);

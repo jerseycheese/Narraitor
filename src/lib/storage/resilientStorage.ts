@@ -153,21 +153,6 @@ export class ResilientStorageMiddleware {
   }
 
   /**
-   * Start health monitoring (no-op for backward compatibility)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  startHealthMonitoring(_intervalMs: number = 30000): void {
-    // No-op - method kept for backward compatibility
-  }
-
-  /**
-   * Stop health monitoring (no-op for backward compatibility)
-   */
-  stopHealthMonitoring(): void {
-    // No-op
-  }
-
-  /**
    * Get current storage status
    */
   getStorageStatus(): StorageStatus {

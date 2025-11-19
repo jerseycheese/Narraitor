@@ -25,7 +25,6 @@ export function formatAIResponse(
     return '';
   }
 
-  // Set default output format to text for backward compatibility
   const outputFormat = options.outputFormat || 'text';
   let formatted = text;
 

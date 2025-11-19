@@ -13,7 +13,6 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { goalExtractor } from '../lib/ai/goalExtractor';
 import { CrudStore } from './createCrudStore';
-import { syncEntitiesFromSlice, normalizeCommonStates } from './migrationHelpers';
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -366,29 +365,13 @@ export const useGoalStore = create<GoalStore>()(
     {
       name: 'narraitor-goal-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: 2, // Incremented to clear old migrated data
       partialize: (state) => ({
         goals: state.goals,
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Ensure entities is always in sync with goals after hydration
-        if (state && state.goals) {
-          syncEntitiesFromSlice<NarrativeGoal>(state, 'goals');
-        }
-      },
-      migrate: (persistedState: unknown) => {
-        if (persistedState && typeof persistedState === 'object' && 'goals' in persistedState) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as any;
-
-          // Use centralized helpers for common migration patterns
-          syncEntitiesFromSlice<NarrativeGoal>(state, 'goals');
-          normalizeCommonStates(state);
-        }
-        return persistedState as GoalStore;
-      },
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );
