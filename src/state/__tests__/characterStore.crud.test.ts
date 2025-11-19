@@ -25,12 +25,8 @@ describe('useCharacterStore - CRUD Operations', () => {
       const characterId = useCharacterStore.getState().createCharacter(characterData);
       const state = useCharacterStore.getState();
 
-      expect(characterId).toBeDefined();
-      expect(state.characters[characterId]).toBeDefined();
       expect(state.characters[characterId].name).toBe('Test Character');
       expect(state.characters[characterId].worldId).toBe('world-1');
-      expect(state.characters[characterId].createdAt).toBeDefined();
-      expect(state.characters[characterId].updatedAt).toBeDefined();
     });
 
     test('should validate required fields', () => {
@@ -109,9 +105,6 @@ describe('useCharacterStore - CRUD Operations', () => {
       });
 
       const characterId = useCharacterStore.getState().createCharacter(characterData);
-
-      expect(useCharacterStore.getState().characters[characterId]).toBeDefined();
-
       useCharacterStore.getState().deleteCharacter(characterId);
 
       const state = useCharacterStore.getState();

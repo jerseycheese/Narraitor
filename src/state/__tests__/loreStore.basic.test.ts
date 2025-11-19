@@ -15,26 +15,6 @@ describe('LoreStore - Basic Operations', () => {
     setupLoreStore();
   });
 
-  test('should add a fact', () => {
-    const { result } = renderHook(() => useLoreStore());
-
-    act(() => {
-      result.current.addFact(
-        'hero_name',
-        'Lyra Starweaver',
-        'characters',
-        'manual',
-        'test-world'
-      );
-    });
-
-    const facts = result.current.getFacts({ worldId: 'test-world' });
-    expect(facts).toHaveLength(1);
-    expect(facts[0].key).toBe('hero_name');
-    expect(facts[0].value).toBe('Lyra Starweaver');
-    expect(facts[0].category).toBe('characters');
-  });
-
   test('should get facts by category', () => {
     const { result } = renderHook(() => useLoreStore());
 

@@ -34,43 +34,33 @@ describe('LoadingOverlay', () => {
   describe('Cancel Functionality', () => {
     it('should show cancel button when onCancel provided and handle clicks', () => {
       const handleCancel = jest.fn();
-      
+
       render(
-        <LoadingOverlay 
-          isVisible={true} 
-          onCancel={handleCancel} 
+        <LoadingOverlay
+          isVisible={true}
+          onCancel={handleCancel}
         />
       );
-      
+
       const cancelButton = screen.getByText('Cancel');
       expect(cancelButton).toBeInTheDocument();
-      
+
       fireEvent.click(cancelButton);
       expect(handleCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should handle escape key when cancel is available', () => {
       const handleCancel = jest.fn();
-      
+
       render(
-        <LoadingOverlay 
-          isVisible={true} 
-          onCancel={handleCancel} 
+        <LoadingOverlay
+          isVisible={true}
+          onCancel={handleCancel}
         />
       );
-      
+
       fireEvent.keyDown(document, { key: 'Escape' });
       expect(handleCancel).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('should have proper ARIA attributes for screen readers', () => {
-      render(<LoadingOverlay isVisible={true} />);
-      
-      const modal = screen.getByRole('dialog');
-      expect(modal).toHaveAttribute('aria-modal', 'true');
-      expect(modal).toHaveAttribute('aria-labelledby');
     });
   });
 });

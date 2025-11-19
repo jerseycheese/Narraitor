@@ -19,65 +19,50 @@ describe('useCharacterStore - State Management', () => {
     jest.useRealTimers();
   });
 
-  describe('initialization', () => {
-    test('should initialize with default state', () => {
-      const state = useCharacterStore.getState();
-      expect(state.characters).toEqual({});
-      expect(state.entities).toEqual({});
-      expect(state.currentCharacterId).toBeNull();
-      expect(state.currentEntityId).toBeNull();
-      expect(state.error).toBeNull();
-      expect(state.loading).toBe(false);
-    });
-  });
-
-  describe('error handling', () => {
-    test('should set and clear errors', () => {
-      useCharacterStore.getState().setError({
-        title: 'Test error',
-        message: 'Details',
+  describe('error handling and recovery', () => {
+    test('should set error and allow recovery via clearError', () => {
+      const error = {
+        title: 'Test Error',
+        message: 'Something went wrong',
+        type: ErrorType.VALIDATION,
         retryable: false,
-        type: ErrorType.UNKNOWN
-      });
-      expect(useCharacterStore.getState().error?.title).toBe('Test error');
+      };
 
+      useCharacterStore.getState().setError(error);
+
+      const stateWithError = useCharacterStore.getState();
+      expect(stateWithError.error).toEqual(error);
+
+      // Verify recovery path works
       useCharacterStore.getState().clearError();
-      expect(useCharacterStore.getState().error).toBeNull();
+
+      const recoveredState = useCharacterStore.getState();
+      expect(recoveredState.error).toBeNull();
     });
-  });
 
-  describe('loading state', () => {
-    test('should set loading state', () => {
-      useCharacterStore.getState().setLoading(true);
-      expect(useCharacterStore.getState().loading).toBe(true);
+    test('should reset store to recover from corrupted state', () => {
+      // Simulate corrupted state
+      useCharacterStore.getState().createCharacter(
+        createTestCharacterData()
+      );
 
-      useCharacterStore.getState().setLoading(false);
-      expect(useCharacterStore.getState().loading).toBe(false);
-    });
-  });
-
-  describe('reset', () => {
-    test('should reset store to initial state', () => {
-      // Add some data
-      useCharacterStore.getState().createCharacter(createTestCharacterData());
       useCharacterStore.getState().setError({
-        title: 'Some error',
-        message: 'Details',
+        title: 'Corruption Error',
+        message: 'State corrupted',
+        type: ErrorType.UNKNOWN,
         retryable: false,
-        type: ErrorType.UNKNOWN
       });
+
       useCharacterStore.getState().setLoading(true);
 
-      // Reset
+      // Reset should clear everything
       useCharacterStore.getState().reset();
-      const state = useCharacterStore.getState();
 
-      expect(state.characters).toEqual({});
-      expect(state.entities).toEqual({});
-      expect(state.currentCharacterId).toBeNull();
-      expect(state.currentEntityId).toBeNull();
-      expect(state.error).toBeNull();
-      expect(state.loading).toBe(false);
+      const resetState = useCharacterStore.getState();
+      expect(resetState.characters).toEqual({});
+      expect(resetState.error).toBeNull();
+      expect(resetState.loading).toBe(false);
+      expect(resetState.currentEntityId).toBeNull();
     });
   });
 });

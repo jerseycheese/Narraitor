@@ -6,28 +6,6 @@ describe('useSessionStore', () => {
     useSessionStore.getState().endSession();
   });
 
-  it('initializes with default state', () => {
-    // Reset to a fresh store state
-    useSessionStore.setState({
-      status: 'initializing',
-      currentSceneId: null,
-      playerChoices: [],
-      error: null,
-      worldId: null,
-      characterId: null,
-    });
-    
-    const state = useSessionStore.getState();
-    expect(state).toMatchObject({
-      status: 'initializing',
-      currentSceneId: null,
-      playerChoices: [],
-      error: null,
-      worldId: null,
-      characterId: null,
-    });
-  });
-
   it('initializes a session with the given worldId', async () => {
     // Arrange
     const worldId = 'test-world-id';

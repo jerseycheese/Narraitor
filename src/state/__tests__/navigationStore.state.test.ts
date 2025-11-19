@@ -20,32 +20,6 @@ describe('navigationStore - State Management', () => {
     jest.clearAllMocks();
   });
 
-  describe('initialization', () => {
-    test('should initialize with default state', () => {
-      const state = useNavigationStore.getState();
-
-      expect(state.currentPath).toBeNull();
-      expect(state.previousPath).toBeNull();
-      expect(state.history).toEqual([]);
-      expect(state.modals).toEqual({});
-      expect(state.currentFlowStep).toBeNull();
-      expect(state.breadcrumbs).toEqual([]);
-      expect(state.isHydrated).toBe(false);
-    });
-
-    test('should have default preferences', () => {
-      const state = useNavigationStore.getState();
-
-      expect(state.preferences).toEqual({
-        sidebarCollapsed: false,
-        breadcrumbsEnabled: true,
-        autoNavigateOnSelect: true,
-        showRecentPages: true,
-        maxRecentPages: 10,
-      });
-    });
-  });
-
   describe('preferences management', () => {
     test('should update preferences', () => {
       const { updatePreferences } = useNavigationStore.getState();

@@ -8,26 +8,7 @@ describe('usePointPoolManager', () => {
     { id: 'agility', value: 2, minValue: 1, maxValue: 10 },
   ];
 
-  it('should initialize with correct pool state', () => {
-    const { result } = renderHook(() =>
-      usePointPoolManager({
-        totalPoints: 20,
-        items: initialItems,
-      })
-    );
-
-    expect(result.current.pool).toEqual({
-      total: 20,
-      spent: 10, // 5 + 3 + 2
-      remaining: 10,
-    });
-
-    expect(result.current.items).toEqual(initialItems);
-    expect(result.current.hasPointsRemaining).toBe(true);
-    expect(result.current.isValidDistribution).toBe(true);
-  });
-
-  it('should handle value increases correctly', () => {
+  it('should handle value increases and update pool correctly', () => {
     const { result } = renderHook(() =>
       usePointPoolManager({
         totalPoints: 20,
@@ -45,7 +26,7 @@ describe('usePointPoolManager', () => {
     expect(result.current.pool.remaining).toBe(8);
   });
 
-  it('should handle value decreases correctly', () => {
+  it('should handle value decreases and update pool correctly', () => {
     const { result } = renderHook(() =>
       usePointPoolManager({
         totalPoints: 20,
@@ -115,7 +96,7 @@ describe('usePointPoolManager', () => {
     expect(strengthItem?.value).toBe(8); // Should remain unchanged
   });
 
-  it('should handle setValue correctly', () => {
+  it('should handle setValue and update pool correctly', () => {
     const { result } = renderHook(() =>
       usePointPoolManager({
         totalPoints: 20,
@@ -133,7 +114,7 @@ describe('usePointPoolManager', () => {
     expect(result.current.pool.remaining).toBe(5);
   });
 
-  it('should handle reset operations', () => {
+  it('should handle reset operations and update pool correctly', () => {
     const { result } = renderHook(() =>
       usePointPoolManager({
         totalPoints: 20,
@@ -154,15 +135,15 @@ describe('usePointPoolManager', () => {
 
     const strengthItem = result.current.getItemById('strength');
     expect(strengthItem?.value).toBe(1); // Reset to minimum
+    expect(result.current.pool.spent).toBe(8); // 1 + 5 + 2
 
     // Reset all items
     act(() => {
       result.current.resetAll();
     });
 
-    result.current.items.forEach(item => {
-      expect(item.value).toBe(item.minValue);
-    });
+    expect(result.current.pool.spent).toBe(3); // All items at minimum (1 + 1 + 1)
+    expect(result.current.pool.remaining).toBe(17);
   });
 
   it('should provide correct navigation helpers', () => {
@@ -199,7 +180,7 @@ describe('useSkillPointPool', () => {
     { id: 'magic', value: 4, minValue: 1, maxValue: 10, isSelected: true },
   ];
 
-  it('should only count selected skills in spent calculation', () => {
+  it('should only count selected skills in pool calculation', () => {
     const { result } = renderHook(() =>
       useSkillPointPool({
         totalPoints: 20,
@@ -212,7 +193,7 @@ describe('useSkillPointPool', () => {
     expect(result.current.pool.remaining).toBe(11);
   });
 
-  it('should handle skill selection toggling', () => {
+  it('should update pool when toggling skill selection', () => {
     const { result } = renderHook(() =>
       useSkillPointPool({
         totalPoints: 20,

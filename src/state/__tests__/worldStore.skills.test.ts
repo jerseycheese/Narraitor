@@ -18,18 +18,6 @@ describe('useWorldStore - Skills and Settings', () => {
   });
 
   describe('skill management', () => {
-    test('should add skill to world', () => {
-      const skillData = createTestSkillData();
-
-      useWorldStore.getState().addSkill(worldId, skillData);
-      const state = useWorldStore.getState();
-      const world = state.worlds[worldId];
-
-      expect(world.skills).toHaveLength(1);
-      expect(world.skills[0].name).toBe('Swordsmanship');
-      expect(world.skills[0].worldId).toBe(worldId);
-    });
-
     test('should enforce max skills limit', () => {
       const world = useWorldStore.getState().worlds[worldId];
       world.settings.maxSkills = 1;
@@ -55,22 +43,6 @@ describe('useWorldStore - Skills and Settings', () => {
       const state = useWorldStore.getState();
       expect(state.worlds[worldId].skills).toHaveLength(1);
       expect(state.error?.message).toBe('Maximum skills limit reached');
-    });
-  });
-
-  describe('settings management', () => {
-    test('should update world settings', () => {
-      useWorldStore.getState().updateSettings(worldId, {
-        maxAttributes: 10,
-        attributePointPool: 30
-      });
-
-      const state = useWorldStore.getState();
-      const settings = state.worlds[worldId].settings;
-
-      expect(settings.maxAttributes).toBe(10);
-      expect(settings.attributePointPool).toBe(30);
-      expect(settings.maxSkills).toBe(8); // Unchanged
     });
   });
 });

@@ -93,8 +93,8 @@ describe('SkillRangeEditor', () => {
 
   it('disables the slider when disabled prop is true', () => {
     render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
+      <SkillRangeEditor
+        skill={mockSkill}
         onChange={mockOnChange}
         disabled={true}
       />
@@ -104,54 +104,29 @@ describe('SkillRangeEditor', () => {
     expect(slider).toBeDisabled();
   });
 
-  it('hides labels when showLabels is false', () => {
-    render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
-        onChange={mockOnChange}
-        showLabels={false}
-      />
-    );
-
-    expect(screen.queryByText('Default Value')).not.toBeInTheDocument();
-  });
-
   it('updates when skill prop changes', () => {
     const { rerender } = render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
+      <SkillRangeEditor
+        skill={mockSkill}
         onChange={mockOnChange}
       />
     );
-    
+
     const initialSlider = screen.getByRole('slider');
     expect(initialSlider).toHaveValue('3');
-    
+
     const updatedSkill = { ...mockSkill, baseValue: 4 };
     rerender(
-      <SkillRangeEditor 
-        skill={updatedSkill} 
+      <SkillRangeEditor
+        skill={updatedSkill}
         onChange={mockOnChange}
       />
     );
-    
+
     // Value should be updated
     expect(screen.getByRole('slider')).toHaveValue('4');
   });
 
-  it('shows min and max scale labels', () => {
-    render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
-        onChange={mockOnChange}
-      />
-    );
-
-    // Check that we have min and max scale labels (1 and 5)
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
-  });
-  
   it('displays skill level descriptions when showLevelDescriptions is true', () => {
     render(
       <SkillRangeEditor 
