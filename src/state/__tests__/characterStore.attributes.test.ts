@@ -5,6 +5,7 @@
  */
 
 import { useCharacterStore } from '../characterStore';
+import { ErrorType } from '@/lib/utils/errorUtils';
 import {
   createAttributeTestCharacter,
   createSkillTestCharacter,
@@ -56,7 +57,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
       expect(state.error).toMatchObject({
         title: 'Maximum Skills Reached',
         message: 'This character has reached its maximum number of skills',
-        type: 'validation'
+        type: ErrorType.VALIDATION
       });
     });
   });
