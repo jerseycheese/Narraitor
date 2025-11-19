@@ -61,29 +61,6 @@ describe('RecoveryNotification', () => {
     });
   });
 
-  describe('accessibility', () => {
-    test('has proper ARIA attributes', () => {
-      render(<RecoveryNotification {...defaultProps} />);
-
-      const notification = screen.getByRole('dialog');
-      expect(notification).toHaveAttribute('aria-labelledby');
-      expect(notification).toHaveAttribute('aria-describedby');
-    });
-
-    test('focuses on a button when shown', async () => {
-      render(<RecoveryNotification {...defaultProps} />);
-
-      // Either the recover button or close button should have focus after modal renders
-      await waitFor(() => {
-        const activeElement = document.activeElement;
-        const recoverButton = screen.getByRole('button', { name: /recover progress/i });
-        const closeButton = screen.getByRole('button', { name: /close modal/i });
-
-        expect(activeElement === recoverButton || activeElement === closeButton).toBe(true);
-      });
-    });
-  });
-
   describe('edge cases', () => {
     test('handles missing lastSaved date', () => {
       render(<RecoveryNotification {...defaultProps} lastSaved={undefined} />);

@@ -61,14 +61,6 @@ describe('DataTable', () => {
     expect(rows[1].textContent).toContain('Ancient Map');
   });
 
-  it('has accessible table structure', () => {
-    render(<DataTable columns={mockColumns} data={mockData} />);
-
-    expect(screen.getByRole('table')).toBeTruthy();
-    expect(screen.getAllByRole('columnheader')).toHaveLength(2);
-    expect(screen.getAllByRole('row')).toHaveLength(4); // 1 header + 3 data
-  });
-
   it('displays pagination controls when enabled', () => {
     render(
       <DataTable

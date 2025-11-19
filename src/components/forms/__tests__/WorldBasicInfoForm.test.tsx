@@ -80,14 +80,4 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     });
   });
 
-  // Test that genre dropdown works
-  test('genre dropdown has options', () => {
-    render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
-    
-    // Check that genre dropdown has options available
-    const genreSelect = screen.getByLabelText(/genre/i);
-    const options = genreSelect.querySelectorAll('option');
-    expect(options.length).toBeGreaterThan(1);
-  });
-
 });

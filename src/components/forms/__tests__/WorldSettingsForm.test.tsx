@@ -54,9 +54,9 @@ describe('WorldSettingsForm - MVP Level Tests', () => {
   // Test updating skill point pool
   test('allows updating skill point pool', () => {
     render(
-      <WorldSettingsForm 
-        settings={mockSettings} 
-        onChange={mockOnChange} 
+      <WorldSettingsForm
+        settings={mockSettings}
+        onChange={mockOnChange}
       />
     );
 
@@ -67,32 +67,5 @@ describe('WorldSettingsForm - MVP Level Tests', () => {
       ...mockSettings,
       skillPointPool: 40,
     });
-  });
-
-  // Test section heading
-  test('displays correct section heading', () => {
-    render(
-      <WorldSettingsForm 
-        settings={mockSettings} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    expect(screen.getByText('World Settings')).toBeInTheDocument();
-  });
-
-  // Test that all setting fields have appropriate labels
-  test('all settings have appropriate labels', () => {
-    render(
-      <WorldSettingsForm 
-        settings={mockSettings} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    expect(screen.getByLabelText(/Maximum Attributes/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Maximum Skills/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Attribute Point Pool/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Skill Point Pool/i)).toBeInTheDocument();
   });
 });

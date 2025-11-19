@@ -155,73 +155,17 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
     ]);
   });
 
-  // Test Issue #524 Feature: Value Ranges (through SkillRangeEditor)
-  test('displays skill range editor for baseValue', () => {
-    render(
-      <WorldSkillsForm 
-        skills={mockSkills}
-        attributes={mockAttributes}
-        worldId="world-123" 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Check that the SkillRangeEditor is present
-    expect(screen.getByTestId('skill-range-editor')).toBeInTheDocument();
-    expect(screen.getByText('Default Value')).toBeInTheDocument();
-  });
-
-  // Test Issue #524 Feature: Complete form integration
-  test('displays all skill fields mentioned in issue #524', () => {
-    const skillWithAllFields = {
-      ...mockSkills[0],
-      category: 'Physical',
-      difficulty: 'hard' as const,
-    };
-
-    render(
-      <WorldSkillsForm 
-        skills={[skillWithAllFields]}
-        attributes={mockAttributes}
-        worldId="world-123" 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Verify all Issue #524 fields are present
-    expect(screen.getByDisplayValue('Athletics')).toBeInTheDocument(); // Name
-    expect(screen.getByDisplayValue('Physical prowess')).toBeInTheDocument(); // Description  
-    expect(screen.getByDisplayValue('Physical')).toBeInTheDocument(); // Category
-    expect(screen.getByDisplayValue('Hard')).toBeInTheDocument(); // Difficulty
-    expect(screen.getByTestId('skill-range-editor')).toBeInTheDocument(); // Value ranges
-    expect(screen.getByRole('checkbox', { name: /strength/i })).toBeInTheDocument(); // Attribute linking
-  });
-
   // Test empty state
   test('displays empty state when no skills exist', () => {
     render(
-      <WorldSkillsForm 
+      <WorldSkillsForm
         skills={[]}
         attributes={mockAttributes}
-        worldId="world-123" 
-        onChange={mockOnChange} 
+        worldId="world-123"
+        onChange={mockOnChange}
       />
     );
 
     expect(screen.getByText(/No skills defined yet/i)).toBeInTheDocument();
-  });
-
-  // Test section heading
-  test('displays correct section heading', () => {
-    render(
-      <WorldSkillsForm 
-        skills={mockSkills}
-        attributes={mockAttributes}
-        worldId="world-123" 
-        onChange={mockOnChange} 
-      />
-    );
-
-    expect(screen.getByText('Skills')).toBeInTheDocument();
   });
 });

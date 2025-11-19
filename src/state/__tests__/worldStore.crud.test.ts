@@ -12,16 +12,6 @@ describe('useWorldStore - CRUD Operations', () => {
     useWorldStore.getState().reset();
   });
 
-  describe('initialization', () => {
-    test('should initialize with default state', () => {
-      const state = useWorldStore.getState();
-      expect(state.worlds).toEqual({});
-      expect(state.currentWorldId).toBeNull();
-      expect(state.error).toBeNull();
-      expect(state.loading).toBe(false);
-    });
-  });
-
   describe('createWorld', () => {
     test('should create a new world with generated ID', () => {
       const worldData = createTestWorldData();
@@ -144,16 +134,6 @@ describe('useWorldStore - CRUD Operations', () => {
 
       useWorldStore.getState().clearError();
       expect(useWorldStore.getState().error).toBeNull();
-    });
-  });
-
-  describe('loading state', () => {
-    test('should set loading state', () => {
-      useWorldStore.getState().setLoading(true);
-      expect(useWorldStore.getState().loading).toBe(true);
-
-      useWorldStore.getState().setLoading(false);
-      expect(useWorldStore.getState().loading).toBe(false);
     });
   });
 

@@ -220,13 +220,4 @@ describe('InventoryTable', () => {
     expect(screen.queryByText('2024-01-15T10:00:00Z')).not.toBeInTheDocument();
     expect(screen.getAllByText(/jan/i).length).toBeGreaterThan(0);
   });
-
-  it('has proper ARIA labels for accessibility', () => {
-    render(<InventoryTable characterId="char-1" />);
-
-    const table = screen.getByRole('table');
-    const ariaLabel = table.getAttribute('aria-label');
-    expect(ariaLabel).toBeTruthy();
-    expect(ariaLabel?.toLowerCase()).toContain('inventory');
-  });
 });

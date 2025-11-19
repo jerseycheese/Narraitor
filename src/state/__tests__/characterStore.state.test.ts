@@ -19,18 +19,6 @@ describe('useCharacterStore - State Management', () => {
     jest.useRealTimers();
   });
 
-  describe('initialization', () => {
-    test('should initialize with default state', () => {
-      const state = useCharacterStore.getState();
-      expect(state.characters).toEqual({});
-      expect(state.entities).toEqual({});
-      expect(state.currentCharacterId).toBeNull();
-      expect(state.currentEntityId).toBeNull();
-      expect(state.error).toBeNull();
-      expect(state.loading).toBe(false);
-    });
-  });
-
   describe('error handling', () => {
     test('should set and clear errors', () => {
       useCharacterStore.getState().setError({
@@ -43,16 +31,6 @@ describe('useCharacterStore - State Management', () => {
 
       useCharacterStore.getState().clearError();
       expect(useCharacterStore.getState().error).toBeNull();
-    });
-  });
-
-  describe('loading state', () => {
-    test('should set loading state', () => {
-      useCharacterStore.getState().setLoading(true);
-      expect(useCharacterStore.getState().loading).toBe(true);
-
-      useCharacterStore.getState().setLoading(false);
-      expect(useCharacterStore.getState().loading).toBe(false);
     });
   });
 

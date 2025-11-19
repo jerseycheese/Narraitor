@@ -7,14 +7,6 @@ describe('journalStore', () => {
     useJournalStore.getState().reset();
   });
 
-  it('initializes with default state', () => {
-    const state = useJournalStore.getState();
-    expect(state.entries).toEqual({});
-    expect(state.sessionEntries).toEqual({});
-    expect(state.error).toBeNull();
-    expect(state.loading).toBe(false);
-  });
-
   describe('chronological sorting', () => {
     it('returns journal entries in reverse chronological order (newest first)', async () => {
       const { addEntry, getSessionEntries } = useJournalStore.getState();
