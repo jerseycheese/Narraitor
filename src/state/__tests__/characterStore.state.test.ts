@@ -42,7 +42,7 @@ describe('useCharacterStore - State Management', () => {
 
     test('should reset store to recover from corrupted state', () => {
       // Simulate corrupted state
-      const characterId = useCharacterStore.getState().createCharacter(
+      useCharacterStore.getState().createCharacter(
         createTestCharacterData()
       );
 
