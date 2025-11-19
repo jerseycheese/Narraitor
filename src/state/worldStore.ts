@@ -519,7 +519,15 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
-      migrate: () => getInitialState(), // No migration - always reset to initial state
+      migrate: () => ({
+        worlds: {},
+        entities: {},
+        worldStates: {},
+        currentWorldId: null,
+        currentEntityId: null,
+        error: null,
+        loading: false,
+      }), // No migration - always reset to initial state
     }
   )
 );
