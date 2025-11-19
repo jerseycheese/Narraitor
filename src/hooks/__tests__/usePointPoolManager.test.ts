@@ -135,7 +135,7 @@ describe('usePointPoolManager', () => {
 
     const strengthItem = result.current.getItemById('strength');
     expect(strengthItem?.value).toBe(1); // Reset to minimum
-    expect(result.current.pool.spent).toBe(6); // 1 + 5 + 2
+    expect(result.current.pool.spent).toBe(8); // 1 + 5 + 2
 
     // Reset all items
     act(() => {
