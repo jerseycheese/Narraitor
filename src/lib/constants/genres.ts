@@ -59,15 +59,12 @@ export function normalizeGenre(value: string): string {
     return value;
   }
 
-  // Map common variations to canonical values
+  // Map common variations to canonical values (only for known alternate names)
   const normalized = value.toLowerCase().trim();
   const commonMappings: Record<string, string> = {
     'science fiction': 'sci-fi',
     'scifi': 'sci-fi',
     'science-fiction': 'sci-fi',
-    'post-apocalyptic': 'sci-fi', // Often overlaps with sci-fi
-    'steampunk': 'sci-fi',
-    'space opera': 'sci-fi',
   };
 
   if (commonMappings[normalized]) {
@@ -77,13 +74,8 @@ export function normalizeGenre(value: string): string {
   // Convert to lowercase and replace spaces with hyphens as fallback
   const converted = normalized.replace(/\s+/g, '-');
 
-  // If the converted value matches a valid genre, use it
-  if (GENRES.some(genre => genre.value === converted)) {
-    return converted;
-  }
-
-  // Default to 'other' for unrecognized genres
-  return 'other';
+  // Return the converted/normalized value (preserves mixed genres like "cyberpunk-western")
+  return converted;
 }
 
 /**
