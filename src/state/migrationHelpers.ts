@@ -14,6 +14,7 @@ import type { EntityID } from '@/types/common.types';
  * @param domainKey - The key of the domain slice (e.g., 'worlds', 'characters')
  */
 export function syncEntitiesFromSlice<T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: any,
   domainKey: string
 ): void {
@@ -32,6 +33,7 @@ export function syncEntitiesFromSlice<T>(
  * @param domainIdKey - The domain-specific ID key (e.g., 'currentWorldId')
  */
 export function syncCurrentIds(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: any,
   domainIdKey: string
 ): void {
@@ -54,6 +56,7 @@ export function syncCurrentIds(
  *
  * @param state - The store state to modify (typed as any for migration compatibility)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeErrorState(state: any): void {
   if (typeof state.error === 'string') {
     state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
@@ -67,6 +70,7 @@ export function normalizeErrorState(state: any): void {
  *
  * @param state - The store state to modify (typed as any for migration compatibility)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeLoadingState(state: any): void {
   if (typeof state.loading !== 'boolean') {
     state.loading = false;
@@ -79,6 +83,7 @@ export function normalizeLoadingState(state: any): void {
  *
  * @param state - The store state to modify (typed as any for migration compatibility)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeCommonStates(state: any): void {
   normalizeErrorState(state);
   normalizeLoadingState(state);
