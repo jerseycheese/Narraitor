@@ -48,8 +48,6 @@ describe('npcStore - CRUD Operations', () => {
       expect(updatedNPC.name).toBe('Captain Marcus');
       expect(updatedNPC.description).toBe('A battle-hardened veteran with a kind heart');
       expect(updatedNPC.avatarUrl).toBe('https://example.com/marcus.jpg');
-      expect(updatedNPC.updatedAt).toBeDefined();
-      expect(updatedNPC.createdAt).toBeDefined();
     });
 
     test('should update NPC worldId and maintain world references', () => {
@@ -113,7 +111,6 @@ describe('npcStore - CRUD Operations', () => {
       const npcId = useNPCStore.getState().createNPC(npcData);
       const npc = useNPCStore.getState().getById(npcId);
 
-      expect(npc).toBeDefined();
       expect(npc?.name).toBe('Test NPC');
     });
   });

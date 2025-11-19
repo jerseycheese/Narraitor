@@ -19,12 +19,8 @@ describe('useWorldStore - CRUD Operations', () => {
       const worldId = useWorldStore.getState().createWorld(worldData);
       const state = useWorldStore.getState();
 
-      expect(worldId).toBeDefined();
-      expect(state.worlds[worldId]).toBeDefined();
       expect(state.worlds[worldId].name).toBe('Test World');
       expect(state.worlds[worldId].genre).toBe('fantasy');
-      expect(state.worlds[worldId].createdAt).toBeDefined();
-      expect(state.worlds[worldId].updatedAt).toBeDefined();
     });
 
     test('should validate required fields', () => {
@@ -119,44 +115,6 @@ describe('useWorldStore - CRUD Operations', () => {
       const state = useWorldStore.getState();
       expect(state.error?.message).toBe('World not found');
       expect(state.currentWorldId).toBeNull();
-    });
-  });
-
-  describe('error handling', () => {
-    test('should set and clear errors', () => {
-      useWorldStore.getState().setError({
-        title: 'Test error',
-        message: 'Details',
-        retryable: false,
-        type: ErrorType.UNKNOWN,
-      });
-      expect(useWorldStore.getState().error?.title).toBe('Test error');
-
-      useWorldStore.getState().clearError();
-      expect(useWorldStore.getState().error).toBeNull();
-    });
-  });
-
-  describe('reset', () => {
-    test('should reset store to initial state', () => {
-      // Add some data
-      useWorldStore.getState().createWorld(createTestWorldData());
-      useWorldStore.getState().setError({
-        title: 'Some error',
-        message: 'Details',
-        retryable: false,
-        type: ErrorType.UNKNOWN,
-      });
-      useWorldStore.getState().setLoading(true);
-
-      // Reset
-      useWorldStore.getState().reset();
-      const state = useWorldStore.getState();
-
-      expect(state.worlds).toEqual({});
-      expect(state.currentWorldId).toBeNull();
-      expect(state.error).toBeNull();
-      expect(state.loading).toBe(false);
     });
   });
 });

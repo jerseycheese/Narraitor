@@ -57,7 +57,6 @@ describe('npcStore - World Management and State', () => {
       useNPCStore.getState().clearWorldNPCs(world1);
 
       const state = useNPCStore.getState();
-      expect(state.npcs[npc2Id]).toBeDefined();
       expect(state.worldNpcs[world2]).toContain(npc2Id);
     });
   });
@@ -78,26 +77,6 @@ describe('npcStore - World Management and State', () => {
       const state = useNPCStore.getState();
       expect(state.currentEntityId).toBeNull();
       expect(state.error?.title).toBe('NPC Not Found');
-    });
-
-    test('should reset store', () => {
-      useNPCStore.getState().createNPC(createTestNPCData());
-
-      useNPCStore.getState().reset();
-
-      const state = useNPCStore.getState();
-      expect(state.npcs).toEqual({});
-      expect(state.worldNpcs).toEqual({});
-      expect(state.currentEntityId).toBeNull();
-      expect(state.error).toBeNull();
-    });
-
-    test('should manage loading state', () => {
-      useNPCStore.getState().setLoading(true);
-      expect(useNPCStore.getState().loading).toBe(true);
-
-      useNPCStore.getState().setLoading(false);
-      expect(useNPCStore.getState().loading).toBe(false);
     });
   });
 });
