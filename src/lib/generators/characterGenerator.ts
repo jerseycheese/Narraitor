@@ -41,7 +41,7 @@ export interface CharacterGenerationOptions {
 /**
  * Generate character from predefined templates
  */
-function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {
+export function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {
   const { world } = options;
   
   // Simple template-based character generation

@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { safeTrim } from '@/lib/utils';
-import { normalizeDecisionOptions, normalizeSimpleChoices } from './optionNormalizer';
+import { normalizeDecisionOptions } from './optionNormalizer';
 import { SkillRequirementBadges, ItemRequirementBadges } from './RequirementBadges';
 import { getAlignmentIcon, getAlignmentClasses, getDecisionWeightStyling } from './choiceStyling';
 

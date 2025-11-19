@@ -37,7 +37,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const world = worlds[worldId];
 
   // Auto-save integration
-  const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
+  const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
   React.useEffect(() => {
@@ -241,7 +241,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   return (
     <>
       <WizardContainer title={`Create Character in ${world.name}`} className="component-character-creation-wizard">
-        <div onBlur={handleFieldBlur}>
+        <div>
           {/* Auto-save status indicator */}
           <div className="mb-4 flex justify-end">
             <SaveIndicator

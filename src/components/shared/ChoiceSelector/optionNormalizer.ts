@@ -9,7 +9,6 @@ import { InventoryItem } from '@/types/inventory.types';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { getNormalizedItemRequirementGroups } from '@/lib/utils/requirementNormalizer';
-import { SimpleChoice } from './ChoiceSelector';
 
 export interface NormalizedOption {
   id: string;
@@ -151,23 +150,4 @@ export function normalizeDecisionOptions(
       itemRequirementGroups
     };
   });
-}
-
-/**
- * Normalizes simple choices into the common format (no requirements)
- */
-export function normalizeSimpleChoices(
-  choices: SimpleChoice[],
-  selectedOptionId: string | null
-): NormalizedOption[] {
-  return choices.map(choice => ({
-    id: choice.id,
-    text: choice.text,
-    isSelected: choice.isSelected || choice.id === selectedOptionId,
-    alignment: 'neutral' as ChoiceAlignment,
-    isDisabledByRequirements: false,
-    disabledReason: undefined,
-    skillRequirements: [],
-    itemRequirementGroups: []
-  }));
 }

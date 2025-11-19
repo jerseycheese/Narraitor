@@ -4,7 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
 // Using API routes for secure AI operations - combines both approaches
-import { generateTestCharacter } from '@/lib/generators/characterGenerator';
+import { generateFromTemplate } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
@@ -289,8 +289,37 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
     
     // Generate test data using the traditional approach for form filling
-    const testData = generateTestCharacter(currentWorld);
-    
+    const templateData = generateFromTemplate({ method: 'template', world: currentWorld });
+
+    // Convert to the format expected by devtools
+    const testData = {
+      name: templateData.name,
+      attributes: currentWorld.attributes.map(attr => {
+        const generated = templateData.attributes.find(a => a.id === attr.id);
+        return {
+          attributeId: attr.id,
+          value: generated?.value || Math.floor(Math.random() * (attr.maxValue - attr.minValue + 1)) + attr.minValue
+        };
+      }),
+      skills: currentWorld.skills.map(skill => {
+        const generated = templateData.skills.find(s => s.id === skill.id);
+        return {
+          skillId: skill.id,
+          level: generated?.level || Math.floor(Math.random() * 5) + 1,
+          experience: 0,
+          isActive: !!generated
+        };
+      }),
+      background: {
+        history: templateData.background.description,
+        personality: templateData.background.personality,
+        goals: [templateData.background.motivation],
+        motivation: templateData.background.motivation,
+        physicalDescription: templateData.background.physicalDescription,
+        isKnownFigure: templateData.isKnownFigure
+      }
+    };
+
     // Store the complete wizard state
     const wizardState = {
       currentStep: 0,
