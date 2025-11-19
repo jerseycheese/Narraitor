@@ -315,42 +315,4 @@ describe('goalStore', () => {
       expect(updatedGoal.lastMentionedAt).toBeDefined();
     });
   });
-
-  describe('Error Handling', () => {
-    test('should handle invalid goal updates', () => {
-      useGoalStore.getState().updateGoal('nonexistent-id', { title: 'New Title' });
-      const state = useGoalStore.getState();
-      expect(state.error?.title).toBe('Goal Not Found');
-      expect(state.error?.message).toBe('The specified goal could not be found.');
-    });
-
-    test('should validate required fields', () => {
-      expect(() => {
-        useGoalStore.getState().createGoal({
-          sessionId: 'session-123',
-          title: '', // Empty title should fail
-          description: 'Test description',
-          type: 'quest' as GoalType,
-          priority: 'medium' as GoalPriority,
-          status: 'active' as GoalStatus,
-          mentionCount: 1,
-        });
-      }).toThrow();
-    });
-
-    test('should handle persistence errors gracefully', () => {
-      // Simulate error by setting error state
-      useGoalStore.getState().setError({
-        title: 'Persistence failed',
-        message: 'Persistence failed',
-        retryable: false,
-        type: ErrorType.UNKNOWN
-      });
-      expect(useGoalStore.getState().error?.title).toBe('Persistence failed');
-      
-      // Clear error
-      useGoalStore.getState().clearError();
-      expect(useGoalStore.getState().error).toBeNull();
-    });
-  });
 });

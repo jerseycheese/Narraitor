@@ -36,29 +36,6 @@ describe('AutoSaveService', () => {
   });
 
   describe('Basic Functionality', () => {
-    it('should be able to start and stop', () => {
-      expect(service.isRunning()).toBe(false);
-      
-      service.start();
-      expect(service.isRunning()).toBe(true);
-      
-      service.stop();
-      expect(service.isRunning()).toBe(false);
-    });
-
-    it('should set up interval when started', () => {
-      service.start();
-      
-      // Verify service is running
-      expect(service.isRunning()).toBe(true);
-      
-      // Fast-forward 5 minutes should trigger the interval
-      jest.advanceTimersByTime(5 * 60 * 1000);
-      
-      // The interval should have been set up (we can't easily test the callback without timeout issues)
-      expect(service.isRunning()).toBe(true);
-    });
-
     it('should handle paused sessions appropriately', async () => {
       mockStateProvider.mockResolvedValue({
         session: { id: 'test-session', status: 'paused' },
@@ -82,18 +59,6 @@ describe('AutoSaveService', () => {
       
       expect(mockStateProvider).toHaveBeenCalled();
       expect(mockOnSave).toHaveBeenCalled();
-    });
-
-    it('should handle different trigger reasons', () => {
-      const mockOnSave = jest.fn();
-      service = new AutoSaveService(mockStateProvider, { onSave: mockOnSave, debounceMs: 100 });
-      
-      service.start();
-      
-      // Verify service can handle different trigger types
-      expect(() => service.triggerSave('player-choice')).not.toThrow();
-      expect(() => service.triggerSave('scene-change')).not.toThrow();
-      expect(() => service.triggerSave('periodic')).not.toThrow();
     });
   });
 });

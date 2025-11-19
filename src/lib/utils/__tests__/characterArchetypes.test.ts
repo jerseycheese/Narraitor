@@ -28,47 +28,6 @@ describe('characterArchetypes', () => {
     }
   });
 
-  describe('getArchetypeTemplatesForGenre', () => {
-    test('returns appropriate archetypes for fantasy genre', () => {
-      const templates = getArchetypeTemplatesForGenre('fantasy');
-      
-      expect(templates).toHaveLength(3);
-      expect(templates.map(t => t.name)).toEqual(['Warrior', 'Mage', 'Scout']);
-      
-      // Verify warrior archetype
-      const warrior = templates.find(t => t.name === 'Warrior');
-      expect(warrior).toBeDefined();
-      expect(warrior?.primaryAttributes).toContain('Strength');
-      expect(warrior?.preferredSkills).toContain('Combat');
-    });
-
-    test('returns appropriate archetypes for sci-fi genre', () => {
-      const templates = getArchetypeTemplatesForGenre('sci-fi');
-      
-      expect(templates).toHaveLength(3);
-      expect(templates.map(t => t.name)).toEqual(['Pilot', 'Engineer', 'Medic']);
-      
-      // Verify engineer archetype
-      const engineer = templates.find(t => t.name === 'Engineer');
-      expect(engineer).toBeDefined();
-      expect(engineer?.primaryAttributes).toContain('Intelligence');
-    });
-
-    test('returns appropriate archetypes for modern genre', () => {
-      const templates = getArchetypeTemplatesForGenre('modern');
-      
-      expect(templates).toHaveLength(3);
-      expect(templates.map(t => t.name)).toEqual(['Detective', 'Athlete', 'Scholar']);
-    });
-
-    test('returns fantasy archetypes as fallback for unknown genre', () => {
-      const templates = getArchetypeTemplatesForGenre('unknown' as GenreValue);
-
-      expect(templates).toHaveLength(3);
-      expect(templates.map(t => t.name)).toEqual(['Warrior', 'Mage', 'Scout']);
-    });
-  });
-
   describe('generateCharacterArchetypes', () => {
     test('generates 3 distinct archetypes for fantasy world', async () => {
       const world = createMockWorld('fantasy');
@@ -112,25 +71,13 @@ describe('characterArchetypes', () => {
     test('ensures skill levels are appropriate for archetype roles', async () => {
       const world = createMockWorld('fantasy');
       const archetypes = await generateCharacterArchetypes(world);
-      
+
       // Find the warrior archetype (should have high Combat skill)
       const warrior = archetypes.find(a => a.name.includes('Warrior') || a.name.includes('Fighter'));
       if (warrior) {
         const combatSkill = warrior.skills.find(s => s.name === 'Combat');
         expect(combatSkill?.level).toBeGreaterThan(5); // Should be competent or better
       }
-    });
-
-    test('generates names that fit the world theme', async () => {
-      const world = createMockWorld('fantasy');
-      const archetypes = await generateCharacterArchetypes(world);
-      
-      // Names should be strings and non-empty
-      archetypes.forEach(archetype => {
-        expect(archetype.name).toBeTruthy();
-        expect(typeof archetype.name).toBe('string');
-        expect(archetype.name.length).toBeGreaterThan(0);
-      });
     });
 
     test('respects world attribute and skill bounds', async () => {

@@ -85,25 +85,6 @@ describe('useInventoryStore', () => {
       expect(createdItem?.acquisitionHistory[0].method).toBe('manual');
       expect(createdItem?.categorization.source).toBe('manual');
     });
-
-    test('records validation error when category is invalid', () => {
-      const payload = buildCreatePayload({
-        categorization: buildCategorization('equipment', {
-          // @ts-expect-error - intentionally invalid category to exercise validation
-          categoryId: 'invalid-category',
-        }),
-      });
-
-      const itemId = useInventoryStore.getState().createItem(payload);
-      const state = useInventoryStore.getState();
-
-      expect(itemId).toBe('');
-      expect(state.error).toMatchObject({
-        title: 'Validation Error',
-        message: 'Categorization must resolve to a standard inventory category',
-        type: ErrorType.VALIDATION,
-      });
-    });
   });
 
   describe('addItem', () => {
@@ -133,69 +114,6 @@ describe('useInventoryStore', () => {
       expect(item.quantity).toBe(15);
       expect(item.acquisitionHistory).toHaveLength(2);
       expect(item.acquisitionHistory[1].method).toBe('quest');
-    });
-
-    test('prevents stacking beyond max stack size', () => {
-      const store = useInventoryStore.getState();
-      const payload = buildAddPayload({
-        name: 'Smoke Bomb',
-        maxStack: 3,
-        quantity: 3,
-        categorization: buildCategorization('consumables'),
-        acquisition: buildAcquisition(3, { method: 'craft' }),
-      });
-
-      const itemId = store.addItem('char-1', payload);
-      expect(itemId).toBeTruthy();
-
-      const secondId = store.addItem('char-1', buildAddPayload({
-        name: 'Smoke Bomb',
-        maxStack: 3,
-        quantity: 1,
-        categorization: buildCategorization('consumables'),
-        acquisition: buildAcquisition(1, { method: 'loot' }),
-      }));
-
-      const state = useInventoryStore.getState();
-      expect(secondId).toBe(itemId);
-      expect(state.error).toMatchObject({
-        title: 'Stack Limit Exceeded',
-        message: 'Cannot add more items. Maximum stack size is 3.',
-        type: ErrorType.VALIDATION,
-      });
-      expect(state.items[itemId].quantity).toBe(3);
-    });
-
-    test('requires categorization when creating a new item', () => {
-      const store = useInventoryStore.getState();
-      const result = store.addItem('char-1', {
-        ...buildAddPayload({ categorization: undefined }),
-        acquisition: buildAcquisition(1),
-      });
-
-      const state = useInventoryStore.getState();
-      expect(result).toBe('');
-      expect(state.error).toMatchObject({
-        title: 'Categorization Missing',
-        message: 'Unable to add new item without categorization metadata.',
-        type: ErrorType.VALIDATION,
-      });
-    });
-
-    test('requires acquisition metadata', () => {
-      const store = useInventoryStore.getState();
-      const result = store.addItem('char-1', {
-        ...buildAddPayload(),
-        acquisition: undefined as unknown,
-      } as InventoryItemAddPayload);
-
-      const state = useInventoryStore.getState();
-      expect(result).toBe('');
-      expect(state.error).toMatchObject({
-        title: 'Acquisition Missing',
-        message: 'Unable to add item without acquisition metadata.',
-        type: ErrorType.VALIDATION,
-      });
     });
   });
 

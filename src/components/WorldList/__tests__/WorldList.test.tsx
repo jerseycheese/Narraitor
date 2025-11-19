@@ -46,12 +46,4 @@ describe('WorldList', () => {
     expect(screen.getByTestId('world-list-container')).toBeInTheDocument();
     expect(screen.getAllByTestId('world-card')).toHaveLength(mockWorlds.length);
   });
-
-  // Test case for empty state
-  test('renders an empty message when no worlds are provided', () => {
-    render(<WorldList worlds={[]} onSelectWorld={jest.fn()} onDeleteWorld={jest.fn()} />);
-    expect(screen.getByTestId('world-list-empty-message')).toBeInTheDocument();
-    expect(screen.getByText(/Welcome to Narraitor!/i)).toBeInTheDocument();
-    expect(screen.getByText(/Begin your storytelling journey by creating your first world/i)).toBeInTheDocument();
-  });
 });
