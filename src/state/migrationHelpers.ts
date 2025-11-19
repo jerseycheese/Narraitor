@@ -10,11 +10,11 @@ import type { EntityID } from '@/types/common.types';
  * - Domain-specific object (e.g., state.worlds, state.characters)
  * - Generic entities object (state.entities) for shared access
  *
- * @param state - The store state to modify
+ * @param state - The store state to modify (typed as any for migration compatibility)
  * @param domainKey - The key of the domain slice (e.g., 'worlds', 'characters')
  */
 export function syncEntitiesFromSlice<T>(
-  state: Record<string, unknown>,
+  state: any,
   domainKey: string
 ): void {
   if (state[domainKey] && typeof state[domainKey] === 'object') {
@@ -28,11 +28,11 @@ export function syncEntitiesFromSlice<T>(
  * Some stores have both currentEntityId and currentDomainId (e.g., currentWorldId).
  * This ensures they stay in sync during migration.
  *
- * @param state - The store state to modify
+ * @param state - The store state to modify (typed as any for migration compatibility)
  * @param domainIdKey - The domain-specific ID key (e.g., 'currentWorldId')
  */
 export function syncCurrentIds(
-  state: Record<string, unknown>,
+  state: any,
   domainIdKey: string
 ): void {
   // Sync from domain ID to entity ID
@@ -52,9 +52,9 @@ export function syncCurrentIds(
  * Older versions of stores may have stored errors as strings.
  * This converts them to proper StoreError objects.
  *
- * @param state - The store state to modify
+ * @param state - The store state to modify (typed as any for migration compatibility)
  */
-export function normalizeErrorState(state: Record<string, unknown>): void {
+export function normalizeErrorState(state: any): void {
   if (typeof state.error === 'string') {
     state.error = createStoreError(state.error, state.error, ErrorType.UNKNOWN);
   }
@@ -65,9 +65,9 @@ export function normalizeErrorState(state: Record<string, unknown>): void {
  *
  * Ensures loading is always a boolean (defaults to false if missing/invalid).
  *
- * @param state - The store state to modify
+ * @param state - The store state to modify (typed as any for migration compatibility)
  */
-export function normalizeLoadingState(state: Record<string, unknown>): void {
+export function normalizeLoadingState(state: any): void {
   if (typeof state.loading !== 'boolean') {
     state.loading = false;
   }
@@ -77,9 +77,9 @@ export function normalizeLoadingState(state: Record<string, unknown>): void {
  * Combined helper to normalize error and loading states.
  * This is a common pattern in simpler store migrations.
  *
- * @param state - The store state to modify
+ * @param state - The store state to modify (typed as any for migration compatibility)
  */
-export function normalizeCommonStates(state: Record<string, unknown>): void {
+export function normalizeCommonStates(state: any): void {
   normalizeErrorState(state);
   normalizeLoadingState(state);
 }
