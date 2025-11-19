@@ -626,7 +626,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
         state?.syncDerivedState?.();
       },
-      migrate: () => getInitialState(), // No migration - always reset to initial state
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );

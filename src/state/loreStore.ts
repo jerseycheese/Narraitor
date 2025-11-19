@@ -548,7 +548,7 @@ export const useLoreStore = create<LoreStore>()(
         facts: state.facts,
         factHistory: state.factHistory,
       }),
-      migrate: () => getInitialState(), // No migration - always reset to initial state
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );

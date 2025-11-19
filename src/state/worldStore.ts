@@ -519,7 +519,7 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
-      migrate: () => ({
+      migrate: (persistedState) => persistedState || {
         worlds: {},
         entities: {},
         worldStates: {},
@@ -527,7 +527,7 @@ export const useWorldStore = create<WorldStore>()(
         currentEntityId: null,
         error: null,
         loading: false,
-      }), // No migration - always reset to initial state
+      }, // Preserve data, only clear if null
     }
   )
 );

@@ -1000,7 +1000,7 @@ export const useInventoryStore = create<InventoryStore>()(
         entities: state.entities,
         characterInventories: state.characterInventories,
       }),
-      migrate: () => getInitialState(), // No migration - always reset to initial state
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );

@@ -233,7 +233,7 @@ export const useNPCStore = create<NPCStore>()(
         npcs: state.npcs,
         worldNpcs: state.worldNpcs,
       }),
-      migrate: () => getInitialState(), // No migration - always reset to initial state
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
 );
