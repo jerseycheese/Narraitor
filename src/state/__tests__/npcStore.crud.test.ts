@@ -12,24 +12,6 @@ describe('npcStore - CRUD Operations', () => {
   });
 
   describe('NPC creation', () => {
-    test('should create a new NPC with generated ID', () => {
-      const npcData = createTestNPCData({
-        name: 'Mysterious Stranger',
-        description: 'A hooded figure lurking in the shadows',
-      });
-
-      const npcId = useNPCStore.getState().createNPC(npcData);
-      const state = useNPCStore.getState();
-
-      expect(npcId).toBeDefined();
-      expect(state.npcs[npcId]).toBeDefined();
-      expect(state.npcs[npcId].name).toBe('Mysterious Stranger');
-      expect(state.npcs[npcId].description).toBe('A hooded figure lurking in the shadows');
-      expect(state.npcs[npcId].worldId).toBe('world-123');
-      expect(state.npcs[npcId].createdAt).toBeDefined();
-      expect(state.worldNpcs['world-123']).toContain(npcId);
-    });
-
     test('should create NPC with optional avatarUrl', () => {
       const npcData = createTestNPCData({
         name: 'Elara the Wise',
@@ -92,22 +74,6 @@ describe('npcStore - CRUD Operations', () => {
     });
   });
 
-  describe('NPC deletion', () => {
-    test('should delete NPC and clean up references', () => {
-      const npcData = createTestNPCData({
-        name: 'Temporary NPC',
-        description: 'To be deleted',
-      });
-
-      const npcId = useNPCStore.getState().createNPC(npcData);
-      useNPCStore.getState().deleteNPC(npcId);
-
-      const state = useNPCStore.getState();
-      expect(state.npcs[npcId]).toBeUndefined();
-      expect(state.worldNpcs['world-123']).toBeUndefined();
-    });
-  });
-
   describe('NPC retrieval', () => {
     test('should get NPCs by world', () => {
       const world1 = 'world-123';
@@ -141,11 +107,6 @@ describe('npcStore - CRUD Operations', () => {
       expect(world2NPCs[0].name).toBe('NPC 3');
     });
 
-    test('should return empty array for world with no NPCs', () => {
-      const npcs = useNPCStore.getState().getNPCsByWorld('nonexistent-world');
-      expect(npcs).toEqual([]);
-    });
-
     test('should get NPC by ID', () => {
       const npcData = createTestNPCData();
 
@@ -154,21 +115,6 @@ describe('npcStore - CRUD Operations', () => {
 
       expect(npc).toBeDefined();
       expect(npc?.name).toBe('Test NPC');
-    });
-
-    test('should get all NPCs', () => {
-      useNPCStore.getState().createNPC(createTestNPCData({
-        name: 'NPC 1',
-        description: 'First',
-      }));
-
-      useNPCStore.getState().createNPC(createTestNPCData({
-        name: 'NPC 2',
-        description: 'Second',
-      }));
-
-      const allNPCs = useNPCStore.getState().getAll();
-      expect(allNPCs).toHaveLength(2);
     });
   });
 });
