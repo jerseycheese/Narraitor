@@ -24,7 +24,8 @@ describe('useCharacterStore - State Management', () => {
       const error = {
         title: 'Test Error',
         message: 'Something went wrong',
-        type: 'validation' as ErrorType,
+        type: ErrorType.VALIDATION,
+        retryable: false,
       };
 
       useCharacterStore.getState().setError(error);
@@ -48,7 +49,8 @@ describe('useCharacterStore - State Management', () => {
       useCharacterStore.getState().setError({
         title: 'Corruption Error',
         message: 'State corrupted',
-        type: 'storage' as ErrorType,
+        type: ErrorType.UNKNOWN,
+        retryable: false,
       });
 
       useCharacterStore.getState().setLoading(true);
