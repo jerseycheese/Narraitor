@@ -24,9 +24,9 @@ const meta: Meta<typeof CollapsibleSection> = {
       control: 'text',
       description: 'Section title'
     },
-    initiallyExpanded: {
+    initialCollapsed: {
       control: 'boolean',
-      description: 'Whether the section is initially expanded'
+      description: 'Whether the section is initially collapsed'
     },
     children: {
       control: false
@@ -59,7 +59,7 @@ export const Default: Story = {
 export const InitiallyCollapsed: Story = {
   args: {
     title: 'Collapsed Section',
-    initiallyExpanded: false,
+    initialCollapsed: true,
     children: (
       <div className="p-4 bg-gray-700 rounded">
         <p className="text-gray-200">This content is initially hidden.</p>

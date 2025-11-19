@@ -171,7 +171,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   
   return (
     <div className="component-character-editor space-y-6">
-      <CollapsibleSection title="Character Portrait" initiallyExpanded={false} className="bg-background">
+      <CollapsibleSection title="Character Portrait" initialCollapsed={true} className="bg-background">
         <PortraitSection
           portrait={editingCharacter.portrait}
           characterName={editingCharacter.name}
@@ -185,7 +185,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Basic Information" initiallyExpanded={true} className="bg-background">
+      <CollapsibleSection title="Basic Information" className="bg-background">
         <BasicInfoForm
           name={editingCharacter.name}
           level={editingCharacter.level}
@@ -196,7 +196,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Background" initiallyExpanded={false} className="bg-background">
+      <CollapsibleSection title="Background" initialCollapsed={true} className="bg-background">
         <BackgroundForm
           background={editingCharacter.background}
           onBackgroundChange={(background) => setEditingCharacter({
@@ -206,7 +206,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Attributes" initiallyExpanded={false} className="bg-background">
+      <CollapsibleSection title="Attributes" initialCollapsed={true} className="bg-background">
         <AttributesForm
           attributes={editingCharacter.attributes.map(attr => ({ attributeId: attr.id, value: attr.baseValue }))}
           world={world}
@@ -220,7 +220,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Skills" initiallyExpanded={false} className="bg-background">
+      <CollapsibleSection title="Skills" initialCollapsed={true} className="bg-background">
         <SkillsForm
           skills={editingCharacter.skills.map(skill => ({
             skillId: skill.id,

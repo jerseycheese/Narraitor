@@ -116,9 +116,8 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   
   return (
     <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6 w-full">
-      <CollapsibleSection 
-        title="Basic Information" 
-        initiallyExpanded={true}
+      <CollapsibleSection
+        title="Basic Information"
         className="bg-background"
       >
         <WorldBasicInfoForm 
@@ -127,9 +126,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection 
-        title="World Image" 
-        initiallyExpanded={false}
+      <CollapsibleSection
+        title="World Image"
+        initialCollapsed={true}
         className="bg-background"
       >
         <WorldImageForm
@@ -138,9 +137,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Attributes" 
-        initiallyExpanded={false}
+      <CollapsibleSection
+        title="Attributes"
+        initialCollapsed={true}
         className="bg-background"
       >
         <WorldAttributesForm 
@@ -152,9 +151,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="Skills" 
-        initiallyExpanded={false}
+      <CollapsibleSection
+        title="Skills"
+        initialCollapsed={true}
         className="bg-background"
       >
         <WorldSkillsForm 
@@ -165,9 +164,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
       
-      <CollapsibleSection 
-        title="World Settings" 
-        initiallyExpanded={false}
+      <CollapsibleSection
+        title="World Settings"
+        initialCollapsed={true}
         className="bg-background"
       >
         <WorldSettingsForm 
