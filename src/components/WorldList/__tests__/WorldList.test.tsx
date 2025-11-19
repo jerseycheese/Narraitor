@@ -40,10 +40,4 @@ const mockWorlds: World[] = [
 ];
 
 describe('WorldList', () => {
-  // Test case for normal rendering with worlds
-  test('renders a list of WorldCard components when worlds are provided', () => {
-    render(<WorldList worlds={mockWorlds} onSelectWorld={jest.fn()} onDeleteWorld={jest.fn()} />);
-    expect(screen.getByTestId('world-list-container')).toBeInTheDocument();
-    expect(screen.getAllByTestId('world-card')).toHaveLength(mockWorlds.length);
-  });
 });

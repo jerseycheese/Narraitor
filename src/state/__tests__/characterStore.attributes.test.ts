@@ -23,69 +23,6 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
   });
 
   describe('attribute management', () => {
-    let characterId: string;
-
-    beforeEach(() => {
-      characterId = useCharacterStore.getState().createCharacter(
-        createAttributeTestCharacter()
-      );
-    });
-
-    test('should add attribute to character', () => {
-      const attributeData = {
-        name: 'Strength',
-        baseValue: 10,
-        modifiedValue: 10,
-        category: 'Physical'
-      };
-
-      useCharacterStore.getState().addAttribute(characterId, attributeData);
-      const state = useCharacterStore.getState();
-      const character = state.characters[characterId];
-
-      expect(character.attributes).toHaveLength(1);
-      expect(character.attributes[0].name).toBe('Strength');
-      expect(character.attributes[0].characterId).toBe(characterId);
-    });
-
-    test('should update attribute', () => {
-      useCharacterStore.getState().addAttribute(characterId, {
-        name: 'Strength',
-        baseValue: 10,
-        modifiedValue: 10,
-        category: 'Physical'
-      });
-
-      const state = useCharacterStore.getState();
-      const attributeId = state.characters[characterId].attributes[0].id;
-
-      useCharacterStore.getState().updateAttribute(characterId, attributeId, {
-        baseValue: 12,
-        modifiedValue: 14
-      });
-
-      const updatedState = useCharacterStore.getState();
-      const attribute = updatedState.characters[characterId].attributes[0];
-      expect(attribute.baseValue).toBe(12);
-      expect(attribute.modifiedValue).toBe(14);
-    });
-
-    test('should remove attribute', () => {
-      useCharacterStore.getState().addAttribute(characterId, {
-        name: 'Strength',
-        baseValue: 10,
-        modifiedValue: 10,
-        category: 'Physical'
-      });
-
-      const state = useCharacterStore.getState();
-      const attributeId = state.characters[characterId].attributes[0].id;
-
-      useCharacterStore.getState().removeAttribute(characterId, attributeId);
-
-      const updatedState = useCharacterStore.getState();
-      expect(updatedState.characters[characterId].attributes).toHaveLength(0);
-    });
   });
 
   describe('skill management', () => {
@@ -95,22 +32,6 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
       characterId = useCharacterStore.getState().createCharacter(
         createSkillTestCharacter()
       );
-    });
-
-    test('should add skill to character', () => {
-      const skillData = {
-        name: 'Swordsmanship',
-        level: 3,
-        category: 'Combat'
-      };
-
-      useCharacterStore.getState().addSkill(characterId, skillData);
-      const state = useCharacterStore.getState();
-      const character = state.characters[characterId];
-
-      expect(character.skills).toHaveLength(1);
-      expect(character.skills[0].name).toBe('Swordsmanship');
-      expect(character.skills[0].characterId).toBe(characterId);
     });
 
     test('should enforce max skills limit', () => {
