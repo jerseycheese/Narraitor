@@ -994,11 +994,13 @@ export const useInventoryStore = create<InventoryStore>()(
     {
       name: 'narraitor-inventory-store',
       storage: createIndexedDBStorage(),
+      version: 3, // Incremented to clear old migrated data
       partialize: (state) => ({
         items: state.items,
         entities: state.entities,
         characterInventories: state.characterInventories,
       }),
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );

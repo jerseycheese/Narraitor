@@ -511,6 +511,7 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
+      version: 3, // Incremented to clear old migrated data
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
@@ -518,6 +519,7 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );

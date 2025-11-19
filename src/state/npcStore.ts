@@ -228,10 +228,12 @@ export const useNPCStore = create<NPCStore>()(
     {
       name: 'narraitor-npc-store',
       storage: createIndexedDBStorage(),
+      version: 2, // Incremented to clear old migrated data
       partialize: (state) => ({
         npcs: state.npcs,
         worldNpcs: state.worldNpcs,
       }),
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );

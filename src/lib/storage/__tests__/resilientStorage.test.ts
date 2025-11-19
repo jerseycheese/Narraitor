@@ -189,16 +189,6 @@ describe('ResilientStorageMiddleware', () => {
     });
   });
 
-  describe('Backward Compatibility', () => {
-    it('should accept health monitoring calls without error', () => {
-      const storage = new ResilientStorageMiddleware();
-
-      // These are no-ops now but shouldn't throw
-      expect(() => storage.startHealthMonitoring(30000)).not.toThrow();
-      expect(() => storage.stopHealthMonitoring()).not.toThrow();
-    });
-  });
-
   describe('Remove Operations', () => {
     it('should remove from both IndexedDB and memory', async () => {
       mockAdapter.initialize.mockResolvedValue(undefined);

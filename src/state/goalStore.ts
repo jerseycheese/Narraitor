@@ -365,11 +365,13 @@ export const useGoalStore = create<GoalStore>()(
     {
       name: 'narraitor-goal-store',
       storage: createIndexedDBStorage(),
+      version: 2, // Incremented to clear old migrated data
       partialize: (state) => ({
         goals: state.goals,
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );

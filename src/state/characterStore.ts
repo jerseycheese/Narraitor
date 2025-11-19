@@ -618,6 +618,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
     {
       name: 'narraitor-character-store',
       storage: createIndexedDBStorage(),
+      version: 3, // Incremented to clear old migrated data
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[CharacterStore] Failed to rehydrate state', error);
@@ -625,6 +626,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
         state?.syncDerivedState?.();
       },
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );

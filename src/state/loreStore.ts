@@ -543,10 +543,12 @@ export const useLoreStore = create<LoreStore>()(
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
+      version: 2, // Incremented to clear old migrated data
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
       }),
+      migrate: () => getInitialState(), // No migration - always reset to initial state
     }
   )
 );
