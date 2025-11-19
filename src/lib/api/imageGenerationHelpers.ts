@@ -82,10 +82,14 @@ export function getGeminiApiKey(): string | null {
  * 1. Check for API key
  * 2. Return mock image if no key
  * 3. Try real generation
- * 4. Return fallback if generation fails
+ * 4. Return fallback if generation returns null (soft failure)
+ *
+ * Note: Hard failures (auth errors, rate limits, network issues) are allowed
+ * to throw so the route's error handler can return proper 500 status codes.
  *
  * @param config - Configuration for image generation
  * @returns NextResponse with image data
+ * @throws When Gemini API encounters hard failures (auth, network, etc.)
  */
 export async function generateImageWithFallback(
   config: ImageGenerationConfig
@@ -103,37 +107,12 @@ export async function generateImageWithFallback(
     });
   }
 
-  // Try real image generation
-  try {
-    const generatedImage = await generateImageWithGemini(config.prompt, apiKey);
+  // Try real image generation - let errors bubble to route handler
+  const generatedImage = await generateImageWithGemini(config.prompt, apiKey);
 
-    if (!generatedImage) {
-      logger.warn(config.loggerContext, 'Image generation failed, using fallback');
-      const fallbackImage = createFallbackImage(config.fallback, config.prompt);
-
-      return NextResponse.json({
-        image: fallbackImage,
-        ...config.responseFields,
-      });
-    }
-
-    // Success - return generated image
-    const imageData = {
-      type: 'ai-generated' as const,
-      url: generatedImage.url,
-      generatedAt: getTimestamp(),
-      prompt: config.prompt,
-    };
-
-    logger.debug(config.loggerContext, 'Image generated successfully');
-
-    return NextResponse.json({
-      image: imageData,
-      ...config.responseFields,
-    });
-
-  } catch (error) {
-    logger.error(config.loggerContext, 'Image generation error:', error);
+  if (!generatedImage) {
+    // Soft failure - Gemini returned null but didn't throw
+    logger.warn(config.loggerContext, 'Image generation failed, using fallback');
     const fallbackImage = createFallbackImage(config.fallback, config.prompt);
 
     return NextResponse.json({
@@ -141,4 +120,19 @@ export async function generateImageWithFallback(
       ...config.responseFields,
     });
   }
+
+  // Success - return generated image
+  const imageData = {
+    type: 'ai-generated' as const,
+    url: generatedImage.url,
+    generatedAt: getTimestamp(),
+    prompt: config.prompt,
+  };
+
+  logger.debug(config.loggerContext, 'Image generated successfully');
+
+  return NextResponse.json({
+    image: imageData,
+    ...config.responseFields,
+  });
 }
