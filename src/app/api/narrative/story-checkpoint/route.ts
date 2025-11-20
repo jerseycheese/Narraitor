@@ -6,71 +6,92 @@ import { safeTrim } from '@/lib/utils';
 const MAX_EVENTS = 10;
 const MAX_DECISIONS = 5;
 
-const sanitizeEvents = (events: unknown, fallbackSession: string): StoryCheckpointRequestBody['events'] => {
+const sanitizeEvents = (
+  events: unknown,
+  fallbackSession: string,
+): StoryCheckpointRequestBody['events'] => {
   if (!Array.isArray(events)) {
     return [];
   }
 
-  return events
-    .map((event) => {
-      if (!event || typeof event !== 'object') {
-        return null;
-      }
-      const record = event as Record<string, unknown>;
-      const description = safeTrim(String(record.description ?? ''));
-      const timestampRaw = safeTrim(String(record.timestamp ?? ''));
-      if (!description || !timestampRaw) {
-        return null;
-      }
-      const timestamp = new Date(timestampRaw).toISOString();
-      const id = safeTrim(String(record.id ?? '')) || `event-${timestamp}`;
-      const sessionId = safeTrim(String(record.sessionId ?? fallbackSession)) || fallbackSession;
-      const characterId = record.characterId ? safeTrim(String(record.characterId)) : undefined;
-      const characterName = record.characterName ? safeTrim(String(record.characterName)) : undefined;
+  const sanitized: StoryCheckpointRequestBody['events'] = [];
 
-      return {
-        id,
-        description,
-        timestamp,
-        characterId,
-        characterName,
-        sessionId,
-      };
-    })
-    .filter((entry): entry is StoryCheckpointRequestBody['events'][number] => Boolean(entry))
-    .slice(0, MAX_EVENTS);
+  for (const event of events) {
+    if (!event || typeof event !== 'object') {
+      continue;
+    }
+    const record = event as Record<string, unknown>;
+    const description = safeTrim(String(record.description ?? ''));
+    const timestampRaw = safeTrim(String(record.timestamp ?? ''));
+    if (!description || !timestampRaw) {
+      continue;
+    }
+
+    const timestamp = new Date(timestampRaw).toISOString();
+    const id = safeTrim(String(record.id ?? '')) || `event-${timestamp}`;
+    const sessionId = safeTrim(String(record.sessionId ?? fallbackSession)) || fallbackSession;
+    const characterId = record.characterId ? safeTrim(String(record.characterId)) : undefined;
+    const characterName = record.characterName ? safeTrim(String(record.characterName)) : undefined;
+
+    const payload: StoryCheckpointRequestBody['events'][number] = {
+      id,
+      description,
+      timestamp,
+      sessionId,
+      ...(characterId ? { characterId } : {}),
+      ...(characterName ? { characterName } : {}),
+    };
+
+    sanitized.push(payload);
+
+    if (sanitized.length >= MAX_EVENTS) {
+      break;
+    }
+  }
+
+  return sanitized;
 };
 
-const sanitizeDecisions = (decisions: unknown): StoryCheckpointRequestBody['decisions'] => {
+const sanitizeDecisions = (
+  decisions: unknown,
+): StoryCheckpointRequestBody['decisions'] => {
   if (!Array.isArray(decisions)) {
     return [];
   }
 
-  return decisions
-    .map((decision) => {
-      if (!decision || typeof decision !== 'object') {
-        return null;
-      }
-      const record = decision as Record<string, unknown>;
-      const text = safeTrim(String(record.text ?? ''));
-      if (!text) {
-        return null;
-      }
-      const id = safeTrim(String(record.id ?? '')) || `decision-${Date.now()}`;
-      const consequence = record.consequence ? safeTrim(String(record.consequence)) : undefined;
-      const alignment = record.alignment ? safeTrim(String(record.alignment)) : undefined;
-      const timestamp = record.timestamp ? new Date(String(record.timestamp)).toISOString() : undefined;
+  const sanitized: StoryCheckpointRequestBody['decisions'] = [];
 
-      return {
-        id,
-        text,
-        consequence,
-        alignment,
-        timestamp,
-      };
-    })
-    .filter((entry): entry is NonNullable<StoryCheckpointRequestBody['decisions']>[number] => Boolean(entry))
-    .slice(0, MAX_DECISIONS);
+  for (const decision of decisions) {
+    if (!decision || typeof decision !== 'object') {
+      continue;
+    }
+    const record = decision as Record<string, unknown>;
+    const text = safeTrim(String(record.text ?? ''));
+    if (!text) {
+      continue;
+    }
+
+    const id = safeTrim(String(record.id ?? '')) || `decision-${Date.now()}`;
+    const consequence = record.consequence ? safeTrim(String(record.consequence)) : undefined;
+    const alignment = record.alignment ? safeTrim(String(record.alignment)) : undefined;
+    const timestamp = record.timestamp ? new Date(String(record.timestamp)).toISOString() : undefined;
+
+    const payload: NonNullable<StoryCheckpointRequestBody['decisions']>[number] = {
+      id,
+      text,
+      ...(consequence ? { consequence } : {}),
+      ...(alignment ? { alignment } : {}),
+      ...(timestamp ? { timestamp } : {}),
+    };
+
+    sanitized.push(payload);
+
+    if (sanitized.length >= MAX_DECISIONS) {
+      break;
+    }
+  }
+
+  return sanitized;
 };
 
 export async function POST(request: NextRequest) {

@@ -512,9 +512,30 @@ export const useWorldStore = create<WorldStore>()(
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
       version: 4, // Incremented for story checkpoint support
-      migrate: (persistedState, version) => {
-        if (persistedState && typeof persistedState === 'object' && version < 4) {
-          const worldStates = (persistedState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('[WorldStore] Failed to rehydrate state', error);
+          return;
+        }
+        state?.syncDerivedState?.();
+      },
+      migrate: (persistedState: unknown, version?: number) => {
+        let nextState = persistedState;
+
+        if (!nextState) {
+          nextState = {
+            worlds: {},
+            entities: {},
+            worldStates: {},
+            currentWorldId: null,
+            currentEntityId: null,
+            error: null,
+            loading: false,
+          };
+        }
+
+        if (nextState && typeof nextState === 'object' && typeof version === 'number' && version < 4) {
+          const worldStates = (nextState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
           if (worldStates && typeof worldStates === 'object') {
             Object.values(worldStates).forEach((state) => {
               if (state && !Array.isArray(state.storyCheckpoints)) {
@@ -523,23 +544,8 @@ export const useWorldStore = create<WorldStore>()(
             });
           }
         }
-        return persistedState;
-      },
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error('[WorldStore] Failed to rehydrate state', error);
-          return;
-        }
-        state?.syncDerivedState?.();
-      },
-      migrate: (persistedState) => persistedState || {
-        worlds: {},
-        entities: {},
-        worldStates: {},
-        currentWorldId: null,
-        currentEntityId: null,
-        error: null,
-        loading: false,
+
+        return nextState;
       }, // Preserve data, only clear if null
     }
   )
