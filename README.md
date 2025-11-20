@@ -2,10 +2,6 @@
 
 AI-powered storytelling app that basically lets you play through narrative RPG experiences in any world you can imagine, fictional or non-fictional. Maybe you want to explore Middle Earth? Storm the beach at Normandy? Design something completely original? Narraitor adapts the AI storytelling to match your world's themes and tone.
 
-![Narraitor home page](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/home-page-clean.png)
-
-*The main landing page showcasing the app's core features*
-
 > **A quick note on the UI**: I know it's pretty basic right now. I'm focused on building the foundational systems first - the storytelling engine, world mechanics, character progression. The plan is to eventually have worlds auto-skin their interfaces to match their genres. Think sleek sci-fi panels for space opera, weathered parchment for fantasy, noir shadows for detective stories. Right now it's all about getting the framework solid.
 
 ## What This Actually Does
