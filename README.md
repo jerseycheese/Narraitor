@@ -14,27 +14,27 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 ![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-creation-wizard-clean.png)
 
-*Multi-step wizard for creating custom worlds with templates and AI generation*
+*Seven-step wizard with template selection, AI generation, and custom world building*
 
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
 ![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/characters-page-clean.png)
 
-*Create and manage characters with custom attributes and progression*
+*Character management screen with AI-generated portraits and quick access to play*
 
 ![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-detail-page-clean.png)
 
-*Detailed world view showing attributes, skills, and character creation rules*
+*Complete world configuration showing custom attributes, skills, and character requirements*
 
 ![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/character-detail-page-clean.png)
 
-*Complete character sheet with stats, skills, and background information*
+*Detailed character sheet showing attributes, skill progression, and full background story*
 
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
 ![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/gameplay-session-clean.png)
 
-*AI-generated narrative with choice-based gameplay and skill checks*
+*Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
