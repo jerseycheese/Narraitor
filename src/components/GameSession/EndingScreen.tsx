@@ -403,12 +403,14 @@ export function EndingScreen() {
           {/* Narrative Review - Collapsible Section */}
           <section>
             <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg overflow-hidden">
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={() => setIsNarrativeExpanded(!isNarrativeExpanded)}
                 className="w-full p-6 flex items-center justify-between hover:bg-accent/50 transition-colors"
                 aria-expanded={isNarrativeExpanded}
                 aria-controls="narrative-review-content"
-                aria-label={isNarrativeExpanded ? "Collapse narrative review" : "Expand narrative review"}
+                aria-label={isNarrativeExpanded ? 'Collapse narrative review' : 'Expand narrative review'}
               >
                 <div className="flex items-center gap-3">
                   <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
@@ -419,7 +421,7 @@ export function EndingScreen() {
                 ) : (
                   <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
                 )}
-              </button>
+              </Button>
 
               {isNarrativeExpanded && (
                 <div

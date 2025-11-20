@@ -7,6 +7,7 @@ import {
   NPCRelationshipState,
   NPCRelationshipUpdate,
   WorldStateMajorEvent,
+  StoryCheckpoint,
   PlayerCharacterThread,
   PlayerCharacterThreadUpdate,
   CharacterRelationshipState,
@@ -98,16 +99,22 @@ const dedupeThreadReferences = (
   return Array.from(map.values()).sort((a, b) => compareTimestamps(b.lastReferencedAt, a.lastReferencedAt));
 };
 
+const STORY_CHECKPOINT_LIMIT = 25;
+
 const ensureState = (state: WorldState | undefined, worldId: EntityID): WorldState => {
   if (state) {
     if (state.playerCharacterThreads && state.characterRelationships) {
-      return state;
+      return {
+        ...state,
+        storyCheckpoints: state.storyCheckpoints ?? [],
+      };
     }
 
     return {
       ...state,
       playerCharacterThreads: state.playerCharacterThreads ?? {},
       characterRelationships: state.characterRelationships ?? {},
+      storyCheckpoints: state.storyCheckpoints ?? [],
     };
   }
 
@@ -491,6 +498,37 @@ const mergeEvents = (
   return Array.from(byId.values()).sort((a, b) => compareTimestamps(b.timestamp, a.timestamp));
 };
 
+const mergeCheckpoints = (
+  current: StoryCheckpoint[],
+  incoming: StoryCheckpoint[],
+): StoryCheckpoint[] => {
+  const byId = new Map<EntityID, StoryCheckpoint>();
+
+  for (const checkpoint of current) {
+    if (!checkpoint.id) {
+      continue;
+    }
+    const existing = byId.get(checkpoint.id);
+    if (!existing || compareTimestamps(checkpoint.createdAt, existing.createdAt) >= 0) {
+      byId.set(checkpoint.id, checkpoint);
+    }
+  }
+
+  for (const checkpoint of incoming) {
+    if (!checkpoint.id) {
+      continue;
+    }
+    const existing = byId.get(checkpoint.id);
+    if (!existing || compareTimestamps(checkpoint.createdAt, existing.createdAt) >= 0) {
+      byId.set(checkpoint.id, checkpoint);
+    }
+  }
+
+  return Array.from(byId.values())
+    .sort((a, b) => compareTimestamps(b.createdAt, a.createdAt))
+    .slice(0, STORY_CHECKPOINT_LIMIT);
+};
+
 export const updateNPCRelationship = (
   worldId: EntityID,
   state: WorldState | undefined,
@@ -538,6 +576,57 @@ export const recordMajorEvent = (
   return nextState;
 };
 
+export const recordStoryCheckpoint = (
+  worldId: EntityID,
+  state: WorldState | undefined,
+  checkpoint: Partial<StoryCheckpoint>,
+  sessionId: EntityID,
+): WorldState => {
+  const currentState = ensureState(state, worldId);
+  const timestamp = checkpoint.createdAt ?? getTimestamp();
+  const checkpointId = checkpoint.id ?? `checkpoint-${timestamp}`;
+  const summary = checkpoint.summary?.trim();
+
+  if (!summary) {
+    throw new Error('Story checkpoint summary is required');
+  }
+
+  const highlights = dedupeStrings(checkpoint.highlights ?? []).slice(0, 6);
+  const eventIds = dedupeEntityIds(checkpoint.eventIds ?? []);
+  const decisionIds = checkpoint.decisionIds
+    ? dedupeEntityIds(checkpoint.decisionIds)
+    : undefined;
+
+  const normalized: StoryCheckpoint = {
+    id: checkpointId,
+    sessionId: checkpoint.sessionId ?? sessionId,
+    characterId: checkpoint.characterId,
+    createdAt: timestamp,
+    summary,
+    highlights,
+    eventIds,
+    decisionIds,
+    metadata: checkpoint.metadata,
+  };
+
+  const lastModified = getTimestamp();
+  const nextState: WorldState = {
+    ...currentState,
+    version: currentState.version + 1,
+    lastModified,
+    storyCheckpoints: mergeCheckpoints(currentState.storyCheckpoints, [normalized]),
+  };
+
+  logger.debug('Recorded story checkpoint', {
+    worldId,
+    checkpointId: normalized.id,
+    sessionId: normalized.sessionId,
+    eventCount: normalized.eventIds.length,
+  });
+
+  return nextState;
+};
+
 export const detectConflict = (currentVersion: number, incomingVersion: number): boolean =>
   incomingVersion <= currentVersion;
 
@@ -554,6 +643,7 @@ export const mergeState = (current: WorldState, incoming: WorldState): WorldStat
     lastModified,
     npcRelationships: mergeRelationships(current.npcRelationships, incoming.npcRelationships),
     majorEvents: mergeEvents(current.majorEvents, incoming.majorEvents),
+    storyCheckpoints: mergeCheckpoints(current.storyCheckpoints ?? [], incoming.storyCheckpoints ?? []),
     playerCharacterThreads: mergePlayerCharacterThreads(
       current.playerCharacterThreads ?? {},
       incoming.playerCharacterThreads ?? {},
@@ -582,6 +672,12 @@ export const applyWorldStateUpdate = (
   if (update.majorEvents?.length) {
     for (const event of update.majorEvents) {
       workingState = recordMajorEvent(worldId, workingState, event, sessionId);
+    }
+  }
+
+  if (update.storyCheckpoints?.length) {
+    for (const checkpoint of update.storyCheckpoints) {
+      workingState = recordStoryCheckpoint(worldId, workingState, checkpoint, sessionId);
     }
   }
 
@@ -642,10 +738,15 @@ export const getActiveWorldState = (
     const status = lookupStatus(event.sessionId);
     return !status || status === 'active';
   });
+  const activeCheckpoints = currentState.storyCheckpoints.filter(checkpoint => {
+    const status = lookupStatus(checkpoint.sessionId);
+    return !status || status === 'active';
+  });
 
   return {
     ...currentState,
     npcRelationships: activeRelationships,
     majorEvents: activeEvents,
+    storyCheckpoints: activeCheckpoints,
   };
 };

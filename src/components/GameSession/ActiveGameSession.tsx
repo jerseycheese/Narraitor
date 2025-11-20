@@ -11,6 +11,7 @@ import { useCharacterStore, Character } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
+import { StorySummarySection } from './StorySummarySection';
 import { EndingScreen } from './EndingScreen';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
@@ -846,6 +847,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <InventoryList characterId={characterId} />
         </section>
       )}
+
+      <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
 
       {/* Autosave indicator anchored under the main content */}
       <div className="mt-4">

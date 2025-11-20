@@ -1,4 +1,5 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { majorEventGuidelines } from './majorEventGuidelines';
 
 export const transitionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -57,6 +58,8 @@ IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
 
 ${formattedRoster}
 
+${majorEventGuidelines}
+
 Response Format:
 {
   "content": "The transition text goes here...",
@@ -75,7 +78,8 @@ Response Format:
     ],
     "mood": "appropriate mood",
     ${newLocation ? `"location": "${newLocation}",` : ''}
-    "tags": ["transition"]
+    "tags": ["transition"],
+    "majorEvent": "Short clause if this transition marks a transformation/world change/critical turning point, else null"
   }
 }`;
 };

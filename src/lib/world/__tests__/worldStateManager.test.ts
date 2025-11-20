@@ -1,6 +1,7 @@
 import {
   updateNPCRelationship,
   recordMajorEvent,
+  recordStoryCheckpoint,
   getActiveWorldState,
   detectConflict,
   mergeState,
@@ -50,6 +51,30 @@ describe('worldStateManager', () => {
       'session-active'
     );
 
+    state = recordStoryCheckpoint(
+      baseWorldId,
+      state,
+      {
+        id: 'checkpoint-ended',
+        summary: 'Recap of the doomed arc',
+        highlights: ['Kingdom collapsed'],
+        eventIds: ['event-ended'],
+      },
+      'session-ended'
+    );
+
+    state = recordStoryCheckpoint(
+      baseWorldId,
+      state,
+      {
+        id: 'checkpoint-active',
+        summary: 'Festival recap',
+        highlights: ['City celebrated the hero'],
+        eventIds: ['event-active'],
+      },
+      'session-active'
+    );
+
     const lookup = (sessionId: string) => (sessionId === 'session-active' ? 'active' : 'ended');
 
     const filtered = getActiveWorldState(baseWorldId, state, lookup);
@@ -57,6 +82,7 @@ describe('worldStateManager', () => {
     expect(filtered.npcRelationships).toHaveProperty('npc-active');
     expect(filtered.npcRelationships).not.toHaveProperty('npc-ended');
     expect(filtered.majorEvents.map(event => event.id)).toEqual(['event-active']);
+    expect(filtered.storyCheckpoints.map(checkpoint => checkpoint.id)).toEqual(['checkpoint-active']);
   });
 
   it('applies relationship updates and increments version', () => {
@@ -90,6 +116,7 @@ describe('worldStateManager', () => {
 
     expect(relationship.trust).toBe(65);
     expect(merged.version).toBe(Math.max(current.version, incoming.version));
+    expect(merged.storyCheckpoints).toHaveLength(0);
   });
 
   it('removes player character threads and relationship edges when requested', () => {
@@ -179,5 +206,62 @@ describe('worldStateManager', () => {
     expect(state.characterRelationships.charA).toBeUndefined();
     expect(state.characterRelationships.charB?.charA).toBeUndefined();
     expect(state.playerCharacterThreads['thread-charB'].crossCharacterReferences).toHaveLength(0);
+  });
+
+  it('applies story checkpoint updates via world state update payloads', () => {
+    const state = applyWorldStateUpdate(
+      baseWorldId,
+      createEmptyWorldState(baseWorldId),
+      {
+        storyCheckpoints: [
+          {
+            id: 'checkpoint-1',
+            summary: 'First chapter recap',
+            highlights: ['Hero met mentor'],
+            eventIds: ['event-1'],
+          },
+        ],
+      },
+      'session-story'
+    );
+
+    expect(state.storyCheckpoints).toHaveLength(1);
+    expect(state.storyCheckpoints[0].summary).toBe('First chapter recap');
+    expect(state.storyCheckpoints[0].eventIds).toEqual(['event-1']);
+    expect(state.storyCheckpoints[0].sessionId).toBe('session-story');
+  });
+
+  it('merges story checkpoints preferring the newest revisions', () => {
+    const base = createEmptyWorldState(baseWorldId);
+    const current = recordStoryCheckpoint(
+      baseWorldId,
+      base,
+      {
+        id: 'checkpoint-shared',
+        summary: 'Old arc summary',
+        highlights: ['Old highlight'],
+        eventIds: ['event-old'],
+        createdAt: '2025-01-01T00:00:00.000Z',
+      },
+      'session-a'
+    );
+
+    const incoming = recordStoryCheckpoint(
+      baseWorldId,
+      base,
+      {
+        id: 'checkpoint-shared',
+        summary: 'Updated arc summary',
+        highlights: ['New highlight'],
+        eventIds: ['event-new'],
+        createdAt: '2025-01-02T00:00:00.000Z',
+      },
+      'session-a'
+    );
+
+    const merged = mergeState(current, incoming);
+    expect(merged.storyCheckpoints).toHaveLength(1);
+    expect(merged.storyCheckpoints[0].summary).toBe('Updated arc summary');
+    expect(merged.storyCheckpoints[0].eventIds).toEqual(['event-new']);
   });
 });

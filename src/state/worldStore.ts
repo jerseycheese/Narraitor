@@ -511,7 +511,20 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
-      version: 3, // Incremented to clear old migrated data
+      version: 4, // Incremented for story checkpoint support
+      migrate: (persistedState, version) => {
+        if (persistedState && typeof persistedState === 'object' && version < 4) {
+          const worldStates = (persistedState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
+          if (worldStates && typeof worldStates === 'object') {
+            Object.values(worldStates).forEach((state) => {
+              if (state && !Array.isArray(state.storyCheckpoints)) {
+                state.storyCheckpoints = [];
+              }
+            });
+          }
+        }
+        return persistedState;
+      },
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);

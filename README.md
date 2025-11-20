@@ -44,6 +44,8 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 **Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
 
+**Story Checkpoints**: Manual "story so far" summaries live in the Game Session view so you can capture pivotal arcs on demand. The AI aggregates major events and key decisions between checkpoints to keep the narrative anchored even when the overall session history grows too large. [Read the quick guide](docs/features/story-checkpoints.md) for API details and troubleshooting tips.
+
 **Template Worlds**: Don't want to build from scratch? Start with pre-configured worlds like Western, Sitcom, or high Fantasy, then customize from there.
 
 ## Getting It Running

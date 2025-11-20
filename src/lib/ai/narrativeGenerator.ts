@@ -1035,6 +1035,7 @@ Return ONLY the rewritten narrative.`;
       speakerId?: string;
       itemsAcquired?: AcquiredItemMetadata[];
       characters?: GeneratedCharacterMetadata[];
+      majorEvent?: string;
     } = {};
 
     // Try to parse JSON response if present
@@ -1140,6 +1141,10 @@ Return ONLY the rewritten narrative.`;
                     })
                     .filter((value: GeneratedCharacterMetadata | null | undefined): value is GeneratedCharacterMetadata => Boolean(value))
                 : undefined,
+              majorEvent:
+                typeof parsed?.metadata?.majorEvent === 'string'
+                  ? safeTrim(String(parsed.metadata.majorEvent)).slice(0, 180)
+                  : undefined,
             };
           }
         }
@@ -1354,6 +1359,10 @@ Return ONLY the rewritten narrative.`;
       extractedMetadata.itemsAcquired && extractedMetadata.itemsAcquired.length > 0
         ? extractedMetadata.itemsAcquired
         : metadataAnalysis.items;
+    const sanitizedMajorEvent =
+      extractedMetadata.majorEvent && safeTrim(extractedMetadata.majorEvent).length > 0
+        ? safeTrim(extractedMetadata.majorEvent)
+        : undefined;
 
     return {
       content: normalizedContent,
@@ -1374,6 +1383,7 @@ Return ONLY the rewritten narrative.`;
         itemsAcquired:
           analyzedItems && analyzedItems.length > 0 ? analyzedItems : undefined,
         characters: extractedMetadata.characters,
+        majorEvent: sanitizedMajorEvent,
       },
       tokenUsage:
         response.tokenUsage && typeof response.tokenUsage === 'object'

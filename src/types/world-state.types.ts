@@ -25,6 +25,27 @@ export interface WorldStateMajorEvent {
 }
 
 /**
+ * Story checkpoint snapshots aggregate major events and AI summaries.
+ */
+export interface StoryCheckpoint {
+  id: EntityID;
+  sessionId: EntityID;
+  characterId?: EntityID;
+  createdAt: ISODateString;
+  summary: string;
+  highlights: string[];
+  eventIds: EntityID[];
+  decisionIds?: EntityID[];
+  metadata?: {
+    lastEventTimestamp?: ISODateString;
+    includedEvents?: number;
+    includedDecisions?: number;
+    promptVersion?: string;
+    aiModel?: string;
+  };
+}
+
+/**
  * Reference to another player character within a story thread.
  */
 export interface CharacterThreadReference {
@@ -68,6 +89,7 @@ export interface WorldState {
   lastModified: ISODateString;
   npcRelationships: Record<EntityID, NPCRelationshipState>;
   majorEvents: WorldStateMajorEvent[];
+  storyCheckpoints: StoryCheckpoint[];
   playerCharacterThreads: Record<EntityID, PlayerCharacterThread>;
   characterRelationships: Record<EntityID, Record<EntityID, CharacterRelationshipState>>;
 }
@@ -78,6 +100,7 @@ export interface WorldState {
 export interface WorldStateUpdate {
   npcRelationships?: Record<EntityID, NPCRelationshipUpdate>;
   majorEvents?: WorldStateMajorEventInput[];
+  storyCheckpoints?: StoryCheckpointInput[];
   playerCharacterThreads?: Record<EntityID, PlayerCharacterThreadUpdate>;
   characterRelationships?: Record<EntityID, Record<EntityID, CharacterRelationshipUpdate>>;
   removePlayerCharacterThreads?: EntityID[];
@@ -121,6 +144,10 @@ export interface CharacterRelationshipRemoval {
 }
 
 export type WorldStateMajorEventInput = Omit<WorldStateMajorEvent, 'sessionId'>;
+export type StoryCheckpointInput = Omit<StoryCheckpoint, 'sessionId' | 'createdAt'> & {
+  sessionId?: EntityID;
+  createdAt?: ISODateString;
+};
 
 export interface SessionLifecycleSnapshot {
   id: EntityID;
@@ -137,6 +164,7 @@ export const createEmptyWorldState = (worldId: EntityID): WorldState => ({
   lastModified: new Date().toISOString(),
   npcRelationships: {},
   majorEvents: [],
+  storyCheckpoints: [],
   playerCharacterThreads: {},
   characterRelationships: {},
 });
