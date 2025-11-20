@@ -666,7 +666,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Global event handlers to support hero action buttons from parent pages
   React.useEffect(() => {
     const onEndStory = () => handleEndStoryClick();
-    const onEndSession = () => { if (onEnd) onEnd(); };
+    const onEndSession = async () => {
+      // Dispatch event to trigger final checkpoint before ending session
+      window.dispatchEvent(new CustomEvent('narraitor:finalize-checkpoint'));
+      // Small delay to allow checkpoint to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (onEnd) onEnd();
+    };
     const onNewSession = async () => {
       const sessionStore = useSessionStore.getState();
       const narrativeStore = useNarrativeStore.getState();

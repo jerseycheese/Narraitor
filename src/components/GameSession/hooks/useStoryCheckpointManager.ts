@@ -241,7 +241,33 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       setStatus('error');
       setError(checkpointError instanceof Error ? checkpointError.message : 'Unknown error creating checkpoint.');
     }
-  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId]);
+  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints]);
+
+  // Auto-trigger checkpoint creation when there's at least 1 pending event
+  React.useEffect(() => {
+    if (pendingEvents.length === 0 || status === 'loading') {
+      return;
+    }
+
+    // Debounce: wait 3 seconds after the last event before creating checkpoint
+    const timeoutId = setTimeout(() => {
+      createCheckpoint();
+    }, 3000);
+
+    return () => clearTimeout(timeoutId);
+  }, [pendingEvents.length, status, createCheckpoint]);
+
+  // Listen for session end event to capture final checkpoint
+  React.useEffect(() => {
+    const handleFinalCheckpoint = () => {
+      if (pendingEvents.length > 0 && status !== 'loading') {
+        createCheckpoint();
+      }
+    };
+
+    window.addEventListener('narraitor:finalize-checkpoint', handleFinalCheckpoint);
+    return () => window.removeEventListener('narraitor:finalize-checkpoint', handleFinalCheckpoint);
+  }, [pendingEvents.length, status, createCheckpoint]);
 
   return {
     status,
