@@ -83,16 +83,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
               {lastUpdatedLabel && <span className="text-xs text-gray-500">Updated {lastUpdatedLabel}</span>}
             </div>
             {latestCheckpoint ? (
-              <>
-                <p className="mt-2 text-sm text-gray-800 leading-relaxed">{latestCheckpoint.summary}</p>
-                {latestCheckpoint.highlights?.length ? (
-                  <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">
-                    {latestCheckpoint.highlights.map((highlight) => (
-                      <li key={highlight}>{highlight}</li>
-                    ))}
-                  </ul>
-                ) : null}
-              </>
+              <p className="mt-2 text-sm text-gray-800 leading-relaxed">{latestCheckpoint.summary}</p>
             ) : (
               <p className="mt-2 text-sm text-gray-500">
                 No checkpoints yet. Capture a summary once you experience at least one major event.
