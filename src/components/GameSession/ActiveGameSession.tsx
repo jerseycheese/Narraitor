@@ -24,6 +24,7 @@ import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
@@ -842,10 +843,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Inventory Display */}
       {characterId && (
-        <section className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Inventory</h2>
-          <InventoryList characterId={characterId} />
-        </section>
+        <div className="mt-6" data-testid="inventory-collapsible">
+          <CollapsibleSection title="Inventory" initialCollapsed>
+            <InventoryList characterId={characterId} />
+          </CollapsibleSection>
+        </div>
       )}
 
       <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />

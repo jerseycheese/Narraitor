@@ -11,6 +11,7 @@ import {
   relaxStoryColumnHeight,
   seedStorySummaryForVisual,
   expandStorySummarySection,
+  expandInventorySection,
 } from './utils/game-session-page-seeder';
 
 /**
@@ -367,6 +368,7 @@ test.describe('Game Session Visual Tests', () => {
     await ensureSuggestedActionsExpanded(page);
     await renderSeededSuggestedActions(page);
     await seedInventoryItemsForVisual(page);
+    await expandInventorySection(page);
 
     await page.waitForSelector('[data-testid^="choice-option-"]', {
       state: 'visible',
