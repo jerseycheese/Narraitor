@@ -51,7 +51,7 @@ const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
     : 'No explicit goals documented.';
 
   const previousStory = payload.previousCheckpointSummary
-    ? `\nPrevious Story So Far:\n${payload.previousCheckpointSummary}\n`
+    ? `\nPREVIOUS STORY SO FAR (DO NOT EDIT THIS TEXT):\n<<<PREVIOUS_SUMMARY>>>\n${payload.previousCheckpointSummary}\n<<<END_PREVIOUS_SUMMARY>>>\n`
     : '';
 
   return `You are Narraitor's narrative continuity analyst. Use supplied events and decisions to create a checkpoint recap that preserves long-form campaign stakes.
@@ -71,9 +71,15 @@ Requirements:
 - Only use provided inputs. Do NOT invent events or decisions.
 - Treat major events as the authoritative canon. Reference decisions only if they caused the events.
 - Highlight character transformations, world changes, and critical turning points explicitly.
-- ${payload.previousCheckpointSummary ? 'APPEND the new events to the "Previous Story So Far" to create a continuous, growing narrative. Do not replace or summarize the previous story - ADD to it.' : 'Create an initial story summary from the provided events.'}
-- The summary must cover: major events since last checkpoint, character development highlights, key decisions & consequences, and the current narrative state.
-- Provide specific, vivid yet concise prose (${payload.previousCheckpointSummary ? 'add 50-75 words to the existing story' : 'no more than 75 words in the summary'}).
+- ${
+    payload.previousCheckpointSummary
+      ? `CRITICAL SUMMARY INSTRUCTION:
+  1. Copy the text between <<<PREVIOUS_SUMMARY>>> markers exactly as-is (including punctuation, casing, spacing).
+  2. Paste that text at the very beginning of summary without changes.
+  3. After the copied text, add two new sentences (50-75 words total) describing ONLY the new events provided above.
+  4. Do NOT merge, paraphrase, or rewrite the previous text. The final summary must be: [unchanged previous text] + [blank line or space] + [new sentences].`
+      : 'Create an initial story summary from the provided events (no more than 75 words).'
+  }
 - Use third-person limited voice that can be read aloud to players.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 
@@ -144,9 +150,13 @@ export const generateStoryCheckpointSummary = async (
   try {
     return parseResponse(response.content);
   } catch {
-    const fallbackSummary = payload.events
+    const eventText = payload.events
       .map((event) => `${event.characterName ? `${event.characterName} ` : ''}${event.description}`)
       .join(' ');
+
+    const fallbackSummary = payload.previousCheckpointSummary
+      ? `${payload.previousCheckpointSummary.trim()} ${eventText}`.trim()
+      : eventText;
 
     return {
       summary: fallbackSummary || 'Recent events logged but AI summary unavailable.',

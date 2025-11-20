@@ -241,7 +241,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       setStatus('error');
       setError(checkpointError instanceof Error ? checkpointError.message : 'Unknown error creating checkpoint.');
     }
-  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints]);
+  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints, latestCheckpoint?.summary]);
 
   // Auto-trigger checkpoint creation when there's at least 1 pending event
   React.useEffect(() => {
