@@ -200,13 +200,14 @@ What constitutes "done enough" for a 1.0:
 
 Things that would be cool to explore:
 - **Enhanced Notifications** across all user interactions ([#607](https://github.com/jerseycheese/Narraitor/issues/607))
-- **Multi-Model AI Support** (GPT-4, Claude integration)
 - **Multiplayer Capabilities** (shared worlds and storytelling)
 - **Voice Narration** for enhanced immersion
 - **Mobile App Versions** for on-the-go storytelling
 - **Advanced AI Personalization** based on play patterns
 - **Content Moderation Tools** for public sharing
 - **Economy Systems** for more complex world building
+
+**Note**: Multi-model AI support (GPT-4, Claude, Ollama, etc.) is being explored for earlier implementation - see Epic [#878](https://github.com/jerseycheese/Narraitor/issues/878) for provider-agnostic AI integration plans.
 
 The nice thing about having the foundation solid is that these features can be added incrementally without breaking existing functionality.
 
@@ -235,7 +236,7 @@ GEMINI_API_KEY=your-api-key
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
-**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation/` for details on how that works.
+**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation-guide.md` for details on how that works.
 
 ## License
 
