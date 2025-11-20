@@ -131,15 +131,20 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = React.useState<string | null>(null);
 
-  const latestCheckpoint = worldState?.storyCheckpoints?.[0] ?? null;
+  const checkpointsForSession = React.useMemo(
+    () => (worldState?.storyCheckpoints ?? []).filter((checkpoint) => checkpoint.sessionId === sessionId),
+    [worldState?.storyCheckpoints, sessionId],
+  );
+
+  const latestCheckpoint = checkpointsForSession[0] ?? null;
   const lastEventTimestamp = latestCheckpoint?.metadata?.lastEventTimestamp;
   const summarizedEventIds = React.useMemo(() => {
     const ids = new Set<string>();
-    (worldState?.storyCheckpoints ?? []).forEach((checkpoint) => {
+    checkpointsForSession.forEach((checkpoint) => {
       (checkpoint.eventIds ?? []).forEach((eventId) => ids.add(eventId));
     });
     return ids;
-  }, [worldState?.storyCheckpoints]);
+  }, [checkpointsForSession]);
 
   const sessionEvents = React.useMemo(() => {
     if (!worldState?.majorEvents?.length) {
