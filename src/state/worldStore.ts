@@ -534,7 +534,7 @@ export const useWorldStore = create<WorldStore>()(
           };
         }
 
-        if (nextState && typeof nextState === 'object' && typeof version === 'number' && version < 4) {
+        if (typeof version === 'number' && version < 4) {
           const worldStates = (nextState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
           if (worldStates && typeof worldStates === 'object') {
             Object.values(worldStates).forEach((state) => {
