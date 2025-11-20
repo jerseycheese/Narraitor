@@ -26,6 +26,7 @@ export interface StoryCheckpointRequestBody {
   narrativeSummary?: string;
   currentLocation?: string;
   activeGoals?: string[];
+  previousCheckpointSummary?: string;
 }
 
 export interface StoryCheckpointResponseBody {

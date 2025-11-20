@@ -91,19 +91,12 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
             )}
           </div>
 
-          {pendingEvents.length > 0 ? (
+          {pendingEvents.length > 0 && (
             <EventList
               title="New major events ready for the next checkpoint"
               events={pendingEvents}
               emptyLabel="No pending events."
               accent="pending"
-              characterNames={characterNameLookup}
-            />
-          ) : (
-            <EventList
-              title="Recent major events"
-              events={recentEvents}
-              emptyLabel="Major events will appear here once your story gains momentum."
               characterNames={characterNameLookup}
             />
           )}

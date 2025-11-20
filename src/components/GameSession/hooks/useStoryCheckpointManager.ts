@@ -207,6 +207,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         decisions,
         narrativeSummary: narrativeContext.summary,
         currentLocation: narrativeContext.location,
+        previousCheckpointSummary: latestCheckpoint?.summary,
       });
 
       const response = await fetch('/api/narrative/story-checkpoint', {
@@ -223,11 +224,13 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       const data = (await response.json()) as StoryCheckpointResponseBody;
       const newCheckpoint = buildCheckpointFromResponse(data, pendingEvents, decisions);
 
+      const existingCheckpoints = worldState?.storyCheckpoints ?? [];
       useWorldStore.getState().updateWorldState(
         worldId,
         {
           storyCheckpoints: [
             newCheckpoint,
+            ...existingCheckpoints,
           ],
         },
         sessionId

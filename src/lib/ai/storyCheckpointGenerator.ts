@@ -50,6 +50,10 @@ const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
     ? payload.activeGoals.map((goal, index) => `${index + 1}. ${goal}`).join('\n')
     : 'No explicit goals documented.';
 
+  const previousStory = payload.previousCheckpointSummary
+    ? `\nPrevious Story So Far:\n${payload.previousCheckpointSummary}\n`
+    : '';
+
   return `You are Narraitor's narrative continuity analyst. Use supplied events and decisions to create a checkpoint recap that preserves long-form campaign stakes.
 
 Context:
@@ -58,8 +62,7 @@ Context:
 - Active Character ID: ${payload.characterId || 'unknown'}
 - Current Location: ${location}
 - Current Narrative Summary: ${summary}
-- Active Goals:\n${goals}
-
+- Active Goals:\n${goals}${previousStory}
 Major Events Since Last Checkpoint:\n${eventsText}
 
 Player Decisions:\n${decisionText}
@@ -68,8 +71,9 @@ Requirements:
 - Only use provided inputs. Do NOT invent events or decisions.
 - Treat major events as the authoritative canon. Reference decisions only if they caused the events.
 - Highlight character transformations, world changes, and critical turning points explicitly.
+- ${payload.previousCheckpointSummary ? 'APPEND the new events to the "Previous Story So Far" to create a continuous, growing narrative. Do not replace or summarize the previous story - ADD to it.' : 'Create an initial story summary from the provided events.'}
 - The summary must cover: major events since last checkpoint, character development highlights, key decisions & consequences, and the current narrative state.
-- Provide specific, vivid yet concise prose (no more than 75 words in the summary).
+- Provide specific, vivid yet concise prose (${payload.previousCheckpointSummary ? 'add 50-75 words to the existing story' : 'no more than 75 words in the summary'}).
 - Use third-person limited voice that can be read aloud to players.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 

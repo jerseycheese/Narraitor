@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
             .filter((goal: string) => Boolean(goal))
             .slice(0, 5)
         : undefined,
+      previousCheckpointSummary: rawBody?.previousCheckpointSummary ? safeTrim(String(rawBody.previousCheckpointSummary)) : undefined,
     };
 
     const summary = await generateStoryCheckpointSummary(payload);
