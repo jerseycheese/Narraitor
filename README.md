@@ -44,9 +44,23 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 **Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
 
-**Story Checkpoints**: Manual "story so far" summaries live in the Game Session view so you can capture pivotal arcs on demand. The AI aggregates major events and key decisions between checkpoints to keep the narrative anchored even when the overall session history grows too large. [Read the quick guide](docs/features/story-checkpoints.md) for API details and troubleshooting tips.
+## Additional Features
 
 **Template Worlds**: Don't want to build from scratch? Start with pre-configured worlds like Western, Sitcom, or high Fantasy, then customize from there.
+
+**AI Character Portraits**: Generate visual representations of your characters that match their descriptions and world settings.
+
+**Custom Player Actions**: Type any action you want to try instead of being limited to AI-suggested choices.
+
+**In-Session Journal**: Review story history and past decisions through a floating journal button during gameplay.
+
+**Story Endings**: AI-suggested narrative conclusions help you wrap up campaigns when you're ready to finish.
+
+**Export/Import**: Save and share your worlds, characters, or sessions as JSON files for backup or collaboration.
+
+**Developer Tools**: Built-in debugging panel for inspecting application state and testing features.
+
+**Story Checkpoints**: Capture "story so far" summaries at pivotal moments to keep long campaigns coherent.
 
 ## Getting It Running
 
