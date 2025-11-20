@@ -9,6 +9,8 @@ import {
   ensureSuggestedActionsContentVisible,
   removeDuplicateSuggestedActionsTextarea,
   relaxStoryColumnHeight,
+  seedStorySummaryForVisual,
+  expandStorySummarySection,
 } from './utils/game-session-page-seeder';
 
 /**
@@ -379,6 +381,8 @@ test.describe('Game Session Visual Tests', () => {
     await ensureSuggestedActionsContentVisible(page);
     await removeDuplicateSuggestedActionsTextarea(page);
     await relaxStoryColumnHeight(page);
+    await seedStorySummaryForVisual(page);
+    await expandStorySummarySection(page);
 
     await page.waitForTimeout(200); // Wait for layout to adjust
 

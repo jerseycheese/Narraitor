@@ -3,6 +3,8 @@ import type { Page } from '@playwright/test';
 const SUGGESTED_ACTIONS_TITLE_LOCATOR = '[data-testid="collapsible-section-title"]';
 const SUGGESTED_ACTIONS_CONTENT_LOCATOR = '[data-testid="collapsible-section-content"]';
 const SUGGESTED_ACTIONS_TOGGLE_LOCATOR = '[data-testid="collapsible-section-toggle"]';
+const STORY_SUMMARY_SECTION_LOCATOR = '[data-testid="story-summary-section"]';
+const STORY_SUMMARY_TOGGLE_LOCATOR = '[data-testid="collapsible-section-toggle"]';
 
 /**
  * Ensure the Suggested Actions collapsible section is expanded so the visual baseline
@@ -350,6 +352,127 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
       },
     }));
   });
+}
+
+/**
+ * Seed world state with story checkpoints and major events so the Story Summary section
+ * renders deterministic content for the visual baseline.
+ */
+export async function seedStorySummaryForVisual(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const appWindow = window as typeof window & {
+      useWorldStore?: { getState?: () => any };
+      useSessionStore?: { getState?: () => any };
+    };
+
+    const worldStore = appWindow.useWorldStore?.getState?.();
+    const sessionStore = appWindow.useSessionStore?.getState?.();
+
+    if (!worldStore?.updateWorldState || !sessionStore) {
+      return;
+    }
+
+    const worldId =
+      sessionStore.worldId ||
+      worldStore.currentWorldId ||
+      Object.keys(worldStore.worlds || {})[0];
+    const sessionId =
+      sessionStore.currentSessionId ||
+      sessionStore.id ||
+      'session-visual-story';
+    const characterId =
+      sessionStore.characterId ||
+      'character-cyberpunk-merc';
+
+    if (!worldId || !sessionId) {
+      return;
+    }
+
+    const existingState = worldStore.worldStates?.[worldId];
+    if (existingState?.storyCheckpoints?.some((cp: { id: string }) => cp.id === 'checkpoint-visual-story')) {
+      return;
+    }
+
+    const majorEvents = [
+      {
+        id: 'visual-event-1',
+        description: 'Sable unmasked the traitor council.',
+        timestamp: new Date('2025-11-10T18:00:00Z').toISOString(),
+        characterId,
+      },
+      {
+        id: 'visual-event-2',
+        description: 'AI governor sealed the undercity gates.',
+        timestamp: new Date('2025-11-11T18:30:00Z').toISOString(),
+        characterId,
+      },
+    ];
+
+    worldStore.updateWorldState(worldId, { majorEvents }, sessionId);
+
+    worldStore.updateWorldState(
+      worldId,
+      {
+        storyCheckpoints: [
+          {
+            id: 'checkpoint-visual-story',
+            summary: 'Sable exposed the traitors and rallied the undercity.',
+            highlights: ['Council plot revealed', 'Undercity united'],
+            eventIds: ['visual-event-1'],
+            decisionIds: ['decision-visual-story'],
+            metadata: {
+              lastEventTimestamp: majorEvents[0].timestamp,
+              includedEvents: 1,
+              includedDecisions: 1,
+              promptVersion: 'visual-story',
+              aiModel: 'gemini-1.5-pro',
+            },
+          },
+        ],
+      },
+      sessionId,
+    );
+  });
+}
+
+/**
+ * Ensure the Story Summary collapsible is expanded so the snapshot includes the checkpoint content.
+ */
+export async function expandStorySummarySection(page: Page): Promise<void> {
+  const section = page.locator(STORY_SUMMARY_SECTION_LOCATOR);
+
+  if (!(await section.count())) {
+    return;
+  }
+
+  const toggle = section.locator(STORY_SUMMARY_TOGGLE_LOCATOR).first();
+  const expanded = await toggle.getAttribute('aria-expanded');
+
+  if (expanded !== 'true') {
+    await toggle.click();
+    await page.waitForTimeout(200);
+  }
+
+  await page.evaluate(
+    ({ sectionSelector }) => {
+      const sectionEl = document.querySelector(sectionSelector);
+      const content = sectionEl?.querySelector('[data-testid="collapsible-section-content"]') as HTMLElement | null;
+      const toggleButton = sectionEl?.querySelector('[data-testid="collapsible-section-toggle"]') as HTMLElement | null;
+
+      if (content) {
+        content.classList.add('block');
+        content.classList.remove('hidden');
+        content.setAttribute('aria-hidden', 'false');
+        content.style.display = 'block';
+      }
+
+      if (toggleButton) {
+        toggleButton.setAttribute('aria-expanded', 'true');
+        toggleButton.textContent = '−';
+      }
+    },
+    { sectionSelector: STORY_SUMMARY_SECTION_LOCATOR },
+  );
 }
 
 /**
