@@ -3,7 +3,7 @@
 ## Where We Are
 **Major Milestone**: Core MVP is done. AI storytelling, world creation, character building, session persistence, and navigation all work.
 
-**Current Status**: Advanced polish phase. 30 high-priority items left - journal system, developer tools, feature depth.
+**Current Status**: Advanced polish phase. ~35-40 MVP-blocking items remain across narrative consistency, UI polish, and error handling.
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -29,17 +29,37 @@ Basically, it's a complete solo narrative RPG experience where you can:
 - [x] AI consistency validation tools
 - [x] Character Creation Auto-Save and Recovery
 
-### Phase 2: UI/UX Polish (Current Focus)
-Making the experience smooth. Navigation done: mobile works, loading states are responsive, state persists. 
+### Phase 2: UI/UX Polish
+Making the experience smooth. Navigation done: mobile works, loading states are responsive, state persists.
 
-**Current focus areas**:
-- Journal system completeness (entry viewing, choice tracking, session boundaries)
-- Character system polish (attribute distribution, in-game reference access)
-- World configuration enhancements (custom attributes, suggestion workflows)
+**Priority 1: Narrative Consistency & Lore**
+The lore/narrative consistency system partially works but has inconsistent behavior. This is the highest-priority work because without reliable AI memory, the game experience breaks down:
+- Lore storage and fact tracking (#182-185)
+- Narrative consistency checks (#188-191)
+- Decision consequence tracking (#210, #198, #196)
+- Long-term story impact systems
 
-### Phase 2.5: Developer Infrastructure (New Phase)
-Building debugging and tooling for production support. 30% of remaining work.
-- Error reporting and monitoring systems
+**Priority 2: Player-Facing Polish**
+- Journal system completeness (entry viewing #174-179, formatting #257-263, choice tracking, session boundaries)
+- Narrative display quality (#257-268, #274-284) - story text must be readable and professional
+- Character system polish (in-game reference access, post-creation modifications)
+- Inventory UI (minimum viable implementation - backend complete, add basic UI)
+
+**Priority 3: World Configuration**
+- Custom attribute definition
+- Attribute suggestion workflow improvements
+
+### Phase 2.5: Developer Infrastructure
+Building debugging and tooling for production support.
+
+**Priority 1: Error Handling (MVP Blocker)**
+Cannot ship without graceful error handling:
+- Runtime error capture and display (#159, #158, #155)
+- AI service error viewing (#201-203)
+- Error boundaries and recovery
+
+**Priority 2: Development Tools**
+Useful for ongoing development but not blocking MVP:
 - AI service request/response debugging tools
 - Application state debugging interfaces
 - Developer console access and programmatic debugging
@@ -63,49 +83,48 @@ This is about getting ready for broader use beyond just personal development.
 - Analytics to understand how people use it
 - Marketing website/landing page
 
-## Remaining High-Priority Work (30 Issues)
+## Current Priority Queue
 
-### Phase 2: User Experience Polish
-**Journal System Completeness** (4 issues - small complexity)
-- Entry viewing with formatting
-- Choice and outcome tracking
-- Session boundary logging
-- Information discovery documentation
+### Immediate: Core Quality & Reliability
+Cannot ship without these:
+- Error handling and retry resilience (#902)
+- Lore entity management (#446-449 - fuzzy matching, Unicode support, aliases, entity resolution)
+- Context window management for long games (#408)
+- Lore validation layer (#409)
+- Narrative checkpoint system (#411)
+- Route consistency validation (#420)
 
-**Character System Polish** (3 issues - small to medium complexity)
-- Attribute point distribution refinements
-- In-game character reference access
-- Post-creation character modifications
+### High Priority: Player-Facing Features
+Core user experience:
+- Dashboard home page to guide world → character flow (#398)
+- Guided onboarding tutorial (#399)
+- Character creation templates (#393)
+- Character portraits (custom upload #404, avatar library #405)
+- Skill prerequisites (#392)
+- Table views for journal/character/world lists (#808, #809, #810)
+- Session pacing and reading milestones (#805)
 
-**World Configuration** (2 issues - medium complexity)
-- Custom attribute definition
-- Attribute suggestion workflow improvements
+### Medium Priority: Development & Infrastructure
+Important for quality and debugging:
+- Fix skipped localStorage tests (#646)
+- Visual diff review tooling (#652)
+- Docker containers for cross-platform visual consistency (#653)
+- Snapshot governance (#655)
+- Visual performance metrics (#656)
+- AI service documentation enhancements (#334)
+- AI error handling integration tests (#332)
+- Token usage tracking (#326)
+- Token estimation optimization (#319)
 
-### Phase 2.5: Developer Infrastructure (9 issues - largest category)
-**Error Reporting & Monitoring**
-- Runtime error capture and display
-- Comprehensive error reporting
-- AI service error viewing
-
-**Debugging Tools**
-- Application state modification tools
-- Component visibility debugging
-- Programmatic console access
-
-**AI Service Tools**
-- Request and response monitoring
-- Decision relevance scoring
-- Performance measurement tools
-
-### Advanced Features
-**Narrative Depth** (3 issues - large complexity)
-- Decision consequence tracking
-- Long-term story impact systems
-- AI failure graceful handling
-
-**Lore Management** (3 issues - medium complexity)
-- World fact storage and categorization
-- Developer context integration
+### Deferred: Multi-Provider AI (Epic #878)
+Valuable but can launch with Gemini-only:
+- Provider abstraction layer (#890)
+- Secure configuration storage (#891)
+- Provider configuration UI (#892)
+- Gemini refactor to provider pattern (#893)
+- Claude native SDK (#894)
+- Generic OpenAI-compatible provider (#895)
+- See "Post-MVP Features" section for full multi-provider roadmap
 
 ## Technical Debt & Infrastructure
 - Implement Playwright visual regression testing
@@ -114,16 +133,29 @@ This is about getting ready for broader use beyond just personal development.
 - Improve TypeScript strictness
 - Add logging/monitoring
 
-## Post-MVP Features (Deferred)
-- Inventory system UI (backend complete, deferred from MVP)
-- Multi-model AI support (GPT-4, Claude)
+## Post-MVP Features (Explicitly Deferred)
+Features that are valuable but not required for initial launch:
+
+**Multi-Provider AI Support (Epic #878)**
+- OpenAI-compatible provider abstraction
+- Support for OpenAI, Claude, Deepseek, Mistral, etc.
+- Secure API key storage for user-provided keys
+- Provider configuration UI
+- Note: Can launch with Gemini only, add providers post-launch
+
+**Advanced Features**
 - Multiplayer/shared world support
 - Economy and trading systems
-- Advanced character progression
+- Advanced character progression systems
 - Content moderation and filters
 - Enhanced AI personalization
 - Voice narration support
 - Mobile app versions
+
+**Infrastructure**
+- Visual regression testing (Playwright)
+- Advanced CI/CD pipeline enhancements
+- Dependency updates (Next.js 16, Storybook 9.x, test stack)
 
 ## Success Metrics
 - All critical path issues resolved
@@ -141,14 +173,5 @@ This is about getting ready for broader use beyond just personal development.
 - [ ] Documentation complete
 - [ ] Marketing materials ready
 
-## Timeline Estimate (August 2025)
-*Note: Estimates below are from August 2025 and may be outdated*
-
-- **Phase 2 Completion**: 2-3 weeks (journal + character polish)
-- **Phase 2.5 Completion**: 3-4 weeks (developer infrastructure)
-- **Phase 3 Completion**: 1-2 weeks (testing & quality)
-- **Phase 4 & Launch**: 1-2 weeks
-- **Total to Launch**: 7-11 weeks
-
 ---
-*Last Updated: 2025-08-02 - Major status update reflecting completion of core MVP features*
+*Last Updated: 2025-11-20 - Updated priorities based on actual implementation status, ~35-40 MVP-blocking items identified*
