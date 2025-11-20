@@ -17,6 +17,45 @@ interface UseStoryCheckpointManagerArgs {
 const MAX_DECISIONS = 5;
 const MAX_SEGMENT_SUMMARY = 600;
 
+const buildCheckpointFromResponse = (
+  data: StoryCheckpointResponseBody,
+  pendingEvents: WorldStateMajorEvent[],
+  decisions: StoryCheckpointDecisionPayload[],
+): {
+  id: string;
+  summary: string;
+  highlights: string[];
+  eventIds: string[];
+  decisionIds: string[];
+  metadata: {
+    includedEvents: number;
+    includedDecisions: number;
+    lastEventTimestamp?: string;
+    promptVersion: string;
+    aiModel?: string;
+  };
+} => {
+  const fallbackHighlights = data.majorEvents.slice(0, 3);
+  const highlights = data.highlights?.length ? data.highlights : fallbackHighlights;
+  const eventIds = pendingEvents.map(event => event.id);
+  const decisionIds = decisions.map(decision => decision.id);
+
+  return {
+    id: generateUniqueId('checkpoint'),
+    summary: data.summary,
+    highlights,
+    eventIds,
+    decisionIds,
+    metadata: {
+      includedEvents: data.includedEvents,
+      includedDecisions: data.includedDecisions,
+      lastEventTimestamp: data.lastEventTimestamp ?? pendingEvents[pendingEvents.length - 1]?.timestamp,
+      promptVersion: 'story-checkpoint-v1',
+      aiModel: data.model,
+    },
+  };
+};
+
 const buildDecisionPayload = (
   sessionId: string,
 ): StoryCheckpointDecisionPayload[] => {
@@ -182,29 +221,13 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       }
 
       const data = (await response.json()) as StoryCheckpointResponseBody;
-      const highlights = data.highlights?.length ? data.highlights : data.majorEvents.slice(0, 3);
-      const checkpointId = generateUniqueId('checkpoint');
-      const eventIds = pendingEvents.map((event) => event.id);
-      const decisionIds = decisions.map((decision) => decision.id);
+      const newCheckpoint = buildCheckpointFromResponse(data, pendingEvents, decisions);
 
       useWorldStore.getState().updateWorldState(
         worldId,
         {
           storyCheckpoints: [
-            {
-              id: checkpointId,
-              summary: data.summary,
-              highlights,
-              eventIds,
-              decisionIds,
-              metadata: {
-                includedEvents: data.includedEvents,
-                includedDecisions: data.includedDecisions,
-                lastEventTimestamp: data.lastEventTimestamp ?? pendingEvents[pendingEvents.length - 1]?.timestamp,
-                promptVersion: 'story-checkpoint-v1',
-                aiModel: data.model,
-              },
-            },
+            newCheckpoint,
           ],
         },
         sessionId

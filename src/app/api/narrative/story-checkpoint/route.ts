@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
@@ -71,7 +72,7 @@ const sanitizeDecisions = (
       continue;
     }
 
-    const id = safeTrim(String(record.id ?? '')) || `decision-${Date.now()}`;
+      const id = safeTrim(String(record.id ?? '')) || `decision-${randomUUID()}`;
     const consequence = record.consequence ? safeTrim(String(record.consequence)) : undefined;
     const alignment = record.alignment ? safeTrim(String(record.alignment)) : undefined;
     const timestamp = record.timestamp ? new Date(String(record.timestamp)).toISOString() : undefined;
