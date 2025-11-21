@@ -83,6 +83,7 @@ Requirements:
   }
 ${payload.characterName ? '- Always refer to the protagonist by their given name ("' + payload.characterName + '").' : '- The protagonist prefers third-person pronouns; avoid saying "the player" or using second-person narration.'}
 - Use third-person limited voice and past-tense narration that can be read aloud to players.
+- Each sentence must advance the story with a new development or consequence. Do not restate the same confrontation unless the outcome changed.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 
 Schema:

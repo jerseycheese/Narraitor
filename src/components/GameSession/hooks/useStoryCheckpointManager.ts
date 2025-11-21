@@ -123,14 +123,26 @@ const formatEventsForApi = (
 ): StoryCheckpointRequestBody['events'] =>
   [...events]
     .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
-    .map((event) => ({
-      id: event.id,
-      description: event.description,
-      timestamp: event.timestamp,
-      characterId: event.characterId,
-      characterName: event.characterId ? characterNameLookup[event.characterId] : undefined,
-      sessionId: event.sessionId,
-    }));
+    .reduce<StoryCheckpointRequestBody['events']>((acc, event) => {
+      const previous = acc[acc.length - 1];
+      if (
+        previous &&
+        previous.characterId === event.characterId &&
+        previous.sessionId === event.sessionId &&
+        previous.description === event.description
+      ) {
+        return acc;
+      }
+      acc.push({
+        id: event.id,
+        description: event.description,
+        timestamp: event.timestamp,
+        characterId: event.characterId,
+        characterName: event.characterId ? characterNameLookup[event.characterId] : undefined,
+        sessionId: event.sessionId,
+      });
+      return acc;
+    }, []);
 
 export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: UseStoryCheckpointManagerArgs) => {
   const worldState = useWorldStore((state) => (worldId ? state.worldStates[worldId] : undefined));
