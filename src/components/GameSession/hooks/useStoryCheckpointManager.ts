@@ -21,6 +21,7 @@ const buildCheckpointFromResponse = (
   data: StoryCheckpointResponseBody,
   pendingEvents: WorldStateMajorEvent[],
   decisions: StoryCheckpointDecisionPayload[],
+  previousSummary?: string,
 ): {
   id: string;
   summary: string;
@@ -39,10 +40,17 @@ const buildCheckpointFromResponse = (
   const highlights = data.highlights?.length ? data.highlights : fallbackHighlights;
   const eventIds = pendingEvents.map(event => event.id);
   const decisionIds = decisions.map(decision => decision.id);
+  const trimmedPrevious = previousSummary?.trim() || '';
+  const trimmedIncoming = data.summary.trim();
+  const combinedSummary = trimmedPrevious
+    ? (trimmedIncoming.startsWith(trimmedPrevious)
+      ? trimmedIncoming
+      : `${trimmedPrevious}\n\n${trimmedIncoming}`.trim())
+    : trimmedIncoming;
 
   return {
     id: generateUniqueId('checkpoint'),
-    summary: data.summary,
+    summary: combinedSummary,
     highlights,
     eventIds,
     decisionIds,
@@ -228,7 +236,12 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       }
 
       const data = (await response.json()) as StoryCheckpointResponseBody;
-      const newCheckpoint = buildCheckpointFromResponse(data, pendingEvents, decisions);
+      const newCheckpoint = buildCheckpointFromResponse(
+        data,
+        pendingEvents,
+        decisions,
+        latestCheckpoint?.summary,
+      );
 
       const existingCheckpoints = worldState?.storyCheckpoints ?? [];
       useWorldStore.getState().updateWorldState(
