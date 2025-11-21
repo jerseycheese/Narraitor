@@ -81,7 +81,7 @@ Requirements:
   4. Do NOT merge, paraphrase, or rewrite the previous text. The final summary must be: [unchanged previous text] + [blank line or space] + [new sentences].`
       : 'Create an initial story summary from the provided events (no more than 75 words).'
   }
-- Always refer to the protagonist by their given name ("${payload.characterName ?? 'they'}"). Use third person pronouns instead of saying "the player" or second person narration.
+${payload.characterName ? '- Always refer to the protagonist by their given name ("' + payload.characterName + '").' : '- The protagonist prefers third-person pronouns; avoid saying "the player" or using second-person narration.'}
 - Use third-person limited voice that can be read aloud to players.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 
