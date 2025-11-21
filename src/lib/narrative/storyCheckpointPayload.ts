@@ -4,6 +4,7 @@ interface BuildStoryCheckpointPayloadParams {
   worldId: string;
   sessionId: string;
   characterId?: string;
+  characterName?: string;
   events: StoryCheckpointRequestBody['events'];
   decisions?: StoryCheckpointRequestBody['decisions'];
   narrativeSummary?: string;
@@ -15,6 +16,7 @@ export const buildStoryCheckpointPayload = ({
   worldId,
   sessionId,
   characterId,
+  characterName,
   events,
   decisions,
   narrativeSummary,
@@ -34,5 +36,6 @@ export const buildStoryCheckpointPayload = ({
     narrativeSummary: narrativeSummary || undefined,
     currentLocation: currentLocation || undefined,
     activeGoals: normalizedGoals && normalizedGoals.length > 0 ? normalizedGoals : undefined,
+    characterName: characterName || undefined,
   };
 };

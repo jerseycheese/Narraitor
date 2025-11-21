@@ -50,6 +50,7 @@ const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
     ? payload.activeGoals.map((goal, index) => `${index + 1}. ${goal}`).join('\n')
     : 'No explicit goals documented.';
 
+  const protagonistLabel = payload.characterName || 'the protagonist';
   const previousStory = payload.previousCheckpointSummary
     ? `\nPREVIOUS STORY SO FAR (DO NOT EDIT THIS TEXT):\n<<<PREVIOUS_SUMMARY>>>\n${payload.previousCheckpointSummary}\n<<<END_PREVIOUS_SUMMARY>>>\n`
     : '';
@@ -60,6 +61,7 @@ Context:
 - World ID: ${payload.worldId}
 - Session ID: ${payload.sessionId}
 - Active Character ID: ${payload.characterId || 'unknown'}
+- Active Character Name: ${protagonistLabel}
 - Current Location: ${location}
 - Current Narrative Summary: ${summary}
 - Active Goals:\n${goals}${previousStory}
@@ -80,6 +82,7 @@ Requirements:
   4. Do NOT merge, paraphrase, or rewrite the previous text. The final summary must be: [unchanged previous text] + [blank line or space] + [new sentences].`
       : 'Create an initial story summary from the provided events (no more than 75 words).'
   }
+- Always refer to the protagonist by name ("${protagonistLabel}") instead of saying "the player" or using second person.
 - Use third-person limited voice that can be read aloud to players.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 

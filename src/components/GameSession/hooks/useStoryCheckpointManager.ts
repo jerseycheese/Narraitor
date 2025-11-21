@@ -208,6 +208,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         worldId,
         sessionId,
         characterId,
+        characterName: characterId ? characterNameLookup[characterId] : undefined,
         events: formatEventsForApi(pendingEvents, characterNameLookup),
         decisions,
         narrativeSummary: narrativeContext.summary,

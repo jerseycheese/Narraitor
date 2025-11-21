@@ -21,6 +21,7 @@ export interface StoryCheckpointRequestBody {
   worldId: EntityID;
   sessionId: EntityID;
   characterId?: EntityID;
+  characterName?: string;
   events: StoryCheckpointEventPayload[];
   decisions?: StoryCheckpointDecisionPayload[];
   narrativeSummary?: string;
