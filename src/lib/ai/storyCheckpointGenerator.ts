@@ -82,7 +82,7 @@ Requirements:
       : 'Create an initial story summary from the provided events (no more than 75 words).'
   }
 ${payload.characterName ? '- Always refer to the protagonist by their given name ("' + payload.characterName + '").' : '- The protagonist prefers third-person pronouns; avoid saying "the player" or using second-person narration.'}
-- Use third-person limited voice that can be read aloud to players.
+- Use third-person limited voice and past-tense narration that can be read aloud to players.
 - Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
 
 Schema:
