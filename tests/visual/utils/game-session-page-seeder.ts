@@ -390,9 +390,13 @@ export async function seedStorySummaryForVisual(page: Page): Promise<void> {
     }
 
     const existingState = worldStore.worldStates?.[worldId];
-    if (existingState?.storyCheckpoints?.some((cp: { id: string }) => cp.id === 'checkpoint-visual-story')) {
-      return;
-    }
+     const sessionCheckpoints = existingState?.storyCheckpoints?.filter(
+       (cp: { sessionId?: string }) => cp.sessionId === sessionId,
+     ) ?? [];
+
+     if (sessionCheckpoints.some((cp: { id: string }) => cp.id === 'checkpoint-visual-story')) {
+       return;
+     }
 
     const majorEvents = [
       {
