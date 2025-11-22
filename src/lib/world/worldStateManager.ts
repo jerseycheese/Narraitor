@@ -585,10 +585,10 @@ export const recordStoryCheckpoint = (
   const currentState = ensureState(state, worldId);
   const timestamp = checkpoint.createdAt ?? getTimestamp();
   const checkpointId = checkpoint.id ?? `checkpoint-${timestamp}`;
-  const summary = checkpoint.summary?.trim();
+  const segment = checkpoint.segment?.trim();
 
-  if (!summary) {
-    throw new Error('Story checkpoint summary is required');
+  if (!segment) {
+    throw new Error('Story checkpoint segment is required');
   }
 
   const highlights = dedupeStrings(checkpoint.highlights ?? []).slice(0, 6);
@@ -602,7 +602,7 @@ export const recordStoryCheckpoint = (
     sessionId: checkpoint.sessionId ?? sessionId,
     characterId: checkpoint.characterId,
     createdAt: timestamp,
-    summary,
+    segment,
     highlights,
     eventIds,
     decisionIds,

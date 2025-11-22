@@ -27,11 +27,11 @@ export interface StoryCheckpointRequestBody {
   narrativeSummary?: string;
   currentLocation?: string;
   activeGoals?: string[];
-  previousCheckpointSummary?: string;
+  previousSegments?: string[]; // Last 2-3 checkpoint segments for narrative continuity
 }
 
 export interface StoryCheckpointResponseBody {
-  summary: string;
+  segment: string; // 50-75 word immutable segment about events in this checkpoint only
   highlights: string[];
   majorEvents: string[];
   characterDevelopment: string[];

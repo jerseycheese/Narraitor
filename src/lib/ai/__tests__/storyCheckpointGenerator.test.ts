@@ -47,7 +47,7 @@ describe('generateStoryCheckpointSummary', () => {
   it('parses structured JSON from Gemini responses', async () => {
     mockClient.generateContent.mockResolvedValue({
       content: JSON.stringify({
-        summary: 'Maera disbands the council, forcing the player underground.',
+        segment: 'Maera disbanded the council, forcing the player underground.',
         highlights: ['Council dissolved', 'Royal guard split'],
         majorEvents: ['Maera disbands the council'],
         characterDevelopment: ['Player now leads a resistance cell'],
@@ -62,7 +62,7 @@ describe('generateStoryCheckpointSummary', () => {
 
     const result = await generateStoryCheckpointSummary(basePayload);
 
-    expect(result.summary).toContain('Maera disbands the council');
+    expect(result.segment).toContain('Maera disbanded the council');
     expect(result.highlights).toEqual(['Council dissolved', 'Royal guard split']);
     expect(result.majorEvents).toEqual(['Maera disbands the council']);
     expect(result.model).toBe('gemini-test');
@@ -74,7 +74,7 @@ describe('generateStoryCheckpointSummary', () => {
 
     const result = await generateStoryCheckpointSummary(basePayload);
 
-    expect(result.summary).toContain('Maera dissolved the council');
+    expect(result.segment).toContain('Maera dissolved the council');
     expect(result.highlights).toHaveLength(1);
     expect(result.majorEvents).toEqual(['Maera dissolved the council']);
     expect(result.model).toBe('fallback');

@@ -110,6 +110,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'At least one major event is required to create a checkpoint.' }, { status: 400 });
     }
 
+    const previousSegments = Array.isArray(rawBody?.previousSegments)
+      ? rawBody.previousSegments
+          .map((seg: unknown) => (typeof seg === 'string' ? safeTrim(seg) : ''))
+          .filter((seg: string) => Boolean(seg))
+      : undefined;
+
     const payload: StoryCheckpointRequestBody = {
       worldId,
       sessionId,
@@ -124,8 +130,16 @@ export async function POST(request: NextRequest) {
             .filter((goal: string) => Boolean(goal))
             .slice(0, 5)
         : undefined,
-      previousCheckpointSummary: rawBody?.previousCheckpointSummary ? safeTrim(String(rawBody.previousCheckpointSummary)) : undefined,
+      characterName: rawBody?.characterName ? safeTrim(String(rawBody.characterName)) : undefined,
+      previousSegments,
     };
+
+    console.log('🔍 API CHECKPOINT DEBUG:', {
+      eventsCount: events.length,
+      eventDescriptions: events.map(e => e.description),
+      previousSegmentsCount: previousSegments?.length ?? 0,
+      previousSegments: previousSegments?.map((seg, i) => `[${i + 1}] ${seg.substring(0, 80)}...`),
+    });
 
     const summary = await generateStoryCheckpointSummary(payload);
     return NextResponse.json(summary);

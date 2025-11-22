@@ -136,19 +136,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
 
   // Debug: log key state changes to help diagnose skeleton readiness
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    console.log('[ActiveGameSession]', {
-      sessionId,
-      worldId,
-      initialized,
-      segments: segmentCount,
-      isGenerating,
-      isGeneratingChoices,
-      hasValidChoices: !!hasValidChoices,
-      isGameReady,
-    });
-  }, [sessionId, worldId, initialized, segmentCount, isGenerating, isGeneratingChoices, hasValidChoices, isGameReady]);
+  // (Commented out to reduce console noise)
 
   // Safety net: if no narrative segment arrives within a reasonable window,
   // inject a minimal fallback scene so the UI can progress.

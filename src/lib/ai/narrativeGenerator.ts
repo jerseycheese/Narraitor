@@ -1082,6 +1082,9 @@ Return ONLY the rewritten narrative.`;
         // Only parse if we have a complete JSON structure
         if (jsonEnd !== -1) {
           const parsed = JSON.parse(jsonStr);
+          console.log('\n=== NARRATIVE PARSE DEBUG ===');
+          console.log('Full parsed response:', JSON.stringify(parsed, null, 2));
+          console.log('=== END NARRATIVE PARSE DEBUG ===\n');
           if (parsed.content) {
             actualContent = parsed.content;
           }
@@ -1146,6 +1149,11 @@ Return ONLY the rewritten narrative.`;
                   ? safeTrim(String(parsed.metadata.majorEvent)).slice(0, 180)
                   : undefined,
             };
+
+            console.log('\n=== MAJOR EVENT DEBUG ===');
+            console.log('Raw metadata.majorEvent from AI:', parsed?.metadata?.majorEvent);
+            console.log('Extracted majorEvent:', metadata?.majorEvent);
+            console.log('=== END MAJOR EVENT DEBUG ===\n');
           }
         }
       } catch {

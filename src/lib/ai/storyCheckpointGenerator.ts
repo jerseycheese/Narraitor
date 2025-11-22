@@ -1,12 +1,14 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
+import fs from 'fs';
+import path from 'path';
 
 const RESPONSE_SCHEMA = `{
-  "summary": "2-3 sentences explaining the story state so far",
-  "highlights": ["3 bullets distilling the most consequential beats"],
-  "majorEvents": ["Chronological recap of major events"],
-  "characterDevelopment": ["Statements about character growth or setbacks"],
+  "segment": "2-3 sentences (50-75 words) summarizing ONLY the events provided in this checkpoint",
+  "highlights": ["3 bullets distilling the most consequential beats from these events"],
+  "majorEvents": ["Chronological recap of the major events in this checkpoint"],
+  "characterDevelopment": ["Statements about character growth or setbacks from these events"],
   "nextHooks": ["Concrete story hooks or questions to pursue next"],
   "themes": ["Optional list of tonal throughlines"],
   "includedEvents": 3,
@@ -44,49 +46,47 @@ const formatDecisions = (decisions: StoryCheckpointRequestBody['decisions']): st
 const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
   const eventsText = formatEvents(payload.events);
   const decisionText = formatDecisions(payload.decisions ?? []);
-  const summary = payload.narrativeSummary || 'Not provided';
   const location = payload.currentLocation || 'Unknown';
   const goals = payload.activeGoals && payload.activeGoals.length > 0
     ? payload.activeGoals.map((goal, index) => `${index + 1}. ${goal}`).join('\n')
     : 'No explicit goals documented.';
 
-  const previousStory = payload.previousCheckpointSummary
-    ? `\nPREVIOUS STORY SO FAR (DO NOT EDIT THIS TEXT):\n<<<PREVIOUS_SUMMARY>>>\n${payload.previousCheckpointSummary}\n<<<END_PREVIOUS_SUMMARY>>>\n`
+  // Build recent story context if available
+  const storyContext = payload.previousSegments && payload.previousSegments.length > 0
+    ? `\nRECENT STORY (for context only - DO NOT retell this):\n${payload.previousSegments.join('\n\n')}\n`
     : '';
 
-  return `You are Narraitor's narrative continuity analyst. Use supplied events and decisions to create a checkpoint recap that preserves long-form campaign stakes.
+  return `You are writing an ongoing story. ${storyContext ? 'Continue the narrative naturally from where it left off.' : 'Begin the story with this opening scene.'}
 
-Context:
-- World ID: ${payload.worldId}
-- Session ID: ${payload.sessionId}
-- Active Character ID: ${payload.characterId || 'unknown'}
-- Active Character Name: ${payload.characterName || '[not provided]'}
-- Current Location: ${location}
-- Current Narrative Summary: ${summary}
-- Active Goals:\n${goals}${previousStory}
-Major Events Since Last Checkpoint:\n${eventsText}
+${storyContext}
+Setting Context:
+- Location: ${location}
+- Active Goals: ${goals}
+${payload.characterName ? `- Protagonist: ${payload.characterName}` : '- Protagonist: [unnamed character]'}
 
-Player Decisions:\n${decisionText}
+NEW EVENTS (write the next beat of the story based on these):
+${eventsText}
+${decisionText ? `\nPlayer Decisions:\n${decisionText}` : ''}
 
-Requirements:
-- Only use provided inputs. Do NOT invent events or decisions.
-- Treat major events as the authoritative canon. Reference decisions only if they caused the events.
-- Highlight character transformations, world changes, and critical turning points explicitly.
-- ${
-    payload.previousCheckpointSummary
-      ? `CRITICAL SUMMARY INSTRUCTION:
-  1. Copy the text between <<<PREVIOUS_SUMMARY>>> markers exactly as-is (including punctuation, casing, spacing).
-  2. Paste that text at the very beginning of summary without changes.
-  3. After the copied text, add two new sentences (50-75 words total) describing ONLY the new events provided above.
-  4. Do NOT merge, paraphrase, or rewrite the previous text. The final summary must be: [unchanged previous text] + [blank line or space] + [new sentences].`
-      : 'Create an initial story summary from the provided events (no more than 75 words).'
-  }
-${payload.characterName ? '- Always refer to the protagonist by their given name ("' + payload.characterName + '").' : '- The protagonist prefers third-person pronouns; avoid saying "the player" or using second-person narration.'}
-- Use third-person limited voice and past-tense narration that can be read aloud to players.
-- Each sentence must advance the story with a new development or consequence. Do not restate the same confrontation unless the outcome changed.
-- Return STRICT JSON shaped like the schema below. Do not wrap in markdown fences.
+NARRATIVE WRITING REQUIREMENTS:
+${storyContext ? `- Build naturally from the recent story above - DO NOT retell or re-summarize what already happened
+- Write what happens NEXT as a continuation of the ongoing narrative
+- Use transitions and connective phrases to flow from the previous beat` : '- Set the opening scene for this new story'}
+- Write in a continuous narrative style, like a novel, not a summary or timeline
+- Vary sentence structure: mix short punchy sentences with longer flowing ones
+- Create cause-and-effect flow: show how events connect and build on each other
+- Maintain tension and pacing appropriate to the action
+- Length: 50-75 words (approximately 2-3 sentences)
+- Treat the events listed above as authoritative canon
+${payload.characterName ? `- Refer to the protagonist naturally: ${storyContext ? `since this continues an ongoing story, use first name only ("${payload.characterName.split(' ')[0]}") or pronouns (she/he/they) throughout` : `use "${payload.characterName}" for the first reference in this opening segment, then use first name only ("${payload.characterName.split(' ')[0]}") or pronouns (she/he/they) for subsequent references`}` : '- Use third-person pronouns for the protagonist'}
+- Write ONLY in past tense (was/were, did, had) - NEVER present tense (is/are, does, has)
+- Use third-person limited perspective that can be read aloud
 
-Schema:
+EXAMPLE OF GOOD NARRATIVE FLOW:
+Instead of: "The hero entered the tavern. The hero ordered a drink. The hero noticed a stranger."
+Write like: "The hero pushed through the tavern's creaking door, the warm firelight a stark contrast to the cold rain outside. She ordered a whiskey, neat—and that's when she noticed the hooded stranger watching from the corner booth."
+
+Return STRICT JSON (no markdown fences):
 ${RESPONSE_SCHEMA}
 `;
 };
@@ -120,13 +120,13 @@ const parseResponse = (content: string): StoryCheckpointResponseBody => {
   }
 
   const parsed = JSON.parse(payload);
-  const summary = sanitizeString(parsed.summary);
-  if (!summary) {
-    throw new Error('Summary missing from AI response');
+  const segment = sanitizeString(parsed.segment);
+  if (!segment) {
+    throw new Error('Segment missing from AI response');
   }
 
   return {
-    summary,
+    segment,
     highlights: sanitizeArray(parsed.highlights, []),
     majorEvents: sanitizeArray(parsed.majorEvents, []),
     characterDevelopment: sanitizeArray(parsed.characterDevelopment, []),
@@ -144,6 +144,14 @@ export const generateStoryCheckpointSummary = async (
 ): Promise<StoryCheckpointResponseBody> => {
   const client = createDefaultGeminiClient();
   const prompt = buildPrompt(payload);
+
+  console.log('🔍 GENERATOR DEBUG - Prompt Context:', {
+    eventsCount: payload.events.length,
+    events: payload.events.map(e => e.description),
+    previousSegmentsCount: payload.previousSegments?.length ?? 0,
+    previousSegments: payload.previousSegments?.map((seg, i) => `[${i + 1}] ${seg.substring(0, 100)}...`),
+  });
+
   const response = await client.generateContent(prompt);
 
   if (!response.content) {
@@ -153,16 +161,13 @@ export const generateStoryCheckpointSummary = async (
   try {
     return parseResponse(response.content);
   } catch {
+    // Fallback: create a simple segment from event descriptions
     const eventText = payload.events
       .map((event) => `${event.characterName ? `${event.characterName} ` : ''}${event.description}`)
-      .join(' ');
-
-    const fallbackSummary = payload.previousCheckpointSummary
-      ? `${payload.previousCheckpointSummary.trim()} ${eventText}`.trim()
-      : eventText;
+      .join('. ');
 
     return {
-      summary: fallbackSummary || 'Recent events logged but AI summary unavailable.',
+      segment: eventText || 'Recent events logged but AI summary unavailable.',
       highlights: sanitizeArray(payload.events.map((event) => event.description).slice(0, 3)),
       majorEvents: sanitizeArray(payload.events.map((event) => event.description)),
       characterDevelopment: [],

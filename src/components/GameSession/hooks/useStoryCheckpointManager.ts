@@ -21,10 +21,9 @@ const buildCheckpointFromResponse = (
   data: StoryCheckpointResponseBody,
   pendingEvents: WorldStateMajorEvent[],
   decisions: StoryCheckpointDecisionPayload[],
-  previousSummary?: string,
 ): {
   id: string;
-  summary: string;
+  segment: string;
   highlights: string[];
   eventIds: string[];
   decisionIds: string[];
@@ -40,17 +39,10 @@ const buildCheckpointFromResponse = (
   const highlights = data.highlights?.length ? data.highlights : fallbackHighlights;
   const eventIds = pendingEvents.map(event => event.id);
   const decisionIds = decisions.map(decision => decision.id);
-  const trimmedPrevious = previousSummary?.trim() || '';
-  const trimmedIncoming = data.summary.trim();
-  const combinedSummary = trimmedPrevious
-    ? (trimmedIncoming.startsWith(trimmedPrevious)
-      ? trimmedIncoming
-      : `${trimmedPrevious}\n\n${trimmedIncoming}`.trim())
-    : trimmedIncoming;
 
   return {
     id: generateUniqueId('checkpoint'),
-    summary: combinedSummary,
+    segment: data.segment,
     highlights,
     eventIds,
     decisionIds,
@@ -58,7 +50,7 @@ const buildCheckpointFromResponse = (
       includedEvents: data.includedEvents,
       includedDecisions: data.includedDecisions,
       lastEventTimestamp: data.lastEventTimestamp ?? pendingEvents[pendingEvents.length - 1]?.timestamp,
-      promptVersion: 'story-checkpoint-v1',
+      promptVersion: 'story-checkpoint-v2',
       aiModel: data.model,
     },
   };
@@ -224,16 +216,42 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
     try {
       const decisions = buildDecisionPayload(sessionId);
       const narrativeContext = collectNarrativeContext(sessionId);
+
+      // Get last 2-3 checkpoint segments for narrative continuity
+      const existingCheckpoints = worldState?.storyCheckpoints ?? [];
+      const sessionCheckpoints = existingCheckpoints
+        .filter(cp => cp.sessionId === sessionId)
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt)); // Chronological order
+      const previousSegments = sessionCheckpoints
+        .slice(-3) // Last 3 checkpoints
+        .map(cp => cp.segment)
+        .filter(Boolean);
+
+      console.log('🔍 CHECKPOINT DEBUG - Previous Segments:', {
+        totalCheckpoints: sessionCheckpoints.length,
+        previousSegmentsCount: previousSegments.length,
+        previousSegments: previousSegments.map((seg, i) => `[${i + 1}] ${seg.substring(0, 100)}...`),
+      });
+
+      const formattedEvents = formatEventsForApi(pendingEvents, characterNameLookup);
+      console.log('🔍 CHECKPOINT DEBUG - Events for this checkpoint:', {
+        pendingEventsCount: pendingEvents.length,
+        events: formattedEvents.map(e => ({
+          description: e.description,
+          timestamp: e.timestamp,
+        })),
+      });
+
       const payload = buildStoryCheckpointPayload({
         worldId,
         sessionId,
         characterId,
         characterName: characterId ? characterNameLookup[characterId] : undefined,
-        events: formatEventsForApi(pendingEvents, characterNameLookup),
+        events: formattedEvents,
         decisions,
         narrativeSummary: narrativeContext.summary,
         currentLocation: narrativeContext.location,
-        previousCheckpointSummary: latestCheckpoint?.summary,
+        previousSegments,
       });
 
       const response = await fetch('/api/narrative/story-checkpoint', {
@@ -248,14 +266,8 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       }
 
       const data = (await response.json()) as StoryCheckpointResponseBody;
-      const newCheckpoint = buildCheckpointFromResponse(
-        data,
-        pendingEvents,
-        decisions,
-        latestCheckpoint?.summary,
-      );
+      const newCheckpoint = buildCheckpointFromResponse(data, pendingEvents, decisions);
 
-      const existingCheckpoints = worldState?.storyCheckpoints ?? [];
       useWorldStore.getState().updateWorldState(
         worldId,
         {
@@ -272,7 +284,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       setStatus('error');
       setError(checkpointError instanceof Error ? checkpointError.message : 'Unknown error creating checkpoint.');
     }
-  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints, latestCheckpoint?.summary]);
+  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints]);
 
   // Auto-trigger checkpoint creation when there's at least 1 pending event
   React.useEffect(() => {

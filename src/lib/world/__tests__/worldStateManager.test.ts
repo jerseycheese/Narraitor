@@ -56,7 +56,7 @@ describe('worldStateManager', () => {
       state,
       {
         id: 'checkpoint-ended',
-        summary: 'Recap of the doomed arc',
+        segment: 'Recap of the doomed arc',
         highlights: ['Kingdom collapsed'],
         eventIds: ['event-ended'],
       },
@@ -68,7 +68,7 @@ describe('worldStateManager', () => {
       state,
       {
         id: 'checkpoint-active',
-        summary: 'Festival recap',
+        segment: 'Festival recap',
         highlights: ['City celebrated the hero'],
         eventIds: ['event-active'],
       },
@@ -216,7 +216,7 @@ describe('worldStateManager', () => {
         storyCheckpoints: [
           {
             id: 'checkpoint-1',
-            summary: 'First chapter recap',
+            segment: 'First chapter recap',
             highlights: ['Hero met mentor'],
             eventIds: ['event-1'],
           },
@@ -226,7 +226,7 @@ describe('worldStateManager', () => {
     );
 
     expect(state.storyCheckpoints).toHaveLength(1);
-    expect(state.storyCheckpoints[0].summary).toBe('First chapter recap');
+    expect(state.storyCheckpoints[0].segment).toBe('First chapter recap');
     expect(state.storyCheckpoints[0].eventIds).toEqual(['event-1']);
     expect(state.storyCheckpoints[0].sessionId).toBe('session-story');
   });
@@ -238,7 +238,7 @@ describe('worldStateManager', () => {
       base,
       {
         id: 'checkpoint-shared',
-        summary: 'Old arc summary',
+        segment: 'Old arc summary',
         highlights: ['Old highlight'],
         eventIds: ['event-old'],
         createdAt: '2025-01-01T00:00:00.000Z',
@@ -251,7 +251,7 @@ describe('worldStateManager', () => {
       base,
       {
         id: 'checkpoint-shared',
-        summary: 'Updated arc summary',
+        segment: 'Updated arc summary',
         highlights: ['New highlight'],
         eventIds: ['event-new'],
         createdAt: '2025-01-02T00:00:00.000Z',
@@ -261,7 +261,7 @@ describe('worldStateManager', () => {
 
     const merged = mergeState(current, incoming);
     expect(merged.storyCheckpoints).toHaveLength(1);
-    expect(merged.storyCheckpoints[0].summary).toBe('Updated arc summary');
+    expect(merged.storyCheckpoints[0].segment).toBe('Updated arc summary');
     expect(merged.storyCheckpoints[0].eventIds).toEqual(['event-new']);
   });
 });

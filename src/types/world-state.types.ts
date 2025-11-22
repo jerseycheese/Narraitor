@@ -26,13 +26,17 @@ export interface WorldStateMajorEvent {
 
 /**
  * Story checkpoint snapshots aggregate major events and AI summaries.
+ *
+ * Each checkpoint stores an immutable segment (50-75 words) summarizing only the events
+ * included in that checkpoint. The full "Story So Far" is built by concatenating all
+ * checkpoint segments for a session in chronological order.
  */
 export interface StoryCheckpoint {
   id: EntityID;
   sessionId: EntityID;
   characterId?: EntityID;
   createdAt: ISODateString;
-  summary: string;
+  segment: string; // Immutable 50-75 word summary of events in this checkpoint only
   highlights: string[];
   eventIds: EntityID[];
   decisionIds?: EntityID[];
