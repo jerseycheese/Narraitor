@@ -8,10 +8,14 @@ export const majorEventGuidelines = `MAJOR EVENT METADATA RULES:
   5. Story-changing events (combat outcomes, character injury/death, dramatic arrivals/departures)
 - Set metadata.majorEvent to null for routine actions like:
   - Simple conversations without revelations
-  - Minor location changes (moving between rooms in same building)
+  - Movement/walking/traveling to nearby locations (unless arriving at a completely new area for the first time)
+  - Following something or someone without reaching a destination
+  - Taking steps, approaching objects, getting closer to things
   - Routine item acquisition (picking up common items)
   - Small talk or casual interactions
   - Observing the environment without discovery
+  - Investigating or examining things without finding anything significant
+- MAGNITUDE MATTERS: If the action is incremental progress toward something (walking closer, moving forward, following a trail), it's NOT a major event. Only the ARRIVAL or DISCOVERY at the destination counts.
 - Set metadata.majorEvent to ONE short clause (max ~18 words) describing what happened.
 - One major event per segment only; choose the most consequential beat.
 - Describe the event plainly (no markdown, no stats, no player-perspective language) so downstream systems can summarize it.`;
