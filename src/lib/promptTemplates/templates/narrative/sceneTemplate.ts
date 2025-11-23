@@ -131,7 +131,7 @@ Response Format:
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["relevant", "scene", "tags"],
-    "majorEvent": "Single concise clause describing the transformation/world change/turning point, or null if nothing qualifies"
+    "majorEvent": "Review the content field above. If it contains a transformation/world change/turning point, extract and summarize THAT SPECIFIC MOMENT in one short clause (max 18 words). Otherwise null. Must describe what ACTUALLY HAPPENED in your narrative."
   }
 }`;
 };
