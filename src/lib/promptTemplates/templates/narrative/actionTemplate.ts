@@ -84,7 +84,7 @@ Response Format:
     "mood": "appropriate mood",
     "location": "Current location",
     "tags": ["item-usage", "action-beat"],
-    "majorEvent": "Short clause for a transformation/world shift/turning point caused by this beat, or null if nothing qualifies"
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }`;
 };

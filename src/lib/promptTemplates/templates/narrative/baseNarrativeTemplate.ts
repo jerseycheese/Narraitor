@@ -113,7 +113,7 @@ Response Format:
     "mood": "mysterious",
     "location": "Current location name",
     "tags": ["relevant", "tags"],
-    "majorEvent": "Short clause for the single most significant change, or null when no qualifying event occurs"
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }`;
 };

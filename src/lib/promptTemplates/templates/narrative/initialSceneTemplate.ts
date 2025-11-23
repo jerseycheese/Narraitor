@@ -98,7 +98,7 @@ Response Format (CRITICAL - must be valid JSON):
     "mood": "mysterious",
     "location": "Starting location",
     "tags": ["opening", "introduction"],
-    "majorEvent": "Short clause describing the single most significant transformation/world shift/turning point, or null if the opener only sets context"
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }
 

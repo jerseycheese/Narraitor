@@ -79,7 +79,7 @@ Response Format:
     "mood": "appropriate mood",
     ${newLocation ? `"location": "${newLocation}",` : ''}
     "tags": ["transition"],
-    "majorEvent": "Short clause if this transition marks a transformation/world change/critical turning point, else null"
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }`;
 };
