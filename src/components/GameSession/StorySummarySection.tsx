@@ -63,7 +63,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
             <div className="text-xs text-gray-500 mb-2">Updated {lastUpdatedLabel}</div>
           )}
           {summaryParagraphs.length > 0 ? (
-            <div className="text-sm text-gray-800 leading-relaxed space-y-3">
+            <div className="prose prose-sm prose-gray max-w-none dark:prose-invert">
               {summaryParagraphs.map((paragraph, index) => (
                 <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
               ))}

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import typography from '@tailwindcss/typography'
 import { primitiveColors } from './src/lib/design-tokens'
 
 const config: Config = {
@@ -78,7 +79,58 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    typography({
+      theme: {
+        DEFAULT: {
+          css: {
+            // Align prose colors with design tokens
+            '--tw-prose-body': primitiveColors.gray['800'],
+            '--tw-prose-headings': primitiveColors.gray['900'],
+            '--tw-prose-links': primitiveColors.blue['500'],
+            '--tw-prose-bold': primitiveColors.gray['900'],
+            '--tw-prose-bullets': primitiveColors.gray['500'],
+            '--tw-prose-quotes': primitiveColors.gray['900'],
+            '--tw-prose-quote-borders': primitiveColors.gray['300'],
+            '--tw-prose-captions': primitiveColors.gray['600'],
+            '--tw-prose-code': primitiveColors.gray['900'],
+            '--tw-prose-pre-code': primitiveColors.gray['200'],
+            '--tw-prose-pre-bg': primitiveColors.gray['800'],
+            '--tw-prose-th-borders': primitiveColors.gray['300'],
+            '--tw-prose-td-borders': primitiveColors.gray['200'],
+            color: primitiveColors.gray['800'],
+            a: {
+              color: primitiveColors.blue['500'],
+              '&:hover': {
+                color: primitiveColors.blue['700'],
+              },
+            },
+            strong: {
+              color: primitiveColors.gray['900'],
+            },
+          },
+        },
+        // Dark mode variant
+        invert: {
+          css: {
+            '--tw-prose-body': primitiveColors.gray['300'],
+            '--tw-prose-headings': primitiveColors.white,
+            '--tw-prose-links': primitiveColors.blue['400'],
+            '--tw-prose-bold': primitiveColors.white,
+            '--tw-prose-bullets': primitiveColors.gray['400'],
+            '--tw-prose-quotes': primitiveColors.gray['100'],
+            '--tw-prose-quote-borders': primitiveColors.gray['700'],
+            '--tw-prose-captions': primitiveColors.gray['400'],
+            '--tw-prose-code': primitiveColors.white,
+            '--tw-prose-pre-code': primitiveColors.gray['300'],
+            '--tw-prose-pre-bg': primitiveColors.gray['900'],
+            '--tw-prose-th-borders': primitiveColors.gray['600'],
+            '--tw-prose-td-borders': primitiveColors.gray['700'],
+          },
+        },
+      },
+    }),
+  ],
 }
 
 export default config
