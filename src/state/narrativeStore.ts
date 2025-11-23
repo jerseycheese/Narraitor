@@ -44,6 +44,7 @@ interface WorldStateUpdateParams {
   originalSegmentData: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>;
   finalMetadata: NarrativeMetadata;
   sessionId: EntityID;
+  isFirstSegment: boolean;
 }
 
 async function applyWorldStateThreadUpdates({
@@ -51,6 +52,7 @@ async function applyWorldStateThreadUpdates({
   originalSegmentData,
   finalMetadata,
   sessionId,
+  isFirstSegment,
 }: WorldStateUpdateParams): Promise<void> {
   try {
     if (!sessionStoreModule) {
@@ -191,14 +193,85 @@ async function applyWorldStateThreadUpdates({
       updatePayload.characterRelationships = relationshipUpdates;
     }
 
-    // Add major event if AI identified one
-    if (finalMetadata.majorEvent) {
-      updatePayload.majorEvents = [{
-        id: generateUniqueId('event'),
-        description: finalMetadata.majorEvent,
-        timestamp: getTimestamp(),
-        characterId: activeCharacterId,
-      }];
+    // Add major event if AI identified one OR if this is the first segment
+    // First segment always creates a checkpoint to ensure "The Story So Far" has content
+    if (finalMetadata.majorEvent || isFirstSegment) {
+      // Generate event description - use AI's majorEvent if provided, otherwise create opening event
+      const eventDescription = finalMetadata.majorEvent ||
+        (finalMetadata.location
+          ? `Story begins at ${finalMetadata.location}`
+          : 'Your adventure begins');
+
+      if (isFirstSegment) {
+        // First segment ALWAYS creates a checkpoint - skip validation
+        logger.info('[NarrativeStore]', 'Creating checkpoint for opening scene', {
+          eventDescription,
+          location: finalMetadata.location,
+          hasAIMajorEvent: !!finalMetadata.majorEvent,
+        });
+
+        updatePayload.majorEvents = [{
+          id: generateUniqueId('event'),
+          description: eventDescription,
+          timestamp: getTimestamp(),
+          characterId: activeCharacterId,
+        }];
+      } else {
+        // Subsequent segments: validate event significance via API
+        try {
+          const validationResponse = await fetch('/api/narrative/validate-event-significance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              majorEvent: finalMetadata.majorEvent,
+              context: {
+                location: finalMetadata.location,
+                recentNarrative: newSegment.content?.substring(0, 200), // First 200 chars for context
+              },
+            }),
+          });
+
+          if (!validationResponse.ok) {
+            throw new Error(`Validation API error: ${validationResponse.status}`);
+          }
+
+          const validationResult = await validationResponse.json();
+
+          logger.info('[NarrativeStore]', 'Event significance validation', {
+            majorEvent: finalMetadata.majorEvent,
+            isSignificant: validationResult.isSignificant,
+            reason: validationResult.reason,
+          });
+
+          // Only create major event if validation passes
+          if (validationResult.isSignificant) {
+            updatePayload.majorEvents = [{
+              id: generateUniqueId('event'),
+              description: finalMetadata.majorEvent,
+              timestamp: getTimestamp(),
+              characterId: activeCharacterId,
+            }];
+          } else {
+            logger.debug('[NarrativeStore]', 'Major event filtered out', {
+              majorEvent: finalMetadata.majorEvent,
+              reason: validationResult.reason,
+            });
+          }
+        } catch (error) {
+          // If validation fails, default to accepting the event (fail open)
+          logger.warn('[NarrativeStore]', 'Event validation failed, accepting event', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            majorEvent: finalMetadata.majorEvent,
+          });
+
+          updatePayload.majorEvents = [{
+            id: generateUniqueId('event'),
+            description: finalMetadata.majorEvent,
+            timestamp: getTimestamp(),
+            characterId: activeCharacterId,
+          }];
+        }
+      }
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
@@ -668,10 +741,14 @@ export const useNarrativeStore = create<NarrativeStore>()(
       createdAt: now,
     };
 
+    // Check if this is the first segment BEFORE updating state
+    const sessionSegmentsBeforeAdd = get().sessionSegments[sessionId] || [];
+    const isFirstSegment = sessionSegmentsBeforeAdd.length === 0;
+
     set((state) => {
       // Initialize session segments if not exists
       const sessionSegments = state.sessionSegments[sessionId] || [];
-      
+
       return {
         segments: {
           ...state.segments,
@@ -713,6 +790,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       originalSegmentData: segmentData,
       finalMetadata,
       sessionId,
+      isFirstSegment,
     });
 
     return segmentId;

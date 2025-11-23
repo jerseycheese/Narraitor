@@ -134,4 +134,121 @@ describe('Narrative store world state integration', () => {
     const lifecycle = useSessionStore.getState().getSessionLifecycle(sessionId);
     expect(lifecycle?.status).toBe('ended');
   });
+
+  it('creates checkpoint from opening scene ensuring Story So Far has content', async () => {
+    // Mock fetch for validation API
+    global.fetch = jest.fn();
+
+    const worldId = useWorldStore.getState().createWorld({
+      name: 'Adventure World',
+      description: 'A world for testing checkpoint creation',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 5,
+        maxSkills: 5,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
+    });
+
+    const sessionId = 'session-checkpoint-flow';
+    const characterId = 'character-adventurer';
+
+    useSessionStore.getState().upsertSessionLifecycle({
+      id: sessionId,
+      worldId,
+      characterId,
+      status: 'active',
+      lastActivity: new Date().toISOString(),
+    });
+
+    // Step 1: Add opening segment (no majorEvent from AI)
+    await useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'You awaken in a dimly lit chamber. Ancient runes glow faintly on the walls.',
+      type: 'scene',
+      metadata: {
+        tags: ['intro'],
+        characterIds: [characterId],
+        location: 'Ancient Chamber',
+      },
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Verify checkpoint was created for opening scene
+    let worldState = useWorldStore.getState().worlds[worldId];
+    expect(worldState.majorEvents).toHaveLength(1);
+    expect(worldState.majorEvents[0].description).toBe('Story begins at Ancient Chamber');
+    expect(global.fetch).not.toHaveBeenCalled(); // No validation for first segment
+
+    // Step 2: Mock validation API to reject trivial event
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        isSignificant: false,
+        reason: 'Walking is not a significant event',
+      }),
+    });
+
+    // Add second segment with trivial event
+    await useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'You walk across the chamber, your footsteps echoing.',
+      type: 'scene',
+      metadata: {
+        tags: [],
+        characterIds: [characterId],
+        location: 'Ancient Chamber',
+        majorEvent: 'Character walks across the chamber',
+      },
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Verify validation was called and trivial event was filtered out
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    worldState = useWorldStore.getState().worlds[worldId];
+    expect(worldState.majorEvents).toHaveLength(1); // Still only the opening event
+
+    // Step 3: Mock validation API to accept significant event
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        isSignificant: true,
+        reason: 'Discovering ancient artifacts is significant',
+      }),
+    });
+
+    // Add third segment with significant event
+    await useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'You discover an ancient tome containing forbidden knowledge.',
+      type: 'scene',
+      metadata: {
+        tags: [],
+        characterIds: [characterId],
+        location: 'Ancient Chamber',
+        majorEvent: 'Character discovers the Tome of Forbidden Knowledge',
+      },
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Verify significant event created a checkpoint
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    worldState = useWorldStore.getState().worlds[worldId];
+    expect(worldState.majorEvents).toHaveLength(2);
+    expect(worldState.majorEvents[1].description).toBe('Character discovers the Tome of Forbidden Knowledge');
+
+    jest.restoreAllMocks();
+  });
 });
