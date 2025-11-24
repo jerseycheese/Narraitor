@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useStoryCheckpointManager } from './hooks/useStoryCheckpointManager';
-import { formatRelativeTime } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
 
 interface StorySummarySectionProps {
@@ -28,7 +27,7 @@ const buildStoryFromCheckpoints = (
 };
 
 export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldId, sessionId, characterId }) => {
-  const { latestCheckpoint } = useStoryCheckpointManager({ worldId, sessionId, characterId });
+  useStoryCheckpointManager({ worldId, sessionId, characterId });
   const worldState = useWorldStore(state => worldId ? state.worldStates[worldId] : undefined);
 
   // Get all checkpoints for this session
@@ -43,10 +42,6 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
     [checkpointsForSession]
   );
 
-  const lastUpdatedLabel = latestCheckpoint?.createdAt
-    ? formatRelativeTime(latestCheckpoint.createdAt)
-    : null;
-
   // Split full story into paragraphs
   const summaryParagraphs = fullStory
     ? fullStory
@@ -59,11 +54,8 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
     <section className="mt-6" data-testid="story-summary-section">
       <CollapsibleSection title="The Story So Far" initialCollapsed>
         <div>
-          {lastUpdatedLabel && (
-            <div className="text-xs text-gray-500 mb-2">Updated {lastUpdatedLabel}</div>
-          )}
           {summaryParagraphs.length > 0 ? (
-            <div className="prose prose-sm prose-gray max-w-none dark:prose-invert">
+            <div className="prose prose-gray max-w-none dark:prose-invert">
               {summaryParagraphs.map((paragraph, index) => (
                 <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
               ))}

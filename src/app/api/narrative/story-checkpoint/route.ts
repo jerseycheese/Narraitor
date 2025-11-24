@@ -1,11 +1,38 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
+import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
 
 const MAX_EVENTS = 10;
 const MAX_DECISIONS = 5;
+
+const sanitizeToneSettings = (toneSettings: unknown): ToneSettings | undefined => {
+  if (!toneSettings || typeof toneSettings !== 'object') {
+    return undefined;
+  }
+
+  const record = toneSettings as Record<string, unknown>;
+  const contentRating = record.contentRating;
+  const narrativeStyle = record.narrativeStyle;
+  const languageComplexity = record.languageComplexity;
+  const customInstructions = record.customInstructions;
+
+  const isString = (value: unknown): value is string => typeof value === 'string';
+  if (!isString(contentRating) || !isString(narrativeStyle) || !isString(languageComplexity)) {
+    return undefined;
+  }
+
+  return {
+    contentRating,
+    narrativeStyle,
+    languageComplexity,
+    ...(isString(customInstructions) && customInstructions.trim()
+      ? { customInstructions: customInstructions.trim() }
+      : {}),
+  };
+};
 
 const sanitizeEvents = (
   events: unknown,
@@ -132,6 +159,7 @@ export async function POST(request: NextRequest) {
         : undefined,
       characterName: rawBody?.characterName ? safeTrim(String(rawBody.characterName)) : undefined,
       previousSegments,
+      toneSettings: sanitizeToneSettings(rawBody?.toneSettings),
     };
 
     console.log('🔍 API CHECKPOINT DEBUG:', {

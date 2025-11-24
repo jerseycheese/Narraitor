@@ -138,6 +138,7 @@ const formatEventsForApi = (
 
 export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: UseStoryCheckpointManagerArgs) => {
   const worldState = useWorldStore((state) => (worldId ? state.worldStates[worldId] : undefined));
+  const world = useWorldStore((state) => (worldId ? state.worlds[worldId] : undefined));
   const characters = useCharacterStore((state) => state.characters);
 
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -252,6 +253,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         narrativeSummary: narrativeContext.summary,
         currentLocation: narrativeContext.location,
         previousSegments,
+        toneSettings: world?.toneSettings,
       });
 
       const response = await fetch('/api/narrative/story-checkpoint', {
@@ -284,7 +286,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
       setStatus('error');
       setError(checkpointError instanceof Error ? checkpointError.message : 'Unknown error creating checkpoint.');
     }
-  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints]);
+  }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints, world?.toneSettings]);
 
   // Auto-trigger checkpoint creation when there's at least 1 pending event
   React.useEffect(() => {

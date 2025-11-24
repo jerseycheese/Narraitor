@@ -11,6 +11,7 @@ interface BuildStoryCheckpointPayloadParams {
   currentLocation?: string;
   activeGoals?: string[];
   previousSegments?: string[];
+  toneSettings?: StoryCheckpointRequestBody['toneSettings'];
 }
 
 export const buildStoryCheckpointPayload = ({
@@ -24,6 +25,7 @@ export const buildStoryCheckpointPayload = ({
   currentLocation,
   activeGoals,
   previousSegments,
+  toneSettings,
 }: BuildStoryCheckpointPayloadParams): StoryCheckpointRequestBody => {
   const normalizedGoals = activeGoals
     ?.map((goal) => goal.trim())
@@ -40,5 +42,6 @@ export const buildStoryCheckpointPayload = ({
     activeGoals: normalizedGoals && normalizedGoals.length > 0 ? normalizedGoals : undefined,
     characterName: characterName || undefined,
     previousSegments: previousSegments && previousSegments.length > 0 ? previousSegments : undefined,
+    toneSettings: toneSettings || undefined,
   };
 };

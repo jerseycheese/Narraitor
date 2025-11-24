@@ -1,6 +1,7 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
+import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import fs from 'fs';
 import path from 'path';
 
@@ -50,6 +51,9 @@ const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
   const goals = payload.activeGoals && payload.activeGoals.length > 0
     ? payload.activeGoals.map((goal, index) => `${index + 1}. ${goal}`).join('\n')
     : 'No explicit goals documented.';
+  const toneDirectives = payload.toneSettings
+    ? getDetailedToneInstructions(payload.toneSettings)
+    : 'Tone: balanced and reader-friendly. Language complexity: moderate. Keep content appropriate for general audiences (PG).';
 
   // Build recent story context if available
   const storyContext = payload.previousSegments && payload.previousSegments.length > 0
@@ -72,6 +76,7 @@ NARRATIVE WRITING REQUIREMENTS:
 ${storyContext ? `- Build naturally from the recent story above - DO NOT retell or re-summarize what already happened
 - Write what happens NEXT as a continuation of the ongoing narrative
 - Use transitions and connective phrases to flow from the previous beat` : '- Set the opening scene for this new story'}
+- Apply these tone and language rules: ${toneDirectives}
 - Write in a continuous narrative style, like a novel, not a summary or timeline
 - Vary sentence structure: mix short punchy sentences with longer flowing ones
 - Create cause-and-effect flow: show how events connect and build on each other

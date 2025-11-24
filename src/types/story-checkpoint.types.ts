@@ -1,4 +1,5 @@
 import { EntityID, ISODateString } from './common.types';
+import { ToneSettings } from './tone-settings.types';
 
 export interface StoryCheckpointEventPayload {
   id: EntityID;
@@ -28,6 +29,7 @@ export interface StoryCheckpointRequestBody {
   currentLocation?: string;
   activeGoals?: string[];
   previousSegments?: string[]; // Last 2-3 checkpoint segments for narrative continuity
+  toneSettings?: ToneSettings;
 }
 
 export interface StoryCheckpointResponseBody {
