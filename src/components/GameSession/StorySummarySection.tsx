@@ -4,27 +4,13 @@ import * as React from 'react';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useStoryCheckpointManager } from './hooks/useStoryCheckpointManager';
 import { useWorldStore } from '@/state/worldStore';
+import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 
 interface StorySummarySectionProps {
   worldId: string;
   sessionId: string;
   characterId?: string;
 }
-
-/**
- * Build the full "Story So Far" by concatenating all checkpoint segments in chronological order.
- */
-const buildStoryFromCheckpoints = (
-  checkpoints: Array<{ segment: string; createdAt: string }>
-): string => {
-  if (!checkpoints.length) return '';
-
-  // Sort chronologically (oldest first)
-  const sorted = [...checkpoints].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-
-  // Join all segments with double newlines
-  return sorted.map(cp => cp.segment).filter(Boolean).join('\n\n');
-};
 
 export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldId, sessionId, characterId }) => {
   useStoryCheckpointManager({ worldId, sessionId, characterId });
