@@ -81,6 +81,13 @@ test.describe('EndingScreen Visual Tests', () => {
     // Give extra time for image rendering
     await page.waitForTimeout(1000);
 
+    // Expand "Your Story" collapsible section
+    const yourStoryButton = page.locator('button:has-text("Your Story")');
+    if (await yourStoryButton.isVisible()) {
+      await yourStoryButton.click();
+      await page.waitForTimeout(300); // Wait for expansion animation
+    }
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
     
@@ -233,6 +240,13 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Give extra time for image rendering
     await page.waitForTimeout(1000);
+
+    // Expand "Your Story" collapsible section
+    const yourStoryButton = page.locator('button:has-text("Your Story")');
+    if (await yourStoryButton.isVisible()) {
+      await yourStoryButton.click();
+      await page.waitForTimeout(300); // Wait for expansion animation
+    }
 
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
