@@ -511,7 +511,7 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
-      version: 3, // Incremented to clear old migrated data
+      version: 5, // Incremented for segment-based checkpoint architecture
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('[WorldStore] Failed to rehydrate state', error);
@@ -519,14 +519,46 @@ export const useWorldStore = create<WorldStore>()(
         }
         state?.syncDerivedState?.();
       },
-      migrate: (persistedState) => persistedState || {
-        worlds: {},
-        entities: {},
-        worldStates: {},
-        currentWorldId: null,
-        currentEntityId: null,
-        error: null,
-        loading: false,
+      migrate: (persistedState: unknown, version?: number) => {
+        let nextState = persistedState;
+
+        if (!nextState) {
+          nextState = {
+            worlds: {},
+            entities: {},
+            worldStates: {},
+            currentWorldId: null,
+            currentEntityId: null,
+            error: null,
+            loading: false,
+          };
+        }
+
+        if (typeof version === 'number' && version < 4) {
+          const worldStates = (nextState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
+          if (worldStates && typeof worldStates === 'object') {
+            Object.values(worldStates).forEach((state) => {
+              if (state && !Array.isArray(state.storyCheckpoints)) {
+                state.storyCheckpoints = [];
+              }
+            });
+          }
+        }
+
+        // Migration from v4 to v5: Clean start, remove old cumulative-summary checkpoints
+        if (typeof version === 'number' && version < 5) {
+          const worldStates = (nextState as { worldStates?: Record<EntityID, WorldState> }).worldStates;
+          if (worldStates && typeof worldStates === 'object') {
+            Object.values(worldStates).forEach((state) => {
+              if (state && Array.isArray(state.storyCheckpoints)) {
+                // Clear old checkpoints - fresh start with segment-based architecture
+                state.storyCheckpoints = [];
+              }
+            });
+          }
+        }
+
+        return nextState;
       }, // Preserve data, only clear if null
     }
   )

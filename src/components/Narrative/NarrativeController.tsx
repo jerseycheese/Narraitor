@@ -293,14 +293,6 @@ Respond with JSON format:
         (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__
       );
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[NarrativeController] persistedSegments', persistedSegments.length, {
-        isPlaywrightRuntime,
-        localSegments: segments.length,
-        initialGenerationCompleted,
-        hasHydrated,
-      });
-    }
 
     if (isPlaywrightRuntime && persistedSegments.length === 0) {
       // Visual regression tests seed data via persistence; wait for hydration
@@ -513,11 +505,6 @@ Respond with JSON format:
 
     // Load segments for the current session
     let existingSegments = getSessionSegments(sessionId);
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[NarrativeController] hydration load', existingSegments.length, {
-        sessionId,
-      });
-    }
 
     if (existingSegments.length === 0 && typeof window !== 'undefined') {
       const testWindow = window as typeof window & {

@@ -377,9 +377,6 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'active' || sessionState.status === 'paused' || sessionState.status === 'loading') {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[GameSession] render ActiveGameSession', { status: sessionState.status, stableSessionId });
-    }
     // Use the new narrative integration component
     return (
       <ActiveGameSession

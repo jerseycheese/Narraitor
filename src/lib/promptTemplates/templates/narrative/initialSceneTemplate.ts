@@ -1,3 +1,5 @@
+import { majorEventGuidelines } from './majorEventGuidelines';
+
 export const initialSceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
     worldName,
@@ -75,6 +77,8 @@ SENSORY WRITING GUIDELINES:
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
 - Use fresh, varied sensory language to avoid clichéd phrases
 
+${majorEventGuidelines}
+
 Response Format (CRITICAL - must be valid JSON):
 {
   "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 4-6 complete sentences that tell an engaging story, NOT just metadata or short phrases",
@@ -93,7 +97,8 @@ Response Format (CRITICAL - must be valid JSON):
     ],
     "mood": "mysterious",
     "location": "Starting location",
-    "tags": ["opening", "introduction"]
+    "tags": ["opening", "introduction"],
+    "majorEvent": "Review the content field above. If it contains a CONSEQUENTIAL story beat (critical decision, major revelation, relationship shift, goal progress, or story-changing event), summarize THAT SPECIFIC MOMENT in one short clause (max 18 words). Otherwise null. This must describe what ACTUALLY HAPPENED in your narrative, not a generic description."
   }
 }
 

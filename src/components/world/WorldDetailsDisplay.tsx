@@ -54,7 +54,9 @@ export function WorldDetailsDisplay({
           <h2 id="world-description-heading" className="text-2xl font-semibold mb-4">
             About this world
           </h2>
-          <p className="text-muted-foreground leading-relaxed">{world.description}</p>
+          <div className="prose prose-gray dark:prose-invert">
+            <p>{world.description}</p>
+          </div>
         </section>
       )}
 

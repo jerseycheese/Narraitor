@@ -2,10 +2,6 @@
 
 AI-powered storytelling app that basically lets you play through narrative RPG experiences in any world you can imagine, fictional or non-fictional. Maybe you want to explore Middle Earth? Storm the beach at Normandy? Design something completely original? Narraitor adapts the AI storytelling to match your world's themes and tone.
 
-![Narraitor home page](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/home-page-clean.png)
-
-*The main landing page showcasing the app's core features*
-
 > **A quick note on the UI**: I know it's pretty basic right now. I'm focused on building the foundational systems first - the storytelling engine, world mechanics, character progression. The plan is to eventually have worlds auto-skin their interfaces to match their genres. Think sleek sci-fi panels for space opera, weathered parchment for fantasy, noir shadows for detective stories. Right now it's all about getting the framework solid.
 
 ## What This Actually Does
@@ -16,35 +12,51 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/world-creation-wizard-clean.png)
+![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-creation-wizard-clean.png)
 
-*Multi-step wizard for creating custom worlds with templates and AI generation*
+*Seven-step wizard with template selection, AI generation, and custom world building*
 
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/characters-page-clean.png)
+![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/characters-page-clean.png)
 
-*Create and manage characters with custom attributes and progression*
+*Character management screen with AI-generated portraits and quick access to play*
 
-![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/world-detail-page-clean.png)
+![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-detail-page-clean.png)
 
-*Detailed world view showing attributes, skills, and character creation rules*
+*Complete world configuration showing custom attributes, skills, and character requirements*
 
-![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/character-detail-page-clean.png)
+![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/character-detail-page-clean.png)
 
-*Complete character sheet with stats, skills, and background information*
+*Detailed character sheet showing attributes, skill progression, and full background story*
 
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/gameplay-session-clean.png)
+![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/gameplay-session-clean.png)
 
-*AI-generated narrative with choice-based gameplay and skill checks*
+*Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
 **Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
 
+## Additional Features
+
 **Template Worlds**: Don't want to build from scratch? Start with pre-configured worlds like Western, Sitcom, or high Fantasy, then customize from there.
+
+**AI Character Portraits**: Generate visual representations of your characters that match their descriptions and world settings.
+
+**Custom Player Actions**: Type any action you want to try instead of being limited to AI-suggested choices.
+
+**In-Session Journal**: Review story history and past decisions through a floating journal button during gameplay.
+
+**Story Endings**: AI-suggested narrative conclusions help you wrap up campaigns when you're ready to finish.
+
+**Export/Import**: Save and share your worlds, characters, or sessions as JSON files for backup or collaboration.
+
+**Developer Tools**: Built-in debugging panel for inspecting application state and testing features.
+
+**Story Checkpoints**: Capture "story so far" summaries at pivotal moments to keep long campaigns coherent.
 
 ## Getting It Running
 
@@ -184,13 +196,14 @@ What constitutes "done enough" for a 1.0:
 
 Things that would be cool to explore:
 - **Enhanced Notifications** across all user interactions ([#607](https://github.com/jerseycheese/Narraitor/issues/607))
-- **Multi-Model AI Support** (GPT-4, Claude integration)
 - **Multiplayer Capabilities** (shared worlds and storytelling)
 - **Voice Narration** for enhanced immersion
 - **Mobile App Versions** for on-the-go storytelling
 - **Advanced AI Personalization** based on play patterns
 - **Content Moderation Tools** for public sharing
 - **Economy Systems** for more complex world building
+
+**Note**: Multi-model AI support (GPT-4, Claude, Ollama, etc.) is being explored for earlier implementation - see Epic [#878](https://github.com/jerseycheese/Narraitor/issues/878) for provider-agnostic AI integration plans.
 
 The nice thing about having the foundation solid is that these features can be added incrementally without breaking existing functionality.
 
@@ -219,7 +232,7 @@ GEMINI_API_KEY=your-api-key
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
-**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation/` for details on how that works.
+**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation-guide.md` for details on how that works.
 
 ## License
 

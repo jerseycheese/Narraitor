@@ -2,20 +2,21 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Globe, Play, Image as ImageIcon, ImageOff, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Star, Globe, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useJournalStore } from '@/state/journalStore';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 
 
 /**
@@ -36,16 +37,27 @@ export function EndingScreen() {
   
   const { characters } = useCharacterStore();
   const { worlds } = useWorldStore();
-  const { entries: journalEntries } = useJournalStore();
-  
+
+  // Get story checkpoints for this session (must be called before early returns)
+  const worldState = useWorldStore(state => currentEnding ? state.worldStates[currentEnding.worldId] : undefined);
+  const sessionCheckpoints = useMemo(
+    () => currentEnding ? (worldState?.storyCheckpoints ?? []).filter(
+      checkpoint => checkpoint.sessionId === currentEnding.sessionId
+    ) : [],
+    [worldState?.storyCheckpoints, currentEnding]
+  );
+
+  // Build complete story from checkpoints
+  const fullStory = useMemo(
+    () => buildStoryFromCheckpoints(sessionCheckpoints),
+    [sessionCheckpoints]
+  );
+
   // State for ending image generation
   const [endingImage, setEndingImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
-
-  // State for narrative review collapsible
-  const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(false);
 
   // Initialize image from currentEnding if available
   useEffect(() => {
@@ -345,7 +357,7 @@ export function EndingScreen() {
           {/* Epilogue */}
           <section>
             <SectionWrapper title="Epilogue" className="bg-card/95 backdrop-blur-sm border border-border">
-              <div className="text-lg text-card-foreground leading-relaxed whitespace-pre-wrap">
+              <div className="prose prose-gray dark:prose-invert text-lg">
                 {currentEnding.epilogue}
               </div>
             </SectionWrapper>
@@ -355,7 +367,7 @@ export function EndingScreen() {
             {/* Character Legacy */}
             <section>
               <SectionWrapper title="Character Legacy" className="bg-card/90 backdrop-blur-sm border border-border h-full">
-                <div className="text-card-foreground leading-relaxed">
+                <div className="prose prose-gray dark:prose-invert">
                   {currentEnding.characterLegacy}
                 </div>
               </SectionWrapper>
@@ -394,89 +406,31 @@ export function EndingScreen() {
           {/* World Impact */}
           <section>
             <SectionWrapper title="Impact on the World" className="bg-card/90 backdrop-blur-sm border border-border">
-              <div className="text-card-foreground leading-relaxed">
+              <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.worldImpact}
               </div>
             </SectionWrapper>
           </section>
 
-          {/* Narrative Review - Collapsible Section */}
+          {/* Your Story - Collapsible Section */}
           <section>
-            <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg overflow-hidden">
-              <button
-                onClick={() => setIsNarrativeExpanded(!isNarrativeExpanded)}
-                className="w-full p-6 flex items-center justify-between hover:bg-accent/50 transition-colors"
-                aria-expanded={isNarrativeExpanded}
-                aria-controls="narrative-review-content"
-                aria-label={isNarrativeExpanded ? "Collapse narrative review" : "Expand narrative review"}
-              >
-                <div className="flex items-center gap-3">
-                  <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <h2 className="text-2xl font-bold text-card-foreground">Review Your Journey</h2>
-                </div>
-                {isNarrativeExpanded ? (
-                  <ChevronUp className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+            <CollapsibleSection title="Your Story" initialCollapsed={true}>
+              <div className="max-h-96 overflow-y-auto">
+                {fullStory ? (
+                  <div className="prose prose-gray dark:prose-invert">
+                    {fullStory.split(/\n{2,}/).map((paragraph, index) => (
+                      <p key={`story-paragraph-${index}`}>
+                        {paragraph.trim()}
+                      </p>
+                    ))}
+                  </div>
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-muted-foreground italic">
+                    No story checkpoints available for this session.
+                  </p>
                 )}
-              </button>
-
-              {isNarrativeExpanded && (
-                <div
-                  id="narrative-review-content"
-                  className="px-6 pb-6 space-y-4 max-h-96 overflow-y-auto"
-                >
-                  {(() => {
-                    const narrativeSegments = getSessionSegments(currentEnding.sessionId);
-
-                    if (!narrativeSegments || narrativeSegments.length === 0) {
-                      return (
-                        <p className="text-muted-foreground italic">
-                          No narrative segments available for this session.
-                        </p>
-                      );
-                    }
-
-                    // Get decision journal entries for this session
-                    const decisionEntries = journalEntries
-                      ? Object.values(journalEntries)
-                          .filter(entry => entry.sessionId === currentEnding.sessionId && entry.type === 'decision')
-                          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-                      : [];
-
-                    return narrativeSegments.map((segment, index) => {
-                      // Find decision entry that comes after this segment but before the next
-                      const segmentTime = new Date(segment.timestamp).getTime();
-                      const nextSegmentTime = index < narrativeSegments.length - 1
-                        ? new Date(narrativeSegments[index + 1].timestamp).getTime()
-                        : Infinity;
-
-                      const relatedDecision = decisionEntries.find(entry => {
-                        const entryTime = new Date(entry.createdAt).getTime();
-                        return entryTime >= segmentTime && entryTime < nextSegmentTime;
-                      });
-
-                      return (
-                        <div key={segment.id} className="space-y-3">
-                          <div className="border-l-2 border-primary/30 pl-4 py-2">
-                            <p className="text-card-foreground leading-relaxed">
-                              {segment.content}
-                            </p>
-                          </div>
-                          {relatedDecision && (
-                            <div className="pl-4">
-                              <p className="text-sm text-primary/80 italic">
-                                → {relatedDecision.metadata?.choiceText || relatedDecision.content}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
-              )}
-            </div>
+              </div>
+            </CollapsibleSection>
           </section>
 
           {/* Next Steps */}

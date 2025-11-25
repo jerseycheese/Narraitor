@@ -22,7 +22,6 @@ export const createDefaultGeminiClient = () => {
 
   // In browser environment (client-side), use secure proxy
   if (typeof window !== 'undefined') {
-    console.log("Using secure client proxy for browser");
     return new ClientGeminiClient();
   }
 

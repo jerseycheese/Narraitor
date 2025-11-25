@@ -1,5 +1,6 @@
 // Action template focused on immediate item usage beats
 import { NarrativeSegment } from '@/types/narrative.types';
+import { majorEventGuidelines } from './majorEventGuidelines';
 
 export const actionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -62,6 +63,8 @@ NPC METADATA RULES:
 - Prefer pulling speaking characters from the roster when possible; avoid inventing new NPC identities unless there is no roster member who fits.
 - Do not include bracket tokens like [npc-id] in the narrative – keep IDs strictly in metadata.
 
+${majorEventGuidelines}
+
 Response Format:
 {
   "content": "The action beat goes here...",
@@ -80,7 +83,8 @@ Response Format:
     ],
     "mood": "appropriate mood",
     "location": "Current location",
-    "tags": ["item-usage", "action-beat"]
+    "tags": ["item-usage", "action-beat"],
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }`;
 };

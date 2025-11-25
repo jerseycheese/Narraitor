@@ -22,11 +22,11 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
         characterName={character.name}
         size="xlarge"
       />
-      <div className="flex-1">
+      <div className="flex-1 prose prose-gray dark:prose-invert">
         <h2 className="text-3xl font-bold mb-2">{character.name}</h2>
         <p className="text-muted-foreground mb-4">Level {character.level}</p>
         {character.background.personality && (
-          <p className="text-muted-foreground mb-4 italic">
+          <p className="italic">
             {character.background.personality}
           </p>
         )}

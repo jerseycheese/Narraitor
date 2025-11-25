@@ -9,6 +9,9 @@ import {
   ensureSuggestedActionsContentVisible,
   removeDuplicateSuggestedActionsTextarea,
   relaxStoryColumnHeight,
+  seedStorySummaryForVisual,
+  expandStorySummarySection,
+  expandInventorySection,
 } from './utils/game-session-page-seeder';
 
 /**
@@ -365,6 +368,7 @@ test.describe('Game Session Visual Tests', () => {
     await ensureSuggestedActionsExpanded(page);
     await renderSeededSuggestedActions(page);
     await seedInventoryItemsForVisual(page);
+    await expandInventorySection(page);
 
     await page.waitForSelector('[data-testid^="choice-option-"]', {
       state: 'visible',
@@ -379,6 +383,8 @@ test.describe('Game Session Visual Tests', () => {
     await ensureSuggestedActionsContentVisible(page);
     await removeDuplicateSuggestedActionsTextarea(page);
     await relaxStoryColumnHeight(page);
+    await seedStorySummaryForVisual(page);
+    await expandStorySummarySection(page);
 
     await page.waitForTimeout(200); // Wait for layout to adjust
 

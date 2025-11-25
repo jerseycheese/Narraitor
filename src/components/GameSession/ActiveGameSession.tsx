@@ -11,6 +11,7 @@ import { useCharacterStore, Character } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
+import { StorySummarySection } from './StorySummarySection';
 import { EndingScreen } from './EndingScreen';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
@@ -23,6 +24,7 @@ import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
@@ -134,19 +136,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
 
   // Debug: log key state changes to help diagnose skeleton readiness
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    console.log('[ActiveGameSession]', {
-      sessionId,
-      worldId,
-      initialized,
-      segments: segmentCount,
-      isGenerating,
-      isGeneratingChoices,
-      hasValidChoices: !!hasValidChoices,
-      isGameReady,
-    });
-  }, [sessionId, worldId, initialized, segmentCount, isGenerating, isGeneratingChoices, hasValidChoices, isGameReady]);
+  // (Commented out to reduce console noise)
 
   // Safety net: if no narrative segment arrives within a reasonable window,
   // inject a minimal fallback scene so the UI can progress.
@@ -664,7 +654,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Global event handlers to support hero action buttons from parent pages
   React.useEffect(() => {
     const onEndStory = () => handleEndStoryClick();
-    const onEndSession = () => { if (onEnd) onEnd(); };
+    const onEndSession = async () => {
+      // Dispatch event to trigger final checkpoint before ending session
+      window.dispatchEvent(new CustomEvent('narraitor:finalize-checkpoint'));
+      // Small delay to allow checkpoint to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (onEnd) onEnd();
+    };
     const onNewSession = async () => {
       const sessionStore = useSessionStore.getState();
       const narrativeStore = useNarrativeStore.getState();
@@ -841,11 +837,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Inventory Display */}
       {characterId && (
-        <section className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Inventory</h2>
-          <InventoryList characterId={characterId} />
-        </section>
+        <div className="mt-6" data-testid="inventory-collapsible">
+          <CollapsibleSection title="Inventory" initialCollapsed>
+            <InventoryList characterId={characterId} />
+          </CollapsibleSection>
+        </div>
       )}
+
+      <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
 
       {/* Autosave indicator anchored under the main content */}
       <div className="mt-4">

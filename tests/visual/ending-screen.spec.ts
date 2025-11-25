@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { hideDynamicContent } from './utils/wait-helpers';
+import { hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
@@ -80,6 +80,9 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Give extra time for image rendering
     await page.waitForTimeout(1000);
+
+    // Expand all collapsible sections including "Your Story"
+    await expandAllCollapsibleSections(page);
 
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
@@ -233,6 +236,9 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Give extra time for image rendering
     await page.waitForTimeout(1000);
+
+    // Expand all collapsible sections including "Your Story"
+    await expandAllCollapsibleSections(page);
 
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);

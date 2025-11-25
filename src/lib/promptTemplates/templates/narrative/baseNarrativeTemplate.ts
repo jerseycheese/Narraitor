@@ -1,4 +1,5 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { majorEventGuidelines } from './majorEventGuidelines';
 import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -91,6 +92,8 @@ NPC METADATA RULES:
 - When inventing a new NPC, add them to metadata.characters with a slug-style id (lowercase with hyphens), a short description, and an avatar prompt so future segments can reuse the same identity.
 - Do not print character IDs or bracketed tokens (e.g., [npc-id]) in the narrative text.
 
+${majorEventGuidelines}
+
 Response Format:
 {
   "content": "The narrative text goes here...",
@@ -109,7 +112,8 @@ Response Format:
     ],
     "mood": "mysterious",
     "location": "Current location name",
-    "tags": ["relevant", "tags"]
+    "tags": ["relevant", "tags"],
+    "majorEvent": "ONLY if this beat is CONSEQUENTIAL and PLOT-ADVANCING (critical decision, major revelation, significant relationship shift, major goal progress, or story-changing event) - otherwise null"
   }
 }`;
 };

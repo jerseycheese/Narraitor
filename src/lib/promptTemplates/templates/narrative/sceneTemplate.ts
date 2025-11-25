@@ -1,5 +1,6 @@
 import { NarrativeSegment } from '../../../../types/narrative.types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { majorEventGuidelines } from './majorEventGuidelines';
 
 export const sceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -109,6 +110,8 @@ Focus on varied sensory details and the character's reactions to bring the scene
 
   return `${baseContent}${examplesSection}
 
+${majorEventGuidelines}
+
 Response Format:
 {
   "content": "The scene description goes here...",
@@ -127,7 +130,8 @@ Response Format:
     ],
     "mood": "appropriate mood",
     "location": "Current location",
-    "tags": ["relevant", "scene", "tags"]
+    "tags": ["relevant", "scene", "tags"],
+    "majorEvent": "Review the content field above. If it contains a transformation/world change/turning point, extract and summarize THAT SPECIFIC MOMENT in one short clause (max 18 words). Otherwise null. Must describe what ACTUALLY HAPPENED in your narrative."
   }
 }`;
 };
