@@ -357,7 +357,7 @@ export function EndingScreen() {
           {/* Epilogue */}
           <section>
             <SectionWrapper title="Epilogue" className="bg-card/95 backdrop-blur-sm border border-border">
-              <div className="text-lg text-card-foreground leading-relaxed whitespace-pre-wrap">
+              <div className="prose prose-gray dark:prose-invert text-lg">
                 {currentEnding.epilogue}
               </div>
             </SectionWrapper>
@@ -367,7 +367,7 @@ export function EndingScreen() {
             {/* Character Legacy */}
             <section>
               <SectionWrapper title="Character Legacy" className="bg-card/90 backdrop-blur-sm border border-border h-full">
-                <div className="text-card-foreground leading-relaxed">
+                <div className="prose prose-gray dark:prose-invert">
                   {currentEnding.characterLegacy}
                 </div>
               </SectionWrapper>
@@ -406,7 +406,7 @@ export function EndingScreen() {
           {/* World Impact */}
           <section>
             <SectionWrapper title="Impact on the World" className="bg-card/90 backdrop-blur-sm border border-border">
-              <div className="text-card-foreground leading-relaxed">
+              <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.worldImpact}
               </div>
             </SectionWrapper>
@@ -417,9 +417,9 @@ export function EndingScreen() {
             <CollapsibleSection title="Your Story" initialCollapsed={true}>
               <div className="max-h-96 overflow-y-auto">
                 {fullStory ? (
-                  <div className="prose prose-gray max-w-none dark:prose-invert">
+                  <div className="prose prose-gray dark:prose-invert">
                     {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                      <p key={`story-paragraph-${index}`} className="text-card-foreground leading-relaxed">
+                      <p key={`story-paragraph-${index}`}>
                         {paragraph.trim()}
                       </p>
                     ))}
