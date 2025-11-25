@@ -3,9 +3,6 @@ import type { Page } from '@playwright/test';
 const SUGGESTED_ACTIONS_TITLE_LOCATOR = '[data-testid="collapsible-section-title"]';
 const SUGGESTED_ACTIONS_CONTENT_LOCATOR = '[data-testid="collapsible-section-content"]';
 const SUGGESTED_ACTIONS_TOGGLE_LOCATOR = '[data-testid="collapsible-section-toggle"]';
-const STORY_SUMMARY_SECTION_LOCATOR = '[data-testid="story-summary-section"]';
-const STORY_SUMMARY_TOGGLE_LOCATOR = '[data-testid="collapsible-section-toggle"]';
-const INVENTORY_SECTION_LOCATOR = '[data-testid="inventory-collapsible"]';
 
 /**
  * Ensure the Suggested Actions collapsible section is expanded so the visual baseline
@@ -441,87 +438,6 @@ export async function seedStorySummaryForVisual(page: Page): Promise<void> {
       sessionId,
     );
   });
-}
-
-/**
- * Ensure the Story Summary collapsible is expanded so the snapshot includes the checkpoint content.
- */
-export async function expandStorySummarySection(page: Page): Promise<void> {
-  const section = page.locator(STORY_SUMMARY_SECTION_LOCATOR);
-
-  if (!(await section.count())) {
-    return;
-  }
-
-  const toggle = section.locator(STORY_SUMMARY_TOGGLE_LOCATOR).first();
-  const expanded = await toggle.getAttribute('aria-expanded');
-
-  if (expanded !== 'true') {
-    await toggle.click();
-    await page.waitForTimeout(200);
-  }
-
-  await page.evaluate(
-    ({ sectionSelector }) => {
-      const sectionEl = document.querySelector(sectionSelector);
-      const content = sectionEl?.querySelector('[data-testid="collapsible-section-content"]') as HTMLElement | null;
-      const toggleButton = sectionEl?.querySelector('[data-testid="collapsible-section-toggle"]') as HTMLElement | null;
-
-      if (content) {
-        content.classList.add('block');
-        content.classList.remove('hidden');
-        content.setAttribute('aria-hidden', 'false');
-        content.style.display = 'block';
-      }
-
-      if (toggleButton) {
-        toggleButton.setAttribute('aria-expanded', 'true');
-        toggleButton.textContent = '−';
-      }
-    },
-    { sectionSelector: STORY_SUMMARY_SECTION_LOCATOR },
-  );
-}
-
-/**
- * Ensure the Inventory collapsible renders its contents for visual baselines.
- */
-export async function expandInventorySection(page: Page): Promise<void> {
-  const section = page.locator(INVENTORY_SECTION_LOCATOR);
-
-  if (!(await section.count())) {
-    return;
-  }
-
-  const toggle = section.locator('[data-testid="collapsible-section-toggle"]').first();
-  const expanded = await toggle.getAttribute('aria-expanded');
-
-  if (expanded !== 'true') {
-    await toggle.click();
-    await page.waitForTimeout(200);
-  }
-
-  await page.evaluate(({ selector }) => {
-    const sectionEl = document.querySelector(selector);
-    if (!sectionEl) {
-      return;
-    }
-
-    const content = sectionEl.querySelector('[data-testid="collapsible-section-content"]') as HTMLElement | null;
-    const toggleButton = sectionEl.querySelector('[data-testid="collapsible-section-toggle"]') as HTMLElement | null;
-
-    if (content) {
-      content.classList.add('block');
-      content.classList.remove('hidden');
-      content.setAttribute('aria-hidden', 'false');
-      content.style.display = 'block';
-    }
-
-    if (toggleButton) {
-      toggleButton.setAttribute('aria-expanded', 'true');
-      toggleButton.textContent = '−';
-    }
-  }, { selector: INVENTORY_SECTION_LOCATOR });
 }
 
 /**
