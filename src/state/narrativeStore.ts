@@ -244,7 +244,7 @@ async function applyWorldStateThreadUpdates({
           });
 
           // Only create major event if validation passes
-          if (validationResult.isSignificant) {
+          if (validationResult.isSignificant && finalMetadata.majorEvent) {
             updatePayload.majorEvents = [{
               id: generateUniqueId('event'),
               description: finalMetadata.majorEvent,
@@ -264,12 +264,14 @@ async function applyWorldStateThreadUpdates({
             majorEvent: finalMetadata.majorEvent,
           });
 
-          updatePayload.majorEvents = [{
-            id: generateUniqueId('event'),
-            description: finalMetadata.majorEvent,
-            timestamp: getTimestamp(),
-            characterId: activeCharacterId,
-          }];
+          if (finalMetadata.majorEvent) {
+            updatePayload.majorEvents = [{
+              id: generateUniqueId('event'),
+              description: finalMetadata.majorEvent,
+              timestamp: getTimestamp(),
+              characterId: activeCharacterId,
+            }];
+          }
         }
       }
     }

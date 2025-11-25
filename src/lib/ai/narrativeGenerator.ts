@@ -1152,7 +1152,7 @@ Return ONLY the rewritten narrative.`;
 
             console.log('\n=== MAJOR EVENT DEBUG ===');
             console.log('Raw metadata.majorEvent from AI:', parsed?.metadata?.majorEvent);
-            console.log('Extracted majorEvent:', metadata?.majorEvent);
+            console.log('Extracted majorEvent:', extractedMetadata?.majorEvent);
             console.log('=== END MAJOR EVENT DEBUG ===\n');
           }
         }

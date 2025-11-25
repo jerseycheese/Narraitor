@@ -94,9 +94,9 @@ describe('First segment checkpoint creation', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Verify a major event was created in world state
-    const worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1);
-    expect(worldState.majorEvents[0].description).toBe('Story begins at The Prancing Pony Tavern');
+    const worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1);
+    expect(worldState?.majorEvents?.[0]?.description).toBe('Story begins at The Prancing Pony Tavern');
 
     // Verify validation API was NOT called for first segment
     expect(global.fetch).not.toHaveBeenCalled();
@@ -149,9 +149,9 @@ describe('First segment checkpoint creation', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Verify AI's major event was used
-    const worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1);
-    expect(worldState.majorEvents[0].description).toBe(aiMajorEvent);
+    const worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1);
+    expect(worldState?.majorEvents?.[0]?.description).toBe(aiMajorEvent);
 
     // Verify validation API was NOT called for first segment
     expect(global.fetch).not.toHaveBeenCalled();
@@ -203,8 +203,8 @@ describe('First segment checkpoint creation', () => {
 
     // Verify first segment created event WITHOUT validation
     expect(global.fetch).not.toHaveBeenCalled();
-    const worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1);
+    const worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1);
 
     // Mock validation API to reject trivial event
     (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -241,8 +241,8 @@ describe('First segment checkpoint creation', () => {
     );
 
     // Verify trivial event was filtered out (still only 1 major event)
-    const updatedWorldState = useWorldStore.getState().worlds[worldId];
-    expect(updatedWorldState.majorEvents).toHaveLength(1);
+    const updatedWorldState = useWorldStore.getState().worldStates[worldId];
+    expect(updatedWorldState?.majorEvents).toHaveLength(1);
   });
 
   it('creates default opening event when no location provided', async () => {
@@ -288,8 +288,8 @@ describe('First segment checkpoint creation', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Verify default opening event was created
-    const worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1);
-    expect(worldState.majorEvents[0].description).toBe('Your adventure begins');
+    const worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1);
+    expect(worldState?.majorEvents?.[0]?.description).toBe('Your adventure begins');
   });
 });

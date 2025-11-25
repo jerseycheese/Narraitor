@@ -113,7 +113,7 @@ describe('Narrative store world state integration', () => {
     expect(worldState.npcRelationships[npcId]).toBeDefined();
     expect(worldState.npcRelationships[npcId].trust).toBe(60);
 
-    const eventDescriptions = worldState.majorEvents.map(event => event.description);
+    const eventDescriptions = worldState.majorEvents?.map(event => event.description) || [];
     expect(eventDescriptions).toContain('The kingdom celebrates your diplomatic victory.');
   });
 
@@ -181,9 +181,9 @@ describe('Narrative store world state integration', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Verify checkpoint was created for opening scene
-    let worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1);
-    expect(worldState.majorEvents[0].description).toBe('Story begins at Ancient Chamber');
+    let worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1);
+    expect(worldState?.majorEvents?.[0]?.description).toBe('Story begins at Ancient Chamber');
     expect(global.fetch).not.toHaveBeenCalled(); // No validation for first segment
 
     // Step 2: Mock validation API to reject trivial event
@@ -214,8 +214,8 @@ describe('Narrative store world state integration', () => {
 
     // Verify validation was called and trivial event was filtered out
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(1); // Still only the opening event
+    worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(1); // Still only the opening event
 
     // Step 3: Mock validation API to accept significant event
     (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -245,9 +245,9 @@ describe('Narrative store world state integration', () => {
 
     // Verify significant event created a checkpoint
     expect(global.fetch).toHaveBeenCalledTimes(2);
-    worldState = useWorldStore.getState().worlds[worldId];
-    expect(worldState.majorEvents).toHaveLength(2);
-    expect(worldState.majorEvents[1].description).toBe('Character discovers the Tome of Forbidden Knowledge');
+    worldState = useWorldStore.getState().worldStates[worldId];
+    expect(worldState?.majorEvents).toHaveLength(2);
+    expect(worldState?.majorEvents?.[1]?.description).toBe('Character discovers the Tome of Forbidden Knowledge');
 
     jest.restoreAllMocks();
   });
