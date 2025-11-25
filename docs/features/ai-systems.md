@@ -21,6 +21,8 @@ This the AI integration here is pretty central to the whole experience. The key 
 
 **Ending Detection** - Recognizes when a story arc has reached a natural conclusion point.
 
+**Story Checkpoint Generation** - Creates AI-powered "story so far" summaries at major narrative beats to keep long sessions coherent. See `docs/features/story-checkpoints.md` for details.
+
 ## Security & Performance
 
 The AI requests all go through secure server-side routes to keep API keys protected:

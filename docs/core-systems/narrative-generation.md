@@ -20,6 +20,7 @@ The narrative system is built from several pieces that work together to create c
 3. **Context Management**: Keeps track of what's happened so far so the story makes sense
 4. **Component System**: React components that handle the UI side of storytelling
 5. **State Management**: Stores all the narrative content using Zustand
+6. **Story Checkpoints**: Captures AI-generated summaries at pivotal moments for long-session coherence (see `docs/features/story-checkpoints.md`)
 
 ## Usage Guide
 

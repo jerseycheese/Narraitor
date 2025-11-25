@@ -11,6 +11,7 @@ AI-powered storytelling app built with Next.js that lets you play RPG narratives
 - Jest and React Testing Library for testing
 - Google Gemini for AI integration (secure server-side implementation)
 - **Tailwind CSS v3**: Required for Storybook compatibility
+- **Tailwind Typography Plugin**: `@tailwindcss/typography` for readable story content formatting
 
 ## Security Architecture
 - **API Key Protection**: All API keys stored server-side only (`GEMINI_API_KEY`)

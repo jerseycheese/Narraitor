@@ -421,7 +421,10 @@ export async function seedStorySummaryForVisual(page: Page): Promise<void> {
         storyCheckpoints: [
           {
             id: 'checkpoint-visual-story',
-            summary: 'Sable exposed the traitors and rallied the undercity.',
+            sessionId,
+            characterId,
+            createdAt: new Date('2025-11-10T18:05:00Z').toISOString(),
+            segment: 'Sable exposed the traitors and rallied the undercity.',
             highlights: ['Council plot revealed', 'Undercity united'],
             eventIds: ['visual-event-1'],
             decisionIds: ['decision-visual-story'],
