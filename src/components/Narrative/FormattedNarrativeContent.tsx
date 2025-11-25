@@ -248,10 +248,7 @@ export const FormattedNarrativeContent: React.FC<
         });
 
         return (
-          <p
-            key={index}
-            className="my-4 leading-relaxed max-w-3xl mx-auto first-of-type:mt-0 last-of-type:mb-0"
-          >
+          <p key={index}>
             {paragraphNodes}
           </p>
         );
