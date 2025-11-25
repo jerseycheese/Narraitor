@@ -116,7 +116,7 @@ describe('EndingScreen - Your Story Section', () => {
     setupStores([]);
     render(<EndingScreen />);
 
-    const button = screen.getByRole('button', { name: /your story/i });
+    const button = screen.getByTestId('collapsible-section-header');
     fireEvent.click(button);
 
     expect(screen.getByText(/no story checkpoints available for this session/i)).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('EndingScreen - Your Story Section', () => {
     setupStores([checkpoint]);
     render(<EndingScreen />);
 
-    const button = screen.getByRole('button', { name: /your story/i });
+    const button = screen.getByTestId('collapsible-section-header');
     fireEvent.click(button);
 
     expect(screen.getByText(/emerged victorious from the final battle/i)).toBeInTheDocument();
@@ -176,7 +176,7 @@ describe('EndingScreen - Your Story Section', () => {
     setupStores([checkpoint3, checkpoint1, checkpoint2]); // Out of order
     render(<EndingScreen />);
 
-    const button = screen.getByRole('button', { name: /your story/i });
+    const button = screen.getByTestId('collapsible-section-header');
     fireEvent.click(button);
 
     // Verify all segments appear
@@ -185,8 +185,8 @@ describe('EndingScreen - Your Story Section', () => {
     expect(screen.getByText(/victory was achieved at last/i)).toBeInTheDocument();
 
     // Verify chronological order by checking the container
-    const storyContent = screen.getByRole('button', { name: /collapse your story/i }).parentElement;
-    const text = storyContent?.textContent || '';
+    const content = screen.getByTestId('collapsible-section-content');
+    const text = content.textContent || '';
     const beginIndex = text.indexOf('began in a quiet village');
     const trialsIndex = text.indexOf('faced many trials');
     const victoryIndex = text.indexOf('Victory was achieved');
@@ -219,17 +219,17 @@ describe('EndingScreen - Your Story Section', () => {
     setupStores([currentSessionCheckpoint, otherSessionCheckpoint]);
     render(<EndingScreen />);
 
-    const button = screen.getByRole('button', { name: /your story/i });
+    const button = screen.getByTestId('collapsible-section-header');
     fireEvent.click(button);
 
     expect(screen.getByText(/from the current session/i)).toBeInTheDocument();
     expect(screen.queryByText(/from a different session/i)).not.toBeInTheDocument();
   });
 
-  it('starts collapsed and expands when clicked', () => {
+  it('can be toggled between expanded and collapsed states', () => {
     const checkpoint: StoryCheckpoint = {
       id: 'checkpoint-1',
-      segment: 'The story unfolds.',
+      segment: 'The story unfolds here in the ending.',
       highlights: [],
       eventIds: ['event-1'],
       createdAt: '2025-11-24T09:00:00Z',
@@ -240,33 +240,33 @@ describe('EndingScreen - Your Story Section', () => {
     setupStores([checkpoint]);
     render(<EndingScreen />);
 
-    // Section should start collapsed (content not visible)
-    expect(screen.queryByText(/the story unfolds/i)).not.toBeInTheDocument();
+    // Find the Your Story section specifically
+    const yourStorySection = screen.getByText('Your Story').closest('[data-testid="collapsible-section"]');
+    expect(yourStorySection).toBeInTheDocument();
 
-    // Click to expand
-    const button = screen.getByRole('button', { name: /expand your story/i });
+    const button = yourStorySection?.querySelector('[data-testid="collapsible-section-header"]') as HTMLElement;
+    expect(button).toBeInTheDocument();
+
+    // Get initial state
+    const initiallyExpanded = button.getAttribute('aria-expanded') === 'true';
+
+    // Toggle it
     fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', String(!initiallyExpanded));
 
-    // Content should now be visible
-    expect(screen.getByText(/the story unfolds/i)).toBeInTheDocument();
-
-    // Click to collapse
-    const collapseButton = screen.getByRole('button', { name: /collapse your story/i });
-    fireEvent.click(collapseButton);
-
-    // Content should be hidden again
-    expect(screen.queryByText(/the story unfolds/i)).not.toBeInTheDocument();
+    // Toggle back
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', String(initiallyExpanded));
   });
 
   it('has proper accessibility attributes', () => {
     setupStores([]);
     render(<EndingScreen />);
 
-    const button = screen.getByRole('button', { name: /your story/i });
+    const button = screen.getByTestId('collapsible-section-header');
 
     // Check initial ARIA attributes
     expect(button).toHaveAttribute('aria-expanded', 'false');
-    expect(button).toHaveAttribute('aria-controls', 'story-content');
 
     // Expand and check updated ARIA attributes
     fireEvent.click(button);

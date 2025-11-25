@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Globe, Play, Image as ImageIcon, ImageOff, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Star, Globe, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -12,9 +12,9 @@ import { useSessionStore } from '@/state/sessionStore';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 
 
@@ -42,9 +42,6 @@ export function EndingScreen() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
-
-  // State for narrative review collapsible
-  const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(false);
 
   // Initialize image from currentEnding if available
   useEffect(() => {
@@ -416,48 +413,23 @@ export function EndingScreen() {
 
           {/* Your Story - Collapsible Section */}
           <section>
-            <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg overflow-hidden">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setIsNarrativeExpanded(!isNarrativeExpanded)}
-                className="w-full p-6 flex items-center justify-between hover:bg-accent/50 transition-colors"
-                aria-expanded={isNarrativeExpanded}
-                aria-controls="story-content"
-                aria-label={isNarrativeExpanded ? 'Collapse your story' : 'Expand your story'}
-              >
-                <div className="flex items-center gap-3">
-                  <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <h2 className="text-2xl font-bold text-card-foreground">Your Story</h2>
-                </div>
-                {isNarrativeExpanded ? (
-                  <ChevronUp className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+            <CollapsibleSection title="Your Story" initialCollapsed={true}>
+              <div className="max-h-96 overflow-y-auto">
+                {fullStory ? (
+                  <div className="prose prose-gray max-w-none dark:prose-invert">
+                    {fullStory.split(/\n{2,}/).map((paragraph, index) => (
+                      <p key={`story-paragraph-${index}`} className="text-card-foreground leading-relaxed">
+                        {paragraph.trim()}
+                      </p>
+                    ))}
+                  </div>
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-muted-foreground italic">
+                    No story checkpoints available for this session.
+                  </p>
                 )}
-              </Button>
-
-              {isNarrativeExpanded && (
-                <div
-                  id="story-content"
-                  className="px-6 pb-6 max-h-96 overflow-y-auto"
-                >
-                  {fullStory ? (
-                    <div className="prose prose-gray max-w-none dark:prose-invert">
-                      {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                        <p key={`story-paragraph-${index}`} className="text-card-foreground leading-relaxed">
-                          {paragraph.trim()}
-                        </p>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground italic">
-                      No story checkpoints available for this session.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+              </div>
+            </CollapsibleSection>
           </section>
 
           {/* Next Steps */}
