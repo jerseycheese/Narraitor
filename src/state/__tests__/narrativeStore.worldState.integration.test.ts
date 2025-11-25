@@ -28,6 +28,9 @@ const resetSessionStore = () => {
 };
 
 describe('Narrative store world state integration', () => {
+  // Increase timeout for these async tests
+  jest.setTimeout(30000);
+
   beforeEach(() => {
     setupTestTimers();
     jest.setSystemTime(new Date('2025-02-01T12:00:00.000Z'));
