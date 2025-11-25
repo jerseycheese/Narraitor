@@ -16,13 +16,13 @@ interface CharacterBackgroundDisplayProps {
 
 export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDisplayProps) {
   return (
-    <div className="space-y-6">
+    <div className="prose prose-gray dark:prose-invert space-y-6">
       {/* History Section */}
       <div>
         <h3 className="text-lg font-semibold mb-2">
           History
         </h3>
-        <p className="text-foreground leading-relaxed">
+        <p>
           {background.history}
         </p>
       </div>
@@ -32,7 +32,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
         <h3 className="text-lg font-semibold mb-2">
           Personality
         </h3>
-        <p className="text-foreground leading-relaxed">
+        <p>
           {background.personality}
         </p>
       </div>
@@ -44,11 +44,11 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
             Goals & Motivations
           </h3>
           {background.goals.length === 1 ? (
-            <p className="text-foreground leading-relaxed">
+            <p>
               {background.goals[0]}
             </p>
           ) : (
-            <ul className="list-disc list-inside text-foreground space-y-1">
+            <ul className="list-disc list-inside space-y-1">
               {background.goals.map((goal, index) => (
                 <li key={index}>{goal}</li>
               ))}
@@ -63,7 +63,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
           <h3 className="text-lg font-semibold mb-2">
             Fears
           </h3>
-          <ul className="list-disc list-inside text-foreground space-y-1">
+          <ul className="list-disc list-inside space-y-1">
             {background.fears.map((fear, index) => (
               <li key={index}>{fear}</li>
             ))}
@@ -77,7 +77,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
           <h3 className="text-lg font-semibold mb-2">
             Physical Appearance
           </h3>
-          <p className="text-foreground leading-relaxed">
+          <p>
             {background.physicalDescription}
           </p>
         </div>

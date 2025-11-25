@@ -72,7 +72,7 @@ export function StoryEndingDialog({
     >
       <div
         id="story-ending-content"
-        className="text-base leading-relaxed text-gray-700 mb-6"
+        className="prose prose-gray dark:prose-invert mb-6"
       >
         {typeof content === 'string' ? (
           <p>{content}</p>

@@ -50,11 +50,11 @@ export function WorldDetailsDisplay({
   return (
     <>
       {showDescription && (
-        <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm" aria-labelledby="world-description-heading">
+        <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm prose prose-gray dark:prose-invert" aria-labelledby="world-description-heading">
           <h2 id="world-description-heading" className="text-2xl font-semibold mb-4">
             About this world
           </h2>
-          <p className="text-muted-foreground leading-relaxed">{world.description}</p>
+          <p>{world.description}</p>
         </section>
       )}
 

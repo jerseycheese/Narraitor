@@ -118,7 +118,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
     
     <div className="flex-1 overflow-auto">
       <div className="prose prose-gray max-w-none dark:prose-invert">
-        <div className="text-gray-700 leading-relaxed">
+        <div>
           {entry.type === 'discovery' ? (
             <div 
               dangerouslySetInnerHTML={{ 
