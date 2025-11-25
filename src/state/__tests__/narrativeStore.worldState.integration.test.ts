@@ -1,6 +1,7 @@
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
+import { useCharacterStore } from '../characterStore';
 import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
 const resetSessionStore = () => {
@@ -32,7 +33,8 @@ describe('Narrative store world state integration', () => {
   jest.setTimeout(30000);
 
   beforeEach(() => {
-    setupTestTimers();
+    // Don't use fake timers - these tests need real async behavior for fetch
+    jest.useRealTimers();
     jest.setSystemTime(new Date('2025-02-01T12:00:00.000Z'));
     useWorldStore.getState().reset();
     useNarrativeStore.getState().reset();
@@ -40,7 +42,7 @@ describe('Narrative store world state integration', () => {
   });
 
   afterEach(() => {
-    cleanupTestTimers();
+    jest.useRealTimers();
     useNarrativeStore.getState().reset();
     useWorldStore.getState().reset();
     resetSessionStore();
@@ -62,8 +64,16 @@ describe('Narrative store world state integration', () => {
     });
 
     const sessionId = 'session-integration';
-    const characterId = 'character-hero';
     const npcId = 'npc-guard';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Hero',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -157,7 +167,15 @@ describe('Narrative store world state integration', () => {
     });
 
     const sessionId = 'session-checkpoint-flow';
-    const characterId = 'character-adventurer';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Adventurer',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -181,7 +199,8 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Allow async operations to complete (needs time for dynamic imports + async processing)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Verify checkpoint was created for opening scene
     let worldState = useWorldStore.getState().worldStates[worldId];
@@ -213,7 +232,8 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Allow async operations to complete (needs time for dynamic imports + async processing)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Verify validation was called and trivial event was filtered out
     expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -244,13 +264,16 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Allow async operations to complete (needs time for dynamic imports + async processing)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Verify significant event created a checkpoint
     expect(global.fetch).toHaveBeenCalledTimes(2);
     worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(2);
-    expect(worldState?.majorEvents?.[1]?.description).toBe('Character discovers the Tome of Forbidden Knowledge');
+    // Events are in reverse chronological order (newest first)
+    expect(worldState?.majorEvents?.[0]?.description).toBe('Character discovers the Tome of Forbidden Knowledge');
+    expect(worldState?.majorEvents?.[1]?.description).toBe('Story begins at Ancient Chamber');
 
     jest.restoreAllMocks();
   });

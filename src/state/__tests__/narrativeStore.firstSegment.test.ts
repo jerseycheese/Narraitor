@@ -1,6 +1,7 @@
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
+import { useCharacterStore } from '../characterStore';
 import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
 const resetSessionStore = () => {
@@ -32,7 +33,8 @@ describe('First segment checkpoint creation', () => {
   jest.setTimeout(30000);
 
   beforeEach(() => {
-    setupTestTimers();
+    // Don't use fake timers - these tests need real async behavior for fetch
+    jest.useRealTimers();
     jest.setSystemTime(new Date('2025-02-01T12:00:00.000Z'));
     useWorldStore.getState().reset();
     useNarrativeStore.getState().reset();
@@ -43,7 +45,7 @@ describe('First segment checkpoint creation', () => {
   });
 
   afterEach(() => {
-    cleanupTestTimers();
+    jest.useRealTimers();
     useNarrativeStore.getState().reset();
     useWorldStore.getState().reset();
     resetSessionStore();
@@ -66,7 +68,15 @@ describe('First segment checkpoint creation', () => {
     });
 
     const sessionId = 'session-first-test';
-    const characterId = 'character-hero';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Hero',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -93,8 +103,8 @@ describe('First segment checkpoint creation', () => {
       updatedAt: segmentTimestamp.toISOString(),
     });
 
-    // Allow async operations to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Allow async operations to complete (needs time for dynamic imports + async processing)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Verify a major event was created in world state
     const worldState = useWorldStore.getState().worldStates[worldId];
@@ -121,7 +131,15 @@ describe('First segment checkpoint creation', () => {
     });
 
     const sessionId = 'session-ai-event';
-    const characterId = 'character-pilot';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Pilot',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -176,7 +194,15 @@ describe('First segment checkpoint creation', () => {
     });
 
     const sessionId = 'session-validation';
-    const characterId = 'character-hero';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Hero',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -264,7 +290,15 @@ describe('First segment checkpoint creation', () => {
     });
 
     const sessionId = 'session-no-location';
-    const characterId = 'character-hero';
+
+    // Create character in store
+    const characterId = useCharacterStore.getState().createCharacter({
+      name: 'Test Hero',
+      worldId,
+      attributes: [],
+      skills: [],
+      storyGoals: [],
+    });
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
