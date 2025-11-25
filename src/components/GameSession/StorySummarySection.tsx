@@ -41,7 +41,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
       <CollapsibleSection title="The Story So Far" initialCollapsed>
         <div>
           {summaryParagraphs.length > 0 ? (
-            <div className="prose prose-gray max-w-none dark:prose-invert">
+            <div className="prose prose-gray dark:prose-invert">
               {summaryParagraphs.map((paragraph, index) => (
                 <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
               ))}
