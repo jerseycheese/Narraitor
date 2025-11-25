@@ -2,7 +2,7 @@ import { useNarrativeStore } from '../narrativeStore';
 import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
 import { useCharacterStore } from '../characterStore';
-import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+import { createTestCharacterData } from './characterStore.testHelpers';
 
 const resetSessionStore = () => {
   useSessionStore.setState(() => ({
@@ -70,13 +70,9 @@ describe('First segment checkpoint creation', () => {
     const sessionId = 'session-first-test';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Hero',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -133,13 +129,9 @@ describe('First segment checkpoint creation', () => {
     const sessionId = 'session-ai-event';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Pilot',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -196,13 +188,9 @@ describe('First segment checkpoint creation', () => {
     const sessionId = 'session-validation';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Hero',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -292,13 +280,9 @@ describe('First segment checkpoint creation', () => {
     const sessionId = 'session-no-location';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Hero',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,

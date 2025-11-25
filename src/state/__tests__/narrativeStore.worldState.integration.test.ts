@@ -2,7 +2,7 @@ import { useNarrativeStore } from '../narrativeStore';
 import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
 import { useCharacterStore } from '../characterStore';
-import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+import { createTestCharacterData } from './characterStore.testHelpers';
 
 const resetSessionStore = () => {
   useSessionStore.setState(() => ({
@@ -67,13 +67,9 @@ describe('Narrative store world state integration', () => {
     const npcId = 'npc-guard';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Hero',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
@@ -169,13 +165,9 @@ describe('Narrative store world state integration', () => {
     const sessionId = 'session-checkpoint-flow';
 
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter({
-      name: 'Test Adventurer',
-      worldId,
-      attributes: [],
-      skills: [],
-      storyGoals: [],
-    });
+    const characterId = useCharacterStore.getState().createCharacter(
+      createTestCharacterData({ worldId })
+    );
 
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
