@@ -14,6 +14,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 

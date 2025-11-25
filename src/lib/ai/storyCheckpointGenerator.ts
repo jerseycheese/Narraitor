@@ -52,7 +52,12 @@ const buildPrompt = (payload: StoryCheckpointRequestBody): string => {
     ? payload.activeGoals.map((goal, index) => `${index + 1}. ${goal}`).join('\n')
     : 'No explicit goals documented.';
   const toneDirectives = payload.toneSettings
-    ? getDetailedToneInstructions(payload.toneSettings)
+    ? getDetailedToneInstructions(
+        payload.toneSettings.contentRating,
+        payload.toneSettings.narrativeStyle,
+        payload.toneSettings.languageComplexity,
+        payload.toneSettings.customInstructions
+      )
     : 'Tone: balanced and reader-friendly. Language complexity: moderate. Keep content appropriate for general audiences (PG).';
 
   // Build recent story context if available

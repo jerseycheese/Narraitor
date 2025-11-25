@@ -61,10 +61,12 @@ export async function validateEventSignificance(
 
     const result = await genAI.models.generateContent({
       model,
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      contents: prompt,
       config: {
-        temperature: 0.1, // Low temperature for consistent classification
-        maxOutputTokens: 200, // Short response needed
+        generationConfig: {
+          temperature: 0.1, // Low temperature for consistent classification
+          maxOutputTokens: 200, // Short response needed
+        },
       },
     });
 

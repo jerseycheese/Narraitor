@@ -15,7 +15,7 @@ const setupHook = (overrides: Partial<ReturnType<typeof useStoryCheckpointManage
   mockUseStoryCheckpointManager.mockReturnValue({
     status: 'idle',
     error: null,
-    latestCheckpoint: null,
+    latestCheckpoint: null as any,
     pendingEvents: [],
     recentEvents: [],
     createCheckpoint: jest.fn(),

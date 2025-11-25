@@ -25,9 +25,9 @@ const sanitizeToneSettings = (toneSettings: unknown): ToneSettings | undefined =
   }
 
   return {
-    contentRating,
-    narrativeStyle,
-    languageComplexity,
+    contentRating: contentRating as ToneSettings['contentRating'],
+    narrativeStyle: narrativeStyle as ToneSettings['narrativeStyle'],
+    languageComplexity: languageComplexity as ToneSettings['languageComplexity'],
     ...(isString(customInstructions) && customInstructions.trim()
       ? { customInstructions: customInstructions.trim() }
       : {}),
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       eventsCount: events.length,
       eventDescriptions: events.map(e => e.description),
       previousSegmentsCount: previousSegments?.length ?? 0,
-      previousSegments: previousSegments?.map((seg, i) => `[${i + 1}] ${seg.substring(0, 80)}...`),
+      previousSegments: previousSegments?.map((seg: string, i: number) => `[${i + 1}] ${seg.substring(0, 80)}...`),
     });
 
     const summary = await generateStoryCheckpointSummary(payload);
