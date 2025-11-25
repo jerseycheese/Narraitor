@@ -15,18 +15,19 @@ const setupHook = (overrides: Partial<ReturnType<typeof useStoryCheckpointManage
   mockUseStoryCheckpointManager.mockReturnValue({
     status: 'idle',
     error: null,
-    latestCheckpoint: null as StoryCheckpoint | null,
+    latestCheckpoint: null,
     pendingEvents: [],
     recentEvents: [],
     createCheckpoint: jest.fn(),
     hasPendingEvents: false,
     characterNameLookup: { 'char-1': 'Marin' },
     ...overrides,
-  });
+  } as ReturnType<typeof useStoryCheckpointManager>);
 };
 
 const setupWorldStore = (checkpoints: StoryCheckpoint[] = []) => {
-  mockUseWorldStore.mockImplementation((selector: unknown) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mockUseWorldStore.mockImplementation((selector: any) => {
     const state = {
       worldStates: {
         'world-1': {
