@@ -15,7 +15,7 @@ const setupHook = (overrides: Partial<ReturnType<typeof useStoryCheckpointManage
   mockUseStoryCheckpointManager.mockReturnValue({
     status: 'idle',
     error: null,
-    latestCheckpoint: null as any,
+    latestCheckpoint: null as StoryCheckpoint | null,
     pendingEvents: [],
     recentEvents: [],
     createCheckpoint: jest.fn(),
@@ -26,7 +26,7 @@ const setupHook = (overrides: Partial<ReturnType<typeof useStoryCheckpointManage
 };
 
 const setupWorldStore = (checkpoints: StoryCheckpoint[] = []) => {
-  mockUseWorldStore.mockImplementation((selector: any) => {
+  mockUseWorldStore.mockImplementation((selector: unknown) => {
     const state = {
       worldStates: {
         'world-1': {

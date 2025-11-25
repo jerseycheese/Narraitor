@@ -37,7 +37,22 @@ export function EndingScreen() {
   
   const { characters } = useCharacterStore();
   const { worlds } = useWorldStore();
-  
+
+  // Get story checkpoints for this session (must be called before early returns)
+  const worldState = useWorldStore(state => currentEnding ? state.worldStates[currentEnding.worldId] : undefined);
+  const sessionCheckpoints = useMemo(
+    () => currentEnding ? (worldState?.storyCheckpoints ?? []).filter(
+      checkpoint => checkpoint.sessionId === currentEnding.sessionId
+    ) : [],
+    [worldState?.storyCheckpoints, currentEnding]
+  );
+
+  // Build complete story from checkpoints
+  const fullStory = useMemo(
+    () => buildStoryFromCheckpoints(sessionCheckpoints),
+    [sessionCheckpoints]
+  );
+
   // State for ending image generation
   const [endingImage, setEndingImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -192,21 +207,6 @@ export function EndingScreen() {
 
   const character = characters[currentEnding.characterId];
   const world = worlds[currentEnding.worldId];
-
-  // Get story checkpoints for this session
-  const worldState = useWorldStore(state => state.worldStates[currentEnding.worldId]);
-  const sessionCheckpoints = useMemo(
-    () => (worldState?.storyCheckpoints ?? []).filter(
-      checkpoint => checkpoint.sessionId === currentEnding.sessionId
-    ),
-    [worldState?.storyCheckpoints, currentEnding.sessionId]
-  );
-
-  // Build complete story from checkpoints
-  const fullStory = useMemo(
-    () => buildStoryFromCheckpoints(sessionCheckpoints),
-    [sessionCheckpoints]
-  );
 
   const formatPlayTime = (seconds?: number) => {
     if (!seconds) return 'Unknown';

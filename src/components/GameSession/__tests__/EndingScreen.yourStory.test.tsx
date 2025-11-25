@@ -46,7 +46,7 @@ const setupStores = (checkpoints: StoryCheckpoint[] = []) => {
     refresh: jest.fn(),
     replace: jest.fn(),
     prefetch: jest.fn(),
-  } as any);
+  } as ReturnType<typeof useRouter>);
 
   mockUseNarrativeStore.mockReturnValue({
     currentEnding: mockEnding,
@@ -57,7 +57,7 @@ const setupStores = (checkpoints: StoryCheckpoint[] = []) => {
     clearEnding: jest.fn(),
     clearSessionSegments: jest.fn(),
     clearSessionDecisions: jest.fn(),
-  } as any);
+  } as ReturnType<typeof useNarrativeStore>);
 
   mockUseCharacterStore.mockReturnValue({
     characters: {
@@ -69,14 +69,14 @@ const setupStores = (checkpoints: StoryCheckpoint[] = []) => {
         updatedAt: '2025-11-24T09:00:00Z',
       },
     },
-  } as any);
+  } as ReturnType<typeof useCharacterStore>);
 
   mockUseSessionStore.mockReturnValue({
     endSession: jest.fn(),
-  } as any);
+  } as ReturnType<typeof useSessionStore>);
 
   // Mock useWorldStore with both functional and object return patterns
-  mockUseWorldStore.mockImplementation((selector: any) => {
+  mockUseWorldStore.mockImplementation((selector: unknown) => {
     if (typeof selector === 'function') {
       const state = {
         worlds: {
