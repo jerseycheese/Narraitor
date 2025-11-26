@@ -72,7 +72,7 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 4-6 sentences long (1 focused paragraph)
+6. Is approximately 3-5 sentences long (1 focused paragraph)
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 
