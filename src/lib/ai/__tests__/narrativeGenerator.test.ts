@@ -89,7 +89,14 @@ describe('NarrativeGenerator', () => {
 
     it('includes narrative context when provided', async () => {
       const mockAIResponse = {
-        content: 'Hours pass as you travel deeper into the forest, the path becoming narrower with each step.',
+        content: JSON.stringify({
+          content: 'Hours pass as you travel deeper into the forest, the path becoming narrower with each step.',
+          type: 'transition',
+          metadata: {
+            mood: 'neutral',
+            tags: ['travel', 'time-passage']
+          }
+        }),
         finishReason: 'stop',
         promptTokens: 45,
         completionTokens: 25
@@ -129,8 +136,8 @@ describe('NarrativeGenerator', () => {
 
       const result = await narrativeGenerator.generateSegment(request);
 
-      expect(result.content).toBe(mockAIResponse.content);
-      // Segment type is inferred from content - "hours pass" triggers transition
+      expect(result.content).toContain('Hours pass');
+      // Segment type comes from AI's JSON response
       expect(result.segmentType).toBe('transition');
     });
 
@@ -146,9 +153,16 @@ describe('NarrativeGenerator', () => {
       await expect(narrativeGenerator.generateSegment(request)).rejects.toThrow('Failed to generate narrative segment');
     });
 
-    it('infers dialogue type from content with quotations', async () => {
+    it('uses AI-provided dialogue type from JSON response', async () => {
       const mockAIResponse = {
-        content: '"Welcome, traveler," the innkeeper says with a warm smile. "What brings you to our village?"',
+        content: JSON.stringify({
+          content: '"Welcome, traveler," the innkeeper says with a warm smile. "What brings you to our village?"',
+          type: 'dialogue',
+          metadata: {
+            mood: 'neutral',
+            tags: ['conversation']
+          }
+        }),
         finishReason: 'stop',
         promptTokens: 50,
         completionTokens: 30
@@ -167,14 +181,21 @@ describe('NarrativeGenerator', () => {
 
       const result = await narrativeGenerator.generateSegment(request);
 
-      expect(result.content).toBe(mockAIResponse.content);
-      // Segment type inferred as 'dialogue' due to quotation marks and speaking verb
+      expect(result.content).toContain('Welcome, traveler');
+      // Segment type comes from AI's JSON response
       expect(result.segmentType).toBe('dialogue');
     });
 
-    it('infers action type from content with action verbs', async () => {
+    it('uses AI-provided action type from JSON response', async () => {
       const mockAIResponse = {
-        content: 'You swing your sword in a wide arc, striking the bandit. He dodges backward, barely avoiding the blade.',
+        content: JSON.stringify({
+          content: 'You swing your sword in a wide arc, striking the bandit. He dodges backward, barely avoiding the blade.',
+          type: 'action',
+          metadata: {
+            mood: 'action',
+            tags: ['combat']
+          }
+        }),
         finishReason: 'stop',
         promptTokens: 50,
         completionTokens: 30
@@ -193,8 +214,8 @@ describe('NarrativeGenerator', () => {
 
       const result = await narrativeGenerator.generateSegment(request);
 
-      expect(result.content).toBe(mockAIResponse.content);
-      // Segment type inferred as 'action' due to action verbs (swing, strike, dodges)
+      expect(result.content).toContain('swing your sword');
+      // Segment type comes from AI's JSON response
       expect(result.segmentType).toBe('action');
     });
   });

@@ -112,10 +112,17 @@ Focus on varied sensory details and the character's reactions to bring the scene
 
 ${majorEventGuidelines}
 
+SEGMENT TYPE SELECTION:
+Choose the most appropriate segment type based on your narrative content:
+- "dialogue": Use when the narrative is primarily conversation between characters (with quotation marks)
+- "action": Use when describing physical action, combat, or skill usage
+- "transition": Use when describing time passage or location changes
+- "scene": Use for descriptive narrative, setting details, or mixed content
+
 Response Format:
 {
   "content": "The scene description goes here...",
-  "type": "${segmentType}",
+  "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
     "speakerId": "npc-id-1",
