@@ -1147,7 +1147,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
   generateEnding: async (endingType, params) => {
     set({ isGeneratingEnding: true, endingError: null });
     let narrativeSegments: NarrativeSegment[] = [];
-    let journalEntries: Array<Record<string, unknown>> = [];
+    let journalEntries: JournalEntry[] = [];
 
     try {
       // Get narrative segments and journal entries for this session
