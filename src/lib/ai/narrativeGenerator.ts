@@ -726,9 +726,10 @@ Return ONLY the rewritten narrative.`;
       }
 
       // AI determines segment type in its JSON response
+      // If AI doesn't provide a type, infer from content as fallback
       let result = await this.formatResponse(
         response,
-        'scene' // Default fallback if AI doesn't provide type
+        inferSegmentType(response.content || '')
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
@@ -863,7 +864,8 @@ Return ONLY the rewritten narrative.`;
       }
 
       // AI determines segment type in its JSON response
-      let result = await this.formatResponse(response, 'scene'); // Default fallback if AI doesn't provide type
+      // If AI doesn't provide a type, infer from content as fallback
+      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
@@ -1090,7 +1092,7 @@ Return ONLY the rewritten narrative.`;
           if (parsed.content) {
             actualContent = parsed.content;
           }
-          // Use AI-provided type if available, otherwise fall back to parameter
+          // Use AI-provided type if available, otherwise keep the parameter (which might be inferred)
           if (parsed.type && ['scene', 'dialogue', 'action', 'transition', 'ending'].includes(parsed.type)) {
             segmentType = parsed.type;
           }
@@ -1829,7 +1831,8 @@ ${content}
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
       // AI determines segment type in its JSON response
-      let result = await this.formatResponse(response, 'scene'); // Default fallback if AI doesn't provide type
+      // If AI doesn't provide a type, infer from content as fallback
+      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
