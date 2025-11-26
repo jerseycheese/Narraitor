@@ -61,7 +61,7 @@ describe('NarrativeGenerator', () => {
   describe('generateSegment', () => {
     it('generates a narrative segment with appropriate world context', async () => {
       const mockAIResponse = {
-        content: 'The ancient trees whispered secrets in the moonlight...',
+        content: 'The ancient trees stand tall in the moonlight, their branches swaying gently in the breeze.',
         finishReason: 'stop',
         promptTokens: 50,
         completionTokens: 30
@@ -74,14 +74,14 @@ describe('NarrativeGenerator', () => {
         sessionId: 'session-123',
         characterIds: ['char-1'],
         generationParameters: {
-          desiredLength: 'medium' as const,
-          segmentType: 'scene' as const
+          desiredLength: 'medium' as const
         }
       };
 
       const result = await narrativeGenerator.generateSegment(request);
 
       expect(result.content).toBe(mockAIResponse.content);
+      // Segment type is inferred from content - this should be 'scene' (descriptive content)
       expect(result.segmentType).toBe('scene');
       expect(result.metadata.mood).toBe('mysterious');
       expect(narrativeTemplateManager.getTemplate).toHaveBeenCalledWith('narrative/scene');
@@ -89,7 +89,7 @@ describe('NarrativeGenerator', () => {
 
     it('includes narrative context when provided', async () => {
       const mockAIResponse = {
-        content: 'Continuing deeper into the forest...',
+        content: 'Hours pass as you travel deeper into the forest, the path becoming narrower with each step.',
         finishReason: 'stop',
         promptTokens: 45,
         completionTokens: 25
@@ -124,15 +124,13 @@ describe('NarrativeGenerator', () => {
             }
           ],
           currentLocation: 'Forest Entrance'
-        },
-        generationParameters: {
-          segmentType: 'transition' as const
         }
       };
 
       const result = await narrativeGenerator.generateSegment(request);
 
       expect(result.content).toBe(mockAIResponse.content);
+      // Segment type is inferred from content - "hours pass" triggers transition
       expect(result.segmentType).toBe('transition');
     });
 
@@ -146,6 +144,58 @@ describe('NarrativeGenerator', () => {
       };
 
       await expect(narrativeGenerator.generateSegment(request)).rejects.toThrow('Failed to generate narrative segment');
+    });
+
+    it('infers dialogue type from content with quotations', async () => {
+      const mockAIResponse = {
+        content: '"Welcome, traveler," the innkeeper says with a warm smile. "What brings you to our village?"',
+        finishReason: 'stop',
+        promptTokens: 50,
+        completionTokens: 30
+      };
+
+      mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+      const request = {
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+        generationParameters: {
+          desiredLength: 'short' as const
+        }
+      };
+
+      const result = await narrativeGenerator.generateSegment(request);
+
+      expect(result.content).toBe(mockAIResponse.content);
+      // Segment type inferred as 'dialogue' due to quotation marks and speaking verb
+      expect(result.segmentType).toBe('dialogue');
+    });
+
+    it('infers action type from content with action verbs', async () => {
+      const mockAIResponse = {
+        content: 'You swing your sword in a wide arc, striking the bandit. He dodges backward, barely avoiding the blade.',
+        finishReason: 'stop',
+        promptTokens: 50,
+        completionTokens: 30
+      };
+
+      mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+      const request = {
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+        generationParameters: {
+          desiredLength: 'short' as const
+        }
+      };
+
+      const result = await narrativeGenerator.generateSegment(request);
+
+      expect(result.content).toBe(mockAIResponse.content);
+      // Segment type inferred as 'action' due to action verbs (swing, strike, dodges)
+      expect(result.segmentType).toBe('action');
     });
   });
 

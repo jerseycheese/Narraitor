@@ -668,9 +668,8 @@ Return ONLY the rewritten narrative.`;
     try {
       const world = this.getWorld(request.worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
-      const template = this.getTemplate(
-        request.generationParameters?.segmentType || 'scene'
-      );
+      // Always use scene template for generation - segment type will be inferred from content
+      const template = this.getTemplate('scene');
 
       const context = this.buildContext(world, request);
       const prompt = template(context);
@@ -726,9 +725,10 @@ Return ONLY the rewritten narrative.`;
         }
       }
 
+      // Always use inference to determine segment type based on AI-generated content
       let result = await this.formatResponse(
         response,
-        request.generationParameters?.segmentType || inferSegmentType(response.content || '')
+        inferSegmentType(response.content || '')
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
@@ -737,11 +737,12 @@ Return ONLY the rewritten narrative.`;
       if (isDebugInfoEnabled()) {
         const previousSegments = request.narrativeContext?.previousSegments || [];
         const previousSegment = previousSegments[previousSegments.length - 1];
-        const segmentType = request.generationParameters?.segmentType || 'scene';
+        // Template used is always 'scene' - final type is inferred from AI response
+        const templateType = 'scene';
 
         const debugInfoContext: DebugInfoContext = {
           fullPrompt: fullyEnhancedPrompt,
-          templateName: this.getTemplateName(segmentType),
+          templateName: this.getTemplateName(templateType),
           world,
           toneSettings,
           loreContext,

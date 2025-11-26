@@ -140,6 +140,36 @@ export const SceneWithDialogue: Story = {
 
 
 
+// Dialogue type - shows blue border and conversation styling
+export const Dialogue: Story = {
+  args: {
+    segment: createMockSegment(
+      '"Welcome, traveler," the innkeeper says with a warm smile. "What brings you to our village on this cold night?"',
+      'dialogue',
+      {
+        location: 'Village Inn',
+        mood: 'neutral',
+        tags: ['dialogue', 'conversation', 'npc'],
+      }
+    ),
+  },
+};
+
+// Action type - shows amber border and action-focused styling
+export const Action: Story = {
+  args: {
+    segment: createMockSegment(
+      'You swing your sword in a wide arc, striking the bandit. He dodges backward, barely avoiding the blade, then charges forward with his dagger raised.',
+      'action',
+      {
+        location: 'Dark Alley',
+        mood: 'action',
+        tags: ['combat', 'action', 'fight'],
+      }
+    ),
+  },
+};
+
 // Transition type - shows preserved line breaks formatting
 export const Transition: Story = {
   args: {
@@ -379,6 +409,63 @@ const MultipleNPCs = () => {
 // Multiple NPCs in sequence
 export const MultipleNPCDialogue: Story = {
   render: () => <MultipleNPCs />,
+  args: {
+    segment: null,
+  },
+};
+
+// Mixed segment types showing visual variety
+const MixedSegmentSequence = () => {
+  const segments: NarrativeSegment[] = [
+    createMockSegment(
+      'You enter the bustling tavern. Firelight dances across worn wooden tables, and the air is thick with the smell of ale and roasted meat.',
+      'scene',
+      {
+        location: 'The Prancing Pony',
+        mood: 'neutral',
+        tags: ['tavern', 'arrival'],
+      }
+    ),
+    createMockSegment(
+      '"You look like you\'ve traveled far," the barkeep says, eyeing your dusty cloak. "What can I get you?"',
+      'dialogue',
+      {
+        location: 'The Prancing Pony',
+        mood: 'neutral',
+        tags: ['dialogue', 'conversation'],
+      }
+    ),
+    createMockSegment(
+      'You reach for your coinpurse, but a hand grabs your wrist. You spin around, striking at the attacker.',
+      'action',
+      {
+        location: 'The Prancing Pony',
+        mood: 'action',
+        tags: ['combat', 'ambush'],
+      }
+    ),
+    createMockSegment(
+      'Hours later, you leave the tavern and travel through the night toward the northern pass.',
+      'transition',
+      {
+        mood: 'neutral',
+        tags: ['travel', 'time-passage'],
+      }
+    ),
+  ];
+
+  return (
+    <div className="space-y-4">
+      {segments.map((segment, index) => (
+        <NarrativeDisplay key={index} segment={segment} />
+      ))}
+    </div>
+  );
+};
+
+// Shows different segment types in sequence with varied visual styling
+export const MixedSegmentTypes: Story = {
+  render: () => <MixedSegmentSequence />,
   args: {
     segment: null,
   },
