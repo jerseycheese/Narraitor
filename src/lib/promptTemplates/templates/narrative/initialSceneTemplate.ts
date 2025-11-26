@@ -88,7 +88,7 @@ Choose the most appropriate segment type for your opening narrative:
 
 Response Format (CRITICAL - must be valid JSON):
 {
-  "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 4-6 complete sentences that tell an engaging story, NOT just metadata or short phrases",
+  "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 3-5 complete sentences that tell an engaging story, NOT just metadata or short phrases",
   "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": [],
