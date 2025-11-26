@@ -44,7 +44,7 @@ Create an engaging opening scene that:
 3. Follows ${genre} genre conventions
 4. Hooks the reader with intrigue or action
 5. Establishes the initial setting and situation
-6. Is engaging and substantial - exactly 1 paragraph of 4-6 sentences that vividly establishes the scene
+6. Is engaging and substantial - exactly 1 paragraph of 3-5 sentences that vividly establishes the scene
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 
