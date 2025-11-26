@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
+import { JournalEntry } from '../types/journal.types';
 import { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
@@ -43,7 +44,7 @@ const buildLocalEnding = ({
     desiredTone?: EndingTone;
   };
   narrativeSegments: NarrativeSegment[];
-  journalEntries: Array<Record<string, unknown>>;
+  journalEntries: JournalEntry[];
 }): StoryEnding => {
   const now = new Date();
   const isoNow = now.toISOString();
