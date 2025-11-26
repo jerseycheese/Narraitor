@@ -870,7 +870,6 @@ Respond with JSON format:
           currentSituation: `Player chose: "${choiceText}"`
         },
         generationParameters: {
-          segmentType: 'scene',
           includedTopics: [choiceText],
           desiredLength: 'short'
         }

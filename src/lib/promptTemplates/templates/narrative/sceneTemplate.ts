@@ -72,7 +72,7 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 4-6 sentences long (1 focused paragraph)
+6. Is approximately 3-5 sentences long (1 focused paragraph)
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 
@@ -112,10 +112,17 @@ Focus on varied sensory details and the character's reactions to bring the scene
 
 ${majorEventGuidelines}
 
+SEGMENT TYPE SELECTION:
+Choose the most appropriate segment type based on your narrative content:
+- "dialogue": Use when the narrative is primarily conversation between characters (with quotation marks)
+- "action": Use when describing physical action, combat, or skill usage
+- "transition": Use when describing time passage or location changes
+- "scene": Use for descriptive narrative, setting details, or mixed content
+
 Response Format:
 {
   "content": "The scene description goes here...",
-  "type": "${segmentType}",
+  "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
     "speakerId": "npc-id-1",

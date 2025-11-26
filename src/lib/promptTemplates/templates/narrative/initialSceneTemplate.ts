@@ -44,7 +44,7 @@ Create an engaging opening scene that:
 3. Follows ${genre} genre conventions
 4. Hooks the reader with intrigue or action
 5. Establishes the initial setting and situation
-6. Is engaging and substantial - exactly 1 paragraph of 4-6 sentences that vividly establishes the scene
+6. Is engaging and substantial - exactly 1 paragraph of 3-5 sentences that vividly establishes the scene
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 
@@ -79,10 +79,17 @@ SENSORY WRITING GUIDELINES:
 
 ${majorEventGuidelines}
 
+SEGMENT TYPE SELECTION:
+Choose the most appropriate segment type for your opening narrative:
+- "dialogue": Use if the opening is primarily conversation
+- "action": Use if starting with physical action or combat
+- "transition": Use if describing arrival or location change
+- "scene": Use for descriptive opening (most common for initial scenes)
+
 Response Format (CRITICAL - must be valid JSON):
 {
-  "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 4-6 complete sentences that tell an engaging story, NOT just metadata or short phrases",
-  "type": "scene",
+  "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 3-5 complete sentences that tell an engaging story, NOT just metadata or short phrases",
+  "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": [],
     "speakerId": "npc-id-if-someone-speaks",

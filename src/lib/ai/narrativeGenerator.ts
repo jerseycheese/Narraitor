@@ -668,9 +668,8 @@ Return ONLY the rewritten narrative.`;
     try {
       const world = this.getWorld(request.worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
-      const template = this.getTemplate(
-        request.generationParameters?.segmentType || 'scene'
-      );
+      // Always use scene template for generation - segment type will be inferred from content
+      const template = this.getTemplate('scene');
 
       const context = this.buildContext(world, request);
       const prompt = template(context);
@@ -726,9 +725,11 @@ Return ONLY the rewritten narrative.`;
         }
       }
 
+      // AI determines segment type in its JSON response
+      // If AI doesn't provide a type, infer from content as fallback
       let result = await this.formatResponse(
         response,
-        request.generationParameters?.segmentType || inferSegmentType(response.content || '')
+        inferSegmentType(response.content || '')
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
@@ -737,11 +738,12 @@ Return ONLY the rewritten narrative.`;
       if (isDebugInfoEnabled()) {
         const previousSegments = request.narrativeContext?.previousSegments || [];
         const previousSegment = previousSegments[previousSegments.length - 1];
-        const segmentType = request.generationParameters?.segmentType || 'scene';
+        // Template used is always 'scene' - final type is inferred from AI response
+        const templateType = 'scene';
 
         const debugInfoContext: DebugInfoContext = {
           fullPrompt: fullyEnhancedPrompt,
-          templateName: this.getTemplateName(segmentType),
+          templateName: this.getTemplateName(templateType),
           world,
           toneSettings,
           loreContext,
@@ -861,6 +863,8 @@ Return ONLY the rewritten narrative.`;
         }
       }
 
+      // AI determines segment type in its JSON response
+      // If AI doesn't provide a type, infer from content as fallback
       let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
@@ -1087,6 +1091,10 @@ Return ONLY the rewritten narrative.`;
           console.log('=== END NARRATIVE PARSE DEBUG ===\n');
           if (parsed.content) {
             actualContent = parsed.content;
+          }
+          // Use AI-provided type if available, otherwise keep the parameter (which might be inferred)
+          if (parsed.type && ['scene', 'dialogue', 'action', 'transition', 'ending'].includes(parsed.type)) {
+            segmentType = parsed.type;
           }
           if (parsed.metadata) {
             extractedMetadata = {
@@ -1822,6 +1830,8 @@ ${content}
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
+      // AI determines segment type in its JSON response
+      // If AI doesn't provide a type, infer from content as fallback
       let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
