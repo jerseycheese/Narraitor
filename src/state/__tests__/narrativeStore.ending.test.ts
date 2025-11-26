@@ -127,7 +127,7 @@ describe('narrativeStore - Ending functionality', () => {
       expect(useNarrativeStore.getState().isGeneratingEnding).toBe(false);
     });
 
-    it('should handle generation errors', async () => {
+    it('should handle generation errors with local fallback', async () => {
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 500,
@@ -137,8 +137,9 @@ describe('narrativeStore - Ending functionality', () => {
       await useNarrativeStore.getState().generateEnding('session-limit', defaultEndingContext);
 
       const { currentEnding, endingError, isGeneratingEnding } = useNarrativeStore.getState();
-      expect(currentEnding).toBeNull();
-      expect(endingError).toContain('Unable to load ending');
+      expect(currentEnding).not.toBeNull();
+      expect(currentEnding?.type).toBe('session-limit');
+      expect(endingError).toBeNull();
       expect(isGeneratingEnding).toBe(false);
     });
 
