@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
+import { JournalEntry } from '../types/journal.types';
 import { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
@@ -25,6 +26,73 @@ let characterStoreModule: typeof import('./characterStore') | null = null;
 let journalStoreModule: typeof import('./journalStore') | null = null;
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
+const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
+
+const buildLocalEnding = ({
+  endingType,
+  params,
+  narrativeSegments,
+  journalEntries,
+}: {
+  endingType: EndingType;
+  params: {
+    sessionId: EntityID;
+    characterId: EntityID;
+    worldId: EntityID;
+    world?: World;
+    character?: Character;
+    desiredTone?: EndingTone;
+  };
+  narrativeSegments: NarrativeSegment[];
+  journalEntries: JournalEntry[];
+}): StoryEnding => {
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const worldName = params.world?.name || 'their world';
+  const characterName = params.character?.name || 'The hero';
+
+  const recentNarrative = narrativeSegments
+    .slice(-3)
+    .map((segment) => segment.content?.trim())
+    .filter(Boolean)
+    .join(' ');
+
+  const epilogue = recentNarrative
+    ? `${recentNarrative} As the dust settles, ${characterName} closes this chapter in ${worldName}.`
+    : `${characterName} closes this chapter in ${worldName}, leaving the streets quieter than before.`;
+
+  const journalHighlight = journalEntries.find((entry) => typeof entry?.content === 'string') as
+    | { content?: string }
+    | undefined;
+
+  const characterLegacy = journalHighlight?.content
+    ? `${characterName} is remembered for ${journalHighlight.content}`
+    : `${characterName} leaves a mark on everyone they crossed paths with.`;
+
+  const worldImpact = `In ${worldName}, the ripples of this story linger, whispered about by those who witnessed it.`;
+
+  const achievements = journalEntries
+    .map((entry) => (entry?.title as string) || (entry?.content as string) || '')
+    .filter((text) => text)
+    .slice(-3);
+
+  return {
+    id: generateUniqueId('ending'),
+    sessionId: params.sessionId,
+    characterId: params.characterId,
+    worldId: params.worldId,
+    type: endingType,
+    tone: params.desiredTone ?? FALLBACK_ENDING_TONE,
+    epilogue,
+    characterLegacy,
+    worldImpact,
+    timestamp: now,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    achievements,
+    playTime: undefined,
+  };
+};
 
 /**
  * Serialized version of PromptDebugInfo for IndexedDB storage.
@@ -1078,6 +1146,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
   // Ending actions
   generateEnding: async (endingType, params) => {
     set({ isGeneratingEnding: true, endingError: null });
+    let narrativeSegments: NarrativeSegment[] = [];
+    let journalEntries: JournalEntry[] = [];
 
     try {
       // Get narrative segments and journal entries for this session
@@ -1086,7 +1156,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       const allSegments = Object.values(state.segments)
         .filter(segment => segment.sessionId === params.sessionId)
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      const narrativeSegments = allSegments.slice(-10); // Last 10 segments only
+      narrativeSegments = allSegments.slice(-10); // Last 10 segments only
 
       // Lazy load journal store to avoid circular dependencies
       if (!journalStoreModule) {
@@ -1096,7 +1166,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       const allJournalEntries = journalState.entries
         ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
         : [];
-      const journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
+      journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
 
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await fetch('/api/narrative/ending', {
@@ -1158,13 +1228,33 @@ export const useNarrativeStore = create<NarrativeStore>()(
       // Mark the session as ended to prevent further generation
       get().markSessionEnded(params.sessionId);
     } catch (error) {
-      logger.error('Failed to load ending', { error, endingType, params });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Failed to load ending', { error: errorMessage, endingType, params });
+
+      // Fallback: craft a local ending so the user still sees a conclusion
+      if (narrativeSegments.length === 0) {
+        const state = get();
+        const fallbackSegments = Object.values(state.segments)
+          .filter(segment => segment.sessionId === params.sessionId)
+          .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        narrativeSegments = fallbackSegments.slice(-10);
+      }
+
+      const fallbackEnding = buildLocalEnding({
+        endingType,
+        params,
+        narrativeSegments,
+        journalEntries,
+      });
 
       set({
-        currentEnding: null,
+        currentEnding: fallbackEnding,
         isGeneratingEnding: false,
-        endingError: `Unable to load ending: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        endingError: null,
       });
+
+      // Mark the session as ended so UI transitions to EndingScreen
+      get().markSessionEnded(params.sessionId);
     }
   },
   
