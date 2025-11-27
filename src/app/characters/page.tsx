@@ -130,7 +130,10 @@ export default function CharactersPage() {
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [characterName, setCharacterName] = useState('');
-  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('original');
+  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>(() => {
+    const types: Array<'known' | 'original'> = ['known', 'original'];
+    return types[Math.floor(Math.random() * types.length)];
+  });
   const [deleteDialog, setDeleteDialog] = useState({
     isOpen: false,
     characterId: null as string | null,
@@ -334,7 +337,10 @@ export default function CharactersPage() {
       // Reset dialog state
       setShowGenerateDialog(false);
       setCharacterName('');
-      setGenerationType('original');
+      setGenerationType(() => {
+        const types: Array<'known' | 'original'> = ['known', 'original'];
+        return types[Math.floor(Math.random() * types.length)];
+      });
       setGenerateError(null);
       
       // Navigate to view the character
