@@ -334,7 +334,7 @@ export default function CharactersPage() {
       // Reset dialog state
       setShowGenerateDialog(false);
       setCharacterName('');
-      setGenerationType('known');
+      setGenerationType('original');
       setGenerateError(null);
       
       // Navigate to view the character
