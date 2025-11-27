@@ -333,7 +333,7 @@ export default function CharactersPage() {
         effectiveWorldId,
         updateCharacter
       );
-      
+
       // Reset dialog state
       setShowGenerateDialog(false);
       setCharacterName('');
