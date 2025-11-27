@@ -26,7 +26,6 @@ const sessionStorageHelpers = {
     if (!isStorageAvailable()) return;
     try {
       sessionStorage.setItem(STORAGE_KEYS.SESSION_PATH, path);
-      logger.debug('Saved current path to sessionStorage:', path);
     } catch (error) {
       logger.warn('Failed to save path to sessionStorage:', error);
     }
@@ -36,7 +35,6 @@ const sessionStorageHelpers = {
     if (!isStorageAvailable()) return null;
     try {
       const path = sessionStorage.getItem(STORAGE_KEYS.SESSION_PATH);
-      logger.debug('Retrieved current path from sessionStorage:', path);
       return path;
     } catch (error) {
       logger.warn('Failed to retrieve path from sessionStorage:', error);
@@ -48,7 +46,6 @@ const sessionStorageHelpers = {
     if (!isStorageAvailable()) return;
     try {
       sessionStorage.setItem(STORAGE_KEYS.NAVIGATION_BREADCRUMBS, JSON.stringify(breadcrumbs));
-      logger.debug('Saved breadcrumbs to sessionStorage:', breadcrumbs);
     } catch (error) {
       logger.warn('Failed to save breadcrumbs to sessionStorage:', error);
     }
@@ -71,7 +68,6 @@ const sessionStorageHelpers = {
       Object.values(STORAGE_KEYS).forEach(key => {
         sessionStorage.removeItem(key);
       });
-      logger.debug('Cleared navigation session storage');
     } catch (error) {
       logger.warn('Failed to clear navigation session storage:', error);
     }
@@ -90,7 +86,6 @@ const localStorageHelpers = {
       } else {
         localStorage.removeItem(STORAGE_KEYS.FLOW_STATE);
       }
-      logger.debug('Saved flow state to localStorage:', flowState);
     } catch (error) {
       logger.warn('Failed to save flow state to localStorage:', error);
     }
@@ -100,7 +95,6 @@ const localStorageHelpers = {
     if (!isStorageAvailable()) return null;
     try {
       const flowState = localStorage.getItem(STORAGE_KEYS.FLOW_STATE);
-      logger.debug('Retrieved flow state from localStorage:', flowState);
       return flowState;
     } catch (error) {
       logger.warn('Failed to retrieve flow state from localStorage:', error);
@@ -216,8 +210,6 @@ export const useNavigationStore = create<NavigationState>()(
 
       // Navigation path management
       setCurrentPath: (path: string, title?: string, params?: Record<string, string>) => {
-        logger.debug('Setting current path:', path, { title, params });
-        
         set(state => {
           // Prevent unnecessary re-renders when setting the same path
           // This is crucial for avoiding infinite loops in navigation persistence
@@ -253,8 +245,6 @@ export const useNavigationStore = create<NavigationState>()(
 
       // History management
       addToHistory: (entry: NavigationHistoryEntry) => {
-        logger.debug('Adding to history:', entry);
-        
         set(state => {
           if (!state.preferences.showRecentPages) {
             return state;
@@ -270,12 +260,10 @@ export const useNavigationStore = create<NavigationState>()(
       },
 
       clearHistory: () => {
-        logger.debug('Clearing navigation history');
         set({ history: [] });
       },
 
       removeFromHistory: (path: string) => {
-        logger.debug('Removing from history:', path);
         set(state => ({
           history: state.history.filter(entry => entry.path !== path)
         }));
@@ -283,8 +271,6 @@ export const useNavigationStore = create<NavigationState>()(
 
       // Preferences management
       updatePreferences: (updates: Partial<NavigationPreferences>) => {
-        logger.debug('Updating navigation preferences:', updates);
-        
         set(state => {
           const newPreferences = { ...state.preferences, ...updates };
           
@@ -301,8 +287,6 @@ export const useNavigationStore = create<NavigationState>()(
       },
 
       setSidebarCollapsed: (collapsed: boolean) => {
-        logger.debug('Setting sidebar collapsed:', collapsed);
-        
         set(state => ({
           preferences: {
             ...state.preferences,
@@ -313,8 +297,6 @@ export const useNavigationStore = create<NavigationState>()(
 
       // Modal state management
       setModalState: (modalId: string, isOpen: boolean) => {
-        logger.debug('Setting modal state:', modalId, isOpen);
-        
         set(state => ({
           modals: {
             ...state.modals,
@@ -324,7 +306,6 @@ export const useNavigationStore = create<NavigationState>()(
       },
 
       closeAllModals: () => {
-        logger.debug('Closing all modals');
         set((state) => {
           // Performance optimization: only update state if there are actually modals to close
           // This prevents unnecessary re-renders when no modals are open
@@ -337,8 +318,6 @@ export const useNavigationStore = create<NavigationState>()(
 
       // Flow state management
       setCurrentFlowStep: (step: NavigationState['currentFlowStep']) => {
-        logger.debug('Setting current flow step:', step);
-        
         set(state => {
           // Prevent unnecessary re-renders when setting the same flow step
           // This is essential for navigation persistence stability
@@ -355,17 +334,13 @@ export const useNavigationStore = create<NavigationState>()(
 
       // Breadcrumb management
       setBreadcrumbs: (breadcrumbs: string[]) => {
-        logger.debug('Setting breadcrumbs:', breadcrumbs);
-        
         // Save to sessionStorage for browser refresh recovery
         sessionStorageHelpers.setBreadcrumbs(breadcrumbs);
-        
+
         set({ breadcrumbs });
       },
 
       addBreadcrumb: (breadcrumb: string) => {
-        logger.debug('Adding breadcrumb:', breadcrumb);
-        
         set(state => {
           const newBreadcrumbs = [...state.breadcrumbs, breadcrumb];
           
@@ -377,33 +352,25 @@ export const useNavigationStore = create<NavigationState>()(
       },
 
       clearBreadcrumbs: () => {
-        logger.debug('Clearing breadcrumbs');
-        
         sessionStorageHelpers.setBreadcrumbs([]);
         set({ breadcrumbs: [] });
       },
 
       // Hydration and initialization
       hydrateFromSession: () => {
-        logger.debug('Hydrating navigation state from session storage');
-        
         const sessionPath = sessionStorageHelpers.getCurrentPath();
         const sessionBreadcrumbs = sessionStorageHelpers.getBreadcrumbs();
         const flowState = localStorageHelpers.getFlowState();
-        
+
         set(state => ({
           currentPath: sessionPath || state.currentPath,
           breadcrumbs: sessionBreadcrumbs.length > 0 ? sessionBreadcrumbs : state.breadcrumbs,
           currentFlowStep: (flowState as NavigationState['currentFlowStep']) || state.currentFlowStep,
           isHydrated: true,
         }));
-        
-        logger.debug('Navigation state hydrated:', { sessionPath, sessionBreadcrumbs, flowState });
       },
 
       initializeNavigation: (currentPath: string) => {
-        logger.debug('Initializing navigation for path:', currentPath);
-        
         set(state => {
           // Atomic initialization: hydrate from storage and set current path in one operation
           // This prevents multiple re-renders during the initialization process
@@ -411,9 +378,7 @@ export const useNavigationStore = create<NavigationState>()(
             const sessionPath = sessionStorageHelpers.getCurrentPath();
             const sessionBreadcrumbs = sessionStorageHelpers.getBreadcrumbs();
             const flowState = localStorageHelpers.getFlowState();
-            
-            logger.debug('Hydrating during initialization:', { sessionPath, sessionBreadcrumbs, flowState });
-            
+
             // Update state with hydrated values and ensure initialization completes
             return {
               ...state,
@@ -424,7 +389,7 @@ export const useNavigationStore = create<NavigationState>()(
               modals: {}, // Clear any lingering modals
             };
           }
-          
+
           // Already hydrated, just ensure current path is set
           return {
             ...state,
@@ -432,8 +397,6 @@ export const useNavigationStore = create<NavigationState>()(
             modals: {}, // Clear any lingering modals
           };
         });
-        
-        logger.debug('Navigation initialized');
       },
 
       // Utility functions

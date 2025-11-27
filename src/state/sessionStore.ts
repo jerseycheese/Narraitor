@@ -505,7 +505,6 @@ export const useSessionStore = create<SessionStore>()(
   
   // Set session ID
   setSessionId: (id) => {
-    logger.debug('Setting session ID:', id);
     set({ id });
   },
   
@@ -518,11 +517,9 @@ export const useSessionStore = create<SessionStore>()(
   // Get saved session for a world/character combination
   getSavedSession: (worldId: string, characterId: string) => {
     const { savedSessions } = get();
-    logger.debug('Looking for saved session:', { worldId, characterId, savedSessions });
     const found = Object.values(savedSessions).find(
       session => session.worldId === worldId && session.characterId === characterId
     );
-    logger.debug('Found saved session:', found);
     return found;
   },
   
@@ -530,9 +527,8 @@ export const useSessionStore = create<SessionStore>()(
   resumeSavedSession: (sessionId: string) => {
     const { savedSessions } = get();
     const savedSession = savedSessions[sessionId];
-    
+
     if (savedSession) {
-      logger.debug('Resuming session:', sessionId);
       const activationTimestamp = getTimestamp();
       set(state => {
         const nextLifecycle: Record<string, SessionLifecycleMetadata> = {
