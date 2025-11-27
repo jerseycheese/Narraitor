@@ -403,21 +403,12 @@ export const TestDataGeneratorSection: React.FC = () => {
     try {
       for (let i = 0; i < 5; i++) {
         console.log(`[DevTools] Generating character ${i + 1}/5 for world "${currentWorld.name}"...`);
-        
-        // Smart character type selection based on world relationship (my enhancement)
-        let characterType: 'known' | 'original';
-        if (currentWorld.relationship === 'set_within') {
-          // 100% known figures for "set in" worlds - all characters from that universe
-          characterType = 'known';
-        } else if (currentWorld.relationship === 'inspired_by') {
-          // 100% original characters for "based on" worlds - inspired by but not from that universe
-          characterType = 'original';
-        } else {
-          // No reference - 100% original characters for original worlds
-          characterType = 'original';
-        }
-        
-        console.log(`[DevTools] Generating ${characterType} character for ${currentWorld.relationship || 'no reference'} world`);
+
+        // Random character type selection (50/50 between known and original)
+        const types: Array<'known' | 'original'> = ['known', 'original'];
+        const characterType = types[Math.floor(Math.random() * types.length)];
+
+        console.log(`[DevTools] Generating ${characterType} character for world "${currentWorld.name}"`);
         
         // Use the AI character generator via API route (secure approach from develop)
         const response: Response = await fetch('/api/generate-character', {
@@ -562,8 +553,8 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       const characterNames = createdCharacters.map(c => c.name).join(', ');
-      console.log(`[DevTools] Generated 5 AI characters (smart type selection) with portraits for world "${currentWorld.name}":`, createdCharacters);
-      alert(`Successfully generated 5 AI characters (smart type selection) with portraits: ${characterNames}`);
+      console.log(`[DevTools] Generated 5 AI characters (random type selection) with portraits for world "${currentWorld.name}":`, createdCharacters);
+      alert(`Successfully generated 5 AI characters (random type selection) with portraits: ${characterNames}`);
       
     } catch (error) {
       console.error('[DevTools] Error generating AI characters:', error);
@@ -770,9 +761,9 @@ export const TestDataGeneratorSection: React.FC = () => {
           size="sm"
           variant="success"
           disabled={!effectiveWorldId}
-          title="Creates 5 AI-generated characters directly in the selected world using smart character type selection based on world relationship"
+          title="Creates 5 AI-generated characters directly in the selected world with random character type selection (50/50 known/original)"
         >
-          Generate 5 Smart AI Characters for World
+          Generate 5 AI Characters for World
         </Button>
         
         <Button
