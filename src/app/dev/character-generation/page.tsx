@@ -6,7 +6,10 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { generateCharacter, type GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 
 export default function CharacterGenerationTestPage() {
-  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
+  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>(() => {
+    const types: Array<'known' | 'original'> = ['known', 'original'];
+    return types[Math.floor(Math.random() * types.length)];
+  });
   const [suggestedName, setSuggestedName] = useState('');
   const [selectedWorldId, setSelectedWorldId] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);

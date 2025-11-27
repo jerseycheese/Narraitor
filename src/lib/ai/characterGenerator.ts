@@ -20,7 +20,9 @@ export async function generateCharacter(
   world: World,
   existingCharacterNames: string[],
   suggestedName?: string,
-  generationType: 'known' | 'original' | 'specific' = 'original'
+  generationType?: 'known' | 'original' | 'specific'
 ): Promise<GeneratedCharacterData> {
-  return generateAICharacter(world, existingCharacterNames, suggestedName, generationType);
+  // Random generation type if not specified
+  const effectiveType = generationType ?? (Math.random() < 0.5 ? 'known' : 'original');
+  return generateAICharacter(world, existingCharacterNames, suggestedName, effectiveType);
 }
