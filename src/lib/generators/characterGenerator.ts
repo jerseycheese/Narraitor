@@ -5,6 +5,9 @@ import { validateWorld } from '@/types/type-guards';
 
 const logger = new Logger('CharacterGenerator');
 
+// Character level range for generated characters
+const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
+
 export interface GeneratedCharacterData {
   name: string;
   background: {
@@ -108,7 +111,7 @@ export function generateFromTemplate(options: CharacterGenerationOptions): Gener
   
   return {
     name: finalName,
-    level: Math.floor(Math.random() * 3) + 1, // Level 1-3
+    level: Math.floor(Math.random() * (CHARACTER_LEVEL_RANGE.max - CHARACTER_LEVEL_RANGE.min + 1)) + CHARACTER_LEVEL_RANGE.min,
     background: {
       description: `A mysterious figure with an interesting past${world.reference ? ` from the ${world.reference} universe` : ''}.`,
       personality: personalities[Math.floor(Math.random() * personalities.length)],
@@ -197,10 +200,9 @@ Generate a character and return ONLY a valid JSON object:
 
 {
   "name": "Character Name",
-  "level": 3,
   "background": {
     "description": "Their complete history and background story",
-    "personality": "Their personality traits and behavioral patterns", 
+    "personality": "Their personality traits and behavioral patterns",
     "motivation": "What drives them and their goals",
     "fears": ["List 2-3 specific fears or anxieties this character has"],
     "physicalDescription": "Their appearance including age, race/ethnicity, height, build, hair, eyes, and typical clothing"
@@ -464,7 +466,10 @@ CRITICAL INSTRUCTIONS:
       characterData.isKnownFigure = false;
       characterData.characterType = 'original';
     }
-    
+
+    // Calculate character level (1-5 range) - not from AI
+    characterData.level = Math.floor(Math.random() * (CHARACTER_LEVEL_RANGE.max - CHARACTER_LEVEL_RANGE.min + 1)) + CHARACTER_LEVEL_RANGE.min;
+
     return characterData;
   } catch (error) {
     // Don't fall back for certain types of validation errors
