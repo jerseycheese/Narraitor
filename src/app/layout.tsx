@@ -27,7 +27,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="antialiased">
-      <body className="font-sans m-0 p-0 min-h-screen flex flex-col">
+      <body className="font-sans m-0 p-0 min-h-screen flex flex-col" suppressHydrationWarning>
         <SkipLinks />
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
