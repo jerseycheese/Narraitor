@@ -53,9 +53,10 @@ export const evaluateRequirement = (
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
 
     return {
-      success: compareValues(currentLevel, requiredValue, requirement.operator),
+      success: true,
       current: currentLevel,
-      required: requiredValue
+      required: requiredValue,
+      skillName: skill?.name
     };
   }
 

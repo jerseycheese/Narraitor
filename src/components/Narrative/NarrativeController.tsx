@@ -3,7 +3,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
+import { Decision, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
 import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -20,6 +20,7 @@ interface NarrativeControllerProps {
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
   onEndingSuggested?: (reason: string, endingType: import('@/types/narrative.types').EndingType) => void;
+  onSkillCheckPerformed?: (results: SkillCheckRoll[]) => void;
   triggerGeneration?: boolean;
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
@@ -33,6 +34,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
+  onSkillCheckPerformed,
   triggerGeneration = true,
   choiceId,
   className,
@@ -42,7 +44,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [skillCheckResults, setSkillCheckResults] = useState<SkillCheckRoll[]>([]);
+
   // Access store methods in a way that works with testing
   const addSegment = useNarrativeStore(state => state.addSegment);
   const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
@@ -782,6 +785,8 @@ Respond with JSON format:
 
       // Evaluate skill requirements if present
       const skillCheckTags: string[] = [];
+      const rollResults: SkillCheckRoll[] = [];
+
       if (selectedOption?.requirements && characterId) {
         const character = characters[characterId];
         const world = worlds[worldId];
@@ -791,14 +796,13 @@ Respond with JSON format:
           const skillRequirements = selectedOption.requirements.filter(req => req.type === 'skill');
 
           for (const requirement of skillRequirements) {
-            // Create SkillCheck object for evaluateSkillCheck
-            const difficulty = typeof requirement.value === 'number'
+            const requiredLevel = typeof requirement.value === 'number'
               ? requirement.value
               : parseInt(requirement.value, 10);
 
             const skillCheck = {
               skillId: requirement.targetId,
-              difficulty
+              difficulty: requiredLevel
             };
 
             // Adapt store character format to evaluator's expected format
@@ -811,7 +815,7 @@ Respond with JSON format:
                 skillId: skill.worldSkillId || skill.id,
                 level: skill.level,
                 experience: 0,
-                isActive: true // Store doesn't track this, assume all skills are active
+                isActive: true
               })),
               attributes: character.attributes.map(attr => ({
                 attributeId: attr.worldAttributeId || attr.id,
@@ -822,13 +826,13 @@ Respond with JSON format:
                 personality: character.background?.personality || '',
                 goals: character.background?.goals || [],
                 fears: character.background?.fears || [],
-                relationships: [] // Store uses unknown[], evaluator expects CharacterRelationship[]
+                relationships: []
               },
               inventory: {
                 characterId: character.inventory.characterId,
-                items: [], // Store uses unknown[], evaluator expects InventoryItem[]
+                items: [],
                 capacity: character.inventory.capacity,
-                categories: [], // Store uses string[], evaluator expects InventoryCategory[]
+                categories: [],
                 itemOrder: [],
               },
               status: character.status,
@@ -836,20 +840,37 @@ Respond with JSON format:
               updatedAt: character.updatedAt
             };
 
-            const success = evaluateSkillCheck(
-              adaptedCharacter,
-              skillCheck,
-              world.skills || []
-            );
+            try {
+              const rollResult = evaluateSkillCheck(
+                adaptedCharacter,
+                skillCheck,
+                world.skills || []
+              );
+              rollResults.push(rollResult);
 
-            // Add success or failure tags for each skill check
-            const tag = success
-              ? `skill-success:${requirement.targetId}`
-              : `skill-failure:${requirement.targetId}`;
-            skillCheckTags.push(tag);
+              // Build tags based on outcome
+              if (rollResult.isCriticalSuccess) {
+                skillCheckTags.push(`skill-critical-success:${requirement.targetId}`);
+              } else if (rollResult.isCriticalFailure) {
+                skillCheckTags.push(`skill-critical-failure:${requirement.targetId}`);
+              } else if (rollResult.success) {
+                skillCheckTags.push(`skill-success:${requirement.targetId}`);
+              } else {
+                skillCheckTags.push(`skill-failure:${requirement.targetId}`);
+              }
+
+              skillCheckTags.push(`skill-roll:${rollResult.diceRoll}`);
+            } catch (error) {
+              console.error('Skill check failed:', error);
+              skillCheckTags.push(`skill-error:${requirement.targetId}`);
+            }
           }
         }
       }
+
+      // Store results for badge display
+      setSkillCheckResults(rollResults);
+      onSkillCheckPerformed?.(rollResults);
 
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];

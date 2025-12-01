@@ -1,9 +1,12 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { RequirementLogic } from '@/types/narrative.types';
+import { RequirementLogic, SkillCheckRoll } from '@/types/narrative.types';
 
 interface SkillRequirement {
   skillName?: string;
+  requirement?: {
+    targetId: string;
+  };
 }
 
 interface ItemRequirement {
@@ -21,6 +24,7 @@ interface ItemRequirementGroup {
 interface SkillRequirementBadgesProps {
   requirements: SkillRequirement[];
   optionId: string;
+  rollResults?: SkillCheckRoll[];
 }
 
 interface ItemRequirementBadgesProps {
@@ -29,11 +33,12 @@ interface ItemRequirementBadgesProps {
 }
 
 /**
- * Renders skill requirement badges
+ * Renders skill requirement badges with roll results
  */
 export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   requirements,
   optionId,
+  rollResults = [],
 }) => {
   if (!requirements || requirements.length === 0) {
     return null;
@@ -42,12 +47,34 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   return (
     <div className="flex flex-wrap gap-1 mt-2">
       {requirements.map((skillReq, index) => {
-        const label = `${skillReq.skillName}`;
+        const rollResult = rollResults.find(r => r.skillId === skillReq.requirement?.targetId);
+
+        let variant: 'skill-requirement' | 'success' | 'destructive' | 'warning' = 'skill-requirement';
+        let label = skillReq.skillName || 'Unknown Skill';
+
+        if (rollResult) {
+          if (rollResult.isCriticalSuccess) {
+            variant = 'success';
+            label = `${skillReq.skillName} - Natural 20! (auto-success)`;
+          } else if (rollResult.isCriticalFailure) {
+            variant = 'destructive';
+            label = `${skillReq.skillName} - Natural 1! (auto-fail)`;
+          } else if (rollResult.success) {
+            variant = 'success';
+            label = `${skillReq.skillName} - Success (${rollResult.total} vs DC ${rollResult.dc})`;
+          } else {
+            variant = 'warning';
+            label = `${skillReq.skillName} - Failed (${rollResult.total} vs DC ${rollResult.dc})`;
+          }
+        } else {
+          label = `${skillReq.skillName} Check Required`;
+        }
 
         return (
           <Badge
             key={`${optionId}-skill-${index}`}
-            variant="skill-requirement"
+            variant={variant}
+            className="text-xs"
           >
             {label}
           </Badge>

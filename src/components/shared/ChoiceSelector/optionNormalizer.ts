@@ -99,20 +99,11 @@ export function normalizeDecisionOptions(
       };
     });
 
-    const allSkillRequirementsMet = skillRequirements.every(r => r.met);
     const allItemGroupsMet =
       itemRequirementGroups.length === 0 ||
       itemRequirementGroups.every(group => group.met);
 
     const disabledReasonParts: string[] = [];
-    if (!allSkillRequirementsMet) {
-      const missingSkills = skillRequirements
-        .filter(req => !req.met)
-        .map(req => req.skillName || 'Required skill');
-      if (missingSkills.length > 0) {
-        disabledReasonParts.push(`Skills: ${missingSkills.join(', ')}`);
-      }
-    }
 
     if (!allItemGroupsMet) {
       const missingItems = itemRequirementGroups
@@ -141,7 +132,7 @@ export function normalizeDecisionOptions(
       hint: opt.hint,
       isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
       alignment: opt.alignment,
-      isDisabledByRequirements: !(allSkillRequirementsMet && allItemGroupsMet),
+      isDisabledByRequirements: !allItemGroupsMet,
       disabledReason,
       skillRequirements,
       itemRequirementGroups

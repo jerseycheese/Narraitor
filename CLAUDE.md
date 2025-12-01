@@ -28,6 +28,96 @@ Key practices:
 - **PR-based workflow**: No direct commits to main branches. Every change gets reviewed.
 - **KISS principle**: Simple solutions over clever ones. The codebase should be readable six months later.
 
+## Custom Agents
+The project uses specialized Claude Code agents to maintain code quality and automate workflows. These agents should be invoked proactively when their conditions are met:
+
+### issue-prioritizer
+**When to use**: User asks what to work on next, or needs help deciding between multiple open issues.
+
+Analyzes all open GitHub issues and provides prioritized recommendations based on age, user impact, technical debt, effort estimation, dependencies, and community interest. Gives specific reasoning for each recommendation.
+
+Example triggers:
+- "What should I work on next?"
+- "I have 15 open issues and don't know where to start"
+- "Help me prioritize the backlog"
+
+### test-fixer
+**When to use**: Test suite has failures, or user requests test cleanup.
+
+Maintains test quality by fixing failing tests properly (never rigging them to pass), removing trivial tests that provide no value, and focusing on acceptance criteria. Follows KISS principle and tests WHAT features do for users, not HOW code implements them.
+
+Example triggers:
+- Test suite failures
+- "fix failing tests"
+- "remove trivial tests"
+- "clean up test suite"
+
+### design-system-cop
+**When to use**: Proactively when implementing or reviewing UI components, styles, or accessibility features.
+
+Enforces the 23-color design token system, WCAG 2 accessibility standards, and shadcn/ui component usage. Catches hardcoded colors, validates contrast ratios, checks semantic HTML, and ensures keyboard navigation support.
+
+Example triggers:
+- User creates/modifies UI components
+- Style changes across multiple files
+- Before starting new UI features
+- User mentions styling, colors, or accessibility
+
+### pr-closer
+**When to use**: Automatically after a PR is merged.
+
+Updates related GitHub issues by checking off acceptance criteria, posting a natural-sounding completion comment, and closing the issue. Uses conversational tone ("This is done. Merged in PR #45") rather than corporate language.
+
+Example triggers:
+- "I just merged PR #45"
+- "Just finished merging the world creation wizard PR"
+- Detecting PR merge events
+
+### formatting-cop
+**When to use**: Before commits, or when user requests code cleanup.
+
+Enforces code formatting standards including 300-line file limit, removes console.log statements, validates shadcn/ui component usage, checks for unused imports, ensures no `any` types, and cleans up TODO/FIXME comments.
+
+Example triggers:
+- "check formatting" or "fix formatting"
+- Before committing code
+- "clean up code"
+- File size violations detected
+
+## Custom Skills
+The project uses Claude Code skills that provide deep expertise for specific tasks. Skills are invoked with the Skill tool:
+
+### narraitor-architecture
+**When to use**: Automatically when implementing features, planning implementations, or refactoring within Narraitor.
+
+Enforces Narraitor's domain-driven architecture, Zustand state patterns, and Next.js 15 conventions. Ensures code follows the five core domains (World, Character, Inventory, Narrative, Journal) and prevents domain boundary violations. Provides guidance on component organization, shadcn/ui usage, API route security, and the three-stage verification testing approach.
+
+Key enforcement areas:
+- Domain separation and boundaries
+- Zustand store patterns (CRUD operations, consistent interface)
+- Component architecture (max 300 lines, proper organization)
+- Next.js 15 App Router patterns (server vs client components)
+- Security patterns (server-side API keys, rate limiting)
+
+### narraitor-pattern-alignment-skill
+**When to use**: Automatically during code review to ensure consistency.
+
+Comprehensive code review assistant that checks all changes against established patterns, existing utilities, design system, and WCAG 2.1 Level AA accessibility standards. Prevents reinventing existing utilities and ensures design token compliance.
+
+Checks for:
+- Component structure and naming (PascalCase, 300-line limit, single responsibility)
+- Design token usage (no hardcoded colors, 23-color palette enforcement)
+- Error handling patterns (using errorUtils, proper categorization)
+- Import organization (React first, third-party, internal, types)
+- Testing patterns (behavior over implementation, user-centric queries)
+- Utility function reuse (checking src/lib/utils/ before creating new ones)
+- WCAG 2.1 Level AA accessibility (contrast, semantic HTML, keyboard nav, ARIA)
+- Type safety (no `any` types, proper interfaces)
+- Zustand patterns (using createCrudStore, domain-specific stores)
+- Domain boundaries (no mixing World logic with Character logic)
+
+Provides structured feedback with specific file locations, existing utilities to use, and code examples for fixes.
+
 ## Three-Stage Verification Framework
 All implementations must go through the Three-Stage Verification process:
 
@@ -162,3 +252,24 @@ Available at `/dev/*` routes:
 - `/dev/world-creation-wizard` - World Creation Wizard testing
 - `/dev/devtools-test` - DevTools panel testing
 - `/dev/game-session` - Game session testing
+
+## MCP Servers
+The project uses Model Context Protocol (MCP) servers to extend capabilities:
+
+### GitHub MCP Server
+Provides direct integration with GitHub for issue and PR operations. Used by the `pr-closer` and `issue-prioritizer` agents for automated workflow management.
+
+### Brave Search
+Web search capabilities for looking up documentation, APIs, and external resources.
+
+### Context7 (Upstash)
+Advanced context management and storage capabilities.
+
+### Filesystem
+Enhanced filesystem operations with MCP protocol.
+
+### Sequential Thinking
+Structured thinking and reasoning capabilities for complex problem-solving.
+
+### Memory
+Persistent memory across sessions for maintaining context and learnings.
