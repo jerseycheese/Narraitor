@@ -195,7 +195,6 @@ export const useGameSessionState = ({
   const handleSelectChoice = (choiceId: string) => {
     if (!sessionState.playerChoices) return;
     
-    logger.debug('Selecting choice:', choiceId);
     
     // Update local state immediately for visual feedback
     setSessionState(prev => {

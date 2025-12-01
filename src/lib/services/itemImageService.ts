@@ -88,10 +88,6 @@ class ItemImageService {
       inventoryStore.setGeneratingImage(itemId, false);
       inventoryStore.setImageGenerationError(itemId, null);
 
-      logger.info('generateForItem', `Image generated for item: ${item.name}`, {
-        itemId,
-        imageType: generatedImage.type,
-      });
 
       return generatedImage;
     } catch (error) {
@@ -121,10 +117,6 @@ class ItemImageService {
       genre,
     };
 
-    logger.debug('_generateImageInternal', 'Calling /api/generate-item-image', {
-      itemName: item.name,
-      genre,
-    });
 
     const response = await fetch('/api/generate-item-image', {
       method: 'POST',
