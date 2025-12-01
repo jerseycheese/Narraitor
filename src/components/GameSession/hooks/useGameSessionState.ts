@@ -261,7 +261,6 @@ export const useGameSessionState = ({
         // Initialize a new session if:
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
-        logger.debug('[useGameSessionState] Creating new session with character:', sessionCharacterId, 'disableAutoResume:', disableAutoResume);
         actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, disableAutoResume);
       }
     }

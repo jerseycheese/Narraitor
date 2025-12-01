@@ -85,17 +85,6 @@ export const useSessionStore = create<SessionStore>()(
   initializeSession: async (worldId, characterId, onComplete, force = false) => {
     const currentState = get();
 
-    logger.debug('TARGET: initializeSession called:', {
-      worldId,
-      characterId,
-      force,
-      currentState: {
-        id: currentState.id,
-        status: currentState.status,
-        worldId: currentState.worldId,
-        characterId: currentState.characterId
-      }
-    });
 
     // Don't initialize if we already have an active session for the same world/character
     // unless force is true (for fresh sessions)
@@ -107,14 +96,12 @@ export const useSessionStore = create<SessionStore>()(
       return;
     }
     
-    logger.debug('Initializing session for worldId:', worldId, 'characterId:', characterId);
     
     // Generate a new session ID for fresh sessions or when changing characters
     const isNewCharacterSession = currentState.characterId !== characterId;
     const sessionId = (isNewCharacterSession || !currentState.id) 
       ? `session-${worldId}-${characterId}-${Date.now()}` 
       : currentState.id;
-    logger.debug('🆔 Using session ID:', sessionId, { isNewCharacterSession, previousCharacterId: currentState.characterId });
     
     // Clear narrative data only for the new session to prevent inheritance
     // IMPORTANT: We preserve old session data when changing characters to avoid data loss
@@ -127,7 +114,6 @@ export const useSessionStore = create<SessionStore>()(
         // The old session data is preserved so users can return to it later
         if (isNewCharacterSession && currentState.id) {
           // Save the current session before switching (but don't clear its data)
-          logger.debug('💾 Preserving old session data for potential return:', currentState.id);
           // The old session data remains intact in the narrative store
         }
 
@@ -141,7 +127,6 @@ export const useSessionStore = create<SessionStore>()(
 
         // Always clear any global ending state
         narrativeStore.clearEnding();
-        logger.debug('🧹 Cleared global ending state for new session:', sessionId);
       } catch (error) {
         logger.warn('Failed to clear narrative data:', error);
       }
@@ -188,7 +173,6 @@ export const useSessionStore = create<SessionStore>()(
     };
     
     set(state => {
-      logger.debug('Setting loading state from:', state);
       return { 
         id: sessionId,
         status: 'loading', 
@@ -206,10 +190,8 @@ export const useSessionStore = create<SessionStore>()(
       // Simulate loading time for development
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      logger.debug('Session loaded, setting active state');
       const activationTimestamp = getTimestamp();
       set(state => {
-        logger.debug('Current state before setting active:', state);
         return { 
           status: 'active',
           currentSceneId: 'initial-scene',
@@ -228,7 +210,6 @@ export const useSessionStore = create<SessionStore>()(
         };
       });
       
-      logger.debug('State updated to active:', get());
       
       // Create session start journal entry (Issue #176)
       try {
@@ -282,7 +263,6 @@ export const useSessionStore = create<SessionStore>()(
           updatedAt: sessionStartTime
         });
         
-        logger.debug('📓 Session start journal entry created');
       } catch (error) {
         logger.warn('Failed to create session start journal entry:', error);
       }
@@ -751,7 +731,6 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   updateAutoSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error', errorMessage?: string) => {
-    logger.debug('Updating auto-save status:', status, errorMessage);
     set(state => ({
       autoSave: {
         ...state.autoSave,
@@ -762,7 +741,6 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   recordAutoSave: (timestamp: string) => {
-    logger.debug('Recording auto-save at:', timestamp);
     set(state => ({
       autoSave: {
         ...state.autoSave,

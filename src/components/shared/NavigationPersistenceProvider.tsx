@@ -34,7 +34,6 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
    */
   useEffect(() => {
     setIsClient(true);
-    logger.debug('Forcing immediate navigation initialization');
     setIsInitialized(true);
   }, []);
 

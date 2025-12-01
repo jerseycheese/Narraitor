@@ -579,10 +579,6 @@ The items will be automatically added to the character's inventory with proper c
       if (rewritten) {
         const secondEval = evaluateLanguageComplexity(rewritten, level);
         if (secondEval.passes) {
-          logger.info('Narrative rewritten to align with language complexity guidelines.', {
-            level,
-            metrics: secondEval.metrics,
-          });
 
           return {
             ...result,
