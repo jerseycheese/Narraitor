@@ -882,29 +882,38 @@ Respond with JSON format:
       onSkillCheckPerformed?.(rollResults);
 
       // Show toast notifications for skill check results
+      // Use longer duration (8 seconds) so players have time to read the roll details
       rollResults.forEach(result => {
         const modifier = result.skillLevel + result.attributeBonus;
 
         if (result.isCriticalSuccess) {
-          toast.success(
-            `Critical Success! ${result.skillName}`,
-            `Natural 20! Total: ${result.total} vs DC ${result.dc}`
-          );
+          toast.addToast({
+            title: `Critical Success! ${result.skillName}`,
+            description: `Natural 20! Total: ${result.total} vs DC ${result.dc}`,
+            variant: 'success',
+            duration: 8000
+          });
         } else if (result.isCriticalFailure) {
-          toast.error(
-            `Critical Failure! ${result.skillName}`,
-            `Natural 1! Total: ${result.total} vs DC ${result.dc}`
-          );
+          toast.addToast({
+            title: `Critical Failure! ${result.skillName}`,
+            description: `Natural 1! Total: ${result.total} vs DC ${result.dc}`,
+            variant: 'error',
+            duration: 8000
+          });
         } else if (result.success) {
-          toast.success(
-            `${result.skillName} Check Passed`,
-            `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`
-          );
+          toast.addToast({
+            title: `${result.skillName} Check Passed`,
+            description: `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`,
+            variant: 'success',
+            duration: 8000
+          });
         } else {
-          toast.warning(
-            `${result.skillName} Check Failed`,
-            `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`
-          );
+          toast.addToast({
+            title: `${result.skillName} Check Failed`,
+            description: `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`,
+            variant: 'warning',
+            duration: 8000
+          });
         }
       });
 
