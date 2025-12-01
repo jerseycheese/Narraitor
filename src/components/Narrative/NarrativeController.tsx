@@ -934,6 +934,23 @@ Respond with JSON format:
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
       const currentTags = [...existingTags, ...skillCheckTags];
 
+      // Build skill check context for the AI
+      let skillCheckContext = '';
+      if (rollResults.length > 0) {
+        const skillResultDescriptions = rollResults.map(r => {
+          if (r.isCriticalSuccess) {
+            return `${r.skillName}: CRITICAL SUCCESS (natural 20)`;
+          } else if (r.isCriticalFailure) {
+            return `${r.skillName}: CRITICAL FAILURE (natural 1)`;
+          } else if (r.success) {
+            return `${r.skillName}: SUCCESS (rolled ${r.total} vs DC ${r.dc})`;
+          } else {
+            return `${r.skillName}: FAILURE (rolled ${r.total} vs DC ${r.dc})`;
+          }
+        });
+        skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
+      }
+
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
@@ -946,7 +963,7 @@ Respond with JSON format:
           currentTags,
           sessionId: sessionId || 'temp-session',
           recentSegments,
-          currentSituation: `Player chose: "${choiceText}"`
+          currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`
         },
         generationParameters: {
           includedTopics: [choiceText],
