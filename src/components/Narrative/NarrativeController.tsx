@@ -891,7 +891,11 @@ Respond with JSON format:
           const parts = [`d20: ${result.diceRoll}`];
           if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
           if (result.attributeBonus > 0) parts.push(`attribute: +${result.attributeBonus}`);
-          const breakdown = parts.join(', ');
+
+          // If no bonuses, explicitly show that
+          const hasAnyBonus = result.skillLevel > 0 || result.attributeBonus > 0;
+          const breakdown = hasAnyBonus ? parts.join(', ') : `${parts[0]} (no bonuses)`;
+
           return `${breakdown} = ${result.total} (need ${result.dc})`;
         };
 
