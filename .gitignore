@@ -103,12 +103,14 @@ docs/voice-writing-profile.md
 .claude/*
 .claude-workflow/
 .clauderc
+CLAUDE.md
 
 # MCP local config (do not commit)
 .mcp.json
 
 # Agent guidelines
 AGENTS.local.md
+AGENTS.md
 
 # Personal paths (security)
 **/Users/*/
