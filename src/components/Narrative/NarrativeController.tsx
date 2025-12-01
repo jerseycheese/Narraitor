@@ -10,6 +10,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
 import type { Character as UtilCharacter } from '@/types/character.types';
+import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
 
@@ -45,6 +46,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [skillCheckResults, setSkillCheckResults] = useState<SkillCheckRoll[]>([]);
+  const toast = useToast();
 
   // Access store methods in a way that works with testing
   const addSegment = useNarrativeStore(state => state.addSegment);
@@ -871,6 +873,31 @@ Respond with JSON format:
       // Store results for badge display
       setSkillCheckResults(rollResults);
       onSkillCheckPerformed?.(rollResults);
+
+      // Show toast notifications for skill check results
+      rollResults.forEach(result => {
+        if (result.isCriticalSuccess) {
+          toast.success(
+            `Critical Success! ${result.skillName}`,
+            `Natural 20! Total: ${result.totalRoll} vs DC ${result.dc}`
+          );
+        } else if (result.isCriticalFailure) {
+          toast.error(
+            `Critical Failure! ${result.skillName}`,
+            `Natural 1! Total: ${result.totalRoll} vs DC ${result.dc}`
+          );
+        } else if (result.success) {
+          toast.success(
+            `${result.skillName} Check Passed`,
+            `Rolled ${result.diceRoll} + ${result.modifier} = ${result.totalRoll} vs DC ${result.dc}`
+          );
+        } else {
+          toast.warning(
+            `${result.skillName} Check Failed`,
+            `Rolled ${result.diceRoll} + ${result.modifier} = ${result.totalRoll} vs DC ${result.dc}`
+          );
+        }
+      });
 
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];

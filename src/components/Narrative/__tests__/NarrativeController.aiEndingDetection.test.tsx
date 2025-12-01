@@ -5,6 +5,7 @@ import { render } from '@testing-library/react';
 import { NarrativeController } from '../NarrativeController';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { mockZustandStore, createMockNarrativeStore } from '@/lib/test-utils';
+import { ToastProvider } from '@/components/ui/toast/toaster';
 
 // Mock the AI client
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
@@ -44,9 +45,14 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
   const mockAddSegment = jest.fn();
   const mockGetSessionSegments = jest.fn();
 
+  // Helper to wrap component in ToastProvider
+  const renderWithToast = (component: React.ReactElement) => {
+    return render(<ToastProvider>{component}</ToastProvider>);
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup narrative store mock
     mockZustandStore(useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>, createMockNarrativeStore({
       addSegment: mockAddSegment,
@@ -63,7 +69,7 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
 
   describe('Component Integration', () => {
     it('should render NarrativeController with ending detection enabled', () => {
-      const { container } = render(
+      const { container } = renderWithToast(
         <NarrativeController
           worldId="test-world"
           sessionId="test-session"
@@ -77,8 +83,8 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
 
     it('should accept onEndingSuggested callback prop', () => {
       const mockCallback = jest.fn();
-      
-      render(
+
+      renderWithToast(
         <NarrativeController
           worldId="test-world"
           sessionId="test-session"
@@ -92,7 +98,7 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
     });
 
     it('should work without onEndingSuggested callback', () => {
-      render(
+      renderWithToast(
         <NarrativeController
           worldId="test-world"
           sessionId="test-session"
@@ -116,8 +122,8 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
         generateChoices: false
       };
 
-      const { container } = render(<NarrativeController {...props} />);
-      
+      const { container } = renderWithToast(<NarrativeController {...props} />);
+
       expect(container.querySelector('.narrative-controller')).toBeInTheDocument();
     });
   });
