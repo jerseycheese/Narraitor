@@ -264,8 +264,9 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       expect(result.skillName).toBe('tunneling');
       expect(result.diceRoll).toBe(1);
-      expect(result.modifier).toBe(0);
-      expect(result.totalRoll).toBe(1);
+      expect(result.skillLevel).toBe(0);
+      expect(result.attributeBonus).toBe(0);
+      expect(result.total).toBe(1);
       expect(result.success).toBe(false);
       expect(result.isCriticalFailure).toBe(true);
     });

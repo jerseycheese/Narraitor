@@ -126,12 +126,14 @@ export function evaluateSkillCheck(
       skillId: skillCheck.skillId || '',
       skillName: attemptedSkillName,
       diceRoll: 1, // Minimum roll
-      modifier: 0,
-      totalRoll: 1,
-      dc: skillCheck.dc || 15,
+      skillLevel: 0,
+      attributeBonus: 0,
+      total: 1,
+      dc: skillCheck.difficulty * 2, // Use standard DC calculation
       success: false,
       isCriticalSuccess: false,
       isCriticalFailure: true, // Unknown skill = critical failure
+      timestamp: new Date().toISOString()
     };
   }
 
