@@ -883,25 +883,27 @@ Respond with JSON format:
 
       // Show toast notifications for skill check results
       rollResults.forEach(result => {
+        const modifier = result.skillLevel + result.attributeBonus;
+
         if (result.isCriticalSuccess) {
           toast.success(
             `Critical Success! ${result.skillName}`,
-            `Natural 20! Total: ${result.totalRoll} vs DC ${result.dc}`
+            `Natural 20! Total: ${result.total} vs DC ${result.dc}`
           );
         } else if (result.isCriticalFailure) {
           toast.error(
             `Critical Failure! ${result.skillName}`,
-            `Natural 1! Total: ${result.totalRoll} vs DC ${result.dc}`
+            `Natural 1! Total: ${result.total} vs DC ${result.dc}`
           );
         } else if (result.success) {
           toast.success(
             `${result.skillName} Check Passed`,
-            `Rolled ${result.diceRoll} + ${result.modifier} = ${result.totalRoll} vs DC ${result.dc}`
+            `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`
           );
         } else {
           toast.warning(
             `${result.skillName} Check Failed`,
-            `Rolled ${result.diceRoll} + ${result.modifier} = ${result.totalRoll} vs DC ${result.dc}`
+            `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`
           );
         }
       });
