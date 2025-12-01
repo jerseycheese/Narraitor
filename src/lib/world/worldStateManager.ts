@@ -118,7 +118,6 @@ const ensureState = (state: WorldState | undefined, worldId: EntityID): WorldSta
     };
   }
 
-  logger.debug('Creating empty world state for world:', worldId);
   return createEmptyWorldState(worldId);
 };
 
@@ -550,7 +549,6 @@ export const updateNPCRelationship = (
     },
   };
 
-  logger.debug('Updated NPC relationship', { worldId, npcId, sessionId, lastModified });
   return nextState;
 };
 
@@ -572,7 +570,6 @@ export const recordMajorEvent = (
     majorEvents: mergeEvents(currentState.majorEvents, [nextEvent]),
   };
 
-  logger.debug('Recorded major event', { worldId, eventId: event.id, sessionId, timestamp });
   return nextState;
 };
 
@@ -617,12 +614,6 @@ export const recordStoryCheckpoint = (
     storyCheckpoints: mergeCheckpoints(currentState.storyCheckpoints, [normalized]),
   };
 
-  logger.debug('Recorded story checkpoint', {
-    worldId,
-    checkpointId: normalized.id,
-    sessionId: normalized.sessionId,
-    eventCount: normalized.eventIds.length,
-  });
 
   return nextState;
 };

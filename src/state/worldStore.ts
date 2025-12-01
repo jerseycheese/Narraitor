@@ -428,7 +428,6 @@ export const useWorldStore = create<WorldStore>()(
               return {};
             }
 
-            logger.debug('Initializing world state for world:', worldId);
             return {
               worldStates: {
                 ...state.worldStates,
@@ -443,7 +442,6 @@ export const useWorldStore = create<WorldStore>()(
             logger.warn('Attempted to update state for unknown world', { worldId, sessionId });
             return;
           }
-          logger.debug('Applying world state update', { worldId, sessionId, keys: Object.keys(stateUpdate ?? {}) });
           set(state => {
             const currentState = state.worldStates[worldId];
             const nextState = applyWorldStateUpdate(worldId, currentState, stateUpdate, sessionId);
@@ -458,7 +456,6 @@ export const useWorldStore = create<WorldStore>()(
         },
 
         mergeWorldState: (incomingState) => {
-          logger.debug('Merging external world state', { worldId: incomingState.worldId, version: incomingState.version });
           set(state => {
             const currentState = state.worldStates[incomingState.worldId];
             const merged = currentState ? mergeState(currentState, incomingState) : incomingState;

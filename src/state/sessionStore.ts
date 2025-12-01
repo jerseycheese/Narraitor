@@ -91,7 +91,6 @@ export const useSessionStore = create<SessionStore>()(
     if (!force && currentState.status === 'active' &&
         currentState.worldId === worldId &&
         currentState.characterId === characterId) {
-      logger.debug('Session already active for this world/character, skipping initialization');
       if (onComplete) onComplete();
       return;
     }
@@ -122,7 +121,6 @@ export const useSessionStore = create<SessionStore>()(
         if (existingSegments.length > 0) {
           narrativeStore.clearSessionSegments(sessionId);
           narrativeStore.clearSessionDecisions(sessionId);
-          logger.debug('🧹 Cleared existing data for session:', sessionId);
         }
 
         // Always clear any global ending state
@@ -140,7 +138,6 @@ export const useSessionStore = create<SessionStore>()(
         const clearInventory = () => {
           try {
             useInventoryStore.getState().clearCharacterInventory(characterId);
-            logger.debug('🧹 Cleared inventory for character due to forced fresh session:', characterId);
           } catch (clearError) {
             logger.warn('Failed to clear inventory for fresh session (during hydration callback):', clearError);
           }
@@ -268,7 +265,6 @@ export const useSessionStore = create<SessionStore>()(
       }
       
       if (onComplete) {
-        logger.debug('Calling onComplete callback');
         onComplete();
       }
     } catch (error) {
@@ -287,16 +283,8 @@ export const useSessionStore = create<SessionStore>()(
     
     // Add stack trace to debug unexpected calls
     const stack = new Error().stack;
-    logger.debug('🔚 endSession called:', {
-      currentId: state.id,
-      status: state.status,
-      worldId: state.worldId,
-      characterId: state.characterId,
-      stack: stack?.split('\n').slice(0, 5).join('\n') // First 5 lines of stack
-    });
     
     if (state.id && state.worldId && state.characterId) {
-      logger.debug('Saving session before ending:', state.id);
       
       // Create session end journal entry (Issue #176)
       try {
@@ -368,7 +356,6 @@ export const useSessionStore = create<SessionStore>()(
             updatedAt: sessionEndTime
           });
           
-          logger.debug('📓 Session end journal entry created with duration:', durationText);
         } catch (journalError) {
           logger.warn('Failed to access journal store for session end entry:', journalError);
         }
@@ -391,7 +378,6 @@ export const useSessionStore = create<SessionStore>()(
           }
         };
         
-        logger.debug('🔚 Saving session and resetting state:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
         const previousMetadata = prevState.sessionLifecycle[sessionId];
         const updatedLifecycle: Record<string, SessionLifecycleMetadata> = {
           ...prevState.sessionLifecycle,
@@ -418,7 +404,6 @@ export const useSessionStore = create<SessionStore>()(
         };
       });
     } else {
-      logger.debug('🔚 No active session to save, just resetting state');
       // Keep savedSessions and onboarding state when resetting
       set(prevState => ({
         ...initialState,
@@ -431,25 +416,21 @@ export const useSessionStore = create<SessionStore>()(
 
   // Set session status
   setStatus: (status) => {
-    logger.debug('Setting status to:', status);
     set({ status });
   },
 
   // Set error message
   setError: (error) => {
-    logger.debug('Setting error:', error);
     set({ error });
   },
 
   // Set player choices
   setPlayerChoices: (choices) => {
-    logger.debug('Setting player choices:', choices);
     set({ playerChoices: choices });
   },
 
   // Select a player choice
   selectChoice: (choiceId) => {
-    logger.debug('Selecting choice:', choiceId);
     const { playerChoices } = get();
     const updatedChoices = playerChoices.map(choice => ({
       ...choice,
@@ -461,25 +442,21 @@ export const useSessionStore = create<SessionStore>()(
 
   // Clear player choices
   clearPlayerChoices: () => {
-    logger.debug('Clearing player choices');
     set({ playerChoices: [] });
   },
 
   // Set current scene
   setCurrentScene: (sceneId) => {
-    logger.debug('Setting current scene:', sceneId);
     set({ currentSceneId: sceneId });
   },
 
   // Pause the session
   pauseSession: () => {
-    logger.debug('Pausing session');
     set({ status: 'paused' });
   },
 
   // Resume the session from paused state
   resumeSession: () => {
-    logger.debug('Resuming session from paused state');
     set({ status: 'active' });
   },
   
@@ -490,7 +467,6 @@ export const useSessionStore = create<SessionStore>()(
   
   // Set character ID
   setCharacterId: (characterId: string) => {
-    logger.debug('Setting character ID:', characterId);
     set({ characterId });
   },
   
@@ -549,7 +525,6 @@ export const useSessionStore = create<SessionStore>()(
   
   // Delete a saved session
   deleteSavedSession: (sessionId: string) => {
-    logger.debug('Deleting saved session:', sessionId);
     set(state => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [sessionId]: _, ...remainingSessions } = state.savedSessions;
@@ -576,7 +551,6 @@ export const useSessionStore = create<SessionStore>()(
   // This ensures sessions are saved when narrative content is added during gameplay,
   // not only when explicitly ended
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => {
-    logger.debug('Updating narrative count for session:', sessionId, narrativeCount);
     set(state => {
       const timestamp = getTimestamp();
       // If session doesn't exist in savedSessions yet, create it
@@ -590,7 +564,6 @@ export const useSessionStore = create<SessionStore>()(
           return state;
         }
         // This is the active session - save it for the first time
-        logger.debug('Creating new saved session entry for active session:', sessionId);
         const nextLifecycle: Record<string, SessionLifecycleMetadata> = {
           ...state.sessionLifecycle,
           [sessionId]: {
@@ -663,7 +636,6 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => {
-    logger.debug('Upserting session lifecycle metadata:', metadata);
     set(state => ({
       sessionLifecycle: {
         ...state.sessionLifecycle,
@@ -676,7 +648,6 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   setSessionLifecycleStatus: (sessionId: string, status: SessionLifecycleStatus) => {
-    logger.debug('Setting session lifecycle status:', { sessionId, status });
     set(state => {
       const existing = state.sessionLifecycle[sessionId];
       if (!existing) {
@@ -703,7 +674,6 @@ export const useSessionStore = create<SessionStore>()(
 
   // Template history actions
   addTemplateToHistory: (entry: TemplateHistoryEntry) => {
-    logger.debug('Adding template to history:', entry.template.name);
     set(state => {
       const newHistory = [entry, ...state.templateHistory].slice(0, 5); // Keep only last 5
       return { templateHistory: newHistory };
@@ -715,13 +685,11 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   clearTemplateHistory: () => {
-    logger.debug('Clearing template history');
     set({ templateHistory: [] });
   },
 
   // Auto-save methods
   setAutoSaveEnabled: (enabled: boolean) => {
-    logger.debug('Setting auto-save enabled:', enabled);
     set(state => ({
       autoSave: {
         ...state.autoSave,
@@ -754,7 +722,6 @@ export const useSessionStore = create<SessionStore>()(
   
   // Onboarding actions
   setOnboardingCompleted: (completed: boolean) => {
-    logger.debug('Setting onboarding completed:', completed);
     set({ onboardingCompleted: completed });
   },
   
@@ -785,13 +752,11 @@ export const useSessionStore = create<SessionStore>()(
             narrativeCount: actualCount
           };
           hasUpdates = true;
-          logger.debug('Fixed narrative count for session:', sessionId, actualCount);
         }
       }
       
       if (hasUpdates) {
         set({ savedSessions: updatedSessions });
-        logger.debug('Updated narrative counts for existing sessions');
       }
     } catch (error) {
       logger.error('Failed to fix existing session narrative counts:', error);
