@@ -120,10 +120,11 @@ export function evaluateSkillCheck(
   if (!worldSkill) {
     // AI generated a skill check for a skill that doesn't exist in this world
     // Return automatic failure instead of throwing
-    console.warn(`Skill not found: ${skillCheck.skillId || skillCheck.skillName} - treating as automatic failure`);
+    const attemptedSkillName = skillCheck.skillName || skillCheck.skillId || 'Unknown Skill';
+    console.warn(`Skill not found: ${attemptedSkillName} - treating as automatic failure`);
     return {
       skillId: skillCheck.skillId || '',
-      skillName: skillCheck.skillName || 'Unknown',
+      skillName: attemptedSkillName,
       diceRoll: 1, // Minimum roll
       modifier: 0,
       totalRoll: 1,
