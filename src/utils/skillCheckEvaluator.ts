@@ -237,11 +237,19 @@ function findWorldSkill(
   worldSkills: WorldSkill[]
 ): WorldSkill | null {
   if (skillIdentifier.skillId) {
-    return worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
+    const found = worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
+    if (!found) {
+      console.warn(`[findWorldSkill] No match for skillId: "${skillIdentifier.skillId}". Available skill IDs:`, worldSkills.map(ws => ws.id));
+    }
+    return found;
   }
 
   if (skillIdentifier.skillName) {
-    return worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
+    const found = worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
+    if (!found) {
+      console.warn(`[findWorldSkill] No match for skillName: "${skillIdentifier.skillName}". Available skill names:`, worldSkills.map(ws => ws.name));
+    }
+    return found;
   }
 
   return null;
