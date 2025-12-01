@@ -886,31 +886,40 @@ Respond with JSON format:
       rollResults.forEach(result => {
         const modifier = result.skillLevel + result.attributeBonus;
 
+        // Build detailed breakdown for description
+        const buildBreakdown = () => {
+          const parts = [`d20: ${result.diceRoll}`];
+          if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
+          if (result.attributeBonus > 0) parts.push(`attribute: +${result.attributeBonus}`);
+          const breakdown = parts.join(', ');
+          return `${breakdown} = ${result.total} (need ${result.dc})`;
+        };
+
         if (result.isCriticalSuccess) {
           toast.addToast({
             title: `Critical Success! ${result.skillName}`,
-            description: `Natural 20! Total: ${result.total} vs DC ${result.dc}`,
+            description: `Natural 20! Automatic success regardless of modifiers.`,
             variant: 'success',
             duration: 8000
           });
         } else if (result.isCriticalFailure) {
           toast.addToast({
             title: `Critical Failure! ${result.skillName}`,
-            description: `Natural 1! Total: ${result.total} vs DC ${result.dc}`,
+            description: `Natural 1! Automatic failure regardless of modifiers.`,
             variant: 'error',
             duration: 8000
           });
         } else if (result.success) {
           toast.addToast({
-            title: `${result.skillName} Check Passed`,
-            description: `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`,
+            title: `${result.skillName} Check: Success`,
+            description: buildBreakdown(),
             variant: 'success',
             duration: 8000
           });
         } else {
           toast.addToast({
-            title: `${result.skillName} Check Failed`,
-            description: `Rolled ${result.diceRoll} + ${modifier} = ${result.total} vs DC ${result.dc}`,
+            title: `${result.skillName} Check: Failed`,
+            description: buildBreakdown(),
             variant: 'warning',
             duration: 8000
           });
