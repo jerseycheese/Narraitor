@@ -884,8 +884,6 @@ Respond with JSON format:
       // Show toast notifications for skill check results
       // Use longer duration (8 seconds) so players have time to read the roll details
       rollResults.forEach(result => {
-        const modifier = result.skillLevel + result.attributeBonus;
-
         // Build detailed breakdown for description
         const buildBreakdown = () => {
           const parts = [`d20: ${result.diceRoll}`];

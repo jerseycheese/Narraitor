@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { Decision, SkillCheckRoll } from '@/types/narrative.types';
+import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,6 @@ interface ChoiceSelectorProps {
     category?: string;
   }>;
   inventoryItems?: InventoryItem[];
-  skillCheckResults?: SkillCheckRoll[];
 
   // Ending suggestion props
   endingSuggestion?: {
@@ -68,7 +67,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
-  skillCheckResults = [],
   endingSuggestion,
 }) => {
   // Custom input state
@@ -263,7 +261,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   <SkillRequirementBadges
                     requirements={option.skillRequirements || []}
                     optionId={option.id}
-                    rollResults={skillCheckResults}
                   />
                   <ItemRequirementBadges
                     groups={option.itemRequirementGroups || []}

@@ -4,7 +4,7 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
-import { Decision, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
+import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
@@ -78,9 +78,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
-
-  // Skill check roll results
-  const [skillCheckResults, setSkillCheckResults] = React.useState<SkillCheckRoll[]>([]);
 
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -596,10 +593,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     useSessionStore.getState().setPlayerChoices(playerChoices);
   };
 
-  const handleSkillCheckPerformed = (results: SkillCheckRoll[]) => {
-    setSkillCheckResults(results);
-  };
-
   // Handle ending story functionality with confirmation
   const handleEndStory = async () => {
     if (!characterId || !world || !character) return;
@@ -729,7 +722,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             onNarrativeGenerated={handleNarrativeGenerated}
             onChoicesGenerated={handleChoicesGenerated}
             onEndingSuggested={handleEndingSuggested}
-            onSkillCheckPerformed={handleSkillCheckPerformed}
             generateChoices={true}
           />
         </div>
@@ -781,7 +773,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onNarrativeGenerated={handleNarrativeGenerated}
               onChoicesGenerated={handleChoicesGenerated}
               onEndingSuggested={handleEndingSuggested}
-              onSkillCheckPerformed={handleSkillCheckPerformed}
               generateChoices={true}
             />
           </div>
@@ -804,7 +795,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 worldSkills={world?.skills || []}
                 characterSkills={characterSkills}
                 inventoryItems={inventoryItems}
-                skillCheckResults={skillCheckResults}
                 endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
                   reason: endingSuggestionReason,
                   onAccept: handleAcceptEndingSuggestion,
