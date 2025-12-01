@@ -228,20 +228,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         .map(cp => cp.segment)
         .filter(Boolean);
 
-      console.log('🔍 CHECKPOINT DEBUG - Previous Segments:', {
-        totalCheckpoints: sessionCheckpoints.length,
-        previousSegmentsCount: previousSegments.length,
-        previousSegments: previousSegments.map((seg, i) => `[${i + 1}] ${seg.substring(0, 100)}...`),
-      });
-
       const formattedEvents = formatEventsForApi(pendingEvents, characterNameLookup);
-      console.log('🔍 CHECKPOINT DEBUG - Events for this checkpoint:', {
-        pendingEventsCount: pendingEvents.length,
-        events: formattedEvents.map(e => ({
-          description: e.description,
-          timestamp: e.timestamp,
-        })),
-      });
 
       const payload = buildStoryCheckpointPayload({
         worldId,

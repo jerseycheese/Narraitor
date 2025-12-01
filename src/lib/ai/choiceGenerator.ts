@@ -44,29 +44,14 @@ export class ChoiceGenerator {
 
     try {
       const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
-      
-      console.log('🔄 Generating choices - Step 1: Getting world', { worldId });
+
       const world = this.getWorld(worldId);
-      
-      console.log('🔄 Generating choices - Step 2: Getting template', { useAlignedChoices });
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
-      
-      console.log('🔄 Generating choices - Step 3: Building context');
       const context = this.buildContext(world, narrativeContext, characterIds);
-      
-      console.log('🔄 Generating choices - Step 4: Generating base prompt');
       const basePrompt = template(context);
-
-      console.log('🔄 Generating choices - Step 4b: Enhancing with inventory context');
       const inventoryAwarePrompt = this.enhancePromptWithInventory(basePrompt, characterIds);
-      
-      console.log('🔄 Generating choices - Step 5: Enhancing with lore');
       const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId);
-      
-      console.log('🔄 Generating choices - Step 6: Enhancing with tone settings');
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
-
-      console.log('🔄 Generating choices - Step 7: Enhancing with decision history');
       const prompt = includeDecisionHistory && sessionId
         ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
         : toneEnhancedPrompt;
