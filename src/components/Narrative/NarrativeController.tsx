@@ -45,7 +45,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [skillCheckResults, setSkillCheckResults] = useState<SkillCheckRoll[]>([]);
   const toast = useToast();
 
   // Access store methods in a way that works with testing
@@ -877,8 +876,7 @@ Respond with JSON format:
         }
       }
 
-      // Store results for badge display
-      setSkillCheckResults(rollResults);
+      // Pass results to parent component
       onSkillCheckPerformed?.(rollResults);
 
       // Show toast notifications for skill check results
