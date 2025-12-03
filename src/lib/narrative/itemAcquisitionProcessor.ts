@@ -2,11 +2,28 @@
 
 import { useInventoryStore } from '@/state/inventoryStore';
 import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
-import { getTimestamp, titleCase } from '@/lib/utils';
+import {
+  getTimestamp,
+  normalizeText,
+  NORM_DESC,
+  NORM_NAME,
+  titleCase,
+} from '@/lib/utils';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
-import type { InventoryItemCategorization } from '@/types/inventory.types';
+import type { InventoryItem, InventoryItemCategorization } from '@/types/inventory.types';
 import { itemImageService } from '@/lib/services/itemImageService';
+
+type PreparedItem = AcquiredItemMetadata & {
+  normalizedName: string;
+  normalizedDescription: string;
+  stackable: boolean;
+  categorization: InventoryItemCategorization;
+  quantity: number;
+};
+
+const RATE_LIMIT_DELAY_MS = 200;
+const processingQueue = new Map<EntityID, Promise<void>>();
 
 /**
  * Processes items acquired during narrative generation and adds them to character inventory.
@@ -30,117 +47,73 @@ export async function processAcquiredItems(
     return;
   }
 
-  const inventoryStore = useInventoryStore.getState();
-  const now = getTimestamp();
+  const previous = processingQueue.get(characterId) ?? Promise.resolve();
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    try {
-      const normalizedName = normalizeItemName(item.name);
-      const existingItems = inventoryStore.getCharacterItems(characterId);
-      const existingMatch = existingItems.find(
-        (existing) =>
-          existing && normalizeItemName(existing.name).toLowerCase() === normalizedName.toLowerCase()
+  const tracked = previous
+    .catch((err) => {
+      // Prevent a failed prior job from blocking the queue
+      console.error('Previous item acquisition run failed', err);
+    })
+    .then(async () => {
+      const inventoryStore = useInventoryStore.getState();
+      const now = getTimestamp();
+
+      const preparedItems = await Promise.all(
+        items.map((item) => prepareItem(item, now))
       );
 
-      // Use AI to categorize the item
-      let categorization: InventoryItemCategorization;
+      const deduplicatedItems = deduplicateBatch(preparedItems);
 
-      try {
-        const aiCategorization = await categorizeInventoryItemClient({
-          name: item.name,
-          description: item.description || '',
-        });
+      for (let i = 0; i < deduplicatedItems.length; i++) {
+        const item = deduplicatedItems[i];
 
-        categorization = {
-          ...aiCategorization,
-          classifiedAt: now,
-        };
-      } catch {
-        // Fallback to miscellaneous if AI categorization fails
-        categorization = {
-          categoryId: 'miscellaneous',
-          source: 'fallback',
-          classifiedAt: now,
-          confidence: 0,
-          rationale: 'AI categorization unavailable',
-        };
-      }
+        try {
+          const existingItems = inventoryStore.getCharacterItems(characterId);
+          const existingMatch = findExistingMatch(existingItems, item);
 
-      // Determine if item is stackable based on category
-      const stackable = isStackableCategory(categorization.categoryId);
-      const quantity = item.quantity || 1;
+          if (item.stackable && existingMatch) {
+            const newQuantity = (existingMatch.quantity || 0) + item.quantity;
+            inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
+            continue;
+          }
 
-      // Handle non-stackable equipment with quantity > 1
-      // Split into individual items to satisfy inventory store validation
-      if (!stackable && quantity > 1) {
-        // Add each equipment item separately
-        for (let i = 0; i < quantity; i++) {
-          const itemId = inventoryStore.addItem(characterId, {
-            name: normalizedName,
-            description: item.description,
-            quantity: 1,
-            stackable: false,
-            categorization,
-            acquisition: {
-              method: item.acquisitionMethod || 'unknown',
-              quantity: 1,
-              sessionId,
-              acquiredAt: now,
-            },
-          });
+          if (!item.stackable && existingMatch) {
+            console.warn(
+              `Equipment item "${item.normalizedName}" already exists in inventory. Skipping duplicate addition.`
+            );
+            continue;
+          }
 
-          // Trigger background image generation (fire and forget)
-          if (itemId) {
-            itemImageService.generateForItem(itemId, characterId).catch((error) => {
-              console.warn(`Background image generation failed for item: ${normalizedName}`, error);
-            });
+          if (!item.stackable && item.quantity > 1) {
+            for (let copyIndex = 0; copyIndex < item.quantity; copyIndex++) {
+              const singleItem: PreparedItem = { ...item, quantity: 1 };
 
-            // Small delay between items to prevent rate limiting
-            if (i < items.length - 1) {
-              await new Promise((resolve) => setTimeout(resolve, 200));
+              await addItemToInventory(inventoryStore, singleItem, characterId, sessionId, now);
+              await delayBetweenItems(copyIndex, item.quantity);
             }
+            continue;
           }
-        }
-      } else {
-        if (stackable && existingMatch) {
-          const newQuantity = (existingMatch.quantity || 0) + quantity;
-          inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
-          continue;
-        }
 
-        // Add item normally for stackable items or single equipment
-        const itemId = inventoryStore.addItem(characterId, {
-          name: normalizedName,
-          description: item.description,
-          quantity,
-          stackable,
-          categorization,
-          acquisition: {
-            method: item.acquisitionMethod || 'unknown',
-            quantity,
-            sessionId,
-            acquiredAt: now,
-          },
-        });
-
-        // Trigger background image generation (fire and forget)
-        if (itemId) {
-          itemImageService.generateForItem(itemId, characterId).catch((error) => {
-            console.warn(`Background image generation failed for item: ${normalizedName}`, error);
-          });
-
-          // Small delay between items to prevent rate limiting
-          if (i < items.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 200));
-          }
+          await addItemToInventory(inventoryStore, item, characterId, sessionId, now);
+          await delayBetweenItems(i, deduplicatedItems.length);
+        } catch (err) {
+          // Log error but continue processing remaining items
+          console.error(`Failed to add item "${item.name}" to inventory:`, err);
         }
       }
-    } catch (err) {
-      // Log error but continue processing remaining items
-      console.error(`Failed to add item "${item.name}" to inventory:`, err);
-    }
-  }
+    })
+    .catch((err) => {
+      console.error('processAcquiredItems encountered an unexpected error', err);
+    })
+    .finally(() => {
+      if (processingQueue.get(characterId) === tracked) {
+        processingQueue.delete(characterId);
+      }
+    });
+
+  processingQueue.set(characterId, tracked);
+
+  return tracked;
 }
 
 /**
@@ -164,4 +137,143 @@ function normalizeItemName(rawName: string): string {
   }
 
   return titleCase(trimmed);
+}
+
+function normalizeDescription(rawDescription?: string): string {
+  return normalizeText(rawDescription || '', NORM_DESC);
+}
+
+function buildDedupKey(name: string, categoryId: string, description: string): string {
+  const normalizedNameForKey = normalizeText(name || '', NORM_NAME).toLowerCase();
+  const normalizedDescriptionForKey = normalizeText(description || '', NORM_DESC).toLowerCase();
+
+  return `${normalizedNameForKey}::${categoryId || 'unknown'}::${normalizedDescriptionForKey}`;
+}
+
+async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
+  const normalizedName = normalizeItemName(item.name);
+  const categorization = await getItemCategorization(item, now);
+  const stackable = isStackableCategory(categorization.categoryId);
+  const quantity = item.quantity ?? 1;
+
+  return {
+    ...item,
+    normalizedName,
+    normalizedDescription: normalizeDescription(item.description),
+    stackable,
+    categorization,
+    quantity,
+  };
+}
+
+async function getItemCategorization(
+  item: AcquiredItemMetadata,
+  now: string
+): Promise<InventoryItemCategorization> {
+  try {
+    const aiCategorization = await categorizeInventoryItemClient({
+      name: item.name,
+      description: item.description || '',
+    });
+
+    return {
+      ...aiCategorization,
+      classifiedAt: now,
+    };
+  } catch {
+    return {
+      categoryId: 'miscellaneous',
+      source: 'fallback',
+      classifiedAt: now,
+      confidence: 0,
+      rationale: 'AI categorization unavailable',
+    };
+  }
+}
+
+function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
+  const map = new Map<string, PreparedItem>();
+
+  for (const item of items) {
+    const dedupKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
+    const existing = map.get(dedupKey);
+
+    if (!existing) {
+      map.set(dedupKey, { ...item });
+      continue;
+    }
+
+    if (item.stackable && existing.stackable) {
+      const mergedQuantity = (existing.quantity || 0) + (item.quantity || 0);
+      map.set(dedupKey, {
+        ...existing,
+        quantity: mergedQuantity,
+        acquisitionMethod: existing.acquisitionMethod ?? item.acquisitionMethod,
+      });
+
+      if (existing.acquisitionMethod && item.acquisitionMethod && existing.acquisitionMethod !== item.acquisitionMethod) {
+        console.warn(
+          `Stackable item "${item.normalizedName}" had differing acquisition methods within the same batch. Using "${existing.acquisitionMethod}".`
+        );
+      }
+
+      continue;
+    }
+
+    // Duplicate equipment within the same batch
+    console.warn(
+      `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping the first occurrence only.`
+    );
+  }
+
+  return Array.from(map.values());
+}
+
+function findExistingMatch(existingItems: InventoryItem[], item: PreparedItem): InventoryItem | undefined {
+  const targetKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
+
+  return existingItems.find((existing) => {
+    if (!existing) {
+      return false;
+    }
+
+    const existingKey = buildDedupKey(existing.name, existing.categoryId, existing.description || '');
+    return existingKey === targetKey;
+  });
+}
+
+async function addItemToInventory(
+  inventoryStore: ReturnType<typeof useInventoryStore.getState>,
+  item: PreparedItem,
+  characterId: EntityID,
+  sessionId: EntityID,
+  now: string
+): Promise<void> {
+  const itemId = inventoryStore.addItem(characterId, {
+    name: item.normalizedName,
+    description: item.description,
+    quantity: item.quantity,
+    stackable: item.stackable,
+    categorization: item.categorization,
+    acquisition: {
+      method: item.acquisitionMethod || 'unknown',
+      quantity: item.quantity,
+      sessionId,
+      acquiredAt: now,
+    },
+  });
+
+  if (itemId) {
+    itemImageService.generateForItem(itemId, characterId).catch((error) => {
+      console.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
+    });
+  }
+}
+
+function delayBetweenItems(index: number, total: number): Promise<void> {
+  if (index >= total - 1) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
 }

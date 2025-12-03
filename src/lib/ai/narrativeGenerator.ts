@@ -524,6 +524,9 @@ Examples:
 Important:
 - Only include items the character ACTUALLY ACQUIRES AND KEEPS during this segment (not items they merely see, borrow momentarily, use as environmental tools, or were already carrying)
 - Avoid duplicate entries for the same object; use the description to capture clarifications or additional detail
+- CRITICAL: Do NOT list the same item name twice. If the character gains multiple of the same item, set quantity accordingly on a single entry instead of repeating the name.
+- If you need to clarify an already listed item, update its description rather than adding another entry.
+- Example: if "Iron Sword" is already present, do not add another "Iron Sword" later. Either refine the original description or increase the quantity when the character truly acquires additional swords.
 - Be specific with item names and descriptions
 - Use an appropriate acquisitionMethod for the narrative context
 - If the narrative mentions vague supplies, still include the best concrete description you can infer

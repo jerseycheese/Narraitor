@@ -5,26 +5,64 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
+import type { InventoryItem } from '@/types/inventory.types';
 
 // Mock the dependencies
 jest.mock('@/state/inventoryStore');
 jest.mock('@/lib/inventory/categorizeInventoryItemClient');
+jest.mock('@/lib/services/itemImageService', () => ({
+  itemImageService: {
+    generateForItem: jest.fn().mockResolvedValue(undefined),
+  },
+}));
 
 describe('itemAcquisitionProcessor', () => {
-  const mockAddItem = jest.fn();
+  let mockAddItem: jest.Mock;
+  let mockGetCharacterItems: jest.Mock;
+  let mockUpdateItemQuantity: jest.Mock;
   const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
     typeof categorizeInventoryItemClient
   >;
+  let warnSpy: jest.SpyInstance;
+  let characterItems: InventoryItem[];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const mockInventoryState = {
-      addItem: mockAddItem,
-      getCharacterItems: jest.fn().mockReturnValue([]),
-      updateItemQuantity: jest.fn(),
-    };
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    characterItems = [] as InventoryItem[];
 
-    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockInventoryState));
+    mockAddItem = jest.fn((characterId: string, payload: Partial<InventoryItem>) => {
+      const id = `item-${characterItems.length + 1}`;
+      characterItems.push({
+        ...payload,
+        id,
+        categoryId: payload.categorization?.categoryId || (payload as InventoryItem).categoryId || 'uncategorized',
+        quantity: payload.quantity ?? 1,
+      } as InventoryItem);
+      return id;
+    });
+
+    mockGetCharacterItems = jest.fn(() => characterItems);
+
+    mockUpdateItemQuantity = jest.fn((id: string, quantity: number) => {
+      const target = characterItems.find((item) => item.id === id);
+      if (target) {
+        target.quantity = quantity;
+      }
+    });
+
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore({
+        addItem: mockAddItem,
+        getCharacterItems: mockGetCharacterItems,
+        updateItemQuantity: mockUpdateItemQuantity,
+      })
+    );
+  });
+
+  afterEach(() => {
+    warnSpy?.mockRestore();
   });
 
   describe('processAcquiredItems', () => {
@@ -97,7 +135,8 @@ describe('itemAcquisitionProcessor', () => {
           source: 'ai',
           confidence: 0.9,
           classifiedAt: new Date().toISOString(),
-        })        .mockResolvedValueOnce({
+        })
+        .mockResolvedValueOnce({
           categoryId: 'valuables',
           source: 'ai',
           confidence: 0.95,
@@ -301,6 +340,93 @@ describe('itemAcquisitionProcessor', () => {
         quantity: 1,
         stackable: false,
       }));
+    });
+
+    it('deduplicates identical stackable items in the same batch', async () => {
+      const items: AcquiredItemMetadata[] = [
+        { name: 'Health Potion', quantity: 2, acquisitionMethod: 'loot' },
+        { name: 'Health Potion', quantity: 3, acquisitionMethod: 'loot' },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'consumables',
+        source: 'ai',
+        confidence: 0.95,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockAddItem).toHaveBeenCalledWith(
+        'character-123',
+        expect.objectContaining({
+          name: 'Health Potion',
+          quantity: 5,
+          acquisition: expect.objectContaining({ quantity: 5 }),
+        })
+      );
+      expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('deduplicates identical equipment in the same batch and keeps one', async () => {
+      const items: AcquiredItemMetadata[] = [
+        { name: 'Iron Sword', description: 'A basic sword' },
+        { name: 'Iron Sword', description: 'A basic sword' },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'equipment',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalled();
+    });
+
+    it('keeps equipment separate when descriptions differ', async () => {
+      const items: AcquiredItemMetadata[] = [
+        { name: 'Sword', description: 'Sharp edge' },
+        { name: 'Sword', description: 'Rusty blade' },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'equipment',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      expect(mockAddItem).toHaveBeenCalledTimes(2);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('prevents duplicate equipment across segments', async () => {
+      const item: AcquiredItemMetadata = {
+        name: 'Iron Sword',
+        description: 'A sturdy blade',
+      };
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'equipment',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems([item], 'character-123', 'session-456');
+      await processAcquiredItems([item], 'character-123', 'session-456');
+
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalled();
     });
   });
 });
