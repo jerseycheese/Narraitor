@@ -315,6 +315,44 @@ export async function processItemUsage(
         const journalStore = useJournalStore.getState();
         journalStore.addEntry(resolvedSessionId, journalEntry);
       }
+
+      // After item-usage narrative, clear any stale decisions and generate fresh choices
+      try {
+        const recentSegments = narrativeStore.getSessionSegments(resolvedSessionId).slice(-5);
+        const lastSegment = recentSegments[recentSegments.length - 1];
+
+        const narrativeContext = {
+          worldId,
+          sessionId: resolvedSessionId,
+          currentSceneId: `item-usage-${item.id}-${Date.now()}`,
+          characterIds: [characterId],
+          previousSegments: recentSegments,
+          recentSegments,
+          currentTags: lastSegment?.metadata?.tags || [],
+          currentLocation: lastSegment?.metadata?.location,
+        } as const;
+
+        // Reset existing pending decisions so the new choice set is shown
+        narrativeStore.clearSessionDecisions(resolvedSessionId);
+
+        const decision = await generator.generatePlayerChoices(
+          worldId,
+          narrativeContext,
+          [characterId],
+          resolvedSessionId
+        );
+
+        // Persist decision in store for UI to pick up
+        narrativeStore.addDecision(resolvedSessionId, {
+          prompt: decision.prompt,
+          options: decision.options,
+          decisionWeight: decision.decisionWeight,
+          contextSummary: decision.contextSummary,
+        });
+      } catch (error) {
+        // Non-fatal; item usage narrative already generated
+        console.warn('Failed to generate choices after item usage', error);
+      }
     } catch {
       narrative = buildUsageNarrative(item, usageResult, 'simple');
     }
