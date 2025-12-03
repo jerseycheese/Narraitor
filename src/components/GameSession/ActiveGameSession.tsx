@@ -282,8 +282,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         if (latestId) {
           const latest = useNarrativeStore.getState().decisions[latestId] || null;
           setCurrentDecision(latest);
+          setIsGeneratingChoices(false);
         } else {
           setCurrentDecision(null);
+          // If narrative already exists, surface a loading state while choices regenerate
+          const hasSegments =
+            (useNarrativeStore.getState().sessionSegments[sessionId]?.length ?? 0) > 0;
+          if (hasSegments) {
+            setIsGeneratingChoices(true);
+          }
         }
       }
     );
@@ -830,6 +837,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               />
             ) : (
               <div className="space-y-4 p-4">
+                {isGeneratingChoices && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <LoadingState message="Generating new choices..." />
+                  </div>
+                )}
                 {/* Choice decision skeleton - matches ChoiceSelector layout */}
                 <div className="space-y-3">
                   {/* Choice prompt skeleton */}
