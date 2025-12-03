@@ -389,7 +389,7 @@ describe('itemAcquisitionProcessor', () => {
       expect(warnSpy).toHaveBeenCalled();
     });
 
-    it('keeps equipment separate when descriptions differ', async () => {
+    it('merges equipment with the same name even when descriptions differ', async () => {
       const items: AcquiredItemMetadata[] = [
         { name: 'Sword', description: 'Sharp edge' },
         { name: 'Sword', description: 'Rusty blade' },
@@ -404,8 +404,28 @@ describe('itemAcquisitionProcessor', () => {
 
       await processAcquiredItems(items, 'character-123', 'session-456');
 
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalled();
+      const storedDescription = characterItems[0]?.description;
+      expect(storedDescription === 'Sharp edge' || storedDescription === 'Rusty blade').toBe(true);
+    });
+
+    it('keeps stackable items separate when descriptions differ', async () => {
+      const items: AcquiredItemMetadata[] = [
+        { name: 'Health Potion', description: 'Small', quantity: 1 },
+        { name: 'Health Potion', description: 'Large', quantity: 1 },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'consumables',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
       expect(mockAddItem).toHaveBeenCalledTimes(2);
-      expect(warnSpy).not.toHaveBeenCalled();
     });
 
     it('prevents duplicate equipment across segments', async () => {

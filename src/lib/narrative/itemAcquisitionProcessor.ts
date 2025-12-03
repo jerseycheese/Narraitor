@@ -158,18 +158,20 @@ function normalizeDescription(rawDescription?: string): string {
   return normalizeText(rawDescription || '', NORM_DESC);
 }
 
-function buildDedupKey(name: string, categoryId: string, description: string): string {
+function buildStackableKey(name: string, categoryId: string, description: string): string {
   const normalizedNameForKey = normalizeText(name || '', NORM_NAME).toLowerCase();
   const normalizedDescriptionForKey = normalizeText(description || '', NORM_DESC).toLowerCase();
 
   return `${normalizedNameForKey}::${categoryId || 'unknown'}::${normalizedDescriptionForKey}`;
 }
 
-function buildSoftKey(name: string, description: string): string {
+function buildEquipmentKey(name: string, categoryId: string): string {
   const normalizedNameForKey = normalizeText(name || '', NORM_NAME).toLowerCase();
-  const normalizedDescriptionForKey = normalizeText(description || '', NORM_DESC).toLowerCase();
+  return `${normalizedNameForKey}::${categoryId || 'unknown'}`;
+}
 
-  return `${normalizedNameForKey}::${normalizedDescriptionForKey}`;
+function buildNameKey(name: string): string {
+  return normalizeText(name || '', NORM_NAME).toLowerCase();
 }
 
 async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
@@ -215,26 +217,32 @@ async function getItemCategorization(
 
 function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
   const map = new Map<string, PreparedItem>();
-  const softKeyIndex = new Map<string, string>();
+  const nameIndex = new Map<string, string>(); // nameKey -> primaryKey
 
   for (const item of items) {
-    const dedupKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
-    const softKey = buildSoftKey(item.normalizedName, item.description || '');
+    const nameKey = buildNameKey(item.normalizedName);
 
-    let existingKey: string | undefined = dedupKey;
-    let existing = map.get(dedupKey);
+    const primaryKey = item.stackable
+      ? buildStackableKey(item.normalizedName, item.categorization.categoryId, item.description || '')
+      : buildEquipmentKey(item.normalizedName, item.categorization.categoryId);
 
-    if (!existing) {
-      const softExistingKey = softKeyIndex.get(softKey);
-      if (softExistingKey) {
-        existingKey = softExistingKey;
-        existing = map.get(softExistingKey);
+    let existingKey: string | undefined = primaryKey;
+    let existing = map.get(primaryKey);
+
+    // For equipment, fall back to name-only dedup if category differs across items in the same batch
+    if (!existing && !item.stackable) {
+      const altKey = nameIndex.get(nameKey);
+      if (altKey) {
+        existingKey = altKey;
+        existing = map.get(altKey);
       }
     }
 
     if (!existing) {
-      map.set(dedupKey, { ...item });
-      softKeyIndex.set(softKey, dedupKey);
+      map.set(primaryKey, { ...item });
+      if (!item.stackable) {
+        nameIndex.set(nameKey, primaryKey);
+      }
       continue;
     }
 
@@ -255,9 +263,16 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
       continue;
     }
 
-    // Duplicate equipment within the same batch
+    // Equipment duplicate within the same batch (description may differ)
+    const betterDescription = chooseBetterDescription(existing.description, item.description);
+    map.set(existingKey as string, {
+      ...existing,
+      description: betterDescription,
+      normalizedDescription: normalizeDescription(betterDescription),
+    });
+
     console.warn(
-      `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping the first occurrence only.`
+      `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping one entry and merging details.`
     );
   }
 
@@ -268,21 +283,45 @@ function findExistingMatch(
   existingItems: InventoryItem[],
   item: PreparedItem
 ): { match: InventoryItem; matchedBySoft: boolean } | undefined {
-  const targetKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
-  const targetSoftKey = buildSoftKey(item.normalizedName, item.description || '');
+  if (item.stackable) {
+    const targetKey = buildStackableKey(item.normalizedName, item.categorization.categoryId, item.description || '');
+    for (const existing of existingItems) {
+      if (!existing || !existing.stackable) continue;
+      const existingKey = buildStackableKey(existing.name, existing.categoryId, existing.description || '');
+      if (existingKey === targetKey) {
+        return { match: existing, matchedBySoft: false };
+      }
+    }
+
+    // Fallback: item is marked stackable but a non-stackable with same name exists (category drift)
+    const targetNameKey = buildNameKey(item.normalizedName);
+    for (const existing of existingItems) {
+      if (!existing || existing.stackable) continue;
+      const existingNameKey = buildNameKey(existing.name);
+      if (existingNameKey === targetNameKey) {
+        return { match: existing, matchedBySoft: true };
+      }
+    }
+
+    return undefined;
+  }
+
+  // Equipment: ignore description; match by name+category, then by name-only to catch category drift
+  const targetKey = buildEquipmentKey(item.normalizedName, item.categorization.categoryId);
+  const targetNameKey = buildNameKey(item.normalizedName);
 
   for (const existing of existingItems) {
-    if (!existing) continue;
-    const existingKey = buildDedupKey(existing.name, existing.categoryId, existing.description || '');
+    if (!existing || existing.stackable) continue;
+    const existingKey = buildEquipmentKey(existing.name, existing.categoryId);
     if (existingKey === targetKey) {
       return { match: existing, matchedBySoft: false };
     }
   }
 
   for (const existing of existingItems) {
-    if (!existing) continue;
-    const existingSoftKey = buildSoftKey(existing.name, existing.description || '');
-    if (existingSoftKey === targetSoftKey) {
+    if (!existing || existing.stackable) continue;
+    const existingNameKey = buildNameKey(existing.name);
+    if (existingNameKey === targetNameKey) {
       return { match: existing, matchedBySoft: true };
     }
   }
@@ -324,4 +363,19 @@ function delayBetweenItems(index: number, total: number): Promise<void> {
   }
 
   return new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
+}
+
+function chooseBetterDescription(existing?: string, incoming?: string): string | undefined {
+  const existingTrimmed = (existing || '').trim();
+  const incomingTrimmed = (incoming || '').trim();
+
+  if (!existingTrimmed) {
+    return incomingTrimmed || existingTrimmed;
+  }
+
+  if (!incomingTrimmed) {
+    return existingTrimmed;
+  }
+
+  return incomingTrimmed.length > existingTrimmed.length ? incomingTrimmed : existingTrimmed;
 }
