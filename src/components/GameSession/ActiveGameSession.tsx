@@ -837,11 +837,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               />
             ) : (
               <div className="space-y-4 p-4">
-                {isGeneratingChoices && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <LoadingState message="Generating new choices..." />
-                  </div>
-                )}
                 {/* Choice decision skeleton - matches ChoiceSelector layout */}
                 <div className="space-y-3">
                   {/* Choice prompt skeleton */}
