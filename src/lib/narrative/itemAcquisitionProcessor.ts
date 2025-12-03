@@ -69,11 +69,26 @@ export async function processAcquiredItems(
 
         try {
           const existingItems = inventoryStore.getCharacterItems(characterId);
-          const existingMatch = findExistingMatch(existingItems, item);
+          const matchResult = findExistingMatch(existingItems, item);
+          const existingMatch = matchResult?.match;
 
           if (item.stackable && existingMatch) {
-            const newQuantity = (existingMatch.quantity || 0) + item.quantity;
-            inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
+            if (existingMatch.stackable) {
+              const newQuantity = (existingMatch.quantity || 0) + item.quantity;
+              inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
+
+              if (matchResult.matchedBySoft) {
+                console.warn(
+                  `Merged stackable item "${item.normalizedName}" despite category mismatch due to identical name/description.`
+                );
+              }
+
+              continue;
+            }
+
+            console.warn(
+              `Item "${item.normalizedName}" was categorized as stackable but matches existing equipment. Skipping duplicate addition.`
+            );
             continue;
           }
 
@@ -150,6 +165,13 @@ function buildDedupKey(name: string, categoryId: string, description: string): s
   return `${normalizedNameForKey}::${categoryId || 'unknown'}::${normalizedDescriptionForKey}`;
 }
 
+function buildSoftKey(name: string, description: string): string {
+  const normalizedNameForKey = normalizeText(name || '', NORM_NAME).toLowerCase();
+  const normalizedDescriptionForKey = normalizeText(description || '', NORM_DESC).toLowerCase();
+
+  return `${normalizedNameForKey}::${normalizedDescriptionForKey}`;
+}
+
 async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
   const normalizedName = normalizeItemName(item.name);
   const categorization = await getItemCategorization(item, now);
@@ -193,19 +215,32 @@ async function getItemCategorization(
 
 function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
   const map = new Map<string, PreparedItem>();
+  const softKeyIndex = new Map<string, string>();
 
   for (const item of items) {
     const dedupKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
-    const existing = map.get(dedupKey);
+    const softKey = buildSoftKey(item.normalizedName, item.description || '');
+
+    let existingKey: string | undefined = dedupKey;
+    let existing = map.get(dedupKey);
+
+    if (!existing) {
+      const softExistingKey = softKeyIndex.get(softKey);
+      if (softExistingKey) {
+        existingKey = softExistingKey;
+        existing = map.get(softExistingKey);
+      }
+    }
 
     if (!existing) {
       map.set(dedupKey, { ...item });
+      softKeyIndex.set(softKey, dedupKey);
       continue;
     }
 
     if (item.stackable && existing.stackable) {
       const mergedQuantity = (existing.quantity || 0) + (item.quantity || 0);
-      map.set(dedupKey, {
+      map.set(existingKey as string, {
         ...existing,
         quantity: mergedQuantity,
         acquisitionMethod: existing.acquisitionMethod ?? item.acquisitionMethod,
@@ -229,17 +264,30 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
   return Array.from(map.values());
 }
 
-function findExistingMatch(existingItems: InventoryItem[], item: PreparedItem): InventoryItem | undefined {
+function findExistingMatch(
+  existingItems: InventoryItem[],
+  item: PreparedItem
+): { match: InventoryItem; matchedBySoft: boolean } | undefined {
   const targetKey = buildDedupKey(item.normalizedName, item.categorization.categoryId, item.description || '');
+  const targetSoftKey = buildSoftKey(item.normalizedName, item.description || '');
 
-  return existingItems.find((existing) => {
-    if (!existing) {
-      return false;
-    }
-
+  for (const existing of existingItems) {
+    if (!existing) continue;
     const existingKey = buildDedupKey(existing.name, existing.categoryId, existing.description || '');
-    return existingKey === targetKey;
-  });
+    if (existingKey === targetKey) {
+      return { match: existing, matchedBySoft: false };
+    }
+  }
+
+  for (const existing of existingItems) {
+    if (!existing) continue;
+    const existingSoftKey = buildSoftKey(existing.name, existing.description || '');
+    if (existingSoftKey === targetSoftKey) {
+      return { match: existing, matchedBySoft: true };
+    }
+  }
+
+  return undefined;
 }
 
 async function addItemToInventory(

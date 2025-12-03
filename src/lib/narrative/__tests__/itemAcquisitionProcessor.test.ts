@@ -428,5 +428,33 @@ describe('itemAcquisitionProcessor', () => {
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
       expect(warnSpy).toHaveBeenCalled();
     });
+
+    it('prevents duplicate equipment even if AI category changes across segments', async () => {
+      const item: AcquiredItemMetadata = {
+        name: 'Rusted Hunting Knife',
+        description: 'A worn but sharp hunting knife',
+      };
+
+      mockCategorize
+        .mockResolvedValueOnce({
+          categoryId: 'equipment',
+          source: 'ai',
+          confidence: 0.9,
+          classifiedAt: new Date().toISOString(),
+        })
+        .mockResolvedValueOnce({
+          categoryId: 'miscellaneous',
+          source: 'ai',
+          confidence: 0.4,
+          classifiedAt: new Date().toISOString(),
+        });
+
+      await processAcquiredItems([item], 'character-123', 'session-456');
+      await processAcquiredItems([item], 'character-123', 'session-789');
+
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalled();
+    });
   });
 });
