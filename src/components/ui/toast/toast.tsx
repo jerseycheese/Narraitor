@@ -41,10 +41,22 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const toastVariants = {
-  success: "bg-green-300 border-green-500 text-green-800",
-  error: "bg-destructive/10 border-destructive text-destructive",
-  warning: "bg-amber-300 border-amber-500 text-amber-800",
-  info: "bg-blue-300 border-blue-400 text-blue-800",
+  success: {
+    className: "border-green-600 text-green-900",
+    style: { backgroundColor: '#f0fdf4' } // green-50
+  },
+  error: {
+    className: "border-red-600 text-red-900",
+    style: { backgroundColor: '#fef2f2' } // red-50
+  },
+  warning: {
+    className: "border-amber-600 text-amber-900",
+    style: { backgroundColor: '#fffbeb' } // amber-50
+  },
+  info: {
+    className: "border-blue-600 text-blue-900",
+    style: { backgroundColor: '#eff6ff' } // blue-50
+  },
 }
 
 /**
@@ -108,15 +120,18 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
 
     if (!isVisible) return null
 
+    const variantConfig = toastVariants[variant]
+
     return (
       <div
         ref={ref}
         className={cn(
           "relative rounded-lg border p-4 shadow-lg transition-all duration-300",
           "min-w-80 max-w-md",
-          toastVariants[variant],
+          variantConfig.className,
           className
         )}
+        style={variantConfig.style}
         role="alert"
         aria-live="polite"
         aria-atomic="true"
