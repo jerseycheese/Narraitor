@@ -63,8 +63,8 @@ export class ChoiceGenerator {
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
-      const decision = this.parseChoiceResponse(response.content, narrativeContext);
-      
+      const decision = this.parseChoiceResponse(response.content, narrativeContext, world);
+
       // Ensure we have the minimum number of options
       if (decision.options.length < minOptions) {
         const fallbackDecision = this.generateFallbackChoices(worldId, narrativeContext);
@@ -109,7 +109,7 @@ export class ChoiceGenerator {
   /**
    * Parse the AI response into a structured Decision object
    */
-  private parseChoiceResponse(content: string, narrativeContext: NarrativeContext): Decision {
+  private parseChoiceResponse(content: string, narrativeContext: NarrativeContext, world: World): Decision {
     // Create a new decision ID
     const decisionId = generateUniqueId('decision');
     
@@ -244,12 +244,24 @@ export class ChoiceGenerator {
             if (skillMatch) {
               const skillName = skillMatch[1];
               const level = parseInt(skillMatch[2]);
-              currentOption.requirements?.push({
-                type: 'skill',
-                targetId: skillName.toLowerCase(),
-                operator: 'gte',
-                value: level
-              });
+
+              // Look up the world skill by name to get its ID
+              const worldSkill = world.skills?.find(
+                ws => ws.name.toLowerCase() === skillName.toLowerCase()
+              );
+
+              if (!worldSkill) {
+                console.warn(`[ChoiceGenerator] Unknown skill "${skillName}" in AI response - skipping requirement`);
+                // Skip this requirement - don't add it to the array
+              } else {
+                // Use the skill ID instead of the name
+                currentOption.requirements?.push({
+                  type: 'skill',
+                  targetId: worldSkill.id,
+                  operator: 'gte',
+                  value: level
+                });
+              }
             }
           }
         }

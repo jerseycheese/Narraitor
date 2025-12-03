@@ -801,15 +801,10 @@ Respond with JSON format:
               ? requirement.value
               : parseInt(requirement.value, 10);
 
-            // AI provides skill names in targetId, but we need the actual skill ID
-            // Try to find the world skill by name to get the real UUID
-            const worldSkill = world.skills?.find(
-              ws => ws.name.toLowerCase() === requirement.targetId.toLowerCase()
-            );
-
+            // ChoiceGenerator has already converted skill names to IDs
+            // targetId now contains the skill ID directly
             const skillCheck = {
-              skillId: worldSkill?.id,
-              skillName: requirement.targetId, // Fallback to name if ID not found
+              skillId: requirement.targetId,
               difficulty: requiredLevel
             };
 
