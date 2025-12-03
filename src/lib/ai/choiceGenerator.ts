@@ -44,29 +44,14 @@ export class ChoiceGenerator {
 
     try {
       const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
-      
-      console.log('🔄 Generating choices - Step 1: Getting world', { worldId });
+
       const world = this.getWorld(worldId);
-      
-      console.log('🔄 Generating choices - Step 2: Getting template', { useAlignedChoices });
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
-      
-      console.log('🔄 Generating choices - Step 3: Building context');
       const context = this.buildContext(world, narrativeContext, characterIds);
-      
-      console.log('🔄 Generating choices - Step 4: Generating base prompt');
       const basePrompt = template(context);
-
-      console.log('🔄 Generating choices - Step 4b: Enhancing with inventory context');
       const inventoryAwarePrompt = this.enhancePromptWithInventory(basePrompt, characterIds);
-      
-      console.log('🔄 Generating choices - Step 5: Enhancing with lore');
       const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId);
-      
-      console.log('🔄 Generating choices - Step 6: Enhancing with tone settings');
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
-
-      console.log('🔄 Generating choices - Step 7: Enhancing with decision history');
       const prompt = includeDecisionHistory && sessionId
         ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
         : toneEnhancedPrompt;
@@ -78,8 +63,8 @@ export class ChoiceGenerator {
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
-      const decision = this.parseChoiceResponse(response.content, narrativeContext);
-      
+      const decision = this.parseChoiceResponse(response.content, narrativeContext, world);
+
       // Ensure we have the minimum number of options
       if (decision.options.length < minOptions) {
         const fallbackDecision = this.generateFallbackChoices(worldId, narrativeContext);
@@ -124,7 +109,7 @@ export class ChoiceGenerator {
   /**
    * Parse the AI response into a structured Decision object
    */
-  private parseChoiceResponse(content: string, narrativeContext: NarrativeContext): Decision {
+  private parseChoiceResponse(content: string, narrativeContext: NarrativeContext, world: World): Decision {
     // Create a new decision ID
     const decisionId = generateUniqueId('decision');
     
@@ -259,12 +244,24 @@ export class ChoiceGenerator {
             if (skillMatch) {
               const skillName = skillMatch[1];
               const level = parseInt(skillMatch[2]);
-              currentOption.requirements?.push({
-                type: 'skill',
-                targetId: skillName.toLowerCase(),
-                operator: 'gte',
-                value: level
-              });
+
+              // Look up the world skill by name to get its ID
+              const worldSkill = world.skills?.find(
+                ws => ws.name.toLowerCase() === skillName.toLowerCase()
+              );
+
+              if (!worldSkill) {
+                console.warn(`[ChoiceGenerator] Unknown skill "${skillName}" in AI response - skipping requirement`);
+                // Skip this requirement - don't add it to the array
+              } else {
+                // Use the skill ID instead of the name
+                currentOption.requirements?.push({
+                  type: 'skill',
+                  targetId: worldSkill.id,
+                  operator: 'gte',
+                  value: level
+                });
+              }
             }
           }
         }

@@ -100,6 +100,24 @@ export interface DecisionRequirement {
 }
 
 /**
+ * Result of a d20 skill check roll
+ * Serialization-safe (string timestamp) for Next.js API routes / state
+ */
+export interface SkillCheckRoll {
+  diceRoll: number;        // Raw d20 result (1-20)
+  skillLevel: number;      // Character's skill level (0 if untrained)
+  attributeBonus: number;  // Math.round(attribute * 0.1)
+  total: number;           // diceRoll + skillLevel + attributeBonus
+  dc: number;              // Difficulty Class (required level × 2)
+  success: boolean;
+  isCriticalSuccess: boolean;  // Natural 20 (auto-success)
+  isCriticalFailure: boolean;  // Natural 1 (auto-fail)
+  skillId: string;
+  skillName: string;
+  timestamp: string;       // ISO string, not Date
+}
+
+/**
  * Represents a consequence of a decision
  */
 export interface Consequence {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { X } from 'lucide-react'
 import { cn } from "@/lib/utils/classNames"
+import { primitiveColors } from "@/lib/design-tokens"
 
 /**
  * Props for the Toast component
@@ -41,10 +42,22 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const toastVariants = {
-  success: "bg-green-200 border-green-500 text-green-700",
-  error: "bg-destructive/10 border-destructive text-destructive",
-  warning: "bg-amber-200 border-amber-500 text-amber-700",
-  info: "bg-blue-100 border-blue-300 text-blue-700",
+  success: {
+    className: "border-green-600 text-green-900",
+    style: { backgroundColor: primitiveColors.green[50] }
+  },
+  error: {
+    className: "border-red-600 text-red-900",
+    style: { backgroundColor: primitiveColors.red[50] }
+  },
+  warning: {
+    className: "border-amber-600 text-amber-900",
+    style: { backgroundColor: primitiveColors.amber[50] }
+  },
+  info: {
+    className: "border-blue-600 text-blue-900",
+    style: { backgroundColor: primitiveColors.blue[50] }
+  },
 }
 
 /**
@@ -108,15 +121,18 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
 
     if (!isVisible) return null
 
+    const variantConfig = toastVariants[variant]
+
     return (
       <div
         ref={ref}
         className={cn(
           "relative rounded-lg border p-4 shadow-lg transition-all duration-300",
           "min-w-80 max-w-md",
-          toastVariants[variant],
+          variantConfig.className,
           className
         )}
+        style={variantConfig.style}
         role="alert"
         aria-live="polite"
         aria-atomic="true"

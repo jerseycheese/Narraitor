@@ -3,13 +3,14 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
+import { Decision, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
 import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
 import type { Character as UtilCharacter } from '@/types/character.types';
+import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
 
@@ -20,6 +21,7 @@ interface NarrativeControllerProps {
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
   onEndingSuggested?: (reason: string, endingType: import('@/types/narrative.types').EndingType) => void;
+  onSkillCheckPerformed?: (results: SkillCheckRoll[]) => void;
   triggerGeneration?: boolean;
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
@@ -33,6 +35,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
+  onSkillCheckPerformed,
   triggerGeneration = true,
   choiceId,
   className,
@@ -42,7 +45,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const toast = useToast();
+
   // Access store methods in a way that works with testing
   const addSegment = useNarrativeStore(state => state.addSegment);
   const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
@@ -782,6 +786,8 @@ Respond with JSON format:
 
       // Evaluate skill requirements if present
       const skillCheckTags: string[] = [];
+      const rollResults: SkillCheckRoll[] = [];
+
       if (selectedOption?.requirements && characterId) {
         const character = characters[characterId];
         const world = worlds[worldId];
@@ -791,14 +797,15 @@ Respond with JSON format:
           const skillRequirements = selectedOption.requirements.filter(req => req.type === 'skill');
 
           for (const requirement of skillRequirements) {
-            // Create SkillCheck object for evaluateSkillCheck
-            const difficulty = typeof requirement.value === 'number'
+            const requiredLevel = typeof requirement.value === 'number'
               ? requirement.value
               : parseInt(requirement.value, 10);
 
+            // ChoiceGenerator has already converted skill names to IDs
+            // targetId now contains the skill ID directly
             const skillCheck = {
               skillId: requirement.targetId,
-              difficulty
+              difficulty: requiredLevel
             };
 
             // Adapt store character format to evaluator's expected format
@@ -811,7 +818,7 @@ Respond with JSON format:
                 skillId: skill.worldSkillId || skill.id,
                 level: skill.level,
                 experience: 0,
-                isActive: true // Store doesn't track this, assume all skills are active
+                isActive: true
               })),
               attributes: character.attributes.map(attr => ({
                 attributeId: attr.worldAttributeId || attr.id,
@@ -822,13 +829,13 @@ Respond with JSON format:
                 personality: character.background?.personality || '',
                 goals: character.background?.goals || [],
                 fears: character.background?.fears || [],
-                relationships: [] // Store uses unknown[], evaluator expects CharacterRelationship[]
+                relationships: []
               },
               inventory: {
                 characterId: character.inventory.characterId,
-                items: [], // Store uses unknown[], evaluator expects InventoryItem[]
+                items: [],
                 capacity: character.inventory.capacity,
-                categories: [], // Store uses string[], evaluator expects InventoryCategory[]
+                categories: [],
                 itemOrder: [],
               },
               status: character.status,
@@ -836,24 +843,104 @@ Respond with JSON format:
               updatedAt: character.updatedAt
             };
 
-            const success = evaluateSkillCheck(
-              adaptedCharacter,
-              skillCheck,
-              world.skills || []
-            );
+            try {
+              const rollResult = evaluateSkillCheck(
+                adaptedCharacter,
+                skillCheck,
+                world.skills || []
+              );
+              rollResults.push(rollResult);
 
-            // Add success or failure tags for each skill check
-            const tag = success
-              ? `skill-success:${requirement.targetId}`
-              : `skill-failure:${requirement.targetId}`;
-            skillCheckTags.push(tag);
+              // Build tags based on outcome
+              if (rollResult.isCriticalSuccess) {
+                skillCheckTags.push(`skill-critical-success:${requirement.targetId}`);
+              } else if (rollResult.isCriticalFailure) {
+                skillCheckTags.push(`skill-critical-failure:${requirement.targetId}`);
+              } else if (rollResult.success) {
+                skillCheckTags.push(`skill-success:${requirement.targetId}`);
+              } else {
+                skillCheckTags.push(`skill-failure:${requirement.targetId}`);
+              }
+
+              skillCheckTags.push(`skill-roll:${rollResult.diceRoll}`);
+            } catch (error) {
+              console.error('Skill check failed:', error);
+              skillCheckTags.push(`skill-error:${requirement.targetId}`);
+            }
           }
         }
       }
 
+      // Pass results to parent component
+      onSkillCheckPerformed?.(rollResults);
+
+      // Show toast notifications for skill check results
+      // Use longer duration (8 seconds) so players have time to read the roll details
+      rollResults.forEach(result => {
+        // Build detailed breakdown for description
+        const buildBreakdown = () => {
+          const parts = [`d20: ${result.diceRoll}`];
+          if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
+          if (result.attributeBonus > 0) parts.push(`attribute: +${result.attributeBonus}`);
+
+          // If no bonuses, explicitly show that
+          const hasAnyBonus = result.skillLevel > 0 || result.attributeBonus > 0;
+          const breakdown = hasAnyBonus ? parts.join(', ') : `${parts[0]} (no bonuses)`;
+
+          return `${breakdown} = ${result.total} (need ${result.dc})`;
+        };
+
+        if (result.isCriticalSuccess) {
+          toast.addToast({
+            title: `Critical Success! ${result.skillName}`,
+            description: `Natural 20! Automatic success regardless of modifiers.`,
+            variant: 'success',
+            duration: 8000
+          });
+        } else if (result.isCriticalFailure) {
+          toast.addToast({
+            title: `Critical Failure! ${result.skillName}`,
+            description: `Natural 1! Automatic failure regardless of modifiers.`,
+            variant: 'error',
+            duration: 8000
+          });
+        } else if (result.success) {
+          toast.addToast({
+            title: `${result.skillName} Check: Success`,
+            description: buildBreakdown(),
+            variant: 'success',
+            duration: 8000
+          });
+        } else {
+          toast.addToast({
+            title: `${result.skillName} Check: Failed`,
+            description: buildBreakdown(),
+            variant: 'warning',
+            duration: 8000
+          });
+        }
+      });
+
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
       const currentTags = [...existingTags, ...skillCheckTags];
+
+      // Build skill check context for the AI
+      let skillCheckContext = '';
+      if (rollResults.length > 0) {
+        const skillResultDescriptions = rollResults.map(r => {
+          if (r.isCriticalSuccess) {
+            return `${r.skillName}: CRITICAL SUCCESS (natural 20)`;
+          } else if (r.isCriticalFailure) {
+            return `${r.skillName}: CRITICAL FAILURE (natural 1)`;
+          } else if (r.success) {
+            return `${r.skillName}: SUCCESS (rolled ${r.total} vs DC ${r.dc})`;
+          } else {
+            return `${r.skillName}: FAILURE (rolled ${r.total} vs DC ${r.dc})`;
+          }
+        });
+        skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
+      }
 
       const result = await narrativeGenerator.generateSegment({
         worldId,
@@ -867,7 +954,7 @@ Respond with JSON format:
           currentTags,
           sessionId: sessionId || 'temp-session',
           recentSegments,
-          currentSituation: `Player chose: "${choiceText}"`
+          currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`
         },
         generationParameters: {
           includedTopics: [choiceText],

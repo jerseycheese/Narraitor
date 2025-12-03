@@ -77,7 +77,6 @@ export class AutoSaveService {
       return;
     }
 
-    this.logger.info('Starting auto-save service with interval:', this.intervalMs / 1000 / 60, 'minutes');
     this.isServiceRunning = true;
     this.intervalId = setInterval(() => {
       this.performAutoSave('periodic');
@@ -93,7 +92,6 @@ export class AutoSaveService {
    * Stop the auto-save service
    */
   stop(): void {
-    this.logger.info('Stopping auto-save service');
     
     if (this.intervalId) {
       clearInterval(this.intervalId);
@@ -142,7 +140,6 @@ export class AutoSaveService {
     
     try {
       this.options.onSaveStart?.(reason);
-      this.logger.debug('Starting auto-save operation:', { reason, operationId });
       const gameState = await this.stateProvider();
       
       // Only save if session is active (or if it's a manual save)
@@ -178,7 +175,6 @@ export class AutoSaveService {
       const gameStateStr = JSON.stringify(gameState);
       const size = gameStateStr.length;
 
-      this.logger.debug('Saving game state:', { size, reason, sessionId: gameState.session.id });
 
       // Save game state to IndexedDB
       const saveKey = `auto-save-${gameState.session.id}-${Date.now()}`;
@@ -199,7 +195,6 @@ export class AutoSaveService {
         duration
       };
       
-      this.logger.info('Auto-save successful:', { reason, size, duration });
       
       if (this.options.onSave) {
         this.options.onSave(result);

@@ -579,10 +579,6 @@ The items will be automatically added to the character's inventory with proper c
       if (rewritten) {
         const secondEval = evaluateLanguageComplexity(rewritten, level);
         if (secondEval.passes) {
-          logger.info('Narrative rewritten to align with language complexity guidelines.', {
-            level,
-            metrics: secondEval.metrics,
-          });
 
           return {
             ...result,
@@ -1086,9 +1082,6 @@ Return ONLY the rewritten narrative.`;
         // Only parse if we have a complete JSON structure
         if (jsonEnd !== -1) {
           const parsed = JSON.parse(jsonStr);
-          console.log('\n=== NARRATIVE PARSE DEBUG ===');
-          console.log('Full parsed response:', JSON.stringify(parsed, null, 2));
-          console.log('=== END NARRATIVE PARSE DEBUG ===\n');
           if (parsed.content) {
             actualContent = parsed.content;
           }
@@ -1158,10 +1151,6 @@ Return ONLY the rewritten narrative.`;
                   : undefined,
             };
 
-            console.log('\n=== MAJOR EVENT DEBUG ===');
-            console.log('Raw metadata.majorEvent from AI:', parsed?.metadata?.majorEvent);
-            console.log('Extracted majorEvent:', extractedMetadata?.majorEvent);
-            console.log('=== END MAJOR EVENT DEBUG ===\n');
           }
         }
       } catch {

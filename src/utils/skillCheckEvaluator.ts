@@ -1,21 +1,35 @@
 /**
  * @fileoverview Skill Check Evaluator Utility
- * 
- * Provides deterministic skill check evaluation for character abilities against skill requirements.
- * This utility is used by the narrative system to determine choice availability based on character skills.
- * 
+ *
+ * Provides probabilistic d20-based skill check evaluation for character abilities.
+ * This utility is used by the narrative system to determine skill check outcomes.
+ *
  * Key Features:
- * - Deterministic evaluation (no RNG for MVP)
+ * - D20 roll-based probabilistic evaluation
+ * - Critical success (natural 20) and critical failure (natural 1)
  * - 10% attribute bonus calculation
  * - Support for skill ID or name lookup
- * - Graceful handling of missing skills
- * 
+ * - Untrained characters (skill level 0) can attempt checks
+ *
  * @author Generated with Claude Code
  * @since v1.0.0
  */
 
 import { Character } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
+import { SkillCheckRoll } from '@/types/narrative.types';
+
+// ============================================================================
+// DICE ROLLER
+// ============================================================================
+
+/**
+ * Roll a d20 (1-20). Exported for testing.
+ * In tests, mock Math.random to control rolls.
+ */
+export function rollD20(): number {
+  return Math.floor(Math.random() * 20) + 1;
+}
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -57,36 +71,37 @@ export interface SkillCheck {
 // ============================================================================
 
 /**
- * Evaluates whether a character passes a skill check based on their abilities and attributes.
- * 
+ * Performs a d20-based skill check evaluation for a character.
+ *
  * This is the main entry point for skill check evaluation in the narrative system.
- * The evaluation is deterministic and follows these steps:
+ * The evaluation is probabilistic and follows these steps:
  * 1. Find the skill in the world definition
- * 2. Check if character has the skill and it's active
- * 3. Calculate total skill value (base skill + attribute bonus)
- * 4. Compare against difficulty threshold
- * 
+ * 2. Get character's skill level (0 if untrained - anyone can attempt)
+ * 3. Calculate attribute bonus (10% of linked attribute)
+ * 4. Roll d20 and calculate total (roll + skill + attribute bonus)
+ * 5. Evaluate success (criticals override, otherwise total >= DC)
+ *
  * @param character - The character whose skills are being evaluated
  * @param skillCheck - The skill check parameters (skill identifier + difficulty)
  * @param worldSkills - Array of world skill definitions for lookup and bonus calculation
- * @returns true if character meets or exceeds the skill difficulty, false otherwise
- * 
+ * @returns SkillCheckRoll object with complete roll data and outcome
+ *
  * @example
  * ```typescript
  * const character = {
  *   skills: [{ skillId: 'athletics', level: 8, isActive: true }],
  *   attributes: [{ attributeId: 'strength', value: 20 }]
  * };
- * 
- * const skillCheck = { skillId: 'athletics', difficulty: 10 };
- * 
+ *
+ * const skillCheck = { skillId: 'athletics', difficulty: 5 };  // DC will be 10
+ *
  * const worldSkills = [{
  *   id: 'athletics',
- *   name: 'Athletics', 
+ *   name: 'Athletics',
  *   attributeIds: ['strength']
  * }];
- * 
- * // Returns true: 8 (skill) + 2 (20 * 0.1 strength bonus) = 10 >= 10
+ *
+ * // Returns SkillCheckRoll: { diceRoll: 12, skillLevel: 8, attributeBonus: 2, total: 22, dc: 10, success: true, ... }
  * const result = evaluateSkillCheck(character, skillCheck, worldSkills);
  * ```
  */
@@ -94,44 +109,79 @@ export function evaluateSkillCheck(
   character: Character,
   skillCheck: SkillCheck,
   worldSkills: WorldSkill[]
-): boolean {
+): SkillCheckRoll {
   // Step 1: Validate skill identifier
   if (!skillCheck.skillId && !skillCheck.skillName) {
-    return false;
+    throw new Error('Skill check must have skillId or skillName');
   }
 
   // Step 2: Find skill definition in world
   const worldSkill = findWorldSkill(skillCheck, worldSkills);
   if (!worldSkill) {
-    return false;
+    // AI generated a skill check for a skill that doesn't exist in this world
+    // Return automatic failure instead of throwing
+    const attemptedSkillName = skillCheck.skillName || skillCheck.skillId || 'Unknown Skill';
+    console.warn(`Skill not found: ${attemptedSkillName} - treating as automatic failure`);
+    return {
+      skillId: skillCheck.skillId || '',
+      skillName: attemptedSkillName,
+      diceRoll: 1, // Minimum roll
+      skillLevel: 0,
+      attributeBonus: 0,
+      total: 1,
+      dc: skillCheck.difficulty * 2, // Use standard DC calculation
+      success: false,
+      isCriticalSuccess: false,
+      isCriticalFailure: true, // Unknown skill = critical failure
+      timestamp: new Date().toISOString()
+    };
   }
 
-  // Step 3: Find character's skill level
-  const characterSkill = character.skills.find(skill => 
+  // Step 3: Find character's skill level (0 if untrained)
+  const characterSkill = character.skills.find(skill =>
     skill.skillId === worldSkill.id && skill.isActive
   );
+  const skillLevel = characterSkill?.level || 0;  // Changed: allow 0
 
-  if (!characterSkill) {
-    return false;
-  }
-
-  // Step 4: Calculate total skill value (base + attribute bonus)
-  let totalSkillValue = characterSkill.level;
-  
+  // Step 4: Calculate attribute bonus (reuse existing helper)
+  let attributeBonus = 0;
   if (worldSkill.attributeIds?.length && worldSkill.attributeIds.length > 0) {
     // Use primary attribute for bonus calculation (MVP: first attribute)
     const primaryAttributeId = worldSkill.attributeIds[0];
-    const linkedAttribute = character.attributes.find(attr => 
+    const linkedAttribute = character.attributes.find(attr =>
       attr.attributeId === primaryAttributeId
     );
-    
+
     if (linkedAttribute) {
-      totalSkillValue += calculateAttributeBonus(linkedAttribute.value);
+      attributeBonus = calculateAttributeBonus(linkedAttribute.value);
     }
   }
 
-  // Step 5: Compare against difficulty threshold
-  return totalSkillValue >= skillCheck.difficulty;
+  // Step 5: Calculate DC (no mutation, local const)
+  const dc = skillCheck.difficulty * 2;
+
+  // Step 6: Roll the dice!
+  const diceRoll = rollD20();
+  const total = diceRoll + skillLevel + attributeBonus;
+
+  // Step 7: Evaluate outcome (criticals override normal)
+  const isCriticalSuccess = diceRoll === 20;
+  const isCriticalFailure = diceRoll === 1;
+  const success = isCriticalSuccess || (!isCriticalFailure && total >= dc);
+
+  return {
+    diceRoll,
+    skillLevel,
+    attributeBonus,
+    total,
+    dc,
+    success,
+    isCriticalSuccess,
+    isCriticalFailure,
+    skillId: worldSkill.id,
+    skillName: worldSkill.name,
+    timestamp: new Date().toISOString()  // Serialization-safe
+  };
 }
 
 // ============================================================================
@@ -189,11 +239,19 @@ function findWorldSkill(
   worldSkills: WorldSkill[]
 ): WorldSkill | null {
   if (skillIdentifier.skillId) {
-    return worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
+    const found = worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
+    if (!found) {
+      console.warn(`[findWorldSkill] No match for skillId: "${skillIdentifier.skillId}". Available skill IDs:`, worldSkills.map(ws => ws.id));
+    }
+    return found;
   }
 
   if (skillIdentifier.skillName) {
-    return worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
+    const found = worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
+    if (!found) {
+      console.warn(`[findWorldSkill] No match for skillName: "${skillIdentifier.skillName}". Available skill names:`, worldSkills.map(ws => ws.name));
+    }
+    return found;
   }
 
   return null;

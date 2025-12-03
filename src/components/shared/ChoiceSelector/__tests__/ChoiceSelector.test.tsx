@@ -165,13 +165,13 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill badges with skill names only (no difficulty)', () => {
+    it('shows skill badges with skill names and "Check Required" label', () => {
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      // Skill badges should show skill name only (no numbers)
-      expect(screen.getByText('Stealth')).toBeInTheDocument();
-      expect(screen.getByText('Intimidation')).toBeInTheDocument();
+      // Skill badges should show skill name with "Check Required" label
+      expect(screen.getByText('Stealth Check Required')).toBeInTheDocument();
+      expect(screen.getByText('Intimidation Check Required')).toBeInTheDocument();
     });
 
     it('disables options when character lacks required skills', async () => {
@@ -189,18 +189,18 @@ describe('ChoiceSelector', () => {
       );
       expandSuggestions();
 
-      // Options with unmet requirements should be disabled
+      // Skill requirements no longer disable options (probabilistic checks on selection)
       const sneakOption = screen.getByText('Sneak past').closest('button');
       const intimidateOption = screen.getByText('Intimidate the guard').closest('button');
       const directOption = screen.getByText('Walk directly').closest('button');
 
-      expect(sneakOption).toBeDisabled();
-      expect(intimidateOption).toBeDisabled();
-      expect(directOption).not.toBeDisabled(); // No requirements
+      expect(sneakOption).not.toBeDisabled();
+      expect(intimidateOption).not.toBeDisabled();
+      expect(directOption).not.toBeDisabled();
 
-      // Should not trigger onSelect when clicking disabled options
+      // Should trigger onSelect when clicking skill-gated options
       await user.click(screen.getByText('Sneak past'));
-      expect(mockOnSelect).not.toHaveBeenCalled();
+      expect(mockOnSelect).toHaveBeenCalled();
     });
   });
 
@@ -225,26 +225,25 @@ describe('ChoiceSelector', () => {
       return screen.getByTestId('choice-option-combined-opt');
     };
 
-    it('disables when skill requirement is met but item requirement is missing', () => {
+    it('disables when item requirement is missing (skills do not disable)', () => {
       const button = renderCombinedOption(proficientSkills, []);
       expect(button).toBeDisabled();
       expect(button?.getAttribute('data-disabled-reason')).toMatch(/Items/i);
     });
 
-    it('disables when item requirement is met but skill requirement is missing', () => {
+    it('does not disable when item requirement is met (skills do not disable)', () => {
       const button = renderCombinedOption(insufficientSkills, [
         createInventoryItem('Lockpick', 1, { stackable: false }),
       ]);
-      expect(button).toBeDisabled();
-      expect(button?.getAttribute('data-disabled-reason')).toMatch(/Skills/i);
+      expect(button).not.toBeDisabled();
     });
 
-    it('disables when both requirements are unmet', () => {
+    it('disables when item requirement is unmet (skills do not disable)', () => {
       const button = renderCombinedOption([], []);
       expect(button).toBeDisabled();
       const reason = button?.getAttribute('data-disabled-reason') ?? '';
-      expect(reason).toMatch(/Skills/i);
       expect(reason).toMatch(/Items/i);
+      expect(reason).not.toMatch(/Skills/i);
     });
 
     it('enables when both requirements are satisfied', () => {

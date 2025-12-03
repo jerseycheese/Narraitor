@@ -195,7 +195,6 @@ export const useGameSessionState = ({
   const handleSelectChoice = (choiceId: string) => {
     if (!sessionState.playerChoices) return;
     
-    logger.debug('Selecting choice:', choiceId);
     
     // Update local state immediately for visual feedback
     setSessionState(prev => {
@@ -261,7 +260,6 @@ export const useGameSessionState = ({
         // Initialize a new session if:
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
-        logger.debug('[useGameSessionState] Creating new session with character:', sessionCharacterId, 'disableAutoResume:', disableAutoResume);
         actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, disableAutoResume);
       }
     }

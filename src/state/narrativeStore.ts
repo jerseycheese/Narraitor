@@ -272,11 +272,6 @@ async function applyWorldStateThreadUpdates({
 
       if (isFirstSegment) {
         // First segment ALWAYS creates a checkpoint - skip validation
-        logger.info('[NarrativeStore]', 'Creating checkpoint for opening scene', {
-          eventDescription,
-          location: finalMetadata.location,
-          hasAIMajorEvent: !!finalMetadata.majorEvent,
-        });
 
         updatePayload.majorEvents = [{
           id: generateUniqueId('event'),
@@ -305,11 +300,6 @@ async function applyWorldStateThreadUpdates({
 
           const validationResult = await validationResponse.json();
 
-          logger.info('[NarrativeStore]', 'Event significance validation', {
-            majorEvent: finalMetadata.majorEvent,
-            isSignificant: validationResult.isSignificant,
-            reason: validationResult.reason,
-          });
 
           // Only create major event if validation passes
           if (validationResult.isSignificant && finalMetadata.majorEvent) {
@@ -320,10 +310,6 @@ async function applyWorldStateThreadUpdates({
               characterId: activeCharacterId,
             }];
           } else {
-            logger.debug('[NarrativeStore]', 'Major event filtered out', {
-              majorEvent: finalMetadata.majorEvent,
-              reason: validationResult.reason,
-            });
           }
         } catch (error) {
           // If validation fails, default to accepting the event (fail open)
@@ -346,11 +332,6 @@ async function applyWorldStateThreadUpdates({
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
   } catch (error) {
-    logger.debug(
-      '[NarrativeStore]',
-      'World state thread update skipped:',
-      error instanceof Error ? error.message : 'Unknown error'
-    );
   }
 }
 
@@ -847,11 +828,9 @@ export const useNarrativeStore = create<NarrativeStore>()(
         const goalStoreModule = await import('./goalStore');
         const goalStore = goalStoreModule.useGoalStore.getState();
         const result = await goalStore.processSegmentForGoals(segmentId, segmentData.metadata?.characterIds?.[0]);
-        logger.debug('[NarrativeStore]', 'Goal processing result:', result);
       } catch (error) {
         // Silently fail goal processing if goalStore is not available
         // This is not critical for narrative functionality
-        logger.debug('[NarrativeStore]', 'Goal processing skipped:', error instanceof Error ? error.message : 'Unknown error');
       }
     });
 

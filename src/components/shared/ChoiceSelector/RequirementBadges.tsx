@@ -4,6 +4,9 @@ import { RequirementLogic } from '@/types/narrative.types';
 
 interface SkillRequirement {
   skillName?: string;
+  requirement?: {
+    targetId: string;
+  };
 }
 
 interface ItemRequirement {
@@ -29,7 +32,8 @@ interface ItemRequirementBadgesProps {
 }
 
 /**
- * Renders skill requirement badges
+ * Renders skill requirement badges (pre-selection only)
+ * Roll results are shown via toasts instead
  */
 export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   requirements,
@@ -41,18 +45,15 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
 
   return (
     <div className="flex flex-wrap gap-1 mt-2">
-      {requirements.map((skillReq, index) => {
-        const label = `${skillReq.skillName}`;
-
-        return (
-          <Badge
-            key={`${optionId}-skill-${index}`}
-            variant="skill-requirement"
-          >
-            {label}
-          </Badge>
-        );
-      })}
+      {requirements.map((skillReq, index) => (
+        <Badge
+          key={`${optionId}-skill-${index}`}
+          variant="skill-requirement"
+          className="text-xs"
+        >
+          {skillReq.skillName || 'Unknown Skill'} Check Required
+        </Badge>
+      ))}
     </div>
   );
 };

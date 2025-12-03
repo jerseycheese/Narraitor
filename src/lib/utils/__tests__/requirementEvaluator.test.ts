@@ -161,7 +161,7 @@ describe('requirementEvaluator', () => {
 
       const result = evaluateRequirement(requirement, mockCharacter);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
       expect(result.current).toBe(3);
       expect(result.required).toBe(5);
     });
@@ -180,7 +180,7 @@ describe('requirementEvaluator', () => {
       expect(result.current).toBe(6);
     });
 
-    it('should fail gracefully for non-existent skills', () => {
+    it('should always succeed for skill requirements (probabilistic checks)', () => {
       const requirement: DecisionRequirement = {
         type: 'skill',
         targetId: 'nonexistent',
@@ -190,7 +190,7 @@ describe('requirementEvaluator', () => {
 
       const result = evaluateRequirement(requirement, mockCharacter);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
       expect(result.current).toBe(0);
       expect(result.required).toBe(1);
     });
@@ -246,7 +246,7 @@ describe('requirementEvaluator', () => {
 
       const result = evaluateRequirement(requirement, emptyCharacter);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
       expect(result.current).toBe(0);
     });
 

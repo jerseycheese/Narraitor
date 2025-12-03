@@ -79,7 +79,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
 
-  
+
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
@@ -592,7 +592,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Update session store with AI-generated choices
     useSessionStore.getState().setPlayerChoices(playerChoices);
   };
-  
+
   // Handle ending story functionality with confirmation
   const handleEndStory = async () => {
     if (!characterId || !world || !character) return;
@@ -768,7 +768,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               worldId={worldId}
               sessionId={sessionId}
               characterId={characterId || undefined}
-              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
+              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
               choiceId={localSelectedChoiceId || selectedChoiceId}
               onNarrativeGenerated={handleNarrativeGenerated}
               onChoicesGenerated={handleChoicesGenerated}
