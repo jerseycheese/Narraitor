@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { X } from 'lucide-react'
 import { cn } from "@/lib/utils/classNames"
+import { primitiveColors } from "@/lib/design-tokens"
 
 /**
  * Props for the Toast component
@@ -43,19 +44,19 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 const toastVariants = {
   success: {
     className: "border-green-600 text-green-900",
-    style: { backgroundColor: '#f0fdf4' } // green-50
+    style: { backgroundColor: primitiveColors.green[50] }
   },
   error: {
     className: "border-red-600 text-red-900",
-    style: { backgroundColor: '#fef2f2' } // red-50
+    style: { backgroundColor: primitiveColors.red[50] }
   },
   warning: {
     className: "border-amber-600 text-amber-900",
-    style: { backgroundColor: '#fffbeb' } // amber-50
+    style: { backgroundColor: primitiveColors.amber[50] }
   },
   info: {
     className: "border-blue-600 text-blue-900",
-    style: { backgroundColor: '#eff6ff' } // blue-50
+    style: { backgroundColor: primitiveColors.blue[50] }
   },
 }
 
