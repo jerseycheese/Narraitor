@@ -274,26 +274,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Clean up previous subscription
     decisionSubscriptionRef.current?.();
 
-    const unsubscribe = useNarrativeStore.subscribe(
-      (state) => state.sessionDecisions[sessionId],
-      (decisionIds) => {
-        const ids = decisionIds || [];
-        const latestId = ids[ids.length - 1];
-        if (latestId) {
-          const latest = useNarrativeStore.getState().decisions[latestId] || null;
-          setCurrentDecision(latest);
-          setIsGeneratingChoices(false);
-        } else {
-          setCurrentDecision(null);
-          // If narrative already exists, surface a loading state while choices regenerate
-          const hasSegments =
-            (useNarrativeStore.getState().sessionSegments[sessionId]?.length ?? 0) > 0;
-          if (hasSegments) {
-            setIsGeneratingChoices(true);
-          }
+    const unsubscribe = useNarrativeStore.subscribe((state) => {
+      const decisionIds = state.sessionDecisions[sessionId];
+      const ids = decisionIds || [];
+      const latestId = ids[ids.length - 1];
+      if (latestId) {
+        const latest = state.decisions[latestId] || null;
+        setCurrentDecision(latest);
+        setIsGeneratingChoices(false);
+      } else {
+        setCurrentDecision(null);
+        // If narrative already exists, surface a loading state while choices regenerate
+        const hasSegments = (state.sessionSegments[sessionId]?.length ?? 0) > 0;
+        if (hasSegments) {
+          setIsGeneratingChoices(true);
         }
       }
-    );
+    });
 
     decisionSubscriptionRef.current = unsubscribe;
     return () => {
