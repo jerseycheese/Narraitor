@@ -22,6 +22,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
   const mockWorldSkills: WorldSkill[] = [
     {
       id: mockStealthSkillId,
+      worldId: 'test-world',
       name: 'Stealth',
       description: 'Move silently and avoid detection',
       difficulty: 'medium',
@@ -38,10 +39,20 @@ describe('Skill Check Integration - ID-based Flow', () => {
     name: 'Test Hero',
     worldId: 'test-world',
     description: 'A skilled hero',
+    background: {
+      history: 'A skilled adventurer',
+      personality: 'Cautious and observant',
+      goals: ['Master the art of stealth'],
+      fears: [],
+      relationships: []
+    },
+    status: {
+      health: 100,
+      maxHealth: 100,
+      conditions: []
+    },
     attributes: [
       {
-        id: 'char-attr-dex',
-        characterId: mockCharacterId,
         attributeId: 'dexterity',
         value: 14
       }
@@ -54,7 +65,13 @@ describe('Skill Check Integration - ID-based Flow', () => {
         isActive: true
       }
     ],
-    inventory: [],
+    inventory: {
+      characterId: mockCharacterId,
+      items: [],
+      capacity: 10,
+      categories: [],
+      itemOrder: []
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
