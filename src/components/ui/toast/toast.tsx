@@ -41,10 +41,10 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const toastVariants = {
-  success: "bg-green-200 border-green-500 text-green-700",
+  success: "bg-green-300 border-green-500 text-green-800",
   error: "bg-destructive/10 border-destructive text-destructive",
-  warning: "bg-amber-200 border-amber-500 text-amber-700",
-  info: "bg-blue-100 border-blue-300 text-blue-700",
+  warning: "bg-amber-300 border-amber-500 text-amber-800",
+  info: "bg-blue-300 border-blue-400 text-blue-800",
 }
 
 /**
