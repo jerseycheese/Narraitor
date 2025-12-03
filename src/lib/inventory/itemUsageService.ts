@@ -335,6 +335,9 @@ export async function processItemUsage(
         // Reset existing pending decisions so the new choice set is shown
         narrativeStore.clearSessionDecisions(resolvedSessionId);
 
+        // Yield so the UI can render a loading/skeleton state before new choices arrive
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
         const decision = await generator.generatePlayerChoices(
           worldId,
           narrativeContext,
