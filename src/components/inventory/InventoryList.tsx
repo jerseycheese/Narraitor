@@ -211,7 +211,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     {/* Category Badge and Acquisition Method */}
                     <div className="flex items-center gap-2">
                       <Badge
-                        variant="outline"
+                        variant="outline-static"
                         size="sm"
                         className="item-category"
                         aria-label={`Category: ${categoryName}`}

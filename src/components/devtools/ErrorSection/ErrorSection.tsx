@@ -224,11 +224,11 @@ export const ErrorSection = () => {
                     <Badge className={`text-xs ${getSeverityColor(error.severity)} text-white`}>
                       {error.severity.toUpperCase()}
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline-static" className="text-xs">
                       {error.category}
                     </Badge>
                     {error.count > 1 && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary-static" className="text-xs">
                         {error.count}x
                       </Badge>
                     )}

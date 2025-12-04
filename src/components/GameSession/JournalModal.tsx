@@ -105,11 +105,11 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>
           {!entry.isRead && (
-            <Badge variant="secondary" size="sm">Unread</Badge>
+            <Badge variant="secondary-static" size="sm">Unread</Badge>
           )}
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
-            <Badge variant="outline" size="sm" className="text-gray-700 border-gray-300">
+            <Badge variant="outline-static" size="sm" className="text-gray-700 border-gray-300">
               Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
@@ -141,20 +141,20 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           <h4 className="font-semibold text-amber-900 mb-2">Related</h4>
           <div className="flex flex-wrap gap-2">
             {entry.relatedEntities.map((entity, index) => (
-              <Badge key={index} variant="outline" size="sm">
+              <Badge key={index} variant="outline-static" size="sm">
                 {titleCase(entity.type)}: {entity.name}
               </Badge>
             ))}
           </div>
         </div>
       )}
-      
+
       {entry.metadata.tags && entry.metadata.tags.length > 0 && (
         <div className="mt-4">
           <h4 className="font-semibold text-amber-900 mb-2">Tags</h4>
           <div className="flex flex-wrap gap-2">
             {entry.metadata.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" size="sm">
+              <Badge key={index} variant="secondary-static" size="sm">
                 {tag}
               </Badge>
             ))}
