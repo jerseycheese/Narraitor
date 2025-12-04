@@ -43,21 +43,19 @@ export function InventoryTable({
   characterId,
   categoryFilter,
 }: InventoryTableProps) {
-  // Get the items object directly and memoize the transformation
-  const itemsObject = useInventoryStore((state) => state.items);
-  const items = React.useMemo(() => Object.values(itemsObject), [itemsObject]);
+  const getCharacterItems = useInventoryStore((state) => state.getCharacterItems);
   const removeItem = useInventoryStore((state) => state.removeItem);
 
-  // Filter items by character and optional category
+  // Get items for this specific character and filter by category
   const filteredItems = React.useMemo(() => {
-    let filtered = items;
+    let filtered = getCharacterItems(characterId);
 
     if (categoryFilter) {
       filtered = filtered.filter((item) => item.categoryId === categoryFilter);
     }
 
     return filtered;
-  }, [items, categoryFilter]);
+  }, [getCharacterItems, characterId, categoryFilter]);
 
   // Define table columns
   const columns: ColumnDef<InventoryItem>[] = React.useMemo(

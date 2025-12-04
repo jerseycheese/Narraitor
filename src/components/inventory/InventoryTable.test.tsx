@@ -78,6 +78,7 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: jest.fn(),
     };
 
@@ -181,6 +182,7 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: mockRemoveItem,
     };
 
@@ -200,6 +202,7 @@ describe('InventoryTable', () => {
   it('displays empty state when no inventory items', () => {
     const mockState = {
       items: {},
+      getCharacterItems: jest.fn(() => []),
       removeItem: jest.fn(),
     };
 
@@ -219,5 +222,39 @@ describe('InventoryTable', () => {
     // Check that dates are formatted (not raw ISO strings)
     expect(screen.queryByText('2024-01-15T10:00:00Z')).not.toBeInTheDocument();
     expect(screen.getAllByText(/jan/i).length).toBeGreaterThan(0);
+  });
+
+  it('only displays items for the specified character', () => {
+    const mockGetCharacterItems = jest.fn((characterId: string) => {
+      // Return different items based on character
+      if (characterId === 'char-1') {
+        return [mockInventoryItems[0]]; // Only Health Potion
+      }
+      return [mockInventoryItems[1], mockInventoryItems[2]]; // Other items
+    });
+
+    const mockState = {
+      items: mockInventoryItems.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<string, typeof mockInventoryItems[0]>),
+      getCharacterItems: mockGetCharacterItems,
+      removeItem: jest.fn(),
+    };
+
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
+    );
+
+    render(<InventoryTable characterId="char-1" />);
+
+    // Should only show char-1's items
+    expect(screen.getByText('Health Potion')).toBeInTheDocument();
+    expect(screen.queryByText('Iron Sword')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ancient Map')).not.toBeInTheDocument();
+
+    // Verify the correct characterId was passed
+    expect(mockGetCharacterItems).toHaveBeenCalledWith('char-1');
   });
 });
