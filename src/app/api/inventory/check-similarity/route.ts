@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { GeminiClient } from '@/lib/ai/geminiClient';
-import { getAIConfig } from '@/lib/ai/config';
+import { getDefaultConfig } from '@/lib/ai/config';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('CheckSimilarityAPI');
@@ -54,15 +54,15 @@ If they're definitely different items, return similar: false.
 
 Response (JSON only):`;
 
-    const config = getAIConfig();
+    const config = getDefaultConfig();
     const client = new GeminiClient(config);
     const response = await client.generateContent(prompt);
 
     // Parse JSON from response
-    const text = response.text.trim();
+    const text = response.content.trim();
 
     // Try to extract JSON from response
-    let jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       logger.warn('No JSON found in AI response:', text);
       return NextResponse.json({
