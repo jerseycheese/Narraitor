@@ -262,29 +262,38 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
     let existing = map.get(primaryKey);
 
     // Check semantic name similarity for all items (e.g., "Lantern" vs "Rusty Kerosene Lantern", "Locket" vs "Tarnished Silver Locket")
+    let existingIndex = -1;
     if (!existing) {
-      for (const { key, item: existingItem } of allItems) {
-        if (await itemNamesMatch(item.normalizedName, existingItem.normalizedName)) {
-          existingKey = key;
-          existing = existingItem;
+      for (let i = 0; i < allItems.length; i++) {
+        if (await itemNamesMatch(item.normalizedName, allItems[i].item.normalizedName)) {
+          existingKey = allItems[i].key;
+          existing = map.get(existingKey);
+          existingIndex = i;
           break;
         }
       }
     }
 
     if (!existing) {
-      map.set(primaryKey, { ...item });
-      allItems.push({ key: primaryKey, item });
+      const newItem = { ...item };
+      map.set(primaryKey, newItem);
+      allItems.push({ key: primaryKey, item: newItem });
       continue;
     }
 
     if (item.stackable && existing.stackable) {
       const mergedQuantity = (existing.quantity || 0) + (item.quantity || 0);
-      map.set(existingKey as string, {
+      const mergedItem = {
         ...existing,
         quantity: mergedQuantity,
         acquisitionMethod: existing.acquisitionMethod ?? item.acquisitionMethod,
-      });
+      };
+      map.set(existingKey as string, mergedItem);
+
+      // Update the item reference in allItems so subsequent matches see the merged quantity
+      if (existingIndex >= 0) {
+        allItems[existingIndex].item = mergedItem;
+      }
 
       if (existing.acquisitionMethod && item.acquisitionMethod && existing.acquisitionMethod !== item.acquisitionMethod) {
         console.warn(
@@ -297,11 +306,17 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
 
     // Equipment duplicate within the same batch (description may differ)
     const betterDescription = chooseBetterDescription(existing.description, item.description);
-    map.set(existingKey as string, {
+    const mergedItem = {
       ...existing,
       description: betterDescription,
       normalizedDescription: normalizeDescription(betterDescription),
-    });
+    };
+    map.set(existingKey as string, mergedItem);
+
+    // Update the item reference in allItems so subsequent matches see the merged description
+    if (existingIndex >= 0) {
+      allItems[existingIndex].item = mergedItem;
+    }
 
     console.warn(
       `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping one entry and merging details.`

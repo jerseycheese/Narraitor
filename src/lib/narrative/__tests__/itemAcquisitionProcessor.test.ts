@@ -620,6 +620,31 @@ describe('itemAcquisitionProcessor', () => {
       expect(mockUpdateItemQuantity).toHaveBeenCalledWith('item-1', 4);
     });
 
+    it('correctly merges three semantically similar stackable items (triple-merge test)', async () => {
+      // Test for the bug where three similar items would only merge to qty2 instead of qty3
+      // because the second merge would use the stale base quantity
+      const items: AcquiredItemMetadata[] = [
+        { name: 'Potion', description: 'Healing elixir', quantity: 1 },
+        { name: 'Health Potion', description: 'Restores health', quantity: 1 },
+        { name: 'Healing Potion', description: 'Heals wounds', quantity: 1 },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'consumables',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      // Should merge all three into a single item with qty 3
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockAddItem).toHaveBeenCalledWith('character-123', expect.objectContaining({
+        quantity: 3, // All three merged correctly
+      }));
+    });
+
     it('documents that AI handles complex semantic matches', () => {
       // This test documents the expected behavior for AI-based matching.
       // In real usage with the actual AI API, it would handle cases like:

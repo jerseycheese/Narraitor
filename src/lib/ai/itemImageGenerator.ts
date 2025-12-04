@@ -1,8 +1,7 @@
 // src/lib/ai/itemImageGenerator.ts
 
-import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
+import type { InventoryItem } from '@/types/inventory.types';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
-import { safeTrim } from '@/lib/utils';
 
 /**
  * Generates optimized prompts for AI image generation of inventory items.
