@@ -64,6 +64,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const decisionSubscriptionRef = React.useRef<(() => void) | undefined>(undefined);
 
   // Game readiness state for coordinated loading
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
@@ -267,6 +268,36 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       }
     };
   }, [sessionId, worldId, controllerKey]);
+
+  // Keep currentDecision synchronized with store updates (supports external generators like item usage)
+  React.useEffect(() => {
+    // Clean up previous subscription
+    decisionSubscriptionRef.current?.();
+
+    const unsubscribe = useNarrativeStore.subscribe((state) => {
+      const decisionIds = state.sessionDecisions[sessionId];
+      const ids = decisionIds || [];
+      const latestId = ids[ids.length - 1];
+      if (latestId) {
+        const latest = state.decisions[latestId] || null;
+        setCurrentDecision(latest);
+        setIsGeneratingChoices(false);
+      } else {
+        setCurrentDecision(null);
+        // If narrative already exists, surface a loading state while choices regenerate
+        const hasSegments = (state.sessionSegments[sessionId]?.length ?? 0) > 0;
+        if (hasSegments) {
+          setIsGeneratingChoices(true);
+        }
+      }
+    });
+
+    decisionSubscriptionRef.current = unsubscribe;
+    return () => {
+      unsubscribe();
+      decisionSubscriptionRef.current = undefined;
+    };
+  }, [sessionId]);
 
   // Helper function to generate AI summary for journal entries
   const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
