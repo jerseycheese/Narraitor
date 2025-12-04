@@ -97,7 +97,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
 
     // Mock getState for store access
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
-    (useInventoryStore as jest.MockedFunction<typeof useInventoryStore>).getState = jest.fn(() => mockInventoryStore as ReturnType<typeof useInventoryStore.getState>);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (useInventoryStore as jest.MockedFunction<typeof useInventoryStore>).getState = jest.fn(() => mockInventoryStore as any);
 
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());
