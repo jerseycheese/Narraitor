@@ -174,6 +174,20 @@ function buildNameKey(name: string): string {
   return normalizeText(name || '', NORM_NAME).toLowerCase();
 }
 
+/**
+ * Checks if two equipment item names are semantically similar.
+ * Uses simple substring matching: "Lantern" matches "Rusty Kerosene Lantern"
+ */
+function equipmentNamesMatch(name1: string, name2: string): boolean {
+  const normalized1 = normalizeText(name1 || '', NORM_NAME).toLowerCase();
+  const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
+
+  if (normalized1 === normalized2) return true;
+
+  // Check if one is a substring of the other (handles "Lantern" vs "Rusty Kerosene Lantern")
+  return normalized1.includes(normalized2) || normalized2.includes(normalized1);
+}
+
 async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
   const normalizedName = normalizeItemName(item.name);
   const categorization = await getItemCategorization(item, now);
@@ -217,11 +231,9 @@ async function getItemCategorization(
 
 function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
   const map = new Map<string, PreparedItem>();
-  const nameIndex = new Map<string, string>(); // nameKey -> primaryKey
+  const equipmentItems: Array<{ key: string; item: PreparedItem }> = [];
 
   for (const item of items) {
-    const nameKey = buildNameKey(item.normalizedName);
-
     const primaryKey = item.stackable
       ? buildStackableKey(item.normalizedName, item.categorization.categoryId, item.description || '')
       : buildEquipmentKey(item.normalizedName, item.categorization.categoryId);
@@ -229,19 +241,21 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
     let existingKey: string | undefined = primaryKey;
     let existing = map.get(primaryKey);
 
-    // For equipment, fall back to name-only dedup if category differs across items in the same batch
+    // For equipment, check semantic name similarity (e.g., "Lantern" vs "Rusty Kerosene Lantern")
     if (!existing && !item.stackable) {
-      const altKey = nameIndex.get(nameKey);
-      if (altKey) {
-        existingKey = altKey;
-        existing = map.get(altKey);
+      for (const { key, item: existingEquip } of equipmentItems) {
+        if (equipmentNamesMatch(item.normalizedName, existingEquip.normalizedName)) {
+          existingKey = key;
+          existing = existingEquip;
+          break;
+        }
       }
     }
 
     if (!existing) {
       map.set(primaryKey, { ...item });
       if (!item.stackable) {
-        nameIndex.set(nameKey, primaryKey);
+        equipmentItems.push({ key: primaryKey, item });
       }
       continue;
     }
@@ -306,23 +320,11 @@ function findExistingMatch(
     return undefined;
   }
 
-  // Equipment: ignore description; match by name+category, then by name-only to catch category drift
-  const targetKey = buildEquipmentKey(item.normalizedName, item.categorization.categoryId);
-  const targetNameKey = buildNameKey(item.normalizedName);
-
+  // Equipment: use semantic name matching (handles "Lantern" vs "Rusty Kerosene Lantern")
   for (const existing of existingItems) {
     if (!existing || existing.stackable) continue;
-    const existingKey = buildEquipmentKey(existing.name, existing.categoryId);
-    if (existingKey === targetKey) {
+    if (equipmentNamesMatch(item.normalizedName, existing.name)) {
       return { match: existing, matchedBySoft: false };
-    }
-  }
-
-  for (const existing of existingItems) {
-    if (!existing || existing.stackable) continue;
-    const existingNameKey = buildNameKey(existing.name);
-    if (existingNameKey === targetNameKey) {
-      return { match: existing, matchedBySoft: true };
     }
   }
 

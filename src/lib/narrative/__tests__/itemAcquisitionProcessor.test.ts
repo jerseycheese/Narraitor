@@ -476,5 +476,34 @@ describe('itemAcquisitionProcessor', () => {
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
       expect(warnSpy).toHaveBeenCalled();
     });
+
+    it('deduplicates equipment with semantically similar names (e.g., "Lantern" vs "Rusty Kerosene Lantern")', async () => {
+      mockCategorize.mockResolvedValue({
+        categoryId: 'equipment',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      // Add "Rusty Kerosene Lantern" first
+      await processAcquiredItems(
+        [{ name: 'Rusty Kerosene Lantern', description: 'Heavy, glass grimy, and partially filled' }],
+        'character-123',
+        'session-456'
+      );
+
+      // Try to add just "Lantern" - should be detected as duplicate
+      await processAcquiredItems(
+        [{ name: 'Lantern', description: 'Filled with kerosene' }],
+        'character-123',
+        'session-456'
+      );
+
+      // Should only add once (first item)
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Equipment item "Lantern" already exists')
+      );
+    });
   });
 });
