@@ -208,8 +208,8 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
                   {/* Item Metadata and Actions */}
                   <div className="space-y-2">
-                    {/* Category Badge and Acquisition Info */}
-                    <div className="flex items-start justify-between gap-2">
+                    {/* Category Badge and Acquisition Method */}
+                    <div className="flex items-center gap-2">
                       <Badge
                         variant="outline"
                         size="sm"
@@ -219,16 +219,9 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         {categoryName}
                       </Badge>
                       {item.acquisitionHistory[0] && (
-                        <div className="text-xs text-muted-foreground text-right">
-                          <div>
-                            {new Date(item.acquisitionHistory[0].acquiredAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </div>
-                          <div className="capitalize">{item.acquisitionHistory[0].method}</div>
-                        </div>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {item.acquisitionHistory[0].method}
+                        </span>
                       )}
                     </div>
 

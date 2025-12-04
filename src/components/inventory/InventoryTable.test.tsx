@@ -100,7 +100,7 @@ describe('InventoryTable', () => {
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Quantity')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
-    expect(screen.getByText('Acquired')).toBeInTheDocument();
+    expect(screen.getByText('Source')).toBeInTheDocument();
     expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
@@ -223,12 +223,13 @@ describe('InventoryTable', () => {
     expect(screen.getByText(/no items in inventory/i)).toBeInTheDocument();
   });
 
-  it('displays acquisition date in readable format', () => {
+  it('displays acquisition method', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    // Check that dates are formatted (not raw ISO strings)
-    expect(screen.queryByText('2024-01-15T10:00:00Z')).not.toBeInTheDocument();
-    expect(screen.getAllByText(/jan/i).length).toBeGreaterThan(0);
+    // Check that acquisition methods are displayed
+    expect(screen.getByText('unknown')).toBeInTheDocument();
+    expect(screen.getByText('purchase')).toBeInTheDocument();
+    expect(screen.getByText('reward')).toBeInTheDocument();
   });
 
   it('only displays items for the specified character', () => {

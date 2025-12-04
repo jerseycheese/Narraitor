@@ -15,16 +15,6 @@ import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
 
-// Helper function for formatting dates in tables
-function formatTableDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
 interface InventoryTableProps {
   characterId: EntityID;
   categoryFilter?: StandardInventoryCategory;
@@ -126,21 +116,17 @@ export function InventoryTable({
         enableSorting: true,
       },
       {
-        id: 'acquired',
-        header: 'Acquired',
+        id: 'acquisitionMethod',
+        header: 'Source',
         accessorFn: (row) => {
           const firstAcquisition = row.acquisitionHistory[0];
-          return firstAcquisition?.acquiredAt || row.createdAt;
+          return firstAcquisition?.method || 'unknown';
         },
         cell: ({ row }) => {
           const firstAcquisition = row.original.acquisitionHistory[0];
-          const date = firstAcquisition?.acquiredAt || row.original.createdAt;
           const method = firstAcquisition?.method || 'unknown';
           return (
-            <div className="text-sm">
-              <div>{formatTableDate(date)}</div>
-              <div className="text-muted-foreground capitalize">{method}</div>
-            </div>
+            <div className="text-sm capitalize">{method}</div>
           );
         },
         enableSorting: true,
