@@ -156,7 +156,7 @@ describe('Gemini Image Generator', () => {
             generationConfig: {
               responseModalities: ["IMAGE"],
               imageConfig: {
-                aspectRatio: "21:9"
+                aspectRatio: "1:1"
               }
             }
           })
