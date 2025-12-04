@@ -37,7 +37,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   characterId,
   className = '',
 }) => {
-  const { getCharacterItems, removeItem } = useInventoryStore();
+  // Select items and character inventory to re-render on changes
+  const itemsObject = useInventoryStore((state) => state.items);
+  const characterInventories = useInventoryStore((state) => state.characterInventories);
+  const removeItem = useInventoryStore((state) => state.removeItem);
+
+  // Derive character items from selected state
+  const items = React.useMemo(() => {
+    const itemIds = characterInventories[characterId] || [];
+    return itemIds
+      .map((id) => itemsObject[id])
+      .filter((item): item is InventoryItem => Boolean(item));
+  }, [itemsObject, characterInventories, characterId]);
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
@@ -57,9 +68,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       localStorage.setItem('inventory-view-mode', mode);
     }
   };
-
-  // Get all items for this character
-  const items = getCharacterItems(characterId);
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {

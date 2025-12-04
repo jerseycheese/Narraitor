@@ -35,21 +35,28 @@ export function InventoryTable({
   characterId,
   categoryFilter,
 }: InventoryTableProps) {
-  const getCharacterItems = useInventoryStore((state) => state.getCharacterItems);
+  // Select items and character inventory to re-render on changes
+  const items = useInventoryStore((state) => state.items);
+  const characterInventories = useInventoryStore((state) => state.characterInventories);
   const removeItem = useInventoryStore((state) => state.removeItem);
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = React.useState<EntityID | null>(null);
 
-  // Get items for this specific character and filter by category
+  // Derive character items from selected state
+  const characterItems = React.useMemo(() => {
+    const itemIds = characterInventories[characterId] || [];
+    return itemIds
+      .map((id) => items[id])
+      .filter((item): item is InventoryItem => Boolean(item));
+  }, [items, characterInventories, characterId]);
+
+  // Filter by category if specified
   const filteredItems = React.useMemo(() => {
-    let filtered = getCharacterItems(characterId);
-
     if (categoryFilter) {
-      filtered = filtered.filter((item) => item.categoryId === categoryFilter);
+      return characterItems.filter((item) => item.categoryId === categoryFilter);
     }
-
-    return filtered;
-  }, [getCharacterItems, characterId, categoryFilter]);
+    return characterItems;
+  }, [characterItems, categoryFilter]);
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {

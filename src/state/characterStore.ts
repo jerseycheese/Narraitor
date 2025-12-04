@@ -8,6 +8,7 @@ import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
+import { useInventoryStore } from './inventoryStore';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -357,7 +358,6 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
           // Clean up related data before deleting character
           try {
-            const { useInventoryStore } = eval('require("./inventoryStore")');
             const inventoryStore = useInventoryStore.getState();
             inventoryStore.clearCharacterInventory(id);
           } catch (error) {
@@ -615,7 +615,6 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
 
           // Clean up inventory for all characters in the world
           try {
-            const { useInventoryStore } = eval('require("./inventoryStore")');
             const inventoryStore = useInventoryStore.getState();
             charactersInWorld.forEach((characterId) => {
               inventoryStore.clearCharacterInventory(characterId);

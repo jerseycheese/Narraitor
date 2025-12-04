@@ -78,6 +78,9 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': mockInventoryItems.map((item) => item.id),
+      },
       getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: jest.fn(),
     };
@@ -189,6 +192,9 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': mockInventoryItems.map((item) => item.id),
+      },
       getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: mockRemoveItem,
     };
@@ -209,6 +215,9 @@ describe('InventoryTable', () => {
   it('displays empty state when no inventory items', () => {
     const mockState = {
       items: {},
+      characterInventories: {
+        'char-1': [],
+      },
       getCharacterItems: jest.fn(() => []),
       removeItem: jest.fn(),
     };
@@ -246,6 +255,9 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': [mockInventoryItems[0].id], // Only first item for char-1
+      },
       getCharacterItems: mockGetCharacterItems,
       removeItem: jest.fn(),
     };
@@ -261,8 +273,5 @@ describe('InventoryTable', () => {
     expect(screen.getByText('Health Potion')).toBeInTheDocument();
     expect(screen.queryByText('Iron Sword')).not.toBeInTheDocument();
     expect(screen.queryByText('Ancient Map')).not.toBeInTheDocument();
-
-    // Verify the correct characterId was passed
-    expect(mockGetCharacterItems).toHaveBeenCalledWith('char-1');
   });
 });

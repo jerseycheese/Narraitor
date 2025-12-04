@@ -73,9 +73,14 @@ describe('InventoryList', () => {
       }),
     ];
 
-    mockUseInventoryStore.mockReturnValue({
-      getCharacterItems: jest.fn().mockReturnValue(mockItems),
-    } as MockInventoryStore);
+    const mockItemsById = mockItems.reduce((acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    }, {} as Record<string, typeof mockItems[0]>);
+    const mockCharacterInventories = { [characterId]: mockItems.map((item) => item.id) };
+    mockUseInventoryStore.mockImplementation((selector: any) =>
+      selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
+    );
 
     render(<InventoryList characterId={characterId} />);
 
@@ -98,9 +103,14 @@ describe('InventoryList', () => {
       }),
     ];
 
-    mockUseInventoryStore.mockReturnValue({
-      getCharacterItems: jest.fn().mockReturnValue(mockItems),
-    } as MockInventoryStore);
+    const mockItemsById = mockItems.reduce((acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    }, {} as Record<string, typeof mockItems[0]>);
+    const mockCharacterInventories = { [characterId]: mockItems.map((item) => item.id) };
+    mockUseInventoryStore.mockImplementation((selector: any) =>
+      selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
+    );
 
     render(<InventoryList characterId={characterId} />);
 
@@ -108,9 +118,11 @@ describe('InventoryList', () => {
   });
 
   test('renders empty state when inventory is empty', () => {
-    mockUseInventoryStore.mockReturnValue({
-      getCharacterItems: jest.fn().mockReturnValue([]),
-    } as MockInventoryStore);
+    const mockItemsById = {};
+    const mockCharacterInventories = { [characterId]: [] };
+    mockUseInventoryStore.mockImplementation((selector: any) =>
+      selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
+    );
 
     render(<InventoryList characterId={characterId} />);
 
@@ -118,24 +130,31 @@ describe('InventoryList', () => {
   });
 
   test('updates when inventory items change', () => {
-    const getCharacterItems = jest.fn()
-      .mockReturnValueOnce([])
-      .mockReturnValueOnce([
-        createItem({
-          id: 'item-4',
-          name: 'Arcane Tome',
-          description: 'Contains forbidden spells',
-          categoryId: 'documents',
-          stackable: false,
-        }),
-      ]);
+    const newItem = createItem({
+      id: 'item-4',
+      name: 'Arcane Tome',
+      description: 'Contains forbidden spells',
+      categoryId: 'documents',
+      stackable: false,
+    });
 
-    mockUseInventoryStore.mockReturnValue({
-      getCharacterItems,
-    } as MockInventoryStore);
+    // First render: empty inventory
+    let mockItemsById = {};
+    let mockCharacterInventories = { [characterId]: [] };
+
+    mockUseInventoryStore.mockImplementation((selector: any) =>
+      selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
+    );
 
     const { rerender } = render(<InventoryList characterId={characterId} />);
     expect(screen.getByText(/no items in inventory/i)).toBeInTheDocument();
+
+    // Second render: item added to inventory
+    mockItemsById = { [newItem.id]: newItem };
+    mockCharacterInventories = { [characterId]: [newItem.id] };
+    mockUseInventoryStore.mockImplementation((selector: any) =>
+      selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
+    );
 
     rerender(<InventoryList characterId={characterId} />);
 
