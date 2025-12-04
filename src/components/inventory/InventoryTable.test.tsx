@@ -100,8 +100,8 @@ describe('InventoryTable', () => {
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Quantity')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
-    expect(screen.getByText('Max Stack')).toBeInTheDocument();
     expect(screen.getByText('Acquired')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
   it('displays quantity values correctly', () => {
@@ -111,10 +111,14 @@ describe('InventoryTable', () => {
     expect(screen.getAllByText('1')).toHaveLength(2); // Iron Sword and Ancient Map
   });
 
-  it('shows max stack for stackable items', () => {
+  it('shows use and drop action buttons', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    expect(screen.getByText('99')).toBeInTheDocument(); // Health Potion max stack
+    const useButtons = screen.getAllByLabelText(/use/i);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+
+    expect(useButtons.length).toBeGreaterThan(0);
+    expect(dropButtons.length).toBeGreaterThan(0);
   });
 
   it('displays category names in readable format', () => {
@@ -169,11 +173,14 @@ describe('InventoryTable', () => {
   it('displays row actions for each item', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-    expect(deleteButtons).toHaveLength(3);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+    const useButtons = screen.getAllByLabelText(/use/i);
+
+    expect(dropButtons).toHaveLength(3);
+    expect(useButtons).toHaveLength(3);
   });
 
-  it('calls delete handler when delete button clicked', async () => {
+  it('calls remove handler when drop button clicked', async () => {
     const user = userEvent.setup();
     const mockRemoveItem = jest.fn();
 
@@ -193,8 +200,8 @@ describe('InventoryTable', () => {
 
     render(<InventoryTable characterId="char-1" />);
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-    await user.click(deleteButtons[0]);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+    await user.click(dropButtons[0]);
 
     expect(mockRemoveItem).toHaveBeenCalledWith('char-1', 'item-1');
   });

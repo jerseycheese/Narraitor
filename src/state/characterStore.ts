@@ -355,6 +355,15 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return;
           }
 
+          // Clean up related data before deleting character
+          try {
+            const { useInventoryStore } = eval('require("./inventoryStore")');
+            const inventoryStore = useInventoryStore.getState();
+            inventoryStore.clearCharacterInventory(id);
+          } catch (error) {
+            console.warn('Failed to clean up inventory for deleted character', error);
+          }
+
           set((state) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedCharacter, ...remainingCharacters } = state.characters;
@@ -598,21 +607,39 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           return Object.keys(characters).length;
         },
 
-        deleteCharactersInWorld: (worldId) => set((state) => {
-          const charactersToKeep = Object.fromEntries(
-            Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
-          );
+        deleteCharactersInWorld: (worldId) => {
+          const state = get();
+          const charactersInWorld = Object.entries(state.characters)
+            .filter(([, char]) => char.worldId === worldId)
+            .map(([id]) => id);
 
-          const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+          // Clean up inventory for all characters in the world
+          try {
+            const { useInventoryStore } = eval('require("./inventoryStore")');
+            const inventoryStore = useInventoryStore.getState();
+            charactersInWorld.forEach((characterId) => {
+              inventoryStore.clearCharacterInventory(characterId);
+            });
+          } catch (error) {
+            console.warn('Failed to clean up inventory for deleted world characters', error);
+          }
 
-          return {
-            characters: charactersToKeep,
-            entities: charactersToKeep,
-            worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
-            currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
-            currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
-          };
-        }),
+          set((state) => {
+            const charactersToKeep = Object.fromEntries(
+              Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
+            );
+
+            const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+
+            return {
+              characters: charactersToKeep,
+              entities: charactersToKeep,
+              worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
+              currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
+              currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
+            };
+          });
+        },
       };
     },
     {

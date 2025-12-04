@@ -1,13 +1,15 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
 import { useJournalStore } from '../journalStore';
+import { useInventoryStore } from '../inventoryStore';
 import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
-import { mockZustandStore, createMockJournalStore } from '@/lib/test-utils';
+import { mockZustandStore, createMockJournalStore, createMockInventoryStore } from '@/lib/test-utils';
 import { createTestCharacterData } from './characterStore.testHelpers';
 
-// Mock journal store
+// Mock stores
 jest.mock('../journalStore');
+jest.mock('../inventoryStore');
 
 // Test helper for journal entries
 const createTestJournalEntry = (
@@ -59,6 +61,20 @@ describe('CharacterStore - Related Data Cleanup', () => {
     getEntriesByType: jest.fn(),
   };
 
+  const mockInventoryStore = {
+    items: {},
+    characterInventories: {},
+    clearCharacterInventory: jest.fn(),
+    getCharacterItems: jest.fn(() => []),
+    addItem: jest.fn(),
+    removeItem: jest.fn(),
+    updateItemQuantity: jest.fn(),
+    delete: jest.fn(),
+    error: null,
+    loading: false,
+    generatingImageFor: new Set(),
+  };
+
   // Initialize entries dynamically based on test character IDs
   const initializeMockEntries = (charId1: EntityID, charId2: EntityID) => {
     mockJournalStore.entries = {
@@ -77,9 +93,11 @@ describe('CharacterStore - Related Data Cleanup', () => {
     initializeMockEntries(testCharacterId1, testCharacterId2);
 
     mockZustandStore(useJournalStore as jest.MockedFunction<typeof useJournalStore>, createMockJournalStore(mockJournalStore));
+    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockInventoryStore));
 
     // Mock getState for store access
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
+    (useInventoryStore as jest.MockedFunction<typeof useInventoryStore>).getState = jest.fn(() => mockInventoryStore as any);
 
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());
@@ -253,6 +271,57 @@ describe('CharacterStore - Related Data Cleanup', () => {
       });
 
       expect(Object.keys(result.current.characters)).toHaveLength(initialCharacterCount);
+    });
+
+    test('cleans up character inventory when character is deleted', () => {
+      const { result } = renderHook(() => useCharacterStore());
+
+      let characterId: EntityID = '' as EntityID;
+
+      act(() => {
+        characterId = result.current.createCharacter(
+          createTestCharacterData({ name: 'Test Character', description: 'Test description' })
+        );
+      });
+
+      act(() => {
+        result.current.deleteCharacter(characterId);
+      });
+
+      // Verify inventory cleanup was called
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(characterId);
+    });
+
+    test('cleans up inventory for all characters when world is deleted', () => {
+      const { result } = renderHook(() => useCharacterStore());
+
+      let char1Id: EntityID = '' as EntityID;
+      let char2Id: EntityID = '' as EntityID;
+      let char3Id: EntityID = '' as EntityID;
+
+      act(() => {
+        // Create characters in world-1
+        char1Id = result.current.createCharacter(
+          createTestCharacterData({ name: 'Character 1', worldId: 'world-1' as EntityID })
+        );
+        char2Id = result.current.createCharacter(
+          createTestCharacterData({ name: 'Character 2', worldId: 'world-1' as EntityID })
+        );
+        // Create character in world-2 (should NOT be cleaned)
+        char3Id = result.current.createCharacter(
+          createTestCharacterData({ name: 'Character 3', worldId: 'world-2' as EntityID })
+        );
+      });
+
+      act(() => {
+        result.current.deleteCharactersInWorld('world-1' as EntityID);
+      });
+
+      // Verify inventory cleanup was called for world-1 characters only
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(char1Id);
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(char2Id);
+      expect(mockInventoryStore.clearCharacterInventory).not.toHaveBeenCalledWith(char3Id);
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledTimes(2);
     });
   });
 });
