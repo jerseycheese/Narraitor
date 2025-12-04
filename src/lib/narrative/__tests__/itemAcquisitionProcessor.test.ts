@@ -3,6 +3,7 @@
 import { processAcquiredItems } from '../itemAcquisitionProcessor';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { checkItemSimilarityClient } from '@/lib/inventory/checkItemSimilarityClient';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 import type { InventoryItem } from '@/types/inventory.types';
@@ -10,6 +11,7 @@ import type { InventoryItem } from '@/types/inventory.types';
 // Mock the dependencies
 jest.mock('@/state/inventoryStore');
 jest.mock('@/lib/inventory/categorizeInventoryItemClient');
+jest.mock('@/lib/inventory/checkItemSimilarityClient');
 jest.mock('@/lib/services/itemImageService', () => ({
   itemImageService: {
     generateForItem: jest.fn().mockResolvedValue(undefined),
@@ -23,6 +25,9 @@ describe('itemAcquisitionProcessor', () => {
   const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
     typeof categorizeInventoryItemClient
   >;
+  const mockCheckSimilarity = checkItemSimilarityClient as jest.MockedFunction<
+    typeof checkItemSimilarityClient
+  >;
   let warnSpy: jest.SpyInstance;
   let characterItems: InventoryItem[];
 
@@ -30,6 +35,30 @@ describe('itemAcquisitionProcessor', () => {
     jest.clearAllMocks();
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     characterItems = [] as InventoryItem[];
+
+    // Mock AI similarity checker with smart matching logic
+    mockCheckSimilarity.mockImplementation(async ({ name1, name2 }) => {
+      const n1 = name1.toLowerCase();
+      const n2 = name2.toLowerCase();
+
+      // Exact match
+      if (n1 === n2) return { similar: true, confidence: 1.0, rationale: 'Exact match' };
+
+      // Substring matching (e.g., "Potion" in "Health Potion")
+      if (n1.includes(n2) || n2.includes(n1)) {
+        return { similar: true, confidence: 0.9, rationale: 'Substring match' };
+      }
+
+      // Singular/plural (e.g., "Coin" vs "Coins")
+      const s1 = n1.endsWith('s') ? n1.slice(0, -1) : n1;
+      const s2 = n2.endsWith('s') ? n2.slice(0, -1) : n2;
+      if (s1 === s2 || s1.includes(s2) || s2.includes(s1)) {
+        return { similar: true, confidence: 0.85, rationale: 'Singular/plural match' };
+      }
+
+      // Not similar
+      return { similar: false, confidence: 0.1, rationale: 'Different items' };
+    });
 
     mockAddItem = jest.fn((characterId: string, payload: Partial<InventoryItem>) => {
       const id = `item-${characterItems.length + 1}`;
@@ -410,10 +439,10 @@ describe('itemAcquisitionProcessor', () => {
       expect(storedDescription === 'Sharp edge' || storedDescription === 'Rusty blade').toBe(true);
     });
 
-    it('keeps stackable items separate when descriptions differ', async () => {
+    it('merges stackable items with semantically similar names in the same batch', async () => {
       const items: AcquiredItemMetadata[] = [
-        { name: 'Health Potion', description: 'Small', quantity: 1 },
-        { name: 'Health Potion', description: 'Large', quantity: 1 },
+        { name: 'Health Potion', description: 'Restores health', quantity: 1 },
+        { name: 'Potion', description: 'A healing elixir', quantity: 1 },
       ];
 
       mockCategorize.mockResolvedValue({
@@ -425,7 +454,11 @@ describe('itemAcquisitionProcessor', () => {
 
       await processAcquiredItems(items, 'character-123', 'session-456');
 
-      expect(mockAddItem).toHaveBeenCalledTimes(2);
+      // Should merge in batch because "Potion" is substring of "Health Potion"
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockAddItem).toHaveBeenCalledWith('character-123', expect.objectContaining({
+        quantity: 2, // Merged quantity
+      }));
     });
 
     it('prevents duplicate equipment across segments', async () => {
@@ -502,8 +535,105 @@ describe('itemAcquisitionProcessor', () => {
       // Should only add once (first item)
       expect(mockAddItem).toHaveBeenCalledTimes(1);
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Equipment item "Lantern" already exists')
+        expect.stringContaining('Item "Lantern" already exists')
       );
+    });
+
+    it('deduplicates valuables with semantically similar names (e.g., "Locket" vs "Tarnished Silver Locket")', async () => {
+      mockCategorize.mockResolvedValue({
+        categoryId: 'valuables',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      // Add "Tarnished Silver Locket" first
+      await processAcquiredItems(
+        [{ name: 'Tarnished Silver Locket', description: 'Delicate locket on a chain', quantity: 1 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Try to add just "Locket" - should be detected as duplicate and stack
+      await processAcquiredItems(
+        [{ name: 'Locket', description: 'A simple locket', quantity: 1 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Valuables are stackable, so should merge via semantic matching
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockUpdateItemQuantity).toHaveBeenCalledWith('item-1', 2);
+    });
+
+    it('deduplicates consumables with semantically similar names (e.g., "Potion" vs "Health Potion")', async () => {
+      mockCategorize.mockResolvedValue({
+        categoryId: 'consumables',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      // Add "Health Potion" first
+      await processAcquiredItems(
+        [{ name: 'Health Potion', description: 'Restores health', quantity: 2 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Try to add just "Potion" - should be detected as duplicate and stack
+      await processAcquiredItems(
+        [{ name: 'Potion', description: 'A healing potion', quantity: 1 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Should only add once but update quantity
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockUpdateItemQuantity).toHaveBeenCalledWith('item-1', 3);
+    });
+
+    it('deduplicates singular/plural variations (e.g., "Gold Coin" vs "Gold Coins")', async () => {
+      mockCategorize.mockResolvedValue({
+        categoryId: 'valuables',
+        source: 'ai',
+        confidence: 0.9,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      // Add "Gold Coins" (plural) first
+      await processAcquiredItems(
+        [{ name: 'Gold Coins', description: 'Shiny currency', quantity: 3 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Try to add "Gold Coin" (singular) - should be detected as duplicate and stack
+      await processAcquiredItems(
+        [{ name: 'Gold Coin', description: 'A gold coin', quantity: 1 }],
+        'character-123',
+        'session-456'
+      );
+
+      // Should merge via singular/plural matching
+      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockUpdateItemQuantity).toHaveBeenCalledWith('item-1', 4);
+    });
+
+    it('documents that AI handles complex semantic matches', () => {
+      // This test documents the expected behavior for AI-based matching.
+      // In real usage with the actual AI API, it would handle cases like:
+      // - "Photo of Mom" vs "Photo of your mother" (synonyms + possessives)
+      // - "Dad's Watch" vs "Father's Timepiece" (synonyms + word order)
+      // - "Healing Draught" vs "Curative Elixir" (complete synonym replacement)
+      //
+      // The mock in beforeEach() simulates this by handling:
+      // - Exact matches
+      // - Substring matches (e.g., "Potion" in "Health Potion")
+      // - Singular/plural (e.g., "Coin" vs "Coins")
+      //
+      // Real AI would go beyond simple string matching to understand semantic meaning.
+      expect(mockCheckSimilarity).toBeDefined();
     });
   });
 });

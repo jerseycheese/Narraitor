@@ -62,14 +62,14 @@ export async function processAcquiredItems(
         items.map((item) => prepareItem(item, now))
       );
 
-      const deduplicatedItems = deduplicateBatch(preparedItems);
+      const deduplicatedItems = await deduplicateBatch(preparedItems);
 
       for (let i = 0; i < deduplicatedItems.length; i++) {
         const item = deduplicatedItems[i];
 
         try {
           const existingItems = inventoryStore.getCharacterItems(characterId);
-          const matchResult = findExistingMatch(existingItems, item);
+          const matchResult = await findExistingMatch(existingItems, item);
           const existingMatch = matchResult?.match;
 
           if (item.stackable && existingMatch) {
@@ -94,7 +94,7 @@ export async function processAcquiredItems(
 
           if (!item.stackable && existingMatch) {
             console.warn(
-              `Equipment item "${item.normalizedName}" already exists in inventory. Skipping duplicate addition.`
+              `Item "${item.normalizedName}" already exists in inventory. Skipping duplicate addition.`
             );
             continue;
           }
@@ -136,9 +136,10 @@ export async function processAcquiredItems(
  * Most categories allow stacking except equipment which is often unique.
  */
 function isStackableCategory(categoryId: string): boolean {
-  // Equipment items are typically not stackable (each is unique)
-  // All other categories typically allow stacking
-  return categoryId !== 'equipment';
+  // Equipment, personal items, and quest items are unique (non-stackable)
+  // All other categories are stackable (consumables, valuables, documents, miscellaneous)
+  const nonStackableCategories = ['equipment', 'personal', 'quest-items'];
+  return !nonStackableCategories.includes(categoryId);
 }
 
 /**
@@ -175,17 +176,36 @@ function buildNameKey(name: string): string {
 }
 
 /**
- * Checks if two equipment item names are semantically similar.
- * Uses simple substring matching: "Lantern" matches "Rusty Kerosene Lantern"
+ * Checks if two item names are semantically similar using AI.
+ * Handles complex variations like:
+ * - "Lantern" vs "Rusty Kerosene Lantern"
+ * - "Photo of Mom" vs "Photo of your mother"
+ * - "Gold Coin" vs "Gold Coins"
+ * - "Healing Potion" vs "Potion of Healing"
  */
-function equipmentNamesMatch(name1: string, name2: string): boolean {
+async function itemNamesMatch(name1: string, name2: string): Promise<boolean> {
   const normalized1 = normalizeText(name1 || '', NORM_NAME).toLowerCase();
   const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
 
+  // Quick exact match check (avoid AI call)
   if (normalized1 === normalized2) return true;
 
-  // Check if one is a substring of the other (handles "Lantern" vs "Rusty Kerosene Lantern")
-  return normalized1.includes(normalized2) || normalized2.includes(normalized1);
+  // Use AI for semantic similarity
+  const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
+
+  try {
+    const result = await checkItemSimilarityClient({
+      name1,
+      name2,
+    });
+
+    // Consider items similar if AI says so with reasonable confidence
+    return result.similar && result.confidence > 0.7;
+  } catch (error) {
+    // If AI check fails, fall back to simple substring matching
+    console.warn('AI similarity check failed, using fallback:', error);
+    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
+  }
 }
 
 async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
@@ -229,9 +249,9 @@ async function getItemCategorization(
   }
 }
 
-function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
+async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> {
   const map = new Map<string, PreparedItem>();
-  const equipmentItems: Array<{ key: string; item: PreparedItem }> = [];
+  const allItems: Array<{ key: string; item: PreparedItem }> = [];
 
   for (const item of items) {
     const primaryKey = item.stackable
@@ -241,12 +261,12 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
     let existingKey: string | undefined = primaryKey;
     let existing = map.get(primaryKey);
 
-    // For equipment, check semantic name similarity (e.g., "Lantern" vs "Rusty Kerosene Lantern")
-    if (!existing && !item.stackable) {
-      for (const { key, item: existingEquip } of equipmentItems) {
-        if (equipmentNamesMatch(item.normalizedName, existingEquip.normalizedName)) {
+    // Check semantic name similarity for all items (e.g., "Lantern" vs "Rusty Kerosene Lantern", "Locket" vs "Tarnished Silver Locket")
+    if (!existing) {
+      for (const { key, item: existingItem } of allItems) {
+        if (await itemNamesMatch(item.normalizedName, existingItem.normalizedName)) {
           existingKey = key;
-          existing = existingEquip;
+          existing = existingItem;
           break;
         }
       }
@@ -254,9 +274,7 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
 
     if (!existing) {
       map.set(primaryKey, { ...item });
-      if (!item.stackable) {
-        equipmentItems.push({ key: primaryKey, item });
-      }
+      allItems.push({ key: primaryKey, item });
       continue;
     }
 
@@ -293,10 +311,11 @@ function deduplicateBatch(items: PreparedItem[]): PreparedItem[] {
   return Array.from(map.values());
 }
 
-function findExistingMatch(
+async function findExistingMatch(
   existingItems: InventoryItem[],
   item: PreparedItem
-): { match: InventoryItem; matchedBySoft: boolean } | undefined {
+): Promise<{ match: InventoryItem; matchedBySoft: boolean } | undefined> {
+  // First try exact matching based on stackability
   if (item.stackable) {
     const targetKey = buildStackableKey(item.normalizedName, item.categorization.categoryId, item.description || '');
     for (const existing of existingItems) {
@@ -306,25 +325,23 @@ function findExistingMatch(
         return { match: existing, matchedBySoft: false };
       }
     }
-
-    // Fallback: item is marked stackable but a non-stackable with same name exists (category drift)
+  } else {
+    // Non-stackable: try exact name match first
     const targetNameKey = buildNameKey(item.normalizedName);
     for (const existing of existingItems) {
       if (!existing || existing.stackable) continue;
       const existingNameKey = buildNameKey(existing.name);
       if (existingNameKey === targetNameKey) {
-        return { match: existing, matchedBySoft: true };
+        return { match: existing, matchedBySoft: false };
       }
     }
-
-    return undefined;
   }
 
-  // Equipment: use semantic name matching (handles "Lantern" vs "Rusty Kerosene Lantern")
+  // Semantic name matching for all items (handles "Locket" vs "Tarnished Silver Locket", "Photo of Mom" vs "Photo of your mother")
   for (const existing of existingItems) {
-    if (!existing || existing.stackable) continue;
-    if (equipmentNamesMatch(item.normalizedName, existing.name)) {
-      return { match: existing, matchedBySoft: false };
+    if (!existing) continue;
+    if (await itemNamesMatch(item.normalizedName, existing.name)) {
+      return { match: existing, matchedBySoft: true };
     }
   }
 
