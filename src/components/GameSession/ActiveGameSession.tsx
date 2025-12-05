@@ -73,12 +73,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
   const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
+  const autoEndingTriggeredRef = React.useRef(false);
   
   // Manual end story confirmation
   const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
 
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
+
+  // Reset auto-ending guard when session changes
+  React.useEffect(() => {
+    autoEndingTriggeredRef.current = false;
+  }, [sessionId]);
 
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -645,6 +651,34 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleEndingSuggested = (reason: string, endingType: EndingType) => {
     setEndingSuggestionReason(reason);
     setSuggestedEndingType(endingType);
+
+    // Treat "session-limit" suggestions as hard stops (auto game over)
+    // so players can reach a natural/game-over ending without clicking End Story.
+    if (endingType === 'session-limit' && !autoEndingTriggeredRef.current) {
+      autoEndingTriggeredRef.current = true;
+
+      if (!characterId || !world || !character) {
+        // Fall back to showing the banner if we lack context to generate
+        setShowEndingSuggestion(true);
+        return;
+      }
+
+      // Fire-and-forget; any errors already surfaced in generateEnding
+      void generateEnding(endingType, {
+        sessionId,
+        characterId,
+        worldId: world.id,
+        world,
+        character,
+      }).catch((error) => {
+        console.error('Failed to auto-generate ending:', error);
+        // Allow manual acceptance if auto generation fails
+        setShowEndingSuggestion(true);
+        autoEndingTriggeredRef.current = false;
+      });
+      return;
+    }
+
     setShowEndingSuggestion(true);
   };
   
