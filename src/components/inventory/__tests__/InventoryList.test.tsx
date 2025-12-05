@@ -139,8 +139,8 @@ describe('InventoryList', () => {
     });
 
     // First render: empty inventory
-    let mockItemsById = {};
-    let mockCharacterInventories = { [characterId]: [] };
+    let mockItemsById: Record<string, InventoryItem> = {};
+    let mockCharacterInventories: Record<string, string[]> = { [characterId]: [] };
 
     mockUseInventoryStore.mockImplementation((selector: any) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
