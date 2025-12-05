@@ -42,9 +42,19 @@ ${narrativeContext?.currentTags?.some((tag: string) => tag.includes('skill-succe
 SKILL CHECK RESULT GUIDANCE:
 ${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-success:')) ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
 ${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-failure:')) ? '- The player FAILED at their action - show realistic consequences and setbacks' : ''}
+${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
 - Success = things work out, failure = things go wrong or backfire
+` : ''}
+
+${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? `
+FATAL/INCAPACITATING OUTCOME OPTION:
+- This was a pivotal decision and it critically failed.
+- It is allowed to leave the player character dead, unconscious, or otherwise unable to continue.
+- If you take this path, be explicit about the irreversible consequence and its immediate fallout.
+- Keep it grounded in established world rules (no sudden miracles).
+- When the character cannot continue, add a 'fatal-outcome' tag in metadata.tags.
 ` : ''}
 
 CRITICAL CONTINUITY RULES:

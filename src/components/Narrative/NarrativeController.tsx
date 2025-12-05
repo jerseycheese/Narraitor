@@ -973,7 +973,8 @@ Respond with JSON format:
         },
         generationParameters: {
           includedTopics: [choiceText],
-          desiredLength: 'short'
+          desiredLength: 'short',
+          decisionWeight
         }
       });
       
