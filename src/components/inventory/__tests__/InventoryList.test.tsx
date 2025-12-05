@@ -78,7 +78,7 @@ describe('InventoryList', () => {
       return acc;
     }, {} as Record<string, typeof mockItems[0]>);
     const mockCharacterInventories = { [characterId]: mockItems.map((item) => item.id) };
-    mockUseInventoryStore.mockImplementation((selector: any) =>
+    mockUseInventoryStore.mockImplementation((selector) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
     );
 
@@ -108,7 +108,7 @@ describe('InventoryList', () => {
       return acc;
     }, {} as Record<string, typeof mockItems[0]>);
     const mockCharacterInventories = { [characterId]: mockItems.map((item) => item.id) };
-    mockUseInventoryStore.mockImplementation((selector: any) =>
+    mockUseInventoryStore.mockImplementation((selector) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
     );
 
@@ -120,7 +120,7 @@ describe('InventoryList', () => {
   test('renders empty state when inventory is empty', () => {
     const mockItemsById = {};
     const mockCharacterInventories = { [characterId]: [] };
-    mockUseInventoryStore.mockImplementation((selector: any) =>
+    mockUseInventoryStore.mockImplementation((selector) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
     );
 
@@ -142,7 +142,7 @@ describe('InventoryList', () => {
     let mockItemsById: Record<string, InventoryItem> = {};
     let mockCharacterInventories: Record<string, string[]> = { [characterId]: [] };
 
-    mockUseInventoryStore.mockImplementation((selector: any) =>
+    mockUseInventoryStore.mockImplementation((selector) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
     );
 
@@ -152,7 +152,7 @@ describe('InventoryList', () => {
     // Second render: item added to inventory
     mockItemsById = { [newItem.id]: newItem };
     mockCharacterInventories = { [characterId]: [newItem.id] };
-    mockUseInventoryStore.mockImplementation((selector: any) =>
+    mockUseInventoryStore.mockImplementation((selector) =>
       selector({ items: mockItemsById, characterInventories: mockCharacterInventories, removeItem: jest.fn() })
     );
 
