@@ -18,6 +18,7 @@ interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
   characterId?: string;
+  decisionWeight?: import('@/types/narrative.types').DecisionWeight;
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
   onEndingSuggested?: (reason: string, endingType: import('@/types/narrative.types').EndingType) => void;
@@ -32,6 +33,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
   sessionId,
   characterId,
+  decisionWeight,
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
@@ -920,6 +922,19 @@ Respond with JSON format:
           });
         }
       });
+
+      // Fatal fail guard: if a pivotal (critical) decision produces any critical failure,
+      // surface an ending suggestion to let the session conclude.
+      const fatalFailure =
+        decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure);
+
+      if (fatalFailure && onEndingSuggested && !endingSuggestedRef.current) {
+        endingSuggestedRef.current = true;
+        onEndingSuggested(
+          'fatal: critical failure on a pivotal decision left the character incapacitated.',
+          'story-complete'
+        );
+      }
 
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
