@@ -667,6 +667,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         worldId: world.id,
         world: world,
         character: character,
+        desiredTone: 'tragic',
       }).catch((error) => {
         console.error('Failed to auto-generate fatal ending:', error);
         setShowEndingSuggestion(true);

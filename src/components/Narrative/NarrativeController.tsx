@@ -974,7 +974,9 @@ Respond with JSON format:
         generationParameters: {
           includedTopics: [choiceText],
           desiredLength: 'short',
-          decisionWeight
+          decisionWeight,
+          // Fatal paths should skew tragic tone
+          desiredTone: fatalFailure ? 'tragic' : undefined
         }
       });
       
