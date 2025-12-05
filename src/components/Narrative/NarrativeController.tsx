@@ -923,18 +923,18 @@ Respond with JSON format:
         }
       });
 
-      // Fatal fail guard: if a pivotal (critical) decision produces any critical failure,
-      // surface an ending suggestion to let the session conclude.
-      const fatalFailure =
-        decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure);
+  // Fatal fail guard: if a pivotal (critical) decision produces any critical failure,
+  // surface an ending suggestion to let the session conclude.
+  const fatalFailure =
+    decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure);
 
-      if (fatalFailure && onEndingSuggested && !endingSuggestedRef.current) {
-        endingSuggestedRef.current = true;
-        onEndingSuggested(
-          'fatal: critical failure on a pivotal decision left the character incapacitated.',
-          'story-complete'
-        );
-      }
+  if (fatalFailure && onEndingSuggested && !endingSuggestedRef.current) {
+    endingSuggestedRef.current = true;
+    onEndingSuggested(
+      'fatal: critical failure on a pivotal decision left the character incapacitated.',
+      'story-complete'
+    );
+  }
 
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
@@ -957,11 +957,11 @@ Respond with JSON format:
         skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
       }
 
-      const result = await narrativeGenerator.generateSegment({
-        worldId,
-        sessionId,
-        characterIds: characterId ? [characterId] : [],
-        narrativeContext: {
+  const result = await narrativeGenerator.generateSegment({
+    worldId,
+    sessionId,
+    characterIds: characterId ? [characterId] : [],
+    narrativeContext: {
           worldId,
           currentSceneId: `scene-${Date.now()}`,
           characterIds: characterId ? [characterId] : [],
@@ -971,12 +971,12 @@ Respond with JSON format:
           recentSegments,
           currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`
         },
-        generationParameters: {
-          includedTopics: [choiceText],
-          desiredLength: 'short',
-          decisionWeight
-        }
-      });
+    generationParameters: {
+      includedTopics: [choiceText],
+      desiredLength: 'short',
+      decisionWeight
+    }
+  });
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
@@ -998,22 +998,32 @@ Respond with JSON format:
         updatedAt: now.toISOString()
       };
       
-      // Add to local state
-      setSegments(prev => [...prev, newSegment]);
+  // Add to local state
+  setSegments(prev => [...prev, newSegment]);
       
       // Add to store
-      addSegment(sessionId, {
-        content: newSegment.content,
-        type: newSegment.type,
-        characterIds: newSegment.characterIds || [],
-        metadata: newSegment.metadata,
-        updatedAt: newSegment.updatedAt,
-        timestamp: newSegment.timestamp
-      });
-      
-      if (onNarrativeGenerated) {
-        onNarrativeGenerated(newSegment);
-      }
+  addSegment(sessionId, {
+    content: newSegment.content,
+    type: newSegment.type,
+    characterIds: newSegment.characterIds || [],
+    metadata: newSegment.metadata,
+    updatedAt: newSegment.updatedAt,
+    timestamp: newSegment.timestamp
+  });
+
+  if (onNarrativeGenerated) {
+    onNarrativeGenerated(newSegment);
+  }
+
+  // If the AI marked this segment as fatal, surface an ending suggestion immediately
+  const hasFatalTag = newSegment.metadata?.tags?.includes('fatal-outcome');
+  if (hasFatalTag && onEndingSuggested && !endingSuggestedRef.current) {
+    endingSuggestedRef.current = true;
+    onEndingSuggested(
+      'fatal: narrative segment marked the player as dead or incapacitated.',
+      'story-complete'
+    );
+  }
       
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
