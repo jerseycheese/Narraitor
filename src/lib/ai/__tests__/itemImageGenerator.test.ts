@@ -14,31 +14,41 @@ describe('ItemImageGenerator', () => {
     const baseItem: Partial<InventoryItem> = {
       id: 'item-1',
       name: 'Health Potion',
-      description: 'A red liquid that restores health',
+      description: 'A red liquid',
       categoryId: 'consumables',
     };
 
-    test('builds basic prompt with item name and description', async () => {
+    test('builds basic prompt with item name', async () => {
       const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
 
       expect(prompt).toContain('Health Potion');
-      expect(prompt).toContain('A red liquid that restores health');
     });
 
-    test('includes genre context when provided', async () => {
+    test('includes short descriptions', async () => {
+      const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
+
+      expect(prompt).toContain('A red liquid');
+    });
+
+    test('excludes long descriptions to keep prompts simple', async () => {
+      const itemWithLongDesc: Partial<InventoryItem> = {
+        ...baseItem,
+        description: 'This is a very long description that goes on and on about the item',
+      };
+
+      const prompt = await generator.buildItemPrompt(itemWithLongDesc as InventoryItem);
+
+      expect(prompt).toContain('Health Potion');
+      expect(prompt).not.toContain('very long description');
+    });
+
+    test('does not include genre styling even when provided', async () => {
       const prompt = await generator.buildItemPrompt(
         baseItem as InventoryItem,
         'fantasy'
       );
 
-      expect(prompt).toContain('fantasy');
-    });
-
-    test('includes category context for visual consistency', async () => {
-      const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
-
-      // Should reference that it's a consumable in some way
-      expect(prompt.toLowerCase()).toMatch(/consumable|potion|drink|liquid/);
+      expect(prompt).not.toContain('fantasy');
     });
 
     test('handles items without description gracefully', async () => {
@@ -53,40 +63,40 @@ describe('ItemImageGenerator', () => {
       expect(prompt).toBeTruthy();
     });
 
-    test('generates appropriate prompt for equipment items', async () => {
+    test('generates simple prompt for equipment items', async () => {
       const sword: Partial<InventoryItem> = {
         id: 'item-2',
         name: 'Iron Sword',
-        description: 'A sturdy blade forged from iron',
+        description: 'A sturdy blade',
         categoryId: 'equipment',
       };
 
       const prompt = await generator.buildItemPrompt(sword as InventoryItem, 'fantasy');
 
       expect(prompt).toContain('Iron Sword');
-      expect(prompt).toContain('A sturdy blade forged from iron');
-      expect(prompt).toContain('fantasy');
+      expect(prompt).toContain('A sturdy blade');
+      expect(prompt).not.toContain('fantasy');
     });
 
-    test('generates appropriate prompt for valuables', async () => {
+    test('generates simple prompt for valuables', async () => {
       const gem: Partial<InventoryItem> = {
         id: 'item-3',
         name: 'Ruby',
-        description: 'A precious red gemstone',
+        description: 'A precious gemstone',
         categoryId: 'valuables',
       };
 
       const prompt = await generator.buildItemPrompt(gem as InventoryItem);
 
       expect(prompt).toContain('Ruby');
-      expect(prompt).toContain('A precious red gemstone');
+      expect(prompt).toContain('A precious gemstone');
     });
 
-    test('uses sci-fi styling for sci-fi genre', async () => {
+    test('does not use genre styling even for sci-fi genre', async () => {
       const energyCell: Partial<InventoryItem> = {
         id: 'item-4',
         name: 'Energy Cell',
-        description: 'Powers laser weapons',
+        description: 'Battery pack',
         categoryId: 'consumables',
       };
 
@@ -96,21 +106,33 @@ describe('ItemImageGenerator', () => {
       );
 
       expect(prompt).toContain('Energy Cell');
-      expect(prompt).toContain('sci-fi');
+      expect(prompt).not.toContain('sci-fi');
     });
 
-    test('defaults to generic style when no genre provided', async () => {
+    test('includes realistic style directive', async () => {
       const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
 
-      expect(prompt).toBeTruthy();
-      expect(prompt).toContain('Health Potion');
+      expect(prompt).toContain('realistic style');
+    });
+
+    test('includes white background directive', async () => {
+      const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
+
+      expect(prompt).toContain('white background');
+    });
+
+    test('includes professional photography directives', async () => {
+      const prompt = await generator.buildItemPrompt(baseItem as InventoryItem);
+
+      expect(prompt).toContain('centered');
+      expect(prompt).toContain('professional lighting');
     });
 
     test('normalizes item name and description', async () => {
       const messyItem: Partial<InventoryItem> = {
         id: 'item-5',
         name: '  Ancient   Scroll  ',
-        description: '  Contains   powerful   magic  ',
+        description: '  Old   parchment  ',
         categoryId: 'documents',
       };
 
@@ -119,49 +141,6 @@ describe('ItemImageGenerator', () => {
       // Should clean up extra spaces
       expect(prompt).not.toMatch(/\s{2,}/);
       expect(prompt).toContain('Ancient Scroll');
-    });
-  });
-
-  describe('getCategoryStyle', () => {
-    test('returns appropriate style for consumables', () => {
-      const style = generator.getCategoryStyle('consumables');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/potion|bottle|vial|container/);
-    });
-
-    test('returns appropriate style for equipment', () => {
-      const style = generator.getCategoryStyle('equipment');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/tool|weapon|gear|equipment/);
-    });
-
-    test('returns appropriate style for valuables', () => {
-      const style = generator.getCategoryStyle('valuables');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/treasure|valuable|precious|gem|coin/);
-    });
-
-    test('returns appropriate style for documents', () => {
-      const style = generator.getCategoryStyle('documents');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/document|paper|scroll|book|text/);
-    });
-
-    test('returns appropriate style for personal items', () => {
-      const style = generator.getCategoryStyle('personal');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/clothing|personal|accessory|garment/);
-    });
-
-    test('returns appropriate style for quest items', () => {
-      const style = generator.getCategoryStyle('quest-items');
-      expect(style).toBeTruthy();
-      expect(style.toLowerCase()).toMatch(/special|unique|important|quest/);
-    });
-
-    test('returns generic style for miscellaneous', () => {
-      const style = generator.getCategoryStyle('miscellaneous');
-      expect(style).toBeTruthy();
     });
   });
 });

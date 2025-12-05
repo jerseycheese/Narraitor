@@ -78,6 +78,10 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': mockInventoryItems.map((item) => item.id),
+      },
+      getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: jest.fn(),
     };
 
@@ -99,8 +103,8 @@ describe('InventoryTable', () => {
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Quantity')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
-    expect(screen.getByText('Max Stack')).toBeInTheDocument();
-    expect(screen.getByText('Acquired')).toBeInTheDocument();
+    expect(screen.getByText('Source')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
   it('displays quantity values correctly', () => {
@@ -110,10 +114,14 @@ describe('InventoryTable', () => {
     expect(screen.getAllByText('1')).toHaveLength(2); // Iron Sword and Ancient Map
   });
 
-  it('shows max stack for stackable items', () => {
+  it('shows use and drop action buttons', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    expect(screen.getByText('99')).toBeInTheDocument(); // Health Potion max stack
+    const useButtons = screen.getAllByLabelText(/use/i);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+
+    expect(useButtons.length).toBeGreaterThan(0);
+    expect(dropButtons.length).toBeGreaterThan(0);
   });
 
   it('displays category names in readable format', () => {
@@ -168,11 +176,14 @@ describe('InventoryTable', () => {
   it('displays row actions for each item', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-    expect(deleteButtons).toHaveLength(3);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+    const useButtons = screen.getAllByLabelText(/use/i);
+
+    expect(dropButtons).toHaveLength(3);
+    expect(useButtons).toHaveLength(3);
   });
 
-  it('calls delete handler when delete button clicked', async () => {
+  it('calls remove handler when drop button clicked', async () => {
     const user = userEvent.setup();
     const mockRemoveItem = jest.fn();
 
@@ -181,6 +192,10 @@ describe('InventoryTable', () => {
         acc[item.id] = item;
         return acc;
       }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': mockInventoryItems.map((item) => item.id),
+      },
+      getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: mockRemoveItem,
     };
 
@@ -191,8 +206,8 @@ describe('InventoryTable', () => {
 
     render(<InventoryTable characterId="char-1" />);
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-    await user.click(deleteButtons[0]);
+    const dropButtons = screen.getAllByLabelText(/drop/i);
+    await user.click(dropButtons[0]);
 
     expect(mockRemoveItem).toHaveBeenCalledWith('char-1', 'item-1');
   });
@@ -200,6 +215,10 @@ describe('InventoryTable', () => {
   it('displays empty state when no inventory items', () => {
     const mockState = {
       items: {},
+      characterInventories: {
+        'char-1': [],
+      },
+      getCharacterItems: jest.fn(() => []),
       removeItem: jest.fn(),
     };
 
@@ -213,11 +232,46 @@ describe('InventoryTable', () => {
     expect(screen.getByText(/no items in inventory/i)).toBeInTheDocument();
   });
 
-  it('displays acquisition date in readable format', () => {
+  it('displays acquisition method', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    // Check that dates are formatted (not raw ISO strings)
-    expect(screen.queryByText('2024-01-15T10:00:00Z')).not.toBeInTheDocument();
-    expect(screen.getAllByText(/jan/i).length).toBeGreaterThan(0);
+    // Check that acquisition methods are displayed
+    expect(screen.getByText('unknown')).toBeInTheDocument();
+    expect(screen.getByText('purchase')).toBeInTheDocument();
+    expect(screen.getByText('reward')).toBeInTheDocument();
+  });
+
+  it('only displays items for the specified character', () => {
+    const mockGetCharacterItems = jest.fn((characterId: string) => {
+      // Return different items based on character
+      if (characterId === 'char-1') {
+        return [mockInventoryItems[0]]; // Only Health Potion
+      }
+      return [mockInventoryItems[1], mockInventoryItems[2]]; // Other items
+    });
+
+    const mockState = {
+      items: mockInventoryItems.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {} as Record<string, typeof mockInventoryItems[0]>),
+      characterInventories: {
+        'char-1': [mockInventoryItems[0].id], // Only first item for char-1
+      },
+      getCharacterItems: mockGetCharacterItems,
+      removeItem: jest.fn(),
+    };
+
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockState)
+    );
+
+    render(<InventoryTable characterId="char-1" />);
+
+    // Should only show char-1's items
+    expect(screen.getByText('Health Potion')).toBeInTheDocument();
+    expect(screen.queryByText('Iron Sword')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ancient Map')).not.toBeInTheDocument();
   });
 });

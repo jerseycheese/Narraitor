@@ -8,6 +8,7 @@ import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
+import { useInventoryStore } from './inventoryStore';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -355,6 +356,14 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             return;
           }
 
+          // Clean up related data before deleting character
+          try {
+            const inventoryStore = useInventoryStore.getState();
+            inventoryStore.clearCharacterInventory(id);
+          } catch (error) {
+            console.warn('Failed to clean up inventory for deleted character', error);
+          }
+
           set((state) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedCharacter, ...remainingCharacters } = state.characters;
@@ -598,21 +607,38 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           return Object.keys(characters).length;
         },
 
-        deleteCharactersInWorld: (worldId) => set((state) => {
-          const charactersToKeep = Object.fromEntries(
-            Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
-          );
+        deleteCharactersInWorld: (worldId) => {
+          const state = get();
+          const charactersInWorld = Object.entries(state.characters)
+            .filter(([, char]) => char.worldId === worldId)
+            .map(([id]) => id);
 
-          const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+          // Clean up inventory for all characters in the world
+          try {
+            const inventoryStore = useInventoryStore.getState();
+            charactersInWorld.forEach((characterId) => {
+              inventoryStore.clearCharacterInventory(characterId);
+            });
+          } catch (error) {
+            console.warn('Failed to clean up inventory for deleted world characters', error);
+          }
 
-          return {
-            characters: charactersToKeep,
-            entities: charactersToKeep,
-            worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
-            currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
-            currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
-          };
-        }),
+          set((state) => {
+            const charactersToKeep = Object.fromEntries(
+              Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
+            );
+
+            const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+
+            return {
+              characters: charactersToKeep,
+              entities: charactersToKeep,
+              worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
+              currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
+              currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
+            };
+          });
+        },
       };
     },
     {

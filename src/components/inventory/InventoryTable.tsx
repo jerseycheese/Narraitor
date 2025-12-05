@@ -8,20 +8,12 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2 } from 'lucide-react';
+import { Trash2, PackageMinus } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
-
-// Helper function for formatting dates in tables
-function formatTableDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 interface InventoryTableProps {
   characterId: EntityID;
@@ -43,21 +35,40 @@ export function InventoryTable({
   characterId,
   categoryFilter,
 }: InventoryTableProps) {
-  // Get the items object directly and memoize the transformation
-  const itemsObject = useInventoryStore((state) => state.items);
-  const items = React.useMemo(() => Object.values(itemsObject), [itemsObject]);
+  // Select items and character inventory to re-render on changes
+  const items = useInventoryStore((state) => state.items);
+  const characterInventories = useInventoryStore((state) => state.characterInventories);
   const removeItem = useInventoryStore((state) => state.removeItem);
+  const sessionId = useSessionStore((state) => state.id);
+  const [usingItemId, setUsingItemId] = React.useState<EntityID | null>(null);
 
-  // Filter items by character and optional category
+  // Derive character items from selected state
+  const characterItems = React.useMemo(() => {
+    const itemIds = characterInventories[characterId] || [];
+    return itemIds
+      .map((id) => items[id])
+      .filter((item): item is InventoryItem => Boolean(item));
+  }, [items, characterInventories, characterId]);
+
+  // Filter by category if specified
   const filteredItems = React.useMemo(() => {
-    let filtered = items;
-
     if (categoryFilter) {
-      filtered = filtered.filter((item) => item.categoryId === categoryFilter);
+      return characterItems.filter((item) => item.categoryId === categoryFilter);
     }
+    return characterItems;
+  }, [characterItems, categoryFilter]);
 
-    return filtered;
-  }, [items, categoryFilter]);
+  // Handle item usage
+  const handleUseItem = async (itemId: EntityID) => {
+    setUsingItemId(itemId);
+    try {
+      await processItemUsage(characterId, itemId, sessionId || undefined);
+    } catch (error) {
+      console.error('Failed to use item:', error);
+    } finally {
+      setUsingItemId(null);
+    }
+  };
 
   // Define table columns
   const columns: ColumnDef<InventoryItem>[] = React.useMemo(
@@ -104,7 +115,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const categoryId = row.getValue('categoryId') as StandardInventoryCategory;
           return (
-            <Badge variant="outline">
+            <Badge variant="outline-static">
               {CATEGORY_NAMES[categoryId] || categoryId}
             </Badge>
           );
@@ -112,34 +123,17 @@ export function InventoryTable({
         enableSorting: true,
       },
       {
-        accessorKey: 'maxStack',
-        header: 'Max Stack',
-        cell: ({ row }) => {
-          const maxStack = row.original.maxStack;
-          return (
-            <div className="text-center">
-              {maxStack !== undefined ? maxStack : '—'}
-            </div>
-          );
-        },
-        enableSorting: true,
-      },
-      {
-        id: 'acquired',
-        header: 'Acquired',
+        id: 'acquisitionMethod',
+        header: 'Source',
         accessorFn: (row) => {
           const firstAcquisition = row.acquisitionHistory[0];
-          return firstAcquisition?.acquiredAt || row.createdAt;
+          return firstAcquisition?.method || 'unknown';
         },
         cell: ({ row }) => {
           const firstAcquisition = row.original.acquisitionHistory[0];
-          const date = firstAcquisition?.acquiredAt || row.original.createdAt;
           const method = firstAcquisition?.method || 'unknown';
           return (
-            <div className="text-sm">
-              <div>{formatTableDate(date)}</div>
-              <div className="text-muted-foreground capitalize">{method}</div>
-            </div>
+            <div className="text-sm capitalize">{method}</div>
           );
         },
         enableSorting: true,
@@ -147,21 +141,35 @@ export function InventoryTable({
       {
         id: 'actions',
         header: 'Actions',
-        cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(characterId, row.original.id)}
-              aria-label={`Delete ${row.original.name}`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const isUsing = usingItemId === row.original.id;
+          return (
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleUseItem(row.original.id)}
+                disabled={isUsing}
+                aria-label={`Use ${row.original.name}`}
+                title="Use item"
+              >
+                <PackageMinus className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeItem(characterId, row.original.id)}
+                aria-label={`Drop ${row.original.name}`}
+                title="Drop item"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        },
       },
     ],
-    [characterId, removeItem]
+    [characterId, removeItem, handleUseItem, usingItemId]
   );
 
   // Handle empty state

@@ -16,6 +16,7 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-white hover:bg-destructive/90",
         outline: "text-gray-900 border border-gray-300 bg-white hover:bg-gray-100",
+        "outline-static": "text-gray-900 border border-gray-300 bg-white",
         // Entity badge variants
         success: "border-transparent bg-green-500 text-white hover:bg-green-700",
         warning: "border-transparent bg-amber-500 text-white hover:bg-amber-700",

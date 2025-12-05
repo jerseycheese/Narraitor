@@ -332,9 +332,6 @@ export async function processItemUsage(
           currentLocation: lastSegment?.metadata?.location,
         };
 
-        // Reset existing pending decisions so the new choice set is shown
-        narrativeStore.clearSessionDecisions(resolvedSessionId);
-
         // Yield so the UI can render a loading/skeleton state before new choices arrive
         await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -347,7 +344,10 @@ export async function processItemUsage(
           resolvedSessionId
         );
 
-        // Persist decision in store for UI to pick up
+        // Clear old decisions only after successful generation
+        narrativeStore.clearSessionDecisions(resolvedSessionId);
+
+        // Persist new decision in store for UI to pick up
         narrativeStore.addDecision(resolvedSessionId, {
           prompt: decision.prompt,
           options: decision.options,
@@ -355,8 +355,8 @@ export async function processItemUsage(
           contextSummary: decision.contextSummary,
         });
       } catch (error) {
-        // Non-fatal; item usage narrative already generated
-        console.warn('Failed to generate choices after item usage', error);
+        // If generation fails, existing decisions remain intact (not cleared)
+        console.warn('Failed to generate choices after item usage, keeping existing decisions', error);
       }
     } catch {
       narrative = buildUsageNarrative(item, usageResult, 'simple');

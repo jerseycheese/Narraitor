@@ -15,6 +15,7 @@ import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import { InventoryViewToggle, type InventoryViewMode } from './InventoryViewToggle';
 import { InventoryTable } from './InventoryTable';
+import { Trash2 } from 'lucide-react';
 
 interface InventoryListProps {
   characterId: EntityID;
@@ -36,7 +37,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   characterId,
   className = '',
 }) => {
-  const { getCharacterItems } = useInventoryStore();
+  // Select items and character inventory to re-render on changes
+  const itemsObject = useInventoryStore((state) => state.items);
+  const characterInventories = useInventoryStore((state) => state.characterInventories);
+  const removeItem = useInventoryStore((state) => state.removeItem);
+
+  // Derive character items from selected state
+  const items = React.useMemo(() => {
+    const itemIds = characterInventories[characterId] || [];
+    return itemIds
+      .map((id) => itemsObject[id])
+      .filter((item): item is InventoryItem => Boolean(item));
+  }, [itemsObject, characterInventories, characterId]);
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
@@ -56,9 +68,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       localStorage.setItem('inventory-view-mode', mode);
     }
   };
-
-  // Get all items for this character
-  const items = getCharacterItems(characterId);
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {
@@ -205,32 +214,46 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     </p>
                   )}
 
-                  {/* Item Metadata Footer */}
-                  <div className="flex items-center justify-between gap-2 text-xs">
+                  {/* Item Metadata and Actions */}
+                  <div className="space-y-2">
+                    {/* Category Badge and Acquisition Method */}
                     <div className="flex items-center gap-2">
                       <Badge
-                        variant="outline"
+                        variant="outline-static"
                         size="sm"
                         className="item-category"
                         aria-label={`Category: ${categoryName}`}
                       >
                         {categoryName}
                       </Badge>
-                      {item.stackable && item.maxStack && (
-                        <span className="text-muted-foreground" aria-label={`Maximum stack size: ${item.maxStack}`}>
-                          Max: {item.maxStack}
+                      {item.acquisitionHistory[0] && (
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {item.acquisitionHistory[0].method}
                         </span>
                       )}
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleUseItem(item.id)}
-                      disabled={usingItemId === item.id || item.quantity <= 0}
-                      className="ml-auto"
-                    >
-                      {usingItemId === item.id ? 'Using...' : 'Use'}
-                    </Button>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUseItem(item.id)}
+                        disabled={usingItemId === item.id || item.quantity <= 0}
+                        className="flex-1"
+                      >
+                        {usingItemId === item.id ? 'Using...' : 'Use'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeItem(characterId, item.id)}
+                        aria-label={`Drop ${item.name}`}
+                        title="Drop item"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
