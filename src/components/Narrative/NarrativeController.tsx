@@ -3,7 +3,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { Decision, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
+import { Decision, DecisionWeight, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
 import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -431,7 +431,8 @@ Respond with JSON format:
       // Add decision to store and get the actual stored ID
       const storedDecisionId = useNarrativeStore.getState().addDecision(sessionId, {
         prompt: decision.prompt,
-        options: decision.options
+        options: decision.options,
+        decisionWeight: decision.decisionWeight
       });
       
       // Update the decision with the stored ID before passing to parent
@@ -773,10 +774,13 @@ Respond with JSON format:
       // Find the decision that contains this choice
       let isCustomInput = false;
       let selectedOption = null;
+      let decisionWeight: DecisionWeight | undefined;
       for (const decision of decisions) {
         const option = decision.options.find(opt => opt.id === triggeringChoiceId);
         if (option) {
           selectedOption = option;
+          // Extract decision weight from the decision
+          decisionWeight = decision.decisionWeight;
           // For custom input, use the customText, otherwise use the regular text
           choiceText = option.isCustomInput && option.customText
             ? option.customText
@@ -923,15 +927,14 @@ Respond with JSON format:
         }
       });
 
-      // Fatal fail guard: if a pivotal (critical) decision produces any critical failure,
-      // surface an ending suggestion to let the session conclude.
-      const fatalFailure =
-        decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure);
+      // Fatal outcome check: Any failure on a critical decision ends the game
+      // This makes critical decisions truly life-or-death
+      const hasCriticalFailure = decisionWeight === 'critical' && rollResults.some(r => !r.success);
 
-      if (fatalFailure && onEndingSuggested && !endingSuggestedRef.current) {
+      if (hasCriticalFailure && onEndingSuggested && !endingSuggestedRef.current) {
         endingSuggestedRef.current = true;
         onEndingSuggested(
-          'fatal: critical failure on a pivotal decision left the character incapacitated.',
+          'fatal: failure on a pivotal decision left the character unable to continue.',
           'story-complete'
         );
       }
@@ -975,8 +978,8 @@ Respond with JSON format:
           includedTopics: [choiceText],
           desiredLength: 'short',
           decisionWeight,
-          // Fatal paths should skew tragic tone
-          desiredTone: fatalFailure ? 'tragic' : undefined
+          // Critical decisions with critical failures should have tragic tone
+          desiredTone: (decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure)) ? 'tragic' : undefined
         }
       });
       
@@ -992,7 +995,11 @@ Respond with JSON format:
         content: result.content,
         type: result.segmentType,
         characterIds: result.metadata.characterIds || [],
-        metadata: result.metadata,
+        metadata: {
+          ...result.metadata,
+          // Merge skill check tags into metadata
+          tags: [...(result.metadata.tags || []), ...skillCheckTags]
+        },
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId
         timestamp: now,

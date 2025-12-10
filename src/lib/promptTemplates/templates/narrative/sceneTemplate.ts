@@ -48,13 +48,18 @@ ${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-criti
 - Success = things work out, failure = things go wrong or backfire
 ` : ''}
 
-${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? `
-FATAL/INCAPACITATING OUTCOME OPTION:
-- This was a pivotal decision and it critically failed.
-- It is allowed to leave the player character dead, unconscious, or otherwise unable to continue.
-- If you take this path, be explicit about the irreversible consequence and its immediate fallout.
-- Keep it grounded in established world rules (no sudden miracles).
-- When the character cannot continue, add a 'fatal-outcome' tag in metadata.tags.
+${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-failure:') || tag.startsWith('skill-critical-failure:')) ? `
+FATAL/INCAPACITATING OUTCOME:
+- This was a pivotal, life-or-death decision and it FAILED${narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? ' critically' : ''}.
+- The player character should be dead, unconscious, or otherwise unable to continue.
+- Describe the fatal consequence explicitly and dramatically - this is game over.
+- Keep it grounded in established world rules (no sudden miracles or lucky escapes).
+- The narrative tone should be tragic and final.
+` : generationParameters?.decisionWeight === 'critical' ? `
+PIVOTAL DECISION (LIFE OR DEATH):
+- This is a critical decision with extreme stakes.
+- Success should feel earned and impactful.
+- Failure will end the game, so make successes meaningful.
 ` : ''}
 
 CRITICAL CONTINUITY RULES:
