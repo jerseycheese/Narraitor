@@ -73,6 +73,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
   const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
+  const fatalEndingTriggeredRef = React.useRef(false);
   
   // Manual end story confirmation
   const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
@@ -80,6 +81,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
 
+  // Reset fatal guard when session changes
+  React.useEffect(() => {
+    fatalEndingTriggeredRef.current = false;
+  }, [sessionId]);
 
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -645,6 +650,32 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleEndingSuggested = (reason: string, endingType: EndingType) => {
     setEndingSuggestionReason(reason);
     setSuggestedEndingType(endingType);
+
+    const isFatal = reason.toLowerCase().startsWith('fatal:');
+
+    if (isFatal && !fatalEndingTriggeredRef.current) {
+      fatalEndingTriggeredRef.current = true;
+
+      if (!characterId || !world || !character) {
+        setShowEndingSuggestion(true);
+        return;
+      }
+
+      void generateEnding(endingType, {
+        sessionId,
+        characterId,
+        worldId: world.id,
+        world: world,
+        character: character,
+        desiredTone: 'tragic',
+      }).catch((error) => {
+        console.error('Failed to auto-generate fatal ending:', error);
+        setShowEndingSuggestion(true);
+        fatalEndingTriggeredRef.current = false;
+      });
+      return;
+    }
+
     setShowEndingSuggestion(true);
   };
   
@@ -748,6 +779,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             worldId={worldId}
             sessionId={sessionId}
             characterId={characterId || undefined}
+            decisionWeight={currentDecision?.decisionWeight}
             triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
             choiceId={localSelectedChoiceId || selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
@@ -799,6 +831,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               worldId={worldId}
               sessionId={sessionId}
               characterId={characterId || undefined}
+              decisionWeight={currentDecision?.decisionWeight}
               triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
               choiceId={localSelectedChoiceId || selectedChoiceId}
               onNarrativeGenerated={handleNarrativeGenerated}

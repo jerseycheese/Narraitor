@@ -133,6 +133,11 @@ ALIGNMENT INSTRUCTIONS:
 - Mix alignments to provide variety - not every choice needs to be neutral!
 - DO NOT include any emojis in your response - the frontend will add them automatically
 
+LETHAL STAKES (ONLY WHEN Decision Weight IS CRITICAL):
+- If the current situation justifies it, one or more options may carry lethal or incapacitating consequences on failure.
+- Make the stakes explicit in the option text or hint (e.g., “risk bleeding out if this fails”).
+- Keep consequences grounded in the world’s rules; no miraculous escapes if tone/genre wouldn’t allow it.
+
 CONTEXT SUMMARY INSTRUCTIONS:
 - Provide a brief 1-2 sentence summary that captures the current narrative moment
 - Focus on what just happened that led to this decision point

@@ -3,7 +3,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { Decision, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
+import { Decision, DecisionWeight, NarrativeContext, NarrativeSegment, SkillCheckRoll } from '@/types/narrative.types';
 import { truncate, safeTrim } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -18,6 +18,7 @@ interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
   characterId?: string;
+  decisionWeight?: import('@/types/narrative.types').DecisionWeight;
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
   onEndingSuggested?: (reason: string, endingType: import('@/types/narrative.types').EndingType) => void;
@@ -32,6 +33,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
   sessionId,
   characterId,
+  decisionWeight,
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
@@ -429,7 +431,8 @@ Respond with JSON format:
       // Add decision to store and get the actual stored ID
       const storedDecisionId = useNarrativeStore.getState().addDecision(sessionId, {
         prompt: decision.prompt,
-        options: decision.options
+        options: decision.options,
+        decisionWeight: decision.decisionWeight
       });
       
       // Update the decision with the stored ID before passing to parent
@@ -771,10 +774,13 @@ Respond with JSON format:
       // Find the decision that contains this choice
       let isCustomInput = false;
       let selectedOption = null;
+      let decisionWeight: DecisionWeight | undefined;
       for (const decision of decisions) {
         const option = decision.options.find(opt => opt.id === triggeringChoiceId);
         if (option) {
           selectedOption = option;
+          // Extract decision weight from the decision
+          decisionWeight = decision.decisionWeight;
           // For custom input, use the customText, otherwise use the regular text
           choiceText = option.isCustomInput && option.customText
             ? option.customText
@@ -921,6 +927,18 @@ Respond with JSON format:
         }
       });
 
+      // Fatal outcome check: Any failure on a critical decision ends the game
+      // This makes critical decisions truly life-or-death
+      const hasCriticalFailure = decisionWeight === 'critical' && rollResults.some(r => !r.success);
+
+      if (hasCriticalFailure && onEndingSuggested && !endingSuggestedRef.current) {
+        endingSuggestedRef.current = true;
+        onEndingSuggested(
+          'fatal: failure on a pivotal decision left the character unable to continue.',
+          'story-complete'
+        );
+      }
+
       // Combine existing tags with skill check tags
       const existingTags = recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
       const currentTags = [...existingTags, ...skillCheckTags];
@@ -958,7 +976,10 @@ Respond with JSON format:
         },
         generationParameters: {
           includedTopics: [choiceText],
-          desiredLength: 'short'
+          desiredLength: 'short',
+          decisionWeight,
+          // Critical decisions with critical failures should have tragic tone
+          desiredTone: (decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure)) ? 'tragic' : undefined
         }
       });
       
@@ -974,7 +995,11 @@ Respond with JSON format:
         content: result.content,
         type: result.segmentType,
         characterIds: result.metadata.characterIds || [],
-        metadata: result.metadata,
+        metadata: {
+          ...result.metadata,
+          // Merge skill check tags into metadata
+          tags: [...(result.metadata.tags || []), ...skillCheckTags]
+        },
         sessionId, // Explicitly set sessionId
         worldId,   // Explicitly set worldId
         timestamp: now,
@@ -994,9 +1019,19 @@ Respond with JSON format:
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp
       });
-      
+
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
+      }
+
+      // If the AI marked this segment as fatal, surface an ending suggestion immediately
+      const hasFatalTag = newSegment.metadata?.tags?.includes('fatal-outcome');
+      if (hasFatalTag && onEndingSuggested && !endingSuggestedRef.current) {
+        endingSuggestedRef.current = true;
+        onEndingSuggested(
+          'fatal: narrative segment marked the player as dead or incapacitated.',
+          'story-complete'
+        );
       }
       
       // Check for ending indicators

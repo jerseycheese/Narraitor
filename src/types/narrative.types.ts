@@ -277,6 +277,8 @@ export interface GenerationParameters {
   segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
   includedTopics?: string[];
   excludedTopics?: string[];
+  decisionWeight?: DecisionWeight;
+  desiredTone?: EndingTone;
   /**
    * When true, skips the post-processing step that turns AI metadata.itemsAcquired
    * into actual inventory entries. Useful for narrative beats that reference

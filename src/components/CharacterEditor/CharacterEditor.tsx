@@ -208,11 +208,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
 
       <CollapsibleSection title="Attributes" initialCollapsed={true} className="bg-background">
         <AttributesForm
-          attributes={editingCharacter.attributes.map(attr => ({ attributeId: attr.id, value: attr.baseValue }))}
+          attributes={editingCharacter.attributes.map(attr => ({ attributeId: attr.worldAttributeId || attr.id, value: attr.baseValue }))}
           world={world}
           onAttributesChange={(formAttributes) => {
             const updatedAttributes = editingCharacter.attributes.map(attr => {
-              const formAttr = formAttributes.find(fa => fa.attributeId === attr.id);
+              const formAttr = formAttributes.find(fa => fa.attributeId === (attr.worldAttributeId || attr.id));
               return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
             });
             setEditingCharacter({ ...editingCharacter, attributes: updatedAttributes });
@@ -223,7 +223,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       <CollapsibleSection title="Skills" initialCollapsed={true} className="bg-background">
         <SkillsForm
           skills={editingCharacter.skills.map(skill => ({
-            skillId: skill.id,
+            skillId: skill.worldSkillId || skill.id,
             level: skill.level,
             experience: 0,
             isActive: true
@@ -231,7 +231,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           world={world}
           onSkillsChange={(formSkills) => {
             const updatedSkills = editingCharacter.skills.map(skill => {
-              const formSkill = formSkills.find(fs => fs.skillId === skill.id);
+              const formSkill = formSkills.find(fs => fs.skillId === (skill.worldSkillId || skill.id));
               return formSkill ? { ...skill, level: formSkill.level } : skill;
             });
             setEditingCharacter({ ...editingCharacter, skills: updatedSkills });
