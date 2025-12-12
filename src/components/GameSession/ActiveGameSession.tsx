@@ -635,6 +635,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleEndStory = async () => {
     if (!characterId || !world || !character) return;
 
+    // Manual endings are never fatal
+    setIsFatalEnding(false);
+
     try {
       await generateEnding('player-choice', {
         sessionId,
@@ -705,6 +708,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Reject AI ending suggestion
   const handleRejectEndingSuggestion = () => {
     setShowEndingSuggestion(false);
+    setIsFatalEnding(false); // Reset fatal flag when suggestion dismissed
   };
   
   // Handle manual end story button click
