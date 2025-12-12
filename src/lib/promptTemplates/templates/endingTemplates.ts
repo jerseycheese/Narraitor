@@ -52,8 +52,10 @@ Generate a complete story ending with the following components:
    - MYSTERIOUS: Use when there are unresolved questions, ambiguous outcomes, enigmatic events,
      or the story leaves mysteries unsolved. The ending raises new questions.
 
-   - TRAGIC: Use when the character suffered major losses, failed important quests, made heavy
-     sacrifices, or faced somber outcomes. The journey had a high cost or ended in failure.
+   - TRAGIC: Use when the character DIED, was INCAPACITATED, or suffered catastrophic failure.
+     The character's story has ENDED—they cannot continue. Use past tense. Focus on their
+     final moments, immediate legacy, and permanent impact. DO NOT suggest future possibilities,
+     ongoing journeys, or continued adventures. The character is GONE. The story is OVER.
 
    IMPORTANT: Don't default to "hopeful" - carefully evaluate the actual story events and choose
    the tone that honestly reflects what happened in the narrative.
@@ -63,6 +65,14 @@ Generate a complete story ending with the following components:
    - Reference specific events from their journey
    - Match the chosen tone throughout
    - Provide narrative closure while respecting the ending type
+
+   For TRAGIC endings where the character died:
+   * Describe their final moments with weight and dignity
+   * Focus on what they accomplished BEFORE their end
+   * Acknowledge the permanent nature of their loss
+   * Avoid any language suggesting they will return or continue
+   * Example: "The fall proved fatal. {{characterName}} drew their last breath..."
+   * NOT: "As {{characterName}} continues their journey..." ← WRONG for death
 
 3. CHARACTER LEGACY (1 paragraph):
    - How will {{characterName}} be remembered?
@@ -96,7 +106,16 @@ Remember to:
 - Reference specific story events, not generic fantasy tropes
 - Match your chosen tone throughout all sections
 - Provide closure while leaving room for imagination
-- Keep the language evocative and engaging`,
+- Keep the language evocative and engaging
+
+DO NOT (especially for tragic/fatal endings):
+- Use phrases like "continues their journey", "bright future", "what lies ahead"
+- Suggest the character will recover or return
+- Frame death as a "temporary setback"
+- Use hopeful language about future possibilities when the character is dead
+- Leave open the possibility of continuation
+
+For tragic endings, be clear: the story has ended. The character is gone. Honor their sacrifice.`,
 
   variables: [
     { name: 'worldName', type: 'string', description: 'Name of the world' },
@@ -122,8 +141,31 @@ export function prepareEndingTemplateVariables(
   endingType: EndingType,
   recentNarrative: string[],
   journalEntries?: string[],
-  customPrompt?: string
+  customPrompt?: string,
+  desiredTone?: 'triumphant' | 'mysterious' | 'tragic' | 'hopeful'
 ): Record<string, string | number> {
+  let finalCustomPrompt = customPrompt || 'No additional instructions.';
+
+  // CRITICAL: Inject explicit fatal context for tragic endings
+  if (desiredTone === 'tragic') {
+    const fatalContext = `
+
+⚠️ CRITICAL INSTRUCTION - FATAL OUTCOME ⚠️
+This is a FATAL ending. The character has DIED or is INCAPACITATED.
+- The character CANNOT continue their journey - they are GONE
+- Use ONLY past tense ("was", "had been", "drew their last breath")
+- Focus on their FINAL moments and immediate death
+- DO NOT use future tense or suggest continuation ("will be", "continues", "journey ahead")
+- DO NOT frame this as hopeful - the character is DEAD
+- Tone must be TRAGIC, acknowledging permanent loss
+
+The story is OVER. Honor the character's death with dignity and finality.`;
+
+    finalCustomPrompt = finalCustomPrompt === 'No additional instructions.'
+      ? fatalContext
+      : `${finalCustomPrompt}\n${fatalContext}`;
+  }
+
   return {
     worldName: world.name,
     worldDescription: world.description || 'A mysterious realm',
@@ -137,6 +179,6 @@ export function prepareEndingTemplateVariables(
     endingTypeDescription: endingTypeDescriptions[endingType],
     recentNarrative: recentNarrative.join('\n'),
     journalEntries: journalEntries?.length ? journalEntries.join('\n') : 'No significant events recorded in journal.',
-    customPrompt: customPrompt || 'No additional instructions.'
+    customPrompt: finalCustomPrompt
   };
 }

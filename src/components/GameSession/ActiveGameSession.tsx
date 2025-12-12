@@ -74,6 +74,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
   const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
   const fatalEndingTriggeredRef = React.useRef(false);
+  const [isFatalEnding, setIsFatalEnding] = React.useState(false);
   
   // Manual end story confirmation
   const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
@@ -81,9 +82,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
 
-  // Reset fatal guard when session changes
+  // Reset fatal guard and flag when session changes
   React.useEffect(() => {
     fatalEndingTriggeredRef.current = false;
+    setIsFatalEnding(false);
   }, [sessionId]);
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -633,6 +635,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleEndStory = async () => {
     if (!characterId || !world || !character) return;
 
+    // Manual endings are never fatal
+    setIsFatalEnding(false);
+
     try {
       await generateEnding('player-choice', {
         sessionId,
@@ -652,6 +657,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setSuggestedEndingType(endingType);
 
     const isFatal = reason.toLowerCase().startsWith('fatal:');
+
+    // Set fatal ending flag for loader text
+    setIsFatalEnding(isFatal);
 
     if (isFatal && !fatalEndingTriggeredRef.current) {
       fatalEndingTriggeredRef.current = true;
@@ -700,6 +708,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Reject AI ending suggestion
   const handleRejectEndingSuggestion = () => {
     setShowEndingSuggestion(false);
+    setIsFatalEnding(false); // Reset fatal flag when suggestion dismissed
   };
   
   // Handle manual end story button click
@@ -761,7 +770,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   if (isGeneratingEnding) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingState message="Writing your story's ending..." />
+        <LoadingState
+          message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
+        />
       </div>
     );
   }
