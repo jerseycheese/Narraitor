@@ -43,7 +43,8 @@ class EndingGenerator {
         request.endingType,
         recentNarrative,
         journalSummary,
-        request.customPrompt
+        request.customPrompt,
+        request.desiredTone
       );
 
       // Render the template with variables

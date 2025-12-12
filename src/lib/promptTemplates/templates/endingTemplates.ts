@@ -141,8 +141,31 @@ export function prepareEndingTemplateVariables(
   endingType: EndingType,
   recentNarrative: string[],
   journalEntries?: string[],
-  customPrompt?: string
+  customPrompt?: string,
+  desiredTone?: 'triumphant' | 'mysterious' | 'tragic' | 'hopeful'
 ): Record<string, string | number> {
+  let finalCustomPrompt = customPrompt || 'No additional instructions.';
+
+  // CRITICAL: Inject explicit fatal context for tragic endings
+  if (desiredTone === 'tragic') {
+    const fatalContext = `
+
+⚠️ CRITICAL INSTRUCTION - FATAL OUTCOME ⚠️
+This is a FATAL ending. The character has DIED or is INCAPACITATED.
+- The character CANNOT continue their journey - they are GONE
+- Use ONLY past tense ("was", "had been", "drew their last breath")
+- Focus on their FINAL moments and immediate death
+- DO NOT use future tense or suggest continuation ("will be", "continues", "journey ahead")
+- DO NOT frame this as hopeful - the character is DEAD
+- Tone must be TRAGIC, acknowledging permanent loss
+
+The story is OVER. Honor the character's death with dignity and finality.`;
+
+    finalCustomPrompt = finalCustomPrompt === 'No additional instructions.'
+      ? fatalContext
+      : `${finalCustomPrompt}\n${fatalContext}`;
+  }
+
   return {
     worldName: world.name,
     worldDescription: world.description || 'A mysterious realm',
@@ -156,6 +179,6 @@ export function prepareEndingTemplateVariables(
     endingTypeDescription: endingTypeDescriptions[endingType],
     recentNarrative: recentNarrative.join('\n'),
     journalEntries: journalEntries?.length ? journalEntries.join('\n') : 'No significant events recorded in journal.',
-    customPrompt: customPrompt || 'No additional instructions.'
+    customPrompt: finalCustomPrompt
   };
 }
