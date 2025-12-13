@@ -2,7 +2,6 @@ import {
   TokenBudgetManager,
   ComponentPriority,
   BudgetAllocation,
-  DegradationResult,
 } from '../tokenBudgetManager';
 
 describe('TokenBudgetManager', () => {

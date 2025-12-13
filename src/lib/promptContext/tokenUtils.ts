@@ -57,13 +57,68 @@ export function estimateTokenCount(text: string | undefined | null): number {
 }
 
 /**
+ * Truncates text to fit within an estimated token limit.
+ *
+ * Uses a binary search over character boundaries to find the largest prefix
+ * that stays within the limit. Best-effort only: token estimation is heuristic.
+ *
+ * @param text - The text to truncate
+ * @param limit - Max estimated tokens to allow
+ * @returns Truncated text (or empty string if limit <= 0)
+ */
+export function truncateToTokenLimit(
+  text: string | undefined | null,
+  limit: number
+): string {
+  if (!text) return '';
+  if (limit <= 0) return '';
+
+  const original = text;
+  if (estimateTokenCount(original) <= limit) {
+    return original;
+  }
+
+  let low = 0;
+  let high = original.length;
+  let best = '';
+
+  // ~log2(200k) < 18; cap iterations for safety
+  for (let i = 0; i < 20 && low <= high; i++) {
+    const mid = Math.floor((low + high) / 2);
+    let candidate = original.slice(0, mid).trimEnd();
+
+    // Avoid returning a partial trailing word where possible
+    if (mid < original.length && /\S$/.test(candidate) && /\S/.test(original[mid])) {
+      candidate = candidate.replace(/\s+\S*$/, '').trimEnd();
+    }
+
+    const tokens = estimateTokenCount(candidate);
+    if (tokens <= limit) {
+      best = candidate;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+
+  if (!best) return '';
+
+  const suffix = '\n…';
+  if (estimateTokenCount(best + suffix) <= limit) {
+    return best + suffix;
+  }
+
+  return best;
+}
+
+/**
  * Provides detailed token estimation with confidence and breakdown
  *
  * @param text - The text to estimate
  * @returns Detailed estimation with confidence level and breakdown
  */
 export function estimateWithMetadata(text: string): TokenEstimation {
-  if (!text) {
+  if (!text || text.trim().length === 0) {
     return {
       tokenCount: 0,
       confidence: 'high',
@@ -103,9 +158,40 @@ export function estimateWithMetadata(text: string): TokenEstimation {
 
   for (const word of words) {
     // Strip punctuation from word for analysis
-    const cleanWord = word.replace(/[.,!?;:'"()\[\]{}@#$%^&*+=<>\/\\|`~-]+/g, '');
+    // Keep hyphens for segment analysis (they're already counted in punctuationCount)
+    const cleanWord = word.replace(/[.,!?;:'"()\[\]{}@#$%^&*+=<>\/\\|`~]+/g, '');
 
     if (cleanWord.length === 0) {
+      continue;
+    }
+
+    // Check for hyphenated words (count parts, hyphen already counted separately)
+    if (cleanWord.includes('-')) {
+      const parts = cleanWord.split('-').filter((p) => p.length > 0);
+      for (const part of parts) {
+        // Re-run the same heuristics on each part
+        const camelCaseSegments = part.split(/(?=[A-Z])/);
+        if (camelCaseSegments.length > 1 && camelCaseSegments.every((s) => s.length > 0)) {
+          breakdown.camelCaseCount += camelCaseSegments.length;
+          totalTokens += camelCaseSegments.length * 1.5;
+          continue;
+        }
+
+        if (part.length > 10) {
+          breakdown.longWordCount++;
+          totalTokens += Math.ceil(part.length / 4.5);
+          continue;
+        }
+
+        if (part.length <= 2) {
+          breakdown.wordCount++;
+          totalTokens += 1;
+          continue;
+        }
+
+        breakdown.wordCount++;
+        totalTokens += 1.3;
+      }
       continue;
     }
 
@@ -113,15 +199,7 @@ export function estimateWithMetadata(text: string): TokenEstimation {
     const camelCaseSegments = cleanWord.split(/(?=[A-Z])/);
     if (camelCaseSegments.length > 1 && camelCaseSegments.every((s) => s.length > 0)) {
       breakdown.camelCaseCount += camelCaseSegments.length;
-      totalTokens += Math.ceil(camelCaseSegments.length * 1.5);
-      continue;
-    }
-
-    // Check for hyphenated words
-    if (cleanWord.includes('-')) {
-      const parts = cleanWord.split('-').filter((p) => p.length > 0);
-      breakdown.wordCount += parts.length;
-      totalTokens += parts.length;
+      totalTokens += camelCaseSegments.length * 1.5;
       continue;
     }
 
@@ -142,7 +220,7 @@ export function estimateWithMetadata(text: string): TokenEstimation {
 
     // Normal words with 1.3x multiplier
     breakdown.wordCount++;
-    totalTokens += Math.ceil(1.3);
+    totalTokens += 1.3;
   }
 
   // Apply minimum word count multiplier if needed
@@ -165,7 +243,7 @@ export function estimateWithMetadata(text: string): TokenEstimation {
   }
 
   return {
-    tokenCount: Math.max(1, Math.round(totalTokens)),
+    tokenCount: Math.max(0, Math.round(totalTokens)),
     confidence,
     breakdown,
     warnings,

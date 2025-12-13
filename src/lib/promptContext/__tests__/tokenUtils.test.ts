@@ -1,4 +1,4 @@
-import { estimateTokenCount, estimateWithMetadata, TokenEstimation } from '../tokenUtils';
+import { estimateTokenCount, estimateWithMetadata, truncateToTokenLimit } from '../tokenUtils';
 
 describe('estimateTokenCount', () => {
   describe('basic text handling', () => {
@@ -45,7 +45,7 @@ describe('estimateTokenCount', () => {
 
       // CamelCase should estimate similarly to separate words
       // since LLMs often tokenize them separately
-      expect(camelCase).toBeGreaterThanOrEqual(3);
+      expect(camelCase).toBeGreaterThanOrEqual(separate);
     });
 
     it('estimates hyphenated words as multiple tokens', () => {
@@ -131,6 +131,24 @@ describe('estimateWithMetadata', () => {
     const specialChars = estimateWithMetadata('$$$ %%% @@@ ### *** !!!');
 
     expect(specialChars.confidence).toBe('low');
+  });
+});
+
+describe('truncateToTokenLimit', () => {
+  it('returns empty string when limit is 0 or negative', () => {
+    expect(truncateToTokenLimit('Hello world', 0)).toBe('');
+    expect(truncateToTokenLimit('Hello world', -1)).toBe('');
+  });
+
+  it('truncates long text to stay within the estimated token limit', () => {
+    const text = new Array(100).fill('word').join(' ');
+    const limit = 20;
+
+    const truncated = truncateToTokenLimit(text, limit);
+
+    expect(truncated.length).toBeGreaterThan(0);
+    expect(truncated.length).toBeLessThan(text.length);
+    expect(estimateTokenCount(truncated)).toBeLessThanOrEqual(limit);
   });
 });
 
