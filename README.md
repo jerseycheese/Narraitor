@@ -71,6 +71,9 @@ npm install
 # Add your API key
 cp .env.example .env.local
 # Edit .env.local and add: GEMINI_API_KEY=your-key-here
+# Optional: enable token-budget-based prompt truncation
+# (keeps long-running sessions from ballooning prompt size)
+# ENABLE_TOKEN_BUDGET_MANAGER=true
 
 # Fire it up
 npm run dev
@@ -228,6 +231,8 @@ The AI system routes everything through Next.js API endpoints (`/api/narrative/g
 ```bash
 # .env.local
 GEMINI_API_KEY=your-api-key
+# Optional: enable token-budget-based prompt truncation
+# ENABLE_TOKEN_BUDGET_MANAGER=true
 ```
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.

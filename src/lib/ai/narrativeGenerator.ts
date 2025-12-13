@@ -2,6 +2,7 @@ import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -40,6 +41,8 @@ import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/l
 import { logger } from '@/lib/utils/logger';
 import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
 import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
+import { TokenBudgetManager, DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, type RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
+import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -112,12 +115,101 @@ export class NarrativeGenerator {
     this.personalizationEngine = new PersonalizationEngine();
   }
 
+  private createRequestBudget(): RequestBudget {
+    const enabled = process.env.ENABLE_TOKEN_BUDGET_MANAGER === 'true';
+    const manager = new TokenBudgetManager({ enabled });
+    return manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
+  }
+
+  private applyBudget(
+    content: string,
+    componentId: string,
+    budget?: RequestBudget
+  ): string {
+    if (!budget || !budget.isEnabled()) {
+      return content;
+    }
+
+    const estimatedTokens = estimateTokenCount(content);
+    const limit = budget.getAllocation(componentId);
+
+    if (!Number.isFinite(limit) || limit <= 0) {
+      budget.recordUsage(componentId, 0);
+      return '';
+    }
+
+    if (estimatedTokens <= limit) {
+      budget.recordUsage(componentId, estimatedTokens);
+      return content;
+    }
+
+    const limited = truncateToTokenLimit(content, limit);
+    budget.recordUsage(componentId, estimateTokenCount(limited));
+    return limited;
+  }
+
+  private limitNarrativeContextToBudget(
+    narrativeContext: NarrativeContext | undefined,
+    budget: RequestBudget
+  ): NarrativeContext | undefined {
+    if (!narrativeContext || !budget.isEnabled()) {
+      return narrativeContext;
+    }
+
+    const limit = budget.getAllocation('recent-narrative');
+    if (!Number.isFinite(limit) || limit <= 0) {
+      return { ...narrativeContext, recentSegments: [] };
+    }
+
+    const recentSegments = narrativeContext.recentSegments ?? [];
+    if (recentSegments.length === 0) {
+      return narrativeContext;
+    }
+
+    const selected: NarrativeSegment[] = [];
+    let totalTokens = 0;
+
+    for (let i = recentSegments.length - 1; i >= 0; i--) {
+      const segment = recentSegments[i];
+      const segmentTokens = estimateTokenCount(segment.content);
+
+      if (selected.length === 0 && segmentTokens > limit) {
+        const truncated = truncateToTokenLimit(segment.content, limit);
+        selected.unshift({ ...segment, content: truncated });
+        totalTokens = estimateTokenCount(truncated);
+        break;
+      }
+
+      if (totalTokens + segmentTokens > limit) {
+        const remaining = limit - totalTokens;
+        if (selected.length > 0 && remaining > 0) {
+          const truncated = truncateToTokenLimit(segment.content, remaining);
+          if (safeTrim(truncated)) {
+            selected.unshift({ ...segment, content: truncated });
+            totalTokens += estimateTokenCount(truncated);
+          }
+        }
+        break;
+      }
+
+      selected.unshift(segment);
+      totalTokens += segmentTokens;
+    }
+
+    budget.recordUsage('recent-narrative', totalTokens);
+    return { ...narrativeContext, recentSegments: selected };
+  }
+
   /**
    * Enhances a prompt with lore context for the given world
    */
-  private enhancePromptWithLore(prompt: string, worldId: EntityID): string {
+  private enhancePromptWithLore(
+    prompt: string,
+    worldId: EntityID,
+    budget?: RequestBudget
+  ): string {
     const loreContext = getLoreContextForPrompt(worldId);
-    return prompt + loreContext;
+    return prompt + this.applyBudget(loreContext, 'lore-context', budget);
   }
 
   /**
@@ -125,7 +217,8 @@ export class NarrativeGenerator {
    */
   private enhancePromptWithGoalContext(
     prompt: string,
-    sessionId?: string
+    sessionId?: string,
+    budget?: RequestBudget
   ): string {
     if (!sessionId) return prompt;
 
@@ -135,7 +228,14 @@ export class NarrativeGenerator {
         .buildContextForSession(sessionId);
 
       if (aiContext.goalContext && safeTrim(aiContext.goalContext)) {
-        return `${prompt}\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
+        const goalSection = `\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
+
+        if (!budget || !budget.isEnabled()) {
+          return `${prompt}${goalSection}`;
+        }
+
+        const limited = this.applyBudget(goalSection, 'goals', budget);
+        return safeTrim(limited) ? `${prompt}${limited}` : prompt;
       }
 
       return prompt;
@@ -148,7 +248,11 @@ export class NarrativeGenerator {
    * Enhances a prompt with detailed tone settings for consistent narrative style
    * Uses caching to avoid regenerating tone instructions for the same world
    */
-  private enhancePromptWithToneSettings(prompt: string, world: World): string {
+  private enhancePromptWithToneSettings(
+    prompt: string,
+    world: World,
+    budget?: RequestBudget
+  ): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
 
     // Create cache key from tone settings
@@ -173,7 +277,11 @@ export class NarrativeGenerator {
       this.staticContentCache.toneSettings?.set(cacheKey, toneInstructions);
     }
 
-    return prompt + toneInstructions;
+    if (!budget || !budget.isEnabled()) {
+      return prompt + toneInstructions;
+    }
+
+    return prompt + this.applyBudget(toneInstructions, 'tone-settings', budget);
   }
 
   /**
@@ -227,7 +335,7 @@ export class NarrativeGenerator {
   /**
    * Converts store character to personalization-compatible character
    */
-  private convertToPersonalizationCharacter(storeCharacter: unknown): {
+  private convertToPersonalizationCharacter(storeCharacter: StoreCharacter): {
     id: string;
     name: string;
     background: string;
@@ -240,24 +348,34 @@ export class NarrativeGenerator {
     createdAt: string;
     updatedAt: string;
   } {
-    // Create a character object compatible with PersonalizationEngine
-    // This handles the type mismatch between store Character and PersonalizationEngine Character
-    const char = storeCharacter as Record<string, unknown>;
+    const backgroundValue: unknown = storeCharacter.background as unknown;
+    const background =
+      typeof backgroundValue === 'string'
+        ? backgroundValue
+        : (backgroundValue as { summary?: string; history?: string } | null)?.summary ??
+          (backgroundValue as { history?: string } | null)?.history ??
+          storeCharacter.description ??
+          '';
+
     return {
-      id: String(char.id || ''),
-      name: String(char.name || ''),
-      background:
-        (char.background as { summary?: string })?.summary ||
-        String(char.background || ''),
-      attributes: (char.attributes as Record<string, number>) || {},
-      skills:
-        (char.skills as Array<{
-          name: string;
-          level: number;
-          worldSkillId?: string;
-        }>) || [],
-      createdAt: String(char.createdAt || ''),
-      updatedAt: String(char.updatedAt || ''),
+      id: storeCharacter.id,
+      name: storeCharacter.name,
+      background,
+      attributes: Array.isArray(storeCharacter.attributes)
+        ? storeCharacter.attributes.map((attribute) => ({
+            attributeId: String(attribute.worldAttributeId ?? attribute.id),
+            value: Number(attribute.modifiedValue ?? attribute.baseValue ?? 0),
+          }))
+        : {},
+      skills: Array.isArray(storeCharacter.skills)
+        ? storeCharacter.skills.map((skill) => ({
+            name: skill.name,
+            level: skill.level,
+            worldSkillId: skill.worldSkillId,
+          }))
+        : [],
+      createdAt: storeCharacter.createdAt,
+      updatedAt: storeCharacter.updatedAt,
     };
   }
 
@@ -297,7 +415,8 @@ export class NarrativeGenerator {
     prompt: string,
     worldId: EntityID,
     characterIds: string[],
-    sessionId?: EntityID
+    sessionId?: EntityID,
+    budget?: RequestBudget
   ): string {
     try {
       const world = this.getWorld(worldId);
@@ -373,21 +492,29 @@ export class NarrativeGenerator {
           personalizedContext
         );
 
-      // Combine enhancement text and decision history
-      let enhancedPrompt = prompt;
+      let personalizationSection = '';
       if (safeTrim(enhancementText)) {
-        enhancedPrompt = `${enhancedPrompt}\n\n${enhancementText}`;
+        personalizationSection += `\n\n${enhancementText}`;
       }
       if (decisionHistory) {
-        enhancedPrompt = `${enhancedPrompt}${decisionHistory}`;
+        personalizationSection += decisionHistory;
       }
 
       const otherCharacterContext = this.buildOtherCharacterContext(worldId, playerCharacterId);
       if (otherCharacterContext) {
-        enhancedPrompt = `${enhancedPrompt}\n\n${otherCharacterContext}\nWeave these concurrent storylines naturally when they influence the current scene, but avoid forced references.`;
+        personalizationSection += `\n\n${otherCharacterContext}\nWeave these concurrent storylines naturally when they influence the current scene, but avoid forced references.`;
       }
 
-      return enhancedPrompt;
+      if (!safeTrim(personalizationSection)) {
+        return prompt;
+      }
+
+      if (!budget || !budget.isEnabled()) {
+        return `${prompt}${personalizationSection}`;
+      }
+
+      const limited = this.applyBudget(personalizationSection, 'personalization', budget);
+      return safeTrim(limited) ? `${prompt}${limited}` : prompt;
     } catch {
       return prompt;
     }
@@ -463,7 +590,8 @@ export class NarrativeGenerator {
    */
   private enhancePromptWithInventory(
     prompt: string,
-    characterIds: string[]
+    characterIds: string[],
+    budget?: RequestBudget
   ): string {
     try {
       if (!characterIds || characterIds.length === 0) {
@@ -479,8 +607,12 @@ export class NarrativeGenerator {
       }
 
       const equippedItemIds = this.getEquippedItemIds(characterIds);
-      const { context: inventorySection } = buildInventoryContext(items, {
+      const tokenLimit = budget && budget.isEnabled()
+        ? budget.getAllocation('inventory')
+        : undefined;
+      const { context: inventorySection, tokenCount } = buildInventoryContext(items, {
         equippedItemIds,
+        tokenLimit: typeof tokenLimit === 'number' && Number.isFinite(tokenLimit) ? tokenLimit : undefined,
       });
 
       if (!inventorySection) {
@@ -489,6 +621,10 @@ export class NarrativeGenerator {
 
       const guidance =
         'When generating narrative, naturally reference these items only if they matter to the current situation. Avoid forced mentions or repetitive callbacks.';
+
+      if (budget && budget.isEnabled()) {
+        budget.recordUsage('inventory', tokenCount);
+      }
 
       return `${prompt}\n\n${inventorySection}\n\n${guidance}`;
     } catch {
@@ -502,7 +638,10 @@ export class NarrativeGenerator {
    * Instructs the AI to return structured item data when describing acquisition
    * Uses caching to avoid repeating static content
    */
-  private enhancePromptWithItemAcquisitionInstructions(prompt: string): string {
+  private enhancePromptWithItemAcquisitionInstructions(
+    prompt: string,
+    budget?: RequestBudget
+  ): string {
     // Cache the static instructions - they never change
     if (!this.staticContentCache.itemAcquisitionInstructions) {
       this.staticContentCache.itemAcquisitionInstructions = `
@@ -534,7 +673,17 @@ Important:
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
     }
 
-    return prompt + this.staticContentCache.itemAcquisitionInstructions;
+    if (!budget || !budget.isEnabled()) {
+      return prompt + this.staticContentCache.itemAcquisitionInstructions;
+    }
+
+    const limited = this.applyBudget(
+      this.staticContentCache.itemAcquisitionInstructions,
+      'item-instructions',
+      budget
+    );
+
+    return safeTrim(limited) ? prompt + limited : prompt;
   }
 
   private getEquippedItemIds(characterIds: string[] | undefined): string[] {
@@ -670,7 +819,18 @@ Return ONLY the rewritten narrative.`;
       // Always use scene template for generation - segment type will be inferred from content
       const template = this.getTemplate('scene');
 
-      const context = this.buildContext(world, request);
+      const budget = this.createRequestBudget();
+      const requestForTemplate = budget.isEnabled()
+        ? ({
+            ...request,
+            narrativeContext: this.limitNarrativeContextToBudget(
+              request.narrativeContext,
+              budget
+            ),
+          } as NarrativeGenerationRequest)
+        : request;
+
+      const context = this.buildContext(world, requestForTemplate);
       const prompt = template(context);
 
       // Capture lore context for debug info
@@ -679,28 +839,34 @@ Return ONLY the rewritten narrative.`;
       // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
-        world
+        world,
+        budget
       );
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        request.worldId
+        request.worldId,
+        budget
       );
       const goalEnhancedPrompt = this.enhancePromptWithGoalContext(
         loreEnhancedPrompt,
-        request.sessionId
+        request.sessionId,
+        budget
       );
       const personalizedPrompt = this.enhancePromptWithPersonalization(
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
-        request.sessionId
+        request.sessionId,
+        budget
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
-        request.characterIds || []
+        request.characterIds || [],
+        budget
       );
       const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt
+        inventoryEnhancedPrompt,
+        budget
       );
 
       const response =
@@ -790,6 +956,7 @@ Return ONLY the rewritten narrative.`;
       const world = this.getWorld(worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('initialScene');
+      const budget = this.createRequestBudget();
 
       // Get character details
       const { characters } = useCharacterStore.getState();
@@ -821,24 +988,29 @@ Return ONLY the rewritten narrative.`;
       // Add tone settings, lore context, personalization, inventory, and item acquisition instructions to initial scene
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
-        world
+        world,
+        budget
       );
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        worldId
+        worldId,
+        budget
       );
       const personalizedPrompt = this.enhancePromptWithPersonalization(
         loreEnhancedPrompt,
         worldId,
         characterIds,
-        sessionId
+        sessionId,
+        budget
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         personalizedPrompt,
-        characterIds
+        characterIds,
+        budget
       );
       const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt
+        inventoryEnhancedPrompt,
+        budget
       );
 
       const response =
@@ -1785,6 +1957,7 @@ ${content}
       const world = this.getWorld(worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('skillAcknowledgment');
+      const budget = this.createRequestBudget();
 
       // Get character details
       const { characters } = useCharacterStore.getState();
@@ -1796,7 +1969,7 @@ ${content}
       const context = {
         worldName: world.name,
         genre: world.genre,
-        narrativeContext,
+        narrativeContext: this.limitNarrativeContextToBudget(narrativeContext, budget),
         playerCharacterName: playerCharacter?.name,
         skillUsed,
         customAction,
@@ -1805,18 +1978,22 @@ ${content}
       const prompt = template(context);
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
         prompt,
-        world
+        world,
+        budget
       );
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        worldId
+        worldId,
+        budget
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(
         loreEnhancedPrompt,
-        characterIds
+        characterIds,
+        budget
       );
       const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt
+        inventoryEnhancedPrompt,
+        budget
       );
 
       const response =

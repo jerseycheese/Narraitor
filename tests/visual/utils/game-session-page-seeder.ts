@@ -495,13 +495,34 @@ export async function removeDuplicateSuggestedActionsTextarea(page: Page): Promi
  * full-page screenshot.
  */
 export async function relaxStoryColumnHeight(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-    if (storyColumn) {
-      const element = storyColumn as HTMLElement;
-      element.style.maxHeight = 'none';
-      element.style.overflow = 'visible';
-      console.log('✅ Removed height constraints for fullPage screenshot');
-    }
+  // Use a CSS override with !important so React re-renders can't re-apply
+  // the inline maxHeight/overflow constraints during visual tests.
+  await page.addStyleTag({
+    content: `
+      #narrative-container {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      #narrative-container .narrative-history-manager,
+      #narrative-container .narrative-history-container {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        flex: none !important;
+      }
+
+      #narrative-container .narrative-history-container .relative.overflow-hidden {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+      }
+
+      #narrative-container [data-radix-scroll-area-viewport] {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+    `,
   });
 }
