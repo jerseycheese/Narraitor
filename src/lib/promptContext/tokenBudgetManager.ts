@@ -390,7 +390,7 @@ export class TokenBudgetManager {
 
 /**
  * Default component allocations for narrative generation
- * Based on analysis from issue #408
+ * Based on initial prompt analysis and expected growth.
  */
 export const DEFAULT_ALLOCATIONS: BudgetAllocation[] = [
   { componentId: 'base-template', priority: ComponentPriority.CRITICAL, min: 200, target: 300, max: 500 },
