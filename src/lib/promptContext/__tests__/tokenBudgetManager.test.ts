@@ -114,7 +114,9 @@ describe('TokenBudgetManager', () => {
       // Should suggest reducing LOW priority first
       expect(degradation.suggestions.length).toBeGreaterThan(0);
       expect(degradation.suggestions[0].componentId).toBe('examples');
-      expect(degradation.totalOverage).toBe(200); // 300 over lore + 100 over examples - only examples over target
+      // lore: used 1000, allocated 800 = overage 200
+      // examples: used 300, allocated 200 = overage 100
+      expect(degradation.totalOverage).toBe(300);
     });
 
     it('calculates degradation in correct priority order', () => {

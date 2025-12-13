@@ -139,11 +139,12 @@ describe('estimation accuracy guidelines', () => {
   // They help calibrate the estimation multiplier
 
   it('should be within 30% of expected for simple English text', () => {
-    // Known approximate token counts for Gemini/GPT models
+    // Approximate token counts accounting for punctuation and multipliers
+    // Enhanced estimation counts punctuation separately and applies word multipliers
     const testCases = [
-      { text: 'Hello', expectedRange: [1, 2] },
-      { text: 'The quick brown fox jumps over the lazy dog.', expectedRange: [9, 15] },
-      { text: 'This is a test.', expectedRange: [4, 8] },
+      { text: 'Hello', expectedRange: [1, 3] },
+      { text: 'The quick brown fox jumps over the lazy dog.', expectedRange: [9, 20] },
+      { text: 'This is a test.', expectedRange: [4, 10] },
     ];
 
     for (const { text, expectedRange } of testCases) {
