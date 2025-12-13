@@ -49,6 +49,11 @@ describe('NarrativeGenerator budget integration', () => {
   let narrativeGenerator: NarrativeGenerator;
   let mockAIClient: { generateContent: jest.Mock };
   const originalEnv = process.env.ENABLE_TOKEN_BUDGET_MANAGER;
+  type TemplateContext = {
+    narrativeContext?: {
+      recentSegments?: Array<{ content: string }>;
+    };
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -124,9 +129,10 @@ describe('NarrativeGenerator budget integration', () => {
     (getLoreContextForPrompt as jest.Mock).mockReturnValue('');
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
-      jest.fn().mockImplementation((context: any) => {
-        const recent = context?.narrativeContext?.recentSegments ?? [];
-        return `Base narrative template\n${recent.map((seg: any) => seg.content).join('\n')}`;
+      jest.fn().mockImplementation((context: unknown) => {
+        const typed = context as TemplateContext;
+        const recent = typed?.narrativeContext?.recentSegments ?? [];
+        return `Base narrative template\n${recent.map((seg) => seg.content).join('\n')}`;
       })
     );
 
