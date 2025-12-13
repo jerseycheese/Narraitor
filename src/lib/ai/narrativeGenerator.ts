@@ -2,6 +2,7 @@ import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -120,6 +121,33 @@ export class NarrativeGenerator {
     return manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
   }
 
+  private applyBudget(
+    content: string,
+    componentId: string,
+    budget?: RequestBudget
+  ): string {
+    if (!budget || !budget.isEnabled()) {
+      return content;
+    }
+
+    const estimatedTokens = estimateTokenCount(content);
+    const limit = budget.getAllocation(componentId);
+
+    if (!Number.isFinite(limit) || limit <= 0) {
+      budget.recordUsage(componentId, 0, { estimatedTokens });
+      return '';
+    }
+
+    if (estimatedTokens <= limit) {
+      budget.recordUsage(componentId, estimatedTokens, { estimatedTokens });
+      return content;
+    }
+
+    const limited = truncateToTokenLimit(content, limit);
+    budget.recordUsage(componentId, estimateTokenCount(limited), { estimatedTokens });
+    return limited;
+  }
+
   private limitNarrativeContextToBudget(
     narrativeContext: NarrativeContext | undefined,
     budget: RequestBudget
@@ -173,18 +201,7 @@ export class NarrativeGenerator {
     budget?: RequestBudget
   ): string {
     const loreContext = getLoreContextForPrompt(worldId);
-    if (!budget || !budget.isEnabled()) {
-      return prompt + loreContext;
-    }
-
-    const estimatedTokens = estimateTokenCount(loreContext);
-    const limit = budget.getAllocation('lore-context');
-    const limited = estimatedTokens > limit
-      ? truncateToTokenLimit(loreContext, limit)
-      : loreContext;
-
-    budget.recordUsage('lore-context', estimateTokenCount(limited), { estimatedTokens });
-    return prompt + limited;
+    return prompt + this.applyBudget(loreContext, 'lore-context', budget);
   }
 
   /**
@@ -209,14 +226,8 @@ export class NarrativeGenerator {
           return `${prompt}${goalSection}`;
         }
 
-        const estimatedTokens = estimateTokenCount(goalSection);
-        const limit = budget.getAllocation('goals');
-        const limited = estimatedTokens > limit
-          ? truncateToTokenLimit(goalSection, limit)
-          : goalSection;
-
-        budget.recordUsage('goals', estimateTokenCount(limited), { estimatedTokens });
-        return `${prompt}${limited}`;
+        const limited = this.applyBudget(goalSection, 'goals', budget);
+        return safeTrim(limited) ? `${prompt}${limited}` : prompt;
       }
 
       return prompt;
@@ -262,14 +273,7 @@ export class NarrativeGenerator {
       return prompt + toneInstructions;
     }
 
-    const estimatedTokens = estimateTokenCount(toneInstructions);
-    const limit = budget.getAllocation('tone-settings');
-    const limited = estimatedTokens > limit
-      ? truncateToTokenLimit(toneInstructions, limit)
-      : toneInstructions;
-
-    budget.recordUsage('tone-settings', estimateTokenCount(limited), { estimatedTokens });
-    return prompt + limited;
+    return prompt + this.applyBudget(toneInstructions, 'tone-settings', budget);
   }
 
   /**
@@ -323,7 +327,7 @@ export class NarrativeGenerator {
   /**
    * Converts store character to personalization-compatible character
    */
-  private convertToPersonalizationCharacter(storeCharacter: unknown): {
+  private convertToPersonalizationCharacter(storeCharacter: StoreCharacter): {
     id: string;
     name: string;
     background: string;
@@ -336,24 +340,34 @@ export class NarrativeGenerator {
     createdAt: string;
     updatedAt: string;
   } {
-    // Create a character object compatible with PersonalizationEngine
-    // This handles the type mismatch between store Character and PersonalizationEngine Character
-    const char = storeCharacter as Record<string, unknown>;
+    const backgroundValue: unknown = storeCharacter.background as unknown;
+    const background =
+      typeof backgroundValue === 'string'
+        ? backgroundValue
+        : (backgroundValue as { summary?: string; history?: string } | null)?.summary ??
+          (backgroundValue as { history?: string } | null)?.history ??
+          storeCharacter.description ??
+          '';
+
     return {
-      id: String(char.id || ''),
-      name: String(char.name || ''),
-      background:
-        (char.background as { summary?: string })?.summary ||
-        String(char.background || ''),
-      attributes: (char.attributes as Record<string, number>) || {},
-      skills:
-        (char.skills as Array<{
-          name: string;
-          level: number;
-          worldSkillId?: string;
-        }>) || [],
-      createdAt: String(char.createdAt || ''),
-      updatedAt: String(char.updatedAt || ''),
+      id: storeCharacter.id,
+      name: storeCharacter.name,
+      background,
+      attributes: Array.isArray(storeCharacter.attributes)
+        ? storeCharacter.attributes.map((attribute) => ({
+            attributeId: String(attribute.worldAttributeId ?? attribute.id),
+            value: Number(attribute.modifiedValue ?? attribute.baseValue ?? 0),
+          }))
+        : {},
+      skills: Array.isArray(storeCharacter.skills)
+        ? storeCharacter.skills.map((skill) => ({
+            name: skill.name,
+            level: skill.level,
+            worldSkillId: skill.worldSkillId,
+          }))
+        : [],
+      createdAt: storeCharacter.createdAt,
+      updatedAt: storeCharacter.updatedAt,
     };
   }
 
@@ -491,14 +505,8 @@ export class NarrativeGenerator {
         return `${prompt}${personalizationSection}`;
       }
 
-      const estimatedTokens = estimateTokenCount(personalizationSection);
-      const limit = budget.getAllocation('personalization');
-      const limited = estimatedTokens > limit
-        ? truncateToTokenLimit(personalizationSection, limit)
-        : personalizationSection;
-
-      budget.recordUsage('personalization', estimateTokenCount(limited), { estimatedTokens });
-      return `${prompt}${limited}`;
+      const limited = this.applyBudget(personalizationSection, 'personalization', budget);
+      return safeTrim(limited) ? `${prompt}${limited}` : prompt;
     } catch {
       return prompt;
     }
@@ -661,21 +669,13 @@ The items will be automatically added to the character's inventory with proper c
       return prompt + this.staticContentCache.itemAcquisitionInstructions;
     }
 
-    const instructions = this.staticContentCache.itemAcquisitionInstructions;
-    const estimatedTokens = estimateTokenCount(instructions);
-    const limit = budget.getAllocation('item-instructions');
+    const limited = this.applyBudget(
+      this.staticContentCache.itemAcquisitionInstructions,
+      'item-instructions',
+      budget
+    );
 
-    if (!Number.isFinite(limit) || limit <= 0) {
-      budget.recordUsage('item-instructions', 0, { estimatedTokens });
-      return prompt;
-    }
-
-    const limited = estimatedTokens > limit
-      ? truncateToTokenLimit(instructions, limit)
-      : instructions;
-
-    budget.recordUsage('item-instructions', estimateTokenCount(limited), { estimatedTokens });
-    return prompt + limited;
+    return safeTrim(limited) ? prompt + limited : prompt;
   }
 
   private getEquippedItemIds(characterIds: string[] | undefined): string[] {
