@@ -171,13 +171,36 @@ A wise and powerful wizard
 ## API Reference
 
 ### estimateTokenCount(text: string): number
-Estimates token count using simplified approach (1 token ≈ 4 characters).
+Estimates token count using heuristic rules that approximate LLM tokenization (word boundaries, punctuation, CamelCase/hyphen splits, long-word character heuristics). It’s not perfect, but it’s good enough for budgeting and truncation without pulling in a tokenizer dependency.
 
 ```typescript
 import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 const text = "This is a sample text to estimate token count.";
 const tokenCount = estimateTokenCount(text);
+```
+
+### truncateToTokenLimit(text: string, limit: number): string
+Truncates a string to fit within an estimated token limit (best-effort). This is what the budget-aware prompt assembly uses to cap large prompt sections without cutting off mid-word when it can avoid it.
+
+```typescript
+import { truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
+
+const limited = truncateToTokenLimit(longLoreBlob, 800);
+```
+
+### TokenBudgetManager / RequestBudget (Implemented)
+Centralizes prompt budgets across components (lore, recent narrative, goals, tone, inventory, etc.). When enabled, prompt builders can record usage and trim sections to stay inside their per-component allocations.
+
+```typescript
+import {
+  TokenBudgetManager,
+  DEFAULT_ALLOCATIONS,
+  DEFAULT_TOTAL_BUDGET,
+} from '@/lib/promptContext/tokenBudgetManager';
+
+const manager = new TokenBudgetManager({ enabled: true });
+const budget = manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
 ```
 
 ### generateContext(options: ContextOptions): Promise<GenerateResult>

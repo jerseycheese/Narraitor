@@ -93,6 +93,12 @@ Different moments in the story need different approaches, so we have specialized
 2. **Scene Template**: Handles the main story beats
 3. **Transition Template**: Smoothly connects different narrative moments
 
+### Token Budgeting (Context Window Management)
+
+Long-running sessions tend to accumulate a lot of context, and prompts can quietly balloon if nothing pushes back. The narrative generator now supports a token budget manager that caps the largest prompt sections (recent narrative, lore, goals, tone settings, inventory, personalization, and item acquisition instructions).
+
+It’s opt-in via `ENABLE_TOKEN_BUDGET_MANAGER=true`, which makes it easy to turn on gradually and adjust allocations without risking a breaking change to prompt composition.
+
 ### Tone Settings System
 
 The narrative generator enforces tone settings instead of just suggesting them to the AI.
@@ -157,6 +163,6 @@ Unit tests cover the key components:
 
 ## Future Enhancements
 
-There are several areas where the narrative system could be extended. Enhanced context management would allow more sophisticated tracking for longer narratives - right now the context window is pretty limited. Better character integration would improve how player and NPC characters interact in the narrative, making relationships and character development feel more natural.
+There are several areas where the narrative system could be extended. More sophisticated context selection would help long sessions stay coherent by preferring the most relevant history instead of just “the most recent that fits.” Better character integration would improve how player and NPC characters interact in the narrative, making relationships and character development feel more natural.
 
 Long-term narrative memory for persistent game worlds would be useful for players who want to continue stories across multiple sessions. More complex branching storylines based on player choices could create more meaningful consequences for decisions. Allowing players to select their preferred narrative style (beyond just tone settings) would let them customize the storytelling experience even further.
