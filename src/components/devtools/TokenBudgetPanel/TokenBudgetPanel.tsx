@@ -53,20 +53,20 @@ export function TokenBudgetPanel({ className }: TokenBudgetPanelProps) {
   const [componentStatuses, setComponentStatuses] = useState<ComponentStatus[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  const initializeBudget = useCallback(() => {
-    const manager = new TokenBudgetManager();
-    const newBudget = manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
-    setBudget(newBudget);
-    updateStatuses(newBudget);
-  }, []);
-
-  const updateStatuses = (currentBudget: RequestBudget) => {
+  const updateStatuses = useCallback((currentBudget: RequestBudget) => {
     const statuses = DEFAULT_ALLOCATIONS.map((alloc) =>
       currentBudget.getComponentStatus(alloc.componentId)
     );
     setComponentStatuses(statuses);
     setSummary(currentBudget.getSummary());
-  };
+  }, []);
+
+  const initializeBudget = useCallback(() => {
+    const manager = new TokenBudgetManager();
+    const newBudget = manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
+    setBudget(newBudget);
+    updateStatuses(newBudget);
+  }, [updateStatuses]);
 
   const simulateUsage = useCallback(() => {
     if (!budget) return;
@@ -93,7 +93,7 @@ export function TokenBudgetPanel({ className }: TokenBudgetPanelProps) {
 
     updateStatuses(budget);
     setIsSimulating(false);
-  }, [budget]);
+  }, [budget, updateStatuses]);
 
   const simulateOverBudget = useCallback(() => {
     if (!budget) return;
@@ -120,7 +120,7 @@ export function TokenBudgetPanel({ className }: TokenBudgetPanelProps) {
 
     updateStatuses(budget);
     setIsSimulating(false);
-  }, [budget]);
+  }, [budget, updateStatuses]);
 
   const resetBudget = useCallback(() => {
     initializeBudget();
@@ -249,7 +249,13 @@ export function TokenBudgetPanel({ className }: TokenBudgetPanelProps) {
                       status.allocated
                     )}`}
                     style={{
-                      width: `${Math.min(100, (status.used / status.allocated) * 100)}%`,
+                      width: `${
+                        status.allocated > 0
+                          ? Math.min(100, (status.used / status.allocated) * 100)
+                          : status.used > 0
+                            ? 100
+                            : 0
+                      }%`,
                     }}
                   />
                 </div>
