@@ -134,17 +134,17 @@ export class NarrativeGenerator {
     const limit = budget.getAllocation(componentId);
 
     if (!Number.isFinite(limit) || limit <= 0) {
-      budget.recordUsage(componentId, 0, { estimatedTokens });
+      budget.recordUsage(componentId, 0);
       return '';
     }
 
     if (estimatedTokens <= limit) {
-      budget.recordUsage(componentId, estimatedTokens, { estimatedTokens });
+      budget.recordUsage(componentId, estimatedTokens);
       return content;
     }
 
     const limited = truncateToTokenLimit(content, limit);
-    budget.recordUsage(componentId, estimateTokenCount(limited), { estimatedTokens });
+    budget.recordUsage(componentId, estimateTokenCount(limited));
     return limited;
   }
 

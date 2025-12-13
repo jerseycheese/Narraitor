@@ -1,23 +1,10 @@
 /**
- * Token Budget Manager for Context Window Management
- *
- * Provides centralized budget tracking across all prompt components with
- * priority-based allocation and graceful degradation when limits are approached.
- *
- * @module tokenBudgetManager
- */
-
-/**
  * Component priority levels for budget allocation and degradation
  */
 export enum ComponentPriority {
-  /** Never drop - essential for generation (base template, character context) */
   CRITICAL = 0,
-  /** Reduce minimally - important for coherence (recent narrative, critical goals) */
   HIGH = 1,
-  /** Reduce significantly when needed (lore, tone, inventory) */
   MEDIUM = 2,
-  /** Drop first when budget is tight (examples, old decisions) */
   LOW = 3,
 }
 
@@ -25,83 +12,17 @@ export enum ComponentPriority {
  * Configuration for a single component's budget allocation
  */
 export interface BudgetAllocation {
-  /** Unique identifier for the component */
   componentId: string;
-  /** Priority level for degradation ordering */
   priority: ComponentPriority;
-  /** Minimum tokens required (never go below this) */
   min: number;
-  /** Target allocation when budget is ample */
   target: number;
-  /** Maximum tokens allowed (cap for this component) */
   max: number;
-}
-
-/**
- * Status information for a single component
- */
-export interface ComponentStatus {
-  componentId: string;
-  priority: ComponentPriority;
-  allocated: number;
-  used: number;
-  remaining: number;
-  overBudget: boolean;
-  overage: number;
-}
-
-/**
- * Suggestion for reducing a component's token usage
- */
-export interface DegradationSuggestion {
-  componentId: string;
-  priority: ComponentPriority;
-  currentUsage: number;
-  suggestedLimit: number;
-  reduction: number;
-}
-
-/**
- * Result of calculating degradation plan
- */
-export interface DegradationResult {
-  suggestions: DegradationSuggestion[];
-  totalOverage: number;
-  canRecover: boolean;
-}
-
-/**
- * Overall budget summary
- */
-export interface BudgetSummary {
-  totalBudget: number;
-  totalAllocated: number;
-  totalUsed: number;
-  componentsOverBudget: number;
-  budgetUtilization: number;
-}
-
-/**
- * Calibration data for estimation accuracy tracking
- */
-export interface CalibrationData {
-  estimatedTokens: number;
-  actualTokens: number;
-  accuracy: number;
-}
-
-/**
- * Options for recording usage
- */
-export interface UsageOptions {
-  estimatedTokens?: number;
 }
 
 /**
  * Configuration options for TokenBudgetManager
  */
 export interface TokenBudgetManagerOptions {
-  /** Whether budget tracking is enabled (default: true) */
   enabled?: boolean;
 }
 
@@ -111,8 +32,6 @@ export interface TokenBudgetManagerOptions {
 export class RequestBudget {
   private allocations: Map<string, BudgetAllocation> = new Map();
   private usage: Map<string, number> = new Map();
-  private calibration: Map<string, CalibrationData> = new Map();
-  private totalBudget: number;
   private enabled: boolean;
 
   constructor(
@@ -120,7 +39,6 @@ export class RequestBudget {
     totalBudget: number,
     enabled: boolean = true
   ) {
-    this.totalBudget = totalBudget;
     this.enabled = enabled;
 
     if (!enabled) {
@@ -223,137 +141,8 @@ export class RequestBudget {
   /**
    * Record actual token usage for a component
    */
-  recordUsage(
-    componentId: string,
-    tokens: number,
-    options?: UsageOptions
-  ): void {
+  recordUsage(componentId: string, tokens: number): void {
     this.usage.set(componentId, tokens);
-
-    if (options?.estimatedTokens !== undefined) {
-      this.calibration.set(componentId, {
-        estimatedTokens: options.estimatedTokens,
-        actualTokens: tokens,
-        accuracy: tokens > 0 ? options.estimatedTokens / tokens : 1,
-      });
-    }
-  }
-
-  /**
-   * Get status for a specific component
-   */
-  getComponentStatus(componentId: string): ComponentStatus {
-    const allocation = this.allocations.get(componentId);
-    const used = this.usage.get(componentId) || 0;
-
-    if (!allocation) {
-      return {
-        componentId,
-        priority: ComponentPriority.LOW,
-        allocated: 0,
-        used,
-        remaining: 0,
-        overBudget: used > 0,
-        overage: used,
-      };
-    }
-
-    const allocated = allocation.target;
-    const remaining = Math.max(0, allocated - used);
-    const overBudget = used > allocated;
-    const overage = overBudget ? used - allocated : 0;
-
-    return {
-      componentId,
-      priority: allocation.priority,
-      allocated,
-      used,
-      remaining,
-      overBudget,
-      overage,
-    };
-  }
-
-  /**
-   * Get degradation plan when budget is exceeded
-   */
-  getDegradationPlan(): DegradationResult {
-    const suggestions: DegradationSuggestion[] = [];
-    let totalOverage = 0;
-
-    // Sort components by priority (LOW first for degradation)
-    const componentIds = Array.from(this.allocations.keys());
-    const sortedIds = componentIds.sort((a, b) => {
-      const allocA = this.allocations.get(a)!;
-      const allocB = this.allocations.get(b)!;
-      // Reverse sort - LOW priority first
-      return allocB.priority - allocA.priority;
-    });
-
-    for (const componentId of sortedIds) {
-      const status = this.getComponentStatus(componentId);
-      if (status.overBudget) {
-        totalOverage += status.overage;
-
-        const allocation = this.allocations.get(componentId)!;
-        suggestions.push({
-          componentId,
-          priority: allocation.priority,
-          currentUsage: status.used,
-          suggestedLimit: allocation.target,
-          reduction: status.overage,
-        });
-      }
-    }
-
-    return {
-      suggestions,
-      totalOverage,
-      canRecover: suggestions.every(
-        (s) => s.priority !== ComponentPriority.CRITICAL
-      ),
-    };
-  }
-
-  /**
-   * Get overall budget summary
-   */
-  getSummary(): BudgetSummary {
-    let totalAllocated = 0;
-    let totalUsed = 0;
-    let componentsOverBudget = 0;
-
-    for (const [componentId] of this.allocations) {
-      const status = this.getComponentStatus(componentId);
-      totalAllocated += status.allocated;
-      totalUsed += status.used;
-      if (status.overBudget) {
-        componentsOverBudget++;
-      }
-    }
-
-    return {
-      totalBudget: this.totalBudget,
-      totalAllocated,
-      totalUsed,
-      componentsOverBudget,
-      budgetUtilization: this.totalBudget > 0 ? totalUsed / this.totalBudget : 0,
-    };
-  }
-
-  /**
-   * Get calibration data for a component
-   */
-  getCalibrationData(componentId: string): CalibrationData {
-    const data = this.calibration.get(componentId);
-    if (!data) {
-      return {
-        estimatedTokens: 0,
-        actualTokens: 0,
-        accuracy: 1,
-      };
-    }
-    return data;
   }
 }
 
