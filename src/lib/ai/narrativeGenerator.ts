@@ -181,6 +181,14 @@ export class NarrativeGenerator {
       }
 
       if (totalTokens + segmentTokens > limit) {
+        const remaining = limit - totalTokens;
+        if (selected.length > 0 && remaining > 0) {
+          const truncated = truncateToTokenLimit(segment.content, remaining);
+          if (safeTrim(truncated)) {
+            selected.unshift({ ...segment, content: truncated });
+            totalTokens += estimateTokenCount(truncated);
+          }
+        }
         break;
       }
 
