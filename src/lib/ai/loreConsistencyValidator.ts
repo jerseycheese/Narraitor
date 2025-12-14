@@ -188,12 +188,7 @@ function parseValidationResponse(responseText: string): Omit<LoreValidationResul
         rawResponse: responseText.substring(0, 200),
       });
 
-      // Attempt partial recovery
-      const partialResult = attemptPartialParse(parsed);
-      if (partialResult) {
-        return partialResult;
-      }
-
+      // Don't trust responses that fail schema validation - throw to trigger fail-open
       throw new Error(`Schema validation failed: ${validationResult.error.message}`);
     }
 
@@ -212,47 +207,6 @@ function parseValidationResponse(responseText: string): Omit<LoreValidationResul
       confidence: 'low',
     };
   }
-}
-
-/**
- * Attempt to extract partial results from malformed response
- */
-function attemptPartialParse(parsed: any): Omit<LoreValidationResult, 'processingTime' | 'validated'> | null {
-  try {
-    // Check if we have at least the basic structure
-    if (typeof parsed.isConsistent === 'boolean') {
-      return {
-        isConsistent: parsed.isConsistent,
-        contradictions: Array.isArray(parsed.contradictions)
-          ? parsed.contradictions.filter(isValidContradiction)
-          : [],
-        severity: ['none', 'minor', 'moderate', 'major', 'breaking'].includes(parsed.severity)
-          ? parsed.severity
-          : 'none',
-        confidence: ['low', 'medium', 'high'].includes(parsed.confidence)
-          ? parsed.confidence
-          : 'low',
-      };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Type guard for contradiction flags
- */
-function isValidContradiction(item: any): item is ContradictionFlag {
-  return (
-    typeof item === 'object' &&
-    item !== null &&
-    ['character', 'world-rule', 'historical-event', 'location'].includes(item.category) &&
-    ['minor', 'moderate', 'major', 'breaking'].includes(item.severity) &&
-    typeof item.description === 'string' &&
-    typeof item.conflictingLore === 'string' &&
-    typeof item.narrativeExcerpt === 'string'
-  );
 }
 
 /**

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateLoreConsistency } from '@/lib/ai/loreConsistencyValidator';
 import type { LoreValidationContext } from '@/types/lore.types';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * API endpoint for validating narrative content against established lore
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Lore validation error:', error);
+    logger.error('LoreValidationAPI', 'Validation error', { error });
 
     // Fail-open: Return success response with validated:false
     // rather than blocking with an error

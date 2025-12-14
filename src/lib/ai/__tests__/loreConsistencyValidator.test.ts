@@ -270,7 +270,7 @@ describe('loreConsistencyValidator', () => {
       expect(result.contradictions).toHaveLength(0);
     });
 
-    it('should handle partial parse recovery', async () => {
+    it('should fail open on schema validation error with invalid contradiction', async () => {
       const mockGenerateContent = jest.fn().mockResolvedValue({
         text: JSON.stringify({
           isConsistent: false,
@@ -282,7 +282,7 @@ describe('loreConsistencyValidator', () => {
               conflictingLore: 'Some lore',
               narrativeExcerpt: 'Some excerpt',
             },
-            // Invalid contradiction - should be filtered out
+            // Invalid contradiction - will fail schema validation
             {
               category: 'invalid',
               severity: 'minor',
@@ -301,9 +301,10 @@ describe('loreConsistencyValidator', () => {
 
       const result = await validateLoreConsistency('Some content', mockContext);
 
-      // Should keep valid contradiction, filter invalid
-      expect(result.contradictions).toHaveLength(1);
-      expect(result.contradictions[0].category).toBe('character');
+      // Should fail open when schema validation fails
+      expect(result.isConsistent).toBe(true);
+      expect(result.contradictions).toHaveLength(0);
+      expect(result.validated).toBe(true);
     });
   });
 
