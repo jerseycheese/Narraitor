@@ -1020,7 +1020,8 @@ Respond with JSON format:
 
         toast.warning(
           `⚠️ ${contradictionCount} lore ${contradictionCount === 1 ? 'contradiction' : 'contradictions'} detected`,
-          `${contradictionDetails}${moreText}. Severity: ${severity}.`
+          `${contradictionDetails}${moreText}. Severity: ${severity}.`,
+          Infinity // Don't auto-close - user needs time to read contradiction details
         );
       }
 

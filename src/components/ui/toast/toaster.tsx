@@ -165,17 +165,17 @@ export function useToast() {
   return {
     ...context,
     /** Display a success toast notification */
-    success: (title: string, description?: string) => 
-      context.addToast({ title, description, variant: 'success' }),
+    success: (title: string, description?: string, duration?: number) =>
+      context.addToast({ title, description, variant: 'success', duration }),
     /** Display an error toast notification */
-    error: (title: string, description?: string) => 
-      context.addToast({ title, description, variant: 'error' }),
+    error: (title: string, description?: string, duration?: number) =>
+      context.addToast({ title, description, variant: 'error', duration }),
     /** Display a warning toast notification */
-    warning: (title: string, description?: string) => 
-      context.addToast({ title, description, variant: 'warning' }),
+    warning: (title: string, description?: string, duration?: number) =>
+      context.addToast({ title, description, variant: 'warning', duration }),
     /** Display an info toast notification */
-    info: (title: string, description?: string) => 
-      context.addToast({ title, description, variant: 'info' }),
+    info: (title: string, description?: string, duration?: number) =>
+      context.addToast({ title, description, variant: 'info', duration }),
   }
 }
 
