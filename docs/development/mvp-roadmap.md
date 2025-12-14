@@ -91,7 +91,6 @@ Cannot ship without these:
 - Lore entity management (#446-449 - fuzzy matching, Unicode support, aliases, entity resolution)
 - Context window management for long games (#408)
 - Narrative checkpoint system (#411) - MVP implementation complete, see `docs/features/story-checkpoints.md`
-- Route consistency validation (#420)
 
 ### High Priority: Player-Facing Features
 Core user experience:
