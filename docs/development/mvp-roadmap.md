@@ -90,7 +90,6 @@ Cannot ship without these:
 - Error handling and retry resilience (#902)
 - Lore entity management (#446-449 - fuzzy matching, Unicode support, aliases, entity resolution)
 - Context window management for long games (#408)
-- Lore validation layer (#409)
 - Narrative checkpoint system (#411) - MVP implementation complete, see `docs/features/story-checkpoints.md`
 - Route consistency validation (#420)
 
