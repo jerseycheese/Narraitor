@@ -168,45 +168,34 @@ Respond ONLY with valid JSON in this exact format:
 
 /**
  * Parse the LLM's validation response with Zod schema validation
+ * Throws on parse/schema errors to ensure validated:false is set by caller
  */
 function parseValidationResponse(responseText: string): Omit<LoreValidationResult, 'processingTime' | 'validated'> {
-  try {
-    // Extract JSON from the response (handle cases where LLM adds extra text)
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    // Validate with Zod schema - defensive parsing
-    const validationResult = LoreValidationResultSchema.safeParse(parsed);
-
-    if (!validationResult.success) {
-      logger.warn('LoreConsistencyValidator', 'Schema validation failed', {
-        errors: validationResult.error.errors,
-        rawResponse: responseText.substring(0, 200),
-      });
-
-      // Don't trust responses that fail schema validation - throw to trigger fail-open
-      throw new Error(`Schema validation failed: ${validationResult.error.message}`);
-    }
-
-    return validationResult.data;
-  } catch (error) {
-    logger.warn('LoreConsistencyValidator', 'Failed to parse validation response', {
+  // Extract JSON from the response (handle cases where LLM adds extra text)
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    logger.warn('LoreConsistencyValidator', 'No JSON found in response', {
       responseText: responseText.substring(0, 200),
-      error,
+    });
+    throw new Error('No JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Validate with Zod schema - defensive parsing
+  const validationResult = LoreValidationResultSchema.safeParse(parsed);
+
+  if (!validationResult.success) {
+    logger.warn('LoreConsistencyValidator', 'Schema validation failed', {
+      errors: validationResult.error.errors,
+      rawResponse: responseText.substring(0, 200),
     });
 
-    // If we can't parse the response, default to accepting the narrative
-    return {
-      isConsistent: true,
-      contradictions: [],
-      severity: 'none',
-      confidence: 'low',
-    };
+    // Don't trust responses that fail schema validation - throw to trigger fail-open
+    throw new Error(`Schema validation failed: ${validationResult.error.message}`);
   }
+
+  return validationResult.data;
 }
 
 /**

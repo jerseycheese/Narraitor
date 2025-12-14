@@ -53,14 +53,17 @@ export type LoreValidationStrictness = 'lenient' | 'moderate' | 'strict';
 
 /**
  * Lore validation configuration
+ *
+ * MVP: Only 'enabled' is currently implemented
+ * Post-MVP settings marked below (see issues #933, #935, #936 for roadmap)
  */
 export interface LoreValidationSettings {
-  enabled: boolean;                 // Default: FALSE (post-MVP opt-in)
-  strictness: LoreValidationStrictness; // Default: moderate
-  validateEveryNSegments: number;   // Default: 1 (every segment)
-  validateOnlyCheckpoints: boolean; // Default: false (post-MVP)
-  autoRegenerate: boolean;          // Default: false (post-MVP feature)
-  blockOnBreaking: boolean;         // Default: false (fail-open)
+  enabled: boolean;                 // [IMPLEMENTED] Default: FALSE (post-MVP opt-in)
+  strictness: LoreValidationStrictness; // [POST-MVP #936] Default: moderate
+  validateEveryNSegments: number;   // [POST-MVP #933] Default: 1 (every segment)
+  validateOnlyCheckpoints: boolean; // [POST-MVP #933] Default: false
+  autoRegenerate: boolean;          // [POST-MVP #935] Default: false
+  blockOnBreaking: boolean;         // [POST-MVP #935] Default: false (fail-open)
 }
 
 /**

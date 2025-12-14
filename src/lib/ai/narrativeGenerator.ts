@@ -794,33 +794,32 @@ The items will be automatically added to the character's inventory with proper c
       }
 
       // Assemble lore context from stores
-      const context = await assembleLoreValidationContext(
-        worldId,
-        characterIds,
-        result.content
-      );
+      const context = await assembleLoreValidationContext(worldId, characterIds);
 
       // Call validation API with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-      const response = await fetch('/api/narrative/validate-lore', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: result.content,
-          context,
-        }),
-        signal: controller.signal,
-      });
+      let validation: LoreValidationResult;
+      try {
+        const response = await fetch('/api/narrative/validate-lore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: result.content,
+            context,
+          }),
+          signal: controller.signal,
+        });
 
-      clearTimeout(timeoutId);
+        if (!response.ok) {
+          throw new Error(`Validation API error: ${response.status}`);
+        }
 
-      if (!response.ok) {
-        throw new Error(`Validation API error: ${response.status}`);
+        validation = await response.json();
+      } finally {
+        clearTimeout(timeoutId);
       }
-
-      const validation: LoreValidationResult = await response.json();
 
       // Attach validation summary to metadata (NOT full contradiction list)
       const existingTags = Array.isArray(result.metadata.tags)

@@ -17,8 +17,8 @@ jest.mock('../loreValidationContextHelper', () => ({
   }),
 }));
 
-// Mock fetch for validation API
-global.fetch = jest.fn();
+// Save original fetch and restore after tests
+const originalFetch = global.fetch;
 
 // Mock stores
 jest.mock('@/state/worldStore', () => ({
@@ -82,12 +82,20 @@ describe('NarrativeGenerator - Lore Validation Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Mock fetch for validation API
+    global.fetch = jest.fn();
+
     mockAIClient = {
       generateContent: jest.fn(),
       isAvailable: jest.fn().mockResolvedValue(true),
     } as any;
 
     generator = new NarrativeGenerator(mockAIClient);
+  });
+
+  afterAll(() => {
+    // Restore original fetch
+    global.fetch = originalFetch;
   });
 
   describe('validation enabled', () => {

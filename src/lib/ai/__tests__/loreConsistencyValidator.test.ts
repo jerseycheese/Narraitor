@@ -264,9 +264,9 @@ describe('loreConsistencyValidator', () => {
 
       const result = await validateLoreConsistency('Some content', mockContext);
 
-      // Should fail open and accept narrative
+      // Should fail open and accept narrative with validated:false
       expect(result.isConsistent).toBe(true);
-      expect(result.validated).toBe(true);
+      expect(result.validated).toBe(false); // Parse error means validation didn't succeed
       expect(result.contradictions).toHaveLength(0);
     });
 
@@ -304,7 +304,7 @@ describe('loreConsistencyValidator', () => {
       // Should fail open when schema validation fails
       expect(result.isConsistent).toBe(true);
       expect(result.contradictions).toHaveLength(0);
-      expect(result.validated).toBe(true);
+      expect(result.validated).toBe(false); // Schema error means validation didn't succeed
     });
   });
 
@@ -373,7 +373,7 @@ describe('loreConsistencyValidator', () => {
 
       // Should fall back to accepting narrative on schema validation failure
       expect(result.isConsistent).toBe(true);
-      expect(result.validated).toBe(true);
+      expect(result.validated).toBe(false); // Schema error means validation didn't succeed
     });
 
     it('should validate contradiction category enum', async () => {

@@ -3,7 +3,7 @@ import type { LoreValidationContext } from '@/types/lore.types';
 import { useLoreStore } from '@/state/loreStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
-import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 /**
  * Maximum tokens allocated for lore context in validation requests
@@ -23,13 +23,11 @@ const MAX_RECENT_FACTS = 50;
  *
  * @param worldId - World to gather lore for
  * @param characterIds - Characters involved in the narrative
- * @param narrativeContent - The narrative content being validated (for context)
  * @returns Complete lore validation context
  */
 export async function assembleLoreValidationContext(
   worldId: EntityID,
-  characterIds: EntityID[],
-  narrativeContent: string
+  characterIds: EntityID[]
 ): Promise<LoreValidationContext> {
   const loreStore = useLoreStore.getState();
   const characterStore = useCharacterStore.getState();
