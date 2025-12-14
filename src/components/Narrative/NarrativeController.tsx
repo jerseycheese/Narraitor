@@ -1006,10 +1006,19 @@ Respond with JSON format:
         createdAt: now.toISOString(),
         updatedAt: now.toISOString()
       };
-      
+
+      // Show toast if lore contradictions were detected
+      if (result.metadata.loreValidation && !result.metadata.loreValidation.isConsistent) {
+        const { severity, contradictionCount } = result.metadata.loreValidation;
+        toast.warning(
+          `⚠️ ${contradictionCount} lore ${contradictionCount === 1 ? 'contradiction' : 'contradictions'} detected`,
+          `Severity: ${severity}. The story continues but may contradict established lore.`
+        );
+      }
+
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
-      
+
       // Add to store
       addSegment(sessionId, {
         content: newSegment.content,
