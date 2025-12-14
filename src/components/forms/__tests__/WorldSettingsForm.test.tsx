@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
-import { WorldSettings } from '@/types/world.types';
+import { WorldSettings, DEFAULT_LORE_VALIDATION } from '@/types/world.types';
 
 describe('WorldSettingsForm - MVP Level Tests', () => {
   const mockSettings: WorldSettings = {
@@ -66,6 +66,87 @@ describe('WorldSettingsForm - MVP Level Tests', () => {
     expect(mockOnChange).toHaveBeenCalledWith({
       ...mockSettings,
       skillPointPool: 40,
+    });
+  });
+
+  // Test lore validation toggle
+  test('displays lore validation checkbox unchecked by default', () => {
+    render(
+      <WorldSettingsForm
+        settings={mockSettings}
+        onChange={mockOnChange}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: /Enable lore validation/i });
+    expect(checkbox).not.toBeChecked();
+  });
+
+  test('displays lore validation checkbox checked when enabled', () => {
+    const settingsWithValidation: WorldSettings = {
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: true,
+      },
+    };
+
+    render(
+      <WorldSettingsForm
+        settings={settingsWithValidation}
+        onChange={mockOnChange}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: /Enable lore validation/i });
+    expect(checkbox).toBeChecked();
+  });
+
+  test('toggles lore validation on when clicked', () => {
+    render(
+      <WorldSettingsForm
+        settings={mockSettings}
+        onChange={mockOnChange}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: /Enable lore validation/i });
+    fireEvent.click(checkbox);
+
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: true,
+      },
+    });
+  });
+
+  test('toggles lore validation off when clicked', () => {
+    const settingsWithValidation: WorldSettings = {
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: true,
+      },
+    };
+
+    render(
+      <WorldSettingsForm
+        settings={settingsWithValidation}
+        onChange={mockOnChange}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: /Enable lore validation/i });
+    fireEvent.click(checkbox);
+
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: false,
+      },
     });
   });
 });

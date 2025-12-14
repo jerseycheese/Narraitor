@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
-import { WorldSettings } from '@/types/world.types';
+import { WorldSettings, DEFAULT_LORE_VALIDATION } from '@/types/world.types';
 
 const mockSettings: WorldSettings = {
   maxAttributes: 10,
@@ -64,6 +64,44 @@ export const BalancedSettings: Story = {
       maxSkills: 12,
       attributePointPool: 27,
       skillPointPool: 40,
+    },
+  },
+};
+
+export const WithLoreValidationEnabled: Story = {
+  args: {
+    settings: {
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: true,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the lore validation section with validation enabled',
+      },
+    },
+  },
+};
+
+export const WithLoreValidationDisabled: Story = {
+  args: {
+    settings: {
+      ...mockSettings,
+      loreValidation: {
+        ...DEFAULT_LORE_VALIDATION,
+        enabled: false,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the lore validation section with validation disabled (default)',
+      },
     },
   },
 };
