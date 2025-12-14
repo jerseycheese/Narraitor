@@ -243,6 +243,27 @@ export interface NarrativeMetadata {
 }
 
 /**
+ * Metadata returned directly from the narrative generator.
+ * Extends NarrativeMetadata with generation-specific fields.
+ */
+export interface NarrativeGenerationMetadata extends NarrativeMetadata {
+  characterIds: EntityID[];
+  timestamp?: string;
+  // Skill-related metadata for tracking skill usage acknowledgment
+  skillsUsed?: Array<{
+    skillId: string;
+    skillName: string;
+    success: boolean;
+    difficulty?: number;
+  }>;
+  // Custom action tracking for implicit skill check situations
+  customActionPerformed?: {
+    action: string;
+    implicitSkills?: string[];
+  };
+}
+
+/**
  * Represents a narrative generation request
  */
 export interface NarrativeGenerationRequest {
@@ -303,33 +324,7 @@ export interface GenerationParameters {
 export interface NarrativeGenerationResult {
   content: string;
   segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
-  metadata: {
-    characterIds: EntityID[];
-    speakerId?: EntityID;
-    location?: string;
-    mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
-    tags: string[];
-    timestamp?: string;
-    characters?: GeneratedCharacterMetadata[];
-    // Skill-related metadata for tracking skill usage acknowledgment
-    skillsUsed?: Array<{
-      skillId: string;
-      skillName: string;
-      success: boolean;
-      difficulty?: number;
-    }>;
-    // Custom action tracking for implicit skill check situations
-    customActionPerformed?: {
-      action: string;
-      implicitSkills?: string[];
-    };
-    // Item acquisition metadata
-    itemsAcquired?: AcquiredItemMetadata[];
-    // Major event tracking
-    majorEvent?: string;
-    // Debug information (dev mode only)
-    debugInfo?: PromptDebugInfo;
-  };
+  metadata: NarrativeGenerationMetadata;
   choices?: Array<{
     text: string;
     outcome?: string;

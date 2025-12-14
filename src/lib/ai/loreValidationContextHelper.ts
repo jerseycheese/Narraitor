@@ -150,8 +150,8 @@ function applyTokenBudget(
  * Returns last 2-3 segments as context string
  */
 export function getRecentNarrativeContext(
-  sessionId: EntityID,
-  maxSegments: number = 3
+  _sessionId: EntityID,
+  _maxSegments: number = 3
 ): string | undefined {
   // This would integrate with narrativeStore
   // For now, return undefined - can be enhanced later

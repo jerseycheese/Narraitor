@@ -3,7 +3,6 @@ import { logger } from '@/lib/utils/logger';
 import type {
   LoreValidationContext,
   LoreValidationResult,
-  ContradictionFlag,
 } from '@/types/lore.types';
 import { LoreValidationResultSchema } from '@/types/lore.types';
 
@@ -44,7 +43,7 @@ export async function validateLoreConsistency(
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       logger.warn('LoreConsistencyValidator', 'GEMINI_API_KEY not found, accepting narrative');
-      return createSkippedValidation('Validation skipped: API key not configured');
+      return createSkippedValidation();
     }
 
     const genAI = new GoogleGenAI({ apiKey });
@@ -90,9 +89,7 @@ export async function validateLoreConsistency(
     });
 
     // Fail open: if validation fails, accept the narrative
-    return createSkippedValidation(
-      `Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    return createSkippedValidation();
   }
 }
 
@@ -201,7 +198,7 @@ function parseValidationResponse(responseText: string): Omit<LoreValidationResul
 /**
  * Create a validation result for skipped validation
  */
-function createSkippedValidation(reason: string): LoreValidationResult {
+function createSkippedValidation(): LoreValidationResult {
   return {
     isConsistent: true,
     contradictions: [],

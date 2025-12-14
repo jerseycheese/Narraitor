@@ -86,9 +86,11 @@ describe('NarrativeGenerator - Lore Validation Integration', () => {
     global.fetch = jest.fn();
 
     mockAIClient = {
-      generateContent: jest.fn(),
-      isAvailable: jest.fn().mockResolvedValue(true),
-    } as any;
+      generateContent: jest.fn() as jest.MockedFunction<AIClient['generateContent']>,
+      isAvailable: jest
+        .fn()
+        .mockResolvedValue(true) as jest.MockedFunction<NonNullable<AIClient['isAvailable']>>,
+    };
 
     generator = new NarrativeGenerator(mockAIClient);
   });

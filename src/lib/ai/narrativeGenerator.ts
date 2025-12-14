@@ -778,7 +778,7 @@ The items will be automatically added to the character's inventory with proper c
     result: NarrativeGenerationResult,
     worldId: EntityID,
     characterIds: EntityID[],
-    sessionId?: EntityID
+    _sessionId?: EntityID
   ): Promise<NarrativeGenerationResult> {
     const startTime = Date.now();
 
