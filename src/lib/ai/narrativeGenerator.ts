@@ -43,6 +43,9 @@ import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/u
 import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
 import { TokenBudgetManager, DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, type RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
+import { assembleLoreValidationContext } from './loreValidationContextHelper';
+import type { LoreValidationResult } from '@/types/lore.types';
+import { DEFAULT_LORE_VALIDATION } from '@/types/world.types';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -767,6 +770,102 @@ The items will be automatically added to the character's inventory with proper c
     };
   }
 
+  /**
+   * Validate narrative content against established lore for contradictions
+   * Follows fail-open architecture: if validation fails or is disabled, narrative is accepted
+   */
+  private async validateLoreConsistency(
+    result: NarrativeGenerationResult,
+    worldId: EntityID,
+    characterIds: EntityID[],
+    sessionId?: EntityID
+  ): Promise<NarrativeGenerationResult> {
+    const startTime = Date.now();
+
+    try {
+      // Check if validation is enabled for this world
+      const worldStore = useWorldStore.getState();
+      const world = worldStore.worlds[worldId];
+      const validationSettings = world?.settings?.loreValidation || DEFAULT_LORE_VALIDATION;
+
+      if (!validationSettings.enabled) {
+        // Validation disabled - skip
+        return result;
+      }
+
+      // Assemble lore context from stores
+      const context = await assembleLoreValidationContext(
+        worldId,
+        characterIds,
+        result.content
+      );
+
+      // Call validation API with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+      const response = await fetch('/api/narrative/validate-lore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: result.content,
+          context,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Validation API error: ${response.status}`);
+      }
+
+      const validation: LoreValidationResult = await response.json();
+
+      // Attach validation summary to metadata (NOT full contradiction list)
+      const existingTags = Array.isArray(result.metadata.tags)
+        ? new Set(result.metadata.tags)
+        : new Set<string>();
+
+      if (!validation.isConsistent) {
+        existingTags.add('lore-review-needed');
+        existingTags.add(`lore-severity-${validation.severity}`);
+
+        logger.info('Lore validation found contradictions', {
+          worldId,
+          severity: validation.severity,
+          count: validation.contradictions.length,
+          duration: Date.now() - startTime,
+        });
+      }
+
+      return {
+        ...result,
+        metadata: {
+          ...result.metadata,
+          tags: Array.from(existingTags),
+          loreValidation: {
+            validated: validation.validated,
+            validatedAt: new Date().toISOString(),
+            isConsistent: validation.isConsistent,
+            severity: validation.severity,
+            contradictionCount: validation.contradictions.length,
+          },
+        },
+      };
+    } catch (error) {
+      // Fail open: if validation fails, accept the narrative
+      const duration = Date.now() - startTime;
+      logger.warn('Lore validation failed, accepting narrative', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        worldId,
+        duration,
+      });
+
+      return result;
+    }
+  }
+
   private async rewriteContentForComplexity(
     content: string,
     level: ToneSettings['languageComplexity'],
@@ -898,6 +997,14 @@ Return ONLY the rewritten narrative.`;
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
+
+      // Validate lore consistency
+      result = await this.validateLoreConsistency(
+        result,
+        request.worldId,
+        request.characterIds,
+        request.narrativeContext?.sessionId
+      );
 
       // Capture debug info if enabled (dev mode only)
       if (isDebugInfoEnabled()) {
@@ -1039,6 +1146,14 @@ Return ONLY the rewritten narrative.`;
       let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
+
+      // Validate lore consistency
+      result = await this.validateLoreConsistency(
+        result,
+        worldId,
+        characterIds,
+        sessionId
+      );
 
       // Process any acquired items from the initial scene
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {

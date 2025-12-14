@@ -230,6 +230,16 @@ export interface NarrativeMetadata {
   majorEvent?: string;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
+  // Lore validation metadata - SUMMARY ONLY to avoid IndexedDB bloat
+  loreValidation?: {
+    validated: boolean;               // true if validation ran successfully
+    validatedAt: string;              // ISO timestamp
+    isConsistent: boolean;            // Overall result
+    severity: 'none' | 'minor' | 'moderate' | 'major' | 'breaking';
+    contradictionCount: number;       // How many contradictions found
+    bypassedByUser?: boolean;         // If user overrode validation
+    // Full contradiction details NOT stored - shown only at generation time
+  };
 }
 
 /**

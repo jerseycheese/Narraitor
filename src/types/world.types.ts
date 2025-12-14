@@ -47,6 +47,35 @@ export interface WorldSkill extends NamedEntity {
 }
 
 /**
+ * Lore validation strictness levels
+ */
+export type LoreValidationStrictness = 'lenient' | 'moderate' | 'strict';
+
+/**
+ * Lore validation configuration
+ */
+export interface LoreValidationSettings {
+  enabled: boolean;                 // Default: FALSE (post-MVP opt-in)
+  strictness: LoreValidationStrictness; // Default: moderate
+  validateEveryNSegments: number;   // Default: 1 (every segment)
+  validateOnlyCheckpoints: boolean; // Default: false (post-MVP)
+  autoRegenerate: boolean;          // Default: false (post-MVP feature)
+  blockOnBreaking: boolean;         // Default: false (fail-open)
+}
+
+/**
+ * Default lore validation configuration
+ */
+export const DEFAULT_LORE_VALIDATION: LoreValidationSettings = {
+  enabled: false,  // OFF by default - post-MVP opt-in
+  strictness: 'moderate',
+  validateEveryNSegments: 1,
+  validateOnlyCheckpoints: false,
+  autoRegenerate: false,
+  blockOnBreaking: false,
+};
+
+/**
  * World-specific configuration settings
  */
 export interface WorldSettings {
@@ -54,4 +83,6 @@ export interface WorldSettings {
   maxSkills: number;
   attributePointPool: number;
   skillPointPool: number;
+  // Lore validation settings
+  loreValidation?: LoreValidationSettings;
 }

@@ -1,9 +1,10 @@
 /**
  * Lore Management Type Definitions
- * Issue #434: Basic lore consistency tracking
+ * Basic lore consistency tracking and validation
  */
 
 import type { EntityID, TimestampedEntity } from './common.types';
+import { z } from 'zod';
 
 /**
  * Basic categories for organizing lore facts
@@ -118,3 +119,113 @@ export interface ConsistencyLoreContext {
     importance?: 'high' | 'medium' | 'low';
   }>;
 }
+
+/**
+ * Lore Validation Types
+ * Lore validation layer for AI-generated content
+ */
+
+/**
+ * Contradiction severity levels
+ */
+export type ContradictionSeverity = 'minor' | 'moderate' | 'major' | 'breaking';
+
+/**
+ * Validation confidence levels
+ */
+export type ValidationConfidence = 'low' | 'medium' | 'high';
+
+/**
+ * Overall validation severity
+ */
+export type ValidationSeverity = 'none' | 'minor' | 'moderate' | 'major' | 'breaking';
+
+/**
+ * Contradiction category
+ */
+export type ContradictionCategory = 'character' | 'world-rule' | 'historical-event' | 'location';
+
+/**
+ * Context for lore validation request
+ */
+export interface LoreValidationContext {
+  characters: Array<{
+    id: EntityID;
+    name: string;
+    background: string;
+    personality: string;
+    physicalDescription?: string;
+  }>;
+  worldRules: Array<{
+    rule: string;
+    description: string;
+    importance: 'low' | 'medium' | 'high';
+  }>;
+  historicalEvents: Array<{
+    description: string;
+    timestamp: string;
+    characterIds: EntityID[];
+  }>;
+  locations: Array<{
+    name: string;
+    type: string;
+    description: string;
+  }>;
+  recentNarrative?: string;
+}
+
+/**
+ * Lore validation request
+ */
+export interface LoreValidationRequest {
+  content: string;
+  worldId: EntityID;
+  characterIds: EntityID[];
+  sessionId?: EntityID;
+  context: LoreValidationContext;
+}
+
+/**
+ * Individual contradiction flag
+ * Compact format - excerpts truncated to 100 chars max
+ */
+export interface ContradictionFlag {
+  category: ContradictionCategory;
+  severity: ContradictionSeverity;
+  description: string;
+  conflictingLore: string;
+  narrativeExcerpt: string;
+}
+
+/**
+ * Lore validation result
+ */
+export interface LoreValidationResult {
+  isConsistent: boolean;
+  contradictions: ContradictionFlag[];
+  severity: ValidationSeverity;
+  confidence: ValidationConfidence;
+  processingTime: number;
+  validated: boolean; // false if validation skipped/failed
+}
+
+/**
+ * Zod schema for contradiction flag validation
+ */
+export const ContradictionFlagSchema = z.object({
+  category: z.enum(['character', 'world-rule', 'historical-event', 'location']),
+  severity: z.enum(['minor', 'moderate', 'major', 'breaking']),
+  description: z.string(),
+  conflictingLore: z.string(),
+  narrativeExcerpt: z.string(),
+});
+
+/**
+ * Zod schema for validation result
+ */
+export const LoreValidationResultSchema = z.object({
+  isConsistent: z.boolean(),
+  contradictions: z.array(ContradictionFlagSchema),
+  severity: z.enum(['none', 'minor', 'moderate', 'major', 'breaking']),
+  confidence: z.enum(['low', 'medium', 'high']),
+});
