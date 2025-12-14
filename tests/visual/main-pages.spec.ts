@@ -82,8 +82,12 @@ test.describe('Main Pages Visual Tests', () => {
     await seedTestData(page);
     await page.goto('/characters');
     await waitForContentStable(page);
+
+    // Wait for the world hero to appear (indicates stores have hydrated)
+    await page.waitForSelector('h2:has-text("Characters")', { timeout: 10000 });
+
     await hideDynamicContent(page);
-    
+
     // Take screenshot of characters page - should show populated characters
     await expect(page).toHaveScreenshot('characters-list.png', { fullPage: true });
   });
