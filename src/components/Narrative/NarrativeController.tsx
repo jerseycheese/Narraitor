@@ -1009,22 +1009,37 @@ Respond with JSON format:
 
       // Show toast if lore contradictions were detected
       if (result.metadata.loreValidation && !result.metadata.loreValidation.isConsistent) {
-        const { severity, contradictionCount } = result.metadata.loreValidation;
+        const { severity, contradictionCount, contradictions } = result.metadata.loreValidation;
+
+        // Build description with actual contradiction details
+        const contradictionDetails = contradictions && contradictions.length > 0
+          ? contradictions.map((c: { description: string }) => c.description).slice(0, 2).join('; ')
+          : 'The story may contradict established lore';
+
+        const moreText = contradictionCount > 2 ? ` (+${contradictionCount - 2} more)` : '';
+
         toast.warning(
           `⚠️ ${contradictionCount} lore ${contradictionCount === 1 ? 'contradiction' : 'contradictions'} detected`,
-          `Severity: ${severity}. The story continues but may contradict established lore.`
+          `${contradictionDetails}${moreText}. Severity: ${severity}.`
         );
       }
 
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
 
-      // Add to store
+      // Strip contradictions array from metadata before persisting to IndexedDB
+      const persistedMetadata = { ...newSegment.metadata };
+      if (persistedMetadata.loreValidation?.contradictions) {
+        const { contradictions, ...loreValidationWithoutContradictions } = persistedMetadata.loreValidation;
+        persistedMetadata.loreValidation = loreValidationWithoutContradictions;
+      }
+
+      // Add to store (with cleaned metadata)
       addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         characterIds: newSegment.characterIds || [],
-        metadata: newSegment.metadata,
+        metadata: persistedMetadata,
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp
       });

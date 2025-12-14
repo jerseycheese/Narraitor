@@ -849,6 +849,8 @@ The items will be automatically added to the character's inventory with proper c
             isConsistent: validation.isConsistent,
             severity: validation.severity,
             contradictionCount: validation.contradictions.length,
+            // Include contradictions for immediate toast display (will be stripped before IndexedDB persist)
+            contradictions: validation.contradictions,
           },
         },
       };

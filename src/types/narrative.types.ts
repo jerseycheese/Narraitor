@@ -238,7 +238,14 @@ export interface NarrativeMetadata {
     severity: 'none' | 'minor' | 'moderate' | 'major' | 'breaking';
     contradictionCount: number;       // How many contradictions found
     bypassedByUser?: boolean;         // If user overrode validation
-    // Full contradiction details NOT stored - shown only at generation time
+    // Full contradiction details - present temporarily for toast display, stripped before IndexedDB persist
+    contradictions?: Array<{
+      category: 'character' | 'world-rule' | 'historical-event' | 'location';
+      severity: 'minor' | 'moderate' | 'major' | 'breaking';
+      description: string;
+      conflictingLore: string;
+      narrativeExcerpt: string;
+    }>;
   };
 }
 
