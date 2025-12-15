@@ -13,7 +13,6 @@ import {
   NarrativeGenerationResult,
   NarrativeSegment,
   GeneratedCharacterMetadata,
-  GenerationParameters,
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -873,11 +872,8 @@ Return ONLY the rewritten narrative.`;
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      // Extract structured lore from generated narrative
-      if (
-        response.content &&
-        !request.generationParameters?.disableLoreExtractionProcessing
-      ) {
+      // Extract structured lore from generated narrative (dev/test only for MVP)
+      if (response.content && process.env.NODE_ENV !== 'production') {
         try {
           const existingLoreContext = getLoreContextForPrompt(request.worldId);
           const structuredLore = await extractStructuredLore(
@@ -964,8 +960,7 @@ Return ONLY the rewritten narrative.`;
   async generateInitialScene(
     worldId: string,
     characterIds: string[],
-    sessionId?: string,
-    generationParameters?: GenerationParameters
+    sessionId?: string
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -1031,8 +1026,8 @@ Return ONLY the rewritten narrative.`;
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      // Extract structured lore from initial scene
-      if (response.content && !generationParameters?.disableLoreExtractionProcessing) {
+      // Extract structured lore from initial scene (dev/test only for MVP)
+      if (response.content && process.env.NODE_ENV !== 'production') {
         try {
           const existingLoreContext = getLoreContextForPrompt(worldId);
           const structuredLore = await extractStructuredLore(

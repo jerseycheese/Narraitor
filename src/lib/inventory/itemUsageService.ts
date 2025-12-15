@@ -185,7 +185,6 @@ export async function generateItemUsageNarrative(
         desiredLength: 'short',
         includedTopics,
         disableItemAcquisitionProcessing: true,
-        disableLoreExtractionProcessing: true,
       },
     });
   } catch {
