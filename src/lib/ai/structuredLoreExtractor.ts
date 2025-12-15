@@ -69,6 +69,7 @@ Respond with ONLY a JSON block in this exact format:
   "characters": [
     {
       "name": "Character Name",
+      "aliases": ["Nickname", "Title", "Alternative Name"],
       "description": "Brief description",
       "role": "their role/title",
       "importance": "low|medium|high",
@@ -77,7 +78,8 @@ Respond with ONLY a JSON block in this exact format:
   ],
   "locations": [
     {
-      "name": "Location Name", 
+      "name": "Location Name",
+      "aliases": ["Common name", "Local nickname"],
       "type": "city|tavern|forest|etc",
       "description": "Brief description",
       "importance": "low|medium|high",
@@ -88,7 +90,7 @@ Respond with ONLY a JSON block in this exact format:
     {
       "description": "What happened",
       "significance": "Why it matters",
-      "importance": "low|medium|high", 
+      "importance": "low|medium|high",
       "relatedEntities": ["entity1", "entity2"]
     }
   ],
@@ -103,13 +105,15 @@ Respond with ONLY a JSON block in this exact format:
   "relationships": [
     {
       "from": "Entity 1",
-      "to": "Entity 2", 
+      "to": "Entity 2",
       "type": "ally|enemy|mentor|etc",
       "description": "Nature of relationship"
     }
   ]
 }
-\`\`\``;
+\`\`\`
+
+**Note on aliases**: Include alternative names, nicknames, titles, or other ways the character or location is referred to in the narrative. Use the most formal/full name as the canonical "name" field.`;
 }
 
 /**
@@ -131,6 +135,8 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
       .filter((char) => char.name && typeof char.name === 'string')
       .map((char) => ({
         name: (char.name as string).trim(),
+        aliases: Array.isArray(char.aliases) ?
+          (char.aliases as unknown[]).filter((a) => typeof a === 'string').map(a => (a as string).trim()) : undefined,
         description: typeof char.description === 'string' ? char.description.trim() : undefined,
         role: typeof char.role === 'string' ? char.role.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(char.importance as string) ? char.importance as 'low' | 'medium' | 'high' : 'medium',
@@ -144,6 +150,8 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
       .filter((loc) => loc.name && typeof loc.name === 'string')
       .map((loc) => ({
         name: (loc.name as string).trim(),
+        aliases: Array.isArray(loc.aliases) ?
+          (loc.aliases as unknown[]).filter((a) => typeof a === 'string').map(a => (a as string).trim()) : undefined,
         type: typeof loc.type === 'string' ? loc.type.trim() : undefined,
         description: typeof loc.description === 'string' ? loc.description.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(loc.importance as string) ? loc.importance as 'low' | 'medium' | 'high' : 'medium',
@@ -224,8 +232,9 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       const name = match.trim();
       extraction.characters.push({
         name,
+        aliases: [], // Empty aliases for mock extraction
         description: 'Character mentioned in narrative',
-        role: match.toLowerCase().includes('sir') ? 'Knight' : 
+        role: match.toLowerCase().includes('sir') ? 'Knight' :
               match.toLowerCase().includes('lady') ? 'Noble' :
               match.toLowerCase().includes('captain') ? 'Military Officer' : 'Person of importance',
         importance: 'medium'
@@ -240,6 +249,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       const name = match.trim();
       extraction.locations.push({
         name,
+        aliases: [], // Empty aliases for mock extraction
         description: 'Location mentioned in narrative',
         type: match.toLowerCase().includes('temple') ? 'religious site' :
               match.toLowerCase().includes('tavern') ? 'establishment' :
@@ -257,6 +267,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       if (nameMatch) {
         extraction.locations.push({
           name: nameMatch[1],
+          aliases: [], // Empty aliases for mock extraction
           description: 'Settlement mentioned in narrative',
           type: 'city',
           importance: 'high'

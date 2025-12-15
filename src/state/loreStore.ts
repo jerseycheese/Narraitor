@@ -60,7 +60,7 @@ export interface LoreStore extends CrudStore<LoreFact> {
     worldId: EntityID,
     sessionId?: EntityID,
     metadata?: LoreFact['metadata']
-  ) => void;
+  ) => EntityID;
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
 
@@ -82,6 +82,12 @@ export interface LoreStore extends CrudStore<LoreFact> {
 
   getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
+
+  // Alias management
+  addAlias: (id: EntityID, alias: string) => void;
+  removeAlias: (id: EntityID, alias: string) => void;
+  setAliases: (id: EntityID, aliases: string[]) => void;
+  findEntityByAnyName: (name: string, worldId: EntityID) => LoreFact | null;
 }
 
 const getInitialState = () => ({
@@ -106,6 +112,7 @@ export const useLoreStore = create<LoreStore>()(
           const now = getTimestamp();
           const newFact: LoreFact = {
             ...factData,
+            aliases: factData.aliases ?? [], // Ensure aliases defaults to empty array
             id,
             createdAt: now,
             updatedAt: now,
@@ -203,7 +210,7 @@ export const useLoreStore = create<LoreStore>()(
         addFact: (key, value, category, source, worldId, sessionId, metadata) => {
           if (!get().validateFact({ key, value, category, worldId })) {
             set({ error: createStoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
-            return;
+            return '' as EntityID;
           }
 
           if (!get().validateKey(key)) {
@@ -213,7 +220,7 @@ export const useLoreStore = create<LoreStore>()(
                 'Lore keys must start with a letter and contain only letters, numbers, or underscores.'
               ),
             });
-            return;
+            return '' as EntityID;
           }
 
           if (!get().validateFactUniqueness(worldId, key, value)) {
@@ -223,12 +230,13 @@ export const useLoreStore = create<LoreStore>()(
                 'A lore fact with this key and value already exists for this world.'
               ),
             });
-            return;
+            return '' as EntityID;
           }
 
-          get().create({
+          return get().create({
             key,
             value,
+            aliases: [],
             category,
             source,
             worldId,
@@ -293,7 +301,7 @@ export const useLoreStore = create<LoreStore>()(
         },
 
         addStructuredLore: (extraction, worldId, sessionId) => {
-          const { addFact, getFacts } = get();
+          const { addFact, setAliases, getFacts } = get();
 
           const existingFacts = getFacts({ worldId });
           const existingKeys = new Set(existingFacts.map((fact) => fact.key));
@@ -301,24 +309,34 @@ export const useLoreStore = create<LoreStore>()(
           extraction.characters.forEach((char) => {
             const key = generateLoreKey(worldId, 'character', char.name);
             if (!existingKeys.has(key)) {
-              addFact(key, char.name, 'characters', 'narrative', worldId, sessionId, {
+              const factId = addFact(key, char.name, 'characters', 'narrative', worldId, sessionId, {
                 description: char.description,
                 type: char.role,
                 importance: char.importance || 'medium',
                 tags: char.tags,
               });
+
+              // Add aliases if extracted by AI
+              if (char.aliases && char.aliases.length > 0 && factId) {
+                setAliases(factId, char.aliases);
+              }
             }
           });
 
           extraction.locations.forEach((loc) => {
             const key = generateLoreKey(worldId, 'location', loc.name);
             if (!existingKeys.has(key)) {
-              addFact(key, loc.name, 'locations', 'narrative', worldId, sessionId, {
+              const factId = addFact(key, loc.name, 'locations', 'narrative', worldId, sessionId, {
                 description: loc.description,
                 type: loc.type,
                 importance: loc.importance || 'medium',
                 tags: loc.tags,
               });
+
+              // Add aliases if extracted by AI
+              if (loc.aliases && loc.aliases.length > 0 && factId) {
+                setAliases(factId, loc.aliases);
+              }
             }
           });
 
@@ -361,7 +379,9 @@ export const useLoreStore = create<LoreStore>()(
 
           return worldFacts.filter((fact) => {
             const normalizedFactValue = normalizeText(fact.value, NORM_NAME).toLowerCase();
-            return normalizedFactValue === normalizedValue;
+            const normalizedAliases = fact.aliases?.map(a => normalizeText(a, NORM_NAME).toLowerCase()) || [];
+            return normalizedFactValue === normalizedValue ||
+                   normalizedAliases.some(alias => alias === normalizedValue);
           });
         },
 
@@ -386,6 +406,7 @@ export const useLoreStore = create<LoreStore>()(
           results = results.filter((fact) =>
             fact.value.toLowerCase().includes(normalizedQuery) ||
             fact.key.toLowerCase().includes(normalizedQuery) ||
+            fact.aliases?.some(alias => alias.toLowerCase().includes(normalizedQuery)) ||
             fact.metadata?.description?.toLowerCase().includes(normalizedQuery) ||
             fact.metadata?.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))
           );
@@ -537,6 +558,62 @@ export const useLoreStore = create<LoreStore>()(
             return Object.values(facts).filter((fact) => fact.worldId === worldId).length;
           }
           return Object.keys(facts).length;
+        },
+
+        // Alias management functions
+        addAlias: (id, alias) => {
+          const fact = get().facts[id];
+          if (!fact) return;
+
+          const trimmedAlias = alias.trim();
+          if (!trimmedAlias) return;
+
+          const currentAliases = fact.aliases || [];
+          if (currentAliases.includes(trimmedAlias)) return; // Prevent duplicates
+
+          get().update(id, {
+            aliases: [...currentAliases, trimmedAlias],
+          });
+        },
+
+        removeAlias: (id, alias) => {
+          const fact = get().facts[id];
+          if (!fact) return;
+
+          const currentAliases = fact.aliases || [];
+          const updatedAliases = currentAliases.filter(a => a !== alias);
+
+          get().update(id, {
+            aliases: updatedAliases,
+          });
+        },
+
+        setAliases: (id, aliases) => {
+          const fact = get().facts[id];
+          if (!fact) return;
+
+          // Filter out empty strings and trim, then remove duplicates
+          const cleanedAliases = aliases
+            .map(a => a.trim())
+            .filter(a => a.length > 0)
+            .filter((alias, index, self) => self.indexOf(alias) === index);
+
+          get().update(id, {
+            aliases: cleanedAliases,
+          });
+        },
+
+        findEntityByAnyName: (name, worldId) => {
+          const facts = get().getFacts({ worldId });
+          const normalizedName = normalizeText(name, NORM_NAME).toLowerCase();
+
+          return facts.find(fact => {
+            const normalizedValue = normalizeText(fact.value, NORM_NAME).toLowerCase();
+            const normalizedAliases = fact.aliases?.map(a => normalizeText(a, NORM_NAME).toLowerCase()) || [];
+
+            return normalizedValue === normalizedName ||
+                   normalizedAliases.includes(normalizedName);
+          }) || null;
         },
       };
     },

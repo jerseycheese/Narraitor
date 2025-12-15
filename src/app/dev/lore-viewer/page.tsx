@@ -9,12 +9,13 @@ import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import type { EntityID } from '@/types';
 
 export default function LoreViewerTestPage() {
-  const { addFact, clearFacts, getFacts, addStructuredLore } = useLoreStore();
+  const { addFact, clearFacts, getFacts, addStructuredLore, setAliases, searchFacts, findEntityByAnyName } = useLoreStore();
   const { worlds, createWorld } = useWorldStore();
   const [showSessionOnly, setShowSessionOnly] = useState(false);
   const [extractionResult, setExtractionResult] = useState<string>('');
   const [customNarrative, setCustomNarrative] = useState('');
   const [worldId, setWorldId] = useState<EntityID | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Create test world on mount if needed
   useEffect(() => {
@@ -101,31 +102,102 @@ export default function LoreViewerTestPage() {
 
   const testErrorHandling = async () => {
     const beforeCount = getFacts({ worldId }).length;
-    
+
     const sampleNarrative = customNarrative || `
       You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares.
       A mysterious woman named Lady Seraphina approaches you with an urgent request.
       She tells you about the Lost Temple of Aethon, hidden deep in the Whispering Woods.
       The temple is said to contain the Crystal of Truth, a powerful artifact.
-      
+
       Sir Gareth, the captain of the guard, warns you that the woods are dangerous.
       Many adventurers have entered the Whispering Woods, but few have returned.
       The local tavern, The Dragon's Rest, might have more information.
     `;
-    
+
     setExtractionResult('Testing AI extraction with error handling...');
-    
+
     try {
       const structuredLore = await extractStructuredLore(sampleNarrative);
       addStructuredLore(structuredLore, worldId, sessionId);
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
-      
+
       setExtractionResult(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
       setTimeout(() => setExtractionResult(''), 7000);
-      
+
     } catch (error) {
       setExtractionResult(`AI extraction failed gracefully: ${error}`);
+      setTimeout(() => setExtractionResult(''), 5000);
+    }
+  };
+
+  const testAliasAddition = () => {
+    const facts = getFacts({ worldId });
+    const characterFacts = facts.filter(f => f.category === 'characters');
+
+    if (characterFacts.length === 0) {
+      setExtractionResult('Add some facts first before testing aliases!');
+      setTimeout(() => setExtractionResult(''), 3000);
+      return;
+    }
+
+    // Add aliases to the first few characters
+    characterFacts.slice(0, 3).forEach(fact => {
+      if (fact.value.includes('Marcus')) {
+        setAliases(fact.id, ['Marcus', 'The Brave', 'Hero of Willowbrook']);
+      } else if (fact.value.includes('Seraphina')) {
+        setAliases(fact.id, ['Seraphina', 'Lady Sera', 'The Mysterious Woman']);
+      } else if (fact.value.includes('Gareth')) {
+        setAliases(fact.id, ['Gareth', 'Captain', 'Guard Captain']);
+      } else {
+        // Add generic aliases for other characters
+        const firstName = fact.value.split(' ')[0];
+        setAliases(fact.id, [firstName, fact.value]);
+      }
+    });
+
+    setExtractionResult('Added aliases to character facts! Check the display above.');
+    setTimeout(() => setExtractionResult(''), 5000);
+  };
+
+  const testAliasSearch = () => {
+    if (!searchQuery.trim()) {
+      setExtractionResult('Enter a search query first!');
+      setTimeout(() => setExtractionResult(''), 3000);
+      return;
+    }
+
+    const results = searchFacts(searchQuery, { worldId });
+    const entityByName = findEntityByAnyName(searchQuery, worldId);
+
+    let message = `Search for "${searchQuery}":\n`;
+    message += `- Found ${results.length} facts via search\n`;
+    message += entityByName
+      ? `- Found exact match: ${entityByName.value}`
+      : `- No exact match found`;
+
+    setExtractionResult(message);
+    setTimeout(() => setExtractionResult(''), 7000);
+  };
+
+  const testAliasExtraction = async () => {
+    const narrativeWithAliases = `
+      You encounter Lady Seraphina Moonwhisper in the market. The locals call her "Sera" or "The Mysterious Woman".
+      She's accompanied by Sir Gareth "The Iron", captain of the guard, who many simply call "Captain".
+      They speak of Goldenhaven (also known as "The Golden City" or "Haven") and its troubles.
+      The Dragon's Rest tavern, which locals affectionately call "The Dragon" or "Dragon's", is nearby.
+    `;
+
+    setExtractionResult('Testing AI alias extraction...');
+
+    try {
+      const structuredLore = await extractStructuredLore(narrativeWithAliases);
+      addStructuredLore(structuredLore, worldId, sessionId);
+
+      setExtractionResult('AI alias extraction complete! Check if aliases were detected in the display above.');
+      setTimeout(() => setExtractionResult(''), 7000);
+    } catch (error) {
+      setExtractionResult(`AI alias extraction failed: ${error}`);
       setTimeout(() => setExtractionResult(''), 5000);
     }
   };
@@ -167,7 +239,7 @@ export default function LoreViewerTestPage() {
           >
             Clear All Facts
           </button>
-          
+
           <label className="inline-flex items-center">
             <input
               type="checkbox"
@@ -177,6 +249,41 @@ export default function LoreViewerTestPage() {
             />
             Show Session Facts Only
           </label>
+        </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <h3 className="font-semibold text-sm">Alias Testing:</h3>
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={testAliasAddition}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
+            >
+              Test Alias Addition
+            </button>
+
+            <button
+              onClick={testAliasExtraction}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
+            >
+              Test AI Alias Extraction
+            </button>
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name or alias (e.g., 'Sera', 'Captain')..."
+              className="flex-1 px-3 py-2 border rounded text-sm"
+            />
+            <button
+              onClick={testAliasSearch}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
+            >
+              Test Alias Search
+            </button>
+          </div>
         </div>
         
         {extractionResult && (
@@ -214,6 +321,9 @@ export default function LoreViewerTestPage() {
           <li><strong>Custom Narrative:</strong> Enter your own text to test extraction (any genre/style supported)</li>
           <li><strong>Session Filtering:</strong> Toggle to show only facts from the current session</li>
           <li><strong>Clear All Facts:</strong> Remove all facts to start fresh</li>
+          <li><strong>Test Alias Addition:</strong> Manually adds aliases to existing character facts</li>
+          <li><strong>Test AI Alias Extraction:</strong> Tests AI extraction of aliases from narrative text</li>
+          <li><strong>Test Alias Search:</strong> Search for entities by their canonical name or any alias</li>
         </ol>
         
         <div className="mt-4 p-3 bg-blue-50 rounded">
@@ -221,9 +331,21 @@ export default function LoreViewerTestPage() {
           <ul className="text-sm space-y-1">
             <li>• Extracts characters with roles, descriptions, and importance</li>
             <li>• Identifies locations with types and context</li>
+            <li>• Detects aliases and alternative names for entities</li>
             <li>• Captures events with significance and relationships</li>
             <li>• Recognizes rules and world mechanics</li>
             <li>• Much more comprehensive than regex patterns</li>
+          </ul>
+        </div>
+
+        <div className="mt-4 p-3 bg-purple-50 rounded">
+          <h3 className="font-semibold text-sm mb-1">Alias Management:</h3>
+          <ul className="text-sm space-y-1">
+            <li>• Characters and locations can have multiple aliases</li>
+            <li>• Search finds entities by canonical name or any alias</li>
+            <li>• AI automatically detects aliases from narrative context</li>
+            <li>• Aliases are displayed inline with the canonical name</li>
+            <li>• Useful for nicknames, titles, and alternative references</li>
           </ul>
         </div>
         
