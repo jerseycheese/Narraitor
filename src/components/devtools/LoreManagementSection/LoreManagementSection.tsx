@@ -32,6 +32,7 @@ export const LoreManagementSection: React.FC = () => {
 
   const { worlds } = useWorldStore();
   const {
+    facts: allFacts,
     getFacts,
     searchFacts,
     deleteFact,
@@ -42,19 +43,19 @@ export const LoreManagementSection: React.FC = () => {
   // Get facts based on filters
   const facts = useMemo(() => {
     if (!selectedWorldId) return [];
-    
+
     if (searchQuery) {
       return searchFacts(searchQuery, {
         worldId: selectedWorldId,
         category: categoryFilter || undefined
       });
     }
-    
+
     return getFacts({
       worldId: selectedWorldId,
       category: categoryFilter || undefined
     });
-  }, [selectedWorldId, searchQuery, categoryFilter, getFacts, searchFacts]);
+  }, [selectedWorldId, searchQuery, categoryFilter, allFacts, getFacts, searchFacts]);
 
   // Group facts by category
   const factsByCategory = useMemo(() => {
@@ -186,8 +187,6 @@ export const LoreManagementSection: React.FC = () => {
                           onClick={() => setSelectedFactId(fact.id)}
                         >
                           <div className="flex-1">
-                            <span className="font-mono text-sm">{fact.key}</span>
-                            <span className="mx-2">:</span>
                             <span>{fact.value}</span>
                           </div>
                           <div className="flex gap-2">

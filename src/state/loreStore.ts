@@ -209,11 +209,13 @@ export const useLoreStore = create<LoreStore>()(
 
         addFact: (key, value, category, source, worldId, sessionId, metadata) => {
           if (!get().validateFact({ key, value, category, worldId })) {
+            console.error('[LoreStore] addFact validation failed:', { key, value, category, worldId });
             set({ error: createStoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
             return '' as EntityID;
           }
 
           if (!get().validateKey(key)) {
+            console.error('[LoreStore] addFact invalid key:', { key });
             set({
               error: createStoreError(
                 'Invalid Lore Key',
@@ -224,6 +226,7 @@ export const useLoreStore = create<LoreStore>()(
           }
 
           if (!get().validateFactUniqueness(worldId, key, value)) {
+            console.log('[LoreStore] addFact duplicate fact (skipping):', { key, value });
             set({
               error: createStoreError(
                 'Duplicate Lore Fact',
@@ -233,7 +236,7 @@ export const useLoreStore = create<LoreStore>()(
             return '' as EntityID;
           }
 
-          return get().create({
+          const factId = get().create({
             key,
             value,
             aliases: [],
@@ -243,6 +246,8 @@ export const useLoreStore = create<LoreStore>()(
             sessionId,
             metadata,
           });
+          console.log('[LoreStore] addFact created fact:', { factId, key, value });
+          return factId;
         },
 
         getFacts: (options) => {
@@ -301,10 +306,24 @@ export const useLoreStore = create<LoreStore>()(
         },
 
         addStructuredLore: (extraction, worldId, sessionId) => {
+          console.log('[LoreStore] addStructuredLore called:', {
+            worldId,
+            sessionId,
+            extraction: {
+              characters: extraction.characters.length,
+              locations: extraction.locations.length,
+              events: extraction.events.length,
+              rules: extraction.rules.length,
+            },
+          });
+
           const { addFact, setAliases, getFacts } = get();
 
           const existingFacts = getFacts({ worldId });
           const existingKeys = new Set(existingFacts.map((fact) => fact.key));
+          console.log('[LoreStore] Existing facts count:', existingFacts.length);
+
+          let addedCount = { characters: 0, locations: 0, events: 0, rules: 0 };
 
           extraction.characters.forEach((char) => {
             const key = generateLoreKey(worldId, 'character', char.name);
@@ -320,6 +339,8 @@ export const useLoreStore = create<LoreStore>()(
               if (char.aliases && char.aliases.length > 0 && factId) {
                 setAliases(factId, char.aliases);
               }
+              addedCount.characters++;
+              console.log('[LoreStore] Added character fact:', { name: char.name, key, factId });
             }
           });
 
@@ -337,6 +358,8 @@ export const useLoreStore = create<LoreStore>()(
               if (loc.aliases && loc.aliases.length > 0 && factId) {
                 setAliases(factId, loc.aliases);
               }
+              addedCount.locations++;
+              console.log('[LoreStore] Added location fact:', { name: loc.name, key, factId });
             }
           });
 
@@ -348,6 +371,8 @@ export const useLoreStore = create<LoreStore>()(
                 importance: event.importance || 'medium',
                 relatedEntities: event.relatedEntities,
               });
+              addedCount.events++;
+              console.log('[LoreStore] Added event fact:', { description: event.description, key });
             }
           });
 
@@ -359,8 +384,14 @@ export const useLoreStore = create<LoreStore>()(
                 importance: rule.importance || 'medium',
                 tags: rule.tags,
               });
+              addedCount.rules++;
+              console.log('[LoreStore] Added rule fact:', { rule: rule.rule, key });
             }
           });
+
+          console.log('[LoreStore] addStructuredLore complete:', addedCount);
+          const updatedFactsCount = getFacts({ worldId }).length;
+          console.log('[LoreStore] Total facts after addition:', updatedFactsCount);
         },
 
         updateFact: (id, updates) => get().update(id, updates),
@@ -495,7 +526,7 @@ export const useLoreStore = create<LoreStore>()(
 
         validateKey: (key) => {
           if (key.includes(':')) {
-            const structuredPattern = /^[a-zA-Z0-9-]+:[a-zA-Z0-9:_-]+$/;
+            const structuredPattern = /^[a-zA-Z0-9_-]+:[a-zA-Z0-9:_-]+$/;
             return structuredPattern.test(key);
           }
           const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
