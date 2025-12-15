@@ -58,12 +58,18 @@ Extract only NEW or SIGNIFICANT information that would be important for maintain
 
 Categories to extract:
 - **Characters**: Named individuals with their roles/descriptions
-- **Locations**: Named places with types and descriptions  
+- **Locations**: Named places with types and descriptions
 - **Events**: Significant happenings that should be remembered
 - **Rules**: Game mechanics, magic systems, or world rules mentioned
 - **Relationships**: Important connections between entities (optional)
 
 Rate importance as 'low', 'medium', or 'high' based on narrative significance.
+
+CRITICAL QUALITY RULES:
+- Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
+- If a person is unnamed, keep it as part of an event description instead of a character entity.
+- Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
+- Keep events concise and non-redundant: include at most 3 high-signal events that add lasting story state.
 
 Narrative Text:
 ${narrativeText}${existingContext}

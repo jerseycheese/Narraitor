@@ -206,6 +206,81 @@ describe('LoreStore - Advanced Features', () => {
       expect(facts.some(f => f.category === 'rules')).toBe(true);
     });
 
+    test('should ignore generic/unnamed character entities', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: 'Unnamed Dothraki Warrior with Crimson Braid', importance: 'medium' as const },
+          { name: 'Dothraki warriors', importance: 'medium' as const },
+          { name: 'Sir Gareth', role: 'Knight', importance: 'medium' as const },
+        ],
+        locations: [],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const characterValues = facts
+        .filter((fact) => fact.category === 'characters')
+        .map((fact) => fact.value);
+
+      expect(characterValues).toEqual(['Sir Gareth']);
+    });
+
+    test('should canonicalize derived locations and keep as aliases', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [
+          { name: 'Vaes Leisi marketplace edge', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const locationFact = facts.find((fact) => fact.category === 'locations');
+
+      expect(locationFact?.value).toBe('Vaes Leisi marketplace');
+      expect(locationFact?.aliases).toContain('Vaes Leisi marketplace edge');
+    });
+
+    test('should cap extracted events per extraction', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [],
+        events: [
+          { description: 'Event one: short', importance: 'low' as const },
+          { description: 'Event two: medium detail', importance: 'medium' as const },
+          { description: 'Event three: high importance and longer description', importance: 'high' as const },
+          { description: 'Event four: also high but should be capped out', importance: 'high' as const },
+          { description: 'Event five: another medium event', importance: 'medium' as const },
+        ],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const eventFacts = facts.filter((fact) => fact.category === 'events');
+
+      expect(eventFacts).toHaveLength(3);
+    });
+
     test('should use world-scoped keys', () => {
       const { result } = renderHook(() => useLoreStore());
 

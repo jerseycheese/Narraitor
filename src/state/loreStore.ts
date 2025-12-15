@@ -10,7 +10,7 @@ import type {
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { getTimestamp } from '@/lib/utils';
+import { getTimestamp, safeTrim } from '@/lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/errorUtils';
@@ -24,6 +24,60 @@ function generateLoreKey(worldId: string, category: string, name: string, maxLen
   const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
   return `${worldId}:${category}_${truncatedName}`;
 }
+
+function shouldStoreExtractedCharacterName(name: string): boolean {
+  const canonicalName = safeTrim(name).replace(/\s+/g, ' ');
+  if (!canonicalName) return false;
+
+  const normalized = normalizeText(canonicalName, NORM_NAME).toLowerCase();
+  if (!normalized) return false;
+
+  // Explicitly reject unnamed placeholders and descriptive phrases.
+  if (normalized.startsWith('unnamed ') || normalized.startsWith('unknown ')) return false;
+  if (normalized.includes(' with ')) return false;
+
+  // Reject obvious group/plural entities (usually not a stable, named character).
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  const isPluralGroup =
+    tokens.length <= 3 &&
+    tokens.some((token) => token.endsWith('s')) &&
+    !canonicalName.includes("'"); // allow possessives/aliases like "King's Guard"
+  if (isPluralGroup) return false;
+
+  // Avoid sentence-like "names".
+  if (tokens.length > 6) return false;
+
+  return true;
+}
+
+function canonicalizeLocationName(name: string): {
+  canonicalName: string;
+  derivedAliases: string[];
+} {
+  const derivedAliases: string[] = [];
+  let canonicalName = safeTrim(name).replace(/\s+/g, ' ');
+  if (!canonicalName) {
+    return { canonicalName: '', derivedAliases };
+  }
+
+  const original = canonicalName;
+
+  const marketplaceEdgeMatch = canonicalName.match(/^(.*)\s+marketplace\s+edge$/i);
+  if (marketplaceEdgeMatch?.[1]) {
+    derivedAliases.push(original);
+    canonicalName = `${safeTrim(marketplaceEdgeMatch[1])} marketplace`;
+  }
+
+  const edgeMatch = canonicalName.match(/^(.*)\s+edge$/i);
+  if (edgeMatch?.[1]) {
+    derivedAliases.push(original);
+    canonicalName = safeTrim(edgeMatch[1]);
+  }
+
+  return { canonicalName, derivedAliases };
+}
+
+const MAX_EVENTS_PER_EXTRACTION = 3;
 
 /**
  * Fact validation structure
@@ -305,7 +359,7 @@ export const useLoreStore = create<LoreStore>()(
           };
         },
 
-          addStructuredLore: (extraction, worldId, sessionId) => {
+	        addStructuredLore: (extraction, worldId, sessionId) => {
           console.log('[LoreStore] addStructuredLore called:', {
             worldId,
             sessionId,
@@ -328,7 +382,9 @@ export const useLoreStore = create<LoreStore>()(
 
           const addedCount = { characters: 0, locations: 0, events: 0, rules: 0 };
 
-          extraction.characters.forEach((char) => {
+          extraction.characters
+            .filter((char) => shouldStoreExtractedCharacterName(char.name))
+            .forEach((char) => {
             const key = generateLoreKey(worldId, 'character', char.name);
             if (!existingKeys.has(key)) {
               const factId = addFact(
@@ -368,11 +424,21 @@ export const useLoreStore = create<LoreStore>()(
           });
 
           extraction.locations.forEach((loc) => {
-            const key = generateLoreKey(worldId, 'location', loc.name);
+            const { canonicalName, derivedAliases } = canonicalizeLocationName(loc.name);
+            if (!canonicalName) {
+              return;
+            }
+
+            const key = generateLoreKey(worldId, 'location', canonicalName);
+            const aliasesToApply = [
+              ...(Array.isArray(loc.aliases) ? loc.aliases : []),
+              ...derivedAliases,
+            ].filter(Boolean);
+
             if (!existingKeys.has(key)) {
               const factId = addFact(
                 key,
-                loc.name,
+                canonicalName,
                 'locations',
                 'narrative',
                 worldId,
@@ -386,27 +452,64 @@ export const useLoreStore = create<LoreStore>()(
               );
 
               // Add aliases if extracted by AI
-              if (loc.aliases && loc.aliases.length > 0 && factId) {
-                setAliases(factId, loc.aliases);
+              if (aliasesToApply.length > 0 && factId) {
+                setAliases(factId, aliasesToApply);
               }
               addedCount.locations++;
               console.log('[LoreStore] Added location fact:', {
-                name: loc.name,
+                name: canonicalName,
                 key,
                 factId,
               });
             } else {
               const existing = existingFactsByKey.get(key);
-              if (existing && loc.aliases && loc.aliases.length > 0) {
+              if (existing && aliasesToApply.length > 0) {
                 setAliases(existing.id, [
                   ...(existing.aliases || []),
-                  ...loc.aliases,
+                  ...aliasesToApply,
                 ]);
               }
             }
           });
 
-          extraction.events.forEach((event) => {
+          const existingEventValues = new Set(
+            existingFacts
+              .filter((fact) => fact.category === 'events')
+              .map((fact) => normalizeText(fact.value, NORM_NAME).toLowerCase())
+              .filter(Boolean)
+          );
+
+          const importanceRank = (importance?: string) => {
+            if (importance === 'high') return 3;
+            if (importance === 'medium') return 2;
+            if (importance === 'low') return 1;
+            return 0;
+          };
+
+          const eventCandidates = extraction.events
+            .filter((event) => typeof event.description === 'string' && safeTrim(event.description).length > 0)
+            .sort((a, b) => {
+              const rankDiff = importanceRank(b.importance as string | undefined) - importanceRank(a.importance as string | undefined);
+              if (rankDiff !== 0) return rankDiff;
+              return safeTrim(b.description).length - safeTrim(a.description).length;
+            });
+
+          const addedEventValues = new Set<string>();
+          let eventsAdded = 0;
+
+          eventCandidates.forEach((event) => {
+            if (eventsAdded >= MAX_EVENTS_PER_EXTRACTION) {
+              return;
+            }
+
+            const normalizedDescription = normalizeText(event.description, NORM_NAME).toLowerCase();
+            if (!normalizedDescription) {
+              return;
+            }
+            if (existingEventValues.has(normalizedDescription) || addedEventValues.has(normalizedDescription)) {
+              return;
+            }
+
             const key = generateLoreKey(worldId, 'event', event.description, 30);
             if (!existingKeys.has(key)) {
               addFact(key, event.description, 'events', 'narrative', worldId, sessionId, {
@@ -415,6 +518,8 @@ export const useLoreStore = create<LoreStore>()(
                 relatedEntities: event.relatedEntities,
               });
               addedCount.events++;
+              eventsAdded++;
+              addedEventValues.add(normalizedDescription);
               console.log('[LoreStore] Added event fact:', { description: event.description, key });
             }
           });
