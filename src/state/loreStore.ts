@@ -323,7 +323,7 @@ export const useLoreStore = create<LoreStore>()(
           const existingKeys = new Set(existingFacts.map((fact) => fact.key));
           console.log('[LoreStore] Existing facts count:', existingFacts.length);
 
-          let addedCount = { characters: 0, locations: 0, events: 0, rules: 0 };
+          const addedCount = { characters: 0, locations: 0, events: 0, rules: 0 };
 
           extraction.characters.forEach((char) => {
             const key = generateLoreKey(worldId, 'character', char.name);
