@@ -25,18 +25,24 @@ export async function extractStructuredLore(
     // Try to parse the JSON response
     const jsonMatch = response.content.match(/```json\s*([\s\S]*?)\s*```/);
     if (!jsonMatch) {
-      // If no JSON block found, try fallback mock extraction for testing
-      console.warn('No JSON block found in AI response, using mock extraction for testing');
-      return createMockExtraction(narrativeText);
+      if (process.env.NODE_ENV !== 'production') {
+        // If no JSON block found, try fallback mock extraction for testing/dev
+        console.warn('No JSON block found in AI response, using mock extraction for testing/dev');
+        return createMockExtraction(narrativeText);
+      }
+      return getEmptyExtraction();
     }
 
     const extractedLore = JSON.parse(jsonMatch[1]) as StructuredLoreExtraction;
     return validateAndCleanExtraction(extractedLore);
     
   } catch (error) {
-    console.warn('Failed to extract structured lore:', error);
-    // Fallback to mock extraction for demonstration
-    return createMockExtraction(narrativeText);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Failed to extract structured lore:', error);
+      // Fallback to mock extraction for demonstration/testing
+      return createMockExtraction(narrativeText);
+    }
+    return getEmptyExtraction();
   }
 }
 

@@ -1,13 +1,16 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default function DevLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  if (process.env.NODE_ENV === 'production') {
+    notFound();
+  }
+
   return (
     <main className="bg-gray-100 min-h-screen">
       <div className="container mx-auto p-4">

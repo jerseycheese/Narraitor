@@ -13,6 +13,7 @@ import {
   NarrativeGenerationResult,
   NarrativeSegment,
   GeneratedCharacterMetadata,
+  GenerationParameters,
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -873,7 +874,10 @@ Return ONLY the rewritten narrative.`;
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
       // Extract structured lore from generated narrative
-      if (response.content) {
+      if (
+        response.content &&
+        !request.generationParameters?.disableLoreExtractionProcessing
+      ) {
         try {
           const existingLoreContext = getLoreContextForPrompt(request.worldId);
           const structuredLore = await extractStructuredLore(
@@ -960,7 +964,8 @@ Return ONLY the rewritten narrative.`;
   async generateInitialScene(
     worldId: string,
     characterIds: string[],
-    sessionId?: string
+    sessionId?: string,
+    generationParameters?: GenerationParameters
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -1027,7 +1032,7 @@ Return ONLY the rewritten narrative.`;
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
       // Extract structured lore from initial scene
-      if (response.content) {
+      if (response.content && !generationParameters?.disableLoreExtractionProcessing) {
         try {
           const existingLoreContext = getLoreContextForPrompt(worldId);
           const structuredLore = await extractStructuredLore(

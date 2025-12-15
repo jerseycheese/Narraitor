@@ -638,7 +638,14 @@ Respond with JSON format:
         setTimeout(() => reject(new Error(`Initial generation timed out after ${timeoutMs}ms`)), timeoutMs);
       });
       const result = await Promise.race([
-        narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []),
+        narrativeGenerator.generateInitialScene(
+          worldId,
+          characterId ? [characterId] : [],
+          undefined,
+          {
+            disableLoreExtractionProcessing: process.env.NODE_ENV === 'production',
+          }
+        ),
         timeoutPromise as unknown as Promise<ReturnType<typeof narrativeGenerator.generateInitialScene>>,
       ]);
       
@@ -979,7 +986,8 @@ Respond with JSON format:
           desiredLength: 'short',
           decisionWeight,
           // Critical decisions with critical failures should have tragic tone
-          desiredTone: (decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure)) ? 'tragic' : undefined
+          desiredTone: (decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure)) ? 'tragic' : undefined,
+          disableLoreExtractionProcessing: process.env.NODE_ENV === 'production',
         }
       });
       

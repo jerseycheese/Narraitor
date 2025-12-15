@@ -285,6 +285,11 @@ export interface GenerationParameters {
    * existing items (e.g., item usage) where no new pickups should be recorded.
    */
   disableItemAcquisitionProcessing?: boolean;
+  /**
+   * When true, skips the second AI call that extracts structured lore entities
+   * from generated narrative content.
+   */
+  disableLoreExtractionProcessing?: boolean;
 }
 
 /**

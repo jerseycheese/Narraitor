@@ -305,7 +305,7 @@ export const useLoreStore = create<LoreStore>()(
           };
         },
 
-        addStructuredLore: (extraction, worldId, sessionId) => {
+          addStructuredLore: (extraction, worldId, sessionId) => {
           console.log('[LoreStore] addStructuredLore called:', {
             worldId,
             sessionId,
@@ -321,6 +321,9 @@ export const useLoreStore = create<LoreStore>()(
 
           const existingFacts = getFacts({ worldId });
           const existingKeys = new Set(existingFacts.map((fact) => fact.key));
+          const existingFactsByKey = new Map(
+            existingFacts.map((fact) => [fact.key, fact])
+          );
           console.log('[LoreStore] Existing facts count:', existingFacts.length);
 
           const addedCount = { characters: 0, locations: 0, events: 0, rules: 0 };
@@ -328,38 +331,78 @@ export const useLoreStore = create<LoreStore>()(
           extraction.characters.forEach((char) => {
             const key = generateLoreKey(worldId, 'character', char.name);
             if (!existingKeys.has(key)) {
-              const factId = addFact(key, char.name, 'characters', 'narrative', worldId, sessionId, {
-                description: char.description,
-                type: char.role,
-                importance: char.importance || 'medium',
-                tags: char.tags,
-              });
+              const factId = addFact(
+                key,
+                char.name,
+                'characters',
+                'narrative',
+                worldId,
+                sessionId,
+                {
+                  description: char.description,
+                  type: char.role,
+                  importance: char.importance || 'medium',
+                  tags: char.tags,
+                }
+              );
 
               // Add aliases if extracted by AI
               if (char.aliases && char.aliases.length > 0 && factId) {
                 setAliases(factId, char.aliases);
               }
               addedCount.characters++;
-              console.log('[LoreStore] Added character fact:', { name: char.name, key, factId });
+              console.log('[LoreStore] Added character fact:', {
+                name: char.name,
+                key,
+                factId,
+              });
+            } else {
+              const existing = existingFactsByKey.get(key);
+              if (existing && char.aliases && char.aliases.length > 0) {
+                setAliases(existing.id, [
+                  ...(existing.aliases || []),
+                  ...char.aliases,
+                ]);
+              }
             }
           });
 
           extraction.locations.forEach((loc) => {
             const key = generateLoreKey(worldId, 'location', loc.name);
             if (!existingKeys.has(key)) {
-              const factId = addFact(key, loc.name, 'locations', 'narrative', worldId, sessionId, {
-                description: loc.description,
-                type: loc.type,
-                importance: loc.importance || 'medium',
-                tags: loc.tags,
-              });
+              const factId = addFact(
+                key,
+                loc.name,
+                'locations',
+                'narrative',
+                worldId,
+                sessionId,
+                {
+                  description: loc.description,
+                  type: loc.type,
+                  importance: loc.importance || 'medium',
+                  tags: loc.tags,
+                }
+              );
 
               // Add aliases if extracted by AI
               if (loc.aliases && loc.aliases.length > 0 && factId) {
                 setAliases(factId, loc.aliases);
               }
               addedCount.locations++;
-              console.log('[LoreStore] Added location fact:', { name: loc.name, key, factId });
+              console.log('[LoreStore] Added location fact:', {
+                name: loc.name,
+                key,
+                factId,
+              });
+            } else {
+              const existing = existingFactsByKey.get(key);
+              if (existing && loc.aliases && loc.aliases.length > 0) {
+                setAliases(existing.id, [
+                  ...(existing.aliases || []),
+                  ...loc.aliases,
+                ]);
+              }
             }
           });
 
@@ -445,70 +488,101 @@ export const useLoreStore = create<LoreStore>()(
           return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         },
 
-        exportFacts: (worldId) => {
-          const facts = get().getFacts({ worldId });
-          const exportData = {
-            worldId,
-            exportedAt: getTimestamp(),
-            facts: facts.map((fact) => ({
-              key: fact.key,
-              value: fact.value,
-              category: fact.category,
-              source: fact.source,
-              metadata: fact.metadata,
-            })),
-          };
+          exportFacts: (worldId) => {
+            const facts = get().getFacts({ worldId });
+            const exportData = {
+              worldId,
+              exportedAt: getTimestamp(),
+              facts: facts.map((fact) => ({
+                key: fact.key,
+                value: fact.value,
+                aliases: Array.isArray(fact.aliases) ? fact.aliases : [],
+                category: fact.category,
+                source: fact.source,
+                metadata: fact.metadata,
+              })),
+            };
 
-          return JSON.stringify(exportData, null, 2);
-        },
+            return JSON.stringify(exportData, null, 2);
+          },
 
-        importFacts: (worldId, jsonData) => {
-          try {
-            const data = JSON.parse(jsonData);
-            const { addFact, validateFactUniqueness } = get();
+          importFacts: (worldId, jsonData) => {
+            try {
+              const data = JSON.parse(jsonData);
+              const { addFact, validateFactUniqueness, getFacts, setAliases } = get();
 
-            if (!data.facts || !Array.isArray(data.facts)) {
-              throw new Error('Invalid import data structure');
-            }
-
-            data.facts.forEach((fact: {
-              key: string;
-              value: string;
-              category: LoreCategory;
-              source?: LoreSource;
-              metadata?: {
-                description?: string;
-                importance?: 'low' | 'medium' | 'high';
-                tags?: string[];
-                relatedEntities?: string[];
-                type?: string;
-              };
-            }) => {
-              if (validateFactUniqueness(worldId, fact.key, fact.value)) {
-                addFact(
-                  fact.key,
-                  fact.value,
-                  fact.category,
-                  fact.source || 'manual',
-                  worldId,
-                  undefined,
-                  fact.metadata
-                );
+              if (!data.facts || !Array.isArray(data.facts)) {
+                throw new Error('Invalid import data structure');
               }
-            });
-          } catch (error) {
-            set({
-              error: createStoreError(
-                'Lore Import Failed',
-                error instanceof Error ? error.message : 'Unknown import error occurred.',
-                ErrorType.SERVICE
-              ),
-            });
-            throw new Error(
-              `Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`
-            );
-          }
-        },
+
+              data.facts.forEach(
+                (fact: {
+                  key: string;
+                  value: string;
+                  aliases?: string[];
+                  category: LoreCategory;
+                  source?: LoreSource;
+                  metadata?: {
+                    description?: string;
+                    importance?: 'low' | 'medium' | 'high';
+                    tags?: string[];
+                    relatedEntities?: string[];
+                    type?: string;
+                  };
+                }) => {
+                  if (validateFactUniqueness(worldId, fact.key, fact.value)) {
+                    const createdId = addFact(
+                      fact.key,
+                      fact.value,
+                      fact.category,
+                      fact.source || 'manual',
+                      worldId,
+                      undefined,
+                      fact.metadata
+                    );
+                    if (
+                      createdId &&
+                      Array.isArray(fact.aliases) &&
+                      fact.aliases.length > 0
+                    ) {
+                      setAliases(createdId, fact.aliases);
+                    }
+                  } else if (
+                    Array.isArray(fact.aliases) &&
+                    fact.aliases.length > 0
+                  ) {
+                    // Merge aliases into the existing fact if present
+                    const existing = getFacts({ worldId }).find(
+                      (existingFact) =>
+                        existingFact.key === fact.key &&
+                        existingFact.value === fact.value
+                    );
+                    if (existing) {
+                      setAliases(existing.id, [
+                        ...(existing.aliases || []),
+                        ...fact.aliases,
+                      ]);
+                    }
+                  }
+                }
+              );
+            } catch (error) {
+              set({
+                error: createStoreError(
+                  'Lore Import Failed',
+                  error instanceof Error
+                    ? error.message
+                    : 'Unknown import error occurred.',
+                  ErrorType.SERVICE
+                ),
+              });
+              throw new Error(
+                `Failed to import facts for worldId "${worldId}": ${
+                  error instanceof Error ? error.message : String(error)
+                }`
+              );
+            }
+          },
 
         getFactHistory: (id) => {
           const history = get().factHistory[id];
