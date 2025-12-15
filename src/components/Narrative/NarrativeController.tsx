@@ -14,6 +14,10 @@ import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
 
+// Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts),
+// which otherwise can produce multiple AI calls and duplicate lore facts for the same session.
+const initialGenerationLocks = new Set<string>();
+
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
@@ -613,24 +617,29 @@ Respond with JSON format:
       return;
     }
 
-    // CHECK FIRST: Don't generate an initial scene if one already exists
-    // Do a fresh check of the store to get the latest state
-    const existingSegments = getSessionSegments(sessionId);
-    const hasAnySegments = existingSegments.length > 0;
-    
-    
-    // If we have ANY segments, this is a resumed session - don't generate initial narrative
-    if (hasAnySegments) {
-      setSegments(existingSegments);
-      setInitialGenerationCompleted(true);
-      setIsLoading(false);
+    const lockKey = String(sessionId);
+    if (initialGenerationLocks.has(lockKey)) {
       return;
     }
-    
-    setIsLoading(true);
-    setError(null);
-    
+    initialGenerationLocks.add(lockKey);
+
     try {
+      // CHECK FIRST: Don't generate an initial scene if one already exists
+      // Do a fresh check of the store to get the latest state
+      const existingSegments = getSessionSegments(sessionId);
+      const hasAnySegments = existingSegments.length > 0;
+
+      // If we have ANY segments, this is a resumed session - don't generate initial narrative
+      if (hasAnySegments) {
+        setSegments(existingSegments);
+        setInitialGenerationCompleted(true);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
       // Race AI generation with a timeout so we can fallback gracefully
       // Allow more time for first-call cold-starts and slower generation
       const timeoutMs = 15000;
@@ -748,6 +757,7 @@ Respond with JSON format:
         setError('Unable to generate narrative. Please check your connection and try again.');
       }
     } finally {
+      initialGenerationLocks.delete(lockKey);
       if (mountedRef.current) {
         setIsLoading(false);
       }
