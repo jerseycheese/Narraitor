@@ -14,10 +14,6 @@ import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
 
-// Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts),
-// which otherwise can produce multiple AI calls and duplicate lore facts for the same session.
-const initialGenerationLocks = new Set<string>();
-
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
@@ -88,6 +84,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const choiceGenerationInProgress = useRef(false);
   // Track if we've already suggested an ending for this session
   const endingSuggestedRef = useRef(false);
+  // Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts)
+  const initialGenerationLocksRef = useRef(new Set<string>());
 
   // Initialize component state on mount
   useEffect(() => {
@@ -112,6 +110,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
+      // Clear generation locks for this session to prevent memory leaks
+      initialGenerationLocksRef.current.delete(sessionId);
     };
   }, [sessionId, worldId, characterId]);
 
@@ -618,10 +618,10 @@ Respond with JSON format:
     }
 
     const lockKey = String(sessionId);
-    if (initialGenerationLocks.has(lockKey)) {
+    if (initialGenerationLocksRef.current.has(lockKey)) {
       return;
     }
-    initialGenerationLocks.add(lockKey);
+    initialGenerationLocksRef.current.add(lockKey);
 
     try {
       // CHECK FIRST: Don't generate an initial scene if one already exists
@@ -757,7 +757,7 @@ Respond with JSON format:
         setError('Unable to generate narrative. Please check your connection and try again.');
       }
     } finally {
-      initialGenerationLocks.delete(lockKey);
+      initialGenerationLocksRef.current.delete(lockKey);
       if (mountedRef.current) {
         setIsLoading(false);
       }

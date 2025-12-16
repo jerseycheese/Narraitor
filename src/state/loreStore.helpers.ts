@@ -1,0 +1,101 @@
+import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
+import { safeTrim } from '@/lib/utils';
+
+/**
+ * Maximum number of events to extract per narrative segment
+ * Prevents transcript-dump effect from overwhelming the lore store
+ */
+export const MAX_EVENTS_PER_EXTRACTION = 3;
+
+/**
+ * Helper function to generate normalized lore keys
+ */
+export function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
+  const normalizedName = normalizeText(name, NORM_NAME).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
+  return `${worldId}:${category}_${truncatedName}`;
+}
+
+/**
+ * Filters out generic/unnamed characters that shouldn't be stored as named entities
+ *
+ * Rejects:
+ * - Unnamed placeholders (e.g., "Unnamed warrior", "Unknown person")
+ * - Descriptive phrases (e.g., "Man with sword")
+ * - Plural/group entities (e.g., "guards", "villagers")
+ * - Sentence-like names (too many words)
+ *
+ * @param name - The character name to validate
+ * @returns true if the name should be stored, false otherwise
+ */
+export function shouldStoreExtractedCharacterName(name: string): boolean {
+  const canonicalName = safeTrim(name).replace(/\s+/g, ' ');
+  if (!canonicalName) return false;
+
+  const normalized = normalizeText(canonicalName, NORM_NAME).toLowerCase();
+  if (!normalized) return false;
+
+  // Explicitly reject unnamed placeholders and descriptive phrases.
+  if (normalized.startsWith('unnamed ') || normalized.startsWith('unknown ')) return false;
+  if (normalized.includes(' with ')) return false;
+
+  // Reject obvious group/plural entities (usually not a stable, named character).
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  const isPluralGroup =
+    tokens.length <= 3 &&
+    tokens.some((token) => token.endsWith('s')) &&
+    !canonicalName.includes("'"); // allow possessives/aliases like "King's Guard"
+  if (isPluralGroup) return false;
+
+  // Avoid sentence-like "names".
+  if (tokens.length > 6) return false;
+
+  return true;
+}
+
+/**
+ * Canonicalizes location names to prevent fragmentation
+ *
+ * Collapses micro-locations into their parent location:
+ * - "X marketplace edge" → "X marketplace" (with "X marketplace edge" as alias)
+ * - "X edge" → "X" (with "X edge" as alias)
+ *
+ * @param name - The location name to canonicalize
+ * @returns Object with canonicalName and derivedAliases
+ */
+export function canonicalizeLocationName(name: string): {
+  canonicalName: string;
+  derivedAliases: string[];
+} {
+  const derivedAliases: string[] = [];
+  let canonicalName = safeTrim(name).replace(/\s+/g, ' ');
+  if (!canonicalName) {
+    return { canonicalName: '', derivedAliases };
+  }
+
+  const original = canonicalName;
+
+  const marketplaceEdgeMatch = canonicalName.match(/^(.*)\s+marketplace\s+edge$/i);
+  if (marketplaceEdgeMatch?.[1]) {
+    derivedAliases.push(original);
+    canonicalName = `${safeTrim(marketplaceEdgeMatch[1])} marketplace`;
+  }
+
+  const edgeMatch = canonicalName.match(/^(.*)\s+edge$/i);
+  if (edgeMatch?.[1]) {
+    derivedAliases.push(original);
+    canonicalName = safeTrim(edgeMatch[1]);
+  }
+
+  return { canonicalName, derivedAliases };
+}
+
+/**
+ * Ranks importance levels for sorting
+ */
+export function importanceRank(importance?: string): number {
+  if (importance === 'high') return 3;
+  if (importance === 'medium') return 2;
+  if (importance === 'low') return 1;
+  return 0;
+}
