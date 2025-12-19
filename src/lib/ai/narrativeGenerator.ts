@@ -875,6 +875,11 @@ Return ONLY the rewritten narrative.`;
       // Extract structured lore from generated narrative (dev/test only for MVP)
       if (response.content && process.env.NODE_ENV !== 'production') {
         try {
+          logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
+            worldId: request.worldId,
+            sessionId: request.sessionId,
+            contentLength: response.content.length
+          });
           const existingLoreContext = getLoreContextForPrompt(request.worldId);
           const structuredLore = await extractStructuredLore(
             response.content,
@@ -1029,6 +1034,11 @@ Return ONLY the rewritten narrative.`;
       // Extract structured lore from initial scene (dev/test only for MVP)
       if (response.content && process.env.NODE_ENV !== 'production') {
         try {
+          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
+            worldId,
+            sessionId,
+            contentLength: response.content.length
+          });
           const existingLoreContext = getLoreContextForPrompt(worldId);
           const structuredLore = await extractStructuredLore(
             response.content,

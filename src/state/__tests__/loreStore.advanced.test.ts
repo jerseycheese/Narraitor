@@ -255,6 +255,120 @@ describe('LoreStore - Advanced Features', () => {
       expect(locationFact?.aliases).toContain('Vaes Leisi marketplace edge');
     });
 
+    test('should canonicalize "Under X" to "X"', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [
+          { name: 'Under Derry', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const locationFact = facts.find((fact) => fact.category === 'locations');
+
+      expect(locationFact?.value).toBe('Derry');
+      expect(locationFact?.aliases).toContain('Under Derry');
+    });
+
+    test('should canonicalize "Sewers beneath X" to "X sewers"', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [
+          { name: 'Sewers beneath Derry', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const locationFact = facts.find((fact) => fact.category === 'locations');
+
+      expect(locationFact?.value).toBe('Derry sewers');
+      expect(locationFact?.aliases).toContain('Sewers beneath Derry');
+    });
+
+    test('should canonicalize "The X" to "X"', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [
+          { name: 'The marketplace', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const locationFact = facts.find((fact) => fact.category === 'locations');
+
+      expect(locationFact?.value).toBe('marketplace');
+      expect(locationFact?.aliases).toContain('The marketplace');
+    });
+
+    test('should merge multiple location variants into canonical form', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      // Simulate multiple extractions with different location variants
+      const extraction1 = {
+        characters: [],
+        locations: [
+          { name: 'Under Derry', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      const extraction2 = {
+        characters: [],
+        locations: [
+          { name: 'Sewers beneath Derry', importance: 'medium' as const },
+        ],
+        events: [],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction1, 'test-world', 'session-1');
+        result.current.addStructuredLore(extraction2, 'test-world', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'test-world' });
+      const locationFacts = facts.filter((fact) => fact.category === 'locations');
+
+      // Should only have 2 canonical locations, not 2 separate ones
+      expect(locationFacts.length).toBe(2);
+
+      // Check that both "Derry" and "Derry sewers" exist
+      const derryFact = locationFacts.find(f => f.value === 'Derry');
+      const derrySewersFact = locationFacts.find(f => f.value === 'Derry sewers');
+
+      expect(derryFact).toBeDefined();
+      expect(derrySewersFact).toBeDefined();
+
+      // Check aliases
+      expect(derryFact?.aliases).toContain('Under Derry');
+      expect(derrySewersFact?.aliases).toContain('Sewers beneath Derry');
+    });
+
     test('should cap extracted events per extraction', () => {
       const { result } = renderHook(() => useLoreStore());
 

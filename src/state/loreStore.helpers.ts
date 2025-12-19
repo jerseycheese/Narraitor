@@ -75,12 +75,35 @@ export function canonicalizeLocationName(name: string): {
 
   const original = canonicalName;
 
+  // "The X" → "X" (e.g., "The sewers" → "sewers")
+  const theMatch = canonicalName.match(/^The\s+(.+)$/i);
+  if (theMatch?.[1]) {
+    derivedAliases.push(original);
+    canonicalName = safeTrim(theMatch[1]);
+  }
+
+  // "Under X" / "Beneath X" / "Inside X" / "Within X" → "X" (e.g., "Under Derry" → "Derry")
+  const prepMatch = canonicalName.match(/^(Under|Beneath|Inside|Within)\s+(.+)$/i);
+  if (prepMatch?.[2]) {
+    derivedAliases.push(original);
+    canonicalName = safeTrim(prepMatch[2]);
+  }
+
+  // "Sewers beneath X" / "Tunnels under X" → "X sewers/tunnels"
+  const locTypeMatch = canonicalName.match(/^(Sewers|Tunnels|Caves|Catacombs)\s+(beneath|under|of)\s+(.+)$/i);
+  if (locTypeMatch?.[1] && locTypeMatch?.[3]) {
+    derivedAliases.push(original);
+    canonicalName = `${safeTrim(locTypeMatch[3])} ${locTypeMatch[1].toLowerCase()}`;
+  }
+
+  // "X marketplace edge" → "X marketplace"
   const marketplaceEdgeMatch = canonicalName.match(/^(.*)\s+marketplace\s+edge$/i);
   if (marketplaceEdgeMatch?.[1]) {
     derivedAliases.push(original);
     canonicalName = `${safeTrim(marketplaceEdgeMatch[1])} marketplace`;
   }
 
+  // "X edge" → "X"
   const edgeMatch = canonicalName.match(/^(.*)\s+edge$/i);
   if (edgeMatch?.[1]) {
     derivedAliases.push(original);

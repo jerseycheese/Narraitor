@@ -65,11 +65,17 @@ Categories to extract:
 
 Rate importance as 'low', 'medium', or 'high' based on narrative significance.
 
+**ANTI-HALLUCINATION RULE**:
+- ONLY extract entities that are EXPLICITLY MENTIONED in the narrative text below.
+- DO NOT use your world knowledge or training data to infer entities.
+- DO NOT add characters, locations, or events from the genre/setting that aren't directly stated.
+- If you recognize the setting (e.g., Derry, Middle-earth), extract ONLY what appears in THIS specific narrative segment.
+
 CRITICAL QUALITY RULES:
 - Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
 - If a person is unnamed, keep it as part of an event description instead of a character entity.
 - Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
-- Keep events concise and non-redundant: include at most 3 high-signal events that add lasting story state.
+- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.
 
 Narrative Text:
 ${narrativeText}${existingContext}
@@ -288,7 +294,10 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
     });
   }
 
-  // Simple events extraction
+  // Simple events extraction - DISABLED to prevent generic hallucinations
+  // These triggers are too broad and create events that weren't in the narrative
+  // Better to extract zero events than incorrect ones
+  /*
   if (narrativeText.toLowerCase().includes('enter') || narrativeText.toLowerCase().includes('approach')) {
     extraction.events.push({
       description: 'Character arrives at a new location',
@@ -304,6 +313,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       importance: 'high'
     });
   }
+  */
 
   return extraction;
 }
