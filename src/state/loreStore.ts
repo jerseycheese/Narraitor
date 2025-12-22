@@ -23,6 +23,7 @@ import {
   findEntityByAnyNameImpl,
   type AliasManagementContext,
 } from './loreStore.aliases';
+import { importanceRank } from './loreStore.helpers';
 import { exportFactsImpl, importFactsImpl, type ImportExportContext } from './loreStore.import-export';
 import {
   cleanupOldFactsImpl,
@@ -269,10 +270,25 @@ export const useLoreStore = create<LoreStore>()(
         }));
       },
 
-      getLoreContext: (worldId, limit = 10) => {
+      getLoreContext: (worldId, limit = 20) => {
         const worldFacts = get().getFacts({ worldId });
-        const recentFacts = worldFacts.slice(0, limit);
-        const factStrings = recentFacts.map((fact) => `${fact.category}: ${fact.key} = ${fact.value}`);
+
+        // Sort by importance (high to low), then by recency within same importance
+        const sortedFacts = worldFacts.sort((a, b) => {
+          const rankA = importanceRank(a.metadata?.importance);
+          const rankB = importanceRank(b.metadata?.importance);
+
+          // Primary sort: importance (descending)
+          if (rankA !== rankB) {
+            return rankB - rankA; // Higher importance first
+          }
+
+          // Secondary sort: recency (descending) for same importance
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+        const selectedFacts = sortedFacts.slice(0, limit);
+        const factStrings = selectedFacts.map((fact) => `${fact.category}: ${fact.key} = ${fact.value}`);
         return { facts: factStrings, factCount: factStrings.length };
       },
 
