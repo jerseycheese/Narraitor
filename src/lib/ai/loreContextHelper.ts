@@ -16,12 +16,6 @@ export function getLoreContextForPrompt(worldId: EntityID): string {
     return '';
   }
 
-  // Log the lore context order for debugging
-  console.log('[LoreContext] Facts sent to AI (in importance order):', {
-    count: context.factCount,
-    facts: context.facts
-  });
-
   return `\nEstablished World Facts:\n${context.facts.join('\n')}\n`;
 }
 
