@@ -22,6 +22,7 @@ const sampleFacts: LoreFact[] = [
     id: 'fact-1',
     key: 'hero_name',
     value: 'Lyra Starweaver',
+    aliases: [],
     category: 'characters',
     source: 'manual',
     worldId: 'world-1',
@@ -32,6 +33,7 @@ const sampleFacts: LoreFact[] = [
     id: 'fact-2',
     key: 'tavern_location',
     value: 'The Prancing Pony',
+    aliases: [],
     category: 'locations',
     source: 'narrative',
     worldId: 'world-1',
@@ -43,6 +45,7 @@ const sampleFacts: LoreFact[] = [
     id: 'fact-3',
     key: 'quest_start',
     value: 'Heroes met at the tavern',
+    aliases: [],
     category: 'events',
     source: 'narrative',
     worldId: 'world-1',
@@ -54,6 +57,7 @@ const sampleFacts: LoreFact[] = [
     id: 'fact-4',
     key: 'magic_cost',
     value: 'All magic requires sacrifice',
+    aliases: [],
     category: 'rules',
     source: 'manual',
     worldId: 'world-1',
@@ -69,7 +73,7 @@ describe('LoreViewer Component', () => {
 
   test('displays facts grouped by category', () => {
     mockGetFacts.mockReturnValue(sampleFacts);
-    
+
     render(<LoreViewer worldId="world-1" />);
 
     // Check category headings are present
@@ -79,9 +83,7 @@ describe('LoreViewer Component', () => {
     expect(screen.getByText('World Rules')).toBeInTheDocument();
 
     // Check facts are displayed
-    expect(screen.getByText('hero_name:')).toBeInTheDocument();
     expect(screen.getByText('Lyra Starweaver')).toBeInTheDocument();
-    expect(screen.getByText('tavern_location:')).toBeInTheDocument();
     expect(screen.getByText('The Prancing Pony')).toBeInTheDocument();
   });
 
@@ -96,7 +98,7 @@ describe('LoreViewer Component', () => {
 
   test('filters facts by session when sessionId is provided', () => {
     mockGetFacts.mockReturnValue([sampleFacts[1], sampleFacts[2]]); // Only session facts
-    
+
     render(<LoreViewer worldId="world-1" sessionId="session-1" />);
 
     // Should call getFacts with session filter
@@ -106,9 +108,9 @@ describe('LoreViewer Component', () => {
     });
 
     // Check that only session facts are displayed
-    expect(screen.getByText('tavern_location:')).toBeInTheDocument();
-    expect(screen.getByText('quest_start:')).toBeInTheDocument();
-    expect(screen.queryByText('hero_name:')).not.toBeInTheDocument();
+    expect(screen.getByText('The Prancing Pony')).toBeInTheDocument();
+    expect(screen.getByText('Heroes met at the tavern')).toBeInTheDocument();
+    expect(screen.queryByText('Lyra Starweaver')).not.toBeInTheDocument();
   });
 
   test('displays total fact count', () => {

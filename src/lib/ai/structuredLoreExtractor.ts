@@ -25,18 +25,24 @@ export async function extractStructuredLore(
     // Try to parse the JSON response
     const jsonMatch = response.content.match(/```json\s*([\s\S]*?)\s*```/);
     if (!jsonMatch) {
-      // If no JSON block found, try fallback mock extraction for testing
-      console.warn('No JSON block found in AI response, using mock extraction for testing');
-      return createMockExtraction(narrativeText);
+      if (process.env.NODE_ENV !== 'production') {
+        // If no JSON block found, try fallback mock extraction for testing/dev
+        console.warn('No JSON block found in AI response, using mock extraction for testing/dev');
+        return createMockExtraction(narrativeText);
+      }
+      return getEmptyExtraction();
     }
 
     const extractedLore = JSON.parse(jsonMatch[1]) as StructuredLoreExtraction;
     return validateAndCleanExtraction(extractedLore);
     
   } catch (error) {
-    console.warn('Failed to extract structured lore:', error);
-    // Fallback to mock extraction for demonstration
-    return createMockExtraction(narrativeText);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Failed to extract structured lore:', error);
+      // Fallback to mock extraction for demonstration/testing
+      return createMockExtraction(narrativeText);
+    }
+    return getEmptyExtraction();
   }
 }
 
@@ -52,12 +58,24 @@ Extract only NEW or SIGNIFICANT information that would be important for maintain
 
 Categories to extract:
 - **Characters**: Named individuals with their roles/descriptions
-- **Locations**: Named places with types and descriptions  
+- **Locations**: Named places with types and descriptions
 - **Events**: Significant happenings that should be remembered
 - **Rules**: Game mechanics, magic systems, or world rules mentioned
 - **Relationships**: Important connections between entities (optional)
 
 Rate importance as 'low', 'medium', or 'high' based on narrative significance.
+
+**ANTI-HALLUCINATION RULE**:
+- ONLY extract entities that are EXPLICITLY MENTIONED in the narrative text below.
+- DO NOT use your world knowledge or training data to infer entities.
+- DO NOT add characters, locations, or events from the genre/setting that aren't directly stated.
+- If you recognize the setting (e.g., Derry, Middle-earth), extract ONLY what appears in THIS specific narrative segment.
+
+CRITICAL QUALITY RULES:
+- Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
+- If a person is unnamed, keep it as part of an event description instead of a character entity.
+- Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
+- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.
 
 Narrative Text:
 ${narrativeText}${existingContext}
@@ -69,6 +87,7 @@ Respond with ONLY a JSON block in this exact format:
   "characters": [
     {
       "name": "Character Name",
+      "aliases": ["Nickname", "Title", "Alternative Name"],
       "description": "Brief description",
       "role": "their role/title",
       "importance": "low|medium|high",
@@ -77,7 +96,8 @@ Respond with ONLY a JSON block in this exact format:
   ],
   "locations": [
     {
-      "name": "Location Name", 
+      "name": "Location Name",
+      "aliases": ["Common name", "Local nickname"],
       "type": "city|tavern|forest|etc",
       "description": "Brief description",
       "importance": "low|medium|high",
@@ -88,7 +108,7 @@ Respond with ONLY a JSON block in this exact format:
     {
       "description": "What happened",
       "significance": "Why it matters",
-      "importance": "low|medium|high", 
+      "importance": "low|medium|high",
       "relatedEntities": ["entity1", "entity2"]
     }
   ],
@@ -103,13 +123,15 @@ Respond with ONLY a JSON block in this exact format:
   "relationships": [
     {
       "from": "Entity 1",
-      "to": "Entity 2", 
+      "to": "Entity 2",
       "type": "ally|enemy|mentor|etc",
       "description": "Nature of relationship"
     }
   ]
 }
-\`\`\``;
+\`\`\`
+
+**Note on aliases**: Include alternative names, nicknames, titles, or other ways the character or location is referred to in the narrative. Use the most formal/full name as the canonical "name" field.`;
 }
 
 /**
@@ -131,6 +153,8 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
       .filter((char) => char.name && typeof char.name === 'string')
       .map((char) => ({
         name: (char.name as string).trim(),
+        aliases: Array.isArray(char.aliases) ?
+          (char.aliases as unknown[]).filter((a) => typeof a === 'string').map(a => (a as string).trim()) : undefined,
         description: typeof char.description === 'string' ? char.description.trim() : undefined,
         role: typeof char.role === 'string' ? char.role.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(char.importance as string) ? char.importance as 'low' | 'medium' | 'high' : 'medium',
@@ -144,6 +168,8 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
       .filter((loc) => loc.name && typeof loc.name === 'string')
       .map((loc) => ({
         name: (loc.name as string).trim(),
+        aliases: Array.isArray(loc.aliases) ?
+          (loc.aliases as unknown[]).filter((a) => typeof a === 'string').map(a => (a as string).trim()) : undefined,
         type: typeof loc.type === 'string' ? loc.type.trim() : undefined,
         description: typeof loc.description === 'string' ? loc.description.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(loc.importance as string) ? loc.importance as 'low' | 'medium' | 'high' : 'medium',
@@ -224,8 +250,9 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       const name = match.trim();
       extraction.characters.push({
         name,
+        aliases: [], // Empty aliases for mock extraction
         description: 'Character mentioned in narrative',
-        role: match.toLowerCase().includes('sir') ? 'Knight' : 
+        role: match.toLowerCase().includes('sir') ? 'Knight' :
               match.toLowerCase().includes('lady') ? 'Noble' :
               match.toLowerCase().includes('captain') ? 'Military Officer' : 'Person of importance',
         importance: 'medium'
@@ -240,6 +267,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       const name = match.trim();
       extraction.locations.push({
         name,
+        aliases: [], // Empty aliases for mock extraction
         description: 'Location mentioned in narrative',
         type: match.toLowerCase().includes('temple') ? 'religious site' :
               match.toLowerCase().includes('tavern') ? 'establishment' :
@@ -257,6 +285,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       if (nameMatch) {
         extraction.locations.push({
           name: nameMatch[1],
+          aliases: [], // Empty aliases for mock extraction
           description: 'Settlement mentioned in narrative',
           type: 'city',
           importance: 'high'
@@ -265,7 +294,10 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
     });
   }
 
-  // Simple events extraction
+  // Simple events extraction - DISABLED to prevent generic hallucinations
+  // These triggers are too broad and create events that weren't in the narrative
+  // Better to extract zero events than incorrect ones
+  /*
   if (narrativeText.toLowerCase().includes('enter') || narrativeText.toLowerCase().includes('approach')) {
     extraction.events.push({
       description: 'Character arrives at a new location',
@@ -281,6 +313,7 @@ function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
       importance: 'high'
     });
   }
+  */
 
   return extraction;
 }

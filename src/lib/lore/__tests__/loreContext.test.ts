@@ -17,7 +17,7 @@ describe('buildLoreContext', () => {
 
     it('handles invalid facts gracefully', () => {
       const invalidFacts = [
-        { id: 'invalid1', key: 'unknown_fact', category: 'unknown' as 'characters', value: 'Invalid fact', source: 'manual' as const, worldId: 'world1', sessionId: 'session1', createdAt: getTimestamp(), updatedAt: getTimestamp() }
+        { id: 'invalid1', key: 'unknown_fact', category: 'unknown' as 'characters', value: 'Invalid fact', aliases: [], source: 'manual' as const, worldId: 'world1', sessionId: 'session1', createdAt: getTimestamp(), updatedAt: getTimestamp() }
       ];
       
       const result = buildLoreContext(invalidFacts);
@@ -40,6 +40,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_aragorn',
           value: 'Aragorn - skilled ranger and the rightful king of Gondor. He is brave and loyal.',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -66,6 +67,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_legolas',
           value: 'Legolas - elf',
           source: 'narrative',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -94,6 +96,7 @@ describe('buildLoreContext', () => {
           key: 'world1:location_rivendell',
           value: 'Rivendell - peaceful elven refuge hidden in the mountains',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -120,6 +123,7 @@ describe('buildLoreContext', () => {
           key: 'world1:location_mordor',
           value: 'Mordor - dark',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -148,6 +152,7 @@ describe('buildLoreContext', () => {
           key: 'world1:rule_magic',
           value: 'Magic requires great concentration and can drain the user\'s energy.',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -175,6 +180,7 @@ describe('buildLoreContext', () => {
           key: 'world1:event_war_of_ring',
           value: 'The War of the Ring ended with the destruction of the One Ring.',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -202,6 +208,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_gandalf',
           value: 'Gandalf - wise wizard',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -213,6 +220,7 @@ describe('buildLoreContext', () => {
           key: 'world1:location_hobbiton',
           value: 'Hobbiton - peaceful village',
           source: 'narrative',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -224,6 +232,7 @@ describe('buildLoreContext', () => {
           key: 'world1:rule_hobbits',
           value: 'Hobbits have natural resistance to corruption.',
           source: 'narrative',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -249,6 +258,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_high',
           value: 'High - importance character',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -260,6 +270,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_medium',
           value: 'Medium - importance character',
           source: 'narrative',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),
@@ -271,6 +282,7 @@ describe('buildLoreContext', () => {
           key: 'world1:character_low',
           value: 'Low - importance character',
           source: 'manual',
+      aliases: [],
           worldId: 'world1',
           sessionId: 'session1',
           createdAt: getTimestamp(),

@@ -23,6 +23,7 @@ export interface LoreFact extends TimestampedEntity {
   category: LoreCategory;
   key: string;      // Descriptive key for human reference (e.g., "world-123:character_lady_seraphina")
   value: string;    // The fact content (canonical name)
+  aliases: string[]; // Alternative names/references for this entity
   source: LoreSource;
   sessionId?: EntityID; // Which game session this fact came from
   worldId: EntityID;
@@ -59,6 +60,7 @@ export interface LoreContext {
 export interface StructuredLoreExtraction {
   characters: Array<{
     name: string;
+    aliases?: string[]; // Alternative names this character is known by
     description?: string;
     role?: string;
     importance?: 'low' | 'medium' | 'high';
@@ -66,6 +68,7 @@ export interface StructuredLoreExtraction {
   }>;
   locations: Array<{
     name: string;
+    aliases?: string[]; // Alternative names for this location
     type?: string; // city, tavern, forest, etc.
     description?: string;
     importance?: 'low' | 'medium' | 'high';

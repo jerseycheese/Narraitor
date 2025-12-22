@@ -84,6 +84,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const choiceGenerationInProgress = useRef(false);
   // Track if we've already suggested an ending for this session
   const endingSuggestedRef = useRef(false);
+  // Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts)
+  const initialGenerationLocksRef = useRef(new Set<string>());
 
   // Initialize component state on mount
   useEffect(() => {
@@ -108,6 +110,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
+      // Clear generation locks for this session to prevent memory leaks
+      initialGenerationLocksRef.current.delete(sessionId);
     };
   }, [sessionId, worldId, characterId]);
 
@@ -204,7 +208,7 @@ Respond with JSON format:
   "suggestEnding": true/false,
   "confidence": "high" | "medium" | "low",
   "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-  "reason": "Clear explanation of why this is/isn't a good ending point"
+  "reason": "Short user-facing message (1-2 sentences max) about why this is a good ending point. Be concise and direct."
 }`;
 
       const response = await client.generateContent(analysisPrompt);
@@ -613,24 +617,29 @@ Respond with JSON format:
       return;
     }
 
-    // CHECK FIRST: Don't generate an initial scene if one already exists
-    // Do a fresh check of the store to get the latest state
-    const existingSegments = getSessionSegments(sessionId);
-    const hasAnySegments = existingSegments.length > 0;
-    
-    
-    // If we have ANY segments, this is a resumed session - don't generate initial narrative
-    if (hasAnySegments) {
-      setSegments(existingSegments);
-      setInitialGenerationCompleted(true);
-      setIsLoading(false);
+    const lockKey = String(sessionId);
+    if (initialGenerationLocksRef.current.has(lockKey)) {
       return;
     }
-    
-    setIsLoading(true);
-    setError(null);
-    
+    initialGenerationLocksRef.current.add(lockKey);
+
     try {
+      // CHECK FIRST: Don't generate an initial scene if one already exists
+      // Do a fresh check of the store to get the latest state
+      const existingSegments = getSessionSegments(sessionId);
+      const hasAnySegments = existingSegments.length > 0;
+
+      // If we have ANY segments, this is a resumed session - don't generate initial narrative
+      if (hasAnySegments) {
+        setSegments(existingSegments);
+        setInitialGenerationCompleted(true);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
       // Race AI generation with a timeout so we can fallback gracefully
       // Allow more time for first-call cold-starts and slower generation
       const timeoutMs = 15000;
@@ -748,6 +757,7 @@ Respond with JSON format:
         setError('Unable to generate narrative. Please check your connection and try again.');
       }
     } finally {
+      initialGenerationLocksRef.current.delete(lockKey);
       if (mountedRef.current) {
         setIsLoading(false);
       }

@@ -69,7 +69,17 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
             <ul className="space-y-2">
               {categoryFacts.map(fact => (
                 <li key={fact.id} className="text-sm">
-                  <span className="font-medium">{fact.key}:</span> {fact.value}
+                  <span className="font-medium">{fact.value}</span>
+                  {fact.aliases && fact.aliases.length > 0 && (
+                    <span className="text-muted-foreground text-xs ml-2">
+                      (also: {fact.aliases.join(', ')})
+                    </span>
+                  )}
+                  {fact.metadata?.description && (
+                    <p className="text-muted-foreground text-xs mt-1">
+                      {fact.metadata.description}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>
