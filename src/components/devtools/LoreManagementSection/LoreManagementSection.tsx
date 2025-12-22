@@ -180,39 +180,60 @@ export const LoreManagementSection: React.FC = () => {
                       {category.charAt(0).toUpperCase() + category.slice(1)}
                     </h3>
                     <div className="space-y-2">
-                      {categoryFacts.map(fact => (
-                        <div
-                          key={fact.id}
-                          className="flex items-center justify-between p-2 bg-gray-100 rounded hover:bg-gray-100 cursor-pointer"
-                          onClick={() => setSelectedFactId(fact.id)}
-                        >
-                          <div className="flex-1">
-                            <span>{fact.value}</span>
+                      {categoryFacts.map(fact => {
+                        const importance = fact.metadata?.importance;
+                        const importanceBadge = importance ? (
+                          <span
+                            className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                              importance === 'high' ? 'bg-red-100 text-red-800' :
+                              importance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                              importance === 'low' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-200 text-gray-600'
+                            }`}
+                          >
+                            {importance.toUpperCase()}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-xs font-semibold rounded bg-gray-200 text-gray-600">
+                            NO IMPORTANCE
+                          </span>
+                        );
+
+                        return (
+                          <div
+                            key={fact.id}
+                            className="flex items-center justify-between p-2 bg-gray-100 rounded hover:bg-gray-100 cursor-pointer"
+                            onClick={() => setSelectedFactId(fact.id)}
+                          >
+                            <div className="flex-1 flex items-center gap-2">
+                              {importanceBadge}
+                              <span>{fact.value}</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedFactId(fact.id);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteFact(fact.id);
+                                }}
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedFactId(fact.id);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteFact(fact.id);
-                              }}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
@@ -260,24 +281,45 @@ export const LoreManagementSection: React.FC = () => {
 
             {/* Search Results */}
             <div className="space-y-2">
-              {facts.map(fact => (
-                <div
-                  key={fact.id}
-                  className="p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
-                  onClick={() => setSelectedFactId(fact.id)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-semibold ${categoryColors[fact.category]}`}>
-                      {fact.category}
-                    </span>
-                    <span className="font-mono text-sm">{fact.key}</span>
+              {facts.map(fact => {
+                const importance = fact.metadata?.importance;
+                const importanceBadge = importance ? (
+                  <span
+                    className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                      importance === 'high' ? 'bg-red-100 text-red-800' :
+                      importance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      importance === 'low' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {importance.toUpperCase()}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 text-xs font-semibold rounded bg-gray-200 text-gray-600">
+                    NO IMPORTANCE
+                  </span>
+                );
+
+                return (
+                  <div
+                    key={fact.id}
+                    className="p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setSelectedFactId(fact.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-semibold ${categoryColors[fact.category]}`}>
+                        {fact.category}
+                      </span>
+                      {importanceBadge}
+                      <span className="font-mono text-sm">{fact.key}</span>
+                    </div>
+                    <div className="mt-1">{fact.value}</div>
+                    {fact.metadata?.description && (
+                      <div className="text-sm text-gray-700 mt-1">{fact.metadata.description}</div>
+                    )}
                   </div>
-                  <div className="mt-1">{fact.value}</div>
-                  {fact.metadata?.description && (
-                    <div className="text-sm text-gray-700 mt-1">{fact.metadata.description}</div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </TabsContent>
 
