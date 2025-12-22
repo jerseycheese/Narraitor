@@ -872,14 +872,17 @@ Return ONLY the rewritten narrative.`;
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      // Extract structured lore from generated narrative (dev/test only for MVP)
-      if (response.content && process.env.NODE_ENV !== 'production') {
+      // Extract structured lore from generated narrative
+      if (response.content) {
         try {
-          logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
-            worldId: request.worldId,
-            sessionId: request.sessionId,
-            contentLength: response.content.length
-          });
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
+              worldId: request.worldId,
+              sessionId: request.sessionId,
+              contentLength: response.content.length
+            });
+          }
+
           const existingLoreContext = getLoreContextForPrompt(request.worldId);
           const structuredLore = await extractStructuredLore(
             response.content,
@@ -891,15 +894,17 @@ Return ONLY the rewritten narrative.`;
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, request.worldId, request.sessionId);
 
-          logger.info('[NarrativeGenerator] Extracted and stored lore:', {
-            worldId: request.worldId,
-            sessionId: request.sessionId,
-            factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
-            characters: structuredLore.characters.map(c => c.name),
-            locations: structuredLore.locations.map(l => l.name),
-            events: structuredLore.events.length,
-            rules: structuredLore.rules.length
-          });
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[NarrativeGenerator] Extracted and stored lore:', {
+              worldId: request.worldId,
+              sessionId: request.sessionId,
+              factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
+              characters: structuredLore.characters.map(c => c.name),
+              locations: structuredLore.locations.map(l => l.name),
+              events: structuredLore.events.length,
+              rules: structuredLore.rules.length
+            });
+          }
         } catch (error) {
           logger.error('[NarrativeGenerator] Failed to extract lore:', error);
         }
@@ -1031,14 +1036,17 @@ Return ONLY the rewritten narrative.`;
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
-      // Extract structured lore from initial scene (dev/test only for MVP)
-      if (response.content && process.env.NODE_ENV !== 'production') {
+      // Extract structured lore from initial scene
+      if (response.content) {
         try {
-          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
-            worldId,
-            sessionId,
-            contentLength: response.content.length
-          });
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
+              worldId,
+              sessionId,
+              contentLength: response.content.length
+            });
+          }
+
           const existingLoreContext = getLoreContextForPrompt(worldId);
           const structuredLore = await extractStructuredLore(
             response.content,
@@ -1050,15 +1058,17 @@ Return ONLY the rewritten narrative.`;
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, worldId, sessionId);
 
-          logger.info('[NarrativeGenerator] Extracted and stored lore from initial scene:', {
-            worldId,
-            sessionId,
-            factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
-            characters: structuredLore.characters.map(c => c.name),
-            locations: structuredLore.locations.map(l => l.name),
-            events: structuredLore.events.length,
-            rules: structuredLore.rules.length
-          });
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[NarrativeGenerator] Extracted and stored lore from initial scene:', {
+              worldId,
+              sessionId,
+              factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
+              characters: structuredLore.characters.map(c => c.name),
+              locations: structuredLore.locations.map(l => l.name),
+              events: structuredLore.events.length,
+              rules: structuredLore.rules.length
+            });
+          }
         } catch (error) {
           logger.error('[NarrativeGenerator] Failed to extract lore from initial scene:', error);
         }
