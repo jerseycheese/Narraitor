@@ -208,7 +208,7 @@ Respond with JSON format:
   "suggestEnding": true/false,
   "confidence": "high" | "medium" | "low",
   "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-  "reason": "Clear explanation of why this is/isn't a good ending point"
+  "reason": "Short user-facing message (1-2 sentences max) about why this is a good ending point. Be concise and direct."
 }`;
 
       const response = await client.generateContent(analysisPrompt);
