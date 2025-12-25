@@ -7,6 +7,9 @@ import type { EntityID } from '../types/common.types';
 import type { LoreFact, LoreCategory, DuplicateMatch } from '../types/lore.types';
 import { findPotentialDuplicates, checkFactSimilarity } from '../lib/lore/fuzzyMatcher';
 import { logger } from '@/lib/utils/logger';
+import { getTimestamp } from '@/lib/utils';
+import type { UserFriendlyError } from '@/lib/utils/errorUtils';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 /**
  * Context interface for deduplication operations
@@ -18,7 +21,7 @@ export interface DeduplicationContext {
   updateFact: (id: EntityID, updates: Partial<LoreFact>) => void;
   deleteFact: (id: EntityID) => void;
   setAliases: (id: EntityID, aliases: string[]) => void;
-  setError: (error: { message: string }) => void;
+  setError: (error: UserFriendlyError | null) => void;
 }
 
 /**
@@ -44,7 +47,12 @@ export async function scanForDuplicatesImpl(
     return duplicates;
   } catch (error) {
     logger.error('[LoreStore] Error scanning for duplicates', error);
-    context.setError({ message: 'Failed to scan for duplicates' });
+    context.setError({
+      title: 'Duplicate Scan Failed',
+      message: 'Failed to scan for duplicates',
+      retryable: true,
+      type: ErrorType.SERVICE,
+    });
     return [];
   }
 }
@@ -92,8 +100,8 @@ export function mergeFactsImpl(
       actualPrimary = secondaryFact;
       actualSecondary = primaryFact;
     } else if (secondaryImportance === primaryImportance) {
-      // If importance is equal, use older fact
-      if (new Date(secondaryFact.createdAt) < new Date(primaryFact.createdAt)) {
+      // If importance is equal, use older fact (earlier timestamp)
+      if (secondaryFact.createdAt < primaryFact.createdAt) {
         actualPrimary = secondaryFact;
         actualSecondary = primaryFact;
       }
@@ -150,7 +158,12 @@ export function mergeFactsImpl(
 
   } catch (error) {
     logger.error('[LoreStore] Error merging facts', error);
-    context.setError({ message: 'Failed to merge facts' });
+    context.setError({
+      title: 'Merge Failed',
+      message: 'Failed to merge facts',
+      retryable: false,
+      type: ErrorType.SERVICE,
+    });
     throw error;
   }
 }
@@ -173,6 +186,7 @@ export async function checkDuplicateBeforeCreateImpl(
     }
 
     // Create a temporary fact for comparison
+    const now = getTimestamp();
     const tempFact: LoreFact = {
       id: 'temp' as EntityID,
       worldId,
@@ -181,8 +195,8 @@ export async function checkDuplicateBeforeCreateImpl(
       value,
       aliases: [],
       source: 'manual',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
     };
 
     const matches: DuplicateMatch[] = [];
