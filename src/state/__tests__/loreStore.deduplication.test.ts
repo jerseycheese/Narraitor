@@ -284,15 +284,20 @@ describe('mergeFactsImpl', () => {
     testFacts.set(lowImportanceFact.id, lowImportanceFact);
     testFacts.set(highImportanceFact.id, highImportanceFact);
 
-    // When merging, the higher importance should be preserved
+    // When merging, the higher importance fact should become the actual primary
     mergeFactsImpl(lowImportanceFact.id, highImportanceFact.id, mockContext);
 
+    // The update should be on the high importance fact (actual primary after swap)
     const updateCall = (mockContext.updateFact as jest.Mock).mock.calls.find(
-      call => call[0] === lowImportanceFact.id
+      call => call[0] === highImportanceFact.id
     );
 
-    // The low importance fact gets the high importance from the merge
+    // The high importance fact remains as high importance
+    expect(updateCall).toBeDefined();
     expect(updateCall[1].metadata?.importance).toBe('high');
+
+    // The low importance fact should be deleted
+    expect(mockContext.deleteFact).toHaveBeenCalledWith(lowImportanceFact.id);
   });
 });
 

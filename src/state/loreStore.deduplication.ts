@@ -130,8 +130,10 @@ export function mergeFactsImpl(
       ? `${primaryDesc}\n\n${secondaryDesc}`
       : primaryDesc || secondaryDesc;
 
-    // Keep the higher importance
-    const mergedImportance = primaryImportance >= secondaryImportance
+    // Keep the higher importance (use actual values after swap)
+    const actualPrimaryImportance = importanceOrder[actualPrimary.metadata?.importance ?? 'undefined'];
+    const actualSecondaryImportance = importanceOrder[actualSecondary.metadata?.importance ?? 'undefined'];
+    const mergedImportance = actualPrimaryImportance >= actualSecondaryImportance
       ? actualPrimary.metadata?.importance
       : actualSecondary.metadata?.importance;
 
