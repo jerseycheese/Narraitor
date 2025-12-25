@@ -55,6 +55,9 @@ yarn-error.log*
 .pnpm-debug.log*
 dev_server.log
 nextjs.log
+.dev-log.txt
+.dev-pid
+.next-dev.log
 
 # local env files
 .env*.local

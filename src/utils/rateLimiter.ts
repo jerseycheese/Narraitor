@@ -5,7 +5,7 @@ interface RateLimitEntry {
   windowStart: number;
 }
 
-interface RateLimitResult {
+export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
   resetTime: number;
