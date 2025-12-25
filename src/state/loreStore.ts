@@ -34,6 +34,13 @@ import {
   validateFactImpl,
   type LoreUtilsContext,
 } from './loreStore.utils';
+import {
+  scanForDuplicatesImpl,
+  mergeFactsImpl,
+  checkDuplicateBeforeCreateImpl,
+  type DeduplicationContext,
+} from './loreStore.deduplication';
+import type { DuplicateMatch } from '../types/lore.types';
 
 /**
  * Fact history tracking
@@ -82,6 +89,9 @@ export interface LoreStore extends CrudStore<LoreFact> {
   removeAlias: (id: EntityID, alias: string) => void;
   setAliases: (id: EntityID, aliases: string[]) => void;
   findEntityByAnyName: (name: string, worldId: EntityID) => LoreFact | null;
+  scanForDuplicates: (worldId: EntityID, category?: LoreCategory) => Promise<DuplicateMatch[]>;
+  mergeFacts: (primaryId: EntityID, secondaryId: EntityID) => void;
+  checkDuplicateBeforeCreate: (value: string, category: LoreCategory, worldId: EntityID) => Promise<DuplicateMatch[]>;
 }
 
 const getInitialState = () => ({
@@ -385,6 +395,42 @@ export const useLoreStore = create<LoreStore>()(
           getFacts: get().getFacts,
         };
         return findEntityByAnyNameImpl(name, worldId, context);
+      },
+
+      scanForDuplicates: async (worldId, category) => {
+        const context: DeduplicationContext = {
+          getFact: get().getById,
+          getFacts: get().getFacts,
+          updateFact: get().update,
+          deleteFact: get().delete,
+          setAliases: get().setAliases,
+          setError: get().setError,
+        };
+        return await scanForDuplicatesImpl(worldId, category ?? null, context);
+      },
+
+      mergeFacts: (primaryId, secondaryId) => {
+        const context: DeduplicationContext = {
+          getFact: get().getById,
+          getFacts: get().getFacts,
+          updateFact: get().update,
+          deleteFact: get().delete,
+          setAliases: get().setAliases,
+          setError: get().setError,
+        };
+        mergeFactsImpl(primaryId, secondaryId, context);
+      },
+
+      checkDuplicateBeforeCreate: async (value, category, worldId) => {
+        const context: DeduplicationContext = {
+          getFact: get().getById,
+          getFacts: get().getFacts,
+          updateFact: get().update,
+          deleteFact: get().delete,
+          setAliases: get().setAliases,
+          setError: get().setError,
+        };
+        return await checkDuplicateBeforeCreateImpl(value, category, worldId, context);
       },
     }),
     {

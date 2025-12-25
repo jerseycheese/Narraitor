@@ -121,3 +121,33 @@ export interface ConsistencyLoreContext {
     importance?: 'high' | 'medium' | 'low';
   }>;
 }
+
+/**
+ * Match between two potentially duplicate facts
+ */
+export interface DuplicateMatch {
+  fact1: LoreFact;
+  fact2: LoreFact;
+  confidence: number; // 0.0 to 1.0
+  method: 'exact' | 'levenshtein' | 'ai' | 'alias';
+  rationale?: string;
+}
+
+/**
+ * Result of similarity check between two facts
+ */
+export interface SimilarityResult {
+  isDuplicate: boolean;
+  confidence: number; // 0.0 to 1.0
+  method: 'exact' | 'levenshtein' | 'ai' | 'alias';
+  rationale: string;
+}
+
+/**
+ * Options for deduplication operations
+ */
+export interface DeduplicationOptions {
+  minConfidence?: number; // Minimum confidence threshold (default: 0.6)
+  category?: LoreCategory; // Filter by category
+  autoMergeThreshold?: number; // Auto-merge above this (default: 0.85)
+}
