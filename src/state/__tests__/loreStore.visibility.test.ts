@@ -19,7 +19,7 @@ describe('LoreStore - Visibility', () => {
     setupLoreStore();
   });
 
-  describe('Increment 2: Default visibility', () => {
+  describe('Default visibility', () => {
     test('addFact defaults to session-private visibility', () => {
       const { result } = renderHook(() => useLoreStore());
 
@@ -40,7 +40,7 @@ describe('LoreStore - Visibility', () => {
     });
   });
 
-  describe('Increment 3: Session-scoped filtering', () => {
+  describe('Session-scoped filtering', () => {
     test('getLoreContext returns session-private facts for current session only', () => {
       const { result } = renderHook(() => useLoreStore());
 
@@ -83,6 +83,44 @@ describe('LoreStore - Visibility', () => {
       // Both sessions see world-shared facts
       expect(context1.factCount).toBe(2);
       expect(context2.factCount).toBe(2);
+    });
+  });
+
+  describe('Facts without sessionId', () => {
+    test('session-private facts without sessionId are never visible', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      let factId: string;
+      act(() => {
+        factId = result.current.addFact('orphan', 'val', 'characters', 'manual', 'world-1');
+        result.current.updateFact(factId!, { visibility: 'session-private', sessionId: undefined });
+      });
+
+      const context = result.current.getLoreContext('world-1', 'session-1');
+
+      expect(context.factCount).toBe(0); // orphan fact not visible
+    });
+  });
+
+  describe('addStructuredLore behavior', () => {
+    test('addStructuredLore creates session-private facts when sessionId provided', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [{ name: 'Lyra', description: 'Hero' }],
+        locations: [],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      expect(facts.length).toBeGreaterThan(0);
+      expect(facts[0].visibility).toBe('session-private');
+      expect(facts[0].sessionId).toBe('session-1');
     });
   });
 });
