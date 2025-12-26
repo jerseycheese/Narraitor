@@ -24,6 +24,7 @@ export const LoreManagementSection: React.FC = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<EntityID>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<LoreCategory | ''>('');
+  const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'session-private' | 'world-shared'>('all');
   const [selectedFactId, setSelectedFactId] = useState<EntityID | null>(null);
   const [importData, setImportData] = useState('');
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -44,18 +45,23 @@ export const LoreManagementSection: React.FC = () => {
   const facts = useMemo(() => {
     if (!selectedWorldId) return [];
 
-    if (searchQuery) {
-      return searchFacts(searchQuery, {
-        worldId: selectedWorldId,
-        category: categoryFilter || undefined
-      });
+    let filtered = searchQuery
+      ? searchFacts(searchQuery, {
+          worldId: selectedWorldId,
+          category: categoryFilter || undefined
+        })
+      : getFacts({
+          worldId: selectedWorldId,
+          category: categoryFilter || undefined
+        });
+
+    // Apply visibility filter
+    if (visibilityFilter !== 'all') {
+      filtered = filtered.filter(f => f.visibility === visibilityFilter);
     }
 
-    return getFacts({
-      worldId: selectedWorldId,
-      category: categoryFilter || undefined
-    });
-  }, [selectedWorldId, searchQuery, categoryFilter, allFacts, getFacts, searchFacts]);
+    return filtered;
+  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, allFacts, getFacts, searchFacts]);
 
   // Group facts by category
   const factsByCategory = useMemo(() => {
@@ -152,9 +158,9 @@ export const LoreManagementSection: React.FC = () => {
           {/* Browse Tab */}
           <TabsContent value="browse" className="space-y-4">
             <div className="flex gap-2 mb-4">
-              <Select 
+              <Select
                 className="w-48"
-                value={categoryFilter} 
+                value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value as LoreCategory | '')}
               >
                 <option value="">All Categories</option>
@@ -162,6 +168,15 @@ export const LoreManagementSection: React.FC = () => {
                 <option value="locations">Locations</option>
                 <option value="events">Events</option>
                 <option value="rules">Rules</option>
+              </Select>
+              <Select
+                className="w-48"
+                value={visibilityFilter}
+                onChange={(e) => setVisibilityFilter(e.target.value as typeof visibilityFilter)}
+              >
+                <option value="all">All Visibility</option>
+                <option value="session-private">Session Private Only</option>
+                <option value="world-shared">World Shared Only</option>
               </Select>
               <div className="ml-auto text-sm text-gray-700">
                 Total facts: {facts.length}
@@ -199,6 +214,18 @@ export const LoreManagementSection: React.FC = () => {
                           </span>
                         );
 
+                        const visibilityBadge = (
+                          <span
+                            className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                              fact.visibility === 'session-private'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {fact.visibility === 'session-private' ? 'Session Private' : 'World Shared'}
+                          </span>
+                        );
+
                         return (
                           <div
                             key={fact.id}
@@ -207,6 +234,7 @@ export const LoreManagementSection: React.FC = () => {
                           >
                             <div className="flex-1 flex items-center gap-2">
                               {importanceBadge}
+                              {visibilityBadge}
                               <span>{fact.value}</span>
                             </div>
                             <div className="flex gap-2">
