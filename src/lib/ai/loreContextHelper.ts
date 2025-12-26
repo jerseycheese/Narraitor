@@ -8,9 +8,9 @@ import type { EntityID } from '@/types';
 /**
  * Get lore context string for AI prompt inclusion
  */
-export function getLoreContextForPrompt(worldId: EntityID): string {
+export function getLoreContextForPrompt(worldId: EntityID, sessionId?: EntityID): string {
   const { getLoreContext } = useLoreStore.getState();
-  const context = getLoreContext(worldId);
+  const context = getLoreContext(worldId, sessionId);
 
   if (context.factCount === 0) {
     return '';

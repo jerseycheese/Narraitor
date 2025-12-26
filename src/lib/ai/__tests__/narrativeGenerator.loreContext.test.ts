@@ -99,8 +99,8 @@ rules: world_rule = Elven magic protects this realm
 
     await narrativeGenerator.generateSegment(request);
 
-    // Verify lore context was requested
-    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+    // Verify lore context was requested with sessionId
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-456');
 
     // Verify the AI was called with enhanced prompt including lore
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
@@ -131,7 +131,7 @@ rules: journey_rule = Every hero must start their journey at dawn
 
     await narrativeGenerator.generateInitialScene('world-123', ['char-1']);
 
-    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', undefined);
 
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
     expect(capturedPrompt).toContain('Established World Facts:');
@@ -164,7 +164,7 @@ rules: journey_rule = Every hero must start their journey at dawn
     const result = await narrativeGenerator.generateSegment(request);
 
     expect(result.content).toBe('A new adventure begins in an unexplored realm...');
-    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-456');
   });
 
   it('should generate narrative consistent with established lore', async () => {

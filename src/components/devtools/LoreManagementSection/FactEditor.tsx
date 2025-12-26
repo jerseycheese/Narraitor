@@ -30,6 +30,9 @@ export const FactEditor: React.FC<FactEditorProps> = ({
   const [key, setKey] = useState(fact?.key || '');
   const [value, setValue] = useState(fact?.value || '');
   const [category, setCategory] = useState<LoreCategory>(fact?.category || 'characters');
+  const [visibility, setVisibility] = useState<'session-private' | 'world-shared'>(
+    fact?.visibility || 'session-private'
+  );
   const [description, setDescription] = useState(fact?.metadata?.description || '');
   const [importance, setImportance] = useState<'low' | 'medium' | 'high'>(
     fact?.metadata?.importance || 'medium'
@@ -111,11 +114,12 @@ export const FactEditor: React.FC<FactEditorProps> = ({
         key,
         value,
         category,
+        visibility,
         metadata
       });
     } else {
       // Create new fact
-      addFact(key, value, category, 'manual', worldId, undefined, metadata);
+      addFact(key, value, category, 'manual', worldId, undefined, metadata, visibility);
     }
 
     // Reset form if creating new
@@ -163,9 +167,9 @@ export const FactEditor: React.FC<FactEditorProps> = ({
 
       <div>
         <Label htmlFor="fact-category">Category</Label>
-        <Select 
+        <Select
           id="fact-category"
-          value={category} 
+          value={category}
           onChange={(e) => setCategory(e.target.value as LoreCategory)}
         >
           <option value="characters">Characters</option>
@@ -176,6 +180,21 @@ export const FactEditor: React.FC<FactEditorProps> = ({
         {errors.category && (
           <p className="text-sm text-red-500 mt-1">{errors.category}</p>
         )}
+      </div>
+
+      <div>
+        <Label htmlFor="fact-visibility">Visibility</Label>
+        <Select
+          id="fact-visibility"
+          value={visibility}
+          onChange={(e) => setVisibility(e.target.value as 'session-private' | 'world-shared')}
+        >
+          <option value="session-private">Session Private</option>
+          <option value="world-shared">World Shared</option>
+        </Select>
+        <p className="text-xs text-gray-600 mt-1">
+          Session Private: Only visible in this session. World Shared: Visible to all sessions.
+        </p>
       </div>
 
       <div>

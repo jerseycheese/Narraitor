@@ -78,6 +78,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(new Set());
   const mountedRef = useRef(false);
   const generateCount = useRef(0);
+  const warnedMissingSessionIdRef = useRef(false);
+
+  const warnMissingSessionId = useCallback((context: string) => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (warnedMissingSessionIdRef.current) return;
+    warnedMissingSessionIdRef.current = true;
+    console.warn(`[NarrativeController] Missing sessionId; skipping ${context} generation.`);
+  }, []);
   // Use a ref to track if we've initiated generation in this component instance
   const initialGenerationInitiated = useRef(false);
   // Use a ref to prevent overlapping choice generation
@@ -284,6 +292,10 @@ Respond with JSON format:
   useEffect(() => {
     // Skip if component is unmounted or persistence not ready
     if (!mountedRef.current || !hasHydrated) return;
+    if (!sessionId) {
+      warnMissingSessionId('narrative');
+      return;
+    }
 
     // Always prefer persisted store segments before generating anything new
     const persistedSegments = useNarrativeStore
@@ -347,6 +359,10 @@ Respond with JSON format:
    */
   const generatePlayerChoices = useCallback(async () => {
     if (!mountedRef.current) {
+      return;
+    }
+    if (!sessionId) {
+      warnMissingSessionId('choice');
       return;
     }
     
@@ -506,7 +522,7 @@ Respond with JSON format:
         setIsGeneratingChoices(false);
       }
     }
-  }, [sessionId, worldId, onChoicesGenerated, narrativeGenerator]);
+  }, [sessionId, worldId, onChoicesGenerated, narrativeGenerator, warnMissingSessionId]);
 
   // Load segments after hydration is complete
   useEffect(() => {
@@ -616,6 +632,10 @@ Respond with JSON format:
     if (!hasHydrated) {
       return;
     }
+    if (!sessionId) {
+      warnMissingSessionId('initial scene');
+      return;
+    }
 
     const lockKey = String(sessionId);
     if (initialGenerationLocksRef.current.has(lockKey)) {
@@ -647,7 +667,7 @@ Respond with JSON format:
         setTimeout(() => reject(new Error(`Initial generation timed out after ${timeoutMs}ms`)), timeoutMs);
       });
       const result = await Promise.race([
-        narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []),
+        narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : [], sessionId),
         timeoutPromise as unknown as Promise<ReturnType<typeof narrativeGenerator.generateInitialScene>>,
       ]);
       
@@ -765,6 +785,10 @@ Respond with JSON format:
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
+    if (!sessionId) {
+      warnMissingSessionId('next segment');
+      return;
+    }
     
     if (segments.length === 0) {
       return;

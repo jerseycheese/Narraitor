@@ -37,7 +37,7 @@ describe('loreContextHelper', () => {
       const result = getLoreContextForPrompt('world-123');
 
       expect(result).toBe('');
-      expect(mockGetLoreContext).toHaveBeenCalledWith('world-123');
+      expect(mockGetLoreContext).toHaveBeenCalledWith('world-123', undefined);
     });
 
     it('should format lore facts for AI prompt inclusion', () => {
@@ -88,7 +88,7 @@ rules: magic_rule = Magic requires sacrifice
 
       getLoreContextForPrompt('specific-world-id');
 
-      expect(mockGetLoreContext).toHaveBeenCalledWith('specific-world-id');
+      expect(mockGetLoreContext).toHaveBeenCalledWith('specific-world-id', undefined);
     });
   });
 });

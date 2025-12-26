@@ -16,7 +16,8 @@ export interface ImportExportContext {
     source: LoreSource,
     worldId: EntityID,
     sessionId?: EntityID,
-    metadata?: LoreFact['metadata']
+    metadata?: LoreFact['metadata'],
+    visibility?: 'session-private' | 'world-shared'
   ) => EntityID;
   validateFactUniqueness: (worldId: EntityID, key: string, value: string) => boolean;
   setAliases: (id: EntityID, aliases: string[]) => void;
@@ -37,6 +38,8 @@ export function exportFactsImpl(worldId: EntityID, context: ImportExportContext)
       aliases: Array.isArray(fact.aliases) ? fact.aliases : [],
       category: fact.category,
       source: fact.source,
+      sessionId: fact.sessionId,
+      visibility: fact.visibility,
       metadata: fact.metadata,
     })),
   };
@@ -63,6 +66,8 @@ export function importFactsImpl(worldId: EntityID, jsonData: string, context: Im
         aliases?: string[];
         category: LoreCategory;
         source?: LoreSource;
+        sessionId?: EntityID;
+        visibility?: 'session-private' | 'world-shared';
         metadata?: LoreFact['metadata'];
       }) => {
         if (validateFactUniqueness(worldId, fact.key, fact.value)) {
@@ -72,8 +77,9 @@ export function importFactsImpl(worldId: EntityID, jsonData: string, context: Im
             fact.category,
             fact.source || 'manual',
             worldId,
-            undefined,
-            fact.metadata
+            fact.sessionId,
+            fact.metadata,
+            fact.visibility
           );
           if (createdId && Array.isArray(fact.aliases) && fact.aliases.length > 0) {
             // Validate aliases before setting

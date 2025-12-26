@@ -104,6 +104,48 @@ describe('LoreStore - Advanced Features', () => {
       const facts = result.current.getFacts({ worldId: 'world-1' });
       expect(facts).toHaveLength(2); // Only one new fact added
     });
+
+    test('should preserve visibility and sessionId during export/import round-trip', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      // Add facts with different visibility settings
+      act(() => {
+        const id1 = result.current.addFact('session_fact', 'Session Fact', 'characters', 'manual', 'world-1', 'session-1');
+        result.current.updateFact(id1, { visibility: 'session-private' });
+
+        const id2 = result.current.addFact('world_fact', 'World Fact', 'locations', 'manual', 'world-1');
+        result.current.updateFact(id2, { visibility: 'world-shared' });
+      });
+
+      // Export facts
+      const exported = result.current.exportFacts('world-1');
+      const parsed = JSON.parse(exported);
+
+      expect(parsed.facts).toHaveLength(2);
+
+      // Check that visibility and sessionId are in export
+      const sessionFact = parsed.facts.find((f: LoreFact) => f.key === 'session_fact');
+      const worldFact = parsed.facts.find((f: LoreFact) => f.key === 'world_fact');
+
+      expect(sessionFact.visibility).toBe('session-private');
+      expect(sessionFact.sessionId).toBe('session-1');
+      expect(worldFact.visibility).toBe('world-shared');
+
+      // Clear and re-import
+      act(() => {
+        result.current.clearFacts('world-1');
+        result.current.importFacts('world-1', exported);
+      });
+
+      // Verify imported facts retain visibility
+      const importedFacts = result.current.getFacts({ worldId: 'world-1' });
+      const importedSession = importedFacts.find(f => f.key === 'session_fact');
+      const importedWorld = importedFacts.find(f => f.key === 'world_fact');
+
+      expect(importedSession?.visibility).toBe('session-private');
+      expect(importedSession?.sessionId).toBe('session-1');
+      expect(importedWorld?.visibility).toBe('world-shared');
+    });
   });
 
   describe('Fact Validation', () => {

@@ -8,6 +8,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 import { FactEditor } from './FactEditor';
 import { FactInspector } from './FactInspector';
@@ -24,6 +25,8 @@ export const LoreManagementSection: React.FC = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<EntityID>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<LoreCategory | ''>('');
+  const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'session-private' | 'world-shared'>('all');
+  const [sessionFilter, setSessionFilter] = useState<'all' | 'current' | EntityID>('all');
   const [selectedFactId, setSelectedFactId] = useState<EntityID | null>(null);
   const [importData, setImportData] = useState('');
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -31,6 +34,8 @@ export const LoreManagementSection: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const { worlds } = useWorldStore();
+  const currentSessionId = useSessionStore((state) => state.id);
+  const currentSessionWorldId = useSessionStore((state) => state.worldId);
   const {
     facts: allFacts,
     getFacts,
@@ -40,22 +45,47 @@ export const LoreManagementSection: React.FC = () => {
     importFacts
   } = useLoreStore();
 
+  const sessionOptions = useMemo(() => {
+    if (!selectedWorldId) return [];
+    const ids = new Set(
+      Object.values(allFacts)
+        .filter((fact) => fact.worldId === selectedWorldId && fact.sessionId)
+        .map((fact) => fact.sessionId as EntityID)
+    );
+    return Array.from(ids).sort();
+  }, [allFacts, selectedWorldId]);
+
+  const effectiveSessionId = useMemo(() => {
+    if (sessionFilter === 'current') {
+      return currentSessionId || undefined;
+    }
+    if (sessionFilter === 'all') return undefined;
+    return sessionFilter;
+  }, [sessionFilter, currentSessionId]);
+
   // Get facts based on filters
   const facts = useMemo(() => {
     if (!selectedWorldId) return [];
 
-    if (searchQuery) {
-      return searchFacts(searchQuery, {
-        worldId: selectedWorldId,
-        category: categoryFilter || undefined
-      });
+    let filtered = searchQuery
+      ? searchFacts(searchQuery, {
+          worldId: selectedWorldId,
+          category: categoryFilter || undefined,
+          sessionId: effectiveSessionId
+        })
+      : getFacts({
+          worldId: selectedWorldId,
+          category: categoryFilter || undefined,
+          sessionId: effectiveSessionId
+        });
+
+    // Apply visibility filter
+    if (visibilityFilter !== 'all') {
+      filtered = filtered.filter(f => f.visibility === visibilityFilter);
     }
 
-    return getFacts({
-      worldId: selectedWorldId,
-      category: categoryFilter || undefined
-    });
-  }, [selectedWorldId, searchQuery, categoryFilter, allFacts, getFacts, searchFacts]);
+    return filtered;
+  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
 
   // Group facts by category
   const factsByCategory = useMemo(() => {
@@ -77,6 +107,11 @@ export const LoreManagementSection: React.FC = () => {
     setSelectedWorldId(worldId);
     setSelectedFactId(null);
     setMessage(null);
+    if (currentSessionId && currentSessionWorldId === worldId) {
+      setSessionFilter('current');
+    } else {
+      setSessionFilter('all');
+    }
   };
 
   const handleDeleteFact = (factId: EntityID) => {
@@ -151,10 +186,10 @@ export const LoreManagementSection: React.FC = () => {
 
           {/* Browse Tab */}
           <TabsContent value="browse" className="space-y-4">
-            <div className="flex gap-2 mb-4">
-              <Select 
-                className="w-48"
-                value={categoryFilter} 
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <Select
+                className="w-full sm:w-48"
+                value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value as LoreCategory | '')}
               >
                 <option value="">All Categories</option>
@@ -163,7 +198,33 @@ export const LoreManagementSection: React.FC = () => {
                 <option value="events">Events</option>
                 <option value="rules">Rules</option>
               </Select>
-              <div className="ml-auto text-sm text-gray-700">
+              <Select
+                className="w-full sm:w-56"
+                value={sessionFilter}
+                onChange={(e) => setSessionFilter(e.target.value as typeof sessionFilter)}
+              >
+                <option value="all">All Sessions</option>
+                {currentSessionId && currentSessionWorldId === selectedWorldId && (
+                  <option value="current">Current Session ({currentSessionId})</option>
+                )}
+                {sessionOptions
+                  .filter((id) => id !== currentSessionId)
+                  .map((id) => (
+                    <option key={id} value={id}>
+                      {id}
+                    </option>
+                  ))}
+              </Select>
+              <Select
+                className="w-full sm:w-48"
+                value={visibilityFilter}
+                onChange={(e) => setVisibilityFilter(e.target.value as typeof visibilityFilter)}
+              >
+                <option value="all">All Visibility</option>
+                <option value="session-private">Session Private Only</option>
+                <option value="world-shared">World Shared Only</option>
+              </Select>
+              <div className="w-full sm:w-auto sm:ml-auto text-sm text-gray-700">
                 Total facts: {facts.length}
               </div>
             </div>
@@ -199,6 +260,18 @@ export const LoreManagementSection: React.FC = () => {
                           </span>
                         );
 
+                        const visibilityBadge = (
+                          <span
+                            className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                              fact.visibility === 'session-private'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {fact.visibility === 'session-private' ? 'Session Private' : 'World Shared'}
+                          </span>
+                        );
+
                         return (
                           <div
                             key={fact.id}
@@ -207,6 +280,7 @@ export const LoreManagementSection: React.FC = () => {
                           >
                             <div className="flex-1 flex items-center gap-2">
                               {importanceBadge}
+                              {visibilityBadge}
                               <span>{fact.value}</span>
                             </div>
                             <div className="flex gap-2">
@@ -253,15 +327,15 @@ export const LoreManagementSection: React.FC = () => {
 
           {/* Search Tab */}
           <TabsContent value="search" className="space-y-4">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Input
                 placeholder="Search facts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
+                className="flex-1 min-w-[12rem]"
               />
               <Select 
-                className="w-48"
+                className="w-full sm:w-48"
                 value={categoryFilter} 
                 onChange={(e) => setCategoryFilter(e.target.value as LoreCategory | '')}
               >
@@ -270,6 +344,23 @@ export const LoreManagementSection: React.FC = () => {
                 <option value="locations">Locations</option>
                 <option value="events">Events</option>
                 <option value="rules">Rules</option>
+              </Select>
+              <Select
+                className="w-full sm:w-56"
+                value={sessionFilter}
+                onChange={(e) => setSessionFilter(e.target.value as typeof sessionFilter)}
+              >
+                <option value="all">All Sessions</option>
+                {currentSessionId && currentSessionWorldId === selectedWorldId && (
+                  <option value="current">Current Session ({currentSessionId})</option>
+                )}
+                {sessionOptions
+                  .filter((id) => id !== currentSessionId)
+                  .map((id) => (
+                    <option key={id} value={id}>
+                      {id}
+                    </option>
+                  ))}
               </Select>
             </div>
 

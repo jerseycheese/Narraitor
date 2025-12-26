@@ -206,9 +206,10 @@ export class NarrativeGenerator {
   private enhancePromptWithLore(
     prompt: string,
     worldId: EntityID,
+    sessionId?: EntityID,
     budget?: RequestBudget
   ): string {
-    const loreContext = getLoreContextForPrompt(worldId);
+    const loreContext = getLoreContextForPrompt(worldId, sessionId);
     return prompt + this.applyBudget(loreContext, 'lore-context', budget);
   }
 
@@ -834,7 +835,7 @@ Return ONLY the rewritten narrative.`;
       const prompt = template(context);
 
       // Capture lore context for debug info
-      const loreContext = getLoreContextForPrompt(request.worldId);
+      const loreContext = getLoreContextForPrompt(request.worldId, request.sessionId);
 
       // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
@@ -845,6 +846,7 @@ Return ONLY the rewritten narrative.`;
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         request.worldId,
+        request.sessionId,
         budget
       );
       const goalEnhancedPrompt = this.enhancePromptWithGoalContext(
@@ -883,7 +885,7 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(request.worldId);
+          const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId);
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -1014,6 +1016,7 @@ Return ONLY the rewritten narrative.`;
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
+        sessionId,
         budget
       );
       const personalizedPrompt = this.enhancePromptWithPersonalization(
@@ -1047,7 +1050,7 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(worldId);
+          const existingLoreContext = getLoreContextForPrompt(worldId, sessionId);
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -2024,6 +2027,7 @@ ${content}
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
+        narrativeContext.sessionId,
         budget
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(

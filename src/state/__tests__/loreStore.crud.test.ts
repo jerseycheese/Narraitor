@@ -45,7 +45,7 @@ describe('LoreStore - CRUD Operations', () => {
         }
       });
 
-      const context = result.current.getLoreContext('test-world', 5);
+      const context = result.current.getLoreContext('test-world', undefined, 5);
       expect(context.factCount).toBe(5);
     });
 
@@ -163,7 +163,7 @@ describe('LoreStore - CRUD Operations', () => {
         expect(context.factCount).toBe(20);
 
         // Should still respect explicit limits
-        const limitedContext = result.current.getLoreContext('test-world', 5);
+        const limitedContext = result.current.getLoreContext('test-world', undefined, 5);
         expect(limitedContext.factCount).toBe(5);
       });
     });

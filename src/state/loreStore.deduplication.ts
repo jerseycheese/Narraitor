@@ -197,6 +197,7 @@ export async function checkDuplicateBeforeCreateImpl(
       value,
       aliases: [],
       source: 'manual',
+      visibility: 'world-shared',
       createdAt: now,
       updatedAt: now,
     };

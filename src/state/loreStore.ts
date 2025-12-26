@@ -67,7 +67,8 @@ export interface LoreStore extends CrudStore<LoreFact> {
     source: LoreSource,
     worldId: EntityID,
     sessionId?: EntityID,
-    metadata?: LoreFact['metadata']
+    metadata?: LoreFact['metadata'],
+    visibility?: 'session-private' | 'world-shared'
   ) => EntityID;
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
@@ -84,7 +85,7 @@ export interface LoreStore extends CrudStore<LoreFact> {
   getFactHistory: (id: EntityID) => LoreFact[];
   validateFact: (fact: Partial<{ key: string; value: string; category: LoreCategory; worldId: EntityID }>) => boolean;
   validateKey: (key: string) => boolean;
-  getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
+  getLoreContext: (worldId: EntityID, sessionId?: EntityID, limit?: number) => LoreContext;
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
   addAlias: (id: EntityID, alias: string) => void;
   removeAlias: (id: EntityID, alias: string) => void;
@@ -203,7 +204,7 @@ export const useLoreStore = create<LoreStore>()(
       clearError: () => set({ error: null }),
       setLoading: (loading) => set({ loading }),
 
-      addFact: (key, value, category, source, worldId, sessionId, metadata) => {
+      addFact: (key, value, category, source, worldId, sessionId, metadata, visibility) => {
         if (!get().validateFact({ key, value, category, worldId })) {
           logger.error('[LoreStore] addFact validation failed', { key, value, category, worldId });
           set({ error: createStoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
@@ -241,6 +242,7 @@ export const useLoreStore = create<LoreStore>()(
           worldId,
           sessionId,
           metadata,
+          visibility: visibility ?? (sessionId ? 'session-private' : 'world-shared'),
         });
         logger.debug('[LoreStore] addFact created fact', { factId, key, value });
         return factId;
@@ -256,7 +258,11 @@ export const useLoreStore = create<LoreStore>()(
           results = results.filter((fact) => fact.category === options.category);
         }
         if (options?.sessionId) {
-          results = results.filter((fact) => fact.sessionId === options.sessionId);
+          // Apply visibility-aware filtering: world-shared OR (session-private AND my-session)
+          results = results.filter((fact) => {
+            if (fact.visibility === 'world-shared') return true;
+            return fact.visibility === 'session-private' && fact.sessionId === options.sessionId;
+          });
         }
 
         return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -280,11 +286,17 @@ export const useLoreStore = create<LoreStore>()(
         }));
       },
 
-      getLoreContext: (worldId, limit = 20) => {
+      getLoreContext: (worldId, sessionId, limit = 20) => {
         const worldFacts = get().getFacts({ worldId });
 
+        // Filter by visibility rules: world-shared OR (session-private AND my-session)
+        const visibleFacts = worldFacts.filter(fact => {
+          if (fact.visibility === 'world-shared') return true;
+          return fact.visibility === 'session-private' && fact.sessionId === sessionId;
+        });
+
         // Sort by importance (high to low), then by recency within same importance
-        const sortedFacts = worldFacts.sort((a, b) => {
+        const sortedFacts = visibleFacts.sort((a, b) => {
           const rankA = importanceRank(a.metadata?.importance);
           const rankB = importanceRank(b.metadata?.importance);
 
@@ -452,12 +464,12 @@ export const useLoreStore = create<LoreStore>()(
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(),
+      migrate: () => getInitialState(),
     }
   )
 );
