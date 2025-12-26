@@ -27,6 +27,7 @@ export interface LoreFact extends TimestampedEntity {
   source: LoreSource;
   sessionId?: EntityID; // Which game session this fact came from
   worldId: EntityID;
+  visibility: 'session-private' | 'world-shared'; // Session-private or shared across all sessions
   // Rich metadata from AI extraction
   metadata?: {
     description?: string;

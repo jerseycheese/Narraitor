@@ -25,6 +25,7 @@ const sampleFacts: LoreFact[] = [
     aliases: [],
     category: 'characters',
     source: 'manual',
+      visibility: 'world-shared',
     worldId: 'world-1',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'
@@ -36,6 +37,7 @@ const sampleFacts: LoreFact[] = [
     aliases: [],
     category: 'locations',
     source: 'narrative',
+      visibility: 'world-shared',
     worldId: 'world-1',
     sessionId: 'session-1',
     createdAt: '2023-01-01T00:00:00Z',
@@ -48,6 +50,7 @@ const sampleFacts: LoreFact[] = [
     aliases: [],
     category: 'events',
     source: 'narrative',
+      visibility: 'world-shared',
     worldId: 'world-1',
     sessionId: 'session-1',
     createdAt: '2023-01-01T00:00:00Z',
@@ -60,6 +63,7 @@ const sampleFacts: LoreFact[] = [
     aliases: [],
     category: 'rules',
     source: 'manual',
+      visibility: 'world-shared',
     worldId: 'world-1',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'

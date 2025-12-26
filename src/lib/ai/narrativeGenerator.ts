@@ -206,9 +206,10 @@ export class NarrativeGenerator {
   private enhancePromptWithLore(
     prompt: string,
     worldId: EntityID,
+    sessionId?: EntityID,
     budget?: RequestBudget
   ): string {
-    const loreContext = getLoreContextForPrompt(worldId);
+    const loreContext = getLoreContextForPrompt(worldId, sessionId);
     return prompt + this.applyBudget(loreContext, 'lore-context', budget);
   }
 
@@ -845,6 +846,7 @@ Return ONLY the rewritten narrative.`;
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         request.worldId,
+        request.sessionId,
         budget
       );
       const goalEnhancedPrompt = this.enhancePromptWithGoalContext(
@@ -1014,6 +1016,7 @@ Return ONLY the rewritten narrative.`;
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
+        sessionId,
         budget
       );
       const personalizedPrompt = this.enhancePromptWithPersonalization(
@@ -2024,6 +2027,7 @@ ${content}
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
+        narrativeContext.sessionId,
         budget
       );
       const inventoryEnhancedPrompt = this.enhancePromptWithInventory(

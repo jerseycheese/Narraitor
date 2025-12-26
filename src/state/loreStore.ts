@@ -84,7 +84,7 @@ export interface LoreStore extends CrudStore<LoreFact> {
   getFactHistory: (id: EntityID) => LoreFact[];
   validateFact: (fact: Partial<{ key: string; value: string; category: LoreCategory; worldId: EntityID }>) => boolean;
   validateKey: (key: string) => boolean;
-  getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
+  getLoreContext: (worldId: EntityID, sessionId?: EntityID, limit?: number) => LoreContext;
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
   addAlias: (id: EntityID, alias: string) => void;
   removeAlias: (id: EntityID, alias: string) => void;
@@ -241,6 +241,7 @@ export const useLoreStore = create<LoreStore>()(
           worldId,
           sessionId,
           metadata,
+          visibility: 'session-private',
         });
         logger.debug('[LoreStore] addFact created fact', { factId, key, value });
         return factId;
@@ -280,11 +281,18 @@ export const useLoreStore = create<LoreStore>()(
         }));
       },
 
-      getLoreContext: (worldId, limit = 20) => {
+      getLoreContext: (worldId, sessionId, limit = 20) => {
         const worldFacts = get().getFacts({ worldId });
 
+        // Filter by visibility rules: world-shared OR (session-private AND my-session)
+        const visibleFacts = worldFacts.filter(fact => {
+          if (fact.visibility === 'world-shared') return true;
+          if (fact.visibility === 'session-private' && fact.sessionId === sessionId) return true;
+          return false;
+        });
+
         // Sort by importance (high to low), then by recency within same importance
-        const sortedFacts = worldFacts.sort((a, b) => {
+        const sortedFacts = visibleFacts.sort((a, b) => {
           const rankA = importanceRank(a.metadata?.importance);
           const rankB = importanceRank(b.metadata?.importance);
 
