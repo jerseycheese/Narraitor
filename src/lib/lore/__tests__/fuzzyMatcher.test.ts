@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import type { LoreFact } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
+import { getTimestamp } from '@/lib/utils';
 
 // Import functions we're about to implement
 import {
@@ -61,8 +62,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Gandalf the Grey',
         aliases: ['Mithrandir', 'The Grey Wizard'],
         source: 'narrative',
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01'),
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
       },
       {
         id: 'fact-2' as EntityID,
@@ -72,8 +73,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Gandolf the Gray',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date('2024-01-02'),
-        updatedAt: new Date('2024-01-02'),
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
       },
       {
         id: 'fact-3' as EntityID,
@@ -83,8 +84,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Aragorn',
         aliases: ['Strider'],
         source: 'narrative',
-        createdAt: new Date('2024-01-03'),
-        updatedAt: new Date('2024-01-03'),
+        createdAt: '2024-01-03T00:00:00.000Z',
+        updatedAt: '2024-01-03T00:00:00.000Z',
       },
       {
         id: 'fact-4' as EntityID,
@@ -94,8 +95,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Gandalf',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date('2024-01-04'),
-        updatedAt: new Date('2024-01-04'),
+        createdAt: '2024-01-04T00:00:00.000Z',
+        updatedAt: '2024-01-04T00:00:00.000Z',
       },
     ];
   });
@@ -133,8 +134,8 @@ describe('findPotentialDuplicates', () => {
         value: 'The Prancing Pony',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       },
       {
         id: 'fact-loc-2' as EntityID,
@@ -144,8 +145,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Prancing Pony Inn',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       },
       {
         id: 'fact-char-1' as EntityID,
@@ -155,8 +156,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Prancing Peter',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       },
     ];
 
@@ -188,8 +189,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Aragorn',
         aliases: ['Strider', 'Elessar'],
         source: 'narrative',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       },
       {
         id: 'fact-a2' as EntityID,
@@ -199,8 +200,8 @@ describe('findPotentialDuplicates', () => {
         value: 'Strider',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
       },
     ];
 
@@ -229,8 +230,8 @@ describe('checkFactSimilarity', () => {
       value: 'Gandalf',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const fact2: LoreFact = {
@@ -255,8 +256,8 @@ describe('checkFactSimilarity', () => {
       value: 'Aragorn',
       aliases: ['Strider', 'Elessar'],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const fact2: LoreFact = {
@@ -267,8 +268,8 @@ describe('checkFactSimilarity', () => {
       value: 'Strider',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const result = await checkFactSimilarity(fact1, fact2);
@@ -287,8 +288,8 @@ describe('checkFactSimilarity', () => {
       value: 'Gandalf the Grey',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const fact2: LoreFact = {
@@ -299,8 +300,8 @@ describe('checkFactSimilarity', () => {
       value: 'Gandolf the Gray',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const result = await checkFactSimilarity(fact1, fact2);
@@ -319,8 +320,8 @@ describe('checkFactSimilarity', () => {
       value: 'Gandalf',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const fact2: LoreFact = {
@@ -331,8 +332,8 @@ describe('checkFactSimilarity', () => {
       value: 'Frodo Baggins',
       aliases: [],
       source: 'narrative',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
     };
 
     const result = await checkFactSimilarity(fact1, fact2);

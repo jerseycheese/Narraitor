@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import type { LoreFact } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
+import { getTimestamp } from '@/lib/utils';
 import {
   scanForDuplicatesImpl,
   mergeFactsImpl,
@@ -39,8 +40,8 @@ describe('scanForDuplicatesImpl', () => {
         value: 'Gandalf the Grey',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01'),
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
       },
       {
         id: 'fact-2' as EntityID,
@@ -50,12 +51,13 @@ describe('scanForDuplicatesImpl', () => {
         value: 'Gandolf',
         aliases: [],
         source: 'narrative',
-        createdAt: new Date('2024-01-02'),
-        updatedAt: new Date('2024-01-02'),
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
       },
     ];
 
     mockContext = {
+      getFact: jest.fn((id) => testFacts.find(f => f.id === id)),
       getFacts: jest.fn((options) => {
         if (options?.worldId) {
           return testFacts.filter(f => f.worldId === options.worldId);
@@ -126,8 +128,8 @@ describe('mergeFactsImpl', () => {
         tags: ['wizard', 'istari'],
         description: 'A powerful wizard',
       },
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-01'),
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     };
 
     secondaryFact = {
@@ -143,8 +145,8 @@ describe('mergeFactsImpl', () => {
         tags: ['magic user'],
         description: 'A wise sage',
       },
-      createdAt: new Date('2024-01-02'),
-      updatedAt: new Date('2024-01-02'),
+      createdAt: '2024-01-02T00:00:00.000Z',
+      updatedAt: '2024-01-02T00:00:00.000Z',
     };
 
     testFacts = new Map([
@@ -306,20 +308,23 @@ describe('checkDuplicateBeforeCreateImpl', () => {
   let mockContext: DeduplicationContext;
 
   beforeEach(() => {
+    const testFacts: LoreFact[] = [
+      {
+        id: 'fact-1' as EntityID,
+        worldId,
+        category: 'characters',
+        key: 'character_gandalf',
+        value: 'Gandalf',
+        aliases: [],
+        source: 'narrative',
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
+      },
+    ];
+
     mockContext = {
-      getFacts: jest.fn(() => [
-        {
-          id: 'fact-1' as EntityID,
-          worldId,
-          category: 'characters',
-          key: 'character_gandalf',
-          value: 'Gandalf',
-          aliases: [],
-          source: 'narrative',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ]),
+      getFact: jest.fn((id) => testFacts.find(f => f.id === id)),
+      getFacts: jest.fn(() => testFacts),
       updateFact: jest.fn(),
       deleteFact: jest.fn(),
       setAliases: jest.fn(),
