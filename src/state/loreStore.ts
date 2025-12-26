@@ -259,12 +259,9 @@ export const useLoreStore = create<LoreStore>()(
         }
         if (options?.sessionId) {
           // Apply visibility-aware filtering: world-shared OR (session-private AND my-session)
-          // Legacy facts without visibility are treated as world-shared
           results = results.filter((fact) => {
-            if (!fact.visibility) return true; // Legacy fact - treat as world-shared
             if (fact.visibility === 'world-shared') return true;
-            if (fact.visibility === 'session-private' && fact.sessionId === options.sessionId) return true;
-            return false;
+            return fact.visibility === 'session-private' && fact.sessionId === options.sessionId;
           });
         }
 
@@ -293,12 +290,9 @@ export const useLoreStore = create<LoreStore>()(
         const worldFacts = get().getFacts({ worldId });
 
         // Filter by visibility rules: world-shared OR (session-private AND my-session)
-        // Legacy facts without visibility are treated as world-shared
         const visibleFacts = worldFacts.filter(fact => {
-          if (!fact.visibility) return true; // Legacy fact - treat as world-shared
           if (fact.visibility === 'world-shared') return true;
-          if (fact.visibility === 'session-private' && fact.sessionId === sessionId) return true;
-          return false;
+          return fact.visibility === 'session-private' && fact.sessionId === sessionId;
         });
 
         // Sort by importance (high to low), then by recency within same importance
@@ -470,12 +464,12 @@ export const useLoreStore = create<LoreStore>()(
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(),
+      migrate: () => getInitialState(),
     }
   )
 );
