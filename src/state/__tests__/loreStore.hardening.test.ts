@@ -9,7 +9,7 @@ import {
   addStructuredLoreImpl,
   type AddStructuredLoreContext,
 } from '../loreStore.extraction';
-import type { StructuredLoreExtraction, LoreFact } from '@/types/lore.types';
+import type { StructuredLoreExtraction, LoreFact, LoreCategory, LoreSource } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
 import { normalizeText, NORM_NAME } from '@/lib/utils/textNormalization';
 
@@ -101,25 +101,9 @@ describe('Lore Extraction Hardening Logic', () => {
 
     it('should transform "Under/Beneath/Inside/Within X" to "X"', () => {
       expect(canonicalizeLocationName('Under Derry').canonicalName).toBe('Derry');
-      expect(canonicalizeLocationName('Beneath the Mountain').canonicalName).toBe('the Mountain'); // "Beneath" stripped, "the Mountain" remains (chained rules handled separately? Wait, logic is sequential but independent regex checks on original/modified string. Let's verify logic flow)
+      expect(canonicalizeLocationName('Beneath the Mountain').canonicalName).toBe('the Mountain');
     });
-    
-    // Let's re-verify the logic flow for chained transformations based on implementation
-    // The implementation modifies `canonicalName` sequentially.
-    // 1. "The X" -> "X"
-    // 2. "Under X" -> "X"
-    // So "Beneath the Mountain":
-    // 1. "The" check: no match (starts with Beneath)
-    // 2. "Beneath" check: matches "Beneath the Mountain" -> "the Mountain"
-    // Then returns. So it produces "the Mountain".
-    // Wait, if I call it recursively or if the caller handles it? No, the function canonicalizeLocationName does linear passes.
-    // But "The sewers beneath Derry"
-    // 1. "The sewers beneath Derry" -> "sewers beneath Derry"
-    // 2. "sewers beneath Derry" -> no match for "Under/Beneath" at start
-    // 3. "Sewers beneath Derry" (case insensitive) -> matches "Sewers beneath X" rule? 
-    // The regex is: /^(Sewers|Tunnels|Caves|Catacombs)\s+(beneath|under|of)\s+(.+)$/i
-    // So "sewers beneath Derry" matches. -> "Derry sewers"
-    
+
     it('should transform location types "Sewers/Tunnels/Caves/Catacombs beneath/under/of X"', () => {
       const result = canonicalizeLocationName('Sewers beneath Derry');
       expect(result.canonicalName).toBe('Derry sewers');
@@ -139,41 +123,10 @@ describe('Lore Extraction Hardening Logic', () => {
     });
 
     it('should handle chained transformations', () => {
-      // "The sewers beneath Derry"
-      // 1. Strips "The " -> "sewers beneath Derry". Alias: "The sewers beneath Derry"
-      // 2. Matches "Sewers beneath Derry" -> "Derry sewers". Alias: "sewers beneath Derry" (Wait, original was captured BEFORE modification in each step?
-      // Let's check implementation of canonicalizeLocationName in src/state/loreStore.helpers.ts
-      /*
-        const derivedAliases: string[] = [];
-        let canonicalName = safeTrim(name).replace(/\s+/g, ' ');
-        // ...
-        const original = canonicalName; // This is capturing the current state of canonicalName at start of function?
-        // NO. const original = canonicalName; is at the top.
-        // So "The sewers beneath Derry" passed in. original = "The sewers beneath Derry"
-        // Step 1: "The" match.
-        // derivedAliases.push(original) -> "The sewers beneath Derry"
-        // canonicalName becomes "sewers beneath Derry"
-        
-        // Step 2: "Under/Beneath" match. No match.
-        
-        // Step 3: "Sewers beneath" match.
-        // derivedAliases.push(original) -> Pushes "The sewers beneath Derry" AGAIN?
-        // Wait, 'original' is defined ONCE at the top.
-        // So aliases will contain duplicates of the *initial input* if multiple rules fire?
-        // Yes, looking at the code:
-        // const original = canonicalName;
-        // if (match1) { derivedAliases.push(original); ... }
-        // if (match2) { derivedAliases.push(original); ... }
-        // So we get duplicates. Ideally we might want unique, but the function returns string[].
-        // The consumer `addStructuredLoreImpl` does `aliasesToApply = [...derivedAliases].filter(Boolean)`.
-        // It doesn't uniq them immediately, but Set usage later handles it?
-        // In `addStructuredLoreImpl`:
-        // const aliasesToApply = [...(Array.isArray(loc.aliases) ? loc.aliases : []), ...derivedAliases].filter(Boolean);
-        // if (!existingKeys.has(key)) { setAliases(factId, aliasesToApply); }
-        // setAliases usually handles arrays.
-        // If the test expects toContain, it doesn't matter if it's there twice.
-      */
-     
+      // "The sewers beneath Derry" applies multiple rules:
+      // 1. "The X" -> "sewers beneath Derry"
+      // 2. "Sewers beneath X" -> "Derry sewers"
+      // Note: 'original' is captured once at start, so derivedAliases may contain duplicates
       const result = canonicalizeLocationName('The sewers beneath Derry');
       expect(result.canonicalName).toBe('Derry sewers');
       expect(result.derivedAliases).toContain('The sewers beneath Derry');
@@ -198,9 +151,17 @@ describe('Lore Extraction Hardening Logic', () => {
     function createMockAddStructuredLoreContext() {
       const addedFacts: LoreFact[] = [];
       const existingFacts: LoreFact[] = [];
-      
+
       const context: AddStructuredLoreContext = {
-        addFact: jest.fn((key, value, category, source, worldId, sessionId, metadata) => {
+        addFact: jest.fn((
+          key: string,
+          value: string,
+          category: LoreCategory,
+          source: LoreSource,
+          worldId: EntityID,
+          _sessionId: EntityID | undefined,
+          metadata: LoreFact['metadata']
+        ) => {
           const factId = `fact-${addedFacts.length}` as EntityID;
           const fact: LoreFact = {
             id: factId,
@@ -217,16 +178,16 @@ describe('Lore Extraction Hardening Logic', () => {
           };
           addedFacts.push(fact);
           return factId;
-        }) as any,
+        }),
         setAliases: jest.fn(),
-        getFacts: jest.fn((options) => {
+        getFacts: jest.fn((options?: { worldId?: EntityID }) => {
           if (options?.worldId) {
             return existingFacts.filter(f => f.worldId === options.worldId);
           }
           return existingFacts;
         }),
       };
-      
+
       return { context, addedFacts, existingFacts };
     }
 
