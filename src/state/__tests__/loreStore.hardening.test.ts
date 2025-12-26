@@ -150,63 +150,25 @@ describe('Lore Extraction Hardening Logic', () => {
     function createMockAddStructuredLoreContext() {
       const addedFacts: LoreFact[] = [];
       const existingFacts: LoreFact[] = [];
-
-      const context: AddStructuredLoreContext = {
-        addFact: jest.fn((
-          key: string,
-          value: string,
-          category: LoreCategory,
-          source: LoreSource,
-          worldId: EntityID,
-          _sessionId: EntityID | undefined,
-          metadata: LoreFact['metadata']
-        ) => {
-          const factId = `fact-${addedFacts.length}` as EntityID;
-          const fact: LoreFact = {
-            id: factId,
-            worldId,
-            category,
-            key,
-            value,
-            aliases: [],
-            source,
-            visibility: 'world-shared',
-            metadata,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          addedFacts.push(fact);
-          return factId;
-        }),
-        setAliases: jest.fn(),
-        getFacts: jest.fn((options?: { worldId?: EntityID }) => {
-          if (options?.worldId) {
-            return existingFacts.filter(f => f.worldId === options.worldId);
-          }
-          return existingFacts;
-        }),
-      };
-
-      return { context, addedFacts, existingFacts };
-    }
-
-    function createTestExtraction(events: Array<{ 
-      description: string;
-      importance?: string;
-      significance?: string;
-    }>): StructuredLoreExtraction {
       return {
-        characters: [],
-        locations: [],
-        events: events.map(e => ({
-          description: e.description,
-          importance: e.importance as 'low' | 'medium' | 'high' | undefined,
-          significance: e.significance || 'Test event',
-          relatedEntities: [],
-        })),
-        rules: [],
+        context: {
+          addFact: jest.fn((key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, _sessionId: EntityID | undefined, metadata: LoreFact['metadata']) => {
+            const factId = `fact-${addedFacts.length}` as EntityID;
+            addedFacts.push({ id: factId, worldId, category, key, value, aliases: [], source, visibility: 'world-shared', metadata, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            return factId;
+          }),
+          setAliases: jest.fn(),
+          getFacts: jest.fn((options?: { worldId?: EntityID }) => options?.worldId ? existingFacts.filter(f => f.worldId === options.worldId) : existingFacts),
+        } as AddStructuredLoreContext,
+        addedFacts,
+        existingFacts,
       };
     }
+
+    const createTestExtraction = (events: Array<{ description: string; importance?: string; significance?: string }>): StructuredLoreExtraction => ({
+      characters: [], locations: [], rules: [],
+      events: events.map(e => ({ description: e.description, importance: e.importance as 'low' | 'medium' | 'high' | undefined, significance: e.significance || 'Test event', relatedEntities: [] })),
+    });
 
     it('should limit events to MAX_EVENTS_PER_EXTRACTION (3)', () => {
       const { context, addedFacts } = createMockAddStructuredLoreContext();
@@ -227,17 +189,13 @@ describe('Lore Extraction Hardening Logic', () => {
 
     it('should prioritize high importance events', () => {
       const { context, addedFacts } = createMockAddStructuredLoreContext();
-      const events = [
+      const extraction = createTestExtraction([
         { description: 'Low Imp Event', importance: 'low' },
         { description: 'Medium Imp Event', importance: 'medium' },
         { description: 'High Imp Event 1', importance: 'high' },
         { description: 'High Imp Event 2', importance: 'high' },
-      ];
-      // Expect: High 1, High 2, Medium (3 total)
-      const extraction = createTestExtraction(events);
-
+      ]);
       addStructuredLoreImpl(extraction, 'world-1', 'session-1', context);
-
       expect(addedFacts.length).toBe(3);
       const descriptions = addedFacts.map(f => f.value);
       expect(descriptions).toContain('High Imp Event 1');
@@ -248,99 +206,55 @@ describe('Lore Extraction Hardening Logic', () => {
 
     it('should treat missing importance as lower than low (rank 0)', () => {
       const { context, addedFacts } = createMockAddStructuredLoreContext();
-      const events = [
-        { description: 'No Imp Event', importance: undefined }, // Rank 0
-        { description: 'Low Imp Event', importance: 'low' }, // Rank 1
-        { description: 'Medium Imp Event', importance: 'medium' }, // Rank 2
-        { description: 'High Imp Event', importance: 'high' }, // Rank 3
-      ];
-      // With limit 3, expect High, Medium, Low. Missing should be dropped.
-      const extraction = createTestExtraction(events);
-
+      const extraction = createTestExtraction([
+        { description: 'No Imp Event', importance: undefined },
+        { description: 'Low Imp Event', importance: 'low' },
+        { description: 'Medium Imp Event', importance: 'medium' },
+        { description: 'High Imp Event', importance: 'high' },
+      ]);
       addStructuredLoreImpl(extraction, 'world-1', 'session-1', context);
-
       expect(addedFacts.length).toBe(3);
-      const descriptions = addedFacts.map(f => f.value);
-      expect(descriptions).not.toContain('No Imp Event');
+      expect(addedFacts.map(f => f.value)).not.toContain('No Imp Event');
     });
 
     it('should deduplicate events with same normalized description', () => {
       const { context, addedFacts } = createMockAddStructuredLoreContext();
-      const events = [
+      const extraction = createTestExtraction([
         { description: 'Unique Event 1', importance: 'medium' },
         { description: 'Duplicate Event', importance: 'medium' },
-        { description: 'duplicate event', importance: 'medium' }, // Case insensitive duplicate
+        { description: 'duplicate event', importance: 'medium' },
         { description: 'Unique Event 2', importance: 'medium' },
-      ];
-      // Expect 3 unique events
-      const extraction = createTestExtraction(events);
-
+      ]);
       addStructuredLoreImpl(extraction, 'world-1', 'session-1', context);
-
       expect(addedFacts.length).toBe(3);
-      const descriptions = addedFacts.map(f => f.value.toLowerCase());
-      expect(descriptions.filter(d => d === 'duplicate event').length).toBe(1);
+      expect(addedFacts.map(f => f.value.toLowerCase()).filter(d => d === 'duplicate event').length).toBe(1);
     });
 
     it('should not add events that already exist in the store', () => {
       const { context, addedFacts, existingFacts } = createMockAddStructuredLoreContext();
-      
-      // Add an existing fact
       const existingDesc = 'Existing Event';
-      existingFacts.push({
-        id: 'existing-1',
-        worldId: 'world-1',
-        category: 'events',
-        key: `world-1:event_${normalizeText(existingDesc, NORM_NAME).toLowerCase()}`,
-        value: existingDesc,
-        aliases: [],
-        source: 'narrative',
-        visibility: 'world-shared',
-        createdAt: '',
-        updatedAt: '',
-      });
-
-      const events = [
+      existingFacts.push({ id: 'existing-1', worldId: 'world-1', category: 'events', key: `world-1:event_${normalizeText(existingDesc, NORM_NAME).toLowerCase()}`, value: existingDesc, aliases: [], source: 'narrative', visibility: 'world-shared', createdAt: '', updatedAt: '' });
+      const extraction = createTestExtraction([
         { description: 'New Event', importance: 'medium' },
-        { description: existingDesc, importance: 'high' }, // Should be skipped even if high importance? 
-        // Logic: existingKeys check happens before existingEventValues check?
-        // Implementation:
-        // const existingKeys = new Set(existingFacts.map((fact) => fact.key));
-        // ...
-        // const existingEventValues = new Set(...)
-        // ...
-        // if (existingEventValues.has(normalizedDescription)) return;
-        
-        // So it should be skipped.
-      ];
-      
-      const extraction = createTestExtraction(events);
-
+        { description: existingDesc, importance: 'high' },
+      ]);
       addStructuredLoreImpl(extraction, 'world-1', 'session-1', context);
-
       expect(addedFacts.length).toBe(1);
       expect(addedFacts[0].value).toBe('New Event');
     });
 
     it('should allow duplicates that do not count towards the limit', () => {
-      // Logic: "Dedup and limiting are interleaved... Duplicates don't 'use up' slots"
       const { context, addedFacts } = createMockAddStructuredLoreContext();
-      const events = [
+      const extraction = createTestExtraction([
         { description: 'Event 1', importance: 'high' },
-        { description: 'Event 1', importance: 'high' }, // Duplicate
-        { description: 'Event 1', importance: 'high' }, // Duplicate
+        { description: 'Event 1', importance: 'high' },
+        { description: 'Event 1', importance: 'high' },
         { description: 'Event 2', importance: 'high' },
         { description: 'Event 3', importance: 'high' },
-      ];
-      // Should result in Event 1, Event 2, Event 3 (3 unique events)
-      
-      const extraction = createTestExtraction(events);
-
+      ]);
       addStructuredLoreImpl(extraction, 'world-1', 'session-1', context);
-
       expect(addedFacts.length).toBe(3);
-      const uniqueValues = new Set(addedFacts.map(f => f.value));
-      expect(uniqueValues.size).toBe(3);
+      expect(new Set(addedFacts.map(f => f.value)).size).toBe(3);
     });
   });
 });
