@@ -50,7 +50,7 @@ export class ChoiceGenerator {
       const context = this.buildContext(world, narrativeContext, characterIds);
       const basePrompt = template(context);
       const inventoryAwarePrompt = this.enhancePromptWithInventory(basePrompt, characterIds);
-      const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId, sessionId);
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
       const prompt = includeDecisionHistory && sessionId
         ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
@@ -453,8 +453,8 @@ export class ChoiceGenerator {
   /**
    * Enhances a prompt with lore context for the given world
    */
-  private enhancePromptWithLore(prompt: string, worldId: string): string {
-    const loreContext = getLoreContextForPrompt(worldId);
+  private enhancePromptWithLore(prompt: string, worldId: string, sessionId?: EntityID): string {
+    const loreContext = getLoreContextForPrompt(worldId, sessionId);
     return prompt + loreContext;
   }
 

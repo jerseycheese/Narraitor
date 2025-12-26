@@ -67,7 +67,8 @@ export interface LoreStore extends CrudStore<LoreFact> {
     source: LoreSource,
     worldId: EntityID,
     sessionId?: EntityID,
-    metadata?: LoreFact['metadata']
+    metadata?: LoreFact['metadata'],
+    visibility?: 'session-private' | 'world-shared'
   ) => EntityID;
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
@@ -203,7 +204,7 @@ export const useLoreStore = create<LoreStore>()(
       clearError: () => set({ error: null }),
       setLoading: (loading) => set({ loading }),
 
-      addFact: (key, value, category, source, worldId, sessionId, metadata) => {
+      addFact: (key, value, category, source, worldId, sessionId, metadata, visibility) => {
         if (!get().validateFact({ key, value, category, worldId })) {
           logger.error('[LoreStore] addFact validation failed', { key, value, category, worldId });
           set({ error: createStoreError('Invalid Lore Fact', 'Lore facts require a key, value, category, and world.') });
@@ -241,7 +242,7 @@ export const useLoreStore = create<LoreStore>()(
           worldId,
           sessionId,
           metadata,
-          visibility: 'session-private',
+          visibility: visibility ?? (sessionId ? 'session-private' : 'world-shared'),
         });
         logger.debug('[LoreStore] addFact created fact', { factId, key, value });
         return factId;
@@ -257,7 +258,14 @@ export const useLoreStore = create<LoreStore>()(
           results = results.filter((fact) => fact.category === options.category);
         }
         if (options?.sessionId) {
-          results = results.filter((fact) => fact.sessionId === options.sessionId);
+          // Apply visibility-aware filtering: world-shared OR (session-private AND my-session)
+          // Legacy facts without visibility are treated as world-shared
+          results = results.filter((fact) => {
+            if (!fact.visibility) return true; // Legacy fact - treat as world-shared
+            if (fact.visibility === 'world-shared') return true;
+            if (fact.visibility === 'session-private' && fact.sessionId === options.sessionId) return true;
+            return false;
+          });
         }
 
         return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -285,7 +293,9 @@ export const useLoreStore = create<LoreStore>()(
         const worldFacts = get().getFacts({ worldId });
 
         // Filter by visibility rules: world-shared OR (session-private AND my-session)
+        // Legacy facts without visibility are treated as world-shared
         const visibleFacts = worldFacts.filter(fact => {
+          if (!fact.visibility) return true; // Legacy fact - treat as world-shared
           if (fact.visibility === 'world-shared') return true;
           if (fact.visibility === 'session-private' && fact.sessionId === sessionId) return true;
           return false;

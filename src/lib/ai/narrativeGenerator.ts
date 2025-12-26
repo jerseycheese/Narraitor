@@ -835,7 +835,7 @@ Return ONLY the rewritten narrative.`;
       const prompt = template(context);
 
       // Capture lore context for debug info
-      const loreContext = getLoreContextForPrompt(request.worldId);
+      const loreContext = getLoreContextForPrompt(request.worldId, request.sessionId);
 
       // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
@@ -885,7 +885,7 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(request.worldId);
+          const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId);
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -1050,7 +1050,7 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(worldId);
+          const existingLoreContext = getLoreContextForPrompt(worldId, sessionId);
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext

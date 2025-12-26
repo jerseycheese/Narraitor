@@ -119,7 +119,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
       });
     } else {
       // Create new fact
-      addFact(key, value, category, 'manual', worldId, undefined, metadata);
+      addFact(key, value, category, 'manual', worldId, undefined, metadata, visibility);
     }
 
     // Reset form if creating new
