@@ -1,7 +1,7 @@
 // Shared utilities for API routes
 
 import { NextRequest, NextResponse } from 'next/server';
-import { globalRateLimiter, RateLimiter } from './rateLimiter';
+import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 
 /**
  * Get client IP address from request headers
@@ -19,30 +19,36 @@ export function getClientIP(request: NextRequest): string {
 
 /**
  * Handle rate limiting for API requests
- * Returns a NextResponse if rate limit is exceeded, null if allowed
+ * Returns both the rate limit result and a NextResponse if rate limit is exceeded
  */
-export function handleRateLimiting(request: NextRequest): NextResponse | null {
+export function handleRateLimiting(request: NextRequest): {
+  response: NextResponse | null;
+  result: RateLimitResult;
+} {
   const clientIP = getClientIP(request);
   const rateLimitResult = globalRateLimiter.checkLimit(clientIP);
-  
+
   if (!rateLimitResult.allowed) {
-    return NextResponse.json(
-      { 
-        error: RateLimiter.getErrorMessage(rateLimitResult.resetTime),
-        code: 'RATE_LIMIT_EXCEEDED'
-      },
-      { 
-        status: 429,
-        headers: {
-          'X-RateLimit-Limit': '50',
-          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-          'X-RateLimit-Reset': Math.ceil(rateLimitResult.resetTime / 1000).toString()
+    return {
+      response: NextResponse.json(
+        {
+          error: RateLimiter.getErrorMessage(rateLimitResult.resetTime),
+          code: 'RATE_LIMIT_EXCEEDED'
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': '50',
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': Math.ceil(rateLimitResult.resetTime / 1000).toString()
+          }
         }
-      }
-    );
+      ),
+      result: rateLimitResult
+    };
   }
-  
-  return null;
+
+  return { response: null, result: rateLimitResult };
 }
 
 /**
@@ -83,14 +89,13 @@ export function validateAPIKey(): string | null {
 
 /**
  * Create rate limit headers for successful responses
+ * Uses the existing rate limit result to avoid double-counting
  */
-export function createRateLimitHeaders(clientIP: string): Record<string, string> {
-  const rateLimitResult = globalRateLimiter.checkLimit(clientIP);
-  
+export function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': '50',
-    'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-    'X-RateLimit-Reset': Math.ceil(rateLimitResult.resetTime / 1000).toString()
+    'X-RateLimit-Remaining': result.remaining.toString(),
+    'X-RateLimit-Reset': Math.ceil(result.resetTime / 1000).toString()
   };
 }
 
@@ -280,7 +285,7 @@ export async function processGeminiTextRequest(
 
   try {
     // Rate limiting
-    const rateLimitResponse = handleRateLimiting(request);
+    const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
     if (rateLimitResponse) {
       return rateLimitResponse;
     }
@@ -373,7 +378,7 @@ export async function processGeminiTextRequest(
     };
 
     return NextResponse.json(responseData, {
-      headers: createRateLimitHeaders(getClientIP(request))
+      headers: createRateLimitHeaders(rateLimitResult)
     });
 
   } catch (error) {
