@@ -31,13 +31,14 @@ export interface AddStructuredLoreContext {
 }
 
 /**
- * Adds structured lore extraction to the store
- * Filters out generic entities and applies deduplication
+ * Adds structured lore extraction to the store.
+ * Filters out generic entities and applies deduplication.
  *
- * @param extraction - The structured lore extracted by AI
- * @param worldId - The world ID to add facts to
- * @param sessionId - Optional session ID for fact tracking
- * @param context - Store methods needed for adding facts
+ * @param extraction - The structured lore extracted by AI.
+ * @param worldId - The world ID to add facts to.
+ * @param sessionId - Optional session ID for fact tracking.
+ * @param context - Store methods needed for adding facts.
+ * @returns void
  */
 export function addStructuredLoreImpl(
   extraction: StructuredLoreExtraction,

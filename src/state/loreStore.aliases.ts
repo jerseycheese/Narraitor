@@ -15,11 +15,12 @@ export interface AliasManagementContext {
 }
 
 /**
- * Adds an alias to a lore fact
+ * Adds a single alias to a lore fact, enforcing category support and deduplication.
  *
- * @param id - The fact ID
- * @param alias - The alias to add
- * @param context - Store methods needed for updating facts
+ * @param id - The fact ID to update.
+ * @param alias - The alias to add (trimmed before storage).
+ * @param context - Store methods needed for reading/updating facts.
+ * @returns void
  */
 export function addAliasImpl(id: EntityID, alias: string, context: AliasManagementContext): void {
   const fact = context.getFact(id);
@@ -46,11 +47,12 @@ export function addAliasImpl(id: EntityID, alias: string, context: AliasManageme
 }
 
 /**
- * Removes an alias from a lore fact
+ * Removes a single alias from a lore fact.
  *
- * @param id - The fact ID
- * @param alias - The alias to remove
- * @param context - Store methods needed for updating facts
+ * @param id - The fact ID to update.
+ * @param alias - The alias to remove.
+ * @param context - Store methods needed for reading/updating facts.
+ * @returns void
  */
 export function removeAliasImpl(id: EntityID, alias: string, context: AliasManagementContext): void {
   const fact = context.getFact(id);
@@ -65,11 +67,12 @@ export function removeAliasImpl(id: EntityID, alias: string, context: AliasManag
 }
 
 /**
- * Sets all aliases for a lore fact (replaces existing)
+ * Replaces all aliases for a lore fact with a cleaned, de-duplicated list.
  *
- * @param id - The fact ID
- * @param aliases - The new aliases array
- * @param context - Store methods needed for updating facts
+ * @param id - The fact ID to update.
+ * @param aliases - The new aliases array (trimmed and de-duplicated).
+ * @param context - Store methods needed for reading/updating facts.
+ * @returns void
  */
 export function setAliasesImpl(id: EntityID, aliases: string[], context: AliasManagementContext): void {
   const fact = context.getFact(id);
@@ -96,13 +99,12 @@ export function setAliasesImpl(id: EntityID, aliases: string[], context: AliasMa
 }
 
 /**
- * Finds an entity by canonical name or any alias
- * Uses case-insensitive normalized matching
+ * Finds an entity by canonical name or any alias using normalized, case-insensitive matching.
  *
- * @param name - The name or alias to search for
- * @param worldId - The world ID to search within
- * @param context - Store methods needed for searching facts
- * @returns The matching fact or null if not found
+ * @param name - The name or alias to search for.
+ * @param worldId - The world ID to search within.
+ * @param context - Store methods needed for searching facts.
+ * @returns The matching fact, or null when no match is found.
  */
 export function findEntityByAnyNameImpl(
   name: string,
