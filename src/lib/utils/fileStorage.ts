@@ -53,6 +53,32 @@ export interface SaveImageResult {
 }
 
 /**
+ * Sanitize entity ID to prevent path traversal attacks
+ * Only allows alphanumeric characters, hyphens, and underscores
+ */
+function sanitizeEntityId(entityId: string): string {
+  // Remove any path separators and only keep safe characters
+  const sanitized = entityId.replace(/[^a-zA-Z0-9_-]/g, '');
+
+  if (sanitized.length === 0) {
+    throw new Error('Invalid entity ID: must contain at least one alphanumeric character');
+  }
+
+  return sanitized;
+}
+
+/**
+ * Validate category is one of the allowed values
+ */
+function validateCategory(category: string): asserts category is SaveImageOptions['category'] {
+  const validCategories: Array<SaveImageOptions['category']> = ['worlds', 'characters', 'portraits', 'items', 'endings'];
+
+  if (!validCategories.includes(category as SaveImageOptions['category'])) {
+    throw new Error(`Invalid category: must be one of ${validCategories.join(', ')}`);
+  }
+}
+
+/**
  * Get file extension from MIME type
  */
 function getExtensionFromMimeType(mimeType: string): string {
@@ -79,11 +105,15 @@ export async function saveBase64Image(options: SaveImageOptions): Promise<SaveIm
   const { category, entityId, mimeType, base64Data } = options;
 
   try {
+    // Validate and sanitize inputs to prevent path traversal
+    validateCategory(category);
+    const safeEntityId = sanitizeEntityId(entityId);
+
     // Get file extension from MIME type
     const extension = getExtensionFromMimeType(mimeType);
 
     // Create filename: entityId.ext (e.g., world-123.png)
-    const filename = `${entityId}.${extension}`;
+    const filename = `${safeEntityId}.${extension}`;
 
     // Define directory path: public/uploads/{category}
     const uploadDir = join(process.cwd(), 'public', 'uploads', category);
@@ -129,9 +159,35 @@ export async function saveBase64Image(options: SaveImageOptions): Promise<SaveIm
  */
 export async function deleteImage(url: string): Promise<boolean> {
   try {
-    // Convert public URL to file path
-    const relativePath = url.startsWith('/') ? url.slice(1) : url;
-    const filePath = join(process.cwd(), 'public', relativePath);
+    // Validate URL format and prevent path traversal
+    if (!url.startsWith('/uploads/')) {
+      throw new Error('Invalid image URL: must start with /uploads/');
+    }
+
+    // Extract and validate category and filename
+    const urlParts = url.split('/');
+    if (urlParts.length !== 4) {
+      throw new Error('Invalid image URL format: expected /uploads/{category}/{filename}');
+    }
+
+    const category = urlParts[2];
+    const filename = urlParts[3];
+
+    // Validate category
+    validateCategory(category);
+
+    // Sanitize filename (should be in format: entityId.ext)
+    const filenameParts = filename.split('.');
+    if (filenameParts.length !== 2) {
+      throw new Error('Invalid filename format: expected {entityId}.{ext}');
+    }
+
+    const safeEntityId = sanitizeEntityId(filenameParts[0]);
+    const extension = filenameParts[1];
+
+    // Reconstruct safe path
+    const safeFilename = `${safeEntityId}.${extension}`;
+    const filePath = join(process.cwd(), 'public', 'uploads', category, safeFilename);
 
     if (!existsSync(filePath)) {
       logger.warn('deleteImage', `File does not exist: ${filePath}`);
