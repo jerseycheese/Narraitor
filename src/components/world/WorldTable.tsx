@@ -219,7 +219,7 @@ export function WorldTable({
 
     const rowStyle: React.CSSProperties = world.image?.url
       ? {
-          backgroundImage: `linear-gradient(to right, hsl(var(--background) / 0.85), hsl(var(--background) / 0.75)), url(${world.image.url})`,
+          backgroundImage: `linear-gradient(to right, hsl(var(--background) / 0.90), hsl(var(--background) / 0.85)), url(${world.image.url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
