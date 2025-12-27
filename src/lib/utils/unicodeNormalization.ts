@@ -36,18 +36,26 @@ export function removeAccents(text: string): string {
  * Returns false for:
  * - Latin with accents (François, Zürich)
  * - Basic ASCII (John, Smith)
+ * - NFD decomposed Latin (e\u0301 → é in NFC)
+ *
+ * Normalizes to NFC first to handle pre-decomposed (NFD) input consistently.
+ * This ensures "François" in both NFC and NFD forms are treated identically.
  *
  * @param text - Text to check
  * @returns true if text contains non-Latin characters
  */
 export function hasNonLatinCharacters(text: string): boolean {
+  // Normalize to NFC first to handle pre-decomposed input (NFD)
+  // This ensures combining diacritics (U+0300-U+036F) are composed with base chars
+  const normalized = text.normalize('NFC');
+
   // Latin-1 Supplement (includes accented chars): U+0000-U+00FF
   // Latin Extended-A: U+0100-U+017F
   // Latin Extended-B: U+0180-U+024F
   // Allow spaces, hyphens, apostrophes, periods, underscores
   // Use * instead of + to match empty string as Latin
   const latinRange = /^[\u0000-\u024F\s\-'._]*$/;
-  return !latinRange.test(text);
+  return !latinRange.test(normalized);
 }
 
 /**

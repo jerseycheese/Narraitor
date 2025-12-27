@@ -77,6 +77,24 @@ describe('Unicode Normalization', () => {
       expect(hasNonLatinCharacters('')).toBe(false); // Empty matches Latin range
       expect(hasNonLatinCharacters('   ')).toBe(false);
     });
+
+    it('handles NFD pre-decomposed Latin input consistently', () => {
+      // NFD (pre-decomposed) form: e + combining acute accent (U+0301)
+      const francoisNFD = 'Franc\u0327ois'; // ç in NFD form (c + combining cedilla)
+      const francoisNFC = 'François'; // Normal NFC form
+
+      // Both forms should be treated as Latin
+      expect(hasNonLatinCharacters(francoisNFD)).toBe(false);
+      expect(hasNonLatinCharacters(francoisNFC)).toBe(false);
+
+      // Multiple combining diacritics
+      const accentedNFD = 'e\u0301'; // é in NFD form (e + combining acute)
+      expect(hasNonLatinCharacters(accentedNFD)).toBe(false);
+
+      // Complex case: café with all diacritics in NFD
+      const cafeNFD = 'cafe\u0301'; // café in NFD
+      expect(hasNonLatinCharacters(cafeNFD)).toBe(false);
+    });
   });
 
   describe('generateSafeKey', () => {
@@ -211,6 +229,19 @@ describe('Unicode Normalization', () => {
 
         expect(key1).toBe('john_smith');
         expect(key2).toBe('john_smith');
+      });
+
+      it('generates consistent keys for NFD vs NFC input', () => {
+        // NFD (pre-decomposed) vs NFC (composed) should produce same key
+        const francoisNFD = 'Franc\u0327ois'; // ç in NFD form (c + combining cedilla)
+        const francoisNFC = 'François'; // Normal NFC form
+
+        const keyNFD = generateSafeKey(francoisNFD);
+        const keyNFC = generateSafeKey(francoisNFC);
+
+        // Both should normalize to the same key
+        expect(keyNFD).toBe(keyNFC);
+        expect(keyNFD).toBe('francois');
       });
     });
 

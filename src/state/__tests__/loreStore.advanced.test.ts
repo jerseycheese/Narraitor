@@ -640,5 +640,41 @@ describe('LoreStore - Advanced Features', () => {
       expect(fact?.key).toMatch(/^world-1:character_character_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
       expect(fact?.value).toBe('Player💀'); // Original preserved
     });
+
+    test('does not truncate UUID keys for non-Latin event/rule descriptions', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [],
+        events: [
+          { description: '大きな戦いが始まる', importance: 'high' as const } // Japanese: "A great battle begins"
+        ],
+        rules: [
+          { rule: '魔法には集中が必要', importance: 'medium' as const } // Japanese: "Magic requires focus"
+        ]
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const eventFact = facts.find(f => f.category === 'events');
+      const ruleFact = facts.find(f => f.category === 'rules');
+
+      // UUID keys should remain valid (not truncated by maxLength)
+      // Events/rules use maxLength=30, but UUIDs are ~47 chars with prefix
+      expect(eventFact?.key).toMatch(/^world-1:event_event_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+      expect(ruleFact?.key).toMatch(/^world-1:rule_rule_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+      // Keys should pass validation (not truncated to invalid partial UUID)
+      expect(result.current.validateKey(eventFact!.key)).toBe(true);
+      expect(result.current.validateKey(ruleFact!.key)).toBe(true);
+
+      // Original descriptions preserved
+      expect(eventFact?.value).toBe('大きな戦いが始まる');
+      expect(ruleFact?.value).toBe('魔法には集中が必要');
+    });
   });
 });

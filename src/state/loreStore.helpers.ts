@@ -23,7 +23,11 @@ export const MAX_EVENTS_PER_EXTRACTION = 3;
  */
 export function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
   const safeKey = generateSafeKey(name, category);
-  const truncatedKey = maxLength ? safeKey.substring(0, maxLength) : safeKey;
+
+  // Don't truncate UUID keys - they need to remain valid
+  const hasUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(safeKey);
+  const truncatedKey = (maxLength && !hasUUID) ? safeKey.substring(0, maxLength) : safeKey;
+
   return `${worldId}:${category}_${truncatedKey}`;
 }
 
