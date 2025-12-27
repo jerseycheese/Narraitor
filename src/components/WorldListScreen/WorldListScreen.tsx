@@ -3,10 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import WorldList from '@/components/WorldList/WorldList';
+import { WorldTable } from '@/components/world/WorldTable';
+import { WorldViewToggle, WorldViewMode } from '@/components/world/WorldViewToggle';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { World } from '@/types/world.types';
+import { EntityID } from '@/types/common.types';
 import { getUserFriendlyError, UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 
 interface WorldListScreenProps {
@@ -16,15 +19,43 @@ interface WorldListScreenProps {
   _storeActions?: {
     setCurrentWorld: (id: string) => void;
   };
+  /** Callback to pass the view toggle component to parent for header placement */
+  onViewToggleRender?: (toggle: React.ReactNode) => void;
 }
 
-const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions }) => {
+const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions, onViewToggleRender }) => {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<UserFriendlyError | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
+  const [selectedWorldIds, setSelectedWorldIds] = useState<EntityID[]>([]);
+
+  // View mode with localStorage persistence (following inventory pattern)
+  const [viewMode, setViewMode] = useState<WorldViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('world-view-mode');
+      return (saved as WorldViewMode) || 'grid';
+    }
+    return 'grid';
+  });
+
+  const handleViewModeChange = (mode: WorldViewMode) => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('world-view-mode', mode);
+    }
+  };
+
+  // Pass the view toggle component to parent for header placement
+  useEffect(() => {
+    if (onViewToggleRender) {
+      onViewToggleRender(
+        <WorldViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
+      );
+    }
+  }, [viewMode, onViewToggleRender]);
 
   useEffect(() => {
     try {
@@ -60,7 +91,16 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     useWorldStore.getState().setCurrentWorld(worldId);
   };
 
-  const handleDeleteClick = (worldId: string) => {
+  const toggleWorldSelection = (worldId: EntityID) => {
+    setSelectedWorldIds(prev => {
+      if (prev.includes(worldId)) return prev.filter(id => id !== worldId);
+      if (prev.length >= 5) return prev;  // Max 5 for comparison
+      return [...prev, worldId];
+    });
+  };
+
+  const handleDeleteClick = (worldId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setWorldToDeleteId(worldId);
     setIsDeleteDialogOpen(true);
   };
@@ -73,6 +113,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   const handleConfirmDelete = () => {
     if (worldToDeleteId) {
       useWorldStore.getState().deleteWorld(worldToDeleteId);
+      // Also remove from selection if deleted
+      setSelectedWorldIds(prev => prev.filter(id => id !== worldToDeleteId));
     }
     handleCloseDeleteDialog();
   };
@@ -106,14 +148,25 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   return (
     <main>
-      <WorldList 
-        worlds={worlds} 
-        currentWorldId={currentWorldId}
-        onSelectWorld={handleSelectWorld} 
-        onDeleteWorld={handleDeleteClick}
-        _router={_router}
-        _storeActions={_storeActions}
-      />
+      {viewMode === 'table' ? (
+        <WorldTable
+          worlds={worlds}
+          selectedWorldIds={selectedWorldIds}
+          onToggleSelect={toggleWorldSelection}
+          onDeleteWorld={handleDeleteClick}
+        />
+      ) : (
+        <WorldList 
+          worlds={worlds} 
+          currentWorldId={currentWorldId}
+          onSelectWorld={handleSelectWorld} 
+          onDeleteWorld={(id) => handleDeleteClick(id)}
+          selectedWorldIds={selectedWorldIds}
+          onToggleSelect={toggleWorldSelection}
+          _router={_router}
+          _storeActions={_storeActions}
+        />
+      )}
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}

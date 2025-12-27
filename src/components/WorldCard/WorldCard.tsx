@@ -12,6 +12,7 @@ import {
   CardActionGroup,
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
@@ -21,8 +22,12 @@ interface WorldCardProps {
   world: World;
   /** Whether this world is currently active */
   isActive?: boolean;
+  /** Whether this world is selected for comparison */
+  isSelected?: boolean;
   /** Callback when user selects this world */
   onSelect: (worldId: string) => void;
+  /** Callback when user toggles selection for comparison */
+  onToggleSelect?: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
@@ -67,7 +72,9 @@ interface WorldCardProps {
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
   isActive = false,
+  isSelected = false,
   onSelect,
+  onToggleSelect,
   onDelete,
   characters = [],
   _storeActions,
@@ -144,42 +151,56 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <ActiveStateCard
       isActive={isActive}
       activeText="Currently Active World"
+      showActiveIndicator={isActive}
       testId="world-card"
       hasImage={true}
+      className={isSelected ? "border-primary bg-primary/5 ring-2 ring-primary" : undefined}
     >
       {/* Always show Hero component - with image or themed background */}
-      <Link href={`/worlds/${world.id}`} className="block cursor-pointer">
-        {(() => {
-          // Use seeded placeholder image during Playwright tests if world has no image
-          const isPlaywright = typeof window !== 'undefined' &&
-            (window.navigator.userAgent.includes('Playwright') || (window as unknown as Record<string, unknown>).__playwright);
-          const STABLE_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
-          const heroImageUrl = world.image?.url || (isPlaywright ? STABLE_PLACEHOLDER : undefined);
-          const heroImage = heroImageUrl ? { url: heroImageUrl, alt: `${world.name} world` } : undefined;
-          
-          return (
-          <Hero
-            title={world.name}
-            image={heroImage}
-            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
-            badge={
-              world.genre && (
-                <span
-                  data-testid="world-card-genre"
-                  className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm"
-                >
-                  {getGenreLabel(world.genre)}
-                </span>
-              )
-            }
-            height="h-48"
-            titleTestId="world-card-name"
-            titleElement="h2"
-            borderRadius="top"
-          />
-          );
-        })()}
-      </Link>
+      <div className="relative group">
+        <Link href={`/worlds/${world.id}`} className="block cursor-pointer">
+          {(() => {
+            // Use seeded placeholder image during Playwright tests if world has no image
+            const isPlaywright = typeof window !== 'undefined' &&
+              (window.navigator.userAgent.includes('Playwright') || (window as unknown as Record<string, unknown>).__playwright);
+            const STABLE_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
+            const heroImageUrl = world.image?.url || (isPlaywright ? STABLE_PLACEHOLDER : undefined);
+            const heroImage = heroImageUrl ? { url: heroImageUrl, alt: `${world.name} world` } : undefined;
+            
+            return (
+            <Hero
+              title={world.name}
+              image={heroImage}
+              theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+              badge={
+                world.genre && (
+                  <span
+                    data-testid="world-card-genre"
+                    className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm"
+                  >
+                    {getGenreLabel(world.genre)}
+                  </span>
+                )
+              }
+              height="h-48"
+              titleTestId="world-card-name"
+              titleElement="h2"
+              borderRadius="top"
+            />
+            );
+          })()}
+        </Link>
+        {onToggleSelect && (
+          <div className="absolute top-3 right-3 z-10">
+            <Checkbox
+              checked={isSelected}
+              onChange={() => onToggleSelect(world.id)}
+              aria-label={`Select ${world.name} for comparison`}
+              className="bg-white/90 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+            />
+          </div>
+        )}
+      </div>
 
       <div className="p-4 flex-grow flex flex-col">
         {/* Content area that grows to fill space */}
