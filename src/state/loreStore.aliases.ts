@@ -15,7 +15,8 @@ export interface AliasManagementContext {
 }
 
 /**
- * Adds a single alias to a lore fact, enforcing category support and deduplication.
+ * Adds a single alias to a lore fact, which means category checks and de-duplication
+ * happen before anything gets stored.
  *
  * @param id - The fact ID to update.
  * @param alias - The alias to add (trimmed before storage).
@@ -47,7 +48,8 @@ export function addAliasImpl(id: EntityID, alias: string, context: AliasManageme
 }
 
 /**
- * Removes a single alias from a lore fact.
+ * Removes a single alias from a lore fact so the canonical value stays intact,
+ * but the extra name stops matching.
  *
  * @param id - The fact ID to update.
  * @param alias - The alias to remove.
@@ -67,7 +69,8 @@ export function removeAliasImpl(id: EntityID, alias: string, context: AliasManag
 }
 
 /**
- * Replaces all aliases for a lore fact with a cleaned, de-duplicated list.
+ * Replaces all aliases for a lore fact with a cleaned, de-duplicated list,
+ * which keeps the stored data tidy and predictable.
  *
  * @param id - The fact ID to update.
  * @param aliases - The new aliases array (trimmed and de-duplicated).
@@ -99,7 +102,8 @@ export function setAliasesImpl(id: EntityID, aliases: string[], context: AliasMa
 }
 
 /**
- * Finds an entity by canonical name or any alias using normalized, case-insensitive matching.
+ * Finds an entity by canonical name or any alias using normalized, case-insensitive
+ * matching, so lookups behave the same no matter how the input is cased.
  *
  * @param name - The name or alias to search for.
  * @param worldId - The world ID to search within.

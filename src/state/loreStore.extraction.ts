@@ -31,8 +31,8 @@ export interface AddStructuredLoreContext {
 }
 
 /**
- * Adds structured lore extraction to the store.
- * Filters out generic entities and applies deduplication.
+ * Adds structured lore extraction to the store, which means generic entities are
+ * filtered out and duplicates are avoided before anything is persisted.
  *
  * @param extraction - The structured lore extracted by AI.
  * @param worldId - The world ID to add facts to.
