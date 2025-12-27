@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { WorldTable } from '@/components/world/WorldTable';
 import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
@@ -27,9 +27,31 @@ const mockWorlds: World[] = [
     name: 'Fantasy Realm',
     description: 'A magical world',
     genre: 'fantasy',
-    attributes: [{ id: 'attr-1', name: 'Strength', type: 'number' }],
-    skills: [{ id: 'skill-1', name: 'Combat', type: 'skill' }],
-    settings: {},
+    attributes: [{
+      id: 'attr-1' as EntityID,
+      name: 'Strength',
+      worldId: 'world-1' as EntityID,
+      description: 'Physical strength',
+      baseValue: 10,
+      minValue: 1,
+      maxValue: 20,
+    }],
+    skills: [{
+      id: 'skill-1' as EntityID,
+      name: 'Combat',
+      worldId: 'world-1' as EntityID,
+      description: 'Fighting ability',
+      difficulty: 'medium',
+      baseValue: 5,
+      minValue: 0,
+      maxValue: 10,
+    }],
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 20,
+      attributePointPool: 50,
+      skillPointPool: 30,
+    },
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
@@ -38,9 +60,22 @@ const mockWorlds: World[] = [
     name: 'Sci-Fi Universe',
     description: 'A futuristic world',
     genre: 'sci-fi',
-    attributes: [{ id: 'attr-2', name: 'Intelligence', type: 'number' }],
+    attributes: [{
+      id: 'attr-2' as EntityID,
+      name: 'Intelligence',
+      worldId: 'world-2' as EntityID,
+      description: 'Mental acuity',
+      baseValue: 12,
+      minValue: 1,
+      maxValue: 20,
+    }],
     skills: [],
-    settings: {},
+    settings: {
+      maxAttributes: 8,
+      maxSkills: 15,
+      attributePointPool: 40,
+      skillPointPool: 25,
+    },
     createdAt: '2024-01-02T00:00:00.000Z',
     updatedAt: '2024-01-02T00:00:00.000Z',
   },

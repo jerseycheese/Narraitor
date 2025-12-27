@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
-    getRowId: (row: any) => row.id || (row as any)._id,
+    getRowId: (row) => (row as { id?: string; _id?: string }).id || (row as { id?: string; _id?: string })._id || '',
     state: {
       sorting,
       columnFilters,

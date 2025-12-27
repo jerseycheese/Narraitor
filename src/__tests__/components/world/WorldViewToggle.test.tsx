@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { WorldViewToggle, WorldViewMode } from '@/components/world/WorldViewToggle';
+import { WorldViewToggle } from '@/components/world/WorldViewToggle';
 
 describe('WorldViewToggle', () => {
   const mockOnModeChange = jest.fn();
