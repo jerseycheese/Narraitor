@@ -79,7 +79,8 @@ function validateCategory(category: string): asserts category is SaveImageOption
 }
 
 /**
- * Get file extension from MIME type
+ * Validate and get file extension from MIME type
+ * Only allows whitelisted image MIME types
  */
 function getExtensionFromMimeType(mimeType: string): string {
   const mimeMap: Record<string, string> = {
@@ -91,7 +92,30 @@ function getExtensionFromMimeType(mimeType: string): string {
     'image/svg+xml': 'svg',
   };
 
-  return mimeMap[mimeType.toLowerCase()] || 'png';
+  const extension = mimeMap[mimeType.toLowerCase()];
+
+  if (!extension) {
+    throw new Error(`Invalid MIME type: ${mimeType}. Only image types are allowed.`);
+  }
+
+  return extension;
+}
+
+/**
+ * Validate that the final file path is within the allowed directory
+ * Prevents path traversal even if sanitization is bypassed
+ */
+function validatePathWithinDirectory(filePath: string, allowedDirectory: string): void {
+  const { normalize, resolve } = require('path');
+
+  // Resolve to absolute paths
+  const absoluteFilePath = resolve(filePath);
+  const absoluteAllowedDir = resolve(allowedDirectory);
+
+  // Check if the file path starts with the allowed directory
+  if (!absoluteFilePath.startsWith(absoluteAllowedDir + '/') && absoluteFilePath !== absoluteAllowedDir) {
+    throw new Error('Path traversal detected: file path is outside allowed directory');
+  }
 }
 
 /**
@@ -127,10 +151,13 @@ export async function saveBase64Image(options: SaveImageOptions): Promise<SaveIm
     // Full file path
     const filePath = join(uploadDir, filename);
 
-    // Convert base64 to buffer
+    // Final security check: ensure path is within allowed directory
+    validatePathWithinDirectory(filePath, uploadDir);
+
+    // Convert base64 to buffer (validated user data, safe to write)
     const imageBuffer = Buffer.from(base64Data, 'base64');
 
-    // Save file
+    // Save file to validated path
     logger.debug('saveBase64Image', `Saving image to: ${filePath} (${imageBuffer.length} bytes)`);
     await writeFile(filePath, imageBuffer);
 
@@ -187,7 +214,11 @@ export async function deleteImage(url: string): Promise<boolean> {
 
     // Reconstruct safe path
     const safeFilename = `${safeEntityId}.${extension}`;
-    const filePath = join(process.cwd(), 'public', 'uploads', category, safeFilename);
+    const uploadsDir = join(process.cwd(), 'public', 'uploads', category);
+    const filePath = join(uploadsDir, safeFilename);
+
+    // Final security check: ensure path is within allowed directory
+    validatePathWithinDirectory(filePath, uploadsDir);
 
     if (!existsSync(filePath)) {
       logger.warn('deleteImage', `File does not exist: ${filePath}`);
