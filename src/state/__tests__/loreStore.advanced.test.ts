@@ -179,12 +179,14 @@ describe('LoreStore - Advanced Features', () => {
       // Valid keys
       expect(result.current.validateKey('valid_key')).toBe(true);
       expect(result.current.validateKey('key123')).toBe(true);
-      expect(result.current.validateKey('KEY_NAME')).toBe(true);
+      expect(result.current.validateKey('key_name')).toBe(true);
 
       // Invalid keys
       expect(result.current.validateKey('key with spaces')).toBe(false);
       expect(result.current.validateKey('key-with-dashes')).toBe(false);
       expect(result.current.validateKey('123startswithnumber')).toBe(false);
+      expect(result.current.validateKey('KEY_NAME')).toBe(false);
+      expect(result.current.validateKey('KeyWithCaps')).toBe(false);
     });
   });
 
@@ -480,6 +482,197 @@ describe('LoreStore - Advanced Features', () => {
       const characterFacts = facts.filter(f => f.category === 'characters' && f.value === 'Duplicate Character');
 
       expect(characterFacts.length).toBe(1);
+    });
+  });
+
+  describe('International Character Handling', () => {
+    test('handles Western European character names', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: 'André Duval', importance: 'medium' as const }, // No 's' endings to avoid plural detection
+          { name: 'Françoise Laurent', importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+
+      const andreFact = facts.find(f => f.value === 'André Duval');
+      const francoiseFact = facts.find(f => f.value === 'Françoise Laurent');
+
+      // Keys should be normalized (lowercase, no accents)
+      expect(andreFact?.key).toBe('world-1:character_andre_duval');
+      expect(francoiseFact?.key).toBe('world-1:character_francoise_laurent');
+
+      // Keys should pass validation
+      expect(result.current.validateKey(andreFact!.key)).toBe(true);
+      expect(result.current.validateKey(francoiseFact!.key)).toBe(true);
+    });
+
+    test('handles non-Latin character names with UUID fallback', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: '村田さん', importance: 'medium' as const },
+          { name: 'Владимир', importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const japaneseFact = facts.find(f => f.value === '村田さん');
+      const cyrillicFact = facts.find(f => f.value === 'Владимир');
+
+      // Keys should have UUID fallback for non-Latin scripts
+      expect(japaneseFact?.key).toMatch(/^world-1:character_character_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+      expect(cyrillicFact?.key).toMatch(/^world-1:character_character_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+      // Validation should accept UUID format
+      expect(result.current.validateKey(japaneseFact!.key)).toBe(true);
+      expect(result.current.validateKey(cyrillicFact!.key)).toBe(true);
+    });
+
+    test('preserves original names in fact values', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: '村田さん', importance: 'medium' as const }
+        ],
+        locations: [
+          { name: 'François Plaza', importance: 'medium' as const }
+        ],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const characterFact = facts.find(f => f.category === 'characters');
+      const locationFact = facts.find(f => f.category === 'locations');
+
+      // Original Unicode names preserved in values
+      expect(characterFact?.value).toBe('村田さん');
+      expect(locationFact?.value).toBe('François Plaza');
+    });
+
+    test('rejects uppercase keys, accepts lowercase and UUID keys', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      // Uppercase keys rejected
+      expect(result.current.validateKey('OLD_KEY_FORMAT')).toBe(false);
+      expect(result.current.validateKey('KeyWithCaps')).toBe(false);
+      expect(result.current.validateKey('world-1:OLD_FORMAT')).toBe(false);
+
+      // Lowercase keys accepted
+      expect(result.current.validateKey('new_lowercase_format')).toBe(true);
+      expect(result.current.validateKey('world-1:character_francois')).toBe(true);
+
+      // UUID keys accepted
+      const uuidKey = 'world-1:character_character_abc12345-def6-7890-abcd-ef1234567890';
+      expect(result.current.validateKey(uuidKey)).toBe(true);
+    });
+
+    test('handles mixed Latin and special characters', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: "Jean-Pierre O'Neill", importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const fact = facts.find(f => f.category === 'characters');
+
+      // Special characters replaced with underscores
+      expect(fact?.key).toBe('world-1:character_jean_pierre_o_neill');
+      expect(fact?.value).toBe("Jean-Pierre O'Neill"); // Original preserved
+    });
+
+    test('handles emoji in names with UUID fallback', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [
+          { name: 'Player💀', importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const fact = facts.find(f => f.category === 'characters');
+
+      // Emoji triggers UUID fallback
+      expect(fact?.key).toMatch(/^world-1:character_character_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+      expect(fact?.value).toBe('Player💀'); // Original preserved
+    });
+
+    test('does not truncate UUID keys for non-Latin event/rule descriptions', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [],
+        events: [
+          { description: '大きな戦いが始まる', importance: 'high' as const } // Japanese: "A great battle begins"
+        ],
+        rules: [
+          { rule: '魔法には集中が必要', importance: 'medium' as const } // Japanese: "Magic requires focus"
+        ]
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const facts = result.current.getFacts({ worldId: 'world-1' });
+      const eventFact = facts.find(f => f.category === 'events');
+      const ruleFact = facts.find(f => f.category === 'rules');
+
+      // UUID keys should remain valid (not truncated by maxLength)
+      // Events/rules use maxLength=30, but UUIDs are ~47 chars with prefix
+      expect(eventFact?.key).toMatch(/^world-1:event_event_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+      expect(ruleFact?.key).toMatch(/^world-1:rule_rule_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+      // Keys should pass validation (not truncated to invalid partial UUID)
+      expect(result.current.validateKey(eventFact!.key)).toBe(true);
+      expect(result.current.validateKey(ruleFact!.key)).toBe(true);
+
+      // Original descriptions preserved
+      expect(eventFact?.value).toBe('大きな戦いが始まる');
+      expect(ruleFact?.value).toBe('魔法には集中が必要');
     });
   });
 });

@@ -134,7 +134,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -157,7 +157,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -189,7 +189,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -212,7 +212,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId1: string, factId2: string;
       act(() => {
         factId1 = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Seraphina',
           'characters',
           'manual',
@@ -221,7 +221,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
         result.current.setAliases(factId1, ['Lady Seraphina', 'Lady Sera']);
 
         factId2 = result.current.addFact(
-          'character:lady-victoria',
+          'world-1:character_lady_victoria',
           'Victoria',
           'characters',
           'manual',
@@ -245,7 +245,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let charFactId: string, locFactId: string;
       act(() => {
         charFactId = result.current.addFact(
-          'character:starweaver',
+          'world-1:character_starweaver',
           'Lyra Starweaver',
           'characters',
           'manual',
@@ -254,7 +254,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
         result.current.setAliases(charFactId, ['Star Mage', 'The Starweaver']);
 
         locFactId = result.current.addFact(
-          'location:star-tower',
+          'world-1:location_star_tower',
           'The Star Tower',
           'locations',
           'manual',
@@ -283,7 +283,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -306,7 +306,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -332,7 +332,7 @@ describe('LoreStore - Duplicate Detection and Search', () => {
       let factId: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
