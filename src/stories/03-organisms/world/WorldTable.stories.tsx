@@ -118,6 +118,28 @@ export const WithSelection: Story = {
   decorators: [MockStoreDecorator],
 };
 
+// Create a proper React component for the interactive story
+const InteractiveWorldTable = () => {
+  const [selectedIds, setSelectedIds] = useState<EntityID[]>([]);
+
+  const handleToggle = (id: EntityID) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(p => p !== id)
+        : prev.length < 5 ? [...prev, id] : prev
+    );
+  };
+
+  return (
+    <WorldTable
+      worlds={mockWorlds}
+      selectedWorldIds={selectedIds}
+      onToggleSelect={handleToggle}
+      onDeleteWorld={() => console.log('Delete clicked')}
+    />
+  );
+};
+
 export const Interactive: Story = {
   args: {
     worlds: mockWorlds,
@@ -125,26 +147,7 @@ export const Interactive: Story = {
     onToggleSelect: () => {},
     onDeleteWorld: () => {},
   },
-  render: () => {
-    const [selectedIds, setSelectedIds] = useState<EntityID[]>([]);
-    
-    const handleToggle = (id: EntityID) => {
-      setSelectedIds(prev => 
-        prev.includes(id) 
-          ? prev.filter(p => p !== id)
-          : prev.length < 5 ? [...prev, id] : prev
-      );
-    };
-
-    return (
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={selectedIds}
-        onToggleSelect={handleToggle}
-        onDeleteWorld={() => console.log('Delete clicked')}
-      />
-    );
-  },
+  render: () => <InteractiveWorldTable />,
   decorators: [MockStoreDecorator],
 };
 

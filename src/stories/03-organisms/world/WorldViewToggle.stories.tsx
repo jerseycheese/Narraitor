@@ -36,13 +36,16 @@ export const TableMode: Story = {
   },
 };
 
+// Create a proper React component for the interactive story
+const InteractiveViewToggle = () => {
+  const [mode, setMode] = useState<'grid' | 'table'>('grid');
+  return <WorldViewToggle mode={mode} onModeChange={setMode} />;
+};
+
 export const Interactive: Story = {
   args: {
     mode: 'grid',
     onModeChange: () => {},
   },
-  render: () => {
-    const [mode, setMode] = useState<'grid' | 'table'>('grid');
-    return <WorldViewToggle mode={mode} onModeChange={setMode} />;
-  },
+  render: () => <InteractiveViewToggle />,
 };
