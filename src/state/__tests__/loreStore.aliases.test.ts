@@ -14,7 +14,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -36,7 +36,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -60,7 +60,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -83,7 +83,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -106,7 +106,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -140,7 +140,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -163,7 +163,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -198,7 +198,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -220,7 +220,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -243,7 +243,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -265,7 +265,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -287,7 +287,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -309,7 +309,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -344,7 +344,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -365,7 +365,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -389,7 +389,7 @@ describe('LoreStore - Alias Management', () => {
       let factId!: string;
       act(() => {
         factId = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -421,7 +421,7 @@ describe('LoreStore - Alias Management', () => {
       let factId1!: string, factId2!: string;
       act(() => {
         factId1 = result.current.addFact(
-          'character:lady-seraphina',
+          'world-1:character_lady_seraphina',
           'Lady Seraphina',
           'characters',
           'manual',
@@ -430,7 +430,7 @@ describe('LoreStore - Alias Management', () => {
         result.current.setAliases(factId1, ['Seraphina']);
 
         factId2 = result.current.addFact(
-          'character:lady-victoria',
+          'world-2:character_lady_victoria',
           'Lady Victoria',
           'characters',
           'manual',
@@ -456,7 +456,7 @@ describe('LoreStore - Alias Management', () => {
       let specialFactId!: string;
       act(() => {
         specialFactId = result.current.addFact(
-          'character:dr-oconnor',
+          'world-1:character_dr_oconnor',
           "Dr. O'Connor",
           'characters',
           'manual',

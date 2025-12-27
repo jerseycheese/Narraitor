@@ -1,5 +1,6 @@
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
 import { safeTrim } from '@/lib/utils';
+import { generateSafeKey } from '@/lib/utils/unicodeNormalization';
 
 /**
  * Maximum number of events to extract per narrative segment
@@ -8,12 +9,22 @@ import { safeTrim } from '@/lib/utils';
 export const MAX_EVENTS_PER_EXTRACTION = 3;
 
 /**
- * Helper function to generate normalized lore keys
+ * Helper function to generate normalized lore keys with Unicode support
+ *
+ * Handles international characters via NFD decomposition and diacritic removal:
+ * - Western European: François → world-123:character_francois
+ * - Non-Latin scripts: 村田さん → world-123:character_character_uuid-abc123
+ *
+ * @param worldId - World identifier
+ * @param category - Lore category (character, location, event, rule)
+ * @param name - Original name (preserves Unicode in fact.value)
+ * @param maxLength - Optional maximum length for truncation
+ * @returns Normalized lore key in format: {worldId}:{category}_{normalizedName}
  */
 export function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
-  const normalizedName = normalizeText(name, NORM_NAME).toLowerCase().replace(/[^a-z0-9]+/g, '_');
-  const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
-  return `${worldId}:${category}_${truncatedName}`;
+  const safeKey = generateSafeKey(name, category);
+  const truncatedKey = maxLength ? safeKey.substring(0, maxLength) : safeKey;
+  return `${worldId}:${category}_${truncatedKey}`;
 }
 
 /**

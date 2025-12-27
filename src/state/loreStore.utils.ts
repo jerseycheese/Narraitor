@@ -149,15 +149,31 @@ export function validateFactUniquenessImpl(
 }
 
 /**
- * Validates a lore key format
+ * Validates a lore key format (NEW FORMAT ONLY - no backwards compatibility)
+ *
+ * Accepts:
+ * - Structured keys: worldId:category_name (lowercase + underscores)
+ * - Structured keys with UUID: worldId:category_uuid-abc123
+ * - Simple lowercase keys: my_key_name
+ * - UUIDs: abc123-def456-...
+ *
+ * Rejects (BREAKING CHANGE):
+ * - Old uppercase keys: KEY_NAME, MyKey
+ * - Keys starting with uppercase: KeyName
  */
 export function validateKeyImpl(key: string): boolean {
   if (key.includes(':')) {
-    const structuredPattern = /^[a-zA-Z0-9_-]+:[a-zA-Z0-9:_-]+$/;
+    // Structured keys: worldId:category_name or worldId:category_uuid-abc123
+    // Format: lowercase + underscores OR UUID after last underscore
+    const structuredPattern = /^[a-zA-Z0-9_-]+:[a-z0-9_]+(?:_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?$/;
     return structuredPattern.test(key);
   }
-  const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-  return keyPattern.test(key);
+
+  // Simple keys: lowercase alphanumeric + underscore OR valid UUID only
+  const normalizedPattern = /^[a-z][a-z0-9_]*$/;  // lowercase only (new format)
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  return normalizedPattern.test(key) || uuidPattern.test(key);
 }
 
 /**
