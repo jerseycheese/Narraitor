@@ -25,7 +25,8 @@ export interface AddStructuredLoreContext {
     source: LoreSource,
     worldId: EntityID,
     sessionId?: EntityID,
-    metadata?: LoreFact['metadata']
+    metadata?: LoreFact['metadata'],
+    visibility?: 'session-private' | 'world-shared'
   ) => EntityID;
   setAliases: (id: EntityID, aliases: string[]) => void;
   addAlias: (id: EntityID, alias: string) => void;
