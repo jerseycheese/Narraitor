@@ -65,6 +65,7 @@ export interface StructuredLoreExtraction {
     description?: string;
     role?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   locations: Array<{
@@ -73,18 +74,21 @@ export interface StructuredLoreExtraction {
     type?: string; // city, tavern, forest, etc.
     description?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   events: Array<{
     description: string;
     significance?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     relatedEntities?: string[];
   }>;
   rules: Array<{
     rule: string;
     context?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   relationships?: Array<{

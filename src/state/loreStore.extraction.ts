@@ -94,7 +94,7 @@ export function addStructuredLoreImpl(
               importance: char.importance || 'medium',
               tags: char.tags,
             },
-            visibility: sessionId ? 'session-private' : 'world-shared',
+            visibility: char.visibility ?? (sessionId ? 'session-private' : 'world-shared'),
           },
           {
             getFacts,
@@ -154,7 +154,7 @@ export function addStructuredLoreImpl(
             importance: loc.importance || 'medium',
             tags: loc.tags,
           },
-          visibility: sessionId ? 'session-private' : 'world-shared',
+          visibility: loc.visibility ?? (sessionId ? 'session-private' : 'world-shared'),
         },
         {
           getFacts,
@@ -224,7 +224,7 @@ export function addStructuredLoreImpl(
         description: event.significance,
         importance: event.importance || 'medium',
         relatedEntities: event.relatedEntities,
-      });
+      }, event.visibility ?? (sessionId ? 'session-private' : 'world-shared'));
       addedCount.events++;
       eventsAdded++;
       addedEventValues.add(normalizedDescription);
@@ -240,7 +240,7 @@ export function addStructuredLoreImpl(
         description: rule.context,
         importance: rule.importance || 'medium',
         tags: rule.tags,
-      });
+      }, rule.visibility ?? (sessionId ? 'session-private' : 'world-shared'));
       addedCount.rules++;
       logger.debug('[LoreStore] Added rule fact', { rule: rule.rule, key });
     }
