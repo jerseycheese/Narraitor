@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
@@ -99,11 +99,11 @@ export async function POST(request: NextRequest) {
 
       // Check if we have Gemini API key for image generation
       const apiKey = process.env.GEMINI_API_KEY;
-      
+
       if (apiKey && apiKey !== 'MOCK_API_KEY') {
         try {
-          logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.0-flash-preview-image-generation');
-          
+          logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.5-flash-image');
+
           // Use the same approach as the portrait generation API
           const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
 
@@ -116,14 +116,20 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
-          const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
+          // Generate and save the image to the file system
+          const savedImage = await generateAndSaveImageWithGemini(
+            imagePromptForGemini,
+            apiKey,
+            body.world.id,
+            'worlds'
+          );
 
-          if (generatedImage) {
-            imageUrl = generatedImage.url;
+          if (savedImage) {
+            imageUrl = savedImage.url;
             aiGenerated = true;
             placeholder = false;
 
-            logger.debug('generate-world-image', 'Gemini image generated successfully');
+            logger.debug('generate-world-image', `Gemini image saved successfully: ${savedImage.url} (${savedImage.fileSize} bytes)`);
           } else {
             logger.warn('generate-world-image', 'Image generation failed, using fallback');
             imageUrl = generateFallbackImage(body.world);

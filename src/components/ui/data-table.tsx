@@ -42,6 +42,7 @@ export interface DataTableProps<TData, TValue> {
   };
   rowSelection?: RowSelectionState;
   ariaLabel?: string;
+  customRowRenderer?: (row: { original: TData; id: string }, cells: React.ReactNode) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,6 +52,7 @@ export function DataTable<TData, TValue>({
   searchable = { enabled: false },
   rowSelection,
   ariaLabel = 'Data table',
+  customRowRenderer,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -163,20 +165,31 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
+                const cells = row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ));
+
+                // Use custom row renderer if provided
+                if (customRowRenderer) {
+                  return customRowRenderer(
+                    { original: row.original, id: row.id },
+                    cells
+                  );
+                }
+
+                // Default row rendering
                 const isSelected = rowSelection && rowSelection[row.id];
                 return (
                   <TableRow
                     key={row.id}
                     data-state={isSelected ? 'selected' : undefined}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {cells}
                   </TableRow>
                 );
               })

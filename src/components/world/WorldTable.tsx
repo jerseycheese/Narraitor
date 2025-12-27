@@ -212,6 +212,32 @@ export function WorldTable({
     );
   }
 
+  // Custom row renderer with background images
+  const customRowRenderer = (row: { original: World; id: string }, cells: React.ReactNode) => {
+    const world = row.original;
+    const isSelected = selectedWorldIds.includes(world.id);
+
+    const rowStyle: React.CSSProperties = world.image?.url
+      ? {
+          backgroundImage: `linear-gradient(to right, hsl(var(--background) / 0.85), hsl(var(--background) / 0.75)), url(${world.image.url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }
+      : {};
+
+    return (
+      <tr
+        key={row.id}
+        data-state={isSelected ? 'selected' : undefined}
+        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-primary/10 data-[state=selected]:border-primary/50 data-[state=selected]:hover:bg-primary/15"
+        style={rowStyle}
+      >
+        {cells}
+      </tr>
+    );
+  };
+
   return (
     <DataTable
       columns={columns}
@@ -226,6 +252,7 @@ export function WorldTable({
       }}
       rowSelection={rowSelection}
       ariaLabel="Worlds table"
+      customRowRenderer={customRowRenderer}
     />
   );
 }
