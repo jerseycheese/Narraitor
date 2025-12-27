@@ -7,6 +7,8 @@ import type {
   LoreCategory,
   LoreSource,
   StructuredLoreExtraction,
+  LoreMergeAuditEntry,
+  EntityMatch,
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
@@ -41,6 +43,12 @@ import {
   checkDuplicateBeforeCreateImpl,
   type DeduplicationContext,
 } from './loreStore.deduplication';
+import {
+  resolveEntityImpl,
+  updateEntityReferencesImpl,
+  findPotentialEntityMatchesImpl,
+  type ReferenceUpdateContext,
+} from './loreStore.resolution';
 import type { DuplicateMatch } from '../types/lore.types';
 
 /**
@@ -57,6 +65,7 @@ interface FactHistory {
 export interface LoreStore extends CrudStore<LoreFact> {
   facts: Record<EntityID, LoreFact>;
   factHistory: Record<EntityID, FactHistory>;
+  mergeAuditLog: LoreMergeAuditEntry[];
   error: UserFriendlyError | null;
   loading: boolean;
 
@@ -94,12 +103,15 @@ export interface LoreStore extends CrudStore<LoreFact> {
   scanForDuplicates: (worldId: EntityID, category?: LoreCategory) => Promise<DuplicateMatch[]>;
   mergeFacts: (primaryId: EntityID, secondaryId: EntityID) => void;
   checkDuplicateBeforeCreate: (value: string, category: LoreCategory, worldId: EntityID) => Promise<DuplicateMatch[]>;
+  findPotentialEntityMatches: (worldId: EntityID, options?: { minConfidence?: number; category?: LoreCategory }) => EntityMatch[];
+  getMergeAuditLog: () => LoreMergeAuditEntry[];
 }
 
 const getInitialState = () => ({
   facts: {} as Record<EntityID, LoreFact>,
   entities: {} as Record<EntityID, LoreFact>,
   factHistory: {} as Record<EntityID, FactHistory>,
+  mergeAuditLog: [] as LoreMergeAuditEntry[],
   currentEntityId: null as EntityID | null,
   error: null as UserFriendlyError | null,
   loading: false,
@@ -319,6 +331,9 @@ export const useLoreStore = create<LoreStore>()(
           addFact: get().addFact,
           setAliases: get().setAliases,
           getFacts: get().getFacts,
+          resolveEntity: resolveEntityImpl,
+          addAlias: get().addAlias,
+          getFact: get().getById,
         };
         addStructuredLoreImpl(extraction, worldId, sessionId, context);
       },
@@ -438,7 +453,7 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       mergeFacts: (primaryId, secondaryId) => {
-        const context: DeduplicationContext = {
+        const dedupeContext: DeduplicationContext = {
           getFact: get().getById,
           getFacts: get().getFacts,
           updateFact: get().update,
@@ -446,7 +461,38 @@ export const useLoreStore = create<LoreStore>()(
           setAliases: get().setAliases,
           setError: get().setError,
         };
-        mergeFactsImpl(primaryId, secondaryId, context);
+        const result = mergeFactsImpl(primaryId, secondaryId, dedupeContext);
+
+        const referenceContext: ReferenceUpdateContext = {
+          getFacts: get().getFacts,
+          updateFact: get().update,
+        };
+
+        const referencesUpdated = updateEntityReferencesImpl(
+          result.worldId,
+          [result.secondaryName, ...result.secondaryAliases],
+          result.primaryName,
+          referenceContext
+        );
+
+        const auditEntry: LoreMergeAuditEntry = {
+          id: generateUniqueId('merge'),
+          worldId: result.worldId,
+          primaryId: result.primaryId,
+          secondaryId: result.secondaryId,
+          primaryName: result.primaryName,
+          secondaryName: result.secondaryName,
+          primaryCategory: result.primaryCategory,
+          secondaryCategory: result.secondaryCategory,
+          timestamp: getTimestamp(),
+          referencesUpdated,
+          aliasesAdded: result.aliasesAdded,
+          crossCategory: result.crossCategory,
+        };
+
+        set((state) => ({
+          mergeAuditLog: [auditEntry, ...state.mergeAuditLog],
+        }));
       },
 
       checkDuplicateBeforeCreate: async (value, category, worldId) => {
@@ -460,6 +506,11 @@ export const useLoreStore = create<LoreStore>()(
         };
         return await checkDuplicateBeforeCreateImpl(value, category, worldId, context);
       },
+
+      findPotentialEntityMatches: (worldId, options) =>
+        findPotentialEntityMatchesImpl(worldId, { getFacts: get().getFacts }, options),
+
+      getMergeAuditLog: () => get().mergeAuditLog,
     }),
     {
       name: 'lore-store',
@@ -468,6 +519,7 @@ export const useLoreStore = create<LoreStore>()(
       partialize: (state) => ({
         facts: state.facts,
         factHistory: state.factHistory,
+        mergeAuditLog: state.mergeAuditLog,
       }),
       migrate: () => getInitialState(),
     }

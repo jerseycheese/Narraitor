@@ -1,5 +1,5 @@
 import type { EntityID } from '../types/common.types';
-import type { StructuredLoreExtraction, LoreFact, LoreCategory, LoreSource } from '../types/lore.types';
+import type { StructuredLoreExtraction, LoreFact, LoreCategory, LoreSource, EntityResolutionResult } from '../types/lore.types';
 import { logger } from '@/lib/utils/logger';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
@@ -10,6 +10,7 @@ import {
   importanceRank,
   MAX_EVENTS_PER_EXTRACTION,
 } from './loreStore.helpers';
+import type { EntityResolutionContext, ResolveEntityOptions } from './loreStore.resolution';
 
 /**
  * Structured lore extraction logic for the lore store
@@ -27,7 +28,16 @@ export interface AddStructuredLoreContext {
     metadata?: LoreFact['metadata']
   ) => EntityID;
   setAliases: (id: EntityID, aliases: string[]) => void;
+  addAlias: (id: EntityID, alias: string) => void;
   getFacts: (options?: { worldId?: EntityID }) => LoreFact[];
+  getFact: (id: EntityID) => LoreFact | undefined;
+  resolveEntity: (
+    name: string,
+    category: LoreCategory,
+    worldId: EntityID,
+    options: ResolveEntityOptions,
+    context: EntityResolutionContext
+  ) => EntityResolutionResult;
 }
 
 /**
@@ -56,7 +66,7 @@ export function addStructuredLoreImpl(
     },
   });
 
-  const { addFact, setAliases, getFacts } = context;
+  const { addFact, setAliases, addAlias, getFacts, getFact, resolveEntity } = context;
 
   const existingFacts = getFacts({ worldId });
   const existingKeys = new Set(existingFacts.map((fact) => fact.key));
@@ -71,31 +81,44 @@ export function addStructuredLoreImpl(
     .forEach((char) => {
       const key = generateLoreKey(worldId, 'character', char.name);
       if (!existingKeys.has(key)) {
-        const factId = addFact(
-          key,
+        const result = resolveEntity(
           char.name,
           'characters',
-          'narrative',
           worldId,
-          sessionId,
           {
-            description: char.description,
-            type: char.role,
-            importance: char.importance || 'medium',
-            tags: char.tags,
+            source: 'narrative',
+            sessionId,
+            metadata: {
+              description: char.description,
+              type: char.role,
+              importance: char.importance || 'medium',
+              tags: char.tags,
+            },
+            visibility: sessionId ? 'session-private' : 'world-shared',
+          },
+          {
+            getFacts,
+            getFact,
+            addFact,
+            addAlias,
           }
         );
 
         // Add aliases if extracted by AI
-        if (char.aliases && char.aliases.length > 0 && factId) {
-          setAliases(factId, char.aliases);
+        if (char.aliases && char.aliases.length > 0) {
+          char.aliases.forEach((alias) => addAlias(result.entity.id, alias));
         }
-        addedCount.characters++;
-        logger.debug('[LoreStore] Added character fact', {
-          name: char.name,
-          key,
-          factId,
-        });
+
+        if (result.isNew) {
+          addedCount.characters++;
+          existingKeys.add(key);
+          existingFactsByKey.set(key, result.entity);
+          logger.debug('[LoreStore] Added character fact', {
+            name: char.name,
+            key,
+            factId: result.entity.id,
+          });
+        }
       } else {
         const existing = existingFactsByKey.get(key);
         if (existing && char.aliases && char.aliases.length > 0) {
@@ -118,31 +141,43 @@ export function addStructuredLoreImpl(
     ].filter(Boolean);
 
     if (!existingKeys.has(key)) {
-      const factId = addFact(
-        key,
+      const result = resolveEntity(
         canonicalName,
         'locations',
-        'narrative',
         worldId,
-        sessionId,
         {
-          description: loc.description,
-          type: loc.type,
-          importance: loc.importance || 'medium',
-          tags: loc.tags,
+          source: 'narrative',
+          sessionId,
+          metadata: {
+            description: loc.description,
+            type: loc.type,
+            importance: loc.importance || 'medium',
+            tags: loc.tags,
+          },
+          visibility: sessionId ? 'session-private' : 'world-shared',
+        },
+        {
+          getFacts,
+          getFact,
+          addFact,
+          addAlias,
         }
       );
 
-      // Add aliases if extracted by AI
-      if (aliasesToApply.length > 0 && factId) {
-        setAliases(factId, aliasesToApply);
+      if (aliasesToApply.length > 0) {
+        aliasesToApply.forEach((alias) => addAlias(result.entity.id, alias));
       }
-      addedCount.locations++;
-      logger.debug('[LoreStore] Added location fact', {
-        name: canonicalName,
-        key,
-        factId,
-      });
+
+      if (result.isNew) {
+        addedCount.locations++;
+        existingKeys.add(key);
+        existingFactsByKey.set(key, result.entity);
+        logger.debug('[LoreStore] Added location fact', {
+          name: canonicalName,
+          key,
+          factId: result.entity.id,
+        });
+      }
     } else {
       const existing = existingFactsByKey.get(key);
       if (existing && aliasesToApply.length > 0) {

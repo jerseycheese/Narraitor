@@ -24,6 +24,19 @@ export interface DeduplicationContext {
   setError: (error: UserFriendlyError | null) => void;
 }
 
+export interface MergeResult {
+  worldId: EntityID;
+  primaryId: EntityID;
+  secondaryId: EntityID;
+  primaryName: string;
+  secondaryName: string;
+  secondaryAliases: string[];
+  primaryCategory: LoreCategory;
+  secondaryCategory: LoreCategory;
+  aliasesAdded: string[];
+  crossCategory: boolean;
+}
+
 /**
  * Scan for potential duplicates in a world
  */
@@ -65,7 +78,7 @@ export function mergeFactsImpl(
   primaryId: EntityID,
   secondaryId: EntityID,
   context: DeduplicationContext
-): void {
+): MergeResult {
   // Validate inputs
   if (primaryId === secondaryId) {
     throw new Error('Cannot merge a fact with itself');
@@ -107,9 +120,11 @@ export function mergeFactsImpl(
       }
     }
 
+    const existingAliases = actualPrimary.aliases || [];
+
     // Combine aliases: primary aliases + secondary aliases + secondary value
     const mergedAliases = [
-      ...(actualPrimary.aliases || []),
+      ...existingAliases,
       ...(actualSecondary.aliases || []),
       actualSecondary.value,
     ];
@@ -117,6 +132,8 @@ export function mergeFactsImpl(
     // Remove duplicates from aliases
     const uniqueAliases = Array.from(new Set(mergedAliases.map(a => a.trim())))
       .filter(a => a.length > 0 && a !== actualPrimary.value);
+
+    const aliasesAdded = uniqueAliases.filter((alias) => !existingAliases.includes(alias));
 
     // Merge tags
     const primaryTags = actualPrimary.metadata?.tags || [];
@@ -158,6 +175,18 @@ export function mergeFactsImpl(
       aliasesCount: uniqueAliases.length,
     });
 
+    return {
+      worldId: actualPrimary.worldId,
+      primaryId: actualPrimary.id,
+      secondaryId: actualSecondary.id,
+      primaryName: actualPrimary.value,
+      secondaryName: actualSecondary.value,
+      secondaryAliases: actualSecondary.aliases || [],
+      primaryCategory: actualPrimary.category,
+      secondaryCategory: actualSecondary.category,
+      aliasesAdded,
+      crossCategory: actualPrimary.category !== actualSecondary.category,
+    };
   } catch (error) {
     logger.error('[LoreStore] Error merging facts', error);
     context.setError({
