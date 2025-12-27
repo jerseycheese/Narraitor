@@ -143,11 +143,11 @@ describe('LoreStore - Visibility', () => {
   });
 
   describe('addStructuredLore behavior', () => {
-    test('addStructuredLore creates session-private facts when sessionId provided', () => {
+    test('addStructuredLore respects extracted visibility', () => {
       const { result } = renderHook(() => useLoreStore());
 
       const extraction = {
-        characters: [{ name: 'Lyra', description: 'Hero' }],
+        characters: [{ name: 'Lyra', description: 'Hero', visibility: 'world-shared' as const }],
         locations: [],
         events: [],
         rules: []
@@ -159,7 +159,7 @@ describe('LoreStore - Visibility', () => {
 
       const facts = result.current.getFacts({ worldId: 'world-1' });
       expect(facts.length).toBeGreaterThan(0);
-      expect(facts[0].visibility).toBe('session-private');
+      expect(facts[0].visibility).toBe('world-shared');
       expect(facts[0].sessionId).toBe('session-1');
     });
   });

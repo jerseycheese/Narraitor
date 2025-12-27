@@ -65,6 +65,10 @@ Categories to extract:
 
 Rate importance as 'low', 'medium', or 'high' based on narrative significance.
 
+Choose visibility for each fact:
+- **world-shared**: enduring facts that should persist across sessions/campaigns
+- **session-private**: temporary, session-specific, or uncertain facts
+
 **ANTI-HALLUCINATION RULE**:
 - ONLY extract entities that are EXPLICITLY MENTIONED in the narrative text below.
 - DO NOT use your world knowledge or training data to infer entities.
@@ -91,6 +95,7 @@ Respond with ONLY a JSON block in this exact format:
       "description": "Brief description",
       "role": "their role/title",
       "importance": "low|medium|high",
+      "visibility": "session-private|world-shared",
       "tags": ["tag1", "tag2"]
     }
   ],
@@ -101,6 +106,7 @@ Respond with ONLY a JSON block in this exact format:
       "type": "city|tavern|forest|etc",
       "description": "Brief description",
       "importance": "low|medium|high",
+      "visibility": "session-private|world-shared",
       "tags": ["tag1", "tag2"]
     }
   ],
@@ -109,6 +115,7 @@ Respond with ONLY a JSON block in this exact format:
       "description": "What happened",
       "significance": "Why it matters",
       "importance": "low|medium|high",
+      "visibility": "session-private|world-shared",
       "relatedEntities": ["entity1", "entity2"]
     }
   ],
@@ -117,6 +124,7 @@ Respond with ONLY a JSON block in this exact format:
       "rule": "The rule or mechanic",
       "context": "When/how it applies",
       "importance": "low|medium|high",
+      "visibility": "session-private|world-shared",
       "tags": ["tag1", "tag2"]
     }
   ],
@@ -158,6 +166,7 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         description: typeof char.description === 'string' ? char.description.trim() : undefined,
         role: typeof char.role === 'string' ? char.role.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(char.importance as string) ? char.importance as 'low' | 'medium' | 'high' : 'medium',
+        visibility: ['session-private', 'world-shared'].includes(char.visibility as string) ? char.visibility as 'session-private' | 'world-shared' : undefined,
         tags: Array.isArray(char.tags) ? (char.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }
@@ -173,6 +182,7 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         type: typeof loc.type === 'string' ? loc.type.trim() : undefined,
         description: typeof loc.description === 'string' ? loc.description.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(loc.importance as string) ? loc.importance as 'low' | 'medium' | 'high' : 'medium',
+        visibility: ['session-private', 'world-shared'].includes(loc.visibility as string) ? loc.visibility as 'session-private' | 'world-shared' : undefined,
         tags: Array.isArray(loc.tags) ? (loc.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }
@@ -185,6 +195,7 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         description: (event.description as string).trim(),
         significance: typeof event.significance === 'string' ? event.significance.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(event.importance as string) ? event.importance as 'low' | 'medium' | 'high' : 'medium',
+        visibility: ['session-private', 'world-shared'].includes(event.visibility as string) ? event.visibility as 'session-private' | 'world-shared' : undefined,
         relatedEntities: Array.isArray(event.relatedEntities) ? 
           (event.relatedEntities as unknown[]).filter((e) => typeof e === 'string') as string[] : undefined
       }));
@@ -198,6 +209,7 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         rule: (rule.rule as string).trim(),
         context: typeof rule.context === 'string' ? rule.context.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(rule.importance as string) ? rule.importance as 'low' | 'medium' | 'high' : 'medium',
+        visibility: ['session-private', 'world-shared'].includes(rule.visibility as string) ? rule.visibility as 'session-private' | 'world-shared' : undefined,
         tags: Array.isArray(rule.tags) ? (rule.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }

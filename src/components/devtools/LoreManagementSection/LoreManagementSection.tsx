@@ -87,6 +87,40 @@ export const LoreManagementSection: React.FC = () => {
     return filtered;
   }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
 
+  const visibilityStats = useMemo(() => {
+    if (!selectedWorldId) {
+      return {
+        total: 0,
+        worldShared: 0,
+        sessionPrivate: 0,
+        narrativeWorldShared: 0,
+        narrativeSessionPrivate: 0,
+      };
+    }
+
+    const worldFacts = getFacts({ worldId: selectedWorldId });
+    return worldFacts.reduce(
+      (acc, fact) => {
+        acc.total += 1;
+        if (fact.visibility === 'world-shared') {
+          acc.worldShared += 1;
+          if (fact.source === 'narrative') acc.narrativeWorldShared += 1;
+        } else {
+          acc.sessionPrivate += 1;
+          if (fact.source === 'narrative') acc.narrativeSessionPrivate += 1;
+        }
+        return acc;
+      },
+      {
+        total: 0,
+        worldShared: 0,
+        sessionPrivate: 0,
+        narrativeWorldShared: 0,
+        narrativeSessionPrivate: 0,
+      }
+    );
+  }, [selectedWorldId, allFacts, getFacts]);
+
   // Group facts by category
   const factsByCategory = useMemo(() => {
     const grouped: Record<LoreCategory, LoreFact[]> = {
@@ -226,6 +260,18 @@ export const LoreManagementSection: React.FC = () => {
               </Select>
               <div className="w-full sm:w-auto sm:ml-auto text-sm text-gray-700">
                 Total facts: {facts.length}
+              </div>
+            </div>
+
+            <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              <div>
+                Visibility totals (world): {visibilityStats.total} total • {visibilityStats.worldShared} world-shared • {visibilityStats.sessionPrivate} session-private
+              </div>
+              <div>
+                Narrative facts: {visibilityStats.narrativeWorldShared} world-shared • {visibilityStats.narrativeSessionPrivate} session-private
+              </div>
+              <div>
+                Note: AI-extracted lore uses session-private visibility when a session is active.
               </div>
             </div>
 

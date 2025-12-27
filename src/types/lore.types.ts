@@ -65,6 +65,7 @@ export interface StructuredLoreExtraction {
     description?: string;
     role?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   locations: Array<{
@@ -73,18 +74,21 @@ export interface StructuredLoreExtraction {
     type?: string; // city, tavern, forest, etc.
     description?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   events: Array<{
     description: string;
     significance?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     relatedEntities?: string[];
   }>;
   rules: Array<{
     rule: string;
     context?: string;
     importance?: 'low' | 'medium' | 'high';
+    visibility?: 'session-private' | 'world-shared';
     tags?: string[];
   }>;
   relationships?: Array<{
@@ -151,4 +155,49 @@ export interface DeduplicationOptions {
   minConfidence?: number; // Minimum confidence threshold (default: 0.6)
   category?: LoreCategory; // Filter by category
   autoMergeThreshold?: number; // Auto-merge above this (default: 0.85)
+}
+
+/**
+ * Match record for entity resolution review
+ */
+export interface EntityMatch {
+  id: EntityID;
+  worldId: EntityID;
+  fact1Id: EntityID;
+  fact2Id: EntityID;
+  confidence: number; // 0.0 to 1.0
+  method: 'exact' | 'levenshtein' | 'ai' | 'alias';
+  rationale?: string;
+  crossCategory?: boolean;
+  status: 'pending' | 'merged' | 'ignored';
+  createdAt: string;
+}
+
+/**
+ * Result of resolving an entity name against existing facts
+ */
+export interface EntityResolutionResult {
+  entity: LoreFact;
+  isNew: boolean;
+  confidence: number;
+  matchedBy?: 'exact' | 'levenshtein' | 'ai' | 'alias';
+  matchId?: EntityID;
+}
+
+/**
+ * Audit entry for merges
+ */
+export interface LoreMergeAuditEntry {
+  id: EntityID;
+  worldId: EntityID;
+  primaryId: EntityID;
+  secondaryId: EntityID;
+  primaryName: string;
+  secondaryName: string;
+  primaryCategory: LoreCategory;
+  secondaryCategory: LoreCategory;
+  timestamp: string;
+  referencesUpdated: number;
+  aliasesAdded: string[];
+  crossCategory?: boolean;
 }

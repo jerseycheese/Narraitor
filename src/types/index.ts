@@ -46,7 +46,10 @@ export type {
   LoreCategory,
   LoreSource,
   LoreSearchOptions,
-  LoreContext
+  LoreContext,
+  EntityMatch,
+  EntityResolutionResult,
+  LoreMergeAuditEntry
 } from './lore.types';
 export type { 
   GameSession, 

@@ -152,13 +152,16 @@ describe('Lore Extraction Hardening Logic', () => {
       const existingFacts: LoreFact[] = [];
       return {
         context: {
-          addFact: jest.fn((key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, _sessionId: EntityID | undefined, metadata: LoreFact['metadata']) => {
+          addFact: jest.fn((key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, _sessionId: EntityID | undefined, metadata: LoreFact['metadata'], _visibility?: 'session-private' | 'world-shared') => {
             const factId = `fact-${addedFacts.length}` as EntityID;
             addedFacts.push({ id: factId, worldId, category, key, value, aliases: [], source, visibility: 'world-shared', metadata, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
             return factId;
           }),
           setAliases: jest.fn(),
+          addAlias: jest.fn(),
           getFacts: jest.fn((options?: { worldId?: EntityID }) => options?.worldId ? existingFacts.filter(f => f.worldId === options.worldId) : existingFacts),
+          getFact: jest.fn((id: EntityID) => addedFacts.find((fact) => fact.id === id) || existingFacts.find((fact) => fact.id === id)),
+          resolveEntity: jest.fn(),
         } as AddStructuredLoreContext,
         addedFacts,
         existingFacts,
