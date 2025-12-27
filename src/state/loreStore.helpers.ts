@@ -9,17 +9,18 @@ import { generateSafeKey } from '@/lib/utils/unicodeNormalization';
 export const MAX_EVENTS_PER_EXTRACTION = 3;
 
 /**
- * Helper function to generate normalized lore keys with Unicode support
+ * Generates a normalized lore key with Unicode-safe handling, which keeps IDs stable
+ * even when names include diacritics or non-Latin scripts.
  *
  * Handles international characters via NFD decomposition and diacritic removal:
  * - Western European: François → world-123:character_francois
  * - Non-Latin scripts: 村田さん → world-123:character_character_uuid-abc123
  *
- * @param worldId - World identifier
- * @param category - Lore category (character, location, event, rule)
- * @param name - Original name (preserves Unicode in fact.value)
- * @param maxLength - Optional maximum length for truncation
- * @returns Normalized lore key in format: {worldId}:{category}_{normalizedName}
+ * @param worldId - World identifier.
+ * @param category - Lore category (character, location, event, rule).
+ * @param name - Original name (preserves Unicode in fact.value).
+ * @param maxLength - Optional maximum length for truncation.
+ * @returns Normalized lore key in format: {worldId}:{category}_{normalizedName}.
  */
 export function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
   const safeKey = generateSafeKey(name, category);
@@ -32,7 +33,8 @@ export function generateLoreKey(worldId: string, category: string, name: string,
 }
 
 /**
- * Filters out generic/unnamed characters that shouldn't be stored as named entities
+ * Filters out generic/unnamed characters that shouldn't be stored as named entities,
+ * which avoids cluttering the lore store with placeholders or vague groups.
  *
  * Rejects:
  * - Unnamed placeholders (e.g., "Unnamed warrior", "Unknown person")
@@ -40,8 +42,8 @@ export function generateLoreKey(worldId: string, category: string, name: string,
  * - Plural/group entities (e.g., "guards", "villagers")
  * - Sentence-like names (too many words)
  *
- * @param name - The character name to validate
- * @returns true if the name should be stored, false otherwise
+ * @param name - The character name to validate.
+ * @returns True if the name should be stored, false otherwise.
  */
 export function shouldStoreExtractedCharacterName(name: string): boolean {
   const canonicalName = safeTrim(name).replace(/\s+/g, ' ');
@@ -69,14 +71,15 @@ export function shouldStoreExtractedCharacterName(name: string): boolean {
 }
 
 /**
- * Canonicalizes location names to prevent fragmentation
+ * Canonicalizes location names to prevent fragmentation, so micro-locations get
+ * grouped under a single parent while their original phrasing is kept as aliases.
  *
  * Collapses micro-locations into their parent location:
  * - "X marketplace edge" → "X marketplace" (with "X marketplace edge" as alias)
  * - "X edge" → "X" (with "X edge" as alias)
  *
- * @param name - The location name to canonicalize
- * @returns Object with canonicalName and derivedAliases
+ * @param name - The location name to canonicalize.
+ * @returns Object with the canonicalName and derivedAliases.
  */
 export function canonicalizeLocationName(name: string): {
   canonicalName: string;
@@ -129,7 +132,11 @@ export function canonicalizeLocationName(name: string): {
 }
 
 /**
- * Ranks importance levels for sorting
+ * Ranks importance levels for sorting, which makes it easy to pick the most
+ * meaningful items first.
+ *
+ * @param importance - Optional importance value ("low" | "medium" | "high").
+ * @returns Numeric rank, higher is more important.
  */
 export function importanceRank(importance?: string): number {
   if (importance === 'high') return 3;
