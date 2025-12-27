@@ -176,17 +176,15 @@ describe('LoreStore - Advanced Features', () => {
     test('should validate key format', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      // Valid keys (new format: lowercase only)
+      // Valid keys
       expect(result.current.validateKey('valid_key')).toBe(true);
       expect(result.current.validateKey('key123')).toBe(true);
-      expect(result.current.validateKey('key_name')).toBe(true); // lowercase variant
+      expect(result.current.validateKey('key_name')).toBe(true);
 
       // Invalid keys
       expect(result.current.validateKey('key with spaces')).toBe(false);
       expect(result.current.validateKey('key-with-dashes')).toBe(false);
       expect(result.current.validateKey('123startswithnumber')).toBe(false);
-
-      // BREAKING CHANGE: Old uppercase format now invalid
       expect(result.current.validateKey('KEY_NAME')).toBe(false);
       expect(result.current.validateKey('KeyWithCaps')).toBe(false);
     });
@@ -514,7 +512,7 @@ describe('LoreStore - Advanced Features', () => {
       expect(andreFact?.key).toBe('world-1:character_andre_duval');
       expect(francoiseFact?.key).toBe('world-1:character_francoise_laurent');
 
-      // Validation should accept new format
+      // Keys should pass validation
       expect(result.current.validateKey(andreFact!.key)).toBe(true);
       expect(result.current.validateKey(francoiseFact!.key)).toBe(true);
     });
@@ -576,19 +574,19 @@ describe('LoreStore - Advanced Features', () => {
       expect(locationFact?.value).toBe('François Plaza');
     });
 
-    test('BREAKING CHANGE: rejects old uppercase key format', () => {
+    test('rejects uppercase keys, accepts lowercase and UUID keys', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      // Old format validation explicitly rejected
+      // Uppercase keys rejected
       expect(result.current.validateKey('OLD_KEY_FORMAT')).toBe(false);
       expect(result.current.validateKey('KeyWithCaps')).toBe(false);
       expect(result.current.validateKey('world-1:OLD_FORMAT')).toBe(false);
 
-      // New format validation accepted
+      // Lowercase keys accepted
       expect(result.current.validateKey('new_lowercase_format')).toBe(true);
       expect(result.current.validateKey('world-1:character_francois')).toBe(true);
 
-      // UUID format accepted
+      // UUID keys accepted
       const uuidKey = 'world-1:character_character_abc12345-def6-7890-abcd-ef1234567890';
       expect(result.current.validateKey(uuidKey)).toBe(true);
     });
