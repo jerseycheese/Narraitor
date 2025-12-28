@@ -37,25 +37,28 @@ export function isRetryableError(error: Error): boolean {
 
 /**
  * Maps technical errors to user-friendly messages with categorization
- * 
+ *
  * Categorizes errors by type to enable conditional error handling logic:
  * - NETWORK: Connection, timeout, and network-related errors
- * - SERVICE: Rate limiting and service availability errors  
+ * - SERVICE: Rate limiting and service availability errors
  * - AUTH: Authentication and authorization errors
  * - VALIDATION: Input validation and data format errors
  * - UNKNOWN: Unrecognized or generic errors
- * 
+ *
+ * Includes provider error details in messages to help users understand what went wrong.
+ *
  * @param error - The error to map
  * @returns User-friendly error object with type categorization
  */
 export function getUserFriendlyError(error: Error): UserFriendlyError {
   const message = error.message.toLowerCase();
+  const originalMessage = error.message;
 
   // Network errors
   if (message.includes('network')) {
     return {
       title: 'Connection Problem',
-      message: 'Unable to connect. Please check your internet connection.',
+      message: `Unable to connect: ${originalMessage}`,
       actionLabel: 'Try Again',
       retryable: true,
       type: ErrorType.NETWORK
@@ -65,8 +68,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   // Timeout errors
   if (message.includes('timeout')) {
     return {
-      title: 'Request Timed Out', 
-      message: 'The request is taking too long. Please try again.',
+      title: 'Request Timed Out',
+      message: `Request timed out: ${originalMessage}`,
       actionLabel: 'Try Again',
       retryable: true,
       type: ErrorType.NETWORK
@@ -77,7 +80,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   if (message.includes('429') || message.includes('rate limit')) {
     return {
       title: 'Too Many Requests',
-      message: 'Too many requests. Please wait a moment before trying again.',
+      message: `Rate limit exceeded: ${originalMessage}`,
       actionLabel: 'Try Again Later',
       retryable: true,
       type: ErrorType.SERVICE
@@ -88,19 +91,19 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   if (message.includes('401') || message.includes('unauthorized')) {
     return {
       title: 'Authentication Error',
-      message: 'Authentication failed. Please check your credentials.',
+      message: `Authentication failed: ${originalMessage}`,
       retryable: false,
       type: ErrorType.AUTH
     };
   }
 
   // Validation errors
-  if (message.includes('validation') || message.includes('invalid') || 
+  if (message.includes('validation') || message.includes('invalid') ||
       message.includes('malformed') || message.includes('bad request') ||
       message.includes('400')) {
     return {
       title: 'Validation Error',
-      message: 'The provided data is invalid. Please check your input and try again.',
+      message: `Invalid data: ${originalMessage}`,
       retryable: false,
       type: ErrorType.VALIDATION
     };
@@ -109,7 +112,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   // Default for unknown errors
   return {
     title: 'Something Went Wrong',
-    message: 'An unexpected error occurred. Please try again.',
+    message: `Error: ${originalMessage}`,
     actionLabel: 'Try Again',
     retryable: isRetryableError(error),
     type: ErrorType.UNKNOWN

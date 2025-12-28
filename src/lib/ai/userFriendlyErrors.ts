@@ -10,43 +10,48 @@ export type { UserFriendlyError } from '@/lib/utils/errorUtils';
 
 /**
  * Maps technical errors to user-friendly messages with AI-specific context
+ *
+ * Includes provider error details to help users understand what went wrong
+ * with the AI service.
+ *
  * @param error - The error to map
  * @returns User-friendly error object
  */
 export function getUserFriendlyError(error: Error): UserFriendlyError {
   const baseError = getUserFriendlyErrorUtil(error);
-  
+
   // Add AI-specific context to certain error messages
   const message = error.message.toLowerCase();
-  
+  const originalMessage = error.message;
+
   if (message.includes('network')) {
     return {
       ...baseError,
-      message: 'Unable to connect to the AI service. Please check your internet connection.'
+      message: `AI service connection error: ${originalMessage}`
     };
   }
-  
+
   if (message.includes('timeout')) {
     return {
       ...baseError,
-      message: 'The AI service is taking too long to respond. Please try again.'
+      message: `AI service timeout: ${originalMessage}`
     };
   }
-  
+
   if (message.includes('429') || message.includes('rate limit')) {
     return {
       ...baseError,
-      message: 'You have made too many requests. Please wait a moment before trying again.'
+      message: `AI service rate limit: ${originalMessage}`
     };
   }
-  
+
   if (message.includes('401') || message.includes('unauthorized')) {
     return {
       ...baseError,
-      message: 'Unable to authenticate with the AI service. Please check your API key.'
+      message: `AI service authentication error: ${originalMessage}`
     };
   }
-  
+
   return baseError;
 }
 
