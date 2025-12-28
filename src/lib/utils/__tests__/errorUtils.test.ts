@@ -49,123 +49,127 @@ describe('errorUtils', () => {
   });
 
   describe('getUserFriendlyError', () => {
-    it('should map network errors correctly', () => {
+    it('should map network errors with generic message', () => {
       const error = new Error('network connection failed');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Connection Problem');
-      expect(result.message).toContain('Unable to connect');
-      expect(result.message).toContain('network connection failed');
+      expect(result.message).toBe('Unable to connect. Please check your internet connection.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.actionLabel).toBe('Try Again');
     });
 
-    it('should map timeout errors correctly', () => {
+    it('should map timeout errors with generic message', () => {
       const error = new Error('request timeout');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Request Timed Out');
-      expect(result.message).toContain('timed out');
-      expect(result.message).toContain('request timeout');
+      expect(result.message).toBe('The request is taking too long. Please try again.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.actionLabel).toBe('Try Again');
     });
 
-    it('should map 429 rate limit errors correctly', () => {
+    it('should map 429 rate limit errors with generic message', () => {
       const error = new Error('429 rate limit exceeded');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Too Many Requests');
-      expect(result.message).toContain('Rate limit');
-      expect(result.message).toContain('429 rate limit exceeded');
+      expect(result.message).toBe('Too many requests. Please wait a moment before trying again.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.SERVICE);
       expect(result.actionLabel).toBe('Try Again Later');
     });
 
-    it('should map rate limit text errors correctly', () => {
+    it('should map rate limit text errors with generic message', () => {
       const error = new Error('rate limit exceeded');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Too Many Requests');
-      expect(result.message).toContain('rate limit exceeded');
+      expect(result.message).toBe('Too many requests. Please wait a moment before trying again.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.SERVICE);
     });
 
-    it('should map 401 auth errors correctly', () => {
+    it('should map 401 auth errors with generic message', () => {
       const error = new Error('401 unauthorized');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Authentication Error');
-      expect(result.message).toContain('Authentication failed');
-      expect(result.message).toContain('401 unauthorized');
+      expect(result.message).toBe('Authentication failed. Please check your credentials.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.AUTH);
     });
 
-    it('should map unauthorized text errors correctly', () => {
+    it('should map unauthorized text errors with generic message', () => {
       const error = new Error('unauthorized access');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Authentication Error');
-      expect(result.message).toContain('unauthorized access');
+      expect(result.message).toBe('Authentication failed. Please check your credentials.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.AUTH);
     });
 
-    it('should map validation errors correctly', () => {
+    it('should map validation errors with generic message', () => {
       const error = new Error('validation failed: invalid email');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Validation Error');
-      expect(result.message).toContain('Invalid data');
-      expect(result.message).toContain('validation failed');
+      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
 
-    it('should map 400 bad request errors correctly', () => {
+    it('should map 400 bad request errors with generic message', () => {
       const error = new Error('400 bad request');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Validation Error');
-      expect(result.message).toContain('400 bad request');
+      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
 
-    it('should map invalid errors correctly', () => {
+    it('should map invalid errors with generic message', () => {
       const error = new Error('invalid data format');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Validation Error');
-      expect(result.message).toContain('invalid data format');
+      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
 
-    it('should map malformed errors correctly', () => {
+    it('should map malformed errors with generic message', () => {
       const error = new Error('malformed request');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Validation Error');
-      expect(result.message).toContain('malformed request');
+      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
 
-    it('should map unknown errors with default message', () => {
+    it('should map unknown errors with generic message', () => {
       const error = new Error('something unexpected happened');
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Something Went Wrong');
-      expect(result.message).toContain('Error');
-      expect(result.message).toContain('something unexpected happened');
+      expect(result.message).toBe('An unexpected error occurred. Please try again.');
       expect(result.type).toBe(ErrorType.UNKNOWN);
       expect(result.actionLabel).toBe('Try Again');
+    });
+
+    it('should not expose raw error details in generic handler', () => {
+      const error = new Error('/secret/path/file.ts: Database connection failed with internal error');
+      const result = getUserFriendlyError(error);
+
+      // Should not contain sensitive details
+      expect(result.message).not.toContain('/secret/path');
+      expect(result.message).not.toContain('Database');
+      expect(result.message).not.toContain('internal error');
     });
 
     it('should determine retryability for unknown errors', () => {

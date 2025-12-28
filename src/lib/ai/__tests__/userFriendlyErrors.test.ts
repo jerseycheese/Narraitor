@@ -7,7 +7,7 @@ import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('userFriendlyErrors (AI-specific)', () => {
   describe('getUserFriendlyError', () => {
-    it('should provide AI-specific context for network errors', () => {
+    it('should provide AI-specific context with sanitized error for network errors', () => {
       const error = new Error('network connection failed');
       const result = getUserFriendlyError(error);
 
@@ -17,18 +17,18 @@ describe('userFriendlyErrors (AI-specific)', () => {
       expect(result.retryable).toBe(true);
     });
 
-    it('should provide AI-specific context for timeout errors', () => {
+    it('should provide AI-specific context with sanitized error for timeout errors', () => {
       const error = new Error('request timeout');
       const result = getUserFriendlyError(error);
 
       expect(result.message).toContain('AI service');
-      expect(result.message).toContain('timeout');
+      expect(result.message).toContain('timed out');
       expect(result.message).toContain('request timeout');
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.retryable).toBe(true);
     });
 
-    it('should provide AI-specific context for rate limit errors', () => {
+    it('should provide AI-specific context with sanitized error for rate limit errors', () => {
       const error = new Error('429 rate limit');
       const result = getUserFriendlyError(error);
 
@@ -38,7 +38,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       expect(result.retryable).toBe(true);
     });
 
-    it('should provide AI-specific context for auth errors', () => {
+    it('should provide AI-specific context with sanitized error for auth errors', () => {
       const error = new Error('401 unauthorized');
       const result = getUserFriendlyError(error);
 
@@ -48,7 +48,26 @@ describe('userFriendlyErrors (AI-specific)', () => {
       expect(result.retryable).toBe(false);
     });
 
-    it('should handle rate limit text variations', () => {
+    it('should sanitize file paths from error messages', () => {
+      const error = new Error('network error at /usr/local/lib/node_modules/package.js');
+      const result = getUserFriendlyError(error);
+
+      expect(result.message).not.toContain('/usr/local');
+      expect(result.message).toContain('[path]');
+    });
+
+    it('should truncate very long error messages', () => {
+      const longError = 'A'.repeat(300);
+      const error = new Error(longError);
+      error.message = longError.replace('network', 'network');
+
+      const result = getUserFriendlyError(new Error(`network ${longError}`));
+
+      expect(result.message.length).toBeLessThan(250); // Base message + truncated detail
+      expect(result.message).toContain('...');
+    });
+
+    it('should handle rate limit text variations with sanitization', () => {
       const error = new Error('rate limit exceeded');
       const result = getUserFriendlyError(error);
 
