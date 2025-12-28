@@ -91,22 +91,20 @@ project-config.json
 .temp
 .tmp
 
-# Obsidian
-docs/.obsidian
-
 # Roo
 .roo/mcp.json
 
-# Docs
-docs/development/workflows
-docs/voice-profile.md
-docs/voice-writing-profile.md
+# Docs (private, untracked)
+# Use public_docs/ for committed documentation
+docs/
 
 # Claude Code
 .claude/*
 .claude-workflow/
 .clauderc
 CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
 
 # MCP local config (do not commit)
 .mcp.json
