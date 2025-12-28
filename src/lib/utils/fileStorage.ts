@@ -104,8 +104,9 @@ function getExtensionFromMimeType(mimeType: string): string {
 /**
  * Validate that the final file path is within the allowed directory
  * Prevents path traversal even if sanitization is bypassed
+ * @returns The validated absolute file path
  */
-function validatePathWithinDirectory(filePath: string, allowedDirectory: string): void {
+function validatePathWithinDirectory(filePath: string, allowedDirectory: string): string {
   // Resolve to absolute paths
   const absoluteFilePath = resolve(filePath);
   const absoluteAllowedDir = resolve(allowedDirectory);
@@ -114,6 +115,9 @@ function validatePathWithinDirectory(filePath: string, allowedDirectory: string)
   if (!absoluteFilePath.startsWith(absoluteAllowedDir + '/') && absoluteFilePath !== absoluteAllowedDir) {
     throw new Error('Path traversal detected: file path is outside allowed directory');
   }
+
+  // Return the validated absolute path
+  return absoluteFilePath;
 }
 
 /**
@@ -149,15 +153,15 @@ export async function saveBase64Image(options: SaveImageOptions): Promise<SaveIm
     // Full file path
     const filePath = join(uploadDir, filename);
 
-    // Final security check: ensure path is within allowed directory
-    validatePathWithinDirectory(filePath, uploadDir);
+    // Final security check: ensure path is within allowed directory and get validated absolute path
+    const validatedPath = validatePathWithinDirectory(filePath, uploadDir);
 
     // Convert base64 to buffer (validated user data, safe to write)
     const imageBuffer = Buffer.from(base64Data, 'base64');
 
     // Save file to validated path
-    logger.debug('saveBase64Image', `Saving image to: ${filePath} (${imageBuffer.length} bytes)`);
-    await writeFile(filePath, imageBuffer);
+    logger.debug('saveBase64Image', `Saving image to: ${validatedPath} (${imageBuffer.length} bytes)`);
+    await writeFile(validatedPath, imageBuffer);
 
     // Generate public URL (relative to public directory)
     const publicUrl = `/uploads/${category}/${filename}`;
@@ -215,16 +219,16 @@ export async function deleteImage(url: string): Promise<boolean> {
     const uploadsDir = join(process.cwd(), 'public', 'uploads', category);
     const filePath = join(uploadsDir, safeFilename);
 
-    // Final security check: ensure path is within allowed directory
-    validatePathWithinDirectory(filePath, uploadsDir);
+    // Final security check: ensure path is within allowed directory and get validated absolute path
+    const validatedPath = validatePathWithinDirectory(filePath, uploadsDir);
 
-    if (!existsSync(filePath)) {
-      logger.warn('deleteImage', `File does not exist: ${filePath}`);
+    if (!existsSync(validatedPath)) {
+      logger.warn('deleteImage', `File does not exist: ${validatedPath}`);
       return false;
     }
 
     const { unlink } = await import('fs/promises');
-    await unlink(filePath);
+    await unlink(validatedPath);
 
     logger.info('deleteImage', `Image deleted: ${url}`);
     return true;
