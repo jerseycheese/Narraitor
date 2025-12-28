@@ -14,6 +14,7 @@ import {
   type ColumnDef,
   type SortingState,
   type ColumnFiltersState,
+  type RowSelectionState,
 } from '@tanstack/react-table';
 import {
   Table,
@@ -39,7 +40,9 @@ export interface DataTableProps<TData, TValue> {
     placeholder?: string;
     column?: string;
   };
+  rowSelection?: RowSelectionState;
   ariaLabel?: string;
+  customRowRenderer?: (row: { original: TData; id: string }, cells: React.ReactNode) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -47,7 +50,9 @@ export function DataTable<TData, TValue>({
   data,
   pagination = { pageSize: 10, showPagination: false },
   searchable = { enabled: false },
+  rowSelection,
   ariaLabel = 'Data table',
+  customRowRenderer,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -67,10 +72,12 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
+    getRowId: (row) => (row as { id?: string; _id?: string }).id || (row as { id?: string; _id?: string })._id || '',
     state: {
       sorting,
       columnFilters,
       globalFilter,
+      rowSelection: rowSelection || {},
     },
     initialState: {
       pagination: {
@@ -157,21 +164,35 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const cells = row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ));
+
+                // Use custom row renderer if provided
+                if (customRowRenderer) {
+                  return customRowRenderer(
+                    { original: row.original, id: row.id },
+                    cells
+                  );
+                }
+
+                // Default row rendering
+                const isSelected = rowSelection && rowSelection[row.id];
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={isSelected ? 'selected' : undefined}
+                  >
+                    {cells}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell

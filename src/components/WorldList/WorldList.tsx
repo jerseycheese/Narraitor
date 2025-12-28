@@ -3,12 +3,15 @@ import { World } from '@/types/world.types';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { Globe } from 'lucide-react';
+import { EntityID } from '@/types/common.types';
 
 interface WorldListProps {
   worlds: World[];
   currentWorldId?: string | null;
   onSelectWorld: (worldId: string) => void;
   onDeleteWorld: (worldId: string) => void;
+  selectedWorldIds?: EntityID[];
+  onToggleSelect?: (worldId: EntityID) => void;
   _router?: {
     push: (url: string) => void;
   };
@@ -17,7 +20,16 @@ interface WorldListProps {
   };
 }
 
-const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
+const WorldList: React.FC<WorldListProps> = ({ 
+  worlds, 
+  currentWorldId, 
+  onSelectWorld, 
+  onDeleteWorld, 
+  selectedWorldIds = [],
+  onToggleSelect,
+  _router, 
+  _storeActions 
+}) => {
   // Get character counts and character data for each world using proper hook
   const characters = useCharacterStore((state) => state.characters);
   const allCharacters = Object.values(characters) as Character[];
@@ -68,6 +80,8 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
             key={world.id}
             world={world}
             isActive={world.id === currentWorldId}
+            isSelected={selectedWorldIds.includes(world.id)}
+            onToggleSelect={onToggleSelect}
             characters={charactersByWorld[world.id] || []}
             onSelect={onSelectWorld}
             onDelete={onDeleteWorld}

@@ -162,6 +162,18 @@ export const useWorldStore = create<WorldStore>()(
           const world = get().worlds[id];
           if (!world) return;
 
+          // Delete the world's image file if it exists and is not a data URI
+          if (world.image?.url && !world.image.url.startsWith('data:')) {
+            // Call API to delete the image file
+            fetch('/api/delete-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ imageUrl: world.image.url }),
+            }).catch((error) => {
+              logger.warn('Failed to delete world image file', { worldId: id, error });
+            });
+          }
+
           // Delete all characters in the world
           try {
             const { useCharacterStore } = eval('require("./characterStore")');

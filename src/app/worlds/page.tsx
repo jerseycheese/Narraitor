@@ -14,7 +14,6 @@ import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector/utils';
 import { SimpleModal } from '@/components/shared/SimpleModal';
-
 export default function WorldsPage() {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -23,6 +22,7 @@ export default function WorldsPage() {
   const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [viewToggle, setViewToggle] = useState<React.ReactNode>(null);
 
   const handleCreateWorld = () => {
     router.push('/worlds/create');
@@ -107,7 +107,12 @@ export default function WorldsPage() {
     <PageLayout
       title="My Worlds"
       description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
-      actions={<ActionButtonGroup actions={actionButtons} />}
+      actions={
+        <div className="flex items-center gap-3">
+          {viewToggle}
+          <ActionButtonGroup actions={actionButtons} />
+        </div>
+      }
     >
 
       {/* World Generation Prompt */}
@@ -181,7 +186,7 @@ export default function WorldsPage() {
         />
       </SimpleModal>
 
-      <WorldListScreen />
+      <WorldListScreen onViewToggleRender={setViewToggle} />
     </PageLayout>
   );
 }
