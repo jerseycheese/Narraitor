@@ -15,6 +15,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
+import { semanticColors } from '@/lib/design-tokens';
 
 interface WorldTableProps {
   worlds: World[];
@@ -45,14 +46,14 @@ export function WorldTable({
   const router = useRouter();
   const worldCharacterIds = useCharacterStore((state) => state.worldCharacterIds);
 
-  const handleViewWorld = (worldId: EntityID) => {
+  const handleViewWorld = React.useCallback((worldId: EntityID) => {
     router.push(`/worlds/${worldId}`);
-  };
+  }, [router]);
 
-  const handleEditWorld = (worldId: EntityID, e: React.MouseEvent) => {
+  const handleEditWorld = React.useCallback((worldId: EntityID, e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/worlds/${worldId}/edit`);
-  };
+  }, [router]);
 
   // Convert selectedWorldIds to TanStack RowSelectionState
   const rowSelection = React.useMemo(() => {
@@ -157,7 +158,7 @@ export function WorldTable({
         accessorKey: 'createdAt',
         header: 'Created',
         cell: ({ row }) => (
-          <div className="text-sm text-muted-foreground whitespace-nowrap">
+          <div className="text-sm whitespace-nowrap">
             {formatDate(row.getValue('createdAt'))}
           </div>
         ),
@@ -201,7 +202,7 @@ export function WorldTable({
         enableSorting: false,
       },
     ],
-    [selectedWorldIds, onToggleSelect, onDeleteWorld, worldCharacterIds, router]
+    [worlds, selectedWorldIds, onToggleSelect, onDeleteWorld, worldCharacterIds, handleViewWorld, handleEditWorld]
   );
 
   if (worlds.length === 0) {
@@ -219,10 +220,11 @@ export function WorldTable({
 
     const rowStyle: React.CSSProperties = world.image?.url
       ? {
-          backgroundImage: `linear-gradient(to right, hsl(var(--background) / 0.90), hsl(var(--background) / 0.85)), url(${world.image.url})`,
+          backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.70), rgba(0, 0, 0, 0.65)), url(${world.image.url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          color: semanticColors.text.inverse,
         }
       : {};
 
@@ -230,7 +232,7 @@ export function WorldTable({
       <tr
         key={row.id}
         data-state={isSelected ? 'selected' : undefined}
-        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-primary/10 data-[state=selected]:border-primary/50 data-[state=selected]:hover:bg-primary/15"
+        className="border-b transition-colors hover:bg-black/10 data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25"
         style={rowStyle}
       >
         {cells}
