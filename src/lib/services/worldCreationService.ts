@@ -31,7 +31,6 @@ interface GeneratedNPCResult {
   name: string;
   description: string;
   avatarPrompt?: string;
-  avatarUrl?: string;
 }
 
 const slugify = (value: string): string => {
@@ -76,8 +75,7 @@ Return STRICT JSON with this shape:
       "id": "kebab-case-identifier",
       "name": "NPC display name",
       "description": "One or two vivid sentences summarizing personality and role",
-      "avatarPrompt": "(optional) Short visual prompt for portrait",
-      "avatarUrl": "(optional) Absolute URL for an avatar image"
+      "avatarPrompt": "(optional) Short visual prompt for portrait generation"
     }
   ]
 }
@@ -111,7 +109,7 @@ Every NPC must fit this world snugly. IDs must be unique, lowercase, kebab-case 
         name: safeTrim(npc?.name) || '',
         description: safeTrim(npc?.description) || '',
         avatarPrompt: npc?.avatarPrompt ? safeTrim(npc.avatarPrompt) : undefined,
-        avatarUrl: npc?.avatarUrl ? safeTrim(npc.avatarUrl) : undefined,
+        // Note: We don't use avatarUrl from AI - portraits are generated separately
       }))
       .filter((npc) => npc.name.length > 0 && npc.description.length > 0);
   } catch (error) {
@@ -297,9 +295,6 @@ export const worldCreationService = {
 
       const name = safeTrim(npc.name) || `Companion ${index + 1}`;
       const description = safeTrim(npc.description) || 'Supporting character for this world.';
-      const avatarUrl = npc.avatarUrl && safeTrim(npc.avatarUrl)
-        ? safeTrim(npc.avatarUrl)
-        : undefined;
 
       try {
         const payload: Parameters<typeof npcStore.createNPC>[0] = {
@@ -309,22 +304,16 @@ export const worldCreationService = {
           description,
         };
 
-        if (avatarUrl) {
-          payload.avatarUrl = avatarUrl;
-        }
-
         npcStore.createNPC(payload);
 
-        // Generate portrait in background if NPC doesn't have one
-        if (!avatarUrl) {
-          npcPortraitService.generateForNPC(finalId, world).catch((error) => {
-            logger.warn('NPC portrait generation failed, using initials fallback', {
-              npcId: finalId,
-              worldId: world.id,
-              error
-            });
+        // Generate portrait in background - portraits are always generated, never from AI response
+        npcPortraitService.generateForNPC(finalId, world).catch((error) => {
+          logger.warn('NPC portrait generation failed, using initials fallback', {
+            npcId: finalId,
+            worldId: world.id,
+            error
           });
-        }
+        });
       } catch (error) {
         logger.warn('Failed to seed NPC', { worldId: world.id, finalId, error });
       }

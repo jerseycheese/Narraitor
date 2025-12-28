@@ -37,14 +37,18 @@ export function isRetryableError(error: Error): boolean {
 
 /**
  * Maps technical errors to user-friendly messages with categorization
- * 
+ *
  * Categorizes errors by type to enable conditional error handling logic:
  * - NETWORK: Connection, timeout, and network-related errors
- * - SERVICE: Rate limiting and service availability errors  
+ * - SERVICE: Rate limiting and service availability errors
  * - AUTH: Authentication and authorization errors
  * - VALIDATION: Input validation and data format errors
  * - UNKNOWN: Unrecognized or generic errors
- * 
+ *
+ * This function provides generic user-friendly messages without exposing
+ * raw error details. For domain-specific error handling (e.g., AI providers),
+ * use the domain-specific wrapper functions that can safely append provider context.
+ *
  * @param error - The error to map
  * @returns User-friendly error object with type categorization
  */
@@ -65,7 +69,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   // Timeout errors
   if (message.includes('timeout')) {
     return {
-      title: 'Request Timed Out', 
+      title: 'Request Timed Out',
       message: 'The request is taking too long. Please try again.',
       actionLabel: 'Try Again',
       retryable: true,
@@ -95,7 +99,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   }
 
   // Validation errors
-  if (message.includes('validation') || message.includes('invalid') || 
+  if (message.includes('validation') || message.includes('invalid') ||
       message.includes('malformed') || message.includes('bad request') ||
       message.includes('400')) {
     return {

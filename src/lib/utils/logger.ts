@@ -4,11 +4,20 @@
  */
 
 export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error'
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3,
+  NONE = 4
 }
+
+const LOG_LEVEL_NAMES: { [key: number]: string } = {
+  [LogLevel.DEBUG]: 'DEBUG',
+  [LogLevel.INFO]: 'INFO',
+  [LogLevel.WARN]: 'WARN',
+  [LogLevel.ERROR]: 'ERROR',
+  [LogLevel.NONE]: 'NONE'
+};
 
 interface LogColors {
   [key: string]: string;
@@ -20,19 +29,48 @@ const LOG_COLORS: LogColors = {
   [LogLevel.DEBUG]: `color: ${primitiveColors.gray[500]}; font-weight: normal;`,
   [LogLevel.INFO]: `color: ${primitiveColors.blue[500]}; font-weight: normal;`,
   [LogLevel.WARN]: `color: ${primitiveColors.amber[500]}; font-weight: bold;`,
-  [LogLevel.ERROR]: `color: ${primitiveColors.red[500]}; font-weight: bold;`
+  [LogLevel.ERROR]: `color: ${primitiveColors.red[500]}; font-weight: bold;`,
+  [LogLevel.NONE]: ''
 };
+
+/**
+ * Parse log level from environment variable
+ */
+function parseLogLevel(level?: string): LogLevel {
+  const upperLevel = level?.toUpperCase();
+  switch (upperLevel) {
+    case 'DEBUG': return LogLevel.DEBUG;
+    case 'INFO': return LogLevel.INFO;
+    case 'WARN': return LogLevel.WARN;
+    case 'ERROR': return LogLevel.ERROR;
+    case 'NONE': return LogLevel.NONE;
+    default: return LogLevel.WARN; // Default to WARN for less noise
+  }
+}
 
 export class Logger {
   private context: string;
   public isEnabled: boolean;
+  private minLevel: LogLevel;
 
   constructor(context: string) {
     this.context = context;
-    // Check if logging is enabled via environment variable
-    // Logging is disabled in production regardless of the env variable
-    this.isEnabled = process.env.NODE_ENV !== 'production' && 
-                    process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true';
+
+    // Determine if logging is enabled and at what level
+    if (process.env.NODE_ENV === 'production') {
+      // Production: only errors unless explicitly configured
+      this.isEnabled = true;
+      this.minLevel = parseLogLevel(process.env.NEXT_PUBLIC_LOG_LEVEL) || LogLevel.ERROR;
+    } else {
+      // Development: check legacy flag first, then use log level
+      if (process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'false') {
+        this.isEnabled = false;
+        this.minLevel = LogLevel.NONE;
+      } else {
+        this.isEnabled = true;
+        this.minLevel = parseLogLevel(process.env.NEXT_PUBLIC_LOG_LEVEL);
+      }
+    }
   }
 
   /**
@@ -52,7 +90,7 @@ export class Logger {
    */
   private formatPrefix(level: LogLevel): string {
     const timestamp = this.formatTimestamp();
-    const levelStr = level.toUpperCase().padEnd(5);
+    const levelStr = LOG_LEVEL_NAMES[level].padEnd(5);
     return `[${timestamp}] ${levelStr} [${this.context}]`;
   }
 
@@ -61,13 +99,14 @@ export class Logger {
    */
   private log(level: LogLevel, ...args: unknown[]): void {
     if (!this.isEnabled) return;
+    if (level < this.minLevel) return; // Skip logs below minimum level
 
     const prefix = this.formatPrefix(level);
     const color = LOG_COLORS[level];
-    
+
     // Apply color formatting for browser console
     const formattedPrefix = `%c${prefix}`;
-    
+
     switch (level) {
       case LogLevel.DEBUG:
         console.debug(formattedPrefix, color, ...args);
