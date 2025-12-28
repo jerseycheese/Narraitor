@@ -58,10 +58,9 @@ describe('userFriendlyErrors (AI-specific)', () => {
 
     it('should truncate very long error messages', () => {
       const longError = 'A'.repeat(300);
-      const error = new Error(longError);
-      error.message = longError.replace('network', 'network');
+      const error = new Error(`network error: ${longError}`);
 
-      const result = getUserFriendlyError(new Error(`network ${longError}`));
+      const result = getUserFriendlyError(error);
 
       expect(result.message.length).toBeLessThan(250); // Base message + truncated detail
       expect(result.message).toContain('...');
