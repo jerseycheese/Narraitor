@@ -6,7 +6,7 @@
  */
 
 import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { existsSync } from 'fs';
 import Logger from './logger';
 
@@ -106,8 +106,6 @@ function getExtensionFromMimeType(mimeType: string): string {
  * Prevents path traversal even if sanitization is bypassed
  */
 function validatePathWithinDirectory(filePath: string, allowedDirectory: string): void {
-  const { normalize, resolve } = require('path');
-
   // Resolve to absolute paths
   const absoluteFilePath = resolve(filePath);
   const absoluteAllowedDir = resolve(allowedDirectory);
