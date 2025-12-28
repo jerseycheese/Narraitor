@@ -160,15 +160,14 @@ export async function saveBase64Image(options: SaveImageOptions): Promise<SaveIm
     const imageBuffer = Buffer.from(base64Data, 'base64');
 
     // Save file to validated path
-    logger.debug('saveBase64Image', `Saving image to: ${validatedPath} (${imageBuffer.length} bytes)`);
-    // lgtm[js/path-injection]
     // CodeQL: Path is validated through defense-in-depth:
     // 1. entityId sanitized (alphanumeric + hyphens/underscores only)
     // 2. category validated against whitelist
     // 3. MIME type validated against whitelist
     // 4. Path constructed using safe join()
     // 5. Final absolute path validated to be within allowed directory
-    await writeFile(validatedPath, imageBuffer);
+    logger.debug('saveBase64Image', `Saving image to: ${validatedPath} (${imageBuffer.length} bytes)`);
+    await writeFile(validatedPath, imageBuffer); // codeql[js/path-injection]
 
     // Generate public URL (relative to public directory)
     const publicUrl = `/uploads/${category}/${filename}`;
@@ -235,9 +234,8 @@ export async function deleteImage(url: string): Promise<boolean> {
     }
 
     const { unlink } = await import('fs/promises');
-    // lgtm[js/path-injection]
     // CodeQL: Path is validated through defense-in-depth (same as saveBase64Image)
-    await unlink(validatedPath);
+    await unlink(validatedPath); // codeql[js/path-injection]
 
     logger.info('deleteImage', `Image deleted: ${url}`);
     return true;
