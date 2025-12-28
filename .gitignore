@@ -95,6 +95,7 @@ project-config.json
 .roo/mcp.json
 
 # Docs (private, untracked)
+# Use public_docs/ for committed documentation
 docs/
 
 # Claude Code

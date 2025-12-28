@@ -477,4 +477,4 @@ npm run test:visual
 
 - [Visual Regression Testing Guide](../visual-regression-testing.md) - Main developer guide
 - [Playwright Visual API Reference](../../api/playwright-visual-api.md) - Technical reference
-- [Visual Test Examples](../../examples/visual-test-examples.md) - Code examples
+- [Visual Test Examples](../visual-test-examples.md) - Code examples

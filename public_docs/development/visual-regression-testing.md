@@ -556,7 +556,7 @@ When reviewing PRs with visual changes:
 
 - [Testing Guide](./testing-guide.md) - General testing philosophy and patterns
 - [Playwright Visual Testing Workflow](./workflows/visual-testing-workflow.md) - Step-by-step process guide  
-- [Visual Test Examples](../examples/visual-test-examples.md) - Practical implementation examples
+- [Visual Test Examples](./visual-test-examples.md) - Practical implementation examples
 - [Playwright Visual API Reference](../api/playwright-visual-api.md) - Technical API details
 
 ## External Resources

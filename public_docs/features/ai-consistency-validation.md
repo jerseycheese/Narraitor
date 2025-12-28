@@ -94,6 +94,6 @@ Consistency instructions follow templates defined in:
 - Check for memory leaks in memoized computations
 
 ## Related Documentation
-- [DevTools Extension Guide](../devtools/extending-devtools.md)
+- [DevTools Extension Guide](../technical-guides/extending-devtools.md)
 - [Lore Tracking System](../technical-guides/lore-tracking-system.md)
 - [AI Systems Overview](../features/ai-systems.md)
