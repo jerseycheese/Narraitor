@@ -40,7 +40,5 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: '/language:javascript'
-          upload: true
-          # Don't fail the build on security alerts
-          # Alerts can be reviewed and dismissed in GitHub UI
-          fail-on: never
+          # Don't upload to create automatic PR checks
+          upload: false
