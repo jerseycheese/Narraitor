@@ -6,8 +6,7 @@ import {
   ErrorType,
   isRetryableError,
   getUserFriendlyError,
-  createStoreError,
-  createAPIErrorResponse
+  createStoreError
 } from '../errorUtils';
 
 describe('errorUtils', () => {
