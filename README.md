@@ -12,27 +12,27 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-creation-wizard-clean.png)
+![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-creation-wizard-clean.png)
 
 *Seven-step wizard with template selection, AI generation, and custom world building*
 
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/characters-page-clean.png)
+![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/characters-page-clean.png)
 
 *Character management screen with AI-generated portraits and quick access to play*
 
-![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/world-detail-page-clean.png)
+![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-detail-page-clean.png)
 
 *Complete world configuration showing custom attributes, skills, and character requirements*
 
-![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/character-detail-page-clean.png)
+![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/character-detail-page-clean.png)
 
 *Detailed character sheet showing attributes, skill progression, and full background story*
 
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/docs/images/gameplay-session-clean.png)
+![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/gameplay-session-clean.png)
 
 *Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
@@ -237,7 +237,7 @@ GEMINI_API_KEY=your-api-key
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
-**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation-guide.md` for details on how that works.
+**Portrait Generation**: There's also an AI portrait system for character images. Check `public_docs/features/portrait-generation-guide.md` for details on how that works.
 
 ## License
 
