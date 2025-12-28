@@ -35,10 +35,12 @@ jobs:
         with:
           languages: javascript-typescript
           queries: security-and-quality
-          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v3
         with:
           category: '/language:javascript'
-          fail-on: none
+          upload: true
+          # Don't fail the build on security alerts
+          # Alerts can be reviewed and dismissed in GitHub UI
+          fail-on: never
