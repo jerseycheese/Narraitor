@@ -156,13 +156,17 @@ export default function CharactersPage() {
   }>>([]);
 
   // View mode with localStorage persistence
-  const [viewMode, setViewMode] = useState<CharacterViewMode>(() => {
+  const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
+
+  // Restore view mode from localStorage after mount
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('character-view-mode');
-      return (saved as CharacterViewMode) || 'grid';
+      if (saved === 'table' || saved === 'grid') {
+        setViewMode(saved);
+      }
     }
-    return 'grid';
-  });
+  }, []);
 
   const handleViewModeChange = (mode: CharacterViewMode) => {
     setViewMode(mode);

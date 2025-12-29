@@ -315,12 +315,10 @@ describe('CharacterTable', () => {
     const firstRow = container.querySelector('tbody tr');
     const portraitCell = firstRow?.querySelector('td:first-child div.cursor-pointer');
 
-    if (portraitCell) {
-      fireEvent.click(portraitCell);
-      expect(mockOnView).toHaveBeenCalledWith('char-1');
-    } else {
-      // If we can't find the portrait cell, skip this test
-      expect(true).toBe(true);
-    }
+    // Test should fail if portrait cell isn't found
+    expect(portraitCell).toBeTruthy();
+
+    fireEvent.click(portraitCell!);
+    expect(mockOnView).toHaveBeenCalledWith('char-1');
   });
 });
