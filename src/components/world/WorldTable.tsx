@@ -92,12 +92,14 @@ export function WorldTable({
           );
         },
         cell: ({ row }) => (
-          <Checkbox
-            checked={selectedWorldIds.includes(row.original.id)}
-            onChange={() => onToggleSelect(row.original.id)}
-            aria-label={`Select ${row.original.name} for comparison`}
-            disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
-          />
+          <div className="w-10">
+            <Checkbox
+              checked={selectedWorldIds.includes(row.original.id)}
+              onChange={() => onToggleSelect(row.original.id)}
+              aria-label={`Select ${row.original.name} for comparison`}
+              disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
+            />
+          </div>
         ),
         enableSorting: false,
         size: 40,
