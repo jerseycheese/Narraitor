@@ -15,7 +15,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
-import { semanticColors } from '@/lib/design-tokens';
+import { semanticColors, primitiveColors } from '@/lib/design-tokens';
 
 interface WorldTableProps {
   worlds: World[];
@@ -23,6 +23,53 @@ interface WorldTableProps {
   onToggleSelect: (worldId: EntityID) => void;
   onDeleteWorld: (worldId: EntityID, e: React.MouseEvent) => void;
 }
+
+interface WorldTableRowProps {
+  world: World;
+  isSelected: boolean;
+  cells: React.ReactNode;
+}
+
+// Separate row component to properly handle hover state
+const WorldTableRow = React.memo(({ world, isSelected, cells }: WorldTableRowProps) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const hasImage = Boolean(world.image?.url);
+
+  const rowStyle: React.CSSProperties = React.useMemo(() => {
+    if (hasImage && world.image?.url) {
+      const opacity = isHovered ? '0.75, 0.7' : '0.5, 0.45';
+      return {
+        backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, ${opacity.split(', ')[0]}), rgba(0, 0, 0, ${opacity.split(', ')[1]})), url(${world.image.url})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        color: semanticColors.text.inverse,
+        transition: 'background-image 0.15s ease',
+      };
+    } else {
+      return {
+        backgroundColor: isHovered ? primitiveColors.gray[300] : undefined,
+        transition: 'background-color 0.15s ease',
+      };
+    }
+  }, [hasImage, isHovered, world.image?.url]);
+
+  const baseClasses = "border-b transition-colors h-32 [&>td]:align-middle data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25";
+
+  return (
+    <tr
+      data-state={isSelected ? 'selected' : undefined}
+      className={baseClasses}
+      style={rowStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {cells}
+    </tr>
+  );
+});
+
+WorldTableRow.displayName = 'WorldTableRow';
 
 /**
  * WorldTable - A data table component for comparing and managing multiple worlds
@@ -92,14 +139,12 @@ export function WorldTable({
           );
         },
         cell: ({ row }) => (
-          <div className="w-10">
-            <Checkbox
-              checked={selectedWorldIds.includes(row.original.id)}
-              onChange={() => onToggleSelect(row.original.id)}
-              aria-label={`Select ${row.original.name} for comparison`}
-              disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
-            />
-          </div>
+          <Checkbox
+            checked={selectedWorldIds.includes(row.original.id)}
+            onChange={() => onToggleSelect(row.original.id)}
+            aria-label={`Select ${row.original.name} for comparison`}
+            disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
+          />
         ),
         enableSorting: false,
         size: 40,
@@ -217,35 +262,15 @@ export function WorldTable({
 
   // Custom row renderer with background images
   const customRowRenderer = (row: { original: World; id: string }, cells: React.ReactNode) => {
-    const world = row.original;
-    const isSelected = selectedWorldIds.includes(world.id);
-    const hasImage = Boolean(world.image?.url);
-
-    const rowStyle: React.CSSProperties = hasImage
-      ? {
-          backgroundImage: `url(${world.image.url})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          color: semanticColors.text.inverse,
-          position: 'relative' as const,
-        }
-      : {};
-
-    const baseClasses = "border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32 [&>td]:align-middle";
-    const overlayClasses = hasImage
-      ? "before:absolute before:inset-0 before:bg-gradient-to-r before:from-black/50 before:to-black/45 before:pointer-events-none before:transition-opacity hover:before:from-black/75 hover:before:to-black/70 before:z-0 [&>td]:relative [&>td]:z-10"
-      : "";
+    const isSelected = selectedWorldIds.includes(row.original.id);
 
     return (
-      <tr
+      <WorldTableRow
         key={row.id}
-        data-state={isSelected ? 'selected' : undefined}
-        className={`${baseClasses} ${overlayClasses}`}
-        style={rowStyle}
-      >
-        {cells}
-      </tr>
+        world={row.original}
+        isSelected={isSelected}
+        cells={cells}
+      />
     );
   };
 
