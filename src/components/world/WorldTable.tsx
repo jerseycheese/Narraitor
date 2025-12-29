@@ -47,12 +47,13 @@ const WorldTableRow = React.memo(({ world, isSelected, cells }: WorldTableRowPro
         transition: 'background-image 0.15s ease',
       };
     } else {
+      // Don't override background color when selected (let Tailwind classes handle it)
       return {
-        backgroundColor: isHovered ? primitiveColors.gray[300] : undefined,
+        backgroundColor: !isSelected && isHovered ? primitiveColors.gray[300] : undefined,
         transition: 'background-color 0.15s ease',
       };
     }
-  }, [hasImage, isHovered, world.image?.url]);
+  }, [hasImage, isHovered, isSelected, world.image?.url]);
 
   const baseClasses = "border-b transition-colors h-32 [&>td]:align-middle data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25";
 
