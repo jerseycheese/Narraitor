@@ -101,6 +101,17 @@ export function InventoryTable({
         enableSorting: true,
       },
       {
+        accessorKey: 'description',
+        header: 'Description',
+        cell: ({ row }) => {
+          const description = row.getValue('description') as string;
+          return description ? (
+            <div className="text-sm text-muted-foreground max-w-md">{description}</div>
+          ) : null;
+        },
+        enableSorting: false,
+      },
+      {
         accessorKey: 'quantity',
         header: 'Quantity',
         cell: ({ row }) => (

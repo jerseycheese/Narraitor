@@ -101,6 +101,7 @@ describe('InventoryTable', () => {
     render(<InventoryTable characterId="char-1" />);
 
     expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
     expect(screen.getByText('Quantity')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
     expect(screen.getByText('Source')).toBeInTheDocument();
