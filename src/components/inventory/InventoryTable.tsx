@@ -84,7 +84,7 @@ export function InventoryTable({
             <img
               src={image.url}
               alt={row.original.name}
-              className="w-8 h-8 object-contain rounded item-image"
+              className="w-24 h-24 object-contain rounded-md item-image"
               loading="lazy"
             />
           );
@@ -99,6 +99,17 @@ export function InventoryTable({
           <div className="font-medium">{row.getValue('name')}</div>
         ),
         enableSorting: true,
+      },
+      {
+        accessorKey: 'description',
+        header: 'Description',
+        cell: ({ row }) => {
+          const description = row.getValue('description') as string;
+          return description ? (
+            <div className="text-sm text-muted-foreground max-w-md">{description}</div>
+          ) : null;
+        },
+        enableSorting: false,
       },
       {
         accessorKey: 'quantity',

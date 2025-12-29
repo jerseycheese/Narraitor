@@ -11,6 +11,8 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { getTimestamp } from '@/lib/utils';
 import { CharacterCard } from '@/components/CharacterCard';
+import { CharacterTable } from '@/components/character/CharacterTable';
+import { CharacterViewToggle, type CharacterViewMode } from '@/components/character/CharacterViewToggle';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
@@ -152,6 +154,26 @@ export default function CharactersPage() {
     variant: 'success' | 'error';
     duration?: number;
   }>>([]);
+
+  // View mode with localStorage persistence
+  const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
+
+  // Restore view mode from localStorage after mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('character-view-mode');
+      if (saved === 'table' || saved === 'grid') {
+        setViewMode(saved);
+      }
+    }
+  }, []);
+
+  const handleViewModeChange = (mode: CharacterViewMode) => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('character-view-mode', mode);
+    }
+  };
   
   // Use worldId from URL if provided, otherwise use the current world
   const worldIdFromUrl = searchParams.get('worldId');
@@ -564,7 +586,8 @@ export default function CharactersPage() {
 
       {/* Action buttons below hero when world exists (after hydration) */}
       {mounted && currentWorld && (
-        <div className="mb-8 flex justify-end">
+        <div className="mb-8 flex justify-end items-center gap-3">
+          <CharacterViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
           <ActionButtonGroup actions={actionButtons} />
         </div>
       )}
@@ -638,6 +661,16 @@ export default function CharactersPage() {
               </div>
             </div>
           </div>
+        ) : viewMode === 'table' ? (
+          <CharacterTable
+            characters={worldCharacters as Character[]}
+            currentCharacterId={currentCharacterId}
+            onMakeActive={handleSelectCharacter}
+            onView={handleViewCharacter}
+            onPlay={handleCharacterPlay}
+            onEdit={handleEditCharacter}
+            onDelete={handleDeleteCharacter}
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {(worldCharacters as Character[]).map((character) => (
