@@ -230,7 +230,7 @@ export function WorldTable({
         }
       : {};
 
-    const baseClasses = "border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32 [&>td]:align-top [&>td]:pt-2";
+    const baseClasses = "border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32 [&>td]:align-middle";
     const overlayClasses = hasImage
       ? "before:absolute before:inset-0 before:bg-gradient-to-r before:from-black/50 before:to-black/45 before:pointer-events-none before:transition-opacity hover:before:from-black/75 hover:before:to-black/70 before:z-0 [&>td]:relative [&>td]:z-10"
       : "";
