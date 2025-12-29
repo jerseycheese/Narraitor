@@ -220,11 +220,12 @@ export function WorldTable({
 
     const rowStyle: React.CSSProperties = world.image?.url
       ? {
-          backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.70), rgba(0, 0, 0, 0.65)), url(${world.image.url})`,
+          backgroundImage: `url(${world.image.url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           color: semanticColors.text.inverse,
+          position: 'relative' as const,
         }
       : {};
 
@@ -232,7 +233,7 @@ export function WorldTable({
       <tr
         key={row.id}
         data-state={isSelected ? 'selected' : undefined}
-        className="border-b transition-colors hover:bg-black/10 data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32"
+        className="border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32 before:absolute before:inset-0 before:bg-gradient-to-r before:from-black/50 before:to-black/45 before:pointer-events-none before:transition-opacity hover:before:from-black/75 hover:before:to-black/70"
         style={rowStyle}
       >
         {cells}
