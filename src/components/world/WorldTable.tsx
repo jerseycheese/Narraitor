@@ -232,7 +232,7 @@ export function WorldTable({
       <tr
         key={row.id}
         data-state={isSelected ? 'selected' : undefined}
-        className="border-b transition-colors hover:bg-black/10 data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25"
+        className="border-b transition-colors hover:bg-black/10 data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32"
         style={rowStyle}
       >
         {cells}
