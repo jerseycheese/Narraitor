@@ -217,8 +217,9 @@ export function WorldTable({
   const customRowRenderer = (row: { original: World; id: string }, cells: React.ReactNode) => {
     const world = row.original;
     const isSelected = selectedWorldIds.includes(world.id);
+    const hasImage = Boolean(world.image?.url);
 
-    const rowStyle: React.CSSProperties = world.image?.url
+    const rowStyle: React.CSSProperties = hasImage
       ? {
           backgroundImage: `url(${world.image.url})`,
           backgroundSize: 'cover',
@@ -229,11 +230,16 @@ export function WorldTable({
         }
       : {};
 
+    const baseClasses = "border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32";
+    const overlayClasses = hasImage
+      ? "before:absolute before:inset-0 before:bg-gradient-to-r before:from-black/50 before:to-black/45 before:pointer-events-none before:transition-opacity hover:before:from-black/75 hover:before:to-black/70 before:z-0 [&>td]:relative [&>td]:z-10"
+      : "";
+
     return (
       <tr
         key={row.id}
         data-state={isSelected ? 'selected' : undefined}
-        className="border-b transition-colors data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25 h-32 before:absolute before:inset-0 before:bg-gradient-to-r before:from-black/50 before:to-black/45 before:pointer-events-none before:transition-opacity hover:before:from-black/75 hover:before:to-black/70"
+        className={`${baseClasses} ${overlayClasses}`}
         style={rowStyle}
       >
         {cells}
