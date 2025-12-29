@@ -85,7 +85,7 @@ export function CharacterTable({
             <CharacterPortrait
               portrait={row.original.portrait || { type: 'placeholder', url: null }}
               characterName={row.original.name}
-              size="small"
+              size="large"
             />
           </div>
         ),
