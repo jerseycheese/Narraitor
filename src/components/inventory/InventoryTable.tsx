@@ -84,7 +84,7 @@ export function InventoryTable({
             <img
               src={image.url}
               alt={row.original.name}
-              className="w-8 h-8 object-contain rounded item-image"
+              className="w-24 h-24 object-contain rounded-md item-image"
               loading="lazy"
             />
           );
