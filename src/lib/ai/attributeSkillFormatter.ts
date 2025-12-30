@@ -61,8 +61,8 @@ export function normalizeSkillArray(
   }
 
   // Check if skills have 'name' property (from Character.skills)
-  const firstSkill = skills[0] as any;
-  if ('name' in firstSkill) {
+  const firstSkill = skills[0];
+  if (firstSkill && 'name' in firstSkill) {
     return (skills as Array<{ name: string; level: number; worldSkillId?: string }>).map(skill => ({
       skillId: skill.worldSkillId || skill.name,
       level: skill.level
