@@ -130,6 +130,10 @@ export interface PersonalizedNarrativeContext {
     relationships: CharacterRelationship[];
     /** Recent decisions that inform characterization */
     recentDecisions: PlayerDecision[];
+    /** Character attributes for narrative personalization */
+    attributes?: Record<string, number> | Array<{ attributeId: string; value: number }>;
+    /** Character skills for narrative personalization */
+    skills?: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
   };
   /** Player preferences and patterns */
   playerPreferences: PlayerPreferences;
