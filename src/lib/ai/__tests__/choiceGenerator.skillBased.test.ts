@@ -6,6 +6,7 @@
 import { ChoiceGenerator } from '../choiceGenerator';
 import type { AIClient } from '../types';
 import type { NarrativeContext } from '@/types/narrative.types';
+import type { World } from '@/types/world.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import type { Character } from '@/types/character.types';
@@ -19,7 +20,7 @@ jest.mock('@/state/npcStore');
 describe('ChoiceGenerator - Skill-Based Choices', () => {
   let mockAIClient: AIClient;
   let choiceGenerator: ChoiceGenerator;
-  let mockWorld: any;
+  let mockWorld: World;
   let mockCharacter: Character;
 
   beforeEach(() => {
