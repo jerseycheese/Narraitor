@@ -103,35 +103,35 @@ describe('attributeSkillFormatter - MVP Tests', () => {
   });
 
   describe('getSkillDescriptor', () => {
-    test('returns "Master" for levels 9-10', () => {
-      expect(getSkillDescriptor(9)).toBe('Master');
-      expect(getSkillDescriptor(10)).toBe('Master');
+    test('returns "Master" for level 5', () => {
+      expect(getSkillDescriptor(5)).toBe('Master');
     });
 
-    test('returns "Expert" for levels 7-8', () => {
-      expect(getSkillDescriptor(7)).toBe('Expert');
-      expect(getSkillDescriptor(8)).toBe('Expert');
+    test('returns "Expert" for level 4', () => {
+      expect(getSkillDescriptor(4)).toBe('Expert');
     });
 
-    test('returns "Proficient" for levels 5-6', () => {
-      expect(getSkillDescriptor(5)).toBe('Proficient');
-      expect(getSkillDescriptor(6)).toBe('Proficient');
+    test('returns "Competent" for level 3', () => {
+      expect(getSkillDescriptor(3)).toBe('Competent');
     });
 
-    test('returns "Trained" for levels 3-4', () => {
-      expect(getSkillDescriptor(3)).toBe('Trained');
-      expect(getSkillDescriptor(4)).toBe('Trained');
+    test('returns "Apprentice" for level 2', () => {
+      expect(getSkillDescriptor(2)).toBe('Apprentice');
     });
 
-    test('returns "Novice" for levels 1-2', () => {
+    test('returns "Novice" for level 1', () => {
       expect(getSkillDescriptor(1)).toBe('Novice');
-      expect(getSkillDescriptor(2)).toBe('Novice');
     });
 
-    test('handles edge cases with default', () => {
-      expect(getSkillDescriptor(0)).toBe('Novice');
-      expect(getSkillDescriptor(11)).toBe('Novice');
-      expect(getSkillDescriptor(-1)).toBe('Novice');
+    test('clamps out-of-range values to 1-5', () => {
+      expect(getSkillDescriptor(0)).toBe('Novice'); // Clamps to 1
+      expect(getSkillDescriptor(10)).toBe('Master'); // Clamps to 5
+      expect(getSkillDescriptor(-1)).toBe('Novice'); // Clamps to 1
+    });
+
+    test('rounds fractional values', () => {
+      expect(getSkillDescriptor(3.4)).toBe('Competent'); // Rounds to 3
+      expect(getSkillDescriptor(3.6)).toBe('Expert'); // Rounds to 4
     });
   });
 
@@ -175,16 +175,29 @@ describe('attributeSkillFormatter - MVP Tests', () => {
   });
 
   describe('formatSkillsForNarrative', () => {
-    test('formats all skills with descriptive labels', () => {
+    test('formats all skills with descriptive labels (1-5 scale)', () => {
       const skills = [
-        { skillId: 'lockpicking', level: 8 },
-        { skillId: 'stealth', level: 3 }
+        { skillId: 'lockpicking', level: 4 }, // Expert
+        { skillId: 'stealth', level: 2 }      // Apprentice
       ];
 
       const result = formatSkillsForNarrative(skills);
 
       expect(result).toContain('lockpicking (Expert)');
-      expect(result).toContain('stealth (Trained)');
+      expect(result).toContain('stealth (Apprentice)');
+    });
+
+    test('includes all skills regardless of level', () => {
+      const skills = [
+        { skillId: 'lockpicking', level: 5 }, // Master
+        { skillId: 'stealth', level: 1 }      // Novice
+      ];
+
+      const result = formatSkillsForNarrative(skills);
+
+      // Both should be included, even low-level skills
+      expect(result).toContain('lockpicking (Master)');
+      expect(result).toContain('stealth (Novice)');
     });
 
     test('handles empty skills', () => {
@@ -193,14 +206,14 @@ describe('attributeSkillFormatter - MVP Tests', () => {
 
     test('handles name-based skill format', () => {
       const skills = [
-        { name: 'Lockpicking', level: 8, worldSkillId: 'skill-lockpicking' },
+        { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' },
         { name: 'Stealth', level: 3 }
       ];
 
       const result = formatSkillsForNarrative(skills);
 
       expect(result).toContain('skill-lockpicking (Expert)');
-      expect(result).toContain('Stealth (Trained)');
+      expect(result).toContain('Stealth (Competent)');
     });
   });
 });

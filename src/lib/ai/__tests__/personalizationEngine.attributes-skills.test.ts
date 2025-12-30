@@ -45,9 +45,9 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         { attributeId: 'attr-charisma', value: 5 }        // Moderate (filtered out)
       ],
       skills: [
-        { skillId: 'skill-lockpicking', level: 8, experience: 100, isActive: true },    // Expert
-        { skillId: 'skill-stealth', level: 6, experience: 80, isActive: true },         // Proficient
-        { skillId: 'skill-pickpocket', level: 4, experience: 40, isActive: true }       // Trained
+        { skillId: 'skill-lockpicking', level: 4, experience: 100, isActive: true },    // Expert
+        { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true },         // Competent
+        { skillId: 'skill-pickpocket', level: 2, experience: 40, isActive: true }       // Apprentice
       ],
       inventory: {
         characterId: 'char-1',
@@ -178,18 +178,18 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       expect(enhancement).toContain('Expert');
 
       expect(enhancement).toContain('skill-stealth');
-      expect(enhancement).toContain('Proficient');
+      expect(enhancement).toContain('Competent');
 
       expect(enhancement).toContain('skill-pickpocket');
-      expect(enhancement).toContain('Trained');
+      expect(enhancement).toContain('Apprentice');
     });
 
     test('handles skills with name property', () => {
       const characterWithNameSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
         skills: [
-          { name: 'Lockpicking', level: 8, worldSkillId: 'skill-lockpicking' },
-          { name: 'Stealth', level: 6 }
+          { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' }, // Expert
+          { name: 'Stealth', level: 3 } // Competent
         ]
       };
 

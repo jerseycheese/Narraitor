@@ -50,9 +50,9 @@ Decision Weight: [minor]`
           description: 'Open locks without keys',
           worldId: 'world-1',
           difficulty: 'medium' as const,
-          baseValue: 0,
-          minValue: 0,
-          maxValue: 10
+          baseValue: 3,
+          minValue: 1,
+          maxValue: 5
         },
         {
           id: 'stealth',
@@ -60,9 +60,9 @@ Decision Weight: [minor]`
           description: 'Move unseen and unheard',
           worldId: 'world-1',
           difficulty: 'medium' as const,
-          baseValue: 0,
-          minValue: 0,
-          maxValue: 10
+          baseValue: 3,
+          minValue: 1,
+          maxValue: 5
         }
       ],
       settings: {
@@ -95,13 +95,13 @@ Decision Weight: [minor]`
       skills: [
         {
           skillId: 'lockpicking',
-          level: 8, // Expert level
+          level: 4, // Expert level
           experience: 100,
           isActive: true
         },
         {
           skillId: 'stealth',
-          level: 6, // Proficient
+          level: 3, // Competent
           experience: 60,
           isActive: true
         }
@@ -199,8 +199,8 @@ Decision Weight: [minor]`
 
       const prompt = (mockAIClient.generateContent as jest.Mock).mock.calls[0][0];
 
-      // Should include skill proficiency (Expert, Proficient, etc.)
-      expect(prompt).toMatch(/Expert|Proficient|Master|Trained/i);
+      // Should include skill proficiency (Expert, Competent, etc.) using 1-5 scale labels
+      expect(prompt).toMatch(/Expert|Competent|Master|Apprentice|Novice/i);
     });
 
     test('handles character with no skills gracefully', async () => {
@@ -245,7 +245,7 @@ Decision Weight: [minor]`
         skills: [
           {
             skillId: 'combat',
-            level: 9,
+            level: 5, // Master
             experience: 200,
             isActive: true
           }

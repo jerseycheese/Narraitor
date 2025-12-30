@@ -3,7 +3,13 @@
  *
  * Converts numeric attribute/skill values to descriptive narrative-friendly labels.
  * Maintains narrative immersion while providing AI context for personalization.
+ *
+ * FILTERING PHILOSOPHY:
+ * - Attributes: Filter to notable only (Exceptional/High/Low/Very Low) to reduce token usage
+ * - Skills: Include ALL skills regardless of level - they're player-chosen investments showing intent
  */
+
+import { SKILL_LEVEL_DESCRIPTIONS } from '@/lib/constants/skillLevelDescriptions';
 
 /**
  * Normalized attribute format for internal processing
@@ -97,22 +103,21 @@ export function getAttributeDescriptor(value: number): string {
 /**
  * Convert skill level to descriptive label
  *
- * Scale:
- * - 9-10: Master
- * - 7-8: Expert
- * - 5-6: Proficient
- * - 3-4: Trained
- * - 1-2: Novice
+ * Uses the canonical 1-5 skill scale from SKILL_LEVEL_DESCRIPTIONS:
+ * - 5: Master - Complete mastery at professional level
+ * - 4: Expert - Advanced mastery with consistent results
+ * - 3: Competent - Solid performance in most situations
+ * - 2: Apprentice - Basic proficiency with room for improvement
+ * - 1: Novice - Beginner understanding with limited skill
  */
 export function getSkillDescriptor(level: number): string {
-  // Handle invalid/out of range values
-  if (level < 1 || level > 10) return 'Novice';
+  // Clamp to valid range (1-5)
+  const clampedLevel = Math.max(1, Math.min(5, Math.round(level)));
 
-  if (level >= 9) return 'Master';
-  if (level >= 7) return 'Expert';
-  if (level >= 5) return 'Proficient';
-  if (level >= 3) return 'Trained';
-  return 'Novice';
+  // Find matching description
+  const description = SKILL_LEVEL_DESCRIPTIONS.find(desc => desc.value === clampedLevel);
+
+  return description?.label || 'Novice';
 }
 
 /**
