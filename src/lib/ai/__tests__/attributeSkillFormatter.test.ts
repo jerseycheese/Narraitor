@@ -1,0 +1,206 @@
+/**
+ * MVP-level tests for attributeSkillFormatter
+ * Focus on core acceptance criteria: converting numeric values to descriptive labels
+ */
+
+import {
+  normalizeAttributeArray,
+  normalizeSkillArray,
+  getAttributeDescriptor,
+  getSkillDescriptor,
+  formatAttributesForNarrative,
+  formatSkillsForNarrative
+} from '../attributeSkillFormatter';
+
+describe('attributeSkillFormatter - MVP Tests', () => {
+  describe('normalizeAttributeArray', () => {
+    test('converts Record format to array format', () => {
+      const recordFormat = { strength: 8, intelligence: 6 };
+      const result = normalizeAttributeArray(recordFormat);
+
+      expect(result).toEqual([
+        { attributeId: 'strength', value: 8 },
+        { attributeId: 'intelligence', value: 6 }
+      ]);
+    });
+
+    test('passes through array format unchanged', () => {
+      const arrayFormat = [
+        { attributeId: 'attr-strength', value: 8 },
+        { attributeId: 'attr-intelligence', value: 6 }
+      ];
+      const result = normalizeAttributeArray(arrayFormat);
+
+      expect(result).toEqual(arrayFormat);
+    });
+
+    test('handles empty input', () => {
+      expect(normalizeAttributeArray({})).toEqual([]);
+      expect(normalizeAttributeArray([])).toEqual([]);
+    });
+  });
+
+  describe('normalizeSkillArray', () => {
+    test('normalizes skills with name property to skillId format', () => {
+      const nameFormat = [
+        { name: 'Lockpicking', level: 7, worldSkillId: 'skill-lockpicking' },
+        { name: 'Stealth', level: 5 }
+      ];
+      const result = normalizeSkillArray(nameFormat);
+
+      expect(result).toEqual([
+        { skillId: 'skill-lockpicking', level: 7 },
+        { skillId: 'Stealth', level: 5 }
+      ]);
+    });
+
+    test('passes through skillId format unchanged', () => {
+      const skillIdFormat = [
+        { skillId: 'skill-lockpicking', level: 7 },
+        { skillId: 'skill-stealth', level: 5 }
+      ];
+      const result = normalizeSkillArray(skillIdFormat);
+
+      expect(result).toEqual(skillIdFormat);
+    });
+
+    test('handles empty input', () => {
+      expect(normalizeSkillArray([])).toEqual([]);
+    });
+  });
+
+  describe('getAttributeDescriptor', () => {
+    test('returns "Exceptional" for values 9-10', () => {
+      expect(getAttributeDescriptor(9)).toBe('Exceptional');
+      expect(getAttributeDescriptor(10)).toBe('Exceptional');
+    });
+
+    test('returns "High" for values 7-8', () => {
+      expect(getAttributeDescriptor(7)).toBe('High');
+      expect(getAttributeDescriptor(8)).toBe('High');
+    });
+
+    test('returns "Moderate" for values 4-6', () => {
+      expect(getAttributeDescriptor(4)).toBe('Moderate');
+      expect(getAttributeDescriptor(5)).toBe('Moderate');
+      expect(getAttributeDescriptor(6)).toBe('Moderate');
+    });
+
+    test('returns "Low" for values 2-3', () => {
+      expect(getAttributeDescriptor(2)).toBe('Low');
+      expect(getAttributeDescriptor(3)).toBe('Low');
+    });
+
+    test('returns "Very Low" for value 1', () => {
+      expect(getAttributeDescriptor(1)).toBe('Very Low');
+    });
+
+    test('handles edge cases with default', () => {
+      expect(getAttributeDescriptor(0)).toBe('Moderate');
+      expect(getAttributeDescriptor(11)).toBe('Moderate');
+      expect(getAttributeDescriptor(-1)).toBe('Moderate');
+    });
+  });
+
+  describe('getSkillDescriptor', () => {
+    test('returns "Master" for levels 9-10', () => {
+      expect(getSkillDescriptor(9)).toBe('Master');
+      expect(getSkillDescriptor(10)).toBe('Master');
+    });
+
+    test('returns "Expert" for levels 7-8', () => {
+      expect(getSkillDescriptor(7)).toBe('Expert');
+      expect(getSkillDescriptor(8)).toBe('Expert');
+    });
+
+    test('returns "Proficient" for levels 5-6', () => {
+      expect(getSkillDescriptor(5)).toBe('Proficient');
+      expect(getSkillDescriptor(6)).toBe('Proficient');
+    });
+
+    test('returns "Trained" for levels 3-4', () => {
+      expect(getSkillDescriptor(3)).toBe('Trained');
+      expect(getSkillDescriptor(4)).toBe('Trained');
+    });
+
+    test('returns "Novice" for levels 1-2', () => {
+      expect(getSkillDescriptor(1)).toBe('Novice');
+      expect(getSkillDescriptor(2)).toBe('Novice');
+    });
+
+    test('handles edge cases with default', () => {
+      expect(getSkillDescriptor(0)).toBe('Novice');
+      expect(getSkillDescriptor(11)).toBe('Novice');
+      expect(getSkillDescriptor(-1)).toBe('Novice');
+    });
+  });
+
+  describe('formatAttributesForNarrative', () => {
+    test('formats notable attributes with descriptive labels', () => {
+      const attributes = [
+        { attributeId: 'intelligence', value: 9 },
+        { attributeId: 'strength', value: 3 },
+        { attributeId: 'dexterity', value: 5 }
+      ];
+
+      const result = formatAttributesForNarrative(attributes);
+
+      // Should only include notable attributes (not moderate)
+      expect(result).toContain('intelligence (Exceptional)');
+      expect(result).toContain('strength (Low)');
+      expect(result).not.toContain('dexterity');
+    });
+
+    test('handles empty attributes', () => {
+      expect(formatAttributesForNarrative([])).toBe('');
+    });
+
+    test('filters out moderate attributes', () => {
+      const attributes = [
+        { attributeId: 'charisma', value: 5 },
+        { attributeId: 'wisdom', value: 6 }
+      ];
+
+      const result = formatAttributesForNarrative(attributes);
+      expect(result).toBe('');
+    });
+
+    test('formats Record-style attributes', () => {
+      const attributes = { intelligence: 9, strength: 3 };
+      const result = formatAttributesForNarrative(attributes);
+
+      expect(result).toContain('intelligence (Exceptional)');
+      expect(result).toContain('strength (Low)');
+    });
+  });
+
+  describe('formatSkillsForNarrative', () => {
+    test('formats all skills with descriptive labels', () => {
+      const skills = [
+        { skillId: 'lockpicking', level: 8 },
+        { skillId: 'stealth', level: 3 }
+      ];
+
+      const result = formatSkillsForNarrative(skills);
+
+      expect(result).toContain('lockpicking (Expert)');
+      expect(result).toContain('stealth (Trained)');
+    });
+
+    test('handles empty skills', () => {
+      expect(formatSkillsForNarrative([])).toBe('');
+    });
+
+    test('handles name-based skill format', () => {
+      const skills = [
+        { name: 'Lockpicking', level: 8, worldSkillId: 'skill-lockpicking' },
+        { name: 'Stealth', level: 3 }
+      ];
+
+      const result = formatSkillsForNarrative(skills);
+
+      expect(result).toContain('skill-lockpicking (Expert)');
+      expect(result).toContain('Stealth (Trained)');
+    });
+  });
+});
