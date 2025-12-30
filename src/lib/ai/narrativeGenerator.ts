@@ -26,7 +26,6 @@ import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import { enhanceNarrativeWithAttributes } from './attributeNarrativeEnhancer';
 import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { CharacterGoal } from '@/types/personalization.types';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
@@ -922,55 +921,6 @@ Return ONLY the rewritten narrative.`;
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
-      // Enhance narrative with attribute-aware flavor text (Phase 2)
-      if (request.characterIds && request.characterIds.length > 0) {
-        const { characters } = useCharacterStore.getState();
-        const primaryCharacter = characters[request.characterIds[0]];
-
-        if (process.env.NODE_ENV !== 'production') {
-          logger.info('[Phase2] Attribute enhancement check:', {
-            hasCharacter: !!primaryCharacter,
-            hasAttributes: !!primaryCharacter?.attributes,
-            attributeCount: primaryCharacter?.attributes?.length || 0,
-            attributes: primaryCharacter?.attributes?.map(a => ({
-              name: a.name,
-              worldAttributeId: a.worldAttributeId,
-              modifiedValue: a.modifiedValue
-            }))
-          });
-        }
-
-        if (primaryCharacter && primaryCharacter.attributes && primaryCharacter.attributes.length > 0) {
-          // Convert store attribute format to enhancer format
-          const attributesForEnhancement = primaryCharacter.attributes.map(attr => ({
-            attributeId: attr.worldAttributeId || attr.name,
-            value: attr.modifiedValue
-          }));
-
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info('[Phase2] Before enhancement:', {
-              contentLength: result.content.length,
-              contentPreview: result.content.substring(0, 100)
-            });
-          }
-
-          const enhancedContent = enhanceNarrativeWithAttributes(
-            result.content,
-            attributesForEnhancement
-          );
-
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info('[Phase2] After enhancement:', {
-              changed: enhancedContent !== result.content,
-              enhancedLength: enhancedContent.length,
-              enhancedPreview: enhancedContent.substring(0, 100)
-            });
-          }
-
-          result.content = enhancedContent;
-        }
-      }
-
       // Capture debug info if enabled (dev mode only)
       if (isDebugInfoEnabled()) {
         const previousSegments = request.narrativeContext?.previousSegments || [];
@@ -1132,26 +1082,6 @@ Return ONLY the rewritten narrative.`;
       let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
-
-      // Enhance narrative with attribute-aware flavor text (Phase 2)
-      if (characterIds && characterIds.length > 0) {
-        const { characters } = useCharacterStore.getState();
-        const primaryCharacter = characters[characterIds[0]];
-
-        if (primaryCharacter && primaryCharacter.attributes && primaryCharacter.attributes.length > 0) {
-          // Convert store attribute format to enhancer format
-          const attributesForEnhancement = primaryCharacter.attributes.map(attr => ({
-            attributeId: attr.worldAttributeId || attr.name,
-            value: attr.modifiedValue
-          }));
-
-          const enhancedContent = enhanceNarrativeWithAttributes(
-            result.content,
-            attributesForEnhancement
-          );
-          result.content = enhancedContent;
-        }
-      }
 
       // Process any acquired items from the initial scene
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
@@ -2118,26 +2048,6 @@ ${content}
       let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
-
-      // Enhance narrative with attribute-aware flavor text (Phase 2)
-      if (characterIds && characterIds.length > 0) {
-        const { characters } = useCharacterStore.getState();
-        const primaryCharacter = characters[characterIds[0]];
-
-        if (primaryCharacter && primaryCharacter.attributes && primaryCharacter.attributes.length > 0) {
-          // Convert store attribute format to enhancer format
-          const attributesForEnhancement = primaryCharacter.attributes.map(attr => ({
-            attributeId: attr.worldAttributeId || attr.name,
-            value: attr.modifiedValue
-          }));
-
-          const enhancedContent = enhanceNarrativeWithAttributes(
-            result.content,
-            attributesForEnhancement
-          );
-          result.content = enhancedContent;
-        }
-      }
 
       // Process any acquired items from skill acknowledgment
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {

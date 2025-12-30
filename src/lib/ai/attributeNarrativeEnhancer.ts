@@ -133,6 +133,76 @@ const ATTRIBUTE_FLAVOR_TEMPLATES: Record<string, Record<string, string[]>> = {
       'Your limited stamina makes',
       'Your weakened state hinders'
     ]
+  },
+  // Aliases for common custom attribute names
+  cunning: {
+    Exceptional_observation: [
+      'Your sharp cunning notices',
+      'Your crafty mind observes',
+      'Your shrewd nature reveals',
+      'Your exceptional guile shows'
+    ],
+    Exceptional_challenge: [
+      'Your brilliant cunning quickly grasps',
+      'Your sharp wits cut through',
+      'Your keen cunning illuminates'
+    ],
+    High_observation: [
+      'Your clever mind notices',
+      'Your quick wits reveal',
+      'Your cunning observes'
+    ],
+    High_challenge: [
+      'Your cunning serves you well as',
+      'Your sharp mind helps you grasp'
+    ],
+    Low_challenge: [
+      'You struggle to understand',
+      'The complexity confounds you',
+      'You find it difficult to grasp'
+    ]
+  },
+  toughness: {
+    Exceptional_challenge: [
+      'Your exceptional toughness sustains you',
+      'Your rugged resilience allows',
+      'Your hardy nature enables'
+    ],
+    High_challenge: [
+      'Your toughness serves you well',
+      'Your resilience helps you endure'
+    ],
+    Low_challenge: [
+      'Your limited resilience struggles',
+      'Your lack of toughness makes',
+      'Your weakened state hinders'
+    ]
+  },
+  brawn: {
+    Exceptional_action: [
+      'With tremendous brawn, you',
+      'Your powerful muscles',
+      'Your mighty strength'
+    ],
+    Exceptional_challenge: [
+      'Your exceptional brawn makes',
+      'Your raw power allows you to'
+    ],
+    High_action: [
+      'With considerable brawn, you',
+      'Your strong arms',
+      'Your physical power'
+    ],
+    Low_challenge: [
+      'You strain against',
+      'Your limited brawn struggles with',
+      'The weight proves challenging for'
+    ],
+    Low_action: [
+      'With effort, you',
+      'Struggling somewhat, you',
+      'Despite your weakness, you'
+    ]
   }
 };
 
