@@ -237,9 +237,10 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         {
           id: 'goal-1',
           description: 'Steal the Crown Jewels',
-          priority: 'high' as const,
+          priority: 'primary' as const,
           isActive: true,
           createdAt: '2023-01-01',
+          establishedAt: '2023-01-01',
           progress: 50
         }
       ];
@@ -247,9 +248,12 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       const decisions = [
         {
           id: 'decision-1',
+          prompt: 'How do you approach the palace?',
           choiceText: 'Sneak past the guards',
           choiceType: 'stealthy' as const,
           timestamp: '2023-01-01',
+          sessionId: 'session-1',
+          worldId: 'world-1',
           context: {
             location: 'Palace Courtyard',
             charactersPresent: ['Guard Captain']
