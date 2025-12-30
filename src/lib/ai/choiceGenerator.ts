@@ -1,6 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -15,6 +16,7 @@ import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuild
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { formatSkillsForNarrative } from './attributeSkillFormatter';
 
 /**
  * Parameters for choice generation
@@ -50,7 +52,8 @@ export class ChoiceGenerator {
       const context = this.buildContext(world, narrativeContext, characterIds);
       const basePrompt = template(context);
       const inventoryAwarePrompt = this.enhancePromptWithInventory(basePrompt, characterIds);
-      const loreEnhancedPrompt = this.enhancePromptWithLore(inventoryAwarePrompt, worldId, sessionId);
+      const skillAwarePrompt = this.enhancePromptWithCharacterSkills(inventoryAwarePrompt, characterIds);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(skillAwarePrompt, worldId, sessionId);
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
       const prompt = includeDecisionHistory && sessionId
         ? this.enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
@@ -522,6 +525,51 @@ CHOICE DESIGN RULES:
     }
   }
 
+  /**
+   * Enhances prompt with character skills for skill-based choice generation
+   */
+  private enhancePromptWithCharacterSkills(prompt: string, characterIds: string[]): string {
+    try {
+      if (!characterIds || characterIds.length === 0) {
+        return prompt;
+      }
+
+      const { getCharacterById } = useCharacterStore.getState();
+      const skillSections: string[] = [];
+
+      for (const characterId of characterIds) {
+        const character = getCharacterById(characterId);
+        if (!character || !character.skills || character.skills.length === 0) {
+          continue;
+        }
+
+        // Format skills with proficiency levels
+        const skillString = formatSkillsForNarrative(character.skills);
+        if (skillString) {
+          skillSections.push(`${character.name}: ${skillString}`);
+        }
+      }
+
+      if (skillSections.length === 0) {
+        return prompt;
+      }
+
+      const guidance = `
+
+CHARACTER SKILLS CONTEXT:
+${skillSections.join('\n')}
+
+SKILL-BASED CHOICE GUIDANCE:
+- When relevant to the situation, suggest choices that leverage the character's skills
+- High-level skills (Master, Expert) should enable advanced options
+- Lower-level skills (Trained, Novice) can still provide options but with appropriate risk
+- Don't force skill-based choices if they don't fit the narrative context`;
+
+      return `${prompt}${guidance}`;
+    } catch {
+      return prompt;
+    }
+  }
 
   /**
    * Create a meaningful context summary from the narrative context
