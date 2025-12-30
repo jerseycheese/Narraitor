@@ -120,6 +120,7 @@ Decision Weight: [minor]`
     (useWorldStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockWorldStore);
 
     const mockCharacterStore = {
+      characters: { 'char-1': mockCharacter },
       getCharacterById: jest.fn().mockReturnValue(mockCharacter)
     };
     (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStore);
@@ -142,12 +143,14 @@ Decision Weight: [minor]`
   describe('Character Skills in Context', () => {
     test('includes character skills in choice generation prompt', async () => {
       const narrativeContext: NarrativeContext = {
-        location: 'Locked Door',
-        situation: 'You stand before a locked door',
-        recentEvents: [],
-        currentSegment: 'You approach the door.',
         worldId: 'world-1',
-        previousSegments: []
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
+        currentLocation: 'Locked Door',
+        currentSituation: 'You stand before a locked door'
       };
 
       await choiceGenerator.generateChoices({
@@ -167,12 +170,14 @@ Decision Weight: [minor]`
 
     test('includes skill proficiency levels in context', async () => {
       const narrativeContext: NarrativeContext = {
-        location: 'Locked Chest',
-        situation: 'A locked chest sits before you',
-        recentEvents: [],
-        currentSegment: 'You examine the chest.',
         worldId: 'world-1',
-        previousSegments: []
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
+        currentLocation: 'Locked Chest',
+        currentSituation: 'A locked chest sits before you'
       };
 
       await choiceGenerator.generateChoices({
@@ -194,17 +199,21 @@ Decision Weight: [minor]`
         skills: []
       };
 
-      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-        getCharacterById: jest.fn().mockReturnValue(characterNoSkills)
-      });
+      const mockCharacterStoreNoSkills = {
+        characters: { 'char-1': characterNoSkills }
+      };
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStoreNoSkills);
+      (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStoreNoSkills);
 
       const narrativeContext: NarrativeContext = {
-        location: 'Empty Room',
-        situation: 'An empty room',
-        recentEvents: [],
-        currentSegment: 'You enter.',
         worldId: 'world-1',
-        previousSegments: []
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
+        currentLocation: 'Empty Room',
+        currentSituation: 'An empty room'
       };
 
       const result = await choiceGenerator.generateChoices({
@@ -232,19 +241,24 @@ Decision Weight: [minor]`
         ]
       };
 
-      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
-        getCharacterById: jest.fn((id: string) =>
-          id === 'char-1' ? mockCharacter : secondCharacter
-        )
-      });
+      const mockCharacterStoreMultiple = {
+        characters: {
+          'char-1': mockCharacter,
+          'char-2': secondCharacter
+        }
+      };
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStoreMultiple);
+      (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStoreMultiple);
 
       const narrativeContext: NarrativeContext = {
-        location: 'Ambush Point',
-        situation: 'Enemies ahead',
-        recentEvents: [],
-        currentSegment: 'You sense danger.',
         worldId: 'world-1',
-        previousSegments: []
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1', 'char-2'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
+        currentLocation: 'Ambush Point',
+        currentSituation: 'Enemies ahead'
       };
 
       await choiceGenerator.generateChoices({

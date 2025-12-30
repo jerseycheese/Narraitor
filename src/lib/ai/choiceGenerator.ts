@@ -534,11 +534,11 @@ CHOICE DESIGN RULES:
         return prompt;
       }
 
-      const { getCharacterById } = useCharacterStore.getState();
+      const { characters } = useCharacterStore.getState();
       const skillSections: string[] = [];
 
       for (const characterId of characterIds) {
-        const character = getCharacterById(characterId);
+        const character = characters[characterId];
         if (!character || !character.skills || character.skills.length === 0) {
           continue;
         }

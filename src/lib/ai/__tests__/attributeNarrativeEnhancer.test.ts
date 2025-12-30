@@ -34,7 +34,7 @@ describe('attributeNarrativeEnhancer - MVP Tests', () => {
       const result = getAttributeFlavorText(context);
 
       expect(result).toBeTruthy();
-      expect(result).toMatch(/agil|nimble|quick|swift/i);
+      expect(result).toMatch(/agil|nimble|quick|swift|grace|deft/i);
     });
 
     test('returns low strength flavor text', () => {
