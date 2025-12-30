@@ -25,6 +25,10 @@ import {
   sanitizeString
 } from '@/types/type-guards';
 import { getTimestamp } from '../utils';
+import {
+  formatAttributesForNarrative,
+  formatSkillsForNarrative
+} from './attributeSkillFormatter';
 
 // Simple character interface for personalization
 interface PersonalizationCharacter {
@@ -123,7 +127,9 @@ export class PersonalizationEngine {
         personality: analysis.detectedTraits,
         goals: goals.filter(g => g.isActive),
         relationships,
-        recentDecisions: decisions.slice(-10) // Last 10 decisions
+        recentDecisions: decisions.slice(-10), // Last 10 decisions
+        attributes: character.attributes,
+        skills: character.skills
       },
       playerPreferences: analysis.preferences,
       narrativeHistory: {
@@ -145,6 +151,22 @@ export class PersonalizationEngine {
     const characterName = sanitizeString(context.narrativeHistory.establishedElements[0]);
     if (characterName) {
       parts.push(`CHARACTER: ${characterName}`);
+    }
+
+    // Character attributes (notable values only)
+    if (context.character.attributes) {
+      const attributeString = formatAttributesForNarrative(context.character.attributes);
+      if (attributeString) {
+        parts.push(`ATTRIBUTES: ${attributeString}`);
+      }
+    }
+
+    // Character skills
+    if (context.character.skills && context.character.skills.length > 0) {
+      const skillString = formatSkillsForNarrative(context.character.skills);
+      if (skillString) {
+        parts.push(`SKILLS: ${skillString}`);
+      }
     }
 
     // Recent decisions (raw data for LLM to analyze)
