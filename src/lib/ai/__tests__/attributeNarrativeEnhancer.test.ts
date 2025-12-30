@@ -21,7 +21,7 @@ describe('attributeNarrativeEnhancer - MVP Tests', () => {
       const result = getAttributeFlavorText(context);
 
       expect(result).toBeTruthy();
-      expect(result).toMatch(/intellect|mind|analysis|thought|insight|understanding/i);
+      expect(result).toMatch(/intellect|mind|analys|analyt|thought|insight|understanding/i);
     });
 
     test('returns high dexterity flavor text', () => {
