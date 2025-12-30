@@ -927,6 +927,19 @@ Return ONLY the rewritten narrative.`;
         const { characters } = useCharacterStore.getState();
         const primaryCharacter = characters[request.characterIds[0]];
 
+        if (process.env.NODE_ENV !== 'production') {
+          logger.info('[Phase2] Attribute enhancement check:', {
+            hasCharacter: !!primaryCharacter,
+            hasAttributes: !!primaryCharacter?.attributes,
+            attributeCount: primaryCharacter?.attributes?.length || 0,
+            attributes: primaryCharacter?.attributes?.map(a => ({
+              name: a.name,
+              worldAttributeId: a.worldAttributeId,
+              modifiedValue: a.modifiedValue
+            }))
+          });
+        }
+
         if (primaryCharacter && primaryCharacter.attributes && primaryCharacter.attributes.length > 0) {
           // Convert store attribute format to enhancer format
           const attributesForEnhancement = primaryCharacter.attributes.map(attr => ({
@@ -934,10 +947,26 @@ Return ONLY the rewritten narrative.`;
             value: attr.modifiedValue
           }));
 
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[Phase2] Before enhancement:', {
+              contentLength: result.content.length,
+              contentPreview: result.content.substring(0, 100)
+            });
+          }
+
           const enhancedContent = enhanceNarrativeWithAttributes(
             result.content,
             attributesForEnhancement
           );
+
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info('[Phase2] After enhancement:', {
+              changed: enhancedContent !== result.content,
+              enhancedLength: enhancedContent.length,
+              enhancedPreview: enhancedContent.substring(0, 100)
+            });
+          }
+
           result.content = enhancedContent;
         }
       }
