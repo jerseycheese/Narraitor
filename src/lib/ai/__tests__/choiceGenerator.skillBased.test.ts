@@ -47,12 +47,22 @@ Decision Weight: [minor]`
         {
           id: 'lockpicking',
           name: 'Lockpicking',
-          description: 'Open locks without keys'
+          description: 'Open locks without keys',
+          worldId: 'world-1',
+          difficulty: 'medium' as const,
+          baseValue: 0,
+          minValue: 0,
+          maxValue: 10
         },
         {
           id: 'stealth',
           name: 'Stealth',
-          description: 'Move unseen and unheard'
+          description: 'Move unseen and unheard',
+          worldId: 'world-1',
+          difficulty: 'medium' as const,
+          baseValue: 0,
+          minValue: 0,
+          maxValue: 10
         }
       ],
       settings: {
