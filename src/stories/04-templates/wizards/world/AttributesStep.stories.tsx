@@ -126,7 +126,7 @@ const mockWorldConfig = {
     },
   ],
     skills: [],
-    derivedStats: [],  settings: {
+    settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,

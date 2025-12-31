@@ -69,8 +69,8 @@ const mockWorlds: World[] = [
       minValue: 1,
       maxValue: 20,
     }],
-      skills: [],
-    derivedStats: [],    settings: {
+    skills: [],
+    settings: {
       maxAttributes: 8,
       maxSkills: 15,
       attributePointPool: 40,

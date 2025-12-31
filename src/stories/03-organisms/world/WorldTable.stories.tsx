@@ -71,7 +71,7 @@ const mockWorlds: World[] = [
     updatedAt: '2023-03-06T08:00:00Z',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 3,
       maxSkills: 5,
       attributePointPool: 10,
