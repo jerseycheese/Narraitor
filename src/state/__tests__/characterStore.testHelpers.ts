@@ -25,7 +25,8 @@ export function createTestCharacterData(overrides?: Partial<CharacterInput>): Ch
     level: 1,
     attributes: [],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: 'A test character',
       personality: 'Friendly',
       goals: ['Testing'],

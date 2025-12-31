@@ -43,7 +43,8 @@ const mockCharacter = {
     }
   ],
 
-  derivedStats: [],background: {
+  derivedStats: [],
+  background: {
     history: 'Test history',
     personality: 'Test personality',
     goals: ['Test goal'],

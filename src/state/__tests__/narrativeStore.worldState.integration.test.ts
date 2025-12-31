@@ -53,10 +53,10 @@ describe('Narrative store world state integration', () => {
       name: 'Test Realm',
       description: 'A realm for integration tests',
       genre: 'fantasy',
-        attributes: [],
-        skills: [],
+      attributes: [],
+      skills: [],
     
-        settings: {
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
@@ -153,10 +153,10 @@ describe('Narrative store world state integration', () => {
       name: 'Adventure World',
       description: 'A world for testing checkpoint creation',
       genre: 'fantasy',
-        attributes: [],
-        skills: [],
+      attributes: [],
+      skills: [],
     
-        settings: {
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,

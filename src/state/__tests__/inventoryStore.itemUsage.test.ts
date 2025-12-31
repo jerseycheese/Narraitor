@@ -20,10 +20,10 @@ describe('InventoryStore - Item Usage', () => {
       name: 'Test World',
       description: 'A world for testing',
       genre: 'fantasy',
-        attributes: [],
-        skills: [],
+      attributes: [],
+      skills: [],
     
-        settings: {
+      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,

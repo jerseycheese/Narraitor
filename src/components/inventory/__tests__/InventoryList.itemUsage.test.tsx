@@ -28,9 +28,9 @@ describe('InventoryList - Item Usage', () => {
       name: 'Test World',
       description: 'A world for testing',
       genre: 'fantasy',
-        attributes: [],
-        skills: [],
-        settings: {
+      attributes: [],
+      skills: [],
+      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,

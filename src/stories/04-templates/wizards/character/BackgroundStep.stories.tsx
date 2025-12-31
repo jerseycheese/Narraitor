@@ -43,7 +43,8 @@ const defaultData = {
     description: 'A skilled mage from the northern kingdoms',
     attributes: [],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: '',
       personality: '',
       goals: [],

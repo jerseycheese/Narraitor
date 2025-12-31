@@ -55,7 +55,8 @@ export const mockCharacter = {
   },
   attributes: [],
     skills: [],
-    derivedStats: [],  inventory: {
+    derivedStats: [],
+    inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 10,

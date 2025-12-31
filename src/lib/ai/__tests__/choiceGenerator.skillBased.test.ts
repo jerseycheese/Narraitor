@@ -43,7 +43,7 @@ Decision Weight: [minor]`
       name: 'Fantasy Realm',
       description: 'A medieval fantasy world',
       genre: 'fantasy',
-        skills: [
+      skills: [
         {
           id: 'lockpicking',
           name: 'Lockpicking',
@@ -65,7 +65,7 @@ Decision Weight: [minor]`
           maxValue: 5
         }
       ],
-        settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
@@ -73,7 +73,7 @@ Decision Weight: [minor]`
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-        attributes: []
+      attributes: []
     };
 
     // Mock character with high lockpicking skill

@@ -71,7 +71,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       name: 'Fantasy Realm',
       description: 'A classic fantasy setting',
       genre: 'fantasy',
-        settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
@@ -79,8 +79,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-        attributes: [],
-        skills: []
+      attributes: [],
+      skills: []
     };
   });
 
@@ -116,7 +116,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles Record-style attributes', () => {
       const characterWithRecordAttrs = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        attributes: {
+      attributes: {
           dexterity: 9,
           intelligence: 7,
           strength: 3
@@ -141,7 +141,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty attributes gracefully', () => {
       const characterNoAttrs = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        attributes: []
+      attributes: []
       };
 
       const context = engine.createPersonalizedContext(
@@ -188,7 +188,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles skills with name property', () => {
       const characterWithNameSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        skills: [
+      skills: [
           { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' }, // Expert
           { name: 'Stealth', level: 3 } // Competent
         ]
@@ -212,7 +212,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty skills gracefully', () => {
       const characterNoSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        skills: [],
+      skills: [],
         derivedStats: []
       };
 

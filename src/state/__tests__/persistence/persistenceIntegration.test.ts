@@ -20,12 +20,14 @@ jest.mock('../../persistence', () => {
       }),
       removeItem: jest.fn().mockResolvedValue(undefined)
     };
-    
+
+
     // Store reference globally for tests
     if (typeof global !== 'undefined') {
       (global as { __testMockStorage?: MockStorage }).__testMockStorage = storage;
     }
-    
+
+
     return storage;
   };
   
@@ -57,10 +59,12 @@ describe('Persistence Integration - MVP', () => {
   beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
-    
+
+
     // Get the mock storage
     mockStorage = (global as { __testMockStorage?: typeof mockStorage }).__testMockStorage as typeof mockStorage;
-    
+
+
     // Reset mock functions
     if (mockStorage) {
       mockStorage.getItem.mockClear();
@@ -68,11 +72,13 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.removeItem.mockClear();
       mockStorage.getItem.mockResolvedValue(null);
     }
-    
+
+
     // Reset stores using their reset methods
     useWorldStore.getState().reset();
     useCharacterStore.getState().reset();
-    
+
+
     // Mock global indexedDB
     (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
   });
@@ -148,8 +154,9 @@ describe('Persistence Integration - MVP', () => {
         description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    
+      skills: [],
+
+
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -223,8 +230,9 @@ describe('Persistence Integration - MVP', () => {
         description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    
+      skills: [],
+
+
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -255,8 +263,9 @@ describe('Persistence Integration - MVP', () => {
         description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    
+      skills: [],
+
+
         settings: {
           maxAttributes: 6,
           maxSkills: 8,

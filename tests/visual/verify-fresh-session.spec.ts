@@ -112,7 +112,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               isPlayer: true,
               attributes: [],
                 skills: [],
-    derivedStats: [],              background: {
+    derivedStats: [],
+  background: {
                 history: '',
                 personality: '',
                 goals: [],
@@ -140,7 +141,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               isPlayer: true,
               attributes: [],
                 skills: [],
-    derivedStats: [],              background: {
+    derivedStats: [],
+  background: {
                 history: '',
                 personality: '',
                 goals: [],
@@ -256,7 +258,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             isPlayer: true,
             attributes: [],
               skills: [],
-    derivedStats: [],            background: {
+    derivedStats: [],
+  background: {
               history: '',
               personality: '',
               goals: [],
@@ -351,7 +354,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             isPlayer: true,
             attributes: [],
               skills: [],
-    derivedStats: [],            background: {
+    derivedStats: [],
+  background: {
               history: '',
               personality: '',
               goals: [],

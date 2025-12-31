@@ -44,7 +44,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     worldId: 'test-world',
     attributes: [],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: 'A test character with no history',
       personality: 'Adventurous',
       goals: ['Test the system'],

@@ -44,7 +44,8 @@ const defaultData = {
     portraitPlaceholder: '',
     attributes: [],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: '',
       personality: '',
       goals: [],

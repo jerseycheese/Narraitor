@@ -100,7 +100,8 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
     isPlayer: false,
     attributes: [],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: 'Test history',
       personality: 'Test personality',
       goals: ['Test goal 1', 'Test goal 2'],

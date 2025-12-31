@@ -76,7 +76,8 @@ const defaultData = {
       },
     ],
         skills: [],
-    derivedStats: [],    background: {
+    derivedStats: [],
+  background: {
       history: '',
       personality: '',
       goals: [],
