@@ -79,6 +79,7 @@ export default function CharacterGenerationTestPage() {
           level: skill.level
         };
       }),
+      derivedStats: [],
       background: {
         history: generatedCharacter.background.description,
         personality: generatedCharacter.background.personality,

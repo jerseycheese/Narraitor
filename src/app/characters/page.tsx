@@ -315,6 +315,7 @@ export default function CharactersPage() {
         level: generatedData.level,
         attributes: transformGeneratedAttributes(generatedData, currentWorld!),
         skills: transformGeneratedSkills(generatedData, currentWorld!),
+        derivedStats: [],
         background: {
           history: generatedData.background.description,
           personality: generatedData.background.personality,
