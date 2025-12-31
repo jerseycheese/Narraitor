@@ -30,8 +30,8 @@ describe('Skill Check Integration - ID-based Flow', () => {
       attributeIds: ['dexterity'],
       baseValue: 1,
       minValue: 0,
-      maxValue: 10
-    }
+      maxValue: 10,
+    },
   ];
 
   const mockCharacter: Character = {
@@ -44,26 +44,26 @@ describe('Skill Check Integration - ID-based Flow', () => {
       personality: 'Cautious and observant',
       goals: ['Master the art of stealth'],
       fears: [],
-      relationships: []
+      relationships: [],
     },
     status: {
       health: 100,
       maxHealth: 100,
-      conditions: []
+      conditions: [],
     },
-        attributes: [
+    attributes: [
       {
         attributeId: 'dexterity',
-        value: 14
-      }
+        value: 14,
+      },
     ],
-        skills: [
+    skills: [
       {
         skillId: mockStealthSkillId,
         level: 5,
         experience: 0,
-        isActive: true
-      }
+        isActive: true,
+      },
     ],
     derivedStats: [],
     inventory: {
@@ -71,10 +71,10 @@ describe('Skill Check Integration - ID-based Flow', () => {
       items: [],
       capacity: 10,
       categories: [],
-      itemOrder: []
+      itemOrder: [],
     },
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   it('evaluates skill check using skill ID directly', () => {
@@ -87,7 +87,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
       mockCharacter,
       {
         skillId: mockStealthSkillId, // ID, not name
-        difficulty: 15
+        difficulty: 15,
       },
       mockWorldSkills
     );
@@ -110,7 +110,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
       mockCharacter,
       {
         skillId: 'nonexistent-skill',
-        difficulty: 15
+        difficulty: 15,
       },
       mockWorldSkills
     );

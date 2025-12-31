@@ -50,13 +50,13 @@ jest.mock('@/components/forms/WorldBasicInfoForm', () => {
 });
 
 jest.mock('@/components/forms/WorldAttributesForm', () => {
-  return function MockWorldAttributesForm({ onChange }: MockAttributesFormProps) {
+  return function MockWorldAttributesForm({
+    onChange,
+  }: MockAttributesFormProps) {
     return (
       <div>
         Attributes Form
-        <button onClick={() => onChange([])}>
-          Update Attributes
-        </button>
+        <button onClick={() => onChange([])}>Update Attributes</button>
       </div>
     );
   };
@@ -67,22 +67,21 @@ jest.mock('@/components/forms/WorldSkillsForm', () => {
     return (
       <div>
         Skills Form
-        <button onClick={() => onChange([])}>
-          Update Skills
-        </button>
+        <button onClick={() => onChange([])}>Update Skills</button>
       </div>
     );
   };
 });
 
 jest.mock('@/components/forms/WorldSettingsForm', () => {
-  return function MockWorldSettingsForm({ settings, onChange }: MockSettingsFormProps) {
+  return function MockWorldSettingsForm({
+    settings,
+    onChange,
+  }: MockSettingsFormProps) {
     return (
       <div>
         Settings Form
-        <button onClick={() => onChange(settings)}>
-          Update Settings
-        </button>
+        <button onClick={() => onChange(settings)}>Update Settings</button>
       </div>
     );
   };
@@ -97,7 +96,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
-        skills: [],
+    skills: [],
     derivedStats: [],
     settings: {
       maxAttributes: 10,
@@ -113,7 +112,8 @@ describe('WorldEditor - MVP Level Tests', () => {
     jest.clearAllMocks();
     mockUpdateWorld.mockClear();
 
-    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
         worlds: {
           'world-123': mockWorld,
@@ -198,7 +198,8 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   // Test error handling when world not found
   test('shows error when world is not found', async () => {
-    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
         worlds: {
           'world-456': mockWorld, // Different world ID
@@ -233,7 +234,9 @@ describe('WorldEditor - MVP Level Tests', () => {
 
     // Save changes - wait for save button to appear after form change
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /save changes/i })
+      ).toBeInTheDocument();
     });
     const saveButton = screen.getByRole('button', { name: /save changes/i });
     fireEvent.click(saveButton);

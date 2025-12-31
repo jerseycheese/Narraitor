@@ -7,7 +7,9 @@ interface CharacterDerivedStatsDisplayProps {
   derivedStats: DerivedStat[];
 }
 
-export function CharacterDerivedStatsDisplay({ derivedStats }: CharacterDerivedStatsDisplayProps) {
+export function CharacterDerivedStatsDisplay({
+  derivedStats,
+}: CharacterDerivedStatsDisplayProps) {
   if (!derivedStats || derivedStats.length === 0) {
     return null;
   }
@@ -15,7 +17,8 @@ export function CharacterDerivedStatsDisplay({ derivedStats }: CharacterDerivedS
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {derivedStats.map((stat) => {
-        const percentage = stat.maxValue > 0 ? (stat.currentValue / stat.maxValue) * 100 : 0;
+        const percentage =
+          stat.maxValue > 0 ? (stat.currentValue / stat.maxValue) * 100 : 0;
         const isDepleted = percentage < 50;
         const isLow = percentage < 75;
 
@@ -35,8 +38,8 @@ export function CharacterDerivedStatsDisplay({ derivedStats }: CharacterDerivedS
                   isDepleted
                     ? 'text-destructive'
                     : isLow
-                    ? 'text-orange-500'
-                    : 'text-card-foreground'
+                      ? 'text-orange-500'
+                      : 'text-card-foreground'
                 }`}
               >
                 {stat.currentValue}
@@ -51,8 +54,8 @@ export function CharacterDerivedStatsDisplay({ derivedStats }: CharacterDerivedS
                   isDepleted
                     ? 'bg-destructive'
                     : isLow
-                    ? 'bg-orange-500'
-                    : 'bg-primary'
+                      ? 'bg-orange-500'
+                      : 'bg-primary'
                 }`}
                 style={{ width: `${Math.min(percentage, 100)}%` }}
               />

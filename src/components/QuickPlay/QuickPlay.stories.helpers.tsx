@@ -67,23 +67,24 @@ export const createMockStoreState = (options: MockStoreOptions) => {
 
     if (!hasSession) {
       // Empty state
-      useWorldStore.setState({ 
-        worlds: {}, 
+      useWorldStore.setState({
+        worlds: {},
         entities: {},
         currentWorldId: null,
         currentEntityId: null,
         setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
-      useCharacterStore.setState({ 
+      useCharacterStore.setState({
         characters: {},
         entities: {},
         currentCharacterId: null,
         currentEntityId: null,
         error: null,
         loading: false,
-        setCurrentCharacter: (id: string | null) => console.log('Set character:', id),
+        setCurrentCharacter: (id: string | null) =>
+          console.log('Set character:', id),
       });
-      useSessionStore.setState({ 
+      useSessionStore.setState({
         savedSessions: {},
         resumeSavedSession: (id: string) => {
           console.log('Resume session:', id);
@@ -100,23 +101,24 @@ export const createMockStoreState = (options: MockStoreOptions) => {
         narrativeCount,
       };
 
-      useWorldStore.setState({ 
+      useWorldStore.setState({
         worlds: { [mockWorld.id]: mockWorld },
         entities: { [mockWorld.id]: mockWorld },
         currentWorldId: null,
         currentEntityId: null,
         setCurrentWorld: (id: string | null) => console.log('Set world:', id),
       });
-      useCharacterStore.setState({ 
+      useCharacterStore.setState({
         characters: { [mockCharacter.id]: mockCharacter },
         entities: { [mockCharacter.id]: mockCharacter },
         currentCharacterId: mockCharacter.id,
         currentEntityId: mockCharacter.id,
         error: null,
         loading: false,
-        setCurrentCharacter: (id: string | null) => console.log('Set character:', id),
+        setCurrentCharacter: (id: string | null) =>
+          console.log('Set character:', id),
       });
-      useSessionStore.setState({ 
+      useSessionStore.setState({
         savedSessions: { [mockSavedSession.id]: mockSavedSession },
         resumeSavedSession: (id: string) => {
           console.log('Resume session:', id);

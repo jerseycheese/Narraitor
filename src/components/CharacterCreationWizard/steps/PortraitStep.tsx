@@ -23,7 +23,12 @@ interface CharacterFormData {
     physicalDescription?: string;
     goals: string[];
     isKnownFigure?: boolean;
-    knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
+    knownFigureType?:
+      | 'historical'
+      | 'fictional'
+      | 'celebrity'
+      | 'mythological'
+      | 'other';
   };
 }
 
@@ -36,7 +41,11 @@ interface PortraitStepProps {
   worldConfig: Partial<World>;
 }
 
-export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
+export function PortraitStep({
+  data,
+  onUpdate,
+  worldConfig,
+}: PortraitStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +57,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
 
   const portrait: GeneratedImage = data.characterData.portrait || {
     type: 'placeholder',
-    url: null
+    url: null,
   };
 
   const handleGeneratePortrait = async () => {
@@ -64,7 +73,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         worldId: data.worldId,
         attributes: data.characterData.attributes.map((attr) => ({
           attributeId: attr.attributeId,
-          value: attr.value
+          value: attr.value,
         })),
         skills: data.characterData.skills
           .filter((skill) => skill.isSelected)
@@ -72,21 +81,31 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             skillId: skill.skillId,
             level: skill.level,
             experience: 0,
-            isActive: true
+            isActive: true,
           })),
         derivedStats: [],
         background: {
-          history: data.characterData.background.history + (environmentHint ? ` ${environmentHint}` : ''),
+          history:
+            data.characterData.background.history +
+            (environmentHint ? ` ${environmentHint}` : ''),
           personality: data.characterData.background.personality,
-          physicalDescription: localPhysicalDescription || data.characterData.background.physicalDescription,
+          physicalDescription:
+            localPhysicalDescription ||
+            data.characterData.background.physicalDescription,
           goals: data.characterData.background.goals,
           fears: [],
-          relationships: []
+          relationships: [],
         },
-        inventory: { items: [], capacity: 100, categories: [], characterId: 'temp', itemOrder: [] },
+        inventory: {
+          items: [],
+          capacity: 100,
+          categories: [],
+          characterId: 'temp',
+          itemOrder: [],
+        },
         status: { health: 100, maxHealth: 100, conditions: [] },
         createdAt: getTimestamp(),
-        updatedAt: getTimestamp()
+        updatedAt: getTimestamp(),
       };
 
       // Use the portrait generation API route
@@ -98,7 +117,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         body: JSON.stringify({
           character: characterForGeneration,
           world: worldConfig,
-          customDescription: localPhysicalDescription
+          customDescription: localPhysicalDescription,
         }),
       });
 
@@ -110,10 +129,12 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       const { portrait: generatedPortrait } = await response.json();
 
       onUpdate({
-        portrait: generatedPortrait
+        portrait: generatedPortrait,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate portrait');
+      setError(
+        err instanceof Error ? err.message : 'Failed to generate portrait'
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -123,8 +144,8 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     onUpdate({
       portrait: {
         type: 'placeholder',
-        url: null
-      }
+        url: null,
+      },
     });
     setError(null);
   };
@@ -136,8 +157,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         <p className="text-sm text-gray-700">
           {data.characterData.background?.isKnownFigure
             ? `Generate an AI portrait of ${data.characterData.name} as they are commonly recognized`
-            : 'Generate an AI portrait for your character or use a placeholder'
-          }
+            : 'Generate an AI portrait for your character or use a placeholder'}
         </p>
       </div>
 
@@ -155,11 +175,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       <div className="flex flex-col items-center space-y-4">
         {isGenerating ? (
           <div className="w-32 h-32 flex items-center justify-center">
-            <LoadingState 
-              variant="spinner" 
-              size="md" 
-              centered={false}
-            />
+            <LoadingState variant="spinner" size="md" centered={false} />
           </div>
         ) : (
           <CharacterPortrait
@@ -208,7 +224,8 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         )}
 
         <p className="text-xs text-gray-500 text-center">
-          Portrait generation is optional. You can skip portrait generation and continue.
+          Portrait generation is optional. You can skip portrait generation and
+          continue.
         </p>
       </div>
     </div>

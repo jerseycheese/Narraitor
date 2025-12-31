@@ -67,7 +67,8 @@ const mockCharacters = {
     background: {
       history: 'An ancient wizard with knowledge of forgotten spells',
       personality: 'Thoughtful, patient, and mysteriously wise',
-      physicalDescription: 'Elderly with a long white beard and twinkling blue eyes',
+      physicalDescription:
+        'Elderly with a long white beard and twinkling blue eyes',
       goals: ['Preserve ancient knowledge'],
       fears: ['The loss of magic from the world'],
       relationships: [],
@@ -105,24 +106,30 @@ export const createWizardMockState = (options: WizardMockOptions) => {
     const worlds = hasWorlds ? mockWorlds : {};
     const characters = hasCharacters ? mockCharacters : {};
 
-    useWorldStore.setState({ 
+    useWorldStore.setState({
       worlds,
       entities: worlds,
       currentWorldId: null,
       currentEntityId: null,
     });
-    const firstCharacterId = hasCharacters ? Object.keys(characters)[0] ?? null : null;
-    useCharacterStore.setState({ 
+    const firstCharacterId = hasCharacters
+      ? (Object.keys(characters)[0] ?? null)
+      : null;
+    useCharacterStore.setState({
       characters,
       entities: characters,
       currentCharacterId: firstCharacterId,
       currentEntityId: firstCharacterId,
       error: null,
-      loading: false
+      loading: false,
     });
-    useSessionStore.setState({ 
+    useSessionStore.setState({
       savedSessions: {},
-      initializeSession: async (worldId: string, characterId: string, callback?: () => void) => {
+      initializeSession: async (
+        worldId: string,
+        characterId: string,
+        callback?: () => void
+      ) => {
         console.log('Initializing session:', { worldId, characterId });
         return new Promise<void>((resolve) => {
           setTimeout(() => {
@@ -130,7 +137,7 @@ export const createWizardMockState = (options: WizardMockOptions) => {
             resolve();
           }, 1000);
         });
-      }
+      },
     });
 
     return <Story />;

@@ -12,7 +12,10 @@ import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { getTimestamp } from '@/lib/utils';
 import { CharacterCard } from '@/components/CharacterCard';
 import { CharacterTable } from '@/components/character/CharacterTable';
-import { CharacterViewToggle, type CharacterViewMode } from '@/components/character/CharacterViewToggle';
+import {
+  CharacterViewToggle,
+  type CharacterViewMode,
+} from '@/components/character/CharacterViewToggle';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
@@ -34,7 +37,10 @@ type CharacterPortraitUpdate = {
 };
 
 // Helper function to transform generated data to character attributes
-function transformGeneratedAttributes(generatedData: GeneratedCharacterData, currentWorld: World) {
+function transformGeneratedAttributes(
+  generatedData: GeneratedCharacterData,
+  currentWorld: World
+) {
   return generatedData.attributes.map((attr) => {
     const worldAttr = currentWorld.attributes.find((wa) => wa.id === attr.id);
     return {
@@ -44,13 +50,16 @@ function transformGeneratedAttributes(generatedData: GeneratedCharacterData, cur
       name: worldAttr?.name || 'Unknown',
       baseValue: attr.value, // Use the AI-generated value
       modifiedValue: attr.value, // Use the AI-generated value
-      category: worldAttr?.category || 'General'
+      category: worldAttr?.category || 'General',
     };
   });
 }
 
 // Helper function to transform generated data to character skills
-function transformGeneratedSkills(generatedData: GeneratedCharacterData, currentWorld: World) {
+function transformGeneratedSkills(
+  generatedData: GeneratedCharacterData,
+  currentWorld: World
+) {
   return generatedData.skills.map((skill) => {
     const worldSkill = currentWorld.skills.find((ws) => ws.id === skill.id);
     return {
@@ -59,7 +68,7 @@ function transformGeneratedSkills(generatedData: GeneratedCharacterData, current
       worldSkillId: skill.id, // Store reference to world skill ID
       name: worldSkill?.name || 'Unknown',
       level: skill.level,
-      category: worldSkill?.category
+      category: worldSkill?.category,
     };
   });
 }
@@ -84,8 +93,8 @@ async function generateCharacterPortrait(
         physicalDescription: generatedData.background.physicalDescription || '',
         goals: [],
         fears: [],
-        isKnownFigure: generatedData.isKnownFigure || false
-      }
+        isKnownFigure: generatedData.isKnownFigure || false,
+      },
     };
 
     // Use secure API endpoint for portrait generation
@@ -94,8 +103,8 @@ async function generateCharacterPortrait(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         character: characterForPortrait,
-        world: currentWorld
-      })
+        world: currentWorld,
+      }),
     });
 
     if (response.ok) {
@@ -105,7 +114,7 @@ async function generateCharacterPortrait(
         type: 'ai-generated',
         url: result.image,
         generatedAt: getTimestamp(),
-        prompt: result.prompt
+        prompt: result.prompt,
       };
       // Update character with generated portrait
       updateCharacter(characterId, { portrait });
@@ -116,11 +125,16 @@ async function generateCharacterPortrait(
   }
 }
 
-
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
+  const {
+    characters,
+    currentCharacterId,
+    setCurrentCharacter,
+    createCharacter,
+    updateCharacter,
+  } = useCharacterStore();
   const { worlds, currentWorldId, worldStates } = useWorldStore();
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
@@ -132,7 +146,9 @@ export default function CharactersPage() {
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [characterName, setCharacterName] = useState('');
-  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>(() => {
+  const [generationType, setGenerationType] = useState<
+    'known' | 'original' | 'specific'
+  >(() => {
     const types: Array<'known' | 'original'> = ['known', 'original'];
     return types[Math.floor(Math.random() * types.length)];
   });
@@ -140,20 +156,22 @@ export default function CharactersPage() {
     isOpen: false,
     characterId: null as string | null,
     characterName: '',
-    isDeleting: false
+    isDeleting: false,
   });
   const [characterSwitchDialog, setCharacterSwitchDialog] = useState({
     isOpen: false,
     characterId: null as string | null,
     characterName: '',
   });
-  const [toasts, setToasts] = useState<Array<{
-    id: string;
-    title: string;
-    description?: string;
-    variant: 'success' | 'error';
-    duration?: number;
-  }>>([]);
+  const [toasts, setToasts] = useState<
+    Array<{
+      id: string;
+      title: string;
+      description?: string;
+      variant: 'success' | 'error';
+      duration?: number;
+    }>
+  >([]);
 
   // View mode with localStorage persistence
   const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
@@ -184,55 +202,84 @@ export default function CharactersPage() {
   const worldCharacters = (Object.values(characters) as Character[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
-  const worldState = effectiveWorldId ? worldStates?.[effectiveWorldId] : undefined;
+  const worldState = effectiveWorldId
+    ? worldStates?.[effectiveWorldId]
+    : undefined;
 
   const characterContextById = useMemo(() => {
     if (!worldState) {
-      return {} as Record<string, {
-        recentEvent?: string;
-        relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
-      }>;
+      return {} as Record<
+        string,
+        {
+          recentEvent?: string;
+          relationships: Array<{
+            characterId: string;
+            characterName: string;
+            portraitUrl?: string | null;
+          }>;
+        }
+      >;
     }
 
     const relationshipByCharacter = worldState.characterRelationships ?? {};
 
-    return worldCharacters.reduce((acc, character) => {
-      const relationshipEntries = relationshipByCharacter[character.id] ?? {};
+    return worldCharacters.reduce(
+      (acc, character) => {
+        const relationshipEntries = relationshipByCharacter[character.id] ?? {};
 
-      const relationships = Object.entries(relationshipEntries)
-        .filter(([otherId]) => otherId !== character.id && Boolean(characters[otherId]))
-        .sort(([, a], [, b]) => b.lastInteraction.localeCompare(a.lastInteraction))
-        .slice(0, 2)
-        .map(([otherId]) => {
-          const relatedCharacter = characters[otherId];
-          return {
-            characterId: otherId,
-            characterName: relatedCharacter?.name ?? 'Unknown',
-            portraitUrl: relatedCharacter?.portrait?.url ?? null,
-          };
-        });
+        const relationships = Object.entries(relationshipEntries)
+          .filter(
+            ([otherId]) =>
+              otherId !== character.id && Boolean(characters[otherId])
+          )
+          .sort(([, a], [, b]) =>
+            b.lastInteraction.localeCompare(a.lastInteraction)
+          )
+          .slice(0, 2)
+          .map(([otherId]) => {
+            const relatedCharacter = characters[otherId];
+            return {
+              characterId: otherId,
+              characterName: relatedCharacter?.name ?? 'Unknown',
+              portraitUrl: relatedCharacter?.portrait?.url ?? null,
+            };
+          });
 
-      // Find the most recent major event for this character
-      const characterEvents = (worldState.majorEvents ?? [])
-        .filter(event => event.characterId === character.id)
-        .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+        // Find the most recent major event for this character
+        const characterEvents = (worldState.majorEvents ?? [])
+          .filter((event) => event.characterId === character.id)
+          .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
-      const recentEvent = characterEvents.length > 0 ? characterEvents[0].description : undefined;
+        const recentEvent =
+          characterEvents.length > 0
+            ? characterEvents[0].description
+            : undefined;
 
-      acc[character.id] = {
-        recentEvent,
-        relationships,
-      };
+        acc[character.id] = {
+          recentEvent,
+          relationships,
+        };
 
-      return acc;
-    }, {} as Record<string, {
-      recentEvent?: string;
-      relationships: Array<{ characterId: string; characterName: string; portraitUrl?: string | null }>;
-    }>);
+        return acc;
+      },
+      {} as Record<
+        string,
+        {
+          recentEvent?: string;
+          relationships: Array<{
+            characterId: string;
+            characterName: string;
+            portraitUrl?: string | null;
+          }>;
+        }
+      >
+    );
   }, [worldState, worldCharacters, characters]);
 
   // Get current session progress for confirmation dialog
-  const currentProgress = currentSessionId ? getSessionSegments(currentSessionId).length : 0;
+  const currentProgress = currentSessionId
+    ? getSessionSegments(currentSessionId).length
+    : 0;
 
   // Mark mounted after first client render to make header SSR-safe
   useEffect(() => {
@@ -240,25 +287,27 @@ export default function CharactersPage() {
   }, []);
 
   // Compute header content in a hydration-safe way: keep it on during SSR/first paint
-  const headerTitle = mounted && currentWorld?.image?.url ? undefined : 'My Characters';
-  const headerDescription = mounted && currentWorld?.image?.url
-    ? undefined
-    : 'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.';
+  const headerTitle =
+    mounted && currentWorld?.image?.url ? undefined : 'My Characters';
+  const headerDescription =
+    mounted && currentWorld?.image?.url
+      ? undefined
+      : 'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.';
 
   // Toast management
-  const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
+  const addToast = (toast: Omit<(typeof toasts)[0], 'id'>) => {
     const id = `toast-${Date.now()}-${Math.random()}`;
     const newToast = { ...toast, id };
-    setToasts(prev => [...prev, newToast]);
+    setToasts((prev) => [...prev, newToast]);
 
     // Auto-remove toast after duration
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts((prev) => prev.filter((t) => t.id !== id));
     }, toast.duration || 3000);
   };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
   const handleCreateCharacter = () => {
@@ -280,10 +329,11 @@ export default function CharactersPage() {
 
     try {
       // Get existing character names to avoid duplicates
-      const existingNames = worldCharacters.map(char => char.name);
+      const existingNames = worldCharacters.map((char) => char.name);
 
       // Generate character data based on type
-      const nameToUse = generationType === 'specific' ? characterName : undefined;
+      const nameToUse =
+        generationType === 'specific' ? characterName : undefined;
 
       // Use the character generation API route
       const response = await fetch('/api/generate-character', {
@@ -296,7 +346,7 @@ export default function CharactersPage() {
           characterType: generationType,
           existingNames: existingNames,
           suggestedName: nameToUse,
-          world: currentWorld // Pass the world data to the API
+          world: currentWorld, // Pass the world data to the API
         }),
       });
 
@@ -319,11 +369,14 @@ export default function CharactersPage() {
         background: {
           history: generatedData.background.description,
           personality: generatedData.background.personality,
-          goals: generatedData.background.motivation ? [generatedData.background.motivation] : [],
+          goals: generatedData.background.motivation
+            ? [generatedData.background.motivation]
+            : [],
           fears: generatedData.background.fears || [], // AI-generated fears
-          physicalDescription: generatedData.background.physicalDescription || '',
+          physicalDescription:
+            generatedData.background.physicalDescription || '',
           relationships: [], // Initialize empty relationships array
-          isKnownFigure: generatedData.isKnownFigure || false
+          isKnownFigure: generatedData.isKnownFigure || false,
         },
         isPlayer: true,
         status: {
@@ -336,12 +389,12 @@ export default function CharactersPage() {
           items: [],
           capacity: 20,
           categories: [],
-          itemOrder: []
+          itemOrder: [],
         },
         portrait: {
           type: 'placeholder',
-          url: null
-        }
+          url: null,
+        },
       });
 
       // Select the new character
@@ -369,7 +422,9 @@ export default function CharactersPage() {
       // Navigate to view the character
       router.push(`/characters/${characterId}`);
     } catch (error) {
-      setGenerateError(error instanceof Error ? error.message : 'Failed to generate character');
+      setGenerateError(
+        error instanceof Error ? error.message : 'Failed to generate character'
+      );
     } finally {
       setIsGenerating(false);
       setGeneratingStatus('');
@@ -396,44 +451,46 @@ export default function CharactersPage() {
       isOpen: true,
       characterId,
       characterName: character.name,
-      isDeleting: false
+      isDeleting: false,
     });
   };
 
   const handleConfirmDelete = async () => {
     if (!deleteDialog.characterId) return;
 
-    setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+    setDeleteDialog((prev) => ({ ...prev, isDeleting: true }));
 
     try {
       const characterName = deleteDialog.characterName;
 
       // Use service layer for decoupled deletion with journal cleanup
-      await CharacterDeletionService.deleteCharacterWithCleanup(deleteDialog.characterId);
+      await CharacterDeletionService.deleteCharacterWithCleanup(
+        deleteDialog.characterId
+      );
 
       // Success toast
       addToast({
         title: 'Character Deleted',
         description: `${characterName} has been permanently deleted`,
-        variant: 'success'
+        variant: 'success',
       });
 
       // Close dialog
-      setDeleteDialog({ 
-        isOpen: false, 
-        characterId: null, 
-        characterName: '', 
-        isDeleting: false 
+      setDeleteDialog({
+        isOpen: false,
+        characterId: null,
+        characterName: '',
+        isDeleting: false,
       });
     } catch {
       // Error toast
       addToast({
         title: 'Delete Failed',
         description: 'Failed to delete character. Please try again.',
-        variant: 'error'
+        variant: 'error',
       });
 
-      setDeleteDialog(prev => ({ ...prev, isDeleting: false }));
+      setDeleteDialog((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -442,7 +499,7 @@ export default function CharactersPage() {
       isOpen: false,
       characterId: null,
       characterName: '',
-      isDeleting: false
+      isDeleting: false,
     });
   };
 
@@ -495,7 +552,9 @@ export default function CharactersPage() {
     return (
       <PageLayout
         title="My Characters"
-        description={"Create unique characters for your interactive narrative adventures. Use the \"Make Active\" button on a character to set them as your current character for gameplay."}
+        description={
+          'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.'
+        }
       >
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -503,27 +562,35 @@ export default function CharactersPage() {
           </div>
           <h2 className="text-xl font-semibold mb-2">Choose Your World</h2>
           <p className="text-gray-700 mb-6">
-            Characters belong to specific worlds. To create characters, you need to select an active world first.
+            Characters belong to specific worlds. To create characters, you need
+            to select an active world first.
           </p>
           <div className="bg-blue-100 border border-blue-500 rounded-md p-4 mb-6 text-sm">
-            <h3 className="font-medium text-blue-900 mb-2">How to get started:</h3>
+            <h3 className="font-medium text-blue-900 mb-2">
+              How to get started:
+            </h3>
             <ol className="list-decimal list-inside space-y-1 text-blue-700">
               <li>Go to the Worlds page</li>
-              <li>Click &quot;Make Active&quot; on any world you want to play in</li>
+              <li>
+                Click &quot;Make Active&quot; on any world you want to play in
+              </li>
               <li>Return here to create characters for that world</li>
             </ol>
           </div>
           <ActionButtonGroup
-            actions={[{
-              label: 'Go to Worlds',
-              onClick: () => router.push('/worlds'),
-              variant: 'primary',
-              size: 'lg'
-            }]}
+            actions={[
+              {
+                label: 'Go to Worlds',
+                onClick: () => router.push('/worlds'),
+                variant: 'primary',
+                size: 'lg',
+              },
+            ]}
             className="justify-center"
           />
           <p className="text-sm text-gray-500 mt-4">
-            Each world has unique attributes, skills, and themes that shape your characters
+            Each world has unique attributes, skills, and themes that shape your
+            characters
           </p>
         </div>
       </PageLayout>
@@ -535,50 +602,66 @@ export default function CharactersPage() {
       label: 'Create Character',
       onClick: handleCreateCharacter,
       variant: 'primary' as const,
-      icon: (
-        <Plus className="w-4 h-4" aria-hidden="true" />
-      )
+      icon: <Plus className="w-4 h-4" aria-hidden="true" />,
     },
     {
       label: 'Generate Character',
       onClick: () => setShowGenerateDialog(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: (
-        <Sparkles className="w-4 h-4" aria-hidden="true" />
-      )
+      icon: <Sparkles className="w-4 h-4" aria-hidden="true" />,
     },
-    ...(currentCharacterId && effectiveWorldId ? [{
-      label: 'Start Playing',
-      onClick: () => {
-        const character = characters[currentCharacterId];
-        if (character) {
-          router.push(`/worlds/${character.worldId}/play`);
-        }
-      },
-      variant: 'success' as const,
-      icon: (
-        <Play className="w-4 h-4" aria-hidden="true" />
-      )
-    }] : [])
+    ...(currentCharacterId && effectiveWorldId
+      ? [
+          {
+            label: 'Start Playing',
+            onClick: () => {
+              const character = characters[currentCharacterId];
+              if (character) {
+                router.push(`/worlds/${character.worldId}/play`);
+              }
+            },
+            variant: 'success' as const,
+            icon: <Play className="w-4 h-4" aria-hidden="true" />,
+          },
+        ]
+      : []),
   ];
 
   return (
-    <PageLayout
-      title={headerTitle}
-      description={headerDescription}
-    >
+    <PageLayout title={headerTitle} description={headerDescription}>
       {/* Show world hero with image or themed background (after hydration) */}
       {mounted && currentWorld && (
         <div className="mb-6">
           <Hero
-            title={worldIdFromUrl ? `${currentWorld.name} Characters` : `${currentWorld.name} Characters`}
-            image={currentWorld.image?.url ? {
-              url: currentWorld.image.url,
-              alt: `${currentWorld.name} world`
-            } : undefined}
-            theme={(currentWorld.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
-            subtitle={currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined}
+            title={
+              worldIdFromUrl
+                ? `${currentWorld.name} Characters`
+                : `${currentWorld.name} Characters`
+            }
+            image={
+              currentWorld.image?.url
+                ? {
+                    url: currentWorld.image.url,
+                    alt: `${currentWorld.name} world`,
+                  }
+                : undefined
+            }
+            theme={
+              (currentWorld.genre as
+                | 'fantasy'
+                | 'sci-fi'
+                | 'modern'
+                | 'historical'
+                | 'horror'
+                | 'mystery'
+                | 'western'
+                | 'cyberpunk'
+                | 'other') || 'default'
+            }
+            subtitle={
+              currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
+            }
             height="h-32 sm:h-40"
             titleElement="h2"
           />
@@ -588,7 +671,10 @@ export default function CharactersPage() {
       {/* Action buttons below hero when world exists (after hydration) */}
       {mounted && currentWorld && (
         <div className="mb-8 flex justify-end items-center gap-3">
-          <CharacterViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
+          <CharacterViewToggle
+            mode={viewMode}
+            onModeChange={handleViewModeChange}
+          />
           <ActionButtonGroup actions={actionButtons} />
         </div>
       )}
@@ -616,7 +702,11 @@ export default function CharactersPage() {
         {!currentWorld || worldCharacters.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-2">{currentWorld ? `No characters in ${currentWorld.name} yet` : 'No characters yet'}</h2>
+              <h2 className="text-2xl font-semibold mb-2">
+                {currentWorld
+                  ? `No characters in ${currentWorld.name} yet`
+                  : 'No characters yet'}
+              </h2>
               <p className="text-gray-700 mb-2">
                 Choose how you&apos;d like to add your first character.
               </p>
@@ -624,7 +714,9 @@ export default function CharactersPage() {
             <ActionButtonGroup
               actions={[
                 {
-                  label: isGenerating ? (generatingStatus || 'Generating...') : 'Generate Character',
+                  label: isGenerating
+                    ? generatingStatus || 'Generating...'
+                    : 'Generate Character',
                   onClick: handleGenerateCharacter,
                   variant: 'secondary',
                   disabled: isGenerating,
@@ -633,31 +725,42 @@ export default function CharactersPage() {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <Sparkles className="w-5 h-5" aria-hidden="true" />
-                  )
+                  ),
                 },
                 {
                   label: 'Create Character',
                   onClick: handleCreateCharacter,
                   variant: 'primary',
                   size: 'lg',
-                  icon: (
-                    <Plus className="w-5 h-5" aria-hidden="true" />
-                  )
-                }
+                  icon: <Plus className="w-5 h-5" aria-hidden="true" />,
+                },
               ]}
               className="justify-center"
             />
             <div className="mt-6 text-sm text-gray-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                 <div>
-                  <p className="font-medium text-blue-700 mb-1">Generate Character</p>
-                  <p>AI creates a character {currentWorld?.reference ? `from ${currentWorld.reference}` : 'for your world'}</p>
-                  <p className="text-xs mt-1">Choose known figures, original characters, or specific names</p>
+                  <p className="font-medium text-blue-700 mb-1">
+                    Generate Character
+                  </p>
+                  <p>
+                    AI creates a character{' '}
+                    {currentWorld?.reference
+                      ? `from ${currentWorld.reference}`
+                      : 'for your world'}
+                  </p>
+                  <p className="text-xs mt-1">
+                    Choose known figures, original characters, or specific names
+                  </p>
                 </div>
                 <div>
-                  <p className="font-medium text-green-700 mb-1">Create Character</p>
+                  <p className="font-medium text-green-700 mb-1">
+                    Create Character
+                  </p>
                   <p>Design your own character with custom details</p>
-                  <p className="text-xs mt-1">Full control over attributes, skills, and background</p>
+                  <p className="text-xs mt-1">
+                    Full control over attributes, skills, and background
+                  </p>
                 </div>
               </div>
             </div>

@@ -7,7 +7,7 @@
 import {
   calculateDerivedStat,
   calculateAllDerivedStats,
-  validateFormula
+  validateFormula,
 } from '../derivedStatCalculator';
 import { DerivedStatFormula } from '@/types/world.types';
 import { CharacterAttribute } from '@/state/characterStore';
@@ -26,7 +26,7 @@ describe('calculateDerivedStat', () => {
     name: worldAttributeId,
     baseValue,
     modifiedValue: modifiedValue ?? baseValue,
-    category: 'test'
+    category: 'test',
   });
 
   describe('basic multiplier calculations', () => {
@@ -36,7 +36,7 @@ describe('calculateDerivedStat', () => {
         name: 'Vitality Pool',
         worldId: 'world-1',
         description: 'Health pool',
-        attributeMultipliers: { constitution: 10 }
+        attributeMultipliers: { constitution: 10 },
       };
 
       const attributes = [createAttribute('attr-1', 'constitution', 15)];
@@ -52,7 +52,7 @@ describe('calculateDerivedStat', () => {
         name: 'Vitality Pool',
         worldId: 'world-1',
         description: 'Health pool',
-        attributeMultipliers: { constitution: 10 }
+        attributeMultipliers: { constitution: 10 },
       };
 
       // baseValue is 10, but modifiedValue is 15 (e.g., from item bonus)
@@ -69,7 +69,7 @@ describe('calculateDerivedStat', () => {
         name: 'Defense Bonus',
         worldId: 'world-1',
         description: 'Dexterity bonus to defense',
-        attributeMultipliers: { dexterity: 0.5 }
+        attributeMultipliers: { dexterity: 0.5 },
       };
 
       const attributes = [createAttribute('attr-1', 'dexterity', 16)];
@@ -85,7 +85,7 @@ describe('calculateDerivedStat', () => {
         name: 'Defense Bonus',
         worldId: 'world-1',
         description: 'Dexterity bonus',
-        attributeMultipliers: { dexterity: 0.5 }
+        attributeMultipliers: { dexterity: 0.5 },
       };
 
       const attributes = [createAttribute('attr-1', 'dexterity', 15)];
@@ -104,7 +104,7 @@ describe('calculateDerivedStat', () => {
         worldId: 'world-1',
         description: 'Base defense + dexterity bonus',
         baseValue: 10,
-        attributeMultipliers: { dexterity: 0.5 }
+        attributeMultipliers: { dexterity: 0.5 },
       };
 
       const attributes = [createAttribute('attr-1', 'dexterity', 16)];
@@ -123,13 +123,13 @@ describe('calculateDerivedStat', () => {
         baseValue: 10,
         attributeMultipliers: {
           dexterity: 0.5,
-          constitution: 0.3
-        }
+          constitution: 0.3,
+        },
       };
 
       const attributes = [
         createAttribute('attr-1', 'dexterity', 16),
-        createAttribute('attr-2', 'constitution', 10)
+        createAttribute('attr-2', 'constitution', 10),
       ];
 
       const result = calculateDerivedStat(formula, attributes);
@@ -146,7 +146,7 @@ describe('calculateDerivedStat', () => {
         worldId: 'world-1',
         description: 'Health pool',
         attributeMultipliers: { constitution: 10 },
-        minValue: 50
+        minValue: 50,
       };
 
       const attributes = [createAttribute('attr-1', 'constitution', 3)];
@@ -163,7 +163,7 @@ describe('calculateDerivedStat', () => {
         worldId: 'world-1',
         description: 'Health pool',
         attributeMultipliers: { constitution: 10 },
-        maxValue: 100
+        maxValue: 100,
       };
 
       const attributes = [createAttribute('attr-1', 'constitution', 15)];
@@ -181,7 +181,7 @@ describe('calculateDerivedStat', () => {
         description: 'Health pool',
         attributeMultipliers: { constitution: 10 },
         minValue: 50,
-        maxValue: 200
+        maxValue: 200,
       };
 
       const attributes = [createAttribute('attr-1', 'constitution', 10)];
@@ -203,13 +203,13 @@ describe('calculateDerivedStat', () => {
         attributeMultipliers: {
           strength: 5,
           dexterity: 3,
-          constitution: 2 // This attribute missing
-        }
+          constitution: 2, // This attribute missing
+        },
       };
 
       const attributes = [
         createAttribute('attr-1', 'strength', 10),
-        createAttribute('attr-2', 'dexterity', 8)
+        createAttribute('attr-2', 'dexterity', 8),
         // constitution missing
       ];
 
@@ -225,7 +225,7 @@ describe('calculateDerivedStat', () => {
         worldId: 'world-1',
         description: 'Base defense',
         baseValue: 10,
-        attributeMultipliers: { dexterity: 0.5 }
+        attributeMultipliers: { dexterity: 0.5 },
       };
 
       const attributes = [createAttribute('attr-1', 'strength', 15)]; // Wrong attribute
@@ -241,7 +241,7 @@ describe('calculateDerivedStat', () => {
         name: 'Stat',
         worldId: 'world-1',
         description: 'Test',
-        attributeMultipliers: { missing: 10 }
+        attributeMultipliers: { missing: 10 },
       };
 
       const attributes = [createAttribute('attr-1', 'other', 5)];
@@ -265,7 +265,7 @@ describe('calculateAllDerivedStats', () => {
     name: worldAttributeId,
     baseValue,
     modifiedValue: baseValue,
-    category: 'test'
+    category: 'test',
   });
 
   it('calculates multiple formulas in order', () => {
@@ -275,14 +275,14 @@ describe('calculateAllDerivedStats', () => {
         name: 'Vitality Pool',
         worldId: 'world-1',
         description: 'Health',
-        attributeMultipliers: { constitution: 10 }
+        attributeMultipliers: { constitution: 10 },
       },
       {
         id: 'mana',
         name: 'Arcane Reservoir',
         worldId: 'world-1',
         description: 'Mana',
-        attributeMultipliers: { intelligence: 8 }
+        attributeMultipliers: { intelligence: 8 },
       },
       {
         id: 'defense',
@@ -290,22 +290,22 @@ describe('calculateAllDerivedStats', () => {
         worldId: 'world-1',
         description: 'Defense',
         baseValue: 10,
-        attributeMultipliers: { dexterity: 0.5 }
-      }
+        attributeMultipliers: { dexterity: 0.5 },
+      },
     ];
 
     const attributes = [
       createAttribute('attr-1', 'constitution', 12),
       createAttribute('attr-2', 'intelligence', 10),
-      createAttribute('attr-3', 'dexterity', 14)
+      createAttribute('attr-3', 'dexterity', 14),
     ];
 
     const results = calculateAllDerivedStats(formulas, attributes);
 
     expect(results).toEqual([
       120, // constitution 12 × 10
-      80,  // intelligence 10 × 8
-      17   // 10 + (dexterity 14 × 0.5) = 10 + 7
+      80, // intelligence 10 × 8
+      17, // 10 + (dexterity 14 × 0.5) = 10 + 7
     ]);
   });
 
@@ -325,7 +325,7 @@ describe('validateFormula', () => {
       name: 'Vitality Pool',
       worldId: 'world-1',
       description: 'Health',
-      attributeMultipliers: { constitution: 10 }
+      attributeMultipliers: { constitution: 10 },
     };
 
     const availableIds = new Set(['constitution', 'strength', 'dexterity']);
@@ -342,7 +342,7 @@ describe('validateFormula', () => {
       name: 'Test',
       worldId: 'world-1',
       description: 'Test',
-      attributeMultipliers: {}
+      attributeMultipliers: {},
     };
 
     const availableIds = new Set(['constitution']);
@@ -350,7 +350,9 @@ describe('validateFormula', () => {
     const result = validateFormula(formula, availableIds);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Formula must reference at least one attribute');
+    expect(result.errors).toContain(
+      'Formula must reference at least one attribute'
+    );
   });
 
   it('rejects formula referencing non-existent attribute', () => {
@@ -359,7 +361,7 @@ describe('validateFormula', () => {
       name: 'Test',
       worldId: 'world-1',
       description: 'Test',
-      attributeMultipliers: { 'missing-attr': 10 }
+      attributeMultipliers: { 'missing-attr': 10 },
     };
 
     const availableIds = new Set(['constitution', 'strength']);
@@ -367,7 +369,9 @@ describe('validateFormula', () => {
     const result = validateFormula(formula, availableIds);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Referenced attribute "missing-attr" not found in world');
+    expect(result.errors).toContain(
+      'Referenced attribute "missing-attr" not found in world'
+    );
   });
 
   it('rejects formula with invalid multiplier', () => {
@@ -376,7 +380,7 @@ describe('validateFormula', () => {
       name: 'Test',
       worldId: 'world-1',
       description: 'Test',
-      attributeMultipliers: { constitution: NaN }
+      attributeMultipliers: { constitution: NaN },
     };
 
     const availableIds = new Set(['constitution']);
@@ -384,7 +388,9 @@ describe('validateFormula', () => {
     const result = validateFormula(formula, availableIds);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Multiplier for attribute "constitution" must be a valid number');
+    expect(result.errors).toContain(
+      'Multiplier for attribute "constitution" must be a valid number'
+    );
   });
 
   it('rejects formula where minValue > maxValue', () => {
@@ -395,7 +401,7 @@ describe('validateFormula', () => {
       description: 'Test',
       attributeMultipliers: { constitution: 10 },
       minValue: 100,
-      maxValue: 50
+      maxValue: 50,
     };
 
     const availableIds = new Set(['constitution']);

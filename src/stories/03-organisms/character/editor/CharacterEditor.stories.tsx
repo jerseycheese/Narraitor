@@ -42,9 +42,9 @@ CharacterEditor provides a comprehensive interface for editing existing characte
 
 ## Usage
 The editor automatically loads character data and provides forms for all editable fields including basic info, background, attributes, skills, and portrait generation.
-        `
-      }
-    }
+        `,
+      },
+    },
   },
   decorators: [
     (Story) => {
@@ -66,7 +66,7 @@ The editor automatically loads character data and provides forms for all editabl
             worldId: testWorldId,
             baseValue: 5,
             minValue: 1,
-            maxValue: 10
+            maxValue: 10,
           },
           {
             id: 'attr2',
@@ -75,8 +75,8 @@ The editor automatically loads character data and provides forms for all editabl
             worldId: testWorldId,
             baseValue: 5,
             minValue: 1,
-            maxValue: 10
-          }
+            maxValue: 10,
+          },
         ],
         skills: [
           {
@@ -88,7 +88,7 @@ The editor automatically loads character data and provides forms for all editabl
             attributeIds: ['attr1'],
             baseValue: 5,
             minValue: 0,
-            maxValue: 10
+            maxValue: 10,
           },
           {
             id: 'skill2',
@@ -99,15 +99,15 @@ The editor automatically loads character data and provides forms for all editabl
             attributeIds: ['attr2'],
             baseValue: 3,
             minValue: 0,
-            maxValue: 10
-          }
+            maxValue: 10,
+          },
         ],
         settings: {
           maxAttributes: 2,
           maxSkills: 2,
           attributePointPool: 20,
-          skillPointPool: 30
-        }
+          skillPointPool: 30,
+        },
       });
 
       return (
@@ -124,7 +124,7 @@ type Story = StoryObj<typeof meta>;
 
 export const NewCharacter: Story = {
   args: {
-    characterId: 'new-character-id'
+    characterId: 'new-character-id',
   },
   decorators: [
     (Story) => {
@@ -135,7 +135,8 @@ export const NewCharacter: Story = {
 
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
-        description: 'A brave adventurer who started their journey in a small village',
+        description:
+          'A brave adventurer who started their journey in a small village',
         worldId: worldId,
         level: 3,
         attributes: world.attributes.map((attr, index) => ({
@@ -143,46 +144,47 @@ export const NewCharacter: Story = {
           characterId: 'new-character-id',
           name: attr.name,
           baseValue: attr.baseValue,
-          modifiedValue: attr.baseValue
+          modifiedValue: attr.baseValue,
         })),
         skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'new-character-id',
           name: skill.name,
-          level: 5
+          level: 5,
         })),
         derivedStats: [],
         background: {
-          history: 'A brave adventurer who started their journey in a small village',
+          history:
+            'A brave adventurer who started their journey in a small village',
           personality: 'Courageous and kind',
           goals: ['Seeking glory and treasure', 'Protecting the innocent'],
           fears: ['Losing loved ones', 'Failing their quest'],
           physicalDescription: 'Tall and athletic with distinctive scars',
-          relationships: []
+          relationships: [],
         },
         isPlayer: true,
         status: {
           health: 100,
           maxHealth: 100,
-          conditions: []
+          conditions: [],
         },
         inventory: {
           characterId: '', // Will be set by the store
           items: [],
           capacity: 20,
           categories: [],
-          itemOrder: []
-        }
+          itemOrder: [],
+        },
       });
 
       return <Story args={{ characterId }} />;
-    }
-  ]
+    },
+  ],
 };
 
 export const WithPortrait: Story = {
   args: {
-    characterId: 'character-with-portrait'
+    characterId: 'character-with-portrait',
   },
   decorators: [
     (Story) => {
@@ -201,13 +203,13 @@ export const WithPortrait: Story = {
           characterId: 'character-with-portrait',
           name: attr.name,
           baseValue: attr.baseValue,
-          modifiedValue: attr.baseValue + 2
+          modifiedValue: attr.baseValue + 2,
         })),
         skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'character-with-portrait',
           name: skill.name,
-          level: 7
+          level: 7,
         })),
         derivedStats: [],
         background: {
@@ -216,37 +218,37 @@ export const WithPortrait: Story = {
           goals: ['Protecting the innocent and upholding justice'],
           fears: ['Dishonor', 'Failing in duty'],
           physicalDescription: 'Battle-scarred warrior with piercing eyes',
-          relationships: []
+          relationships: [],
         },
         isPlayer: true,
         status: {
           health: 150,
           maxHealth: 150,
-          conditions: []
+          conditions: [],
         },
         portrait: {
           type: 'ai-generated',
           url: 'https://i.pravatar.cc/200?img=1',
           generatedAt: getTimestamp(),
-          prompt: 'A legendary warrior with noble bearing'
+          prompt: 'A legendary warrior with noble bearing',
         },
         inventory: {
           characterId: '', // Will be set by the store
           items: [],
           capacity: 20,
           categories: [],
-          itemOrder: []
-        }
+          itemOrder: [],
+        },
       });
 
       return <Story args={{ characterId }} />;
-    }
-  ]
+    },
+  ],
 };
 
 export const LoadingState: Story = {
   args: {
-    characterId: 'loading-character'
+    characterId: 'loading-character',
   },
   decorators: [
     () => {
@@ -255,8 +257,12 @@ export const LoadingState: Story = {
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4">
-              <h1 className="text-2xl font-bold">Character Editor - Loading State</h1>
-              <p className="text-gray-700">Demonstrating the LoadingState component</p>
+              <h1 className="text-2xl font-bold">
+                Character Editor - Loading State
+              </h1>
+              <p className="text-gray-700">
+                Demonstrating the LoadingState component
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <LoadingStateComponent message="Loading character data..." />
@@ -264,27 +270,31 @@ export const LoadingState: Story = {
           </div>
         </div>
       );
-    }
-  ]
+    },
+  ],
 };
 
 export const ErrorState: Story = {
   args: {
-    characterId: 'non-existent-character'
-  }
+    characterId: 'non-existent-character',
+  },
 };
 
 export const ErrorWithRetry: Story = {
   args: {
-    characterId: 'error-with-retry-character'
+    characterId: 'error-with-retry-character',
   },
   decorators: [
     () => (
       <div className="min-h-screen bg-gray-100 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
-            <h1 className="text-2xl font-bold">Character Editor - Error State</h1>
-            <p className="text-gray-700">Demonstrating the PageError component</p>
+            <h1 className="text-2xl font-bold">
+              Character Editor - Error State
+            </h1>
+            <p className="text-gray-700">
+              Demonstrating the PageError component
+            </p>
           </div>
           <PageError
             title="Character Loading Failed"
@@ -294,13 +304,13 @@ export const ErrorWithRetry: Story = {
           />
         </div>
       </div>
-    )
-  ]
+    ),
+  ],
 };
 
 export const CustomPromptTesting: Story = {
   args: {
-    characterId: 'custom-prompt-test-character'
+    characterId: 'custom-prompt-test-character',
   },
   decorators: [
     (Story) => {
@@ -319,62 +329,78 @@ export const CustomPromptTesting: Story = {
           characterId: 'custom-prompt-test-character',
           name: attr.name,
           baseValue: attr.baseValue,
-          modifiedValue: attr.baseValue
+          modifiedValue: attr.baseValue,
         })),
         skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'custom-prompt-test-character',
           name: skill.name,
-          level: 3
+          level: 3,
         })),
         derivedStats: [],
         background: {
-          history: 'A test character created to demonstrate custom prompt functionality',
+          history:
+            'A test character created to demonstrate custom prompt functionality',
           personality: 'Designed for testing UI interactions',
           goals: ['Test custom prompts', 'Demonstrate undo functionality'],
           fears: ['Broken UI components'],
-          physicalDescription: 'A basic character appearance for testing portrait generation',
-          relationships: []
+          physicalDescription:
+            'A basic character appearance for testing portrait generation',
+          relationships: [],
         },
         isPlayer: true,
         status: {
           health: 100,
           maxHealth: 100,
-          conditions: []
+          conditions: [],
         },
         inventory: {
           characterId: '',
           items: [],
           capacity: 20,
           categories: [],
-          itemOrder: []
-        }
+          itemOrder: [],
+        },
       });
 
       return (
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h2 className="font-semibold text-blue-900 mb-2">Custom Prompt Testing Instructions</h2>
+              <h2 className="font-semibold text-blue-900 mb-2">
+                Custom Prompt Testing Instructions
+              </h2>
               <ul className="text-blue-700 space-y-1 text-sm">
-                <li>1. Check that &quot;Customize physical description&quot; is <strong>unchecked by default</strong></li>
-                <li>2. Check the checkbox and enter custom text in the textarea</li>
-                <li>3. Verify the &quot;Undo customizations&quot; button appears</li>
-                <li>4. Click &quot;Undo customizations&quot; to test the reset functionality</li>
-                <li>5. Note that all form elements use proper shadcn/ui components</li>
+                <li>
+                  1. Check that &quot;Customize physical description&quot; is{' '}
+                  <strong>unchecked by default</strong>
+                </li>
+                <li>
+                  2. Check the checkbox and enter custom text in the textarea
+                </li>
+                <li>
+                  3. Verify the &quot;Undo customizations&quot; button appears
+                </li>
+                <li>
+                  4. Click &quot;Undo customizations&quot; to test the reset
+                  functionality
+                </li>
+                <li>
+                  5. Note that all form elements use proper shadcn/ui components
+                </li>
               </ul>
             </div>
             <Story args={{ characterId }} />
           </div>
         </div>
       );
-    }
-  ]
+    },
+  ],
 };
 
 export const UIComponentShowcase: Story = {
   args: {
-    characterId: 'ui-showcase-character'
+    characterId: 'ui-showcase-character',
   },
   decorators: [
     (Story) => {
@@ -393,59 +419,91 @@ export const UIComponentShowcase: Story = {
           characterId: 'ui-showcase-character',
           name: attr.name,
           baseValue: attr.baseValue + 2,
-          modifiedValue: attr.baseValue + 2
+          modifiedValue: attr.baseValue + 2,
         })),
         skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'ui-showcase-character',
           name: skill.name,
-          level: 6
+          level: 6,
         })),
         derivedStats: [],
         background: {
-          history: 'This character showcases all the UI component improvements made to the character editor',
+          history:
+            'This character showcases all the UI component improvements made to the character editor',
           personality: 'Well-designed and consistent with the design system',
-          goals: ['Demonstrate proper UI patterns', 'Show component consistency'],
+          goals: [
+            'Demonstrate proper UI patterns',
+            'Show component consistency',
+          ],
           fears: ['Inconsistent styling', 'Raw HTML elements'],
-          physicalDescription: 'Clean, modern appearance that follows design standards',
-          relationships: []
+          physicalDescription:
+            'Clean, modern appearance that follows design standards',
+          relationships: [],
         },
         isPlayer: true,
         status: {
           health: 150,
           maxHealth: 150,
-          conditions: ['Enhanced UI']
+          conditions: ['Enhanced UI'],
         },
         inventory: {
           characterId: '',
           items: [],
           capacity: 25,
           categories: [],
-          itemOrder: []
-        }
+          itemOrder: [],
+        },
       });
 
       return (
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-              <h2 className="font-semibold text-green-700 mb-2">shadcn/ui Component Integration</h2>
+              <h2 className="font-semibold text-green-700 mb-2">
+                shadcn/ui Component Integration
+              </h2>
               <ul className="text-green-700 space-y-1 text-sm">
-                <li>✅ <strong>Input</strong> components with proper styling and focus states</li>
-                <li>✅ <strong>Select</strong> components replacing raw select elements</li>
-                <li>✅ <strong>Textarea</strong> components with consistent styling</li>
-                <li>✅ <strong>Button</strong> components with variants (default, outline, destructive, link)</li>
-                <li>✅ <strong>Checkbox</strong> components with integrated labels</li>
-                <li>✅ <strong>Label</strong> components with proper accessibility</li>
-                <li>✅ <strong>NEW:</strong> RadioGroup components for better form controls</li>
-                <li>✅ <strong>NEW:</strong> Consistent styling across world editor and creation wizard</li>
-                <li>✅ <strong>NEW:</strong> Improved component reusability and maintainability</li>
+                <li>
+                  ✅ <strong>Input</strong> components with proper styling and
+                  focus states
+                </li>
+                <li>
+                  ✅ <strong>Select</strong> components replacing raw select
+                  elements
+                </li>
+                <li>
+                  ✅ <strong>Textarea</strong> components with consistent
+                  styling
+                </li>
+                <li>
+                  ✅ <strong>Button</strong> components with variants (default,
+                  outline, destructive, link)
+                </li>
+                <li>
+                  ✅ <strong>Checkbox</strong> components with integrated labels
+                </li>
+                <li>
+                  ✅ <strong>Label</strong> components with proper accessibility
+                </li>
+                <li>
+                  ✅ <strong>NEW:</strong> RadioGroup components for better form
+                  controls
+                </li>
+                <li>
+                  ✅ <strong>NEW:</strong> Consistent styling across world
+                  editor and creation wizard
+                </li>
+                <li>
+                  ✅ <strong>NEW:</strong> Improved component reusability and
+                  maintainability
+                </li>
               </ul>
             </div>
             <Story args={{ characterId }} />
           </div>
         </div>
       );
-    }
-  ]
+    },
+  ],
 };

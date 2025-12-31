@@ -30,12 +30,16 @@ interface NormalizedSkill {
 /**
  * Input attribute type (supports both Record and Array formats from PersonalizationCharacter)
  */
-type AttributeInput = Record<string, number> | Array<{ attributeId: string; value: number }>;
+type AttributeInput =
+  | Record<string, number>
+  | Array<{ attributeId: string; value: number }>;
 
 /**
  * Input skill type (supports both name and skillId formats from PersonalizationCharacter)
  */
-type SkillInput = Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+type SkillInput =
+  | Array<{ name: string; level: number; worldSkillId?: string }>
+  | Array<{ skillId: string; level: number }>;
 
 /**
  * Normalize PersonalizationCharacter attributes to consistent array format
@@ -51,7 +55,7 @@ export function normalizeAttributeArray(
   // Convert Record to Array
   return Object.entries(attributes).map(([attributeId, value]) => ({
     attributeId,
-    value
+    value,
   }));
 }
 
@@ -59,9 +63,7 @@ export function normalizeAttributeArray(
  * Normalize PersonalizationCharacter skills to consistent format
  * Handles varying skill formats from convertToPersonalizationCharacter
  */
-export function normalizeSkillArray(
-  skills: SkillInput
-): NormalizedSkill[] {
+export function normalizeSkillArray(skills: SkillInput): NormalizedSkill[] {
   if (!Array.isArray(skills) || skills.length === 0) {
     return [];
   }
@@ -69,9 +71,11 @@ export function normalizeSkillArray(
   // Check if skills have 'name' property (from Character.skills)
   const firstSkill = skills[0];
   if (firstSkill && 'name' in firstSkill) {
-    return (skills as Array<{ name: string; level: number; worldSkillId?: string }>).map(skill => ({
+    return (
+      skills as Array<{ name: string; level: number; worldSkillId?: string }>
+    ).map((skill) => ({
       skillId: skill.worldSkillId || skill.name,
-      level: skill.level
+      level: skill.level,
     }));
   }
 
@@ -115,7 +119,9 @@ export function getSkillDescriptor(level: number): string {
   const clampedLevel = Math.max(1, Math.min(5, Math.round(level)));
 
   // Find matching description
-  const description = SKILL_LEVEL_DESCRIPTIONS.find(desc => desc.value === clampedLevel);
+  const description = SKILL_LEVEL_DESCRIPTIONS.find(
+    (desc) => desc.value === clampedLevel
+  );
 
   return description?.label || 'Novice';
 }
@@ -126,16 +132,18 @@ export function getSkillDescriptor(level: number): string {
  * Filters out "Moderate" attributes to reduce token usage and focus on notable traits.
  * Returns comma-separated list: "intelligence (Exceptional), strength (Low)"
  */
-export function formatAttributesForNarrative(attributes: AttributeInput): string {
+export function formatAttributesForNarrative(
+  attributes: AttributeInput
+): string {
   const normalized = normalizeAttributeArray(attributes);
 
   const notableAttributes = normalized
-    .map(attr => ({
+    .map((attr) => ({
       id: attr.attributeId,
-      descriptor: getAttributeDescriptor(attr.value)
+      descriptor: getAttributeDescriptor(attr.value),
     }))
-    .filter(attr => attr.descriptor !== 'Moderate') // Filter out moderate attributes
-    .map(attr => `${attr.id} (${attr.descriptor})`)
+    .filter((attr) => attr.descriptor !== 'Moderate') // Filter out moderate attributes
+    .map((attr) => `${attr.id} (${attr.descriptor})`)
     .join(', ');
 
   return notableAttributes;
@@ -151,7 +159,7 @@ export function formatSkillsForNarrative(skills: SkillInput): string {
   const normalized = normalizeSkillArray(skills);
 
   const skillsList = normalized
-    .map(skill => `${skill.skillId} (${getSkillDescriptor(skill.level)})`)
+    .map((skill) => `${skill.skillId} (${getSkillDescriptor(skill.level)})`)
     .join(', ');
 
   return skillsList;
@@ -179,7 +187,7 @@ export function formatDerivedStatsForNarrative(
     return '';
   }
 
-  const formattedStats = derivedStats.map(stat => {
+  const formattedStats = derivedStats.map((stat) => {
     const { name, currentValue, maxValue } = stat;
 
     // Check if depleted (< 50% of max)

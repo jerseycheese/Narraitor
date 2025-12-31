@@ -17,11 +17,14 @@ describe('PersonalizationEngine - MVP Tests', () => {
   const convertToPersonalizationCharacter = (character: Character) => ({
     id: character.id,
     name: character.name,
-    background: typeof character.background === 'object' ? character.background.history || '' : character.background,
+    background:
+      typeof character.background === 'object'
+        ? character.background.history || ''
+        : character.background,
     attributes: character.attributes,
     skills: character.skills,
     createdAt: character.createdAt,
-    updatedAt: character.updatedAt
+    updatedAt: character.updatedAt,
   });
 
   beforeEach(() => {
@@ -37,15 +40,15 @@ describe('PersonalizationEngine - MVP Tests', () => {
         personality: 'Curious and determined',
         goals: ['Discover ancient secrets'],
         fears: ['Failure'],
-        relationships: []
+        relationships: [],
       },
       attributes: [
         { attributeId: 'attr-intelligence', value: 8 },
-        { attributeId: 'attr-dexterity', value: 6 }
+        { attributeId: 'attr-dexterity', value: 6 },
       ],
       skills: [
         { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
-        { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
+        { skillId: 'skill-2', level: 5, experience: 50, isActive: true },
       ],
       derivedStats: [],
       inventory: {
@@ -53,15 +56,15 @@ describe('PersonalizationEngine - MVP Tests', () => {
         items: [],
         capacity: 100,
         categories: [],
-        itemOrder: []
+        itemOrder: [],
       },
       status: {
         health: 100,
         maxHealth: 100,
-        conditions: []
+        conditions: [],
       },
       createdAt: '2023-01-01',
-      updatedAt: '2023-01-01'
+      updatedAt: '2023-01-01',
     };
 
     mockWorld = {
@@ -69,16 +72,16 @@ describe('PersonalizationEngine - MVP Tests', () => {
       name: 'Ancient Mysteries',
       description: 'A world of archaeological discoveries',
       genre: 'mystery',
-        settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
-        skillPointPool: 40
+        skillPointPool: 40,
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-        attributes: [],
-        skills: []
+      attributes: [],
+      skills: [],
     };
   });
 
@@ -109,7 +112,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
           timestamp: '2023-01-01',
           sessionId: 'session-1',
           worldId: 'world-1',
-          context: {}
+          context: {},
         },
         {
           id: 'dec-2',
@@ -119,8 +122,8 @@ describe('PersonalizationEngine - MVP Tests', () => {
           timestamp: '2023-01-01',
           sessionId: 'session-1',
           worldId: 'world-1',
-          context: {}
-        }
+          context: {},
+        },
       ];
 
       const analysis = engine.analyzePlayerBehavior(
@@ -139,7 +142,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
       const maliciousCharacter = {
         ...convertToPersonalizationCharacter(mockCharacter),
         name: 'Alex<script>alert("xss")</script>',
-        background: 'Evil & "dangerous" character'
+        background: 'Evil & "dangerous" character',
       };
 
       const context = engine.createPersonalizedContext(
@@ -170,8 +173,8 @@ describe('PersonalizationEngine - MVP Tests', () => {
           timestamp: '2023-01-01',
           sessionId: 'session-1',
           worldId: 'world-1',
-          context: {}
-        }
+          context: {},
+        },
       ];
 
       const analysis = engine.analyzePlayerBehavior(
@@ -184,7 +187,6 @@ describe('PersonalizationEngine - MVP Tests', () => {
       expect(analysis.detectedTraits).toContain('diplomatic');
       expect(analysis.preferences.preferredChoiceTypes).toContain('diplomatic');
     });
-
   });
 
   describe('MVP Acceptance Criteria', () => {
@@ -198,7 +200,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
           timestamp: '2023-01-01',
           sessionId: 'session-1',
           worldId: 'world-1',
-          context: {}
+          context: {},
         },
         {
           id: 'dec-2',
@@ -208,8 +210,8 @@ describe('PersonalizationEngine - MVP Tests', () => {
           timestamp: '2023-01-01',
           sessionId: 'session-1',
           worldId: 'world-1',
-          context: {}
-        }
+          context: {},
+        },
       ];
 
       const context = engine.createPersonalizedContext(

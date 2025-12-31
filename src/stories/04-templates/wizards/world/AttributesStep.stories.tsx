@@ -12,15 +12,15 @@ const meta: Meta<typeof AttributesStep> = {
     (Story) => (
       <div className="w-full max-w-2xl">
         <WizardContainer title="Create Character in Storybook Test World">
-          <WizardProgress 
+          <WizardProgress
             steps={[
               { id: 'basic-info', label: 'Basic Info' },
               { id: 'attributes', label: 'Attributes' },
               { id: 'skills', label: 'Skills' },
               { id: 'background', label: 'Background' },
-              { id: 'portrait', label: 'Portrait' }
-            ]} 
-            currentStep={1} 
+              { id: 'portrait', label: 'Portrait' },
+            ]}
+            currentStep={1}
             className="mb-6"
           />
           <div className="p-6 bg-white rounded-lg shadow">
@@ -41,7 +41,7 @@ const defaultData = {
   characterData: {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
-        attributes: [
+    attributes: [
       {
         attributeId: 'strength',
         name: 'Strength',
@@ -75,9 +75,9 @@ const defaultData = {
         maxValue: 18,
       },
     ],
-        skills: [],
+    skills: [],
     derivedStats: [],
-  background: {
+    background: {
       history: '',
       personality: '',
       goals: [],
@@ -126,8 +126,8 @@ const mockWorldConfig = {
       maxValue: 18,
     },
   ],
-    skills: [],
-        settings: {
+  skills: [],
+  settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,

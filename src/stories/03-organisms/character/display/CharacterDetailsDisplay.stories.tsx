@@ -3,7 +3,9 @@ import { CharacterDetailsDisplay } from '@/components/characters/CharacterDetail
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<
+  typeof useCharacterStore.getState
+>['characters'][string];
 import { World } from '@/types/world.types';
 
 const meta = {
@@ -86,7 +88,7 @@ const mockWorld: World = {
       category: 'Mental',
     },
   ],
-        skills: [
+  skills: [
     {
       id: 'swordsmanship',
       worldId: 'world-1',
@@ -128,7 +130,7 @@ const mockWorld: World = {
     maxAttributes: 6,
     maxSkills: 10,
     attributePointPool: 27,
-    skillPointPool: 15
+    skillPointPool: 15,
   },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
@@ -149,7 +151,7 @@ const mockCharacter: StoreCharacter = {
       name: 'Strength',
       baseValue: 18,
       modifiedValue: 18,
-      category: 'Physical'
+      category: 'Physical',
     },
     {
       id: 'char-attr-dex',
@@ -158,7 +160,7 @@ const mockCharacter: StoreCharacter = {
       name: 'Dexterity',
       baseValue: 14,
       modifiedValue: 14,
-      category: 'Physical'
+      category: 'Physical',
     },
     {
       id: 'char-attr-int',
@@ -167,7 +169,7 @@ const mockCharacter: StoreCharacter = {
       name: 'Intelligence',
       baseValue: 12,
       modifiedValue: 12,
-      category: 'Mental'
+      category: 'Mental',
     },
     {
       id: 'char-attr-wis',
@@ -176,17 +178,17 @@ const mockCharacter: StoreCharacter = {
       name: 'Wisdom',
       baseValue: 16,
       modifiedValue: 16,
-      category: 'Mental'
-    }
+      category: 'Mental',
+    },
   ],
-        skills: [
+  skills: [
     {
       id: 'char-skill-swordsmanship',
       characterId: 'char-1',
       worldSkillId: 'swordsmanship',
       name: 'Swordsmanship',
       level: 15,
-      category: 'Combat'
+      category: 'Combat',
     },
     {
       id: 'char-skill-stealth',
@@ -194,7 +196,7 @@ const mockCharacter: StoreCharacter = {
       worldSkillId: 'stealth',
       name: 'Stealth',
       level: 8,
-      category: 'Utility'
+      category: 'Utility',
     },
     {
       id: 'char-skill-lore',
@@ -202,16 +204,24 @@ const mockCharacter: StoreCharacter = {
       worldSkillId: 'lore',
       name: 'Lore',
       level: 10,
-      category: 'Knowledge'
-    }
+      category: 'Knowledge',
+    },
   ],
   derivedStats: [],
   background: {
-    history: 'Raised by elves in Rivendell, trained as a Ranger of the North. He is the rightful heir to the throne of Gondor, though he has spent most of his life wandering the wild lands protecting the innocent.',
-    personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',
-    goals: ['To protect Middle-earth from the growing darkness and fulfill his destiny as king'],
-    fears: ['Failing to live up to his royal heritage', 'Letting down those who depend on him'],
-    physicalDescription: 'Tall, dark-haired ranger with weathered features and piercing eyes',
+    history:
+      'Raised by elves in Rivendell, trained as a Ranger of the North. He is the rightful heir to the throne of Gondor, though he has spent most of his life wandering the wild lands protecting the innocent.',
+    personality:
+      'A noble ranger with a strong sense of duty and honor, destined to become king.',
+    goals: [
+      'To protect Middle-earth from the growing darkness and fulfill his destiny as king',
+    ],
+    fears: [
+      'Failing to live up to his royal heritage',
+      'Letting down those who depend on him',
+    ],
+    physicalDescription:
+      'Tall, dark-haired ranger with weathered features and piercing eyes',
     relationships: [],
     isKnownFigure: true,
   },
@@ -219,19 +229,19 @@ const mockCharacter: StoreCharacter = {
   status: {
     health: 100,
     maxHealth: 100,
-    conditions: []
+    conditions: [],
   },
   inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 20,
     categories: [],
-    itemOrder: []
+    itemOrder: [],
   },
   portrait: {
     type: 'ai-generated',
     url: 'https://i.pravatar.cc/200?img=1',
-    prompt: 'A noble ranger with weathered features and kind eyes'
+    prompt: 'A noble ranger with weathered features and kind eyes',
   },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
@@ -287,7 +297,7 @@ export const MinimalCharacter: Story = {
     character: {
       ...mockCharacter,
       name: 'Simple Character',
-        attributes: [
+      attributes: [
         {
           id: 'char-attr-str-simple',
           characterId: 'char-simple',
@@ -295,7 +305,7 @@ export const MinimalCharacter: Story = {
           name: 'Strength',
           baseValue: 10,
           modifiedValue: 10,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-dex-simple',
@@ -304,18 +314,18 @@ export const MinimalCharacter: Story = {
           name: 'Dexterity',
           baseValue: 10,
           modifiedValue: 10,
-          category: 'Physical'
-        }
+          category: 'Physical',
+        },
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-swordsmanship-simple',
           characterId: 'char-simple',
           worldSkillId: 'swordsmanship',
           name: 'Swordsmanship',
           level: 5,
-          category: 'Combat'
-        }
+          category: 'Combat',
+        },
       ],
       background: {
         history: 'A simple background with minimal details.',
@@ -336,7 +346,7 @@ export const PowerfulCharacter: Story = {
       ...mockCharacter,
       name: 'Gandalf the Grey',
       level: 50,
-        attributes: [
+      attributes: [
         {
           id: 'char-attr-str-gandalf',
           characterId: 'char-gandalf',
@@ -344,7 +354,7 @@ export const PowerfulCharacter: Story = {
           name: 'Strength',
           baseValue: 12,
           modifiedValue: 12,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-dex-gandalf',
@@ -353,7 +363,7 @@ export const PowerfulCharacter: Story = {
           name: 'Dexterity',
           baseValue: 14,
           modifiedValue: 14,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-int-gandalf',
@@ -362,7 +372,7 @@ export const PowerfulCharacter: Story = {
           name: 'Intelligence',
           baseValue: 20,
           modifiedValue: 20,
-          category: 'Mental'
+          category: 'Mental',
         },
         {
           id: 'char-attr-wis-gandalf',
@@ -371,17 +381,17 @@ export const PowerfulCharacter: Story = {
           name: 'Wisdom',
           baseValue: 20,
           modifiedValue: 20,
-          category: 'Mental'
-        }
+          category: 'Mental',
+        },
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-lore-gandalf',
           characterId: 'char-gandalf',
           worldSkillId: 'lore',
           name: 'Lore',
           level: 20,
-          category: 'Knowledge'
+          category: 'Knowledge',
         },
         {
           id: 'char-skill-swordsmanship-gandalf',
@@ -389,7 +399,7 @@ export const PowerfulCharacter: Story = {
           worldSkillId: 'swordsmanship',
           name: 'Swordsmanship',
           level: 12,
-          category: 'Combat'
+          category: 'Combat',
         },
         {
           id: 'char-skill-stealth-gandalf',
@@ -397,13 +407,17 @@ export const PowerfulCharacter: Story = {
           worldSkillId: 'stealth',
           name: 'Stealth',
           level: 6,
-          category: 'Utility'
-        }
+          category: 'Utility',
+        },
       ],
       background: {
-        history: 'One of the Istari, sent to Middle-earth to oppose the growing power of darkness. Has walked among mortals for thousands of years, guiding and protecting them.',
-        personality: 'A wise and powerful wizard who guides others on their journeys.',
-        goals: ['To guide the free peoples in their fight against evil and ensure the destruction of the One Ring'],
+        history:
+          'One of the Istari, sent to Middle-earth to oppose the growing power of darkness. Has walked among mortals for thousands of years, guiding and protecting them.',
+        personality:
+          'A wise and powerful wizard who guides others on their journeys.',
+        goals: [
+          'To guide the free peoples in their fight against evil and ensure the destruction of the One Ring',
+        ],
         fears: ['The corruption of power', 'Failing in his mission'],
         physicalDescription: 'An old wizard with a long grey beard and robes',
         relationships: [],
@@ -420,7 +434,7 @@ export const WeakCharacter: Story = {
       ...mockCharacter,
       name: 'Frodo Baggins',
       level: 1,
-        attributes: [
+      attributes: [
         {
           id: 'char-attr-str-frodo',
           characterId: 'char-frodo',
@@ -428,7 +442,7 @@ export const WeakCharacter: Story = {
           name: 'Strength',
           baseValue: 6,
           modifiedValue: 6,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-dex-frodo',
@@ -437,7 +451,7 @@ export const WeakCharacter: Story = {
           name: 'Dexterity',
           baseValue: 12,
           modifiedValue: 12,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-int-frodo',
@@ -446,7 +460,7 @@ export const WeakCharacter: Story = {
           name: 'Intelligence',
           baseValue: 14,
           modifiedValue: 14,
-          category: 'Mental'
+          category: 'Mental',
         },
         {
           id: 'char-attr-wis-frodo',
@@ -455,17 +469,17 @@ export const WeakCharacter: Story = {
           name: 'Wisdom',
           baseValue: 16,
           modifiedValue: 16,
-          category: 'Mental'
-        }
+          category: 'Mental',
+        },
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-stealth-frodo',
           characterId: 'char-frodo',
           worldSkillId: 'stealth',
           name: 'Stealth',
           level: 8,
-          category: 'Utility'
+          category: 'Utility',
         },
         {
           id: 'char-skill-lore-frodo',
@@ -473,7 +487,7 @@ export const WeakCharacter: Story = {
           worldSkillId: 'lore',
           name: 'Lore',
           level: 6,
-          category: 'Knowledge'
+          category: 'Knowledge',
         },
         {
           id: 'char-skill-swordsmanship-frodo',
@@ -481,15 +495,17 @@ export const WeakCharacter: Story = {
           worldSkillId: 'swordsmanship',
           name: 'Swordsmanship',
           level: 2,
-          category: 'Combat'
-        }
+          category: 'Combat',
+        },
       ],
       background: {
-        history: 'A hobbit from the Shire who inherited a mysterious ring from his cousin Bilbo.',
+        history:
+          'A hobbit from the Shire who inherited a mysterious ring from his cousin Bilbo.',
         personality: 'A brave hobbit with a kind heart and unexpected courage.',
         goals: ['To destroy the One Ring and save Middle-earth'],
         fears: ['The corruption of the Ring', 'Losing himself to its power'],
-        physicalDescription: 'Small hobbit with curly brown hair and large feet',
+        physicalDescription:
+          'Small hobbit with curly brown hair and large feet',
         relationships: [],
         isKnownFigure: true,
       },
@@ -505,7 +521,7 @@ export const OriginalCharacter: Story = {
       id: 'char-2',
       name: 'Lyra Moonwhisper',
       level: 8,
-        attributes: [
+      attributes: [
         {
           id: 'char-attr-str-lyra',
           characterId: 'char-lyra',
@@ -513,7 +529,7 @@ export const OriginalCharacter: Story = {
           name: 'Strength',
           baseValue: 8,
           modifiedValue: 8,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-dex-lyra',
@@ -522,7 +538,7 @@ export const OriginalCharacter: Story = {
           name: 'Dexterity',
           baseValue: 16,
           modifiedValue: 16,
-          category: 'Physical'
+          category: 'Physical',
         },
         {
           id: 'char-attr-int-lyra',
@@ -531,7 +547,7 @@ export const OriginalCharacter: Story = {
           name: 'Intelligence',
           baseValue: 18,
           modifiedValue: 18,
-          category: 'Mental'
+          category: 'Mental',
         },
         {
           id: 'char-attr-wis-lyra',
@@ -540,17 +556,17 @@ export const OriginalCharacter: Story = {
           name: 'Wisdom',
           baseValue: 14,
           modifiedValue: 14,
-          category: 'Mental'
-        }
+          category: 'Mental',
+        },
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-lore-lyra',
           characterId: 'char-lyra',
           worldSkillId: 'lore',
           name: 'Lore',
           level: 12,
-          category: 'Knowledge'
+          category: 'Knowledge',
         },
         {
           id: 'char-skill-stealth-lyra',
@@ -558,7 +574,7 @@ export const OriginalCharacter: Story = {
           worldSkillId: 'stealth',
           name: 'Stealth',
           level: 10,
-          category: 'Utility'
+          category: 'Utility',
         },
         {
           id: 'char-skill-swordsmanship-lyra',
@@ -566,13 +582,17 @@ export const OriginalCharacter: Story = {
           worldSkillId: 'swordsmanship',
           name: 'Swordsmanship',
           level: 4,
-          category: 'Combat'
-        }
+          category: 'Combat',
+        },
       ],
       background: {
-        history: 'Born in the ancient forests of Lothlórien, trained in the old ways of magic by the elven lords.',
-        personality: 'A mysterious elven mage with a deep connection to nature and ancient magic.',
-        goals: ['To preserve the ancient knowledge and protect the natural world'],
+        history:
+          'Born in the ancient forests of Lothlórien, trained in the old ways of magic by the elven lords.',
+        personality:
+          'A mysterious elven mage with a deep connection to nature and ancient magic.',
+        goals: [
+          'To preserve the ancient knowledge and protect the natural world',
+        ],
         fears: ['The loss of magic from the world'],
         physicalDescription: 'Tall elf with flowing robes and mystical aura',
         relationships: [],
@@ -607,11 +627,19 @@ export const FullBackground: Story = {
       ...mockCharacter,
       name: 'Thorin Oakenshield',
       background: {
-        history: 'Heir to the throne of Erebor, exiled when Smaug took the mountain. Has spent years in exile, dreaming of reclaiming his homeland.',
-        personality: 'A proud and stubborn dwarf king with a deep sense of honor and loyalty to his people.',
-        goals: ['To reclaim Erebor and restore the Kingdom under the Mountain to its former glory'],
-        fears: ['Dying without reclaiming his birthright', 'Leaving his people homeless'],
-        physicalDescription: 'Proud dwarf king with royal bearing and warrior\'s build',
+        history:
+          'Heir to the throne of Erebor, exiled when Smaug took the mountain. Has spent years in exile, dreaming of reclaiming his homeland.',
+        personality:
+          'A proud and stubborn dwarf king with a deep sense of honor and loyalty to his people.',
+        goals: [
+          'To reclaim Erebor and restore the Kingdom under the Mountain to its former glory',
+        ],
+        fears: [
+          'Dying without reclaiming his birthright',
+          'Leaving his people homeless',
+        ],
+        physicalDescription:
+          "Proud dwarf king with royal bearing and warrior's build",
         relationships: [],
         isKnownFigure: true,
       },

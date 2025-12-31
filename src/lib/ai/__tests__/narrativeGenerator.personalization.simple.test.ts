@@ -18,16 +18,21 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
   const convertToPersonalizationCharacter = (character: Character) => ({
     id: character.id,
     name: character.name,
-    background: typeof character.background === 'object' ? character.background.history || '' : character.background,
+    background:
+      typeof character.background === 'object'
+        ? character.background.history || ''
+        : character.background,
     attributes: character.attributes,
     skills: character.skills,
     createdAt: character.createdAt,
-    updatedAt: character.updatedAt
+    updatedAt: character.updatedAt,
   });
 
   beforeEach(() => {
     personalizationEngine = new PersonalizationEngine();
-    tracker = new PlayerDecisionTracker({ storageKey: 'test_personalization_decisions' });
+    tracker = new PlayerDecisionTracker({
+      storageKey: 'test_personalization_decisions',
+    });
     tracker.clearDecisions();
 
     mockCharacter = {
@@ -40,15 +45,15 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         personality: 'Curious and determined',
         goals: ['Discover ancient secrets'],
         fears: ['Failure'],
-        relationships: []
+        relationships: [],
       },
       attributes: [
         { attributeId: 'attr-intelligence', value: 8 },
-        { attributeId: 'attr-dexterity', value: 6 }
+        { attributeId: 'attr-dexterity', value: 6 },
       ],
       skills: [
         { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
-        { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
+        { skillId: 'skill-2', level: 5, experience: 50, isActive: true },
       ],
       derivedStats: [],
       inventory: {
@@ -61,10 +66,10 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       status: {
         health: 100,
         maxHealth: 100,
-        conditions: []
+        conditions: [],
       },
       createdAt: '2023-01-01',
-      updatedAt: '2023-01-01'
+      updatedAt: '2023-01-01',
     };
 
     mockWorld = {
@@ -72,16 +77,16 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       name: 'Ancient Mysteries',
       description: 'A world of archaeological discoveries',
       genre: 'mystery',
-        settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
-        skillPointPool: 40
+        skillPointPool: 40,
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-        attributes: [],
-        skills: []
+      attributes: [],
+      skills: [],
     };
   });
 
@@ -121,11 +126,11 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     expect(context.playerPreferences).toBeDefined();
 
     // Generate enhancement
-    const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
+    const enhancement =
+      personalizationEngine.generateNarrativeEnhancement(context);
     expect(enhancement).toContain('Alex Archer');
     expect(enhancement).toMatch(/helpful|diplomatic/i);
   });
-
 
   test('decision patterns influence personalization', () => {
     // Record consistent diplomatic choices

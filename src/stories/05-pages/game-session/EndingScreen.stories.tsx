@@ -16,10 +16,11 @@ const meta: Meta<typeof EndingScreen> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Story ending screen that provides narrative closure with AI-generated epilogue, character legacy, and world impact. Uses shared components and existing tone-based styling.'
-      }
-    }
-  }
+        component:
+          'Story ending screen that provides narrative closure with AI-generated epilogue, character legacy, and world impact. Uses shared components and existing tone-based styling.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -43,7 +44,7 @@ const mockCharacter = {
       category: 'Physical',
     },
   ],
-        skills: [
+  skills: [
     {
       id: 'char-skill-1',
       characterId: 'char-123',
@@ -59,26 +60,26 @@ const mockCharacter = {
     goals: ['Defeat the dark lord and restore peace'],
     fears: ['Losing those she protects'],
     physicalDescription: 'Tall and strong with weathered features',
-    relationships: []
+    relationships: [],
   },
   portrait: {
     type: 'ai-generated' as const,
-    url: 'https://i.pravatar.cc/200?img=1'
+    url: 'https://i.pravatar.cc/200?img=1',
   },
   status: {
     health: 100,
     maxHealth: 100,
-    conditions: []
+    conditions: [],
   },
   inventory: {
     characterId: 'char-123',
     items: [],
     capacity: 20,
     categories: [],
-    itemOrder: []
+    itemOrder: [],
   },
   createdAt: getTimestamp(),
-  updatedAt: getTimestamp()
+  updatedAt: getTimestamp(),
 };
 
 const mockWorld = {
@@ -121,178 +122,195 @@ The alliances forged during the dark times grew stronger, uniting neighboring ki
   updatedAt: getTimestamp(),
   achievements: [
     'Dragon Slayer',
-    'Savior of Eldoria', 
+    'Savior of Eldoria',
     'Peacekeeper',
     'Master Warrior',
-    'Hero of the Realm'
+    'Hero of the Realm',
   ],
-  playTime: 7200 // 2 hours
+  playTime: 7200, // 2 hours
 };
 
 // Mock data URIs for ending images
 const mockEndingImages = {
-  triumphant: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRkZCRjAwIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzkyNDAwRCI+VHJpdW1waGFudDwvdGV4dD4KPHN2Zz4K',
-  tragic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjREMyNjI2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlRyYWdpYzwvdGV4dD4KPHN2Zz4K',
-  mysterious: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk15c3RlcmlvdXM8L3RleHQ+Cjwvc3ZnPgo=',
-  hopeful: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMjJDNTVFIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkhvcGVmdWw8L3RleHQ+Cjwvc3ZnPgo='
+  triumphant:
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRkZCRjAwIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzkyNDAwRCI+VHJpdW1waGFudDwvdGV4dD4KPHN2Zz4K',
+  tragic:
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjREMyNjI2Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlRyYWdpYzwvdGV4dD4KPHN2Zz4K',
+  mysterious:
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk15c3RlcmlvdXM8L3RleHQ+Cjwvc3ZnPgo=',
+  hopeful:
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDgwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMjJDNTVFIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkhvcGVmdWw8L3RleHQ+Cjwvc3ZnPgo=',
 };
 
 // Story decorator to set up store state
 const withEndingState = (ending: StoryEnding) => {
   const EndingStateDecorator = (Story: React.ComponentType) => {
-  // Mock the stores
-  useNarrativeStore.setState({
-    currentEnding: ending,
-    isGeneratingEnding: false,
-    endingError: null
-  });
+    // Mock the stores
+    useNarrativeStore.setState({
+      currentEnding: ending,
+      isGeneratingEnding: false,
+      endingError: null,
+    });
 
-  useCharacterStore.setState({
-    characters: { 'char-123': mockCharacter },
-    entities: { 'char-123': mockCharacter },
-    currentCharacterId: 'char-123',
-    currentEntityId: 'char-123'
-  });
+    useCharacterStore.setState({
+      characters: { 'char-123': mockCharacter },
+      entities: { 'char-123': mockCharacter },
+      currentCharacterId: 'char-123',
+      currentEntityId: 'char-123',
+    });
 
-  useWorldStore.setState({
-    worlds: { 'world-456': mockWorld },
-    entities: { 'world-456': mockWorld }
-  });
+    useWorldStore.setState({
+      worlds: { 'world-456': mockWorld },
+      entities: { 'world-456': mockWorld },
+    });
 
-  // Mock fetch API for ending image generation
-  const originalFetch = global.fetch;
-  global.fetch = ((url: string | Request, init?: RequestInit) => {
-    const urlString = typeof url === 'string' ? url : url.url;
-    if (urlString.includes('/api/generate-ending-image')) {
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          imageUrl: mockEndingImages[ending.tone as keyof typeof mockEndingImages] || mockEndingImages.triumphant
-        })
-      } as Response);
-    }
-    return originalFetch(url, init);
-  }) as typeof fetch;
+    // Mock fetch API for ending image generation
+    const originalFetch = global.fetch;
+    global.fetch = ((url: string | Request, init?: RequestInit) => {
+      const urlString = typeof url === 'string' ? url : url.url;
+      if (urlString.includes('/api/generate-ending-image')) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              imageUrl:
+                mockEndingImages[
+                  ending.tone as keyof typeof mockEndingImages
+                ] || mockEndingImages.triumphant,
+            }),
+        } as Response);
+      }
+      return originalFetch(url, init);
+    }) as typeof fetch;
 
-  // Cleanup mock after story renders
-  React.useEffect(() => {
-    return () => {
-      global.fetch = originalFetch;
-    };
-  }, [originalFetch]);
+    // Cleanup mock after story renders
+    React.useEffect(() => {
+      return () => {
+        global.fetch = originalFetch;
+      };
+    }, [originalFetch]);
 
-  return <Story />;
-};
+    return <Story />;
+  };
   return EndingStateDecorator;
 };
 
 export const Triumphant: Story = {
-  decorators: [withEndingState({
-    ...baseEnding,
-    tone: 'triumphant'
-  })],
+  decorators: [
+    withEndingState({
+      ...baseEnding,
+      tone: 'triumphant',
+    }),
+  ],
   parameters: {
     docs: {
       description: {
-        story: 'A triumphant ending celebrating victory and achievement.'
-      }
-    }
-  }
+        story: 'A triumphant ending celebrating victory and achievement.',
+      },
+    },
+  },
 };
 
-
 export const Mysterious: Story = {
-  decorators: [withEndingState({
-    ...baseEnding,
-    tone: 'mysterious',
-    epilogue: `The final battle ended not with clash of steel, but with whispered words in an ancient tongue. As the dark lord fell, his form began to shimmer and fade, revealing something impossible - he bore Aria's own face, twisted by shadow and time.
+  decorators: [
+    withEndingState({
+      ...baseEnding,
+      tone: 'mysterious',
+      epilogue: `The final battle ended not with clash of steel, but with whispered words in an ancient tongue. As the dark lord fell, his form began to shimmer and fade, revealing something impossible - he bore Aria's own face, twisted by shadow and time.
 
 "You understand now," he gasped with his final breath. "We are two sides of the same coin, forged in different fires."
 
 Aria felt reality shift around her as memories that weren't her own flooded her mind. The victory was complete, but the truth it revealed opened doors to questions she wasn't sure she wanted answered. The prophecy spoke of a chosen one, but it never mentioned what happened after the choosing was done.`,
-    characterLegacy: `The full truth of Aria Stormblade's destiny remained shrouded in mystery. Some claimed she ascended to become a guardian between worlds. Others whispered that she ventured into the spaces between realities, seeking answers to the riddle of her existence.
+      characterLegacy: `The full truth of Aria Stormblade's destiny remained shrouded in mystery. Some claimed she ascended to become a guardian between worlds. Others whispered that she ventured into the spaces between realities, seeking answers to the riddle of her existence.
 
 Her legend grew in the telling, becoming more myth than history. What was certain was that her sacrifice had meaning beyond the simple defeat of evil - she had stepped into a larger pattern, one that touched the very foundations of existence itself.`,
-    worldImpact: `Eldoria prospered, but the kingdom was forever changed by mysteries that Aria's victory had unveiled. Ancient texts were studied with new urgency, and scholars detected patterns in history that suggested cycles repeating across millennia.
+      worldImpact: `Eldoria prospered, but the kingdom was forever changed by mysteries that Aria's victory had unveiled. Ancient texts were studied with new urgency, and scholars detected patterns in history that suggested cycles repeating across millennia.
 
 The realm became a center of learning for those seeking to understand the deeper mysteries of existence. What had seemed like a simple tale of good versus evil revealed itself as one thread in an incomprehensible tapestry that spanned worlds and ages.`,
-    achievements: [
-      'Paradox Resolver', 
-      'Walker Between Worlds',
-      'Truth Seeker',
-      'Pattern Breaker',
-      'Guardian of Mysteries'
-    ]
-  })],
+      achievements: [
+        'Paradox Resolver',
+        'Walker Between Worlds',
+        'Truth Seeker',
+        'Pattern Breaker',
+        'Guardian of Mysteries',
+      ],
+    }),
+  ],
   parameters: {
     docs: {
       description: {
-        story: 'A mysterious ending that leaves questions unanswered and opens new possibilities.'
-      }
-    }
-  }
+        story:
+          'A mysterious ending that leaves questions unanswered and opens new possibilities.',
+      },
+    },
+  },
 };
 
 export const Tragic: Story = {
-  decorators: [withEndingState({
-    ...baseEnding,
-    tone: 'tragic',
-    epilogue: `The price of victory was everything. As Aria struck the killing blow against the dark lord, she felt her own life force being drawn away - the ancient magic demanded a soul for a soul, a truth the prophecies had hidden in their cryptic verses.
+  decorators: [
+    withEndingState({
+      ...baseEnding,
+      tone: 'tragic',
+      epilogue: `The price of victory was everything. As Aria struck the killing blow against the dark lord, she felt her own life force being drawn away - the ancient magic demanded a soul for a soul, a truth the prophecies had hidden in their cryptic verses.
 
 She collapsed beside her fallen enemy, her strength ebbing like the tide. Around her, the shadow armies crumbled to dust, and the cursed lands began to heal. The kingdom was saved, but its savior would not live to see the peace she had bought with her blood.
 
 With her final breath, Aria whispered a prayer for those she was leaving behind. The sunrise broke over a free Eldoria, painting the sky in colors that seemed to honor her sacrifice. The darkness was gone forever, but so was the light she had carried within her.`,
-    characterLegacy: `Aria Stormblade became Eldoria's greatest martyr, her sacrifice inspiring generations to come. Her tomb in the capital became a place of pilgrimage, where people came to remember that freedom's price is often paid by those who will never enjoy it.
+      characterLegacy: `Aria Stormblade became Eldoria's greatest martyr, her sacrifice inspiring generations to come. Her tomb in the capital became a place of pilgrimage, where people came to remember that freedom's price is often paid by those who will never enjoy it.
 
 Her story was told to children as both inspiration and warning - that heroism sometimes demands everything, but that such sacrifice is what separates the truly great from the merely ambitious. Schools were built in her name, teaching that service to others is the highest calling.`,
-    worldImpact: `Eldoria emerged from the shadow war transformed by sacrifice. The kingdom became a realm where selflessness was the highest virtue, where leaders were chosen not for their ambition but for their willingness to serve others before themselves.
+      worldImpact: `Eldoria emerged from the shadow war transformed by sacrifice. The kingdom became a realm where selflessness was the highest virtue, where leaders were chosen not for their ambition but for their willingness to serve others before themselves.
 
 A new order rose from the ashes, one dedicated to ensuring that no future hero would have to pay the price that Aria paid. The realm's scholars worked tirelessly to find ways to break such cruel magics, vowing that her sacrifice would be the last of its kind.`,
-    achievements: [
-      'Ultimate Sacrifice',
-      'Martyr of Eldoria',
-      'Soul-Price Payer',
-      'The Final Light',
-      'Eternal Guardian'
-    ]
-  })],
+      achievements: [
+        'Ultimate Sacrifice',
+        'Martyr of Eldoria',
+        'Soul-Price Payer',
+        'The Final Light',
+        'Eternal Guardian',
+      ],
+    }),
+  ],
   parameters: {
     docs: {
       description: {
-        story: 'A tragic ending where victory comes at the ultimate cost.'
-      }
-    }
-  }
+        story: 'A tragic ending where victory comes at the ultimate cost.',
+      },
+    },
+  },
 };
 
 export const Hopeful: Story = {
-  decorators: [withEndingState({
-    ...baseEnding,
-    tone: 'hopeful',
-    epilogue: `The dark lord's defeat was only the beginning. As his shadow lifted from the land, Aria discovered that the true magic of Eldoria wasn't in ancient spells or mighty weapons - it was in the connections between people, the bonds that had grown stronger in the darkness.
+  decorators: [
+    withEndingState({
+      ...baseEnding,
+      tone: 'hopeful',
+      epilogue: `The dark lord's defeat was only the beginning. As his shadow lifted from the land, Aria discovered that the true magic of Eldoria wasn't in ancient spells or mighty weapons - it was in the connections between people, the bonds that had grown stronger in the darkness.
 
 Standing before the assembled citizens of the realm, she made a choice that surprised everyone, including herself. She laid down her sword and picked up a teacher's staff, choosing to guide the next generation rather than rule them.
 
 "Our greatest victories," she announced to the cheering crowd, "are not the enemies we defeat, but the friends we lift up along the way." The future stretched before them, bright with possibility and rich with the promise of adventures yet to come.`,
-    characterLegacy: `Aria Stormblade's greatest achievement wasn't defeating the dark lord - it was showing an entire kingdom how to grow beyond their need for heroes. She became the realm's first Teacher-Guardian, establishing schools where young people learned not just to fight, but to dream, create, and build.
+      characterLegacy: `Aria Stormblade's greatest achievement wasn't defeating the dark lord - it was showing an entire kingdom how to grow beyond their need for heroes. She became the realm's first Teacher-Guardian, establishing schools where young people learned not just to fight, but to dream, create, and build.
 
 Her methods spread to other kingdoms, sparking a renaissance of learning and growth. The warrior who had saved one world became the teacher who helped countless others save themselves, proving that the most powerful magic is the ability to inspire others to greatness.`,
-    worldImpact: `Eldoria blossomed into an age of unprecedented prosperity and creativity. With Aria's guidance, the kingdom became known throughout the land as a place where anyone could come to learn, grow, and discover their own potential.
+      worldImpact: `Eldoria blossomed into an age of unprecedented prosperity and creativity. With Aria's guidance, the kingdom became known throughout the land as a place where anyone could come to learn, grow, and discover their own potential.
 
 The realm's approach to challenges shifted from combat to collaboration. Problems that once would have required heroes to solve were instead addressed by communities working together, creating solutions that were both more effective and more lasting than any sword could provide.`,
-    achievements: [
-      'Kingdom\'s Teacher',
-      'Hope Bringer',
-      'Future Builder',
-      'Community Creator',
-      'Inspiration to All'
-    ]
-  })],
+      achievements: [
+        "Kingdom's Teacher",
+        'Hope Bringer',
+        'Future Builder',
+        'Community Creator',
+        'Inspiration to All',
+      ],
+    }),
+  ],
   parameters: {
     docs: {
       description: {
-        story: 'A hopeful ending that emphasizes growth, learning, and building a better future.'
-      }
-    }
-  }
+        story:
+          'A hopeful ending that emphasizes growth, learning, and building a better future.',
+      },
+    },
+  },
 };

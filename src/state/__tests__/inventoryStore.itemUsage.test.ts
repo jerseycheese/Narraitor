@@ -44,9 +44,15 @@ describe('InventoryStore - Item Usage', () => {
         categories: [],
         itemOrder: [],
       },
-      background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
-        attributes: [],
-        skills: [],
+      background: {
+        history: 'A brave adventurer',
+        personality: 'Courageous',
+        goals: [],
+        fears: [],
+        relationships: [],
+      },
+      attributes: [],
+      skills: [],
       derivedStats: [],
     });
   });
@@ -101,8 +107,10 @@ describe('InventoryStore - Item Usage', () => {
       const item = useInventoryStore.getState().items[itemId];
       expect(item).toBeUndefined();
       // Verify character no longer has this item
-      const characterItems = useInventoryStore.getState().getCharacterItems(characterId);
-      expect(characterItems.find(i => i.id === itemId)).toBeUndefined();
+      const characterItems = useInventoryStore
+        .getState()
+        .getCharacterItems(characterId);
+      expect(characterItems.find((i) => i.id === itemId)).toBeUndefined();
     });
     it('should not reduce quantity for non-consumable items', () => {
       // Add non-consumable item
@@ -160,7 +168,9 @@ describe('InventoryStore - Item Usage', () => {
   });
   describe('Error handling', () => {
     it('should return error when item does not exist', () => {
-      const result = useInventoryStore.getState().useItem(characterId, 'non-existent-item');
+      const result = useInventoryStore
+        .getState()
+        .useItem(characterId, 'non-existent-item');
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error?.type).toBe('validation');
@@ -185,7 +195,13 @@ describe('InventoryStore - Item Usage', () => {
           categories: [],
           itemOrder: [],
         },
-        background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
+        background: {
+          history: 'Another adventurer',
+          personality: 'Mysterious',
+          goals: [],
+          fears: [],
+          relationships: [],
+        },
         attributes: [],
         skills: [],
         derivedStats: [],

@@ -7,7 +7,12 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 import { getTimestamp } from '@/lib/utils/timestamp';
-import { mockZustandStore, createMockSessionStore, createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
+import {
+  mockZustandStore,
+  createMockSessionStore,
+  createMockWorldStore,
+  createMockCharacterStore,
+} from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -35,25 +40,38 @@ describe('QuickPlay', () => {
 
   describe('when no saved sessions exist', () => {
     beforeEach(() => {
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-        savedSessions: {},
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-      }));
-      mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>, createMockWorldStore({
-        worlds: {},
-      }));
-      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
-        characters: {},
-      }));
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
+          savedSessions: {},
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+        })
+      );
+      mockZustandStore(
+        useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+        createMockWorldStore({
+          worlds: {},
+        })
+      );
+      mockZustandStore(
+        useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+        createMockCharacterStore({
+          characters: {},
+        })
+      );
     });
 
     it('should show "Start New Game" button', () => {
       render(<QuickPlay />);
 
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /continue last game/i })
+      ).not.toBeInTheDocument();
     });
 
     it('should navigate to worlds page when "Start New Game" is clicked', () => {
@@ -126,30 +144,41 @@ describe('QuickPlay', () => {
     };
 
     beforeEach(() => {
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-        savedSessions: {
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
-      }));
-      mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>, createMockWorldStore({
-        worlds: {
-          'world-1': mockWorld,
-        },
-      }));
-      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
-        characters: {
-          'char-1': mockCharacter,
-        },
-      }));
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
+          savedSessions: {
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        })
+      );
+      mockZustandStore(
+        useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+        createMockWorldStore({
+          worlds: {
+            'world-1': mockWorld,
+          },
+        })
+      );
+      mockZustandStore(
+        useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+        createMockCharacterStore({
+          characters: {
+            'char-1': mockCharacter,
+          },
+        })
+      );
     });
 
     it('should show "Continue Last Game" button with world and character info', () => {
       render(<QuickPlay />);
 
-      expect(screen.getByRole('button', { name: /continue last game/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /continue last game/i })
+      ).toBeInTheDocument();
       expect(screen.getByText(/test world/i)).toBeInTheDocument();
       expect(screen.getByText(/test hero/i)).toBeInTheDocument();
       expect(screen.getByText(/5 entries/i)).toBeInTheDocument();
@@ -158,23 +187,30 @@ describe('QuickPlay', () => {
     it('should also show "Start New Game" as secondary option', () => {
       render(<QuickPlay />);
 
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
     });
 
     it('should resume session and navigate when "Continue Last Game" is clicked', async () => {
       const mockResume = jest.fn().mockReturnValue(true);
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-        savedSessions: {
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: mockResume,
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
-      }));
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
+          savedSessions: {
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: mockResume,
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        })
+      );
 
       render(<QuickPlay />);
 
-      fireEvent.click(screen.getByRole('button', { name: /continue last game/i }));
+      fireEvent.click(
+        screen.getByRole('button', { name: /continue last game/i })
+      );
 
       await waitFor(() => {
         expect(mockResume).toHaveBeenCalledWith('session-1');
@@ -189,15 +225,18 @@ describe('QuickPlay', () => {
         lastPlayed: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
       };
 
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-        savedSessions: {
-          'session-old': olderSession,
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
-      }));
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
+          savedSessions: {
+            'session-old': olderSession,
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        })
+      );
 
       render(<QuickPlay />);
 
@@ -214,21 +253,26 @@ describe('QuickPlay', () => {
         mockCleanupSessionData = cleanupSessionData as jest.Mock;
         mockCleanupSessionData.mockClear();
 
-        mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-          savedSessions: {
-            'session-1': mockSavedSession,
-          },
-          resumeSavedSession: jest.fn().mockReturnValue(true),
-          deleteSavedSession: mockDeleteSavedSession,
-          onboardingCompleted: true,
-          shouldShowOnboarding: () => false,
-        }));
+        mockZustandStore(
+          useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+          createMockSessionStore({
+            savedSessions: {
+              'session-1': mockSavedSession,
+            },
+            resumeSavedSession: jest.fn().mockReturnValue(true),
+            deleteSavedSession: mockDeleteSavedSession,
+            onboardingCompleted: true,
+            shouldShowOnboarding: () => false,
+          })
+        );
       });
 
       it('should show delete button on campaign card', () => {
         render(<QuickPlay />);
 
-        expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /delete/i })
+        ).toBeInTheDocument();
       });
 
       it('should open confirmation dialog when delete button is clicked', () => {
@@ -263,7 +307,9 @@ describe('QuickPlay', () => {
         });
 
         // Click the confirm delete button in the dialog
-        const confirmButton = screen.getByRole('button', { name: /Delete Test World - Test Hero/i });
+        const confirmButton = screen.getByRole('button', {
+          name: /Delete Test World - Test Hero/i,
+        });
         fireEvent.click(confirmButton);
 
         await waitFor(() => {
@@ -273,51 +319,71 @@ describe('QuickPlay', () => {
 
       it('should show "Start New Game" after campaign is deleted', () => {
         // Mock empty sessions after deletion
-        mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-          savedSessions: {},
-          resumeSavedSession: jest.fn().mockReturnValue(true),
-          deleteSavedSession: mockDeleteSavedSession,
-          onboardingCompleted: true,
-          shouldShowOnboarding: () => false,
-        }));
+        mockZustandStore(
+          useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+          createMockSessionStore({
+            savedSessions: {},
+            resumeSavedSession: jest.fn().mockReturnValue(true),
+            deleteSavedSession: mockDeleteSavedSession,
+            onboardingCompleted: true,
+            shouldShowOnboarding: () => false,
+          })
+        );
 
         render(<QuickPlay />);
 
-        expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /start new game/i })
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', { name: /continue last game/i })
+        ).not.toBeInTheDocument();
       });
     });
   });
 
   describe('when saved session references deleted world/character', () => {
     beforeEach(() => {
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore({
-        savedSessions: {
-          'session-1': {
-            id: 'session-1',
-            worldId: 'deleted-world',
-            characterId: 'deleted-char',
-            lastPlayed: getTimestamp(),
-            narrativeCount: 3,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+        createMockSessionStore({
+          savedSessions: {
+            'session-1': {
+              id: 'session-1',
+              worldId: 'deleted-world',
+              characterId: 'deleted-char',
+              lastPlayed: getTimestamp(),
+              narrativeCount: 3,
+            },
           },
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
-      }));
-      mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>, createMockWorldStore({
-        worlds: {},
-      }));
-      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
-        characters: {},
-      }));
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        })
+      );
+      mockZustandStore(
+        useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+        createMockWorldStore({
+          worlds: {},
+        })
+      );
+      mockZustandStore(
+        useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+        createMockCharacterStore({
+          characters: {},
+        })
+      );
     });
 
     it('should not show "Continue Last Game" button', () => {
       render(<QuickPlay />);
 
-      expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /continue last game/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
     });
   });
 });

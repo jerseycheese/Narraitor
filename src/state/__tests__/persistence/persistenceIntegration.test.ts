@@ -18,21 +18,20 @@ jest.mock('../../persistence', () => {
         }
         return Promise.resolve();
       }),
-      removeItem: jest.fn().mockResolvedValue(undefined)
+      removeItem: jest.fn().mockResolvedValue(undefined),
     };
-
 
     // Store reference globally for tests
     if (typeof global !== 'undefined') {
-      (global as { __testMockStorage?: MockStorage }).__testMockStorage = storage;
+      (global as { __testMockStorage?: MockStorage }).__testMockStorage =
+        storage;
     }
-
 
     return storage;
   };
 
   return {
-    createIndexedDBStorage: createMockStorage
+    createIndexedDBStorage: createMockStorage,
   };
 });
 
@@ -46,7 +45,7 @@ import { useCharacterStore } from '../../characterStore';
 // Mock indexedDB
 const mockIndexedDB = {
   deleteDatabase: jest.fn(),
-  open: jest.fn()
+  open: jest.fn(),
 };
 
 describe('Persistence Integration - MVP', () => {
@@ -60,10 +59,9 @@ describe('Persistence Integration - MVP', () => {
     // Clear all mocks
     jest.clearAllMocks();
 
-
     // Get the mock storage
-    mockStorage = (global as { __testMockStorage?: typeof mockStorage }).__testMockStorage as typeof mockStorage;
-
+    mockStorage = (global as { __testMockStorage?: typeof mockStorage })
+      .__testMockStorage as typeof mockStorage;
 
     // Reset mock functions
     if (mockStorage) {
@@ -73,18 +71,18 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.getItem.mockResolvedValue(null);
     }
 
-
     // Reset stores using their reset methods
     useWorldStore.getState().reset();
     useCharacterStore.getState().reset();
 
-
     // Mock global indexedDB
-    (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
+    (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB =
+      mockIndexedDB;
   });
 
   afterEach(() => {
-    delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+    delete (global as unknown as { indexedDB?: typeof mockIndexedDB })
+      .indexedDB;
   });
 
   describe('basic persistence functionality', () => {
@@ -109,11 +107,11 @@ describe('Persistence Integration - MVP', () => {
           personality: 'Bold',
           goals: ['Adventure'],
           fears: [],
-          relationships: []
+          relationships: [],
         },
         isPlayer: true,
         inventory: {
-          characterId: "",
+          characterId: '',
           items: [],
           capacity: 20,
           categories: [],
@@ -122,8 +120,8 @@ describe('Persistence Integration - MVP', () => {
         status: {
           health: 100,
           maxHealth: 100,
-          conditions: []
-        }
+          conditions: [],
+        },
       });
 
       // Advance timers and flush promises
@@ -132,7 +130,9 @@ describe('Persistence Integration - MVP', () => {
 
       // Check if character was persisted
       const characterPersisted = mockStorage.setItem.mock.calls.some(
-        call => call[0] === 'narraitor-character-store' && call[1].includes(characterId)
+        (call) =>
+          call[0] === 'narraitor-character-store' &&
+          call[1].includes(characterId)
       );
 
       expect(characterPersisted).toBe(true);
@@ -151,16 +151,16 @@ describe('Persistence Integration - MVP', () => {
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
-        description: "A test world for persistence testing",
+        description: 'A test world for persistence testing',
         genre: 'fantasy',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
-          skillPointPool: 20
-        }
+          skillPointPool: 20,
+        },
       });
 
       // Create a character referencing the world
@@ -177,11 +177,11 @@ describe('Persistence Integration - MVP', () => {
           personality: 'Bold',
           goals: ['Adventure'],
           fears: [],
-          relationships: []
+          relationships: [],
         },
         isPlayer: true,
         inventory: {
-          characterId: "",
+          characterId: '',
           items: [],
           capacity: 20,
           categories: [],
@@ -190,8 +190,8 @@ describe('Persistence Integration - MVP', () => {
         status: {
           health: 100,
           maxHealth: 100,
-          conditions: []
-        }
+          conditions: [],
+        },
       });
 
       // Advance timers and flush promises
@@ -200,8 +200,9 @@ describe('Persistence Integration - MVP', () => {
 
       // Check if the character was persisted with the correct world reference
       const useCharacterStoreCall = mockStorage.setItem.mock.calls.find(
-        call => call[0] === 'narraitor-character-store' && 
-        call[1].includes(characterId)
+        (call) =>
+          call[0] === 'narraitor-character-store' &&
+          call[1].includes(characterId)
       );
 
       expect(useCharacterStoreCall).toBeDefined();
@@ -220,21 +221,22 @@ describe('Persistence Integration - MVP', () => {
   describe('error handling and fallback', () => {
     test('should work without IndexedDB', async () => {
       // Remove IndexedDB
-      delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+      delete (global as unknown as { indexedDB?: typeof mockIndexedDB })
+        .indexedDB;
 
       // Stores should still function without persistence
       const worldId = useWorldStore.getState().createWorld({
         name: 'Fallback World',
-        description: "A test world for persistence testing",
+        description: 'A test world for persistence testing',
         genre: 'fantasy',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
-          skillPointPool: 20
-        }
+          skillPointPool: 20,
+        },
       });
 
       expect(worldId).toBeDefined();
@@ -256,16 +258,16 @@ describe('Persistence Integration - MVP', () => {
       // Store should still function despite errors
       const worldId = useWorldStore.getState().createWorld({
         name: 'Error Test World',
-        description: "A test world for persistence testing",
+        description: 'A test world for persistence testing',
         genre: 'fantasy',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
-          skillPointPool: 20
-        }
+          skillPointPool: 20,
+        },
       });
 
       expect(worldId).toBeDefined();

@@ -1,6 +1,6 @@
 /**
  * Test Data Factory
- * 
+ *
  * Centralized factory for creating mock objects used in tests.
  * Provides consistent test data with sensible defaults that can be overridden.
  */
@@ -14,7 +14,7 @@ import type {
   JournalEntry,
   JournalEntryType,
   InventoryItem,
-  Decision
+  Decision,
 } from '@/types';
 import type { Character } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils';
@@ -40,7 +40,7 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
     genre: 'fantasy',
     attributes: [],
     skills: [],
-        settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 20,
       attributePointPool: 30,
@@ -55,7 +55,9 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
 /**
  * Creates a mock WorldAttribute object
  */
-export function createMockWorldAttribute(overrides: Partial<WorldAttribute> = {}): WorldAttribute {
+export function createMockWorldAttribute(
+  overrides: Partial<WorldAttribute> = {}
+): WorldAttribute {
   return {
     id: overrides.id || generateUniqueId('attr'),
     worldId: 'world-test-1',
@@ -72,7 +74,9 @@ export function createMockWorldAttribute(overrides: Partial<WorldAttribute> = {}
 /**
  * Creates a mock WorldSkill object
  */
-export function createMockWorldSkill(overrides: Partial<WorldSkill> = {}): WorldSkill {
+export function createMockWorldSkill(
+  overrides: Partial<WorldSkill> = {}
+): WorldSkill {
   return {
     id: overrides.id || generateUniqueId('skill'),
     worldId: 'world-test-1',
@@ -90,7 +94,9 @@ export function createMockWorldSkill(overrides: Partial<WorldSkill> = {}): World
 /**
  * Creates a mock Character object with sensible defaults
  */
-export function createMockCharacter(overrides: Partial<Character> = {}): Character {
+export function createMockCharacter(
+  overrides: Partial<Character> = {}
+): Character {
   return {
     id: overrides.id || generateUniqueId('char'),
     worldId: 'world-test-1',
@@ -99,9 +105,9 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
     level: 1,
     isPlayer: false,
     attributes: [],
-        skills: [],
+    skills: [],
     derivedStats: [],
-  background: {
+    background: {
       history: 'Test history',
       personality: 'Test personality',
       goals: ['Test goal 1', 'Test goal 2'],
@@ -113,9 +119,24 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
       items: [],
       capacity: 10,
       categories: [
-        { id: 'equipment', name: 'Equipment', description: 'Weapons, armor, and gear', sortOrder: 0 },
-        { id: 'consumables', name: 'Consumables', description: 'Potions and single-use items', sortOrder: 1 },
-        { id: 'quest-items', name: 'Quest Items', description: 'Important story items', sortOrder: 2 }
+        {
+          id: 'equipment',
+          name: 'Equipment',
+          description: 'Weapons, armor, and gear',
+          sortOrder: 0,
+        },
+        {
+          id: 'consumables',
+          name: 'Consumables',
+          description: 'Potions and single-use items',
+          sortOrder: 1,
+        },
+        {
+          id: 'quest-items',
+          name: 'Quest Items',
+          description: 'Important story items',
+          sortOrder: 2,
+        },
       ],
       itemOrder: [],
     },
@@ -133,7 +154,9 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
 /**
  * Creates a mock GameSession object
  */
-export function createMockSession(overrides: Partial<GameSession> = {}): GameSession {
+export function createMockSession(
+  overrides: Partial<GameSession> = {}
+): GameSession {
   return {
     id: overrides.id || generateUniqueId('session'),
     worldId: 'world-test-1',
@@ -159,7 +182,9 @@ export function createMockSession(overrides: Partial<GameSession> = {}): GameSes
 /**
  * Creates a mock NarrativeSegment object
  */
-export function createMockNarrativeSegment(overrides: Partial<NarrativeSegment> = {}): NarrativeSegment {
+export function createMockNarrativeSegment(
+  overrides: Partial<NarrativeSegment> = {}
+): NarrativeSegment {
   return {
     id: overrides.id || generateUniqueId('seg'),
     worldId: 'world-test-1',
@@ -182,7 +207,9 @@ export function createMockNarrativeSegment(overrides: Partial<NarrativeSegment> 
 /**
  * Creates a mock Decision object
  */
-export function createMockDecision(overrides: Partial<Decision> = {}): Decision {
+export function createMockDecision(
+  overrides: Partial<Decision> = {}
+): Decision {
   return {
     id: overrides.id || generateUniqueId('decision'),
     prompt: 'What do you want to do?',
@@ -199,7 +226,9 @@ export function createMockDecision(overrides: Partial<Decision> = {}): Decision 
 /**
  * Creates a mock PlayerChoice object
  */
-export function createMockPlayerChoice(overrides: Partial<PlayerChoice> = {}): PlayerChoice {
+export function createMockPlayerChoice(
+  overrides: Partial<PlayerChoice> = {}
+): PlayerChoice {
   return {
     id: overrides.id || generateUniqueId('choice'),
     text: 'Test choice',
@@ -211,7 +240,9 @@ export function createMockPlayerChoice(overrides: Partial<PlayerChoice> = {}): P
 /**
  * Creates a mock JournalEntry object
  */
-export function createMockJournalEntry(overrides: Partial<JournalEntry> = {}): JournalEntry {
+export function createMockJournalEntry(
+  overrides: Partial<JournalEntry> = {}
+): JournalEntry {
   return {
     id: overrides.id || generateUniqueId('journal'),
     sessionId: 'session-test-1',
@@ -236,7 +267,9 @@ export function createMockJournalEntry(overrides: Partial<JournalEntry> = {}): J
 /**
  * Creates a mock InventoryItem object
  */
-export function createMockInventoryItem(overrides: Partial<InventoryItem> = {}): InventoryItem {
+export function createMockInventoryItem(
+  overrides: Partial<InventoryItem> = {}
+): InventoryItem {
   const categoryId = overrides.categoryId ?? 'equipment';
   const quantity = overrides.quantity ?? 1;
 
@@ -248,23 +281,20 @@ export function createMockInventoryItem(overrides: Partial<InventoryItem> = {}):
     quantity,
     stackable: overrides.stackable ?? false,
     maxStack: overrides.maxStack,
-    acquisitionHistory:
-      overrides.acquisitionHistory ?? [
-        {
-          acquiredAt: DEFAULT_TIMESTAMP,
-          method: 'manual',
-          quantity,
-        },
-      ],
-    categorization:
-      overrides.categorization ?? {
-        categoryId,
-        source: 'manual',
-        classifiedAt: DEFAULT_TIMESTAMP,
-        confidence: 0.9,
+    acquisitionHistory: overrides.acquisitionHistory ?? [
+      {
+        acquiredAt: DEFAULT_TIMESTAMP,
+        method: 'manual',
+        quantity,
       },
+    ],
+    categorization: overrides.categorization ?? {
+      categoryId,
+      source: 'manual',
+      classifiedAt: DEFAULT_TIMESTAMP,
+      confidence: 0.9,
+    },
     createdAt: overrides.createdAt ?? DEFAULT_TIMESTAMP,
     updatedAt: overrides.updatedAt ?? DEFAULT_TIMESTAMP,
   };
 }
-

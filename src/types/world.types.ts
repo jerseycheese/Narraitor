@@ -1,6 +1,11 @@
 // src/types/world.types.ts
 
-import { EntityID, GeneratedImage, NamedEntity, TimestampedEntity } from './common.types';
+import {
+  EntityID,
+  GeneratedImage,
+  NamedEntity,
+  TimestampedEntity,
+} from './common.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { ToneSettings } from './tone-settings.types';
 import { GenreValue } from '@/lib/constants/genres';
@@ -53,12 +58,12 @@ export interface WorldSkill extends NamedEntity {
 export interface DerivedStatFormula extends NamedEntity {
   worldId: EntityID;
   description: string;
-  baseValue?: number;  // Optional base value to add (e.g., 10 for AC-style stats)
+  baseValue?: number; // Optional base value to add (e.g., 10 for AC-style stats)
   attributeMultipliers: {
-    [attributeId: string]: number;  // Map of attributeId -> multiplier
+    [attributeId: string]: number; // Map of attributeId -> multiplier
   };
-  minValue?: number;  // Optional minimum value
-  maxValue?: number;  // Optional maximum value
+  minValue?: number; // Optional minimum value
+  maxValue?: number; // Optional maximum value
 }
 
 /**
@@ -69,5 +74,5 @@ export interface WorldSettings {
   maxSkills: number;
   attributePointPool: number;
   skillPointPool: number;
-  derivedStatFormulas?: DerivedStatFormula[];  // AI-generated stat formulas
+  derivedStatFormulas?: DerivedStatFormula[]; // AI-generated stat formulas
 }

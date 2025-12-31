@@ -7,7 +7,10 @@ import type { Character } from '../characterStore';
 import type { EntityID } from '@/types/common.types';
 
 // Re-export centralized timer utilities
-export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+export {
+  setupTestTimers,
+  cleanupTestTimers,
+} from '@/lib/test-utils/testTimers';
 
 // Type for creating test characters (omits fields added by store)
 type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
@@ -15,7 +18,9 @@ type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
 /**
  * Creates basic character test data
  */
-export function createTestCharacterData(overrides?: Partial<CharacterInput>): CharacterInput {
+export function createTestCharacterData(
+  overrides?: Partial<CharacterInput>
+): CharacterInput {
   const characterId: EntityID = '';
 
   return {
@@ -24,20 +29,20 @@ export function createTestCharacterData(overrides?: Partial<CharacterInput>): Ch
     worldId: 'world-1',
     level: 1,
     attributes: [],
-        skills: [],
+    skills: [],
     derivedStats: [],
-  background: {
+    background: {
       history: 'A test character',
       personality: 'Friendly',
       goals: ['Testing'],
       fears: [],
-      relationships: []
+      relationships: [],
     },
     isPlayer: true,
     status: {
       health: 100,
       maxHealth: 100,
-      conditions: []
+      conditions: [],
     },
     inventory: {
       characterId,
@@ -46,7 +51,7 @@ export function createTestCharacterData(overrides?: Partial<CharacterInput>): Ch
       categories: [],
       itemOrder: [],
     },
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -62,8 +67,8 @@ export function createAttributeTestCharacter() {
       personality: 'Analytical',
       goals: [],
       fears: [],
-      relationships: []
-    }
+      relationships: [],
+    },
   });
 }
 
@@ -79,7 +84,7 @@ export function createSkillTestCharacter() {
       personality: 'Skilled',
       goals: [],
       fears: [],
-      relationships: []
-    }
+      relationships: [],
+    },
   });
 }

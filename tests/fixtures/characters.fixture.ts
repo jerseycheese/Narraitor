@@ -13,7 +13,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
     worldId: 'world-cyberpunk-2077',
     level: 3,
     isPlayer: true,
-        attributes: [
+    attributes: [
       {
         id: 'char-attr-tech-level',
         characterId: 'char-cyberpunk-hacker',
@@ -31,7 +31,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 6,
       },
     ],
-        skills: [
+    skills: [
       {
         id: 'char-skill-hacking',
         characterId: 'char-cyberpunk-hacker',
@@ -89,7 +89,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
     worldId: 'world-cyberpunk-2077',
     level: 2,
     isPlayer: false,
-        attributes: [
+    attributes: [
       {
         id: 'char-attr-tech-level-2',
         characterId: 'char-cyberpunk-operative',
@@ -107,7 +107,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 7,
       },
     ],
-        skills: [
+    skills: [
       {
         id: 'char-skill-hacking-2',
         characterId: 'char-cyberpunk-operative',
@@ -157,7 +157,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
     worldId: 'world-fantasy-realm',
     level: 4,
     isPlayer: true,
-        attributes: [
+    attributes: [
       {
         id: 'char-attr-magic-power',
         characterId: 'char-fantasy-mage',
@@ -175,7 +175,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 4,
       },
     ],
-        skills: [
+    skills: [
       {
         id: 'char-skill-spellcasting',
         characterId: 'char-fantasy-mage',
@@ -227,7 +227,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
     worldId: 'world-fantasy-realm',
     level: 2,
     isPlayer: false,
-        attributes: [
+    attributes: [
       {
         id: 'char-attr-magic-power-2',
         characterId: 'char-fantasy-ranger',
@@ -245,7 +245,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 1,
       },
     ],
-        skills: [
+    skills: [
       {
         id: 'char-skill-spellcasting-2',
         characterId: 'char-fantasy-ranger',

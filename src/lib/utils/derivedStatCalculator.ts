@@ -32,19 +32,21 @@ export function calculateDerivedStat(
   let total = formula.baseValue ?? 0;
 
   // Apply each attribute multiplier
-  Object.entries(formula.attributeMultipliers).forEach(([attrId, multiplier]) => {
-    // Find the matching attribute by worldAttributeId or id
-    const attribute = characterAttributes.find(
-      attr => attr.worldAttributeId === attrId || attr.id === attrId
-    );
+  Object.entries(formula.attributeMultipliers).forEach(
+    ([attrId, multiplier]) => {
+      // Find the matching attribute by worldAttributeId or id
+      const attribute = characterAttributes.find(
+        (attr) => attr.worldAttributeId === attrId || attr.id === attrId
+      );
 
-    if (attribute) {
-      // Use modifiedValue if available, fall back to baseValue
-      const value = attribute.modifiedValue ?? attribute.baseValue;
-      total += value * multiplier;
+      if (attribute) {
+        // Use modifiedValue if available, fall back to baseValue
+        const value = attribute.modifiedValue ?? attribute.baseValue;
+        total += value * multiplier;
+      }
+      // If attribute not found, skip it (graceful handling)
     }
-    // If attribute not found, skip it (graceful handling)
-  });
+  );
 
   // Round to whole number
   let result = Math.round(total);
@@ -71,7 +73,7 @@ export function calculateAllDerivedStats(
   formulas: DerivedStatFormula[],
   characterAttributes: CharacterAttribute[]
 ): number[] {
-  return formulas.map(formula =>
+  return formulas.map((formula) =>
     calculateDerivedStat(formula, characterAttributes)
   );
 }
@@ -103,7 +105,9 @@ export function validateFormula(
 
     // Validate multiplier is a valid number
     if (typeof multiplier !== 'number' || isNaN(multiplier)) {
-      errors.push(`Multiplier for attribute "${attrId}" must be a valid number`);
+      errors.push(
+        `Multiplier for attribute "${attrId}" must be a valid number`
+      );
     }
   });
 
@@ -118,6 +122,6 @@ export function validateFormula(
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }

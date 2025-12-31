@@ -6,7 +6,13 @@ import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { DerivedStat } from '../types/character.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
+import {
+  safeTrim,
+  normalizeText,
+  NORM_NAME,
+  NORM_DESC,
+  getTimestamp,
+} from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 import { useInventoryStore } from './inventoryStore';
@@ -43,7 +49,12 @@ interface CharacterBackground {
   physicalDescription?: string;
   relationships: unknown[];
   isKnownFigure?: boolean;
-  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
+  knownFigureType?:
+    | 'historical'
+    | 'fictional'
+    | 'celebrity'
+    | 'mythological'
+    | 'other';
 }
 
 interface CharacterStatus {
@@ -85,7 +96,7 @@ export interface Character {
 const addCharacterToRoster = (
   rosters: Record<EntityID, EntityID[]>,
   worldId: EntityID,
-  characterId: EntityID,
+  characterId: EntityID
 ): Record<EntityID, EntityID[]> => {
   const existingRoster = rosters[worldId] ?? [];
   if (existingRoster.includes(characterId)) {
@@ -101,7 +112,7 @@ const addCharacterToRoster = (
 const removeCharacterFromRoster = (
   rosters: Record<EntityID, EntityID[]>,
   worldId: EntityID,
-  characterId: EntityID,
+  characterId: EntityID
 ): Record<EntityID, EntityID[]> => {
   const existingRoster = rosters[worldId];
   if (!existingRoster) {
@@ -126,7 +137,7 @@ const removeCharacterFromRoster = (
 };
 
 const buildWorldCharacterIds = (
-  characters: Record<EntityID, Character>,
+  characters: Record<EntityID, Character>
 ): Record<EntityID, EntityID[]> => {
   const rosters: Record<EntityID, EntityID[]> = {};
 
@@ -158,7 +169,9 @@ export interface CharacterStore extends CrudStore<Character> {
   syncDerivedState: () => void;
 
   // Actions
-  createCharacter: (character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  createCharacter: (
+    character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
+  ) => EntityID;
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
   deleteCharacter: (id: EntityID) => void;
   setCurrentCharacter: (id: EntityID) => void;
@@ -168,18 +181,31 @@ export interface CharacterStore extends CrudStore<Character> {
   getWorldRoster: (worldId: EntityID) => EntityID[];
 
   // Attribute management
-  addAttribute: (characterId: EntityID, attribute: Omit<CharacterAttribute, 'id' | 'characterId'>) => void;
-  updateAttribute: (characterId: EntityID, attributeId: EntityID, updates: Partial<CharacterAttribute>) => void;
+  addAttribute: (
+    characterId: EntityID,
+    attribute: Omit<CharacterAttribute, 'id' | 'characterId'>
+  ) => void;
+  updateAttribute: (
+    characterId: EntityID,
+    attributeId: EntityID,
+    updates: Partial<CharacterAttribute>
+  ) => void;
   removeAttribute: (characterId: EntityID, attributeId: EntityID) => void;
 
   // Skill management
-  addSkill: (characterId: EntityID, skill: Omit<CharacterSkill, 'id' | 'characterId'>) => void;
+  addSkill: (
+    characterId: EntityID,
+    skill: Omit<CharacterSkill, 'id' | 'characterId'>
+  ) => void;
 
   // Derived stats management
   recalculateDerivedStats: (characterId: EntityID) => void;
 
   // Path Count Optimization
-  cleanupCharacterHistory: (worldId?: EntityID, keepRecentCount?: number) => void;
+  cleanupCharacterHistory: (
+    worldId?: EntityID,
+    keepRecentCount?: number
+  ) => void;
   compactCharacterData: () => void;
   getCharactersCount: (worldId?: EntityID) => number;
 
@@ -195,527 +221,661 @@ export interface CharacterStore extends CrudStore<Character> {
 
 // Initial state
 const getInitialState = () => ({
-    characters: {},
-    entities: {},
-    worldCharacterIds: {},
-    currentCharacterId: null,
-    currentEntityId: null,
-    error: null,
-    loading: false,
+  characters: {},
+  entities: {},
+  worldCharacterIds: {},
+  currentCharacterId: null,
+  currentEntityId: null,
+  error: null,
+  loading: false,
 });
 
 // Character Store implementation with persistence
-export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
-  persist(
-    (set, get) => {
-      return {
-        characters: {},
-        entities: {},
-        worldCharacterIds: {},
-        currentCharacterId: null,
-        currentEntityId: null,
-        error: null,
-        loading: false,
+export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
+  create<CharacterStore>()(
+    persist(
+      (set, get) => {
+        return {
+          characters: {},
+          entities: {},
+          worldCharacterIds: {},
+          currentCharacterId: null,
+          currentEntityId: null,
+          error: null,
+          loading: false,
 
-        create: (characterData) => {
-          if (!characterData.name || safeTrim(characterData.name) === '') {
-            throw new Error('Character name is required');
-          }
-
-          const characterId = generateUniqueId('char');
-          const now = getTimestamp();
-
-          const normalizedBackground = characterData.background ? {
-            ...characterData.background,
-            physicalDescription: characterData.background.physicalDescription ? normalizeText(characterData.background.physicalDescription, NORM_DESC) : undefined,
-            personality: normalizeText(characterData.background.personality || '', NORM_DESC),
-            history: normalizeText(characterData.background.history || '', NORM_DESC)
-          } : characterData.background;
-
-          const normalizedName = normalizeText(characterData.name, NORM_NAME);
-
-          const attributes = characterData.attributes?.map(attr => ({
-            ...attr,
-            characterId,
-          })) || [];
-
-          const skills = characterData.skills?.map(skill => ({
-            ...skill,
-            characterId,
-          })) || [];
-
-          const derivedStats = characterData.derivedStats || [];
-
-          const inventory = {
-            ...characterData.inventory,
-            characterId,
-          };
-
-          const newCharacter: Character = {
-            ...characterData,
-            id: characterId,
-            name: normalizedName,
-            background: normalizedBackground,
-            inventory,
-            attributes,
-            skills,
-            derivedStats,
-            level: characterData.level || 1,
-            createdAt: now,
-            updatedAt: now,
-          };
-
-          set((state) => ({
-            characters: {
-              ...state.characters,
-              [characterId]: newCharacter,
-            },
-            entities: {
-              ...state.entities,
-              [characterId]: newCharacter,
-            },
-            worldCharacterIds: addCharacterToRoster(
-              state.worldCharacterIds ?? {},
-              newCharacter.worldId,
-              characterId,
-            ),
-            error: null,
-          }));
-
-          return characterId;
-        },
-
-        update: (id, updates) => {
-          const character = get().characters[id];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          const previousWorldId = character.worldId;
-
-          const normalizedUpdates: Partial<Character> = { ...updates };
-
-          if (updates?.name) {
-            normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
-          }
-
-          if (updates?.background) {
-            const mergedBackground = {
-              ...character.background,
-              ...updates.background,
-            };
-
-            normalizedUpdates.background = {
-              ...mergedBackground,
-              physicalDescription: mergedBackground.physicalDescription ? normalizeText(mergedBackground.physicalDescription, NORM_DESC) : undefined,
-              personality: normalizeText(mergedBackground.personality || '', NORM_DESC),
-              history: normalizeText(mergedBackground.history || '', NORM_DESC),
-            };
-          }
-
-          if (updates?.inventory) {
-            normalizedUpdates.inventory = {
-              ...character.inventory,
-              ...updates.inventory,
-              characterId: id,
-            };
-          }
-
-          const updatedCharacter: Character = {
-            ...character,
-            ...normalizedUpdates,
-            inventory: normalizedUpdates.inventory ?? character.inventory,
-            background: normalizedUpdates.background ?? character.background,
-            updatedAt: getTimestamp(),
-          };
-
-          set((state) => {
-            const nextCharacters = {
-              ...state.characters,
-              [id]: updatedCharacter,
-            };
-
-            let nextWorldCharacterIds = state.worldCharacterIds ?? {};
-            if (previousWorldId !== updatedCharacter.worldId) {
-              const withoutPrevious = removeCharacterFromRoster(
-                nextWorldCharacterIds,
-                previousWorldId,
-                id,
-              );
-              nextWorldCharacterIds = addCharacterToRoster(
-                withoutPrevious,
-                updatedCharacter.worldId,
-                id,
-              );
+          create: (characterData) => {
+            if (!characterData.name || safeTrim(characterData.name) === '') {
+              throw new Error('Character name is required');
             }
 
-            return {
-              characters: nextCharacters,
+            const characterId = generateUniqueId('char');
+            const now = getTimestamp();
+
+            const normalizedBackground = characterData.background
+              ? {
+                  ...characterData.background,
+                  physicalDescription: characterData.background
+                    .physicalDescription
+                    ? normalizeText(
+                        characterData.background.physicalDescription,
+                        NORM_DESC
+                      )
+                    : undefined,
+                  personality: normalizeText(
+                    characterData.background.personality || '',
+                    NORM_DESC
+                  ),
+                  history: normalizeText(
+                    characterData.background.history || '',
+                    NORM_DESC
+                  ),
+                }
+              : characterData.background;
+
+            const normalizedName = normalizeText(characterData.name, NORM_NAME);
+
+            const attributes =
+              characterData.attributes?.map((attr) => ({
+                ...attr,
+                characterId,
+              })) || [];
+
+            const skills =
+              characterData.skills?.map((skill) => ({
+                ...skill,
+                characterId,
+              })) || [];
+
+            const derivedStats = characterData.derivedStats || [];
+
+            const inventory = {
+              ...characterData.inventory,
+              characterId,
+            };
+
+            const newCharacter: Character = {
+              ...characterData,
+              id: characterId,
+              name: normalizedName,
+              background: normalizedBackground,
+              inventory,
+              attributes,
+              skills,
+              derivedStats,
+              level: characterData.level || 1,
+              createdAt: now,
+              updatedAt: now,
+            };
+
+            set((state) => ({
+              characters: {
+                ...state.characters,
+                [characterId]: newCharacter,
+              },
               entities: {
                 ...state.entities,
-                [id]: updatedCharacter,
+                [characterId]: newCharacter,
               },
-              worldCharacterIds: nextWorldCharacterIds,
-              error: null,
-            };
-          });
-        },
-
-        delete: (id) => {
-          const character = get().characters[id];
-          if (!character) {
-            return;
-          }
-
-          // Clean up related data before deleting character
-          try {
-            const inventoryStore = useInventoryStore.getState();
-            inventoryStore.clearCharacterInventory(id);
-          } catch (error) {
-            console.warn('Failed to clean up inventory for deleted character', error);
-          }
-
-          set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedCharacter, ...remainingCharacters } = state.characters;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [id]: _removedEntity, ...remainingEntities } = state.entities;
-            const isCurrent = state.currentCharacterId === id || state.currentEntityId === id;
-
-            return {
-              characters: remainingCharacters,
-              entities: remainingEntities,
-              worldCharacterIds: removeCharacterFromRoster(
+              worldCharacterIds: addCharacterToRoster(
                 state.worldCharacterIds ?? {},
-                character.worldId,
-                id,
+                newCharacter.worldId,
+                characterId
               ),
-              currentCharacterId: isCurrent ? null : state.currentCharacterId,
-              currentEntityId: isCurrent ? null : state.currentEntityId,
               error: null,
-            };
-          });
-        },
+            }));
 
-        setCurrent: (id) => {
-          if (id && !get().characters[id]) {
-            set({
-              error: createStoreError('Character Not Found', 'The specified character could not be found'),
-              currentCharacterId: null,
-              currentEntityId: null,
-            });
-            return;
-          }
+            return characterId;
+          },
 
-          set({
-            currentCharacterId: id,
-            currentEntityId: id,
-            error: null,
-          });
-        },
-
-        getById: (id) => get().characters[id],
-        getAll: () => Object.values(get().characters),
-        getCharactersByWorld: (worldId) => {
-          const { characters, worldCharacterIds } = get();
-          const roster = worldCharacterIds[worldId] ?? [];
-          return roster
-            .map((characterId) => characters[characterId])
-            .filter((char): char is Character => Boolean(char));
-        },
-        getWorldRoster: (worldId) => {
-          const { worldCharacterIds } = get();
-          return [...(worldCharacterIds[worldId] ?? [])];
-        },
-
-        reset: () => set(getInitialState()),
-
-        setError: (error) => set({ error }),
-
-        clearError: () => set({ error: null }),
-        setLoading: (loading) => set({ loading }),
-        syncDerivedState: () => {
-          set((state) => {
-            const characters =
-              state.characters && typeof state.characters === 'object' ? state.characters : {};
-
-            const hasCharacters = Object.keys(characters).length > 0;
-
-            const isValidCharacterId = (id: EntityID | null | undefined) =>
-              Boolean(id && characters[id]);
-
-            const validCurrentCharacterId = isValidCharacterId(state.currentCharacterId)
-              ? state.currentCharacterId
-              : null;
-
-            const validCurrentEntityId = isValidCharacterId(state.currentEntityId)
-              ? state.currentEntityId
-              : null;
-
-            const fallbackId = validCurrentCharacterId ?? validCurrentEntityId ?? null;
-
-            const nextCurrentCharacterId = validCurrentCharacterId ?? fallbackId;
-            const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
-
-            return {
-              characters: hasCharacters ? characters : {},
-              entities: { ...characters },
-              worldCharacterIds: hasCharacters ? buildWorldCharacterIds(characters as Record<EntityID, Character>) : {},
-              currentCharacterId: hasCharacters ? nextCurrentCharacterId : null,
-              currentEntityId: hasCharacters ? nextCurrentEntityId : null,
-              error: state.error ?? null,
-              loading: state.loading ?? false,
-            };
-          });
-        },
-
-        // Domain-specific aliases
-        createCharacter: (characterData) => get().create(characterData),
-        updateCharacter: (id, updates) => get().update(id, updates),
-        deleteCharacter: (id) => get().delete(id),
-        setCurrentCharacter: (id) => get().setCurrent(id),
-
-        // Attribute management
-        addAttribute: (characterId, attributeData) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          const attributeId = generateUniqueId('attr');
-          const newAttribute: CharacterAttribute = {
-            ...attributeData,
-            id: attributeId,
-            characterId,
-          };
-
-          get().update(characterId, {
-            attributes: [...character.attributes, newAttribute],
-          });
-        },
-
-        updateAttribute: (characterId, attributeId, updates) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          const updatedAttributes = character.attributes?.map((attr) =>
-            attr.id === attributeId ? { ...attr, ...updates } : attr
-          ) || [];
-
-          get().update(characterId, {
-            attributes: updatedAttributes,
-          });
-
-          // Recalculate derived stats after attribute change
-          get().recalculateDerivedStats(characterId);
-        },
-
-        removeAttribute: (characterId, attributeId) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          const filteredAttributes = character.attributes?.filter(
-            (attr) => attr.id !== attributeId
-          ) || [];
-
-          get().update(characterId, {
-            attributes: filteredAttributes,
-          });
-        },
-
-        // Skill management
-        addSkill: (characterId, skillData) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          if ((character.skills?.length || 0) >= 2) {
-            set({ error: createStoreError('Maximum Skills Reached', 'This character has reached its maximum number of skills') });
-            return;
-          }
-
-          const skillId = generateUniqueId('skill');
-          const newSkill: CharacterSkill = {
-            ...skillData,
-            id: skillId,
-            characterId,
-          };
-
-          get().update(characterId, {
-            skills: [...character.skills, newSkill],
-          });
-        },
-
-        // Derived stats management
-        recalculateDerivedStats: (characterId) => {
-          const character = get().characters[characterId];
-          if (!character) {
-            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
-            return;
-          }
-
-          const world = useWorldStore.getState().worlds[character.worldId];
-          if (!world?.settings?.derivedStatFormulas || world.settings.derivedStatFormulas.length === 0) {
-            get().update(characterId, { derivedStats: [] });
-            return;
-          }
-
-          const formulas = world.settings.derivedStatFormulas;
-          const currentDerivedStats = character.derivedStats || [];
-
-          const updatedDerivedStats: DerivedStat[] = formulas.map(formula => {
-            const existingStat = currentDerivedStats.find(s => s.derivedStatId === formula.id);
-            const newMaxValue = calculateDerivedStat(formula, character.attributes);
-
-            let newCurrentValue: number;
-            if (existingStat && existingStat.maxValue > 0) {
-              // Preserve ratio when recalculating
-              const ratio = existingStat.currentValue / existingStat.maxValue;
-              newCurrentValue = Math.round(newMaxValue * ratio);
-            } else {
-              // Initialize to max for new stats
-              newCurrentValue = newMaxValue;
+          update: (id, updates) => {
+            const character = get().characters[id];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
             }
 
-            return {
-              id: existingStat?.id || generateUniqueId('dstat'),
-              characterId,
-              derivedStatId: formula.id,
-              name: formula.name,
-              currentValue: newCurrentValue,
-              maxValue: newMaxValue,
-              lastCalculated: getTimestamp()
-            };
-          });
+            const previousWorldId = character.worldId;
 
-          get().update(characterId, { derivedStats: updatedDerivedStats });
-        },
+            const normalizedUpdates: Partial<Character> = { ...updates };
 
-        cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
-          set((state) => {
-            let charactersToProcess = Object.values(state.characters);
-
-            if (worldId) {
-              charactersToProcess = charactersToProcess.filter(char => char.worldId === worldId);
+            if (updates?.name) {
+              normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
             }
 
-            if (charactersToProcess.length <= keepRecentCount) {
-              return state;
+            if (updates?.background) {
+              const mergedBackground = {
+                ...character.background,
+                ...updates.background,
+              };
+
+              normalizedUpdates.background = {
+                ...mergedBackground,
+                physicalDescription: mergedBackground.physicalDescription
+                  ? normalizeText(
+                      mergedBackground.physicalDescription,
+                      NORM_DESC
+                    )
+                  : undefined,
+                personality: normalizeText(
+                  mergedBackground.personality || '',
+                  NORM_DESC
+                ),
+                history: normalizeText(
+                  mergedBackground.history || '',
+                  NORM_DESC
+                ),
+              };
             }
 
-            const sortedCharacters = charactersToProcess
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            if (updates?.inventory) {
+              normalizedUpdates.inventory = {
+                ...character.inventory,
+                ...updates.inventory,
+                characterId: id,
+              };
+            }
 
-            const removedCharacters = sortedCharacters.slice(keepRecentCount);
-            const idsToRemove = new Set(removedCharacters.map(char => char.id));
-
-            const newCharacters = Object.fromEntries(
-              Object.entries(state.characters).filter(([id]) => !idsToRemove.has(id))
-            );
-
-            return {
-              characters: newCharacters,
-              entities: newCharacters,
-              worldCharacterIds: buildWorldCharacterIds(newCharacters as Record<EntityID, Character>),
-              currentCharacterId: state.currentCharacterId && idsToRemove.has(state.currentCharacterId) ? null : state.currentCharacterId,
-              currentEntityId: state.currentEntityId && idsToRemove.has(state.currentEntityId) ? null : state.currentEntityId,
+            const updatedCharacter: Character = {
+              ...character,
+              ...normalizedUpdates,
+              inventory: normalizedUpdates.inventory ?? character.inventory,
+              background: normalizedUpdates.background ?? character.background,
+              updatedAt: getTimestamp(),
             };
-          });
-        },
 
-        compactCharacterData: () => {
-          set((state) => {
-            const compactedCharacters: Record<EntityID, Character> = {};
+            set((state) => {
+              const nextCharacters = {
+                ...state.characters,
+                [id]: updatedCharacter,
+              };
 
-            Object.entries(state.characters).forEach(([id, character]) => {
-              compactedCharacters[id] = {
-                ...character,
-                attributes: character.attributes?.slice(0, 6) || [],
-                skills: character.skills?.slice(0, 5) || [],
-                background: {
-                  ...character.background,
-                  goals: character.background.goals?.slice(0, 3) || [],
-                  fears: character.background.fears?.slice(0, 3) || [],
-                  relationships: [],
+              let nextWorldCharacterIds = state.worldCharacterIds ?? {};
+              if (previousWorldId !== updatedCharacter.worldId) {
+                const withoutPrevious = removeCharacterFromRoster(
+                  nextWorldCharacterIds,
+                  previousWorldId,
+                  id
+                );
+                nextWorldCharacterIds = addCharacterToRoster(
+                  withoutPrevious,
+                  updatedCharacter.worldId,
+                  id
+                );
+              }
+
+              return {
+                characters: nextCharacters,
+                entities: {
+                  ...state.entities,
+                  [id]: updatedCharacter,
                 },
+                worldCharacterIds: nextWorldCharacterIds,
+                error: null,
               };
             });
+          },
 
-            return {
-              characters: compactedCharacters,
-              entities: compactedCharacters,
-              worldCharacterIds: buildWorldCharacterIds(compactedCharacters as Record<EntityID, Character>),
-            };
-          });
-        },
+          delete: (id) => {
+            const character = get().characters[id];
+            if (!character) {
+              return;
+            }
 
-        getCharactersCount: (worldId) => {
-          const { characters } = useCharacterStore.getState();
-          if (worldId) {
-            return Object.values(characters).filter(char => char.worldId === worldId).length;
-          }
-          return Object.keys(characters).length;
-        },
+            // Clean up related data before deleting character
+            try {
+              const inventoryStore = useInventoryStore.getState();
+              inventoryStore.clearCharacterInventory(id);
+            } catch (error) {
+              console.warn(
+                'Failed to clean up inventory for deleted character',
+                error
+              );
+            }
 
-        deleteCharactersInWorld: (worldId) => {
-          const state = get();
-          const charactersInWorld = Object.entries(state.characters)
-            .filter(([, char]) => char.worldId === worldId)
-            .map(([id]) => id);
+            set((state) => {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { [id]: _removedCharacter, ...remainingCharacters } =
+                state.characters;
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { [id]: _removedEntity, ...remainingEntities } =
+                state.entities;
+              const isCurrent =
+                state.currentCharacterId === id || state.currentEntityId === id;
 
-          // Clean up inventory for all characters in the world
-          try {
-            const inventoryStore = useInventoryStore.getState();
-            charactersInWorld.forEach((characterId) => {
-              inventoryStore.clearCharacterInventory(characterId);
+              return {
+                characters: remainingCharacters,
+                entities: remainingEntities,
+                worldCharacterIds: removeCharacterFromRoster(
+                  state.worldCharacterIds ?? {},
+                  character.worldId,
+                  id
+                ),
+                currentCharacterId: isCurrent ? null : state.currentCharacterId,
+                currentEntityId: isCurrent ? null : state.currentEntityId,
+                error: null,
+              };
             });
-          } catch (error) {
-            console.warn('Failed to clean up inventory for deleted world characters', error);
-          }
+          },
 
-          set((state) => {
-            const charactersToKeep = Object.fromEntries(
-              Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
+          setCurrent: (id) => {
+            if (id && !get().characters[id]) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+                currentCharacterId: null,
+                currentEntityId: null,
+              });
+              return;
+            }
+
+            set({
+              currentCharacterId: id,
+              currentEntityId: id,
+              error: null,
+            });
+          },
+
+          getById: (id) => get().characters[id],
+          getAll: () => Object.values(get().characters),
+          getCharactersByWorld: (worldId) => {
+            const { characters, worldCharacterIds } = get();
+            const roster = worldCharacterIds[worldId] ?? [];
+            return roster
+              .map((characterId) => characters[characterId])
+              .filter((char): char is Character => Boolean(char));
+          },
+          getWorldRoster: (worldId) => {
+            const { worldCharacterIds } = get();
+            return [...(worldCharacterIds[worldId] ?? [])];
+          },
+
+          reset: () => set(getInitialState()),
+
+          setError: (error) => set({ error }),
+
+          clearError: () => set({ error: null }),
+          setLoading: (loading) => set({ loading }),
+          syncDerivedState: () => {
+            set((state) => {
+              const characters =
+                state.characters && typeof state.characters === 'object'
+                  ? state.characters
+                  : {};
+
+              const hasCharacters = Object.keys(characters).length > 0;
+
+              const isValidCharacterId = (id: EntityID | null | undefined) =>
+                Boolean(id && characters[id]);
+
+              const validCurrentCharacterId = isValidCharacterId(
+                state.currentCharacterId
+              )
+                ? state.currentCharacterId
+                : null;
+
+              const validCurrentEntityId = isValidCharacterId(
+                state.currentEntityId
+              )
+                ? state.currentEntityId
+                : null;
+
+              const fallbackId =
+                validCurrentCharacterId ?? validCurrentEntityId ?? null;
+
+              const nextCurrentCharacterId =
+                validCurrentCharacterId ?? fallbackId;
+              const nextCurrentEntityId = validCurrentEntityId ?? fallbackId;
+
+              return {
+                characters: hasCharacters ? characters : {},
+                entities: { ...characters },
+                worldCharacterIds: hasCharacters
+                  ? buildWorldCharacterIds(
+                      characters as Record<EntityID, Character>
+                    )
+                  : {},
+                currentCharacterId: hasCharacters
+                  ? nextCurrentCharacterId
+                  : null,
+                currentEntityId: hasCharacters ? nextCurrentEntityId : null,
+                error: state.error ?? null,
+                loading: state.loading ?? false,
+              };
+            });
+          },
+
+          // Domain-specific aliases
+          createCharacter: (characterData) => get().create(characterData),
+          updateCharacter: (id, updates) => get().update(id, updates),
+          deleteCharacter: (id) => get().delete(id),
+          setCurrentCharacter: (id) => get().setCurrent(id),
+
+          // Attribute management
+          addAttribute: (characterId, attributeData) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
+            }
+
+            const attributeId = generateUniqueId('attr');
+            const newAttribute: CharacterAttribute = {
+              ...attributeData,
+              id: attributeId,
+              characterId,
+            };
+
+            get().update(characterId, {
+              attributes: [...character.attributes, newAttribute],
+            });
+          },
+
+          updateAttribute: (characterId, attributeId, updates) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
+            }
+
+            const updatedAttributes =
+              character.attributes?.map((attr) =>
+                attr.id === attributeId ? { ...attr, ...updates } : attr
+              ) || [];
+
+            get().update(characterId, {
+              attributes: updatedAttributes,
+            });
+
+            // Recalculate derived stats after attribute change
+            get().recalculateDerivedStats(characterId);
+          },
+
+          removeAttribute: (characterId, attributeId) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
+            }
+
+            const filteredAttributes =
+              character.attributes?.filter((attr) => attr.id !== attributeId) ||
+              [];
+
+            get().update(characterId, {
+              attributes: filteredAttributes,
+            });
+          },
+
+          // Skill management
+          addSkill: (characterId, skillData) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
+            }
+
+            if ((character.skills?.length || 0) >= 2) {
+              set({
+                error: createStoreError(
+                  'Maximum Skills Reached',
+                  'This character has reached its maximum number of skills'
+                ),
+              });
+              return;
+            }
+
+            const skillId = generateUniqueId('skill');
+            const newSkill: CharacterSkill = {
+              ...skillData,
+              id: skillId,
+              characterId,
+            };
+
+            get().update(characterId, {
+              skills: [...character.skills, newSkill],
+            });
+          },
+
+          // Derived stats management
+          recalculateDerivedStats: (characterId) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              set({
+                error: createStoreError(
+                  'Character Not Found',
+                  'The specified character could not be found'
+                ),
+              });
+              return;
+            }
+
+            const world = useWorldStore.getState().worlds[character.worldId];
+            if (
+              !world?.settings?.derivedStatFormulas ||
+              world.settings.derivedStatFormulas.length === 0
+            ) {
+              get().update(characterId, { derivedStats: [] });
+              return;
+            }
+
+            const formulas = world.settings.derivedStatFormulas;
+            const currentDerivedStats = character.derivedStats || [];
+
+            const updatedDerivedStats: DerivedStat[] = formulas.map(
+              (formula) => {
+                const existingStat = currentDerivedStats.find(
+                  (s) => s.derivedStatId === formula.id
+                );
+                const newMaxValue = calculateDerivedStat(
+                  formula,
+                  character.attributes
+                );
+
+                let newCurrentValue: number;
+                if (existingStat && existingStat.maxValue > 0) {
+                  // Preserve ratio when recalculating
+                  const ratio =
+                    existingStat.currentValue / existingStat.maxValue;
+                  newCurrentValue = Math.round(newMaxValue * ratio);
+                } else {
+                  // Initialize to max for new stats
+                  newCurrentValue = newMaxValue;
+                }
+
+                return {
+                  id: existingStat?.id || generateUniqueId('dstat'),
+                  characterId,
+                  derivedStatId: formula.id,
+                  name: formula.name,
+                  currentValue: newCurrentValue,
+                  maxValue: newMaxValue,
+                  lastCalculated: getTimestamp(),
+                };
+              }
             );
 
-            const shouldResetCurrent = state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId;
+            get().update(characterId, { derivedStats: updatedDerivedStats });
+          },
 
-            return {
-              characters: charactersToKeep,
-              entities: charactersToKeep,
-              worldCharacterIds: buildWorldCharacterIds(charactersToKeep as Record<EntityID, Character>),
-              currentCharacterId: shouldResetCurrent ? null : state.currentCharacterId,
-              currentEntityId: shouldResetCurrent ? null : state.currentEntityId,
-            };
-          });
-        },
-      };
-    },
-    {
-      name: 'narraitor-character-store',
-      storage: createIndexedDBStorage(),
-      version: 3, // Incremented to clear old migrated data
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error('[CharacterStore] Failed to rehydrate state', error);
-          return;
-        }
-        state?.syncDerivedState?.();
+          cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
+            set((state) => {
+              let charactersToProcess = Object.values(state.characters);
+
+              if (worldId) {
+                charactersToProcess = charactersToProcess.filter(
+                  (char) => char.worldId === worldId
+                );
+              }
+
+              if (charactersToProcess.length <= keepRecentCount) {
+                return state;
+              }
+
+              const sortedCharacters = charactersToProcess.sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              );
+
+              const removedCharacters = sortedCharacters.slice(keepRecentCount);
+              const idsToRemove = new Set(
+                removedCharacters.map((char) => char.id)
+              );
+
+              const newCharacters = Object.fromEntries(
+                Object.entries(state.characters).filter(
+                  ([id]) => !idsToRemove.has(id)
+                )
+              );
+
+              return {
+                characters: newCharacters,
+                entities: newCharacters,
+                worldCharacterIds: buildWorldCharacterIds(
+                  newCharacters as Record<EntityID, Character>
+                ),
+                currentCharacterId:
+                  state.currentCharacterId &&
+                  idsToRemove.has(state.currentCharacterId)
+                    ? null
+                    : state.currentCharacterId,
+                currentEntityId:
+                  state.currentEntityId &&
+                  idsToRemove.has(state.currentEntityId)
+                    ? null
+                    : state.currentEntityId,
+              };
+            });
+          },
+
+          compactCharacterData: () => {
+            set((state) => {
+              const compactedCharacters: Record<EntityID, Character> = {};
+
+              Object.entries(state.characters).forEach(([id, character]) => {
+                compactedCharacters[id] = {
+                  ...character,
+                  attributes: character.attributes?.slice(0, 6) || [],
+                  skills: character.skills?.slice(0, 5) || [],
+                  background: {
+                    ...character.background,
+                    goals: character.background.goals?.slice(0, 3) || [],
+                    fears: character.background.fears?.slice(0, 3) || [],
+                    relationships: [],
+                  },
+                };
+              });
+
+              return {
+                characters: compactedCharacters,
+                entities: compactedCharacters,
+                worldCharacterIds: buildWorldCharacterIds(
+                  compactedCharacters as Record<EntityID, Character>
+                ),
+              };
+            });
+          },
+
+          getCharactersCount: (worldId) => {
+            const { characters } = useCharacterStore.getState();
+            if (worldId) {
+              return Object.values(characters).filter(
+                (char) => char.worldId === worldId
+              ).length;
+            }
+            return Object.keys(characters).length;
+          },
+
+          deleteCharactersInWorld: (worldId) => {
+            const state = get();
+            const charactersInWorld = Object.entries(state.characters)
+              .filter(([, char]) => char.worldId === worldId)
+              .map(([id]) => id);
+
+            // Clean up inventory for all characters in the world
+            try {
+              const inventoryStore = useInventoryStore.getState();
+              charactersInWorld.forEach((characterId) => {
+                inventoryStore.clearCharacterInventory(characterId);
+              });
+            } catch (error) {
+              console.warn(
+                'Failed to clean up inventory for deleted world characters',
+                error
+              );
+            }
+
+            set((state) => {
+              const charactersToKeep = Object.fromEntries(
+                Object.entries(state.characters).filter(
+                  ([, char]) => char.worldId !== worldId
+                )
+              );
+
+              const shouldResetCurrent =
+                state.currentCharacterId &&
+                state.characters[state.currentCharacterId]?.worldId === worldId;
+
+              return {
+                characters: charactersToKeep,
+                entities: charactersToKeep,
+                worldCharacterIds: buildWorldCharacterIds(
+                  charactersToKeep as Record<EntityID, Character>
+                ),
+                currentCharacterId: shouldResetCurrent
+                  ? null
+                  : state.currentCharacterId,
+                currentEntityId: shouldResetCurrent
+                  ? null
+                  : state.currentEntityId,
+              };
+            });
+          },
+        };
       },
-      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
-    }
-  )
-);
+      {
+        name: 'narraitor-character-store',
+        storage: createIndexedDBStorage(),
+        version: 3, // Incremented to clear old migrated data
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            console.error('[CharacterStore] Failed to rehydrate state', error);
+            return;
+          }
+          state?.syncDerivedState?.();
+        },
+        migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
+      }
+    )
+  );
 
 // Expose store globally in development for testing and debugging
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {

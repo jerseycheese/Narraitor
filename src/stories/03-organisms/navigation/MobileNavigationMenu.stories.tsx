@@ -65,7 +65,8 @@ const meta: Meta<typeof MobileNavigationMenu> = {
               <h2 className="text-xl font-semibold mb-4">Page Content</h2>
               <p className="text-gray-700">
                 This content is behind the mobile navigation overlay when open.
-                The overlay should cover the entire screen and prevent interaction with background content.
+                The overlay should cover the entire screen and prevent
+                interaction with background content.
               </p>
             </div>
           </div>
@@ -82,11 +83,12 @@ type Story = StoryObj<typeof meta>;
 const setupWorlds = () => {
   const fantasyWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Realm of Shadows',
-    description: 'A dark fantasy world filled with ancient magic and mysterious creatures',
+    description:
+      'A dark fantasy world filled with ancient magic and mysterious creatures',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -99,8 +101,8 @@ const setupWorlds = () => {
     description: 'A cyberpunk future where technology and humanity collide',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -113,8 +115,8 @@ const setupWorlds = () => {
     description: 'Wild west frontier town with outlaws and lawmen',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -210,7 +212,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     skills: [],
     derivedStats: [],
     background: {
-      history: 'Former cop turned private investigator with cybernetic enhancements',
+      history:
+        'Former cop turned private investigator with cybernetic enhancements',
       personality: 'Cynical but determined to find the truth',
       goals: ['Uncover corporate conspiracy', 'Clear his name'],
       fears: ['Corporate retaliation', 'Technology failure'],
@@ -249,10 +252,11 @@ export const Open: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu open with no worlds - shows basic navigation and create world button'
-      }
-    }
-  }
+        story:
+          'Mobile menu open with no worlds - shows basic navigation and create world button',
+      },
+    },
+  },
 };
 
 export const WithWorlds: Story = {
@@ -271,10 +275,11 @@ export const WithWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu with multiple worlds - shows world switcher section with character counts'
-      }
-    }
-  }
+        story:
+          'Mobile menu with multiple worlds - shows world switcher section with character counts',
+      },
+    },
+  },
 };
 
 export const WithActiveWorld: Story = {
@@ -294,8 +299,9 @@ export const WithActiveWorld: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu with active world - shows current world highlighted and play button'
-      }
-    }
-  }
+        story:
+          'Mobile menu with active world - shows current world highlighted and play button',
+      },
+    },
+  },
 };

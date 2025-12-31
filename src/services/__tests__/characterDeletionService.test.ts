@@ -54,7 +54,7 @@ describe('CharacterDeletionService', () => {
         metadata: { tags: [], automaticEntry: true },
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
-      }
+      },
     },
     sessionEntries: {},
     error: null,
@@ -114,8 +114,11 @@ describe('CharacterDeletionService', () => {
     jest.clearAllMocks();
 
     // Mock getState methods
-    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
-    (useCharacterStore as jest.MockedFunction<typeof useCharacterStore>).getState = jest.fn(() => mockCharacterStore);
+    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState =
+      jest.fn(() => mockJournalStore);
+    (
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>
+    ).getState = jest.fn(() => mockCharacterStore);
   });
 
   describe('deleteCharacterWithCleanup', () => {
@@ -123,9 +126,15 @@ describe('CharacterDeletionService', () => {
       await CharacterDeletionService.deleteCharacterWithCleanup('char-1');
 
       // Should clean up journal sessions for this character
-      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith('session-1');
-      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith('session-2');
-      expect(mockJournalStore.deleteSessionEntries).not.toHaveBeenCalledWith('session-3');
+      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith(
+        'session-1'
+      );
+      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith(
+        'session-2'
+      );
+      expect(mockJournalStore.deleteSessionEntries).not.toHaveBeenCalledWith(
+        'session-3'
+      );
 
       // Should delete the character from the store
       expect(mockCharacterStore.deleteCharacter).toHaveBeenCalledWith('char-1');
@@ -137,7 +146,9 @@ describe('CharacterDeletionService', () => {
       });
 
       // Should not throw an error
-      await expect(CharacterDeletionService.deleteCharacterWithCleanup('char-1')).resolves.toBeUndefined();
+      await expect(
+        CharacterDeletionService.deleteCharacterWithCleanup('char-1')
+      ).resolves.toBeUndefined();
 
       // Character deletion should still proceed
       expect(mockCharacterStore.deleteCharacter).toHaveBeenCalledWith('char-1');
@@ -155,12 +166,16 @@ describe('CharacterDeletionService', () => {
     });
 
     test('handles errors during journal store access', async () => {
-      (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => {
+      (
+        useJournalStore as jest.MockedFunction<typeof useJournalStore>
+      ).getState = jest.fn(() => {
         throw new Error('Store access failed');
       });
 
       // Should not throw an error
-      await expect(CharacterDeletionService.deleteCharacterWithCleanup('char-1')).resolves.toBeUndefined();
+      await expect(
+        CharacterDeletionService.deleteCharacterWithCleanup('char-1')
+      ).resolves.toBeUndefined();
 
       // Character deletion should still proceed
       expect(mockCharacterStore.deleteCharacter).toHaveBeenCalledWith('char-1');

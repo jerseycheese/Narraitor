@@ -32,7 +32,10 @@ const SEED_PAYLOAD = {
 };
 
 test.describe('World details NPC portraits', () => {
-  test('shows NPC portraits when available and initials fallback when not', async ({ page, baseURL }) => {
+  test('shows NPC portraits when available and initials fallback when not', async ({
+    page,
+    baseURL,
+  }) => {
     await page.addInitScript(
       async ({ getTimestampSource, seed }) => {
         const instantiateGetTimestamp = (source: string) =>
@@ -68,9 +71,9 @@ test.describe('World details NPC portraits', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                  skills: [],
-    derivedStats: [],
-    settings: {
+                skills: [],
+                derivedStats: [],
+                settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,
@@ -84,9 +87,9 @@ test.describe('World details NPC portraits', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                  skills: [],
-    derivedStats: [],
-    settings: {
+                skills: [],
+                derivedStats: [],
+                settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,
@@ -146,7 +149,7 @@ test.describe('World details NPC portraits', () => {
 
         await Promise.all([
           put('narraitor-world-store', worldPersist),
-          put('narraitor-npc-store', npcPersist)
+          put('narraitor-npc-store', npcPersist),
         ]);
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE, seed: SEED_PAYLOAD }
@@ -160,8 +163,12 @@ test.describe('World details NPC portraits', () => {
     await page.waitForSelector('text=NPCs', { timeout: 10000 });
 
     // Wait for NPCs to be visible
-    await expect(page.locator('text=Elara Moonwhisper')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('text=Thorgrim Ironforge')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Elara Moonwhisper')).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.locator('text=Thorgrim Ironforge')).toBeVisible({
+      timeout: 10000,
+    });
 
     // Verify NPC with portrait shows avatar image
     const elaraAvatar = page.locator('img[alt="Elara Moonwhisper"]');

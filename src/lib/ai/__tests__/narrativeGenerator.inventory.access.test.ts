@@ -10,7 +10,7 @@ import {
   createMockGeminiClient,
   setupTestWorldAndCharacter,
   createMockItem,
-  createTestNarrativeContext
+  createTestNarrativeContext,
 } from './narrativeGenerator.inventory.testHelpers';
 
 describe('NarrativeGenerator - Inventory Data Access', () => {
@@ -27,21 +27,27 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
 
   test('should include inventory items in narrative generation prompt', async () => {
     // Add items to character inventory
-    useInventoryStore.getState().addItem(characterId, createMockItem({
-      name: 'Magic Sword',
-      description: 'A powerful enchanted blade',
-      categoryId: 'equipment',
-      method: 'loot',
-    }));
+    useInventoryStore.getState().addItem(
+      characterId,
+      createMockItem({
+        name: 'Magic Sword',
+        description: 'A powerful enchanted blade',
+        categoryId: 'equipment',
+        method: 'loot',
+      })
+    );
 
-    useInventoryStore.getState().addItem(characterId, createMockItem({
-      name: 'Health Potion',
-      description: 'Restores vitality',
-      stackable: true,
-      quantity: 3,
-      categoryId: 'consumables',
-      method: 'purchase',
-    }));
+    useInventoryStore.getState().addItem(
+      characterId,
+      createMockItem({
+        name: 'Health Potion',
+        description: 'Restores vitality',
+        stackable: true,
+        quantity: 3,
+        categoryId: 'consumables',
+        method: 'purchase',
+      })
+    );
 
     // Verify items were added
     const items = useInventoryStore.getState().getCharacterItems(characterId);
@@ -68,7 +74,9 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
 
     // Check that inventory context is included in the prompt with metadata
     expect(generatedPrompt).toContain('## Inventory Summary');
-    expect(generatedPrompt).toContain('Magic Sword (equipment, qty 1, acquired via loot');
+    expect(generatedPrompt).toContain(
+      'Magic Sword (equipment, qty 1, acquired via loot'
+    );
     expect(generatedPrompt).toContain('A powerful enchanted blade');
   });
 
@@ -107,10 +115,10 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
         personality: 'Mysterious',
         goals: [],
         fears: [],
-        relationships: []
+        relationships: [],
       },
-        attributes: [],
-        skills: [],
+      attributes: [],
+      skills: [],
       derivedStats: [],
       inventory: {
         characterId: '',
@@ -132,15 +140,21 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
     });
 
     // Add different items to each character
-    useInventoryStore.getState().addItem(characterId, createMockItem({
-      name: 'Sword',
-      categoryId: 'equipment',
-    }));
+    useInventoryStore.getState().addItem(
+      characterId,
+      createMockItem({
+        name: 'Sword',
+        categoryId: 'equipment',
+      })
+    );
 
-    useInventoryStore.getState().addItem(character2Id, createMockItem({
-      name: 'Staff',
-      categoryId: 'equipment',
-    }));
+    useInventoryStore.getState().addItem(
+      character2Id,
+      createMockItem({
+        name: 'Staff',
+        categoryId: 'equipment',
+      })
+    );
 
     // Generate narrative for first character
     const context = createTestNarrativeContext(worldId, characterId);

@@ -19,8 +19,10 @@ export function finalizeCharacterCreation(
     description: data.background.history,
     worldId: data.worldId,
     level: 1,
-    attributes: data.attributes.map(attr => {
-      const worldAttr = world?.attributes.find(wa => wa.id === attr.attributeId);
+    attributes: data.attributes.map((attr) => {
+      const worldAttr = world?.attributes.find(
+        (wa) => wa.id === attr.attributeId
+      );
       return {
         id: generateUniqueId('attr'),
         characterId: '', // Will be set by store
@@ -28,23 +30,23 @@ export function finalizeCharacterCreation(
         name: worldAttr?.name || 'Unknown',
         baseValue: attr.value,
         modifiedValue: attr.value,
-        category: worldAttr?.category
+        category: worldAttr?.category,
       };
     }),
     skills: data.skills
-      .filter(skill => skill.isSelected)
-      .map(skill => {
-        const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
+      .filter((skill) => skill.isSelected)
+      .map((skill) => {
+        const worldSkill = world?.skills.find((ws) => ws.id === skill.skillId);
         return {
           id: generateUniqueId('skill'),
           characterId: '', // Will be set by store
           worldSkillId: skill.skillId, // Store reference to world skill ID
           name: worldSkill?.name || 'Unknown',
           level: skill.level,
-          category: worldSkill?.category
+          category: worldSkill?.category,
         };
       }),
-    derivedStats: [],  // Will be calculated below
+    derivedStats: [], // Will be calculated below
     background: {
       history: data.background.history,
       personality: data.background.personality,
@@ -55,7 +57,7 @@ export function finalizeCharacterCreation(
     },
     portrait: data.portrait || {
       type: 'placeholder',
-      url: null
+      url: null,
     },
     isPlayer: true,
     status: {
@@ -68,7 +70,7 @@ export function finalizeCharacterCreation(
       items: [],
       capacity: 20,
       categories: [],
-      itemOrder: []
+      itemOrder: [],
     },
   });
 

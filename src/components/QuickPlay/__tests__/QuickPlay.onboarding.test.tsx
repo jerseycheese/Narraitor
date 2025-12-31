@@ -6,7 +6,12 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { getTimestamp } from '@/lib/utils/timestamp';
-import { mockZustandStore, createMockWorldStore, createMockSessionStore, createMockCharacterStore } from '@/lib/test-utils';
+import {
+  mockZustandStore,
+  createMockWorldStore,
+  createMockSessionStore,
+  createMockCharacterStore,
+} from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -20,7 +25,9 @@ jest.mock('@/state/characterStore');
 
 // Mock GuidedFirstTimeExperience component
 jest.mock('@/components/GuidedFirstTimeExperience', () => ({
-  GuidedFirstTimeExperience: () => <div data-testid="guided-first-time-experience">Guided Experience</div>
+  GuidedFirstTimeExperience: () => (
+    <div data-testid="guided-first-time-experience">Guided Experience</div>
+  ),
 }));
 
 describe('QuickPlay - Onboarding Integration', () => {
@@ -32,12 +39,14 @@ describe('QuickPlay - Onboarding Integration', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
     // Default mock for empty stores
-    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
         worlds: {},
       })
     );
-    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: {},
       })
@@ -47,7 +56,8 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('First-time user experience', () => {
     beforeEach(() => {
       // Mock first-time user state
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: false,
@@ -61,22 +71,29 @@ describe('QuickPlay - Onboarding Integration', () => {
       render(<QuickPlay />);
 
       // Should show the guided experience
-      expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('guided-first-time-experience')
+      ).toBeInTheDocument();
 
       // Should NOT show the generic "Start New Game" button
-      expect(screen.queryByRole('button', { name: /start new game/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /start new game/i })
+      ).not.toBeInTheDocument();
     });
 
     it('does not show "Continue Last Game" option for first-time users', () => {
       render(<QuickPlay />);
 
-      expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /continue last game/i })
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('Returning user experience', () => {
     beforeEach(() => {
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: true,
@@ -90,10 +107,14 @@ describe('QuickPlay - Onboarding Integration', () => {
       render(<QuickPlay />);
 
       // Should show the standard button
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
 
       // Should NOT show the guided experience
-      expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('guided-first-time-experience')
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to worlds page when "Start New Game" is clicked', () => {
@@ -167,7 +188,8 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     beforeEach(() => {
       // Mock returning user with saved sessions
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {
             'session-1': mockSavedSession,
@@ -179,7 +201,8 @@ describe('QuickPlay - Onboarding Integration', () => {
         })
       );
 
-      mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      mockZustandStore(
+        useWorldStore as jest.MockedFunction<typeof useWorldStore>,
         createMockWorldStore({
           worlds: {
             'world-1': mockWorld,
@@ -187,7 +210,8 @@ describe('QuickPlay - Onboarding Integration', () => {
         })
       );
 
-      mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      mockZustandStore(
+        useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
         createMockCharacterStore({
           characters: {
             'char-1': mockCharacter,
@@ -199,11 +223,17 @@ describe('QuickPlay - Onboarding Integration', () => {
     it('shows both "Continue Last Game" and "Start New Game" options', () => {
       render(<QuickPlay />);
 
-      expect(screen.getByRole('button', { name: /continue last game/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /continue last game/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
 
       // Should NOT show guided experience
-      expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('guided-first-time-experience')
+      ).not.toBeInTheDocument();
     });
 
     it('shows session details for the continue option', () => {
@@ -218,7 +248,8 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('User who skipped onboarding', () => {
     beforeEach(() => {
       // Mock user who completed onboarding (via skip) but has no saved sessions
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: true,
@@ -231,8 +262,12 @@ describe('QuickPlay - Onboarding Integration', () => {
     it('shows standard interface, not guided experience', () => {
       render(<QuickPlay />);
 
-      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
-      expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /start new game/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('guided-first-time-experience')
+      ).not.toBeInTheDocument();
     });
 
     it('behaves like a returning user with no sessions', () => {
@@ -247,7 +282,8 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('Edge cases', () => {
     it('handles corrupted onboarding state gracefully', () => {
       // Mock corrupted state
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: undefined, // Corrupted
@@ -259,12 +295,15 @@ describe('QuickPlay - Onboarding Integration', () => {
       render(<QuickPlay />);
 
       // Should default to showing guided experience for safety
-      expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('guided-first-time-experience')
+      ).toBeInTheDocument();
     });
 
     it('handles missing helper methods gracefully', () => {
       // Mock state without helper methods
-      mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>,
+      mockZustandStore(
+        useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
           onboardingCompleted: false,
@@ -278,7 +317,9 @@ describe('QuickPlay - Onboarding Integration', () => {
 
       // Should fall back to checking savedSessions directly
       // If no saved sessions and onboarding not completed, should show guided experience
-      expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('guided-first-time-experience')
+      ).toBeInTheDocument();
     });
   });
 });

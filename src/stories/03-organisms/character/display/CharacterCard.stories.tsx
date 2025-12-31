@@ -3,7 +3,9 @@ import { CharacterCard } from '@/components/CharacterCard/CharacterCard';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<
+  typeof useCharacterStore.getState
+>['characters'][string];
 
 const meta = {
   title: '03-Organisms/character/display/CharacterCard',
@@ -15,7 +17,8 @@ const meta = {
     },
     docs: {
       description: {
-        component: 'A card component for displaying character information with action buttons.',
+        component:
+          'A card component for displaying character information with action buttons.',
       },
     },
   },
@@ -44,11 +47,12 @@ const mockCharacter: StoreCharacter = {
   worldId: 'world-1',
   level: 15,
   attributes: [],
-    skills: [],
-    derivedStats: [],
-background: {
+  skills: [],
+  derivedStats: [],
+  background: {
     history: 'Raised by elves in Rivendell, trained as a Ranger of the North.',
-    personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',
+    personality:
+      'A noble ranger with a strong sense of duty and honor, destined to become king.',
     goals: ['Reclaim the throne of Gondor'],
     fears: ['Failing his people'],
     physicalDescription: 'Tall, dark-haired ranger with weathered features',
@@ -64,14 +68,14 @@ background: {
   status: {
     health: 100,
     maxHealth: 100,
-    conditions: []
+    conditions: [],
   },
   inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 20,
     categories: [],
-    itemOrder: []
+    itemOrder: [],
   },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
@@ -108,8 +112,10 @@ export const KnownFigure: Story = {
       name: 'Gandalf the Grey',
       level: 50,
       background: {
-        history: 'One of the Istari, sent to Middle-earth to oppose the growing power of darkness.',
-        personality: 'A wise and powerful wizard who guides others on their journeys.',
+        history:
+          'One of the Istari, sent to Middle-earth to oppose the growing power of darkness.',
+        personality:
+          'A wise and powerful wizard who guides others on their journeys.',
         goals: ['Guide the free peoples', 'Defeat the dark lord'],
         fears: ['Failing in his mission'],
         physicalDescription: 'An old wizard with a long grey beard and robes',
@@ -139,8 +145,10 @@ export const OriginalCharacter: Story = {
       name: 'Lyra Moonwhisper',
       level: 8,
       background: {
-        history: 'Born in the ancient forests, trained in the old ways of magic.',
-        personality: 'A mysterious elven mage with a deep connection to nature and ancient magic.',
+        history:
+          'Born in the ancient forests, trained in the old ways of magic.',
+        personality:
+          'A mysterious elven mage with a deep connection to nature and ancient magic.',
         goals: ['Protect the ancient forests', 'Master the old magic'],
         fears: ['Loss of nature', 'Forgetting the old ways'],
         physicalDescription: 'Tall elf with flowing robes and mystical aura',
@@ -197,7 +205,8 @@ export const LowLevelCharacter: Story = {
         personality: 'A brave hobbit with a kind heart and unexpected courage.',
         goals: ['Destroy the ring', 'Save the Shire'],
         fears: ['The corruption of the ring', 'Losing friends'],
-        physicalDescription: 'Small hobbit with curly brown hair and large feet',
+        physicalDescription:
+          'Small hobbit with curly brown hair and large feet',
         relationships: [],
         isKnownFigure: true,
       },
@@ -245,11 +254,14 @@ export const LongDescription: Story = {
       ...mockCharacter,
       name: 'Thorin Oakenshield',
       background: {
-        history: 'Heir to the throne of Erebor, exiled when Smaug took the mountain.',
-        personality: 'A proud and stubborn dwarf king with a deep sense of honor and loyalty to his people. Driven by a desire to reclaim his ancestral home and restore the glory of the Kingdom under the Mountain. Can be both noble and petty, brave and reckless, wise and foolish. His pride often leads him into conflict, but his heart is ultimately in the right place when it comes to protecting those he loves.',
+        history:
+          'Heir to the throne of Erebor, exiled when Smaug took the mountain.',
+        personality:
+          'A proud and stubborn dwarf king with a deep sense of honor and loyalty to his people. Driven by a desire to reclaim his ancestral home and restore the glory of the Kingdom under the Mountain. Can be both noble and petty, brave and reckless, wise and foolish. His pride often leads him into conflict, but his heart is ultimately in the right place when it comes to protecting those he loves.',
         goals: ['Reclaim Erebor', 'Restore dwarf kingdom'],
         fears: ['Failing his people', 'Dragon sickness'],
-        physicalDescription: 'Proud dwarf king with royal bearing and warrior\'s build',
+        physicalDescription:
+          "Proud dwarf king with royal bearing and warrior's build",
         relationships: [],
         isKnownFigure: true,
       },
@@ -284,13 +296,13 @@ export const Grid: Story = {
         character={{
           ...mockCharacter,
           name: 'Aragorn',
-          background: { 
-            history: 'Heir of Isildur', 
-            personality: 'A noble ranger destined to become king.', 
+          background: {
+            history: 'Heir of Isildur',
+            personality: 'A noble ranger destined to become king.',
             goals: ['Become king'],
             fears: ['Failing'],
             relationships: [],
-            isKnownFigure: true 
+            isKnownFigure: true,
           },
         }}
         isActive={true}
@@ -306,13 +318,13 @@ export const Grid: Story = {
           id: 'char-2',
           name: 'Frodo Baggins',
           level: 1,
-          background: { 
-            history: 'Hobbit from the Shire', 
-            personality: 'A brave hobbit with unexpected courage.', 
+          background: {
+            history: 'Hobbit from the Shire',
+            personality: 'A brave hobbit with unexpected courage.',
             goals: ['Destroy the ring'],
             fears: ['Corruption'],
             relationships: [],
-            isKnownFigure: true 
+            isKnownFigure: true,
           },
           portrait: {
             type: 'ai-generated',
@@ -333,13 +345,13 @@ export const Grid: Story = {
           id: 'char-3',
           name: 'Lyra Moonwhisper',
           level: 8,
-          background: { 
-            history: 'Elven mage from ancient forests', 
-            personality: 'A mysterious elven mage.', 
+          background: {
+            history: 'Elven mage from ancient forests',
+            personality: 'A mysterious elven mage.',
             goals: ['Master magic'],
             fears: ['Loss of nature'],
             relationships: [],
-            isKnownFigure: false 
+            isKnownFigure: false,
           },
           portrait: {
             type: 'ai-generated',

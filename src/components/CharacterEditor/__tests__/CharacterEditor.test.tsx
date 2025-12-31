@@ -4,7 +4,11 @@ import { useRouter } from 'next/navigation';
 import CharacterEditor from '../CharacterEditor';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
-import { mockZustandStore, createMockCharacterStore, createMockWorldStore } from '@/lib/test-utils';
+import {
+  mockZustandStore,
+  createMockCharacterStore,
+  createMockWorldStore,
+} from '@/lib/test-utils';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -32,15 +36,15 @@ const mockCharacter = {
       name: 'Strength',
       baseValue: 10,
       modifiedValue: 10,
-    }
+    },
   ],
-        skills: [
+  skills: [
     {
       id: 'skill-1',
       characterId: 'test-char-1',
       name: 'Swordsmanship',
       level: 5,
-    }
+    },
   ],
 
   derivedStats: [],
@@ -83,9 +87,9 @@ const mockWorld = {
       minValue: 1,
       maxValue: 20,
       baseValue: 10,
-    }
+    },
   ],
-        skills: [
+  skills: [
     {
       id: 'skill-1',
       worldId: 'test-world-1',
@@ -95,7 +99,7 @@ const mockWorld = {
       maxValue: 10,
       baseValue: 0,
       difficulty: 'medium' as const,
-    }
+    },
   ],
   settings: {
     maxAttributes: 6,
@@ -113,7 +117,8 @@ describe('CharacterEditor MVP Tests', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
     // Mock character store
-    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: { 'test-char-1': mockCharacter },
         updateCharacter: jest.fn(),
@@ -122,7 +127,8 @@ describe('CharacterEditor MVP Tests', () => {
     );
 
     // Mock world store
-    mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
         worlds: { 'test-world-1': mockWorld },
       })
@@ -144,11 +150,10 @@ describe('CharacterEditor MVP Tests', () => {
     expect(nameInput).toHaveValue('Modified Character');
   });
 
-
-
   test('saves changes when user clicks save', async () => {
     const mockUpdateCharacter = jest.fn();
-    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: { 'test-char-1': mockCharacter },
         updateCharacter: mockUpdateCharacter,
@@ -185,7 +190,8 @@ describe('CharacterEditor MVP Tests', () => {
   // Acceptance Criteria 5: Users can cancel edits without saving changes
   test('cancels edits without saving changes', async () => {
     const mockUpdateCharacter = jest.fn();
-    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: { 'test-char-1': mockCharacter },
         updateCharacter: mockUpdateCharacter,
@@ -217,7 +223,8 @@ describe('CharacterEditor MVP Tests', () => {
 
   // Basic error handling test
   test('displays error when character not found', async () => {
-    mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
         characters: {},
         updateCharacter: jest.fn(),
@@ -228,6 +235,8 @@ describe('CharacterEditor MVP Tests', () => {
     render(<CharacterEditor characterId="non-existent" />);
 
     // Wait for the hydration timeout (2 seconds) to show error
-    expect(await screen.findByText('Character Not Found', {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(
+      await screen.findByText('Character Not Found', {}, { timeout: 3000 })
+    ).toBeInTheDocument();
   });
 });

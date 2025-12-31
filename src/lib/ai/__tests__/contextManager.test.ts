@@ -1,5 +1,9 @@
 import { buildEndingContext } from '../contextManager';
-import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry } from '@/lib/test-utils/testDataFactory';
+import {
+  createMockWorld,
+  createMockNarrativeSegment,
+  createMockJournalEntry,
+} from '@/lib/test-utils/testDataFactory';
 import type { EndingGenerationRequest } from '@/types/narrative.types';
 import type { Character as StoreCharacter } from '@/state/characterStore';
 import type { SavedSessionInfo } from '@/types/game.types';

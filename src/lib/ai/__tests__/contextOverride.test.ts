@@ -1,5 +1,10 @@
 import { createTestContext, mergeTestOverrides } from '../contextOverride';
-import type { World, Character, NarrativeContext, AITestConfig } from '../../../types';
+import type {
+  World,
+  Character,
+  NarrativeContext,
+  AITestConfig,
+} from '../../../types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('contextOverride', () => {
@@ -9,15 +14,15 @@ describe('contextOverride', () => {
     description: 'A test world',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,
-      skillPointPool: 40
+      skillPointPool: 40,
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 
   const mockCharacter: Character = {
@@ -30,10 +35,10 @@ describe('contextOverride', () => {
       personality: 'Test personality',
       goals: [],
       fears: [],
-      relationships: []
+      relationships: [],
     },
     attributes: [],
-        skills: [],
+    skills: [],
     derivedStats: [],
     inventory: {
       characterId: 'char-1',
@@ -46,10 +51,10 @@ describe('contextOverride', () => {
       health: 100,
       maxHealth: 100,
       conditions: [],
-      location: 'Test Location'
+      location: 'Test Location',
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 
   const mockNarrativeContext: NarrativeContext = {
@@ -57,17 +62,22 @@ describe('contextOverride', () => {
     activeCharacters: ['char-1'],
     currentLocation: 'Starting area',
     activeQuests: ['Quest: Find the artifact'],
-    mood: 'neutral'
+    mood: 'neutral',
   };
 
   test('creates test context from base components', () => {
     const testConfig: AITestConfig = {
       worldOverride: { name: 'Custom World Name' },
       characterOverride: { description: 'Modified character' },
-      narrativeContext: { currentLocation: 'Custom location' }
+      narrativeContext: { currentLocation: 'Custom location' },
     };
 
-    const result = createTestContext(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
+    const result = createTestContext(
+      mockWorld,
+      mockCharacter,
+      mockNarrativeContext,
+      testConfig
+    );
 
     expect(result.world.name).toBe('Custom World Name');
     expect(result.world.genre).toBe('fantasy'); // Unchanged
@@ -80,10 +90,15 @@ describe('contextOverride', () => {
   test('merges partial overrides without affecting original objects', () => {
     const testConfig: AITestConfig = {
       worldOverride: { description: 'Modified description' },
-      characterOverride: { name: 'Modified Character' }
+      characterOverride: { name: 'Modified Character' },
     };
 
-    const result = mergeTestOverrides(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
+    const result = mergeTestOverrides(
+      mockWorld,
+      mockCharacter,
+      mockNarrativeContext,
+      testConfig
+    );
 
     // Verify overrides applied
     expect(result.world.description).toBe('Modified description');
@@ -97,7 +112,12 @@ describe('contextOverride', () => {
   test('handles empty overrides by returning cloned originals', () => {
     const testConfig: AITestConfig = {};
 
-    const result = createTestContext(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
+    const result = createTestContext(
+      mockWorld,
+      mockCharacter,
+      mockNarrativeContext,
+      testConfig
+    );
 
     expect(result.world).toEqual(mockWorld);
     expect(result.character).toEqual(mockCharacter);
@@ -112,16 +132,23 @@ describe('contextOverride', () => {
   test('handles custom variables configuration', () => {
     const testConfig: AITestConfig = {
       customVariables: {
-        'location': 'Dark Forest',
-        'weather': 'Stormy'
-      }
+        location: 'Dark Forest',
+        weather: 'Stormy',
+      },
     };
 
-    const result = createTestContext(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
+    const result = createTestContext(
+      mockWorld,
+      mockCharacter,
+      mockNarrativeContext,
+      testConfig
+    );
 
     // Verify the narrative context is defined and structure is preserved
     expect(result.narrativeContext).toBeDefined();
-    expect(result.narrativeContext.currentLocation).toBe(mockNarrativeContext.currentLocation);
+    expect(result.narrativeContext.currentLocation).toBe(
+      mockNarrativeContext.currentLocation
+    );
     expect(result.narrativeContext.mood).toBe(mockNarrativeContext.mood);
 
     // Verify that the test config was properly passed through
@@ -134,10 +161,15 @@ describe('contextOverride', () => {
   test('deep clones objects to prevent mutations', () => {
     const originalWorld = { ...mockWorld };
     const testConfig: AITestConfig = {
-      worldOverride: { name: 'Modified World' }
+      worldOverride: { name: 'Modified World' },
     };
 
-    const result = mergeTestOverrides(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
+    const result = mergeTestOverrides(
+      mockWorld,
+      mockCharacter,
+      mockNarrativeContext,
+      testConfig
+    );
 
     // Verify that original objects are not mutated
     expect(mockWorld.name).toBe(originalWorld.name);

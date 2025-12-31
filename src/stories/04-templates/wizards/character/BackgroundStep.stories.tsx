@@ -12,15 +12,15 @@ const meta: Meta<typeof BackgroundStep> = {
     (Story) => (
       <div className="w-full max-w-2xl">
         <WizardContainer title="Create Character in Storybook Test World">
-          <WizardProgress 
+          <WizardProgress
             steps={[
               { id: 'basic-info', label: 'Basic Info' },
               { id: 'attributes', label: 'Attributes' },
               { id: 'skills', label: 'Skills' },
               { id: 'background', label: 'Background' },
-              { id: 'portrait', label: 'Portrait' }
-            ]} 
-            currentStep={3} 
+              { id: 'portrait', label: 'Portrait' },
+            ]}
+            currentStep={3}
             className="mb-6"
           />
           <div className="p-6 bg-white rounded-lg shadow">
@@ -42,9 +42,9 @@ const defaultData = {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
     attributes: [],
-        skills: [],
+    skills: [],
     derivedStats: [],
-  background: {
+    background: {
       history: '',
       personality: '',
       goals: [],
@@ -64,9 +64,9 @@ const mockWorldConfig = {
   description: 'A test world',
   genre: 'fantasy',
   attributes: [],
-    skills: [],
-    derivedStats: [],
-    settings: {
+  skills: [],
+  derivedStats: [],
+  settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,
@@ -92,9 +92,12 @@ export const WithData: Story = {
       characterData: {
         ...defaultData.characterData,
         background: {
-          history: 'Born in the mystical forests of Eldoria, Elara showed an early affinity for magic. She spent her youth studying under the archmage Theron, mastering the arcane arts. When her village was threatened by dark forces, she set out on a journey to find ancient artifacts that could protect her people.',
-          personality: 'Wise beyond her years, yet curious and sometimes impulsive. She values knowledge and often gets lost in her studies. Despite her serious demeanor, she has a warm heart and fierce loyalty to her friends.',
-          motivation: 'To protect the innocent and uncover the lost secrets of the ancient mages',
+          history:
+            'Born in the mystical forests of Eldoria, Elara showed an early affinity for magic. She spent her youth studying under the archmage Theron, mastering the arcane arts. When her village was threatened by dark forces, she set out on a journey to find ancient artifacts that could protect her people.',
+          personality:
+            'Wise beyond her years, yet curious and sometimes impulsive. She values knowledge and often gets lost in her studies. Despite her serious demeanor, she has a warm heart and fierce loyalty to her friends.',
+          motivation:
+            'To protect the innocent and uncover the lost secrets of the ancient mages',
           goals: [
             'Master the forbidden spells of the ancients',
             'Find the Crystal of Eternal Light',

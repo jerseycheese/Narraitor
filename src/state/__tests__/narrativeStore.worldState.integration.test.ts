@@ -60,9 +60,9 @@ describe('Narrative store world state integration', () => {
     const sessionId = 'session-integration';
     const npcId = 'npc-guard';
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -105,12 +105,17 @@ describe('Narrative store world state integration', () => {
         },
       ],
     });
-    useNarrativeStore.getState().selectDecisionOption(decisionId, optionId, characterId);
+    useNarrativeStore
+      .getState()
+      .selectDecisionOption(decisionId, optionId, characterId);
     const worldState = useWorldStore.getState().getWorldState(worldId);
     expect(worldState.npcRelationships[npcId]).toBeDefined();
     expect(worldState.npcRelationships[npcId].trust).toBe(60);
-    const eventDescriptions = worldState.majorEvents?.map(event => event.description) || [];
-    expect(eventDescriptions).toContain('The kingdom celebrates your diplomatic victory.');
+    const eventDescriptions =
+      worldState.majorEvents?.map((event) => event.description) || [];
+    expect(eventDescriptions).toContain(
+      'The kingdom celebrates your diplomatic victory.'
+    );
   });
   it('marks session lifecycle status as ended when markSessionEnded is called', () => {
     const worldId = 'existing-world';
@@ -144,9 +149,9 @@ describe('Narrative store world state integration', () => {
     });
     const sessionId = 'session-checkpoint-flow';
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -157,7 +162,8 @@ describe('Narrative store world state integration', () => {
     // Step 1: Add opening segment (no majorEvent from AI)
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
-      content: 'You awaken in a dimly lit chamber. Ancient runes glow faintly on the walls.',
+      content:
+        'You awaken in a dimly lit chamber. Ancient runes glow faintly on the walls.',
       type: 'scene',
       metadata: {
         tags: ['intro'],
@@ -168,11 +174,13 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
     // Allow async operations to complete (needs time for dynamic imports + async processing)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     // Verify checkpoint was created for opening scene
     let worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(1);
-    expect(worldState?.majorEvents?.[0]?.description).toBe('Story begins at Ancient Chamber');
+    expect(worldState?.majorEvents?.[0]?.description).toBe(
+      'Story begins at Ancient Chamber'
+    );
     expect(global.fetch).not.toHaveBeenCalled(); // No validation for first segment
     // Step 2: Mock validation API to reject trivial event
     (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -197,7 +205,7 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
     // Allow async operations to complete (needs time for dynamic imports + async processing)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     // Verify validation was called and trivial event was filtered out
     expect(global.fetch).toHaveBeenCalledTimes(1);
     worldState = useWorldStore.getState().worldStates[worldId];
@@ -225,14 +233,18 @@ describe('Narrative store world state integration', () => {
       updatedAt: new Date().toISOString(),
     });
     // Allow async operations to complete (needs time for dynamic imports + async processing)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     // Verify significant event created a checkpoint
     expect(global.fetch).toHaveBeenCalledTimes(2);
     worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(2);
     // Events are in reverse chronological order (newest first)
-    expect(worldState?.majorEvents?.[0]?.description).toBe('Character discovers the Tome of Forbidden Knowledge');
-    expect(worldState?.majorEvents?.[1]?.description).toBe('Story begins at Ancient Chamber');
+    expect(worldState?.majorEvents?.[0]?.description).toBe(
+      'Character discovers the Tome of Forbidden Knowledge'
+    );
+    expect(worldState?.majorEvents?.[1]?.description).toBe(
+      'Story begins at Ancient Chamber'
+    );
     jest.restoreAllMocks();
   });
 });

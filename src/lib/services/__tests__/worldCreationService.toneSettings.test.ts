@@ -12,14 +12,29 @@ jest.mock('@/lib/utils/logger');
 // Import mocked modules
 import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
+import {
+  ToneSettingsGenerator,
+  extractWorldAnalysisData,
+} from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
-const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
-const mockGenerateUniqueId = generateUniqueId as jest.MockedFunction<typeof generateUniqueId>;
-const mockToneSettingsGenerator = ToneSettingsGenerator as jest.MockedClass<typeof ToneSettingsGenerator>;
-const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
-const mockExtractWorldAnalysisData = extractWorldAnalysisData as jest.MockedFunction<typeof extractWorldAnalysisData>;
+const mockUseWorldStore = useWorldStore as jest.MockedFunction<
+  typeof useWorldStore
+>;
+const mockGenerateUniqueId = generateUniqueId as jest.MockedFunction<
+  typeof generateUniqueId
+>;
+const mockToneSettingsGenerator = ToneSettingsGenerator as jest.MockedClass<
+  typeof ToneSettingsGenerator
+>;
+const mockCreateDefaultGeminiClient =
+  createDefaultGeminiClient as jest.MockedFunction<
+    typeof createDefaultGeminiClient
+  >;
+const mockExtractWorldAnalysisData =
+  extractWorldAnalysisData as jest.MockedFunction<
+    typeof extractWorldAnalysisData
+  >;
 
 describe('worldCreationService - AI Tone Settings Integration', () => {
   let mockStore: ReturnType<typeof useWorldStore> & {
@@ -42,34 +57,36 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           description: 'A test world',
           genre: 'fantasy',
           attributes: [],
-            skills: [],
-    derivedStats: [],
-    settings: {
+          skills: [],
+          derivedStats: [],
+          settings: {
             maxAttributes: 6,
             maxSkills: 10,
             attributePointPool: 27,
-            skillPointPool: 40
+            skillPointPool: 40,
           },
           toneSettings: {
             contentRating: 'PG',
             narrativeStyle: 'epic',
-            languageComplexity: 'moderate'
+            languageComplexity: 'moderate',
           },
           createdAt: '2024-01-01T00:00:00.000Z',
-          updatedAt: '2024-01-01T00:00:00.000Z'
-        }
-      }
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
+      },
     };
 
     mockUseWorldStore.mockReturnValue(mockStore);
     mockUseWorldStore.getState = jest.fn().mockReturnValue(mockStore);
 
     // Setup mock AI client and generator
-    mockClient = { generateContent: jest.fn() } as unknown as ReturnType<typeof createDefaultGeminiClient>;
+    mockClient = { generateContent: jest.fn() } as unknown as ReturnType<
+      typeof createDefaultGeminiClient
+    >;
     mockCreateDefaultGeminiClient.mockReturnValue(mockClient);
 
     mockGenerator = {
-      generateToneSettings: jest.fn()
+      generateToneSettings: jest.fn(),
     } as unknown as jest.Mocked<ToneSettingsGenerator>;
     mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
@@ -79,7 +96,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       description: worldData.description || '',
       genre: worldData.genre || '',
       reference: worldData.reference,
-      relationship: worldData.relationship
+      relationship: worldData.relationship,
     }));
 
     // Setup ID generation
@@ -100,16 +117,16 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       genre: 'science fiction',
       reference: 'Blade Runner',
       relationship: 'inspired_by',
-        attributes: [
+      attributes: [
         {
           name: 'Cybernetics',
           description: 'Integration with technology',
           baseValue: 1,
           minValue: 0,
-          maxValue: 5
-        }
+          maxValue: 5,
+        },
       ],
-        skills: [
+      skills: [
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',
@@ -117,15 +134,15 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           baseValue: 1,
           minValue: 0,
           maxValue: 10,
-          difficulty: 'medium'
-        }
+          difficulty: 'medium',
+        },
       ],
-        settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 27,
-        skillPointPool: 40
-      }
+        skillPointPool: 40,
+      },
     };
 
     it('should generate AI tone settings based on world data', async () => {
@@ -134,13 +151,16 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         contentRating: 'R' as const,
         narrativeStyle: 'dramatic' as const,
         languageComplexity: 'advanced' as const,
-        reasoning: 'Cyberpunk themes require mature content and dramatic storytelling'
+        reasoning:
+          'Cyberpunk themes require mature content and dramatic storytelling',
       };
 
-      mockGenerator.generateToneSettings.mockResolvedValueOnce(mockToneSettings);
+      mockGenerator.generateToneSettings.mockResolvedValueOnce(
+        mockToneSettings
+      );
 
       const result = await worldCreationService.createWorldFromGeneration({
-        generatedData: sampleGeneratedData
+        generatedData: sampleGeneratedData,
       });
 
       // Verify AI tone generator was called with correct data
@@ -150,20 +170,21 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         description: 'A dark future city where technology dominates human life',
         genre: 'science fiction',
         reference: 'Blade Runner',
-        relationship: 'inspired_by'
+        relationship: 'inspired_by',
       });
 
       // Verify world was created with AI-generated tone settings
       expect(mockStore.createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Cyberpunk Metropolis',
-          description: 'A dark future city where technology dominates human life',
+          description:
+            'A dark future city where technology dominates human life',
           genre: 'science fiction',
           toneSettings: {
             contentRating: 'R',
             narrativeStyle: 'dramatic',
-            languageComplexity: 'advanced'
-          }
+            languageComplexity: 'advanced',
+          },
         })
       );
 
@@ -177,13 +198,13 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       );
 
       const result = await worldCreationService.createWorldFromGeneration({
-        generatedData: sampleGeneratedData
+        generatedData: sampleGeneratedData,
       });
 
       // Verify fallback to default settings
       expect(mockStore.createWorld).toHaveBeenCalledWith(
         expect.objectContaining({
-          toneSettings: DEFAULT_TONE_SETTINGS
+          toneSettings: DEFAULT_TONE_SETTINGS,
         })
       );
 
@@ -194,21 +215,23 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       const customizations = {
         name: 'Custom Cyber City',
         description: 'My custom cyberpunk world',
-        genre: 'dystopian'
+        genre: 'dystopian',
       };
 
       const mockToneSettings = {
         contentRating: 'PG-13' as const,
         narrativeStyle: 'mysterious' as const,
         languageComplexity: 'moderate' as const,
-        reasoning: 'Dystopian themes with mystery elements'
+        reasoning: 'Dystopian themes with mystery elements',
       };
 
-      mockGenerator.generateToneSettings.mockResolvedValueOnce(mockToneSettings);
+      mockGenerator.generateToneSettings.mockResolvedValueOnce(
+        mockToneSettings
+      );
 
       await worldCreationService.createWorldFromGeneration({
         generatedData: sampleGeneratedData,
-        customizations
+        customizations,
       });
 
       // Verify AI was called with customized data
@@ -217,7 +240,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         description: 'My custom cyberpunk world',
         genre: 'dystopian',
         reference: 'Blade Runner',
-        relationship: 'inspired_by'
+        relationship: 'inspired_by',
       });
 
       // Verify world was created with customizations and AI tone settings
@@ -229,13 +252,10 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           toneSettings: {
             contentRating: 'PG-13',
             narrativeStyle: 'mysterious',
-            languageComplexity: 'moderate'
-          }
+            languageComplexity: 'moderate',
+          },
         })
       );
     });
   });
-
-
-
 });

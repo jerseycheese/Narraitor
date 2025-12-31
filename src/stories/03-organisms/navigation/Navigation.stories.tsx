@@ -52,7 +52,8 @@ const meta: Meta<typeof Navigation> = {
                 <h2 className="text-xl font-semibold mb-4">Page Content</h2>
                 <p className="text-gray-700">
                   This area represents the page content below the navigation.
-                  The navigation component adapts based on the current world state and user context.
+                  The navigation component adapts based on the current world
+                  state and user context.
                 </p>
               </div>
             </div>
@@ -73,8 +74,8 @@ const setupWorlds = () => {
     description: 'A dark fantasy world',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -87,8 +88,8 @@ const setupWorlds = () => {
     description: 'Cyberpunk future',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -101,8 +102,8 @@ const setupWorlds = () => {
     description: 'Wild west frontier',
     genre: 'fantasy',
     attributes: [],
-        skills: [],
-        settings: {
+    skills: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -232,10 +233,11 @@ export const NoWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation when no worlds exist - shows "Create Your First World" button'
-      }
-    }
-  }
+        story:
+          'Navigation when no worlds exist - shows "Create Your First World" button',
+      },
+    },
+  },
 };
 
 export const WithWorlds: Story = {
@@ -249,10 +251,11 @@ export const WithWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with multiple worlds - shows world switcher dropdown with character counts'
-      }
-    }
-  }
+        story:
+          'Navigation with multiple worlds - shows world switcher dropdown with character counts',
+      },
+    },
+  },
 };
 
 export const WithActiveWorld: Story = {
@@ -267,10 +270,11 @@ export const WithActiveWorld: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with an active world - shows Characters link and New Character button'
-      }
-    }
-  }
+        story:
+          'Navigation with an active world - shows Characters link and New Character button',
+      },
+    },
+  },
 };
 
 export const WorldSwitcherOpen: Story = {
@@ -295,10 +299,11 @@ export const WorldSwitcherOpen: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator'
-      }
-    }
-  }
+        story:
+          'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator',
+      },
+    },
+  },
 };
 
 export const MobileView: Story = {
@@ -313,10 +318,12 @@ export const MobileView: Story = {
             <Story />
             <div className="p-8">
               <div className="bg-white rounded-lg p-6 shadow">
-                <h2 className="text-xl font-semibold mb-4">Mobile Page Content</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Mobile Page Content
+                </h2>
                 <p className="text-gray-700">
-                  This shows the mobile navigation with hamburger menu. 
-                  The menu should show when screen width is ≤768px.
+                  This shows the mobile navigation with hamburger menu. The menu
+                  should show when screen width is ≤768px.
                 </p>
               </div>
             </div>
@@ -331,8 +338,9 @@ export const MobileView: Story = {
     },
     docs: {
       description: {
-        story: 'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout'
-      }
-    }
-  }
+        story:
+          'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout',
+      },
+    },
+  },
 };
