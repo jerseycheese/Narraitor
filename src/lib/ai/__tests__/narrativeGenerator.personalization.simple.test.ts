@@ -29,7 +29,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     personalizationEngine = new PersonalizationEngine();
     tracker = new PlayerDecisionTracker({ storageKey: 'test_personalization_decisions' });
     tracker.clearDecisions();
-    
+
     mockCharacter = {
       id: 'char-1',
       name: 'Alex Archer',
@@ -94,7 +94,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       'session-1',
       'world-1'
     );
-    
+
     tracker.recordDecision(
       'How do you respond?',
       'Negotiate peacefully',
@@ -106,7 +106,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     // Get decisions for personalization
     const decisions = tracker.getWorldDecisions('world-1');
     expect(decisions).toHaveLength(2);
-    
+
     // Create personalized context
     const context = personalizationEngine.createPersonalizedContext(
       convertToPersonalizationCharacter(mockCharacter),
@@ -116,10 +116,10 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       [],
       []
     );
-    
+
     expect(context.character.personality).toBeDefined();
     expect(context.playerPreferences).toBeDefined();
-    
+
     // Generate enhancement
     const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
     expect(enhancement).toContain('Alex Archer');
@@ -138,13 +138,13 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         'world-1'
       );
     }
-    
+
     const decisions = tracker.getWorldDecisions('world-1');
     const analysis = tracker.analyzeChoicePatterns(decisions);
-    
+
     expect(analysis.dominantChoiceTypes[0]).toBe('diplomatic');
     expect(analysis.patternStrength).toBeGreaterThan(50);
-    
+
     // Use in personalization
     const behaviorAnalysis = personalizationEngine.analyzePlayerBehavior(
       convertToPersonalizationCharacter(mockCharacter),
@@ -152,7 +152,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       [],
       []
     );
-    
+
     expect(behaviorAnalysis.detectedTraits).toContain('diplomatic');
   });
 });

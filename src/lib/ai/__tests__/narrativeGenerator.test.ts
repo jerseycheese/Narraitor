@@ -40,18 +40,18 @@ describe('NarrativeGenerator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Create mocked client
     mockGeminiClient = {
       generateContent: jest.fn()
     } as unknown as jest.Mocked<GeminiClient>;
-    
+
     narrativeGenerator = new NarrativeGenerator(mockGeminiClient);
 
     // Mock prompt template
     const mockTemplate = jest.fn().mockReturnValue('Generated prompt');
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
-    
+
     // Mock world store
     (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld },

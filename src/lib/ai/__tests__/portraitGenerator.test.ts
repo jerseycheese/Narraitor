@@ -18,7 +18,7 @@ describe('PortraitGenerator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     generator = new PortraitGenerator(mockAIClient);
-    
+
     // Mock detection and enhancement responses
     (mockAIClient.generateContent as jest.Mock).mockImplementation((prompt: string) => {
       // Handle detection requests
@@ -34,7 +34,7 @@ describe('PortraitGenerator', () => {
           finishReason: 'stop'
         });
       }
-      
+
       // Handle personality to visual traits conversion
       if (prompt.includes('Convert these personality traits into visible physical expressions')) {
         return Promise.resolve({
@@ -42,7 +42,7 @@ describe('PortraitGenerator', () => {
           finishReason: 'stop'
         });
       }
-      
+
       // Handle physical diversity enhancement  
       if (prompt.includes('Add specific, non-idealized physical features')) {
         return Promise.resolve({
@@ -50,14 +50,14 @@ describe('PortraitGenerator', () => {
           finishReason: 'stop'
         });
       }
-      
+
       // Default fallback for any other prompts
       return Promise.resolve({
         content: 'test response',
         finishReason: 'stop'
       });
     });
-    
+
     mockCharacter = {
       id: 'char-1',
       name: 'Elara Moonshadow',
@@ -111,12 +111,12 @@ describe('PortraitGenerator', () => {
       await generator.generatePortrait(mockCharacter);
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
-      
+
       // Check that detection was called with Elara's name
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('Elara Moonshadow')
       );
-      
+
       // The prompt should be for an unknown character (not a comedian)
       expect(callArgs).toContain('Elara Moonshadow');
       expect(callArgs).toContain('Character portrait'); // Not "Photorealistic portrait"
@@ -168,20 +168,20 @@ describe('PortraitGenerator', () => {
           history: 'Known for his comedy and awkward situations'
         }
       };
-      
+
       // Generate portrait (which includes detection)
       (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
         image: 'data:image/png;base64,abc123',
         prompt: 'Photorealistic portrait of Nathan Fielder'
       });
-      
+
       await generator.generatePortrait(comedianCharacter);
-      
+
       // Check that detection was called
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('Nathan Fielder')
       );
-      
+
       // Check the generated prompt is for a real person, not fantasy
       const imagePrompt = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
       expect(imagePrompt).toContain('Photorealistic portrait of Nathan Fielder');
@@ -201,7 +201,7 @@ describe('PortraitGenerator', () => {
       };
 
       const prompt = await generator.buildPortraitPrompt(longCharacter);
-      
+
       // Gemini has 480 token limit, roughly 1920 characters
       expect(prompt.length).toBeLessThan(1920);
     });

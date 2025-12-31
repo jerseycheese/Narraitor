@@ -200,14 +200,14 @@ export default function EndingScreenTestPage() {
     const characterData = { ...MOCK_CHARACTER_DATA, worldId };
     characterData.inventory.characterId = ''; // Will be set by createCharacter
     const characterId = createCharacter(characterData);
-    
+
     // Store the created IDs for use in mock endings
     setCreatedIds({ characterId, worldId });
   }, [createCharacter, createWorld]);
 
   const handleTestEnding = (tone: string) => {
     if (!createdIds) return;
-    
+
     const ending = MOCK_ENDINGS[tone];
     if (ending) {
       // Update the ending with the actual created IDs

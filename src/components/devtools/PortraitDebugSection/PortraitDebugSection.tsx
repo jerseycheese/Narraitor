@@ -26,21 +26,21 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
   const [showBreakdown, setShowBreakdown] = useState(false);
-  
+
   // Get characters from store
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const characters = useCharacterStore((state: any) => state.characters);
   const charactersArray = (Object.values(characters) as StoreCharacter[]);
   const selectedCharacter = selectedCharacterId ? characters[selectedCharacterId] : null;
-  
+
   // Get worlds from store
   const worlds = useWorldStore((state) => state.worlds);
   const selectedWorld = selectedCharacter ? worlds[selectedCharacter.worldId] : null;
-  
+
   // Use selected character data or passed props
   const effectiveCharacterData = selectedCharacter || characterData;
   const effectiveWorldConfig = selectedWorld || worldConfig;
-  
+
   // Helper to safely access background properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getBackgroundProp = (prop: string): any => {
@@ -48,7 +48,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     const bg = effectiveCharacterData?.background as any;
     return bg?.[prop];
   };
-  
+
   // Helper to safely access status properties  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getStatusProp = (prop: string): any => {
@@ -69,19 +69,19 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     // Handle the different attribute/skill formats between store and types
     type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
     type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
-    
+
     const mockAttributes = effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
       attributeId: attr.attributeId || attr.id || 'attr-1',
       value: attr.value || attr.baseValue || 10
     })) || [];
-    
+
     const mockSkills = effectiveCharacterData.skills?.map((skill: AnySkill) => ({
       skillId: skill.skillId || skill.id || 'skill-1',
       level: skill.level || 1,
       experience: skill.experience || 0,
       isActive: skill.isActive !== undefined ? skill.isActive : true
     })) || [];
-    
+
     return {
       id,
       name: effectiveCharacterData.name || 'Test Character',
@@ -135,26 +135,26 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         customDescription: getBackgroundProp('physicalDescription'),
         promptOnly: true // Add a flag to return only the prompt
       };
-      
+
       console.log('Calling API with character:', mockCharacter.name);
       console.log('Custom description:', requestBody.customDescription);
       console.log('Request body:', requestBody);
       console.log('promptOnly flag:', requestBody.promptOnly);
-      
+
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
       });
-      
+
       console.log('API response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.log('API error response:', errorText);
         throw new Error(`API request failed: ${response.status} - ${errorText}`);
       }
-      
+
       const result = await response.json();
       console.log('API response result:', result);
       const prompt = result.prompt || result.portrait?.prompt;
@@ -174,7 +174,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     try {
       const aiClient = createAIClient();
       const generator = new PortraitGenerator(aiClient);
-      
+
       const mockCharacter = createMockCharacter('test');
 
       const result = await generator.generatePortrait(mockCharacter as unknown as Character, {

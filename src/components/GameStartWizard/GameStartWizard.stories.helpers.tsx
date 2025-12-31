@@ -101,10 +101,10 @@ interface WizardMockOptions {
 export const createWizardMockState = (options: WizardMockOptions) => {
   const WizardMockWrapper = (Story: React.ComponentType) => {
     const { hasWorlds, hasCharacters } = options;
-    
+
     const worlds = hasWorlds ? mockWorlds : {};
     const characters = hasCharacters ? mockCharacters : {};
-    
+
     useWorldStore.setState({ 
       worlds,
       entities: worlds,
@@ -132,10 +132,10 @@ export const createWizardMockState = (options: WizardMockOptions) => {
         });
       }
     });
-    
+
     return <Story />;
   };
-  
+
   WizardMockWrapper.displayName = 'WizardMockWrapper';
   return WizardMockWrapper;
 };

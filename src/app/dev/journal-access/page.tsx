@@ -29,7 +29,7 @@ export default function JournalAccessTestPage() {
   React.useEffect(() => {
     // Clear any existing ending state from narrative store
     useNarrativeStore.getState().clearEnding();
-    
+
     // Clear the "ended sessions" record for our test session to ensure it's not marked as ended
     useNarrativeStore.setState((state) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -39,7 +39,7 @@ export default function JournalAccessTestPage() {
         endedSessions: remainingEndedSessions
       };
     });
-    
+
     if (hasCharacter) {
       useSessionStore.setState({
         characterId: 'test-char-1',
@@ -51,7 +51,7 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         savedSessions: {}
       });
-      
+
       const timestamp = getTimestamp();
       const testCharacter = {
         id: 'test-char-1',
@@ -122,7 +122,7 @@ export default function JournalAccessTestPage() {
   React.useEffect(() => {
     const { addEntry, reset } = useJournalStore.getState();
     reset();
-    
+
     const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       {
         worldId: 'test-world-1',
@@ -202,7 +202,7 @@ export default function JournalAccessTestPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           📖 Journal Access Test Harness - Issue #278
         </h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Character Toggle */}
           <div className="space-y-2">
@@ -245,7 +245,7 @@ export default function JournalAccessTestPage() {
             />
             <span className="text-sm text-gray-700">{entryCount} entries</span>
           </div>
-          
+
           {/* Journal Controls */}
           <div className="space-y-2">
             <h3 className="font-semibold text-gray-700">Journal Debug</h3>

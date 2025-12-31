@@ -51,16 +51,16 @@ describe('QuickPlay', () => {
 
     it('should show "Start New Game" button', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
     });
 
     it('should navigate to worlds page when "Start New Game" is clicked', () => {
       render(<QuickPlay />);
-      
+
       fireEvent.click(screen.getByRole('button', { name: /start new game/i }));
-      
+
       expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
   });
@@ -148,7 +148,7 @@ describe('QuickPlay', () => {
 
     it('should show "Continue Last Game" button with world and character info', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByRole('button', { name: /continue last game/i })).toBeInTheDocument();
       expect(screen.getByText(/test world/i)).toBeInTheDocument();
       expect(screen.getByText(/test hero/i)).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('QuickPlay', () => {
 
     it('should also show "Start New Game" as secondary option', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
     });
 
@@ -173,9 +173,9 @@ describe('QuickPlay', () => {
       }));
 
       render(<QuickPlay />);
-      
+
       fireEvent.click(screen.getByRole('button', { name: /continue last game/i }));
-      
+
       await waitFor(() => {
         expect(mockResume).toHaveBeenCalledWith('session-1');
         expect(mockPush).toHaveBeenCalledWith('/worlds/world-1/play');
@@ -200,7 +200,7 @@ describe('QuickPlay', () => {
       }));
 
       render(<QuickPlay />);
-      
+
       // Should show the more recent session
       expect(screen.getByText(/test hero/i)).toBeInTheDocument();
     });
@@ -227,15 +227,15 @@ describe('QuickPlay', () => {
 
       it('should show delete button on campaign card', () => {
         render(<QuickPlay />);
-        
+
         expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
       });
 
       it('should open confirmation dialog when delete button is clicked', () => {
         render(<QuickPlay />);
-        
+
         fireEvent.click(screen.getByRole('button', { name: /delete/i }));
-        
+
         expect(screen.getByRole('dialog')).toBeInTheDocument();
         expect(screen.getByText(/delete campaign/i)).toBeInTheDocument();
         expect(screen.getByText(/test world.*test hero/i)).toBeInTheDocument();
@@ -243,29 +243,29 @@ describe('QuickPlay', () => {
 
       it('should not delete campaign when dialog is canceled', () => {
         render(<QuickPlay />);
-        
+
         fireEvent.click(screen.getByRole('button', { name: /delete/i }));
         fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-        
+
         expect(mockCleanupSessionData).not.toHaveBeenCalled();
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       });
 
       it('should delete campaign when confirmed', async () => {
         render(<QuickPlay />);
-        
+
         // Click the delete button on the card
         fireEvent.click(screen.getByRole('button', { name: /delete/i }));
-        
+
         // Wait for dialog to open and click the confirm button
         await waitFor(() => {
           expect(screen.getByRole('dialog')).toBeInTheDocument();
         });
-        
+
         // Click the confirm delete button in the dialog
         const confirmButton = screen.getByRole('button', { name: /Delete Test World - Test Hero/i });
         fireEvent.click(confirmButton);
-        
+
         await waitFor(() => {
           expect(mockCleanupSessionData).toHaveBeenCalledWith('session-1');
         });
@@ -282,7 +282,7 @@ describe('QuickPlay', () => {
         }));
 
         render(<QuickPlay />);
-        
+
         expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
       });
@@ -315,7 +315,7 @@ describe('QuickPlay', () => {
 
     it('should not show "Continue Last Game" button', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
     });

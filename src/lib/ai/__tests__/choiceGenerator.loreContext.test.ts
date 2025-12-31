@@ -50,7 +50,7 @@ describe('ChoiceGenerator lore context integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockAIClient = {
       generateContent: jest.fn()
     };
@@ -59,7 +59,7 @@ describe('ChoiceGenerator lore context integration', () => {
 
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
-    
+
     (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
     }));

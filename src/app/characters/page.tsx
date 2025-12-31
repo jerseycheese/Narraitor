@@ -87,7 +87,7 @@ async function generateCharacterPortrait(
         isKnownFigure: generatedData.isKnownFigure || false
       }
     };
-    
+
     // Use secure API endpoint for portrait generation
     const response = await fetch('/api/generate-portrait', {
       method: 'POST',
@@ -97,7 +97,7 @@ async function generateCharacterPortrait(
         world: currentWorld
       })
     });
-    
+
     if (response.ok) {
       const result = await response.json();
       // Handle both response formats for compatibility
@@ -174,10 +174,10 @@ export default function CharactersPage() {
       localStorage.setItem('character-view-mode', mode);
     }
   };
-  
+
   // Use worldId from URL if provided, otherwise use the current world
   const worldIdFromUrl = searchParams.get('worldId');
-  
+
   // Use normal store data
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
@@ -250,7 +250,7 @@ export default function CharactersPage() {
     const id = `toast-${Date.now()}-${Math.random()}`;
     const newToast = { ...toast, id };
     setToasts(prev => [...prev, newToast]);
-    
+
     // Auto-remove toast after duration
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
@@ -264,27 +264,27 @@ export default function CharactersPage() {
   const handleCreateCharacter = () => {
     router.push('/characters/create');
   };
-  
+
   const handleGenerateCharacter = async () => {
     if (!currentWorld || !effectiveWorldId) return;
-    
+
     // Validate specific character name
     if (generationType === 'specific' && !characterName.trim()) {
       setGenerateError('Please enter a character name');
       return;
     }
-    
+
     setIsGenerating(true);
     setGenerateError(null);
     setGeneratingStatus('Creating character...');
-    
+
     try {
       // Get existing character names to avoid duplicates
       const existingNames = worldCharacters.map(char => char.name);
-      
+
       // Generate character data based on type
       const nameToUse = generationType === 'specific' ? characterName : undefined;
-      
+
       // Use the character generation API route
       const response = await fetch('/api/generate-character', {
         method: 'POST',
@@ -306,7 +306,7 @@ export default function CharactersPage() {
       }
 
       const generatedData: GeneratedCharacterData = await response.json();
-      
+
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({
         name: generatedData.name,
@@ -343,10 +343,10 @@ export default function CharactersPage() {
           url: null
         }
       });
-      
+
       // Select the new character
       setCurrentCharacter(characterId);
-      
+
       // Generate portrait for the character
       setGeneratingStatus('Generating portrait...');
       await generateCharacterPortrait(
@@ -365,7 +365,7 @@ export default function CharactersPage() {
         return types[Math.floor(Math.random() * types.length)];
       });
       setGenerateError(null);
-      
+
       // Navigate to view the character
       router.push(`/characters/${characterId}`);
     } catch (error) {
@@ -391,7 +391,7 @@ export default function CharactersPage() {
   const handleDeleteCharacter = (characterId: string) => {
     const character = characters[characterId];
     if (!character) return;
-    
+
     setDeleteDialog({
       isOpen: true,
       characterId,
@@ -402,22 +402,22 @@ export default function CharactersPage() {
 
   const handleConfirmDelete = async () => {
     if (!deleteDialog.characterId) return;
-    
+
     setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
-    
+
     try {
       const characterName = deleteDialog.characterName;
-      
+
       // Use service layer for decoupled deletion with journal cleanup
       await CharacterDeletionService.deleteCharacterWithCleanup(deleteDialog.characterId);
-      
+
       // Success toast
       addToast({
         title: 'Character Deleted',
         description: `${characterName} has been permanently deleted`,
         variant: 'success'
       });
-      
+
       // Close dialog
       setDeleteDialog({ 
         isOpen: false, 
@@ -432,7 +432,7 @@ export default function CharactersPage() {
         description: 'Failed to delete character. Please try again.',
         variant: 'error'
       });
-      
+
       setDeleteDialog(prev => ({ ...prev, isDeleting: false }));
     }
   };
@@ -690,7 +690,7 @@ export default function CharactersPage() {
           </div>
         )}
       </SSRClientOnly>
-      
+
       {/* Character Generation Dialog */}
       <GenerateCharacterDialog
         isOpen={showGenerateDialog}

@@ -6,7 +6,7 @@ jest.mock('../../persistence', () => {
     setItem: jest.Mock;
     removeItem: jest.Mock;
   }
-  
+
   const createMockStorage = () => {
     const storage: MockStorage = {
       getItem: jest.fn().mockResolvedValue(null),
@@ -30,7 +30,7 @@ jest.mock('../../persistence', () => {
 
     return storage;
   };
-  
+
   return {
     createIndexedDBStorage: createMockStorage
   };
@@ -91,10 +91,10 @@ describe('Persistence Integration - MVP', () => {
     test('should persist character store data', async () => {
       // Use Jest's fake timers
       jest.useFakeTimers();
-      
+
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
-      
+
       // Create a character using the actual store
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
@@ -134,9 +134,9 @@ describe('Persistence Integration - MVP', () => {
       const characterPersisted = mockStorage.setItem.mock.calls.some(
         call => call[0] === 'narraitor-character-store' && call[1].includes(characterId)
       );
-      
+
       expect(characterPersisted).toBe(true);
-      
+
       // Clean up
       jest.useRealTimers();
     }, 10000);
@@ -144,10 +144,10 @@ describe('Persistence Integration - MVP', () => {
     test('should maintain data relationships between stores', async () => {
       // Use Jest's fake timers
       jest.useFakeTimers();
-      
+
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
-      
+
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
@@ -155,8 +155,6 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
       skills: [],
-
-
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -207,13 +205,13 @@ describe('Persistence Integration - MVP', () => {
       );
 
       expect(useCharacterStoreCall).toBeDefined();
-      
+
       if (useCharacterStoreCall) {
         const characterData = JSON.parse(useCharacterStoreCall[1]);
         const character = characterData.state.characters[characterId];
         expect(character.worldId).toBe(worldId);
       }
-      
+
       // Clean up
       jest.useRealTimers();
     }, 10000);
@@ -231,8 +229,6 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
       skills: [],
-
-
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -242,7 +238,7 @@ describe('Persistence Integration - MVP', () => {
       });
 
       expect(worldId).toBeDefined();
-      
+
       // State should work in memory
       const state = useWorldStore.getState();
       expect(state.worlds[worldId]).toBeDefined();
@@ -251,7 +247,7 @@ describe('Persistence Integration - MVP', () => {
     test('should handle persistence errors gracefully', async () => {
       // Use Jest's fake timers
       jest.useFakeTimers();
-      
+
       // Simulate persistence errors
       const error = new DOMException('SecurityError');
       mockStorage.getItem.mockRejectedValue(error);
@@ -264,8 +260,6 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
       skills: [],
-
-
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -275,14 +269,14 @@ describe('Persistence Integration - MVP', () => {
       });
 
       expect(worldId).toBeDefined();
-      
+
       // Advance timers and flush promises
       jest.advanceTimersByTime(1000);
       await Promise.resolve();
-      
+
       // Verify store attempted to persist
       expect(mockStorage.setItem).toHaveBeenCalled();
-      
+
       // Clean up
       jest.useRealTimers();
     }, 10000);

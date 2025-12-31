@@ -45,7 +45,7 @@ describe('NarrativeGenerator lore context integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockAIClient = {
       generateContent: jest.fn()
     };
@@ -54,7 +54,7 @@ describe('NarrativeGenerator lore context integration', () => {
 
     // Setup mocks
     mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
-    
+
     (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
       worlds: { 'world-123': mockWorld }
     }));
@@ -252,11 +252,11 @@ events: ritual = Monthly blessing ceremony
     await narrativeGenerator.generateSegment(request);
 
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
-    
+
     // Verify lore context appears after base template but before other enhancements
     const baseTemplateIndex = capturedPrompt.indexOf('Base narrative template');
     const loreContextIndex = capturedPrompt.indexOf('Established World Facts:');
-    
+
     expect(baseTemplateIndex).toBeLessThan(loreContextIndex);
     expect(loreContextIndex).toBeGreaterThan(-1);
   });

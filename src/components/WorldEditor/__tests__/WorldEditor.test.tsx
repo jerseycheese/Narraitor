@@ -112,7 +112,7 @@ describe('WorldEditor - MVP Level Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUpdateWorld.mockClear();
-    
+
     mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
         worlds: {
@@ -144,13 +144,13 @@ describe('WorldEditor - MVP Level Tests', () => {
     await waitFor(() => {
       // Basic info form is present
       expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
-      
+
       // Attributes form is present
       expect(screen.getByText('Attributes Form')).toBeInTheDocument();
-      
+
       // Skills form is present
       expect(screen.getByText('Skills Form')).toBeInTheDocument();
-      
+
       // Settings form is present
       expect(screen.getByText('Settings Form')).toBeInTheDocument();
     });

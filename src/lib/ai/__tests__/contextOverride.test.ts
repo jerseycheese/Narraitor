@@ -123,7 +123,7 @@ describe('contextOverride', () => {
     expect(result.narrativeContext).toBeDefined();
     expect(result.narrativeContext.currentLocation).toBe(mockNarrativeContext.currentLocation);
     expect(result.narrativeContext.mood).toBe(mockNarrativeContext.mood);
-    
+
     // Verify that the test config was properly passed through
     // Note: Custom variables integration would be implemented when real AI integration is added
     // For now, we verify the context structure is intact for future variable injection
@@ -138,14 +138,14 @@ describe('contextOverride', () => {
     };
 
     const result = mergeTestOverrides(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
-    
+
     // Verify that original objects are not mutated
     expect(mockWorld.name).toBe(originalWorld.name);
     expect(mockWorld.name).not.toBe('Modified World');
-    
+
     // Verify that the result has the modified value
     expect(result.world.name).toBe('Modified World');
-    
+
     // Verify deep cloning by checking nested objects
     if (mockWorld.attributes) {
       expect(result.world.attributes).not.toBe(mockWorld.attributes);

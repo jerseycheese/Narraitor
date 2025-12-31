@@ -70,7 +70,7 @@ describe('World Persistence Infrastructure', () => {
   beforeEach(() => {
     mockIDB = mockIndexedDB();
     jest.clearAllMocks();
-    
+
     // Reset Zustand store
     useWorldStore.getState().reset();
   });
@@ -160,7 +160,7 @@ describe('World Persistence Infrastructure', () => {
     test('persists world data across store recreation', async () => {
       // Create initial world
       const { result: firstStore, unmount: unmountFirstStore } = renderHook(() => useWorldStore());
-      
+
       const worldData = {
         name: 'Persistent Test World',
         theme: 'Persistence Testing',
@@ -206,7 +206,7 @@ describe('World Persistence Infrastructure', () => {
 
       // Simulate store recreation (like page refresh)
       unmountFirstStore();
-      
+
       // Create new store instance
       const { result: secondStore } = renderHook(() => useWorldStore());
 
@@ -245,7 +245,7 @@ describe('World Persistence Infrastructure', () => {
       // Rapid create and update operations
       act(() => {
         worldId = result.current.createWorld(baseWorldData);
-        
+
         // Immediate updates
         result.current.updateWorld(worldId, { description: 'Updated description 1' });
         result.current.updateWorld(worldId, { description: 'Updated description 2' });
@@ -271,11 +271,11 @@ describe('World Persistence Infrastructure', () => {
         setItem: jest.fn().mockResolvedValue(undefined),
         getItem: jest.fn().mockResolvedValue('{"test":"data"}'),
       };
-      
+
       // Test basic storage operations with mock
       await mockStorage.setItem('test-key', JSON.stringify({ test: 'data' }));
       const retrieved = await mockStorage.getItem('test-key');
-      
+
       expect(retrieved).toBe('{"test":"data"}');
       expect(mockStorage.setItem).toHaveBeenCalledWith('test-key', '{"test":"data"}');
       expect(mockStorage.getItem).toHaveBeenCalledWith('test-key');

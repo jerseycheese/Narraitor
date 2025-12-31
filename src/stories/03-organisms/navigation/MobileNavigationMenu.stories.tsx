@@ -13,7 +13,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
       description: {
         component: `
         Mobile navigation menu with full-screen overlay design optimized for touch interaction.
-        
+
         **Features:**
         - Touch-friendly 44px minimum button sizes
         - Swipe left gesture to close menu
@@ -46,7 +46,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
     (Story) => {
       // Reset stores before each story
       useWorldStore.getState().reset();
-      
+
       useCharacterStore.setState({
         characters: {},
         entities: {},
@@ -55,7 +55,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
         error: null,
         loading: false,
       });
-      
+
       return (
         <div className="relative h-screen">
           <Story />
@@ -93,7 +93,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const scifiWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Neo-Tokyo 2185',
     description: 'A cyberpunk future where technology and humanity collide',
@@ -107,7 +107,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const westernWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Dustbowl County',
     description: 'Wild west frontier town with outlaws and lawmen',
@@ -121,11 +121,11 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const worldId1 = useWorldStore.getState().createWorld(fantasyWorld);
   const worldId2 = useWorldStore.getState().createWorld(scifiWorld);
   const worldId3 = useWorldStore.getState().createWorld(westernWorld);
-  
+
   return { worldId1, worldId2, worldId3 };
 };
 
@@ -164,7 +164,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=1',
     },
   };
-  
+
   const character2 = {
     name: 'Zara Chen',
     description: 'A skilled mage with ancient knowledge',
@@ -199,7 +199,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=2',
     },
   };
-  
+
   const character3 = {
     name: 'Jack Harrison',
     description: 'A cyber-enhanced detective investigating corruption',
@@ -234,7 +234,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=3',
     },
   };
-  
+
   useCharacterStore.getState().createCharacter(character1);
   useCharacterStore.getState().createCharacter(character2);
   useCharacterStore.getState().createCharacter(character3);

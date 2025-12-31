@@ -112,7 +112,7 @@ describe('CharacterDeletionService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock getState methods
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
     (useCharacterStore as jest.MockedFunction<typeof useCharacterStore>).getState = jest.fn(() => mockCharacterStore);

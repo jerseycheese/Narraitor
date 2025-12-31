@@ -168,25 +168,25 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const checkForEndingIndicators = async (newSegment: NarrativeSegment) => {
     // Don't suggest multiple times
     if (endingSuggestedRef.current || !onEndingSuggested) return;
-    
+
     // Skip if we don't have enough narrative context (less than 3 segments)
     const allSegments = [...segments, newSegment];
     if (allSegments.length < 3) return;
-    
+
     try {
       const client = createDefaultGeminiClient();
-      
+
       // Get recent narrative context (last 5 segments for analysis)
       const recentSegments = allSegments.slice(-5);
       const narrativeContext = recentSegments.map((segment, index) => 
         `Segment ${index + 1}: ${segment.content}`
       ).join('\n\n');
-      
+
       // Get broader story context (all segments but condensed)
       const fullStoryContext = allSegments.length > 10 
         ? `Earlier story: ${truncate(allSegments.slice(0, -5).map(s => s.content).join(' '), 500)}\n\n`
         : '';
-      
+
       const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
 
 ${fullStoryContext}Recent narrative developments:
@@ -220,32 +220,32 @@ Respond with JSON format:
 }`;
 
       const response = await client.generateContent(analysisPrompt);
-      
+
       try {
         // Extract JSON from response, handling markdown code blocks
         let jsonContent = response.content;
-        
+
         // Remove markdown code blocks if present
         if (jsonContent.includes('```json')) {
           jsonContent = jsonContent.replace(/```json\s*/g, '').replace(/```\s*/g, '');
         } else if (jsonContent.includes('```')) {
           jsonContent = jsonContent.replace(/```\s*/g, '');
         }
-        
+
         // Trim whitespace
         jsonContent = safeTrim(jsonContent);
-        
+
         const analysis = JSON.parse(jsonContent);
-        
+
         // Only suggest ending if AI has medium or high confidence
         if (analysis.suggestEnding && ['high', 'medium'].includes(analysis.confidence)) {
           endingSuggestedRef.current = true;
-          
+
           // Determine ending type based on AI analysis or default to story-complete
           const endingType = ['story-complete', 'character-retirement', 'session-limit'].includes(analysis.endingType) 
             ? analysis.endingType 
             : 'story-complete';
-          
+
           onEndingSuggested(analysis.reason, endingType);
         }
       } catch (parseError) {
@@ -269,19 +269,19 @@ Respond with JSON format:
         ids.add(segment.id);
         return false;
       });
-      
+
       if (hasDuplicates) {
         // Deduplicate by keeping only the first occurrence of each ID
         const uniqueSegments = [];
         const seenIds = new Set();
-        
+
         for (const segment of segments) {
           if (!seenIds.has(segment.id)) {
             uniqueSegments.push(segment);
             seenIds.add(segment.id);
           }
         }
-        
+
         // Update local state with deduplicated segments
         setSegments(uniqueSegments);
       }
@@ -323,7 +323,7 @@ Respond with JSON format:
       setIsLoading(false);
       return;
     }
-    
+
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
@@ -331,7 +331,7 @@ Respond with JSON format:
         // Set both state and refs to prevent duplicate generation
         setInitialGenerationCompleted(true);
         initialGenerationInitiated.current = true;
-        
+
         generateCount.current += 1;
         generateInitialNarrative();
       } 
@@ -344,7 +344,7 @@ Respond with JSON format:
           updated.add(choiceId);
           return updated;
         });
-        
+
         generateCount.current += 1;
         generateNextSegment(choiceId);
       }
@@ -365,26 +365,26 @@ Respond with JSON format:
       warnMissingSessionId('choice');
       return;
     }
-    
+
     // Prevent overlapping choice generation using ref (more reliable than state)
     if (choiceGenerationInProgress.current) {
       return;
     }
-    
+
     choiceGenerationInProgress.current = true;
-    
+
     // Get fresh segments from the store instead of relying on component state
     const currentSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-    
+
     if (currentSegments.length === 0) {
       choiceGenerationInProgress.current = false;
       return;
     }
     setIsGeneratingChoices(true);
-    
+
     // Use recent segments for context - get from fresh data
     const recentSegments = currentSegments.slice(-5);
-    
+
     // Create fallback choices upfront - we'll use these immediately if something fails
     const fallbackId = `decision-fallback-${Date.now()}`;
     const fallbackDecision: Decision = {
@@ -400,9 +400,9 @@ Respond with JSON format:
         `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${truncate(recentSegments[recentSegments.length - 1]?.content || 'Making a decision', 100)}` :
         'Making a decision in an unknown location.'
     };
-    
+
     try {
-      
+
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
         worldId,
@@ -414,7 +414,7 @@ Respond with JSON format:
         recentSegments,
         currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
       };
-      
+
       // Generate choices with a 15-second timeout for real API calls
       let decision;
       try {
@@ -422,7 +422,7 @@ Respond with JSON format:
         const timeoutPromise = new Promise<Decision>((_, reject) => {
           setTimeout(() => reject(new Error('AI choice generation timed out after 15 seconds')), 15000);
         });
-        
+
         decision = await Promise.race([
           narrativeGenerator.generatePlayerChoices(
             worldId,
@@ -431,37 +431,37 @@ Respond with JSON format:
           ),
           timeoutPromise
         ]);
-        
+
       } catch {
         // Choice generation failed, using fallback choices
         decision = fallbackDecision;
       }
-      
+
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
         return;
       }
-      
+
       // Verify decision structure and use fallback if invalid
       if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
         decision = fallbackDecision;
       }
-      
-      
+
+
       // Add decision to store and get the actual stored ID
       const storedDecisionId = useNarrativeStore.getState().addDecision(sessionId, {
         prompt: decision.prompt,
         options: decision.options,
         decisionWeight: decision.decisionWeight
       });
-      
+
       // Update the decision with the stored ID before passing to parent
       decision.id = storedDecisionId;
-      
+
       // Only notify parent component if we have AI-generated choices (not fallback)
       // Check if this is a fallback decision by comparing the ID pattern
       const isFallbackDecision = decision.id.includes('decision-fallback-');
-      
+
      if (!isFallbackDecision) {
         if (onChoicesGenerated) {
           try {
@@ -476,13 +476,13 @@ Respond with JSON format:
     } catch {
       // Unhandled error in generatePlayerChoices
       setError('Unable to generate choices. Please check your connection and try again.');
-      
+
       // Even if we get an unhandled error, try to provide fallback choices
-      
+
       try {
         // Only try to create fallback choices if we haven't already added any for this session
         const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
-        
+
         if (existingDecisions.length === 0 && mountedRef.current) {
           // Create and add fallback choices to the store
           const fallbackId = `decision-fallback-error-${Date.now()}`;
@@ -497,16 +497,16 @@ Respond with JSON format:
             decisionWeight: 'minor',
             contextSummary: 'Error occurred during choice generation.'
           };
-          
+
           // Add to store and get the actual stored ID
           const storedFallbackId = useNarrativeStore.getState().addDecision(sessionId, {
             prompt: fallbackDecision.prompt,
             options: fallbackDecision.options
           });
-          
+
           // Update the fallback decision with the stored ID
           fallbackDecision.id = storedFallbackId;
-          
+
           // Notify parent
           if (onChoicesGenerated && mountedRef.current) {
             const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
@@ -670,21 +670,21 @@ Respond with JSON format:
         narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : [], sessionId),
         timeoutPromise as unknown as Promise<ReturnType<typeof narrativeGenerator.generateInitialScene>>,
       ]);
-      
+
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
         return;
       }
-      
+
       // Double-check we still don't have any segments (in case another instance created one)
       const currentSegments = getSessionSegments(sessionId);
       const nowHasSegments = currentSegments.length > 0;
-      
+
       if (nowHasSegments) {
         setIsLoading(false);
         return;
       }
-      
+
       const segmentId = `seg-${worldId}-${Date.now()}`;
       const now = new Date();
       const newSegment: NarrativeSegment = {
@@ -699,10 +699,10 @@ Respond with JSON format:
         createdAt: now.toISOString(),
         updatedAt: now.toISOString()
       };
-      
+
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
-      
+
       // Add to store
       addSegment(sessionId, {
         content: newSegment.content,
@@ -712,17 +712,17 @@ Respond with JSON format:
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp
       });
-      
+
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
-      
+
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
-      
+
       // Generate choices if enabled - always generate for initial narrative
       if (generateChoices) {
-        
+
         // Start generating AI choices immediately without showing fallback choices first
         setTimeout(() => {
           generatePlayerChoices();
@@ -789,22 +789,22 @@ Respond with JSON format:
       warnMissingSessionId('next segment');
       return;
     }
-    
+
     if (segments.length === 0) {
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Use recent segments for context (last 3 segments for efficiency)
       const recentSegments = segments.slice(-3);
-      
+
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
       let choiceText = triggeringChoiceId;
-      
+
       // Find the decision that contains this choice
       let isCustomInput = false;
       let selectedOption = null;
@@ -1017,12 +1017,12 @@ Respond with JSON format:
           desiredTone: (decisionWeight === 'critical' && rollResults.some(r => r.isCriticalFailure)) ? 'tragic' : undefined
         }
       });
-      
+
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
         return;
       }
-      
+
       const segmentId = `seg-${worldId}-${triggeringChoiceId}-${Date.now()}`;
       const now = new Date();
       const newSegment: NarrativeSegment = {
@@ -1041,10 +1041,10 @@ Respond with JSON format:
         createdAt: now.toISOString(),
         updatedAt: now.toISOString()
       };
-      
+
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
-      
+
       // Add to store
       addSegment(sessionId, {
         content: newSegment.content,
@@ -1068,10 +1068,10 @@ Respond with JSON format:
           'story-complete'
         );
       }
-      
+
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
-      
+
       // Generate choices if enabled
       if (generateChoices) {
         if (isCustomInput) {
@@ -1098,7 +1098,7 @@ Respond with JSON format:
 
   const handleRetry = () => {
     setError(null);
-    
+
     // If we have no segments, retry initial generation
     if (segments.length === 0) {
       generateInitialNarrative();

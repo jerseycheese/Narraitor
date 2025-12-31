@@ -51,7 +51,7 @@ The editor automatically loads character data and provides forms for all editabl
       // Reset stores before each story
       useCharacterStore.getState().reset();
       useWorldStore.getState().reset();
-      
+
       // Set up test world
       const testWorldId = 'test-world-id';
       useWorldStore.getState().createWorld({
@@ -109,7 +109,7 @@ The editor automatically loads character data and provides forms for all editabl
           skillPointPool: 30
         }
       });
-      
+
       return (
         <div className="min-h-screen bg-gray-100 p-4">
           <Story />
@@ -132,7 +132,7 @@ export const NewCharacter: Story = {
       const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
-      
+
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
         description: 'A brave adventurer who started their journey in a small village',
@@ -174,7 +174,7 @@ export const NewCharacter: Story = {
           itemOrder: []
         }
       });
-      
+
       return <Story args={{ characterId }} />;
     }
   ]
@@ -190,7 +190,7 @@ export const WithPortrait: Story = {
       const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
-      
+
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Hero with Portrait',
         description: 'A legendary warrior from the northern kingdoms',
@@ -238,7 +238,7 @@ export const WithPortrait: Story = {
           itemOrder: []
         }
       });
-      
+
       return <Story args={{ characterId }} />;
     }
   ]
@@ -308,7 +308,7 @@ export const CustomPromptTesting: Story = {
       const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
-      
+
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Custom Prompt Test Character',
         description: 'A character for testing the custom prompt functionality',
@@ -350,7 +350,7 @@ export const CustomPromptTesting: Story = {
           itemOrder: []
         }
       });
-      
+
       return (
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
@@ -382,7 +382,7 @@ export const UIComponentShowcase: Story = {
       const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
-      
+
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'UI Components Showcase',
         description: 'Demonstrating shadcn/ui component integration',
@@ -424,7 +424,7 @@ export const UIComponentShowcase: Story = {
           itemOrder: []
         }
       });
-      
+
       return (
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">

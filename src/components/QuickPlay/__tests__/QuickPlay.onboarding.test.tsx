@@ -30,7 +30,7 @@ describe('QuickPlay - Onboarding Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    
+
     // Default mock for empty stores
     mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
@@ -59,17 +59,17 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('shows guided first-time experience instead of generic "Start New Game" button', () => {
       render(<QuickPlay />);
-      
+
       // Should show the guided experience
       expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
-      
+
       // Should NOT show the generic "Start New Game" button
       expect(screen.queryByRole('button', { name: /start new game/i })).not.toBeInTheDocument();
     });
 
     it('does not show "Continue Last Game" option for first-time users', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
     });
   });
@@ -88,19 +88,19 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('shows standard "Start New Game" button for returning users with no sessions', () => {
       render(<QuickPlay />);
-      
+
       // Should show the standard button
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
-      
+
       // Should NOT show the guided experience
       expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
     });
 
     it('navigates to worlds page when "Start New Game" is clicked', () => {
       render(<QuickPlay />);
-      
+
       fireEvent.click(screen.getByRole('button', { name: /start new game/i }));
-      
+
       expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
   });
@@ -178,7 +178,7 @@ describe('QuickPlay - Onboarding Integration', () => {
           resumeSavedSession: jest.fn().mockReturnValue(true),
         })
       );
-      
+
       mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
         createMockWorldStore({
           worlds: {
@@ -186,7 +186,7 @@ describe('QuickPlay - Onboarding Integration', () => {
           },
         })
       );
-      
+
       mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
         createMockCharacterStore({
           characters: {
@@ -198,17 +198,17 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('shows both "Continue Last Game" and "Start New Game" options', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByRole('button', { name: /continue last game/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
-      
+
       // Should NOT show guided experience
       expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
     });
 
     it('shows session details for the continue option', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByText(/test world/i)).toBeInTheDocument();
       expect(screen.getByText(/test hero/i)).toBeInTheDocument();
       expect(screen.getByText(/3 entries/i)).toBeInTheDocument();
@@ -230,16 +230,16 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('shows standard interface, not guided experience', () => {
       render(<QuickPlay />);
-      
+
       expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
       expect(screen.queryByTestId('guided-first-time-experience')).not.toBeInTheDocument();
     });
 
     it('behaves like a returning user with no sessions', () => {
       render(<QuickPlay />);
-      
+
       fireEvent.click(screen.getByRole('button', { name: /start new game/i }));
-      
+
       expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
   });
@@ -257,7 +257,7 @@ describe('QuickPlay - Onboarding Integration', () => {
       );
 
       render(<QuickPlay />);
-      
+
       // Should default to showing guided experience for safety
       expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
     });

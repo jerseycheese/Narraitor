@@ -132,7 +132,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       const worldName = testContext.world.name;
       const worldTheme = testContext.world.genre;
       const characterName = testContext.character.name;
-      
+
       const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
 
       // Generate context-aware choices based on genre
@@ -190,7 +190,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   return (
     <div className={`flex flex-col space-y-3 ${className}`}>
       <h3 className="text-sm font-medium text-gray-900 mb-3">AI Testing Panel</h3>
-      
+
       {/* World Override Section */}
       <div className="bg-gray-100 p-3 rounded border border-gray-300">
         <h4 className="text-xs font-medium mb-2 text-gray-900">World Override</h4>

@@ -3,7 +3,6 @@ import { World } from '@/types/world.types';
 import { Character } from '@/state/characterStore';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import React from 'react';
-
 // Mock character data
 const mockCharacters: Character[] = [
   {
@@ -86,8 +85,6 @@ const mockCharacters: Character[] = [
     updatedAt: '2023-01-03T10:00:00Z',
   }
 ];
-
-
 // Mock world data
 const mockWorld: World = {
   id: '1',
@@ -96,7 +93,6 @@ const mockWorld: World = {
   genre: 'fantasy',
   attributes: [],
     skills: [],
-    
 settings: {
     maxAttributes: 10,
     maxSkills: 10,
@@ -112,8 +108,6 @@ settings: {
   createdAt: '2023-01-01T10:00:00Z',
   updatedAt: '2023-12-15T14:30:00Z',
 };
-
-
 // Create a wrapper component that provides both router and store mocks
 const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
   const mockRouter = {
@@ -122,23 +116,20 @@ const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
       return Promise.resolve();
     }
   };
-
   const mockStoreActions = {
     setCurrentWorld: (id: string) => {
       console.log(`[Storybook] Setting current world: ${id}`);
     }
   };
-
   // Use the component's test props to inject mocks
   return (
-    <WorldCard 
+    <WorldCard
       {...args}
       _router={mockRouter}
       _storeActions={mockStoreActions}
     />
   );
 };
-
 const meta: Meta<typeof WorldCard> = {
   title: '03-Organisms/world/display/WorldCard',
   component: WorldCard,
@@ -157,10 +148,8 @@ const meta: Meta<typeof WorldCard> = {
     onDelete: { action: 'delete clicked' },
   },
 };
-
 export default meta;
 type Story = StoryObj<typeof WorldCard>;
-
 // Default story
 export const Default: Story = {
   args: {
@@ -170,9 +159,6 @@ export const Default: Story = {
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
 };
-
-
-
 // Story showing active world state
 export const ActiveWorld: Story = {
   args: {
@@ -190,7 +176,6 @@ export const ActiveWorld: Story = {
     }
   },
 };
-
 // Story with no image layout
 export const NoImage: Story = {
   args: {
@@ -210,7 +195,6 @@ export const NoImage: Story = {
     }
   },
 };
-
 // Story showing "Set In" world type
 export const SetInWorld: Story = {
   args: {
@@ -234,7 +218,6 @@ export const SetInWorld: Story = {
     }
   },
 };
-
 // Story showing "Inspired By" world type
 export const InspiredByWorld: Story = {
   args: {
@@ -257,7 +240,6 @@ export const InspiredByWorld: Story = {
     }
   },
 };
-
 // Story with no characters
 export const NoCharacters: Story = {
   args: {

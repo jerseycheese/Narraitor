@@ -68,7 +68,7 @@ describe('worldAnalyzer', () => {
 
     // Test should expect what the mock is returning
     expect(result.attributes).toHaveLength(3);
-    
+
     // Use a more flexible approach for testing - expect.objectContaining ensures we match
     // the important fields without being strict about additional calculated fields
     expect(result.attributes[0]).toEqual(expect.objectContaining({

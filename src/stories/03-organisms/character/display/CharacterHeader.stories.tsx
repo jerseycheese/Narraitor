@@ -2,11 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterHeader } from '@/components/characters/CharacterHeader';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
-
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 import { getTimestamp } from '@/lib/utils';
-
 const meta = {
   title: '03-Organisms/character/display/CharacterHeader',
   component: CharacterHeader,
@@ -15,10 +13,8 @@ const meta = {
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof CharacterHeader>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 // Mock data
 const mockWorld: World = {
   id: 'world-1',
@@ -29,7 +25,6 @@ const mockWorld: World = {
   reference: 'Lord of the Rings',
   attributes: [],
     skills: [],
-    
 settings: {
     maxAttributes: 6,
     maxSkills: 10,
@@ -39,7 +34,6 @@ settings: {
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
 };
-
 const mockCharacter: StoreCharacter = {
   id: 'char-1',
   name: 'Aragorn',
@@ -79,14 +73,12 @@ const mockCharacter: StoreCharacter = {
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
 };
-
 export const Default: Story = {
   args: {
     character: mockCharacter,
     world: mockWorld,
   },
 };
-
 export const WithoutPortrait: Story = {
   args: {
     character: {
@@ -96,7 +88,6 @@ export const WithoutPortrait: Story = {
     world: mockWorld,
   },
 };
-
 export const LowLevelCharacter: Story = {
   args: {
     character: {
@@ -116,7 +107,6 @@ export const LowLevelCharacter: Story = {
     world: mockWorld,
   },
 };
-
 export const OriginalCharacter: Story = {
   args: {
     character: {
@@ -146,7 +136,6 @@ export const OriginalCharacter: Story = {
     },
   },
 };
-
 export const HighLevelCharacter: Story = {
   args: {
     character: {
@@ -171,7 +160,6 @@ export const HighLevelCharacter: Story = {
     world: mockWorld,
   },
 };
-
 export const NoPersonality: Story = {
   args: {
     character: {
@@ -189,7 +177,6 @@ export const NoPersonality: Story = {
     world: mockWorld,
   },
 };
-
 export const LongPersonality: Story = {
   args: {
     character: {
@@ -208,7 +195,6 @@ export const LongPersonality: Story = {
     world: mockWorld,
   },
 };
-
 export const SciFiCharacter: Story = {
   args: {
     character: {
@@ -238,7 +224,6 @@ export const SciFiCharacter: Story = {
     },
   },
 };
-
 export const RecentlyCreated: Story = {
   args: {
     character: {

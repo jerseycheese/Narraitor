@@ -111,7 +111,7 @@ describe('CharacterEditor MVP Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    
+
     // Mock character store
     mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
       createMockCharacterStore({
@@ -120,7 +120,7 @@ describe('CharacterEditor MVP Tests', () => {
         deleteCharacter: jest.fn(),
       })
     );
-    
+
     // Mock world store
     mockZustandStore(useWorldStore as jest.MockedFunction<typeof useWorldStore>,
       createMockWorldStore({
@@ -132,12 +132,12 @@ describe('CharacterEditor MVP Tests', () => {
   // Acceptance Criteria 1: An editing interface allows modification of existing character fields
   test('allows modification of character fields', async () => {
     render(<CharacterEditor characterId="test-char-1" />);
-    
+
     // Wait for character to load
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
     });
-    
+
     // Verify we can modify name field
     const nameInput = screen.getByDisplayValue('Test Character');
     fireEvent.change(nameInput, { target: { value: 'Modified Character' } });
@@ -194,23 +194,23 @@ describe('CharacterEditor MVP Tests', () => {
     );
 
     render(<CharacterEditor characterId="test-char-1" />);
-    
+
     // Wait for character to load
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
     });
-    
+
     // Modify character name
     const nameInput = screen.getByDisplayValue('Test Character');
     fireEvent.change(nameInput, { target: { value: 'Modified Character' } });
-    
+
     // Click cancel button
     const cancelButton = screen.getByText('Cancel');
     fireEvent.click(cancelButton);
-    
+
     // Verify updateCharacter was NOT called
     expect(mockUpdateCharacter).not.toHaveBeenCalled();
-    
+
     // Verify navigation occurred
     expect(mockRouter.push).toHaveBeenCalledWith('/characters/test-char-1');
   });

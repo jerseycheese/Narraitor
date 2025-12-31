@@ -213,7 +213,7 @@ export default function GameSessionTestHarness() {
   const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
-  
+
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
     const worlds = useWorldStore.getState().worlds || {};
@@ -314,7 +314,7 @@ export default function GameSessionTestHarness() {
 
     logger.info('Test inventory items added');
   }, [logger]);
-  
+
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
     // Set client state
@@ -364,15 +364,15 @@ export default function GameSessionTestHarness() {
       unsubscribeHydration?.();
     };
   }, [createTestWorld, addTestInventoryItems, logger]);
-  
+
   const handleSessionStart = () => {
     logger.info('Session started');
   };
-  
+
   const handleSessionEnd = () => {
     logger.info('Session ended');
   };
-  
+
   if (!isClient) {
     // Return loading placeholder to avoid hydration mismatch
     return (
@@ -382,11 +382,11 @@ export default function GameSessionTestHarness() {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
-      
+
       <div className="mb-4">
         <button 
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4"
@@ -395,7 +395,7 @@ export default function GameSessionTestHarness() {
           {showRealComponent ? 'Hide Component' : 'Show Component'}
         </button>
       </div>
-      
+
       <div className="mb-4">
         <button 
           className="px-4 py-2 bg-green-500 text-white rounded mb-4"
@@ -403,7 +403,7 @@ export default function GameSessionTestHarness() {
         >
           Ensure Test World & Character Exist
         </button>
-        
+
         <button
           className="px-4 py-2 bg-amber-500 text-white rounded mb-4 ml-2"
           onClick={() => {
@@ -437,7 +437,7 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // Reset all session state to break infinite loops
             logger.info('🔄 Resetting all session and narrative state');
-            
+
             // 1. Reset session store completely
             useSessionStore.setState({
               id: null,
@@ -456,15 +456,15 @@ export default function GameSessionTestHarness() {
                 totalSaves: 0,
               }
             });
-            
+
             // 2. Clear all narrative data using reset method
             const narrativeStore = useNarrativeStore.getState();
             narrativeStore.reset(); // This clears all segments, decisions, and endings
             narrativeStore.clearEnding();
-            
+
             // 3. Reset character state
             useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
-            
+
             // 4. Force page refresh to ensure clean state
             setTimeout(() => {
               logger.info('🔄 Forcing page refresh for complete reset');
@@ -475,7 +475,7 @@ export default function GameSessionTestHarness() {
           Reset State & Refresh
         </button>
       </div>
-      
+
       <div className="border p-4 rounded bg-gray-100">
         {showRealComponent ? (
           <GameSession 
@@ -487,7 +487,7 @@ export default function GameSessionTestHarness() {
           <div>Component hidden</div>
         )}
       </div>
-      
+
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
         <p className="text-sm text-gray-700 mb-2">
@@ -503,7 +503,7 @@ export default function GameSessionTestHarness() {
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
-      
+
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
         <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">

@@ -15,33 +15,33 @@ export default function CharacterGenerationTestPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCharacter, setGeneratedCharacter] = useState<GeneratedCharacterData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { worlds } = useWorldStore();
   const { characters } = useCharacterStore();
-  
+
   const handleGenerate = async () => {
     if (!selectedWorldId) {
       setError('Please select a world');
       return;
     }
-    
+
     setIsGenerating(true);
     setError(null);
     setGeneratedCharacter(null);
-    
+
     try {
       const world = worlds[selectedWorldId];
       const existingNames = (Object.values(characters) as Character[])
         .filter(c => c.worldId === selectedWorldId)
         .map(c => c.name);
-      
+
       const result = await generateCharacter(
         world,
         existingNames,
         generationType === 'specific' ? suggestedName : undefined,
         generationType
       );
-      
+
       setGeneratedCharacter(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Generation failed');
@@ -49,12 +49,12 @@ export default function CharacterGenerationTestPage() {
       setIsGenerating(false);
     }
   };
-  
+
   const handleCreateCharacter = () => {
     if (!generatedCharacter || !selectedWorldId) return;
-    
+
     const world = worlds[selectedWorldId];
-    
+
     useCharacterStore.getState().createCharacter({
       name: generatedCharacter.name,
       description: generatedCharacter.background.description || '',
@@ -102,15 +102,15 @@ export default function CharacterGenerationTestPage() {
         itemOrder: []
       }
     });
-    
+
     setGeneratedCharacter(null);
     setSuggestedName('');
   };
-  
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Character Generation Test Harness</h1>
-      
+
       <div className="space-y-6">
         {/* World Selection */}
         <div className="bg-white rounded-lg shadow p-6">
@@ -128,7 +128,7 @@ export default function CharacterGenerationTestPage() {
             ))}
           </select>
         </div>
-        
+
         {/* Generation Type */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Generation Type</h2>
@@ -161,7 +161,7 @@ export default function CharacterGenerationTestPage() {
               <span>Specific Character (provide name)</span>
             </label>
           </div>
-          
+
           {generationType === 'specific' && (
             <div className="mt-4">
               <label className="block text-sm font-medium mb-1">Character Name</label>
@@ -175,7 +175,7 @@ export default function CharacterGenerationTestPage() {
             </div>
           )}
         </div>
-        
+
         {/* Generate Button */}
         <div className="bg-white rounded-lg shadow p-6">
           <button
@@ -186,30 +186,30 @@ export default function CharacterGenerationTestPage() {
             {isGenerating ? 'Generating...' : 'Generate Character'}
           </button>
         </div>
-        
+
         {/* Error Display */}
         {error && (
           <div className="bg-red-200 border border-red-500 rounded-lg p-4">
             <p className="text-red-700">{error}</p>
           </div>
         )}
-        
+
         {/* Generated Character Display */}
         {generatedCharacter && (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Generated Character</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold">Name:</h3>
                 <p>{generatedCharacter.name}</p>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Level:</h3>
                 <p>{generatedCharacter.level || 1}</p>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Background:</h3>
                 <div className="pl-4 space-y-2">
@@ -227,7 +227,7 @@ export default function CharacterGenerationTestPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Attributes:</h3>
                 <div className="grid grid-cols-2 gap-2 mt-2">
@@ -243,7 +243,7 @@ export default function CharacterGenerationTestPage() {
                   })}
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Skills:</h3>
                 <div className="grid grid-cols-2 gap-2 mt-2">
@@ -259,7 +259,7 @@ export default function CharacterGenerationTestPage() {
                   })}
                 </div>
               </div>
-              
+
               <div className="mt-6 pt-6 border-t">
                 <button
                   onClick={handleCreateCharacter}
@@ -271,7 +271,7 @@ export default function CharacterGenerationTestPage() {
             </div>
           </div>
         )}
-        
+
         {/* Existing Characters */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Existing Characters in Selected World</h2>

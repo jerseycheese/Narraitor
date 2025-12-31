@@ -15,7 +15,7 @@ export default function CharacterEditingTestPage() {
     // Create test world if none exists
     const worldIds = Object.keys(worlds);
     let worldId = worldIds[0];
-    
+
     if (!worldId) {
       worldId = createWorld({
         name: 'Test World',

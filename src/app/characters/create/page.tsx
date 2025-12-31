@@ -20,7 +20,7 @@ export default function CharacterCreatePage() {
   const { initializeSession } = useSessionStore();
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
-  
+
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
@@ -32,12 +32,12 @@ export default function CharacterCreatePage() {
       setCurrentWorld(worldIdFromUrl);
     }
   }, [worldIdFromUrl, currentWorldId, setCurrentWorld]);
-  
+
   // Mark mounted to make initial render independent of client-only store hydration
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   // Note: Auto-save data clearing is now handled by the CharacterCreationWizard
   // to allow for recovery dialog functionality
 

@@ -64,7 +64,7 @@ interface MockStoreOptions {
 export const createMockStoreState = (options: MockStoreOptions) => {
   const MockStateWrapper = (Story: React.ComponentType) => {
     const { hasSession, narrativeCount = 12 } = options;
-    
+
     if (!hasSession) {
       // Empty state
       useWorldStore.setState({ 
@@ -124,10 +124,10 @@ export const createMockStoreState = (options: MockStoreOptions) => {
         },
       });
     }
-    
+
     return <Story />;
   };
-  
+
   MockStateWrapper.displayName = 'MockStateWrapper';
   return MockStateWrapper;
 };
