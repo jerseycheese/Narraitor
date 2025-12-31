@@ -134,6 +134,8 @@ export interface PersonalizedNarrativeContext {
     attributes?: Record<string, number> | Array<{ attributeId: string; value: number }>;
     /** Character skills for narrative personalization */
     skills?: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+    /** Derived stats calculated from attributes */
+    derivedStats?: Array<{ name: string; currentValue: number; maxValue: number }>;
   };
   /** Player preferences and patterns */
   playerPreferences: PlayerPreferences;
