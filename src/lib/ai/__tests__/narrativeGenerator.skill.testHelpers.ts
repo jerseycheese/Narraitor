@@ -101,6 +101,7 @@ export function createMockCharacterWithSkills(): Character {
       { id: 'skill-2', characterId: 'char-1', worldSkillId: 'magic', name: 'Magic', level: 4 },
       { id: 'skill-3', characterId: 'char-1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }
     ],
+    derivedStats: [],
     inventory: {
       characterId: 'char-1',
       items: [],
