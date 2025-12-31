@@ -339,7 +339,7 @@ export default function WorldCreationWizard({
         description: data.description!,
         genre: data.genre!,
         attributes: data.attributes || [],
-        skills: data.skills || [],
+      skills: data.skills || [],
         settings: data.settings!,
         toneSettings: data.toneSettings || DEFAULT_TONE_SETTINGS,
         image: data.image, // Include any image if already generated

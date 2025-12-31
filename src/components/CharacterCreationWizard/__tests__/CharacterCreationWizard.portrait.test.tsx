@@ -50,7 +50,7 @@ describe('PortraitStep Component', () => {
       attributes: [
         { attributeId: 'strength', value: 10 }
       ],
-        skills: [
+      skills: [
         { skillId: 'magic', level: 5, isSelected: true }
       ],
       background: {

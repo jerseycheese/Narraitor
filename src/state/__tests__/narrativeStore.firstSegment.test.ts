@@ -58,7 +58,7 @@ describe('First segment checkpoint creation', () => {
       description: 'A test world',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,
@@ -118,7 +118,7 @@ describe('First segment checkpoint creation', () => {
       description: 'A test world',
       genre: 'sci-fi',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,
@@ -178,7 +178,7 @@ describe('First segment checkpoint creation', () => {
       description: 'A test world',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,
@@ -271,7 +271,7 @@ describe('First segment checkpoint creation', () => {
       description: 'A test world',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,

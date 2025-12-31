@@ -21,7 +21,7 @@ describe('InventoryStore - Item Usage', () => {
       description: 'A world for testing',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 10,
@@ -52,7 +52,7 @@ describe('InventoryStore - Item Usage', () => {
       },
       background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
-        skills: [],
+      skills: [],
     
     });
   });

@@ -54,7 +54,7 @@ describe('Narrative store world state integration', () => {
       description: 'A realm for integration tests',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,
@@ -154,7 +154,7 @@ describe('Narrative store world state integration', () => {
       description: 'A world for testing checkpoint creation',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     
       settings: {
         maxAttributes: 5,

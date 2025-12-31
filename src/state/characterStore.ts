@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
+import { DerivedStat } from '../types/character.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
@@ -32,15 +33,7 @@ export interface CharacterSkill {
   category?: string;
 }
 
-export interface DerivedStat {
-  id: EntityID;
-  characterId: EntityID;
-  derivedStatId: EntityID;  // References formula ID
-  name: string;
-  currentValue: number;     // Current amount (changes during gameplay)
-  maxValue: number;         // Calculated maximum from formula
-  lastCalculated: string;   // Timestamp
-}
+// Note: DerivedStat is imported from character.types.ts
 
 interface CharacterBackground {
   history: string;

@@ -86,7 +86,7 @@ describe('SkillReviewStep', () => {
       expect(toggleButton).toHaveTextContent('Excluded');
       
       expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
-        skills: expect.any(Array)
+      skills: expect.any(Array)
       }));
     });
 
@@ -112,7 +112,7 @@ describe('SkillReviewStep', () => {
   describe('Validation', () => {
     it('displays validation errors when present', () => {
       const errors = {
-        skills: 'At least one skill must be selected'
+      skills: 'At least one skill must be selected'
       };
 
       render(
@@ -155,7 +155,7 @@ describe('SkillReviewStep', () => {
 
       // Component should auto-apply accepted suggestions and call onUpdate
       expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
-        skills: expect.any(Array)
+      skills: expect.any(Array)
       }));
       
       // Should display the skill content

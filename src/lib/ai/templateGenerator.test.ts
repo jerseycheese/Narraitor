@@ -48,7 +48,7 @@ describe('TemplateGenerator', () => {
         attributes: expect.arrayContaining([
           expect.objectContaining({ name: 'Strength' })
         ]),
-        skills: expect.arrayContaining([
+      skills: expect.arrayContaining([
           expect.objectContaining({ name: 'Engineering' })
         ]),
         explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian aesthetics'

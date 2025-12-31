@@ -89,7 +89,7 @@ describe('debugInfoBuilder', () => {
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
       attributes: [],
-        skills: [],
+      skills: [],
     settings: {
         maxAttributes: 6,
         maxSkills: 10,

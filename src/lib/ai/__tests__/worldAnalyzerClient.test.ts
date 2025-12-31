@@ -13,7 +13,7 @@ describe('worldAnalyzerClient', () => {
       attributes: [
         { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: false }
       ],
-        skills: [
+      skills: [
         { name: 'Combat', description: 'Fighting ability', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 }
       ]
     };

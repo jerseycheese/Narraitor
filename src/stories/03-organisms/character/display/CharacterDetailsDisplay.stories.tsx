@@ -306,7 +306,7 @@ export const MinimalCharacter: Story = {
           category: 'Physical'
         }
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-swordsmanship-simple',
           characterId: 'char-simple',
@@ -373,7 +373,7 @@ export const PowerfulCharacter: Story = {
           category: 'Mental'
         }
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-lore-gandalf',
           characterId: 'char-gandalf',
@@ -457,7 +457,7 @@ export const WeakCharacter: Story = {
           category: 'Mental'
         }
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-stealth-frodo',
           characterId: 'char-frodo',
@@ -542,7 +542,7 @@ export const OriginalCharacter: Story = {
           category: 'Mental'
         }
       ],
-        skills: [
+      skills: [
         {
           id: 'char-skill-lore-lyra',
           characterId: 'char-lyra',

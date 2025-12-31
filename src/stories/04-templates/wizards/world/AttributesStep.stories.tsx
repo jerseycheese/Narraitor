@@ -160,7 +160,7 @@ export const FullyAllocated: Story = {
       },
       pointPools: {
         attributes: { total: 48, spent: 48, remaining: 0 },
-        skills: { total: 15, spent: 0, remaining: 15 },
+      skills: { total: 15, spent: 0, remaining: 15 },
       },
     },
     onUpdate: () => {},

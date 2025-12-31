@@ -108,7 +108,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           maxValue: 5
         }
       ],
-        skills: [
+      skills: [
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',

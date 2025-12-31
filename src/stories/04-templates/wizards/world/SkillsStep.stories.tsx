@@ -236,7 +236,7 @@ export const MaxSelection: Story = {
       ...defaultData,
       characterData: {
         ...defaultData.characterData,
-        skills: defaultData.characterData.skills.map(skill => ({
+      skills: defaultData.characterData.skills.map(skill => ({
           ...skill,
           isSelected: true,
         })),

@@ -145,7 +145,7 @@ export const NewCharacter: Story = {
           baseValue: attr.baseValue,
           modifiedValue: attr.baseValue
         })),
-        skills: world.skills.map((skill, index) => ({
+      skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'new-character-id',
           name: skill.name,
@@ -202,7 +202,7 @@ export const WithPortrait: Story = {
           baseValue: attr.baseValue,
           modifiedValue: attr.baseValue + 2
         })),
-        skills: world.skills.map((skill, index) => ({
+      skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'character-with-portrait',
           name: skill.name,
@@ -319,7 +319,7 @@ export const CustomPromptTesting: Story = {
           baseValue: attr.baseValue,
           modifiedValue: attr.baseValue
         })),
-        skills: world.skills.map((skill, index) => ({
+      skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'custom-prompt-test-character',
           name: skill.name,
@@ -392,7 +392,7 @@ export const UIComponentShowcase: Story = {
           baseValue: attr.baseValue + 2,
           modifiedValue: attr.baseValue + 2
         })),
-        skills: world.skills.map((skill, index) => ({
+      skills: world.skills.map((skill, index) => ({
           id: `char-skill-${index}`,
           characterId: 'ui-showcase-character',
           name: skill.name,

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DerivedStat } from '@/state/characterStore';
+import { DerivedStat } from '@/types/character.types';
 
 interface CharacterDerivedStatsDisplayProps {
   derivedStats: DerivedStat[];

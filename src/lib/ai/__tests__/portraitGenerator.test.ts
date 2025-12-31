@@ -67,7 +67,7 @@ describe('PortraitGenerator', () => {
         { attributeId: 'strength', value: 8 },
         { attributeId: 'intelligence', value: 15 }
       ],
-        skills: [
+      skills: [
         { skillId: 'magic', level: 10, experience: 100, isActive: true }
       ],
       background: {

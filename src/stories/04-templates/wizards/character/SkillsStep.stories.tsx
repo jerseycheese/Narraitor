@@ -95,7 +95,7 @@ export const Default: Story = {
         ],
       },
       pointPools: {
-        skills: {
+      skills: {
           total: worldConfig.settings.skillPointPool,
           spent: 2,
           remaining: 4,

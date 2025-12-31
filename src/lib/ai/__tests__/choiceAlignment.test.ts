@@ -31,7 +31,7 @@ describe('ChoiceGenerator - Alignment System', () => {
       description: 'A test world for alignment testing',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
+      skills: [],
     settings: {
         maxAttributes: 6,
         maxSkills: 12,

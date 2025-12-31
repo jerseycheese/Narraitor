@@ -111,7 +111,7 @@ export const AttributeReviewStep: Story = {
           { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: true },
           { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: true },
         ],
-        skills: []
+      skills: []
       }
     }
   },
@@ -183,7 +183,7 @@ export const FinalizeStep: Story = {
         { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
         { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
       ],
-        skills: [
+      skills: [
         { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
         { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
       ],

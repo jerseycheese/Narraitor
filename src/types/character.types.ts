@@ -10,6 +10,7 @@ export interface Character extends NamedEntity, TimestampedEntity {
   worldId: EntityID;
   attributes: CharacterAttribute[];
   skills: CharacterSkill[];
+  derivedStats: DerivedStat[];
   background: CharacterBackground;
   inventory: Inventory;
   status: CharacterStatus;
@@ -32,6 +33,19 @@ export interface CharacterSkill {
   level: number;
   experience: number;
   isActive: boolean;
+}
+
+/**
+ * Represents a derived stat calculated from character attributes
+ */
+export interface DerivedStat {
+  id: EntityID;
+  characterId: EntityID;
+  derivedStatId: EntityID;  // References formula ID in world settings
+  name: string;
+  currentValue: number;     // Current amount (changes during gameplay)
+  maxValue: number;         // Calculated maximum from formula
+  lastCalculated: string;   // Timestamp
 }
 
 /**

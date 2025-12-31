@@ -21,7 +21,7 @@ const mockTemplateHistory = [
         { name: 'Tech Savvy', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' },
         { name: 'Grit', baseValue: 70, minValue: 0, maxValue: 100, category: 'Social' }
       ],
-        skills: [
+      skills: [
         { name: 'Hacking', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'hard' as SkillDifficulty, category: 'Technical' },
         { name: 'Quick Draw', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium' as SkillDifficulty, category: 'Combat' }
       ],
