@@ -69,7 +69,8 @@ test.describe('World details NPC portraits', () => {
                 ...seed.world,
                 attributes: [],
                   skills: [],
-    derivedStats: [],                settings: {
+    derivedStats: [],
+    settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,
@@ -84,7 +85,8 @@ test.describe('World details NPC portraits', () => {
                 ...seed.world,
                 attributes: [],
                   skills: [],
-    derivedStats: [],                settings: {
+    derivedStats: [],
+    settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,

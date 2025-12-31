@@ -65,7 +65,8 @@ const mockWorldConfig = {
   genre: 'fantasy',
   attributes: [],
     skills: [],
-    derivedStats: [],  settings: {
+    derivedStats: [],
+    settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 20,

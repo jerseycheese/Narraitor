@@ -81,7 +81,8 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
         description: 'A test world generated for visual testing',
         attributes: [],
           skills: [],
-    derivedStats: [],        settings: {
+    derivedStats: [],
+    settings: {
           toneSettings: {
             complexity: 'medium',
             maturityLevel: 'teen',

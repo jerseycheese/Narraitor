@@ -23,7 +23,8 @@ const mockWorld = {
     { id: 'attr-2', name: 'Danger', description: 'Danger level', worldId: 'world-123', baseValue: 3, minValue: 0, maxValue: 10 }
   ],
     skills: [],
-    derivedStats: [],  settings: {
+    derivedStats: [],
+    settings: {
     maxAttributes: 10,
     maxSkills: 20,
     attributePointPool: 27,

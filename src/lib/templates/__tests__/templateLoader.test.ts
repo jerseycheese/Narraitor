@@ -47,7 +47,8 @@ describe('Template Loader', () => {
       genre: template.genre,
         attributes: [],
         skills: [],
-    derivedStats: [],      settings: {
+    derivedStats: [],
+    settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 30,

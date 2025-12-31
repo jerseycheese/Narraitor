@@ -209,7 +209,8 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       const expertCharacter: Partial<Character> = {
         ...mockCharacter,
           skills: [{ skillId: 'athletics', level: 20, experience: 0, isActive: true }],
-    derivedStats: [],        attributes: [{ attributeId: 'strength', value: 30 }]
+    derivedStats: [],
+    attributes: [{ attributeId: 'strength', value: 30 }]
       };
 
       const skillCheck: SkillCheck = {
