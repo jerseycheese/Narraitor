@@ -106,6 +106,7 @@ Decision Weight: [minor]`
           isActive: true
         }
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],

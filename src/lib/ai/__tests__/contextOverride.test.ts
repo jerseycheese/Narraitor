@@ -10,6 +10,7 @@ describe('contextOverride', () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
+    derivedStats: [],
     settings: {
       maxAttributes: 6,
       maxSkills: 12,
@@ -34,6 +35,7 @@ describe('contextOverride', () => {
     },
     attributes: [],
       skills: [],
+    derivedStats: [],
     inventory: {
       characterId: 'char-1',
       items: [],
