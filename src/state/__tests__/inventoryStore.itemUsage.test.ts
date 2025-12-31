@@ -22,7 +22,7 @@ describe('InventoryStore - Item Usage', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
       settings: {
         maxAttributes: 10,
         maxSkills: 10,
@@ -53,7 +53,7 @@ describe('InventoryStore - Item Usage', () => {
       background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
         skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
     });
   });
 
@@ -211,7 +211,7 @@ describe('InventoryStore - Item Usage', () => {
         background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
       });
 
       // Add item to first character

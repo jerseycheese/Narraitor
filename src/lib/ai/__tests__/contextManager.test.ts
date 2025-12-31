@@ -60,8 +60,9 @@ describe('buildEndingContext', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-      derivedStats: [],background: {
+    derivedStats: [],
+      derivedStats: [],
+    background: {
         history: 'Some backstory',
         personality: 'Curious',
         goals: [],
@@ -117,8 +118,9 @@ describe('buildEndingContext', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-      derivedStats: [],background: {
+    derivedStats: [],
+      derivedStats: [],
+    background: {
         history: 'Time traveler',
         personality: 'Precise',
         goals: [],
@@ -194,8 +196,9 @@ describe('buildEndingContext', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-      derivedStats: [],background: {
+    derivedStats: [],
+      derivedStats: [],
+    background: {
         history: 'Chronicler of events',
         personality: 'Observant',
         goals: [],

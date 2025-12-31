@@ -97,7 +97,7 @@ describe('Persistence Integration - MVP', () => {
         level: 1,
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
         background: {
           history: 'A test character',
           personality: 'Bold',
@@ -149,7 +149,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -166,7 +166,7 @@ describe('Persistence Integration - MVP', () => {
         level: 1,
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
         background: {
           history: 'A test character',
           personality: 'Bold',
@@ -224,7 +224,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -256,7 +256,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,

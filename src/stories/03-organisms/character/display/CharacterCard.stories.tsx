@@ -45,7 +45,8 @@ const mockCharacter: StoreCharacter = {
   level: 15,
   attributes: [],
     skills: [],
-    derivedStats: [],    derivedStats: [],  background: {
+    derivedStats: [],
+background: {
     history: 'Raised by elves in Rivendell, trained as a Ranger of the North.',
     personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',
     goals: ['Reclaim the throne of Gondor'],

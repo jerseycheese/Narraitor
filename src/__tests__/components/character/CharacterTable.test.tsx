@@ -23,11 +23,9 @@ const mockCharacters: Character[] = [
     worldId: 'world-1' as EntityID,
     level: 10,
     attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-
-    derivedStats: [],background: {
+    skills: [],
+    derivedStats: [],
+    background: {
       history: 'A ranger from the North',
       personality: 'Brave and noble',
       goals: [],
@@ -64,11 +62,9 @@ const mockCharacters: Character[] = [
     worldId: 'world-1' as EntityID,
     level: 8,
     attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-
-    derivedStats: [],background: {
+    skills: [],
+    derivedStats: [],
+    background: {
       history: 'An elven prince',
       personality: 'Swift and keen-eyed',
       goals: [],
@@ -104,11 +100,9 @@ const mockCharacters: Character[] = [
     worldId: 'world-1' as EntityID,
     level: 12,
     attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-
-    derivedStats: [],background: {
+    skills: [],
+    derivedStats: [],
+    background: {
       history: 'A stout warrior from the mountains',
       personality: 'Gruff but loyal',
       goals: [],

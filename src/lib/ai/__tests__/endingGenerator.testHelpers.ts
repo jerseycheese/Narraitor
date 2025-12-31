@@ -35,7 +35,8 @@ export function createMockWorld(): World {
     attributes: [],
       skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],    createdAt: getTimestamp(),
+    derivedStats: [],
+createdAt: getTimestamp(),
     updatedAt: getTimestamp()
   };
 }
@@ -53,8 +54,9 @@ export function createMockCharacter(): StoreCharacter {
     attributes: [],
       skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
-    derivedStats: [],background: {
+    derivedStats: [],
+    derivedStats: [],
+    background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
       goals: ['Defeat the dark lord and restore peace', 'Find inner peace'],

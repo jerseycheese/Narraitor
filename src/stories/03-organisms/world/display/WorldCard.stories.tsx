@@ -14,7 +14,8 @@ const mockCharacters: Character[] = [
     level: 15,
     attributes: [],
       skills: [],
-    derivedStats: [],    derivedStats: [],    background: {
+    derivedStats: [],
+background: {
       history: 'A master of arcane arts',
       personality: 'Wise and patient',
       goals: ['Protect the realm'],
@@ -41,7 +42,8 @@ const mockCharacters: Character[] = [
     level: 12,
     attributes: [],
       skills: [],
-    derivedStats: [],    derivedStats: [],    background: {
+    derivedStats: [],
+background: {
       history: 'Champion of the royal guard',
       personality: 'Courageous and noble',
       goals: ['Uphold justice'],
@@ -68,7 +70,8 @@ const mockCharacters: Character[] = [
     level: 10,
     attributes: [],
       skills: [],
-    derivedStats: [],    derivedStats: [],    background: {
+    derivedStats: [],
+background: {
       history: 'Former thief turned hero',
       personality: 'Cunning and independent',
       goals: ['Uncover ancient secrets'],
@@ -93,7 +96,8 @@ const mockWorld: World = {
   genre: 'fantasy',
   attributes: [],
     skills: [],
-    derivedStats: [],    derivedStats: [],  settings: {
+    derivedStats: [],
+settings: {
     maxAttributes: 10,
     maxSkills: 10,
     attributePointPool: 100,

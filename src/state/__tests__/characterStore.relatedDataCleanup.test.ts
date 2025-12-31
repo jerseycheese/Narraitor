@@ -149,7 +149,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
           level: 1,
           attributes: [],
             skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
           background: {
             history: 'Test history',
             personality: 'Test personality',
@@ -199,7 +199,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
           level: 1,
           attributes: [],
             skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
           background: {
             history: 'Active character history',
             personality: 'Active character personality',
@@ -229,7 +229,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
           level: 2,
           attributes: [],
             skills: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
           background: {
             history: 'Other history',
             personality: 'Other personality',

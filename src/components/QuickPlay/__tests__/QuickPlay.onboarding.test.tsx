@@ -114,7 +114,7 @@ describe('QuickPlay - Onboarding Integration', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
       settings: {
         maxAttributes: 6,
         maxSkills: 10,
@@ -134,9 +134,10 @@ describe('QuickPlay - Onboarding Integration', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],    derivedStats: [],
+    derivedStats: [],
 
-      derivedStats: [],background: {
+      derivedStats: [],
+    background: {
         history: 'A brave adventurer',
         personality: '',
         goals: [],
