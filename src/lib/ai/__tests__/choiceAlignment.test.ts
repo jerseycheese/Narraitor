@@ -32,7 +32,7 @@ describe('ChoiceGenerator - Alignment System', () => {
       genre: 'fantasy',
       attributes: [],
       skills: [],
-    settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,

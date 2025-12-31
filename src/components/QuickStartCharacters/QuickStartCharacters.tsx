@@ -51,7 +51,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         world: world.name,
         genre: world.genre,
         attributes: world.attributes?.length || 0,
-      skills: world.skills?.length || 0
+        skills: world.skills?.length || 0
       });
       setError(`Unable to generate character options: ${errorMessage}`);
     } finally {

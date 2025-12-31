@@ -119,7 +119,7 @@ export const Default: Story = {
 
 export const MinimalSkills: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'combat',
         worldId: 'world-test',
@@ -151,7 +151,7 @@ export const MinimalSkills: Story = {
 
 export const WithoutDescriptions: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'swordsmanship',
         worldId: 'world-test',
@@ -183,7 +183,7 @@ export const WithoutDescriptions: Story = {
 
 export const WithoutLinkedAttributes: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'leadership',
         worldId: 'world-test',
@@ -213,7 +213,7 @@ export const WithoutLinkedAttributes: Story = {
 
 export const Fantasy: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'swordsmanship',
         worldId: 'world-test',
@@ -293,7 +293,7 @@ export const Fantasy: Story = {
 
 export const SciFi: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'piloting',
         worldId: 'world-test',
@@ -380,7 +380,7 @@ export const SciFi: Story = {
 
 export const VariedDifficulties: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'walking',
         worldId: 'world-test',
@@ -448,14 +448,14 @@ export const VariedDifficulties: Story = {
 
 export const Empty: Story = {
   args: {
-      skills: [],
+    skills: [],
     attributes: mockAttributes,
   },
 };
 
 export const SingleSkill: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'ultimate_power',
         worldId: 'world-test',
@@ -475,7 +475,7 @@ export const SingleSkill: Story = {
 
 export const ManySkills: Story = {
   args: {
-      skills: [
+    skills: [
       {
         id: 'athletics',
         worldId: 'world-test',

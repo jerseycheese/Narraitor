@@ -22,7 +22,7 @@ jest.mock('@/state/characterStore', () => ({
         attributes: [
           { id: 'attr-1', characterId: 'char-123', name: 'Strength', baseValue: 8, modifiedValue: 8, category: 'Physical' }
         ],
-          skills: [
+        skills: [
           { id: 'skill-1', characterId: 'char-123', name: 'Swordsmanship', level: 3, category: 'Combat' }
         ],
         background: {
@@ -63,7 +63,7 @@ jest.mock('@/state/worldStore', () => ({
         attributes: [
           { id: 'attr-1', worldId: 'world-1', name: 'Strength', description: 'Physical power', baseValue: 10, minValue: 1, maxValue: 20, category: 'Physical' }
         ],
-          skills: [
+        skills: [
           { id: 'skill-1', worldId: 'world-1', name: 'Swordsmanship', description: 'Skill with blades', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, category: 'Combat' }
         ],
         settings: {

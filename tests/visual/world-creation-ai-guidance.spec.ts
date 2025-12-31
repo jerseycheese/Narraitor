@@ -30,7 +30,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
               description: 'Your mental fortitude'
             }
           ],
-            skills: [
+          skills: [
             {
               name: 'Spellweaving',
               description: 'Blend magical and technological effects'

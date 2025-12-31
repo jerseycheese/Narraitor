@@ -104,7 +104,7 @@ describe('WizardStepValidator', () => {
   it('should validate array length rules', () => {
     const validator = new WizardStepValidator<TestFormData>({
       rules: {
-          skills: [
+        skills: [
           createValidationRules.arrayMinLength(1, 'At least one skill required'),
           createValidationRules.arrayMaxLength(5, 'Maximum 5 skills allowed'),
         ],
@@ -116,11 +116,11 @@ describe('WizardStepValidator', () => {
     expect(noSkillsResult.valid).toBe(false);
     expect(noSkillsResult.errors).toContain('At least one skill required');
 
-    const tooManySkillsData = {
-      name: '',
-      email: '',
-      age: 0,
-      skills: ['skill1', 'skill2', 'skill3', 'skill4', 'skill5', 'skill6']
+    const tooManySkillsData = { 
+      name: '', 
+      email: '', 
+      age: 0, 
+      skills: ['skill1', 'skill2', 'skill3', 'skill4', 'skill5', 'skill6'] 
     };
     const tooManySkillsResult = validator.validate(tooManySkillsData);
     expect(tooManySkillsResult.valid).toBe(false);
@@ -230,11 +230,11 @@ describe('createWizardValidator', () => {
       }))
       .build();
 
-    const invalidData = {
-      name: '',
-      email: 'invalid',
-      age: 16,
-      skills: []
+    const invalidData = { 
+      name: '', 
+      email: 'invalid', 
+      age: 16, 
+      skills: [] 
     };
     
     const result = validator.validate(invalidData);
@@ -244,11 +244,11 @@ describe('createWizardValidator', () => {
     expect(result.errors).toContain('Must be 18 or older');
     expect(result.errors).toContain('At least one skill required');
 
-    const validData = {
-      name: 'John',
-      email: 'john@example.com',
-      age: 25,
-      skills: ['programming']
+    const validData = { 
+      name: 'John', 
+      email: 'john@example.com', 
+      age: 25, 
+      skills: ['programming'] 
     };
     
     const validResult = validator.validate(validData);

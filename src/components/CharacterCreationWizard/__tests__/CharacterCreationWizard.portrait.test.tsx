@@ -174,7 +174,7 @@ describe('Character Creation Wizard with Portrait Integration', () => {
     attributes: [
       { id: 'strength', name: 'Strength', category: 'physical', min: 1, max: 20, defaultValue: 10 }
     ],
-      skills: [
+    skills: [
       { 
         id: 'magic', 
         name: 'Magic', 

@@ -20,7 +20,7 @@ const mockWorld: World = {
     { id: 'attr-2', name: 'Marksmanship', description: 'Accuracy with firearms', worldId: 'world-1', baseValue: 8, minValue: 1, maxValue: 10 },
     { id: 'attr-3', name: 'Honor', description: 'Personal code and reputation', worldId: 'world-1', baseValue: 6, minValue: 1, maxValue: 10 }
   ],
-    skills: [
+  skills: [
     { id: 'skill-1', name: 'Gunslinging', description: 'Quick-draw and shooting skill', worldId: 'world-1', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, category: 'Combat' },
     { id: 'skill-2', name: 'Tracking', description: 'Following trails and finding targets', worldId: 'world-1', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, category: 'Outdoors' },
     { id: 'skill-3', name: 'Horsemanship', description: 'Riding and horse care', worldId: 'world-1', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, category: 'Travel' }

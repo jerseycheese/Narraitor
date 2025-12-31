@@ -27,7 +27,7 @@ describe('TemplateGenerator', () => {
           attributes: [
             { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
           ],
-            skills: [
+          skills: [
             { name: 'Engineering', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' }
           ],
           explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian aesthetics'
@@ -48,7 +48,7 @@ describe('TemplateGenerator', () => {
         attributes: expect.arrayContaining([
           expect.objectContaining({ name: 'Strength' })
         ]),
-      skills: expect.arrayContaining([
+        skills: expect.arrayContaining([
           expect.objectContaining({ name: 'Engineering' })
         ]),
         explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian aesthetics'
@@ -69,7 +69,7 @@ describe('TemplateGenerator', () => {
             { name: 'Tech Savvy', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' },
             { name: 'Grit', baseValue: 70, minValue: 0, maxValue: 100, category: 'Social' }
           ],
-            skills: [
+          skills: [
             { name: 'Hacking', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' },
             { name: 'Quick Draw', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
           ],
@@ -102,7 +102,7 @@ describe('TemplateGenerator', () => {
           attributes: [
             { name: 'Surface Tension', baseValue: 40, minValue: 0, maxValue: 100, category: 'Physical' }
           ],
-            skills: [
+          skills: [
             { name: 'Bubble Navigation', baseValue: 30, minValue: 0, maxValue: 100, difficulty: 'easy', category: 'Movement' }
           ],
           explanation: 'An unexpected microscopic world with unique physics and challenges'
@@ -151,7 +151,7 @@ describe('TemplateGenerator', () => {
         attributes: [
           { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
         ],
-          skills: [
+        skills: [
           { name: 'Swordplay', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
         ],
         explanation: 'Test explanation'
@@ -178,7 +178,7 @@ describe('TemplateGenerator', () => {
         attributes: [
           { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
         ],
-          skills: [
+        skills: [
           { name: 'Swordplay', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
         ],
         explanation: 'Test explanation'
@@ -196,7 +196,7 @@ describe('TemplateGenerator', () => {
         attributes: [
           { name: 'Tech', baseValue: 50, minValue: 0, maxValue: 100, category: 'Mental' }
         ],
-          skills: [
+        skills: [
           { name: 'Hacking', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' }
         ],
         explanation: 'Test explanation'

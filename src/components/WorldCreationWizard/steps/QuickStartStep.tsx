@@ -50,7 +50,7 @@ export default function QuickStartStep({
           modifiedValue: attr.value,
           category: 'Generated'
         })),
-      skills: archetype.skills.map(skill => ({
+        skills: archetype.skills.map(skill => ({
           id: `skill-${Date.now()}-${Math.random()}`,
           characterId: '', // Will be set by store
           worldSkillId: skill.id,

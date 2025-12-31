@@ -45,7 +45,7 @@ const TEST_WORLD_DATA = {
   attributes: [
     { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical' }
   ],
-    skills: [
+  skills: [
     { name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as const, category: 'Combat' }
   ]
 };
@@ -234,7 +234,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when skills are modified', async () => {
       // Start with some initial skills and test modification
       const initialData = {
-      skills: TEST_WORLD_DATA.skills.map(skill => ({
+        skills: TEST_WORLD_DATA.skills.map(skill => ({
           ...skill,
           id: `skill-${Date.now()}`,
           worldId: 'test-world-id',

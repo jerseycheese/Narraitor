@@ -45,7 +45,7 @@ export const SAMPLE_WORLDS: World[] = [
         maxValue: 10,
       },
     ],
-      skills: [
+    skills: [
       {
         id: 'skill-world-cyberpunk-2077-1',
         worldId: 'world-cyberpunk-2077',
@@ -116,7 +116,7 @@ export const SAMPLE_WORLDS: World[] = [
         maxValue: 10,
       },
     ],
-      skills: [
+    skills: [
       {
         id: 'skill-world-fantasy-realm-1',
         worldId: 'world-fantasy-realm',

@@ -36,7 +36,7 @@ const mockWorlds: World[] = [
       minValue: 1,
       maxValue: 20,
     }],
-      skills: [{
+    skills: [{
       id: 'skill-1' as EntityID,
       name: 'Combat',
       worldId: 'world-1' as EntityID,

@@ -13,7 +13,7 @@ describe('Type Validation Integration', () => {
         description: 'A test world',
         theme: 'fantasy',
         attributes: undefined, // Invalid: undefined instead of array
-      skills: []
+        skills: []
       };
 
       const result = validateWorld(invalidWorld);

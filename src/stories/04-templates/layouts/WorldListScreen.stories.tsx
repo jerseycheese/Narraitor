@@ -13,7 +13,7 @@ const mockWorlds: World[] = [
     description: 'A magical world full of wonder',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
+    skills: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 10,
@@ -29,7 +29,7 @@ const mockWorlds: World[] = [
     description: 'A futuristic world of technology',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
+    skills: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 10,
@@ -45,7 +45,7 @@ const mockWorlds: World[] = [
     description: 'A lawless frontier',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
+    skills: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 10,
@@ -172,8 +172,8 @@ export const ManyWorlds: Story = {
           description: 'A world after the fall',
           genre: 'fantasy',
           attributes: [],
-            skills: [],
-    settings: {
+          skills: [],
+          settings: {
             maxAttributes: 10,
             maxSkills: 10,
             attributePointPool: 100,
@@ -188,8 +188,8 @@ export const ManyWorlds: Story = {
           description: 'Knights and dragons',
           genre: 'fantasy',
           attributes: [],
-            skills: [],
-    settings: {
+          skills: [],
+          settings: {
             maxAttributes: 10,
             maxSkills: 10,
             attributePointPool: 100,

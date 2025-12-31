@@ -92,7 +92,7 @@ export async function generateCharacterArchetypes(
         description: template.description,
         level: 1, // All quick start characters are level 1
         attributes: distributeAttributes(world.attributes, template),
-      skills: distributeSkills(world.skills, template),
+        skills: distributeSkills(world.skills, template),
         background: {
           description: `${template.description} who has found their way to ${world.name}. ${personality}`,
           personality,

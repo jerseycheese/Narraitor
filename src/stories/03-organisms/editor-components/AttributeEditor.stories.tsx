@@ -63,7 +63,7 @@ export const EditMode: Story = {
             maxValue: 10,
           },
         },
-      skills: {},
+        skills: {},
       },
     },
   },
@@ -91,7 +91,7 @@ export const EditWithLinkedSkills: Story = {
             maxValue: 20,
           },
         },
-      skills: {
+        skills: {
           'skill-1': {
             id: 'skill-1' as EntityID,
             name: 'Investigation',

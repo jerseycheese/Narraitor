@@ -27,7 +27,7 @@ const fantasyWorld: World = {
     { id: 'int', name: 'Intelligence', description: 'Mental acuity and reasoning', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'fantasy-world-1' },
     { id: 'dex', name: 'Dexterity', description: 'Agility and precision', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'fantasy-world-1' },
   ],
-    skills: [
+  skills: [
     { id: 'combat', name: 'Combat', description: 'Skill in battle and warfare', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'fantasy-world-1' },
     { id: 'magic', name: 'Magic', description: 'Understanding of mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'fantasy-world-1' },
     { id: 'stealth', name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'fantasy-world-1' },

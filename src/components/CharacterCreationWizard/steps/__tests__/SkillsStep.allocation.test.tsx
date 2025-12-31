@@ -23,7 +23,7 @@ const buildWorldConfig = (skillPointPool: number): World => ({
       category: 'physical'
     }
   ],
-    skills: [
+  skills: [
     {
       id: 'skill-1',
       worldId: 'world-1',
@@ -59,7 +59,7 @@ describe('SkillsStep - skill point allocation', () => {
     const defaultProps: React.ComponentProps<typeof SkillsStep> = {
       data: {
         characterData: {
-            skills: [
+          skills: [
             {
               skillId: 'skill-1',
               name: 'Stealth',

@@ -10,8 +10,8 @@ const mockWorld: World = {
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z',
   attributes: [],
-    skills: [],
-    settings: {
+  skills: [],
+  settings: {
     maxAttributes: 10,
     maxSkills: 20,
     attributePointPool: 25,

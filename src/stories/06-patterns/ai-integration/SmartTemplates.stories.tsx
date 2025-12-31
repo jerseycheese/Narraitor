@@ -41,7 +41,7 @@ const mockGeneratedTemplate: WorldTemplate = {
     { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' },
     { name: 'Intelligence', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' }
   ],
-    skills: [
+  skills: [
     { name: 'Swordplay', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'medium' as SkillDifficulty, category: 'Combat' },
     { name: 'Magic', baseValue: 35, minValue: 0, maxValue: 100, difficulty: 'hard' as SkillDifficulty, category: 'Mystical' }
   ],
@@ -313,7 +313,7 @@ const mockTemplate: WorldTemplate = {
     { name: 'Social Standing', baseValue: 45, minValue: 0, maxValue: 100, category: 'Social' },
     { name: 'Steam Affinity', baseValue: 55, minValue: 0, maxValue: 100, category: 'Mystical' }
   ],
-    skills: [
+  skills: [
     { name: 'Engineering', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' },
     { name: 'Airship Piloting', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' },
     { name: 'Clockwork Repair', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' },

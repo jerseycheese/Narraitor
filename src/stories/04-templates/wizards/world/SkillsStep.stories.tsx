@@ -47,7 +47,7 @@ const defaultData = {
       { id: 'dexterity', name: 'Dexterity', value: 7 },
       { id: 'charisma', name: 'Charisma', value: 6 },
     ],
-      skills: [
+    skills: [
       {
         skillId: 'magic',
         name: 'Magic',
@@ -130,7 +130,7 @@ const mockWorldConfig = {
     { id: 'dexterity', name: 'Dexterity', description: 'Agility and coordination', minValue: 1, maxValue: 10, baseValue: 5 },
     { id: 'charisma', name: 'Charisma', description: 'Social influence', minValue: 1, maxValue: 10, baseValue: 5 },
   ],
-    skills: [
+  skills: [
     {
       id: 'magic',
       name: 'Magic',
@@ -213,7 +213,7 @@ export const WithSelection: Story = {
       ...defaultData,
       characterData: {
         ...defaultData.characterData,
-          skills: [
+        skills: [
           { ...defaultData.characterData.skills[0], isSelected: true }, // Magic
           { ...defaultData.characterData.skills[1], isSelected: false }, // Swordplay
           { ...defaultData.characterData.skills[2], isSelected: false }, // Archery
@@ -236,7 +236,7 @@ export const MaxSelection: Story = {
       ...defaultData,
       characterData: {
         ...defaultData.characterData,
-      skills: defaultData.characterData.skills.map(skill => ({
+        skills: defaultData.characterData.skills.map(skill => ({
           ...skill,
           isSelected: true,
         })),

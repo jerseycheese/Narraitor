@@ -38,7 +38,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
               category: 'Magical'
             }
           ],
-            skills: [
+          skills: [
             {
               name: 'Spellcasting',
               description: 'Ability to cast magical spells',
@@ -175,7 +175,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
           attributes: [
             { name: 'Steam Power', description: 'Control over steam-based tech' }
           ],
-            skills: [
+          skills: [
             { name: 'Engineering', description: 'Building mechanical devices' }
           ]
         })

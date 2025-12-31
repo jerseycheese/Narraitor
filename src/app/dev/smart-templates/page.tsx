@@ -36,7 +36,7 @@ export default function SmartTemplatesTestPage() {
           category: attr.category,
           accepted: true // Auto-accept template attributes
         })),
-      skills: template.skills.map(skill => ({
+        skills: template.skills.map(skill => ({
           name: skill.name,
           description: skill.description || `${skill.name} is an important skill for characters in this world`,
           difficulty: skill.difficulty,

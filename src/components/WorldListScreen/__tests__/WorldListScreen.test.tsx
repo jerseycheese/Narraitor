@@ -188,8 +188,8 @@ describe('WorldListScreen', () => {
         description: 'Desc 1',
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    settings: {
+        skills: [],
+        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,
@@ -204,8 +204,8 @@ describe('WorldListScreen', () => {
         description: 'Desc 2',
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    settings: {
+        skills: [],
+        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,
@@ -252,8 +252,8 @@ describe('WorldListScreen', () => {
         description: 'Desc 1',
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    settings: {
+        skills: [],
+        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,

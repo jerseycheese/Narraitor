@@ -5,7 +5,7 @@ import { createMockWorld, createMockWorldSkill } from '@/lib/test-utils';
 
 const buildWorld = (overrides: Partial<World> = {}): World => createMockWorld({
   id: 'world-1',
-    skills: [
+  skills: [
     createMockWorldSkill({
       id: 'skill-1',
       worldId: 'world-1',

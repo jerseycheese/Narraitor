@@ -89,7 +89,7 @@ export const westernTemplate: WorldTemplate = {
       defaultValue: 5
     }
   ],
-    skills: [
+  skills: [
     {
       name: 'Shooting',
       description: 'Accuracy with firearms.',
@@ -253,7 +253,7 @@ export const sitcomTemplate: WorldTemplate = {
       defaultValue: 5
     }
   ],
-    skills: [
+  skills: [
     {
       name: 'Physical Comedy',
       description: 'Skill at slapstick and physical humor.',
@@ -417,7 +417,7 @@ export const fantasyTemplate: WorldTemplate = {
       defaultValue: 5
     }
   ],
-    skills: [
+  skills: [
     {
       name: 'Swordsmanship',
       description: 'Skill with bladed weapons.',

@@ -225,7 +225,7 @@ describe('extractWorldAnalysisData', () => {
       relationship: 'inspired_by',
       attributes: [],
       skills: [],
-    settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 27,

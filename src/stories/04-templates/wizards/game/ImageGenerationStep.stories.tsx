@@ -32,8 +32,8 @@ const mockWorldData: Partial<World> = {
   genre: 'fantasy',
   description: 'A mystical world where ancient magic flows through enchanted forests and forgotten ruins hold untold secrets.',
   attributes: [],
-    skills: [],
-    settings: {
+  skills: [],
+  settings: {
     maxAttributes: 10,
     maxSkills: 10,
     attributePointPool: 20,

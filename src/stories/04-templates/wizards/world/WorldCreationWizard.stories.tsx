@@ -111,7 +111,7 @@ export const AttributeReviewStep: Story = {
           { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: true },
           { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: true },
         ],
-      skills: []
+        skills: []
       }
     }
   },
@@ -144,7 +144,7 @@ export const SkillReviewStep: Story = {
       },
       aiSuggestions: {
         attributes: [],
-          skills: [
+        skills: [
           { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium' as SkillDifficulty, category: 'Combat', linkedAttributeNames: ['Strength'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
           { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard' as SkillDifficulty, category: 'Physical', linkedAttributeNames: ['Agility'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
           { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy' as SkillDifficulty, category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },

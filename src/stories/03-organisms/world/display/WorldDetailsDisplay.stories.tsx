@@ -106,7 +106,7 @@ const mockWorld: World = {
       category: 'Social',
     },
   ],
-    skills: [
+  skills: [
     {
       id: 'swordsmanship',
       worldId: 'world-1',

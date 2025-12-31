@@ -57,7 +57,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
       return {
         ...(data.characterData as CharacterCreationData),
-      skills: skillsWithBounds,
+        skills: skillsWithBounds,
         worldId,
       };
     }
@@ -125,7 +125,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       validation: wizard.state.validation,
       pointPools: {
         attributes: attributePool.pool,
-      skills: skillPool,
+        skills: skillPool,
       },
     };
     setData(newData);
@@ -206,7 +206,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       worldId: wizard.state.data.worldId,
       pointPools: { 
         attributes: attributePool.pool, 
-      skills: skillPool 
+        skills: skillPool 
       },
       validation: wizard.state.validation
     };
