@@ -70,6 +70,7 @@ describe('PortraitGenerator', () => {
       skills: [
         { skillId: 'magic', level: 10, experience: 100, isActive: true }
       ],
+      derivedStats: [],
       background: {
         history: 'A skilled mage from the northern kingdoms',
         personality: 'Wise and mysterious',

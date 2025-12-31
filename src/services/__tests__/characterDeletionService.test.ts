@@ -107,6 +107,7 @@ describe('CharacterDeletionService', () => {
     clearError: jest.fn(),
     setLoading: jest.fn(),
     syncDerivedState: jest.fn(),
+    recalculateDerivedStats: jest.fn(),
   };
 
   beforeEach(() => {

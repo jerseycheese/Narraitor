@@ -91,6 +91,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       isPlayer: effectiveCharacterData.isPlayer || false,
       attributes: mockAttributes,
       skills: mockSkills,
+      derivedStats: [],
       background: {
         history: getBackgroundProp('history') || '',
         personality: getBackgroundProp('personality') || '',

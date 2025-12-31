@@ -65,6 +65,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
         isActive: true
       }
     ],
+    derivedStats: [],
     inventory: {
       characterId: mockCharacterId,
       items: [],

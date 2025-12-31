@@ -457,6 +457,7 @@ export const TestDataGeneratorSection: React.FC = () => {
               category: worldSkill?.category
             };
           }),
+          derivedStats: [],
           background: {
             history: aiCharacterData.background.description || '',
             personality: aiCharacterData.background.personality || '',

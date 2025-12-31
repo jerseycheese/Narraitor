@@ -12,6 +12,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
+  derivedStats: any[];
   inventory: {
     items: InventoryItem[];
   };
@@ -40,8 +41,9 @@ describe('requirementEvaluator - Item Requirements', () => {
   });
 
   const mockCharacter: Character = {
-      skills: [],
-    derivedStats: [],    inventory: {
+    skills: [],
+    derivedStats: [],
+    inventory: {
       items: [
         createMockItem('Lockpick', 1),
         createMockItem('Healing Potion', 3),
@@ -220,8 +222,9 @@ describe('requirementEvaluator - Item Requirements', () => {
   describe('edge cases', () => {
     it('should handle empty inventory gracefully', () => {
       const emptyCharacter: Character = {
-          skills: [],
-    derivedStats: [],        inventory: {
+        skills: [],
+        derivedStats: [],
+        inventory: {
           items: [],
         },
       };

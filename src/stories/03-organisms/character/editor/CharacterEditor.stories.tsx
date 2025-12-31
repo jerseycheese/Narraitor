@@ -151,6 +151,7 @@ export const NewCharacter: Story = {
           name: skill.name,
           level: 5
         })),
+        derivedStats: [],
         background: {
           history: 'A brave adventurer who started their journey in a small village',
           personality: 'Courageous and kind',
@@ -208,6 +209,7 @@ export const WithPortrait: Story = {
           name: skill.name,
           level: 7
         })),
+        derivedStats: [],
         background: {
           history: 'A legendary warrior from the northern kingdoms',
           personality: 'Stoic and honorable, with a hidden sense of humor',
@@ -325,6 +327,7 @@ export const CustomPromptTesting: Story = {
           name: skill.name,
           level: 3
         })),
+        derivedStats: [],
         background: {
           history: 'A test character created to demonstrate custom prompt functionality',
           personality: 'Designed for testing UI interactions',
@@ -398,6 +401,7 @@ export const UIComponentShowcase: Story = {
           name: skill.name,
           level: 6
         })),
+        derivedStats: [],
         background: {
           history: 'This character showcases all the UI component improvements made to the character editor',
           personality: 'Well-designed and consistent with the design system',

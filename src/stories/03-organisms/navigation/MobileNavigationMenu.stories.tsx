@@ -137,7 +137,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 5,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'A brave warrior with a mysterious past',
       personality: 'Noble and just, but haunted by ancient memories',
@@ -171,7 +172,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 3,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'A scholar turned adventurer seeking ancient artifacts',
       personality: 'Wise and mysterious, but curious about forbidden knowledge',
@@ -205,7 +207,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 1,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'Former cop turned private investigator with cybernetic enhancements',
       personality: 'Cynical but determined to find the truth',

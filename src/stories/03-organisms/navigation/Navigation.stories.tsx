@@ -125,7 +125,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 5,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'A brave warrior',
       personality: 'Noble and just',
@@ -159,7 +160,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 3,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'A skilled mage with ancient knowledge',
       personality: 'Wise and mysterious',
@@ -193,7 +195,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 1,
     isPlayer: true,
     attributes: [],
-      skills: [],
+    skills: [],
+    derivedStats: [],
     background: {
       history: 'A cyber-enhanced detective investigating corruption',
       personality: 'Cynical but determined',

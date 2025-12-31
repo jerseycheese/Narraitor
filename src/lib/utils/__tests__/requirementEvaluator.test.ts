@@ -26,6 +26,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
+  derivedStats: any[];
   background: {
     history: string;
     personality: string;
@@ -99,6 +100,7 @@ describe('requirementEvaluator', () => {
         category: 'social'
       }
     ],
+    derivedStats: [],
     background: {
       history: 'Test history',
       personality: 'Test personality',
@@ -232,8 +234,9 @@ describe('requirementEvaluator', () => {
     it('should handle empty character gracefully', () => {
       const emptyCharacter: Character = {
         ...mockCharacter,
-          skills: [],
-    derivedStats: [],        attributes: [],
+        skills: [],
+        derivedStats: [],
+        attributes: [],
         level: 1
       };
 

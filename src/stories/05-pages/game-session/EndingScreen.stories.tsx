@@ -52,6 +52,7 @@ const mockCharacter = {
       category: 'Combat',
     },
   ],
+  derivedStats: [],
   background: {
     history: 'A seasoned warrior seeking redemption',
     personality: 'Brave and honorable',
@@ -86,9 +87,8 @@ const mockWorld = {
   description: 'A realm where magic and technology coexist',
   genre: 'fantasy',
   attributes: [],
-    skills: [],
-    derivedStats: [],
-settings: {
+  skills: [],
+  settings: {
     maxAttributes: 6,
     maxSkills: 8,
     attributePointPool: 27,

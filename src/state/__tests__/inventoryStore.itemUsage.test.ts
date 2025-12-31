@@ -53,7 +53,8 @@ describe('InventoryStore - Item Usage', () => {
       background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
       skills: [],
-    
+      derivedStats: [],
+
     });
   });
 
@@ -210,8 +211,9 @@ describe('InventoryStore - Item Usage', () => {
         },
         background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
         attributes: [],
-          skills: [],
-    
+        skills: [],
+        derivedStats: [],
+
       });
 
       // Add item to first character

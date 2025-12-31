@@ -49,6 +49,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true },         // Competent
         { skillId: 'skill-pickpocket', level: 2, experience: 40, isActive: true }       // Apprentice
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],

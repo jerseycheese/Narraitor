@@ -96,8 +96,8 @@ describe('Persistence Integration - MVP', () => {
         worldId: 'test-world-1',
         level: 1,
         attributes: [],
-          skills: [],
-    
+        skills: [],
+        derivedStats: [],
         background: {
           history: 'A test character',
           personality: 'Bold',
@@ -165,8 +165,8 @@ describe('Persistence Integration - MVP', () => {
         worldId: worldId,
         level: 1,
         attributes: [],
-          skills: [],
-    
+        skills: [],
+        derivedStats: [],
         background: {
           history: 'A test character',
           personality: 'Bold',

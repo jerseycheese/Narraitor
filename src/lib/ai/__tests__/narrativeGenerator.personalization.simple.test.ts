@@ -50,6 +50,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
         { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],

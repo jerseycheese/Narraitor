@@ -74,6 +74,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             experience: 0,
             isActive: true
           })),
+        derivedStats: [],
         background: {
           history: data.characterData.background.history + (environmentHint ? ` ${environmentHint}` : ''),
           personality: data.characterData.background.personality,

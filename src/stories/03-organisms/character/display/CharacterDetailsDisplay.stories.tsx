@@ -205,6 +205,7 @@ const mockCharacter: StoreCharacter = {
       category: 'Knowledge'
     }
   ],
+  derivedStats: [],
   background: {
     history: 'Raised by elves in Rivendell, trained as a Ranger of the North. He is the rightful heir to the throne of Gondor, though he has spent most of his life wandering the wild lands protecting the innocent.',
     personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',

@@ -864,6 +864,7 @@ Respond with JSON format:
                 attributeId: attr.worldAttributeId || attr.id,
                 value: attr.modifiedValue || attr.baseValue
               })),
+              derivedStats: [],
               background: {
                 history: character.background?.history || '',
                 personality: character.background?.personality || '',

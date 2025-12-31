@@ -181,6 +181,7 @@ const mockCharacter = {
       category: 'social'
     }
   ],
+  derivedStats: [],
   isPlayer: true,
   status: {
     health: 100,
