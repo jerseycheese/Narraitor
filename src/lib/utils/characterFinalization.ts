@@ -44,6 +44,7 @@ export function finalizeCharacterCreation(
           category: worldSkill?.category
         };
       }),
+    derivedStats: [],  // Will be calculated below
     background: {
       history: data.background.history,
       personality: data.background.personality,
@@ -70,6 +71,9 @@ export function finalizeCharacterCreation(
       itemOrder: []
     },
   });
+
+  // Calculate derived stats from world formulas
+  useCharacterStore.getState().recalculateDerivedStats(characterId);
 
   // Set as current character
   useCharacterStore.getState().setCurrentCharacter(characterId);

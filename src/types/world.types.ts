@@ -47,6 +47,21 @@ export interface WorldSkill extends NamedEntity {
 }
 
 /**
+ * Formula for calculating a derived stat from character attributes
+ * AI-generated during world creation based on world's attributes
+ */
+export interface DerivedStatFormula extends NamedEntity {
+  worldId: EntityID;
+  description: string;
+  baseValue?: number;  // Optional base value to add (e.g., 10 for AC-style stats)
+  attributeMultipliers: {
+    [attributeId: string]: number;  // Map of attributeId -> multiplier
+  };
+  minValue?: number;  // Optional minimum value
+  maxValue?: number;  // Optional maximum value
+}
+
+/**
  * World-specific configuration settings
  */
 export interface WorldSettings {
@@ -54,4 +69,5 @@ export interface WorldSettings {
   maxSkills: number;
   attributePointPool: number;
   skillPointPool: number;
+  derivedStatFormulas?: DerivedStatFormula[];  // AI-generated stat formulas
 }

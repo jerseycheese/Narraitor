@@ -9,6 +9,8 @@ import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/l
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 import { useInventoryStore } from './inventoryStore';
+import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
+import { useWorldStore } from './worldStore';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -28,6 +30,16 @@ export interface CharacterSkill {
   name: string;
   level: number;
   category?: string;
+}
+
+export interface DerivedStat {
+  id: EntityID;
+  characterId: EntityID;
+  derivedStatId: EntityID;  // References formula ID
+  name: string;
+  currentValue: number;     // Current amount (changes during gameplay)
+  maxValue: number;         // Calculated maximum from formula
+  lastCalculated: string;   // Timestamp
 }
 
 interface CharacterBackground {
@@ -56,6 +68,7 @@ export interface Character {
   level: number;
   attributes: CharacterAttribute[];
   skills: CharacterSkill[];
+  derivedStats: DerivedStat[];
   background: CharacterBackground;
   isPlayer: boolean;
   status: CharacterStatus;
@@ -169,6 +182,9 @@ export interface CharacterStore extends CrudStore<Character> {
   // Skill management
   addSkill: (characterId: EntityID, skill: Omit<CharacterSkill, 'id' | 'characterId'>) => void;
 
+  // Derived stats management
+  recalculateDerivedStats: (characterId: EntityID) => void;
+
   // Path Count Optimization
   cleanupCharacterHistory: (worldId?: EntityID, keepRecentCount?: number) => void;
   compactCharacterData: () => void;
@@ -235,6 +251,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             characterId,
           })) || [];
 
+          const derivedStats = characterData.derivedStats || [];
+
           const inventory = {
             ...characterData.inventory,
             characterId,
@@ -248,6 +266,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
             inventory,
             attributes,
             skills,
+            derivedStats,
             level: characterData.level || 1,
             createdAt: now,
             updatedAt: now,
@@ -498,6 +517,9 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           get().update(characterId, {
             attributes: updatedAttributes,
           });
+
+          // Recalculate derived stats after attribute change
+          get().recalculateDerivedStats(characterId);
         },
 
         removeAttribute: (characterId, attributeId) => {
@@ -539,6 +561,51 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
           get().update(characterId, {
             skills: [...character.skills, newSkill],
           });
+        },
+
+        // Derived stats management
+        recalculateDerivedStats: (characterId) => {
+          const character = get().characters[characterId];
+          if (!character) {
+            set({ error: createStoreError('Character Not Found', 'The specified character could not be found') });
+            return;
+          }
+
+          const world = useWorldStore.getState().worlds[character.worldId];
+          if (!world?.settings?.derivedStatFormulas || world.settings.derivedStatFormulas.length === 0) {
+            get().update(characterId, { derivedStats: [] });
+            return;
+          }
+
+          const formulas = world.settings.derivedStatFormulas;
+          const currentDerivedStats = character.derivedStats || [];
+
+          const updatedDerivedStats: DerivedStat[] = formulas.map(formula => {
+            const existingStat = currentDerivedStats.find(s => s.derivedStatId === formula.id);
+            const newMaxValue = calculateDerivedStat(formula, character.attributes);
+
+            let newCurrentValue: number;
+            if (existingStat && existingStat.maxValue > 0) {
+              // Preserve ratio when recalculating
+              const ratio = existingStat.currentValue / existingStat.maxValue;
+              newCurrentValue = Math.round(newMaxValue * ratio);
+            } else {
+              // Initialize to max for new stats
+              newCurrentValue = newMaxValue;
+            }
+
+            return {
+              id: existingStat?.id || generateUniqueId('dstat'),
+              characterId,
+              derivedStatId: formula.id,
+              name: formula.name,
+              currentValue: newCurrentValue,
+              maxValue: newMaxValue,
+              lastCalculated: getTimestamp()
+            };
+          });
+
+          get().update(characterId, { derivedStats: updatedDerivedStats });
         },
 
         cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {

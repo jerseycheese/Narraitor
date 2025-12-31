@@ -46,7 +46,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         { attributeId: 'attr-intelligence', value: 8 },
         { attributeId: 'attr-dexterity', value: 6 }
       ],
-      skills: [
+        skills: [
         { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
         { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
       ],

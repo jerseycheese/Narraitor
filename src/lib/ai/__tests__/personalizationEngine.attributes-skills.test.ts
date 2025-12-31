@@ -44,7 +44,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         { attributeId: 'attr-strength', value: 3 },       // Low
         { attributeId: 'attr-charisma', value: 5 }        // Moderate (filtered out)
       ],
-      skills: [
+        skills: [
         { skillId: 'skill-lockpicking', level: 4, experience: 100, isActive: true },    // Expert
         { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true },         // Competent
         { skillId: 'skill-pickpocket', level: 2, experience: 40, isActive: true }       // Apprentice
@@ -187,7 +187,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles skills with name property', () => {
       const characterWithNameSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        skills: [
+          skills: [
           { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' }, // Expert
           { name: 'Stealth', level: 3 } // Competent
         ]
@@ -211,7 +211,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty skills gracefully', () => {
       const characterNoSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        skills: []
+        skills: [],
+        derivedStats: []
       };
 
       const context = engine.createPersonalizedContext(

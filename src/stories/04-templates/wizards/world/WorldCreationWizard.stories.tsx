@@ -144,7 +144,7 @@ export const SkillReviewStep: Story = {
       },
       aiSuggestions: {
         attributes: [],
-        skills: [
+          skills: [
           { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium' as SkillDifficulty, category: 'Combat', linkedAttributeNames: ['Strength'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
           { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard' as SkillDifficulty, category: 'Physical', linkedAttributeNames: ['Agility'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
           { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy' as SkillDifficulty, category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
@@ -183,7 +183,7 @@ export const FinalizeStep: Story = {
         { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
         { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
       ],
-      skills: [
+        skills: [
         { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
         { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
       ],

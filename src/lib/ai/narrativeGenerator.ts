@@ -346,6 +346,7 @@ export class NarrativeGenerator {
     skills:
       | Array<{ name: string; level: number; worldSkillId?: string }>
       | Array<{ skillId: string; level: number }>;
+    derivedStats?: Array<{ name: string; currentValue: number; maxValue: number }>;
     createdAt: string;
     updatedAt: string;
   } {
@@ -375,6 +376,13 @@ export class NarrativeGenerator {
             worldSkillId: skill.worldSkillId,
           }))
         : [],
+      derivedStats: Array.isArray(storeCharacter.derivedStats)
+        ? storeCharacter.derivedStats.map((stat) => ({
+            name: stat.name,
+            currentValue: stat.currentValue,
+            maxValue: stat.maxValue,
+          }))
+        : undefined,
       createdAt: storeCharacter.createdAt,
       updatedAt: storeCharacter.updatedAt,
     };

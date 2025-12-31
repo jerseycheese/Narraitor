@@ -31,7 +31,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 6,
       },
     ],
-    skills: [
+      skills: [
       {
         id: 'char-skill-hacking',
         characterId: 'char-cyberpunk-hacker',
@@ -47,6 +47,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 8,
       },
     ],
+    derivedStats: [],
     background: {
       history:
         'Former Arasaka security specialist who discovered dark corporate secrets',
@@ -106,7 +107,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 7,
       },
     ],
-    skills: [
+      skills: [
       {
         id: 'char-skill-hacking-2',
         characterId: 'char-cyberpunk-operative',
@@ -122,6 +123,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 5,
       },
     ],
+    derivedStats: [],
     background: {
       history:
         'A former corporate asset who disappeared from official records.',
@@ -173,7 +175,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 4,
       },
     ],
-    skills: [
+      skills: [
       {
         id: 'char-skill-spellcasting',
         characterId: 'char-fantasy-mage',
@@ -189,6 +191,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 7,
       },
     ],
+    derivedStats: [],
     background: {
       history: 'Trained in the ancient towers of Silverwind Academy',
       personality:
@@ -242,7 +245,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 1,
       },
     ],
-    skills: [
+      skills: [
       {
         id: 'char-skill-spellcasting-2',
         characterId: 'char-fantasy-ranger',
@@ -258,6 +261,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 9,
       },
     ],
+    derivedStats: [],
     background: {
       history: 'Guardian of the greenways and hidden glades of Aethermoor.',
       personality: 'Stoic, perceptive, and loyal',

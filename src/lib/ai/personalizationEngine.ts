@@ -27,7 +27,8 @@ import {
 import { getTimestamp } from '../utils';
 import {
   formatAttributesForNarrative,
-  formatSkillsForNarrative
+  formatSkillsForNarrative,
+  formatDerivedStatsForNarrative
 } from './attributeSkillFormatter';
 
 // Simple character interface for personalization
@@ -37,6 +38,7 @@ interface PersonalizationCharacter {
   background: string;
   attributes: Record<string, number> | Array<{ attributeId: string; value: number }>;
   skills: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+  derivedStats?: Array<{ name: string; currentValue: number; maxValue: number }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -166,6 +168,14 @@ export class PersonalizationEngine {
       const skillString = formatSkillsForNarrative(context.character.skills);
       if (skillString) {
         parts.push(`SKILLS: ${skillString}`);
+      }
+    }
+
+    // Derived stats (calculated from attributes)
+    if (context.character.derivedStats && context.character.derivedStats.length > 0) {
+      const derivedStatsString = formatDerivedStatsForNarrative(context.character.derivedStats);
+      if (derivedStatsString) {
+        parts.push(`DERIVED STATS: ${derivedStatsString}`);
       }
     }
 

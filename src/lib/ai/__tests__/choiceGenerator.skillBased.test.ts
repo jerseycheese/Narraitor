@@ -43,7 +43,7 @@ Decision Weight: [minor]`
       name: 'Fantasy Realm',
       description: 'A medieval fantasy world',
       genre: 'fantasy',
-      skills: [
+        skills: [
         {
           id: 'lockpicking',
           name: 'Lockpicking',
@@ -92,7 +92,7 @@ Decision Weight: [minor]`
       attributes: [
         { attributeId: 'dexterity', value: 8 }
       ],
-      skills: [
+        skills: [
         {
           skillId: 'lockpicking',
           level: 4, // Expert level
@@ -207,7 +207,8 @@ Decision Weight: [minor]`
       // Character with no skills
       const characterNoSkills = {
         ...mockCharacter,
-        skills: []
+        skills: [],
+        derivedStats: []
       };
 
       const mockCharacterStoreNoSkills = {
@@ -242,7 +243,7 @@ Decision Weight: [minor]`
         ...mockCharacter,
         id: 'char-2',
         name: 'Strong Warrior',
-        skills: [
+          skills: [
           {
             skillId: 'combat',
             level: 5, // Master
