@@ -26,7 +26,7 @@ export function createMockWorld(): World {
     name: 'Epic Fantasy Realm',
     description: 'A land of magic and adventure',
     genre: 'fantasy',
-    settings: {
+        settings: {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,

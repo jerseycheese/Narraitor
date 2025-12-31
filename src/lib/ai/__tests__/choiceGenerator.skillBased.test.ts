@@ -73,7 +73,7 @@ Decision Weight: [minor]`
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-      attributes: []
+        attributes: []
     };
 
     // Mock character with high lockpicking skill
@@ -208,7 +208,7 @@ Decision Weight: [minor]`
       // Character with no skills
       const characterNoSkills = {
         ...mockCharacter,
-      skills: [],
+        skills: [],
         derivedStats: []
       };
 

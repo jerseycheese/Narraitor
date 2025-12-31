@@ -38,9 +38,9 @@ describe('Item Usage Service', () => {
       name: 'Fantasy Realm',
       description: 'A magical world',
       genre: 'fantasy',
-      attributes: [],
-      skills: [],
-      settings: {
+        attributes: [],
+        skills: [],
+        settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,
@@ -68,8 +68,8 @@ describe('Item Usage Service', () => {
         itemOrder: [],
       },
       background: { history: 'A courageous warrior', personality: 'Brave', goals: [], fears: [], relationships: [] },
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
     });
 

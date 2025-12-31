@@ -89,8 +89,8 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       worldId: effectiveCharacterData.worldId || 'world-1',
       level: effectiveCharacterData.level || 1,
       isPlayer: effectiveCharacterData.isPlayer || false,
-      attributes: mockAttributes,
-      skills: mockSkills,
+        attributes: mockAttributes,
+        skills: mockSkills,
       derivedStats: [],
       background: {
         history: getBackgroundProp('history') || '',

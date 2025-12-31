@@ -363,13 +363,13 @@ export class NarrativeGenerator {
       id: storeCharacter.id,
       name: storeCharacter.name,
       background,
-      attributes: Array.isArray(storeCharacter.attributes)
+        attributes: Array.isArray(storeCharacter.attributes)
         ? storeCharacter.attributes.map((attribute) => ({
             attributeId: String(attribute.worldAttributeId ?? attribute.id),
             value: Number(attribute.modifiedValue ?? attribute.baseValue ?? 0),
           }))
         : {},
-      skills: Array.isArray(storeCharacter.skills)
+        skills: Array.isArray(storeCharacter.skills)
         ? storeCharacter.skills.map((skill) => ({
             name: skill.name,
             level: skill.level,
@@ -1212,7 +1212,7 @@ Return ONLY the rewritten narrative.`;
       worldDescription: world.description,
       genre: world.genre,
       tone: toneSettings.narrativeStyle,
-      attributes: world.attributes,
+        attributes: world.attributes,
       characterIds: request.characterIds,
       playerCharacterName: playerCharacter?.name,
       playerCharacterBackground: playerCharacter?.background,

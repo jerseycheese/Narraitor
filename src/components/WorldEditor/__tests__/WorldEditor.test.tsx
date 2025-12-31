@@ -97,7 +97,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 20,

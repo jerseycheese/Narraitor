@@ -79,8 +79,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-      attributes: [],
-      skills: []
+        attributes: [],
+        skills: []
     };
   });
 
@@ -212,7 +212,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty skills gracefully', () => {
       const characterNoSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-      skills: [],
+        skills: [],
         derivedStats: []
       };
 

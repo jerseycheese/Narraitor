@@ -57,8 +57,8 @@ describe('buildEndingContext', () => {
       description: 'A test character from the store',
       worldId: request.worldId,
       level: 1,
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
       background: {
         history: 'Some backstory',
@@ -113,8 +113,8 @@ describe('buildEndingContext', () => {
       description: 'Keeps track of time',
       worldId: request.worldId,
       level: 3,
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
       background: {
         history: 'Time traveler',
@@ -189,8 +189,8 @@ describe('buildEndingContext', () => {
       description: 'Records everything',
       worldId: request.worldId,
       level: 5,
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
       background: {
         history: 'Chronicler of events',

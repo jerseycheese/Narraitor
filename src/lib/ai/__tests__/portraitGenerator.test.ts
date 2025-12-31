@@ -63,11 +63,11 @@ describe('PortraitGenerator', () => {
       name: 'Elara Moonshadow',
       worldId: 'world-1',
       description: 'A mysterious elven mage with silver hair and piercing blue eyes',
-      attributes: [
+        attributes: [
         { attributeId: 'strength', value: 8 },
         { attributeId: 'intelligence', value: 15 }
       ],
-      skills: [
+        skills: [
         { skillId: 'magic', level: 10, experience: 100, isActive: true }
       ],
       derivedStats: [],

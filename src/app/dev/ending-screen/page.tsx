@@ -53,7 +53,7 @@ const MOCK_WORLD_DATA = {
     genre: 'fantasy',
     attributes: [],
     skills: [],
-    settings: {
+        settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,

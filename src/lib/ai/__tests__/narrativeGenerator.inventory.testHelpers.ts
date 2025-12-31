@@ -37,7 +37,7 @@ export function setupTestWorldAndCharacter() {
     genre: 'fantasy',
     attributes: [],
     skills: [],
-    settings: {
+        settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 10,

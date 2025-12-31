@@ -109,8 +109,8 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
         fears: [],
         relationships: []
       },
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
       inventory: {
         characterId: '',

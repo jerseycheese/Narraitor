@@ -42,7 +42,7 @@ const defaultData = {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    background: {
       history: '',
       personality: '',

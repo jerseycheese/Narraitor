@@ -55,7 +55,7 @@ describe('requirementEvaluator', () => {
     description: 'A test character',
     worldId: 'world-1',
     level: 5,
-    attributes: [
+        attributes: [
       {
         id: 'attr-1',
         characterId: 'char-1',

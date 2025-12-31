@@ -43,7 +43,7 @@ const mockCharacter = {
       category: 'Physical',
     },
   ],
-    skills: [
+        skills: [
     {
       id: 'char-skill-1',
       characterId: 'char-123',

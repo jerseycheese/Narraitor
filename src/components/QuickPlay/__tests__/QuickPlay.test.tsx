@@ -71,9 +71,9 @@ describe('QuickPlay', () => {
       name: 'Test World',
       description: 'A test world',
       genre: 'fantasy' as const,
-      attributes: [],
-      skills: [],
-      settings: {
+        attributes: [],
+        skills: [],
+        settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 50,
@@ -89,8 +89,8 @@ describe('QuickPlay', () => {
       name: 'Test Hero',
       description: 'A brave adventurer',
       level: 1,
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
       derivedStats: [],
       background: {
         history: 'A brave adventurer',

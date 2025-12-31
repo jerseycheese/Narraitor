@@ -60,7 +60,7 @@ export default function CharacterGenerationTestPage() {
       description: generatedCharacter.background.description || '',
       worldId: selectedWorldId,
       level: generatedCharacter.level || 1,
-      attributes: generatedCharacter.attributes.map((attr) => {
+        attributes: generatedCharacter.attributes.map((attr) => {
         const worldAttr = world.attributes.find(wa => wa.id === attr.id);
         return {
           id: `attr-${Date.now()}-${Math.random()}`,
@@ -70,7 +70,7 @@ export default function CharacterGenerationTestPage() {
           modifiedValue: attr.value
         };
       }),
-      skills: generatedCharacter.skills.map((skill) => {
+        skills: generatedCharacter.skills.map((skill) => {
         const worldSkill = world.skills.find(ws => ws.id === skill.id);
         return {
           id: `skill-${Date.now()}-${Math.random()}`,

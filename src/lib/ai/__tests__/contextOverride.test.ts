@@ -9,8 +9,8 @@ describe('contextOverride', () => {
     description: 'A test world',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-    settings: {
+        skills: [],
+        settings: {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,
@@ -33,7 +33,7 @@ describe('contextOverride', () => {
       relationships: []
     },
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],
     inventory: {
       characterId: 'char-1',

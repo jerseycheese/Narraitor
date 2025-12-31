@@ -86,7 +86,7 @@ const mockWorld: World = {
       category: 'Mental',
     },
   ],
-    skills: [
+        skills: [
     {
       id: 'swordsmanship',
       worldId: 'world-1',
@@ -179,7 +179,7 @@ const mockCharacter: StoreCharacter = {
       category: 'Mental'
     }
   ],
-    skills: [
+        skills: [
     {
       id: 'char-skill-swordsmanship',
       characterId: 'char-1',

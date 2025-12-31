@@ -102,7 +102,7 @@ export const Loading: Story = {
   args: {
     loading: true,
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -114,7 +114,7 @@ export const Empty: Story = {
   args: {
     loading: false,
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -127,7 +127,7 @@ export const Error: Story = {
     loading: false,
     error: 'Failed to generate AI suggestions. Please try again.',
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -139,7 +139,7 @@ export const AttributesOnly: Story = {
   args: {
     loading: false,
     attributes: mockAttributes,
-      skills: [],
+        skills: [],
     derivedStats: [],    onAcceptAttribute: (attribute: AttributeSuggestion) => console.log('Accept attribute:', attribute),
     onRejectAttribute: (attribute: AttributeSuggestion) => console.log('Reject attribute:', attribute),
     onAcceptSkill: () => {},

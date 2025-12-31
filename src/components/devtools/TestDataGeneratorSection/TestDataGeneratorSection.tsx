@@ -88,7 +88,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           id: generateUniqueId('attr'),
           worldId: '' // Will be set by store
         })),
-      skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
+        skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
           ...skill,
           id: generateUniqueId('skill'),
           worldId: '' // Will be set by store
@@ -294,14 +294,14 @@ export const TestDataGeneratorSection: React.FC = () => {
     // Convert to the format expected by devtools
     const testData = {
       name: templateData.name,
-      attributes: currentWorld.attributes.map(attr => {
+        attributes: currentWorld.attributes.map(attr => {
         const generated = templateData.attributes.find(a => a.id === attr.id);
         return {
           attributeId: attr.id,
           value: generated?.value || Math.floor(Math.random() * (attr.maxValue - attr.minValue + 1)) + attr.minValue
         };
       }),
-      skills: currentWorld.skills.map(skill => {
+        skills: currentWorld.skills.map(skill => {
         const generated = templateData.skills.find(s => s.id === skill.id);
         return {
           skillId: skill.id,
@@ -332,7 +332,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           spent: testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
           remaining: currentWorld.settings.attributePointPool - testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
         },
-      skills: {
+        skills: {
           total: currentWorld.settings.skillPointPool,
           spent: testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
           remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),

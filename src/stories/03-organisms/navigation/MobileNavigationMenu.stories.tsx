@@ -85,8 +85,8 @@ const setupWorlds = () => {
     description: 'A dark fantasy world filled with ancient magic and mysterious creatures',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-    settings: {
+        skills: [],
+        settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -99,8 +99,8 @@ const setupWorlds = () => {
     description: 'A cyberpunk future where technology and humanity collide',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-    settings: {
+        skills: [],
+        settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -113,8 +113,8 @@ const setupWorlds = () => {
     description: 'Wild west frontier town with outlaws and lawmen',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-    settings: {
+        skills: [],
+        settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,

@@ -66,7 +66,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           attributeId: attr.attributeId,
           value: attr.value
         })),
-      skills: data.characterData.skills
+        skills: data.characterData.skills
           .filter((skill) => skill.isSelected)
           .map((skill) => ({
             skillId: skill.skillId,

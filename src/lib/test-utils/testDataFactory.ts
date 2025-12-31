@@ -40,7 +40,7 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
     genre: 'fantasy',
     attributes: [],
     skills: [],
-    settings: {
+        settings: {
       maxAttributes: 10,
       maxSkills: 20,
       attributePointPool: 30,
@@ -99,7 +99,7 @@ export function createMockCharacter(overrides: Partial<Character> = {}): Charact
     level: 1,
     isPlayer: false,
     attributes: [],
-      skills: [],
+        skills: [],
     derivedStats: [],    background: {
       history: 'Test history',
       personality: 'Test personality',

@@ -45,8 +45,8 @@ describe('Template Loader', () => {
       name: 'Test World Name',
       description: template.description,
       genre: template.genre,
-      attributes: [],
-      skills: [],
+        attributes: [],
+        skills: [],
     derivedStats: [],      settings: {
         maxAttributes: 6,
         maxSkills: 12,
@@ -57,14 +57,14 @@ describe('Template Loader', () => {
 
     // Check that updateWorld was called with attributes and skills
     expect(mockUpdateWorld).toHaveBeenCalledWith('world-123', {
-      attributes: expect.arrayContaining([
+        attributes: expect.arrayContaining([
         expect.objectContaining({
           worldId: 'world-123',
           name: expect.any(String),
           description: expect.any(String)
         })
       ]),
-      skills: expect.arrayContaining([
+        skills: expect.arrayContaining([
         expect.objectContaining({
           worldId: 'world-123',
           name: expect.any(String),

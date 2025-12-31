@@ -42,7 +42,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -78,7 +78,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 
@@ -121,7 +121,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -157,7 +157,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 
@@ -221,7 +221,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -257,7 +257,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 
@@ -307,7 +307,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -343,7 +343,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 
@@ -391,7 +391,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -427,7 +427,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 
@@ -461,7 +461,7 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-      skills: [],
+        skills: [],
         settings: {
           maxAttributes: 6,
           maxSkills: 8,
@@ -497,7 +497,7 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
       });
 

@@ -62,7 +62,7 @@ export function createMockWorldWithSkills(): World {
       }
     ],
     attributes: [],
-    settings: {
+        settings: {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,
@@ -91,7 +91,7 @@ export function createMockCharacterWithSkills(): Character {
       fears: ['Failure'],
       relationships: []
     },
-    attributes: [
+        attributes: [
       { id: 'attr-1', characterId: 'char-1', worldAttributeId: 'strength', name: 'Strength', baseValue: 16, modifiedValue: 16 },
       { id: 'attr-2', characterId: 'char-1', worldAttributeId: 'intelligence', name: 'Intelligence', baseValue: 14, modifiedValue: 14 },
       { id: 'attr-3', characterId: 'char-1', worldAttributeId: 'dexterity', name: 'Dexterity', baseValue: 12, modifiedValue: 12 }

@@ -51,7 +51,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
       maxHealth: 100,
       conditions: []
     },
-    attributes: [
+        attributes: [
       {
         attributeId: 'dexterity',
         value: 14

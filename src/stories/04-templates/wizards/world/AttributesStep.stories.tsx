@@ -41,7 +41,7 @@ const defaultData = {
   characterData: {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
-    attributes: [
+        attributes: [
       {
         attributeId: 'strength',
         name: 'Strength',
@@ -75,7 +75,7 @@ const defaultData = {
         maxValue: 18,
       },
     ],
-      skills: [],
+        skills: [],
     derivedStats: [],    background: {
       history: '',
       personality: '',
@@ -126,7 +126,7 @@ const mockWorldConfig = {
     },
   ],
     skills: [],
-    settings: {
+        settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,
@@ -160,7 +160,7 @@ export const FullyAllocated: Story = {
       },
       pointPools: {
         attributes: { total: 48, spent: 48, remaining: 0 },
-      skills: { total: 15, spent: 0, remaining: 15 },
+        skills: { total: 15, spent: 0, remaining: 15 },
       },
     },
     onUpdate: () => {},

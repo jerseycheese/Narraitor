@@ -34,7 +34,7 @@ const mockCharacter = {
       modifiedValue: 10,
     }
   ],
-    skills: [
+        skills: [
     {
       id: 'skill-1',
       characterId: 'test-char-1',
@@ -84,7 +84,7 @@ const mockWorld = {
       baseValue: 10,
     }
   ],
-    skills: [
+        skills: [
     {
       id: 'skill-1',
       worldId: 'test-world-1',

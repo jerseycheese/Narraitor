@@ -131,7 +131,7 @@ export class PersonalizationEngine {
         relationships,
         recentDecisions: decisions.slice(-10), // Last 10 decisions
         attributes: character.attributes,
-      skills: character.skills
+        skills: character.skills
       },
       playerPreferences: analysis.preferences,
       narrativeHistory: {

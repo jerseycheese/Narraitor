@@ -18,7 +18,7 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
     name: 'Hero',
     background: 'A noble warrior',
     attributes: { strength: 8, wisdom: 6 },
-      skills: [{ name: 'Swordsmanship', level: 3 }],
+        skills: [{ name: 'Swordsmanship', level: 3 }],
     derivedStats: [],    createdAt: '2023-01-01',
     updatedAt: '2023-01-01'
   };
