@@ -61,8 +61,11 @@ export default function JournalAccessTestPage() {
         level: 1,
         isPlayer: true,
         attributes: [],
-        skills: [],
-        background: {
+          skills: [],
+      derivedStats: [],
+    derivedStats: [],    derivedStats: [],
+
+        derivedStats: [],background: {
           history: 'A brave explorer testing journal access',
           personality: 'Curious and methodical',
           goals: ['Master the journal system'],

@@ -32,7 +32,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     description: template.description,
     genre: template.genre,
     attributes: [], // Will be populated in step 2
-    skills: [],     // Will be populated in step 2
+      skills: [],     // Will be populated in step 2
     settings: {
       maxAttributes: 6,
       maxSkills: 12,

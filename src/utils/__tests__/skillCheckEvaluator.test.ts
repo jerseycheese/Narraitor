@@ -180,7 +180,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const weakCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: [],  // No skills
+          skills: [],  // No skills
         attributes: [{ attributeId: 'strength', value: 1 }]  // Minimal attribute
       };
 
@@ -208,8 +208,8 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const expertCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: [{ skillId: 'athletics', level: 20, experience: 0, isActive: true }],
-        attributes: [{ attributeId: 'strength', value: 30 }]
+          skills: [{ skillId: 'athletics', level: 20, experience: 0, isActive: true }],
+    derivedStats: [],        attributes: [{ attributeId: 'strength', value: 30 }]
       };
 
       const skillCheck: SkillCheck = {
@@ -236,7 +236,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const untrainedCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: []  // No athletics skill
+          skills: []  // No athletics skill
       };
 
       const skillCheck: SkillCheck = {

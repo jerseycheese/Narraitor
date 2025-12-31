@@ -37,7 +37,7 @@ describe('worldGenerator', () => {
               defaultValue: 5
             }
           ],
-          skills: [
+            skills: [
             {
               name: "Sales",
               description: "Closing deals and managing clients",
@@ -92,7 +92,7 @@ describe('worldGenerator', () => {
               defaultValue: 5
             }
           ],
-          skills: [
+            skills: [
             {
               name: "Piloting",
               description: "Flying starships and speeders",
@@ -130,7 +130,7 @@ describe('worldGenerator', () => {
               defaultValue: 5
             }
           ],
-          skills: [
+            skills: [
             {
               name: "Swordplay",
               description: "Combat with bladed weapons",
@@ -170,7 +170,7 @@ describe('worldGenerator', () => {
               defaultValue: 5
             }
           ],
-          skills: [
+            skills: [
             {
               name: "Negotiation",
               description: "Making deals and resolving conflicts",

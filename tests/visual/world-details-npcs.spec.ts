@@ -68,8 +68,8 @@ test.describe('World details NPC portraits', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                skills: [],
-                settings: {
+                  skills: [],
+    derivedStats: [],                settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,
@@ -83,8 +83,8 @@ test.describe('World details NPC portraits', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                skills: [],
-                settings: {
+                  skills: [],
+    derivedStats: [],                settings: {
                   maxAttributes: 6,
                   maxSkills: 10,
                   attributePointPool: 27,

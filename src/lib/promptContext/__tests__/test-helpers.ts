@@ -8,7 +8,7 @@ export const createMockWorld = (overrides = {}): WorldContext => ({
   attributes: [
     { id: 'attr-1', name: 'Strength', description: 'Physical power' }
   ],
-  skills: [
+    skills: [
     { id: 'skill-1', name: 'Swordsmanship', description: 'Blade mastery' }
   ],
   ...overrides
@@ -22,7 +22,7 @@ export const createMockCharacter = (overrides = {}): CharacterContext => ({
   attributes: [
     { attributeId: 'attr-1', name: 'Strength', value: 8 }
   ],
-  skills: [
+    skills: [
     { skillId: 'skill-1', name: 'Swordsmanship', value: 3 }
   ],
   ...overrides

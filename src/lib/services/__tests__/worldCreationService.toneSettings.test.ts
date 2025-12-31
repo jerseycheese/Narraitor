@@ -42,8 +42,8 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           description: 'A test world',
           genre: 'fantasy',
           attributes: [],
-          skills: [],
-          settings: {
+            skills: [],
+    derivedStats: [],          settings: {
             maxAttributes: 6,
             maxSkills: 10,
             attributePointPool: 27,
@@ -108,7 +108,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           maxValue: 5
         }
       ],
-      skills: [
+        skills: [
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',

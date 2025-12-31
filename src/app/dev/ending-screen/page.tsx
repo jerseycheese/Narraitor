@@ -17,8 +17,10 @@ const MOCK_CHARACTER_DATA = {
     level: 10,
     isPlayer: true,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+      derivedStats: [],
+    derivedStats: [],
+    derivedStats: [],background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
       goals: ['Defeat the dark lord and restore peace'],
@@ -51,8 +53,9 @@ const MOCK_WORLD_DATA = {
     description: 'A realm where magic and technology coexist',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+      derivedStats: [],
+    derivedStats: [],    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,

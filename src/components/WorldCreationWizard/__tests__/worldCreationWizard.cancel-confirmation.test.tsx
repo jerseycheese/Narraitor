@@ -45,7 +45,7 @@ const TEST_WORLD_DATA = {
   attributes: [
     { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical' }
   ],
-  skills: [
+    skills: [
     { name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as const, category: 'Combat' }
   ]
 };

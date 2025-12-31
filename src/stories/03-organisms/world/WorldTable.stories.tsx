@@ -30,7 +30,7 @@ const mockWorlds: World[] = [
       { id: 'attr-1', worldId: 'world-1', name: 'Strength', description: '', baseValue: 10, minValue: 1, maxValue: 20 },
       { id: 'attr-2', worldId: 'world-1', name: 'Magic', description: '', baseValue: 10, minValue: 1, maxValue: 20 },
     ],
-    skills: [
+      skills: [
       { id: 'skill-1', worldId: 'world-1', name: 'Fireball', description: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 10 },
       { id: 'skill-2', worldId: 'world-1', name: 'Swordplay', description: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 10 },
       { id: 'skill-3', worldId: 'world-1', name: 'Stealth', description: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 10 },
@@ -52,7 +52,7 @@ const mockWorlds: World[] = [
     attributes: [
       { id: 'attr-3', worldId: 'world-2', name: 'Tech', description: '', baseValue: 5, minValue: 1, maxValue: 10 },
     ],
-    skills: [
+      skills: [
       { id: 'skill-4', worldId: 'world-2', name: 'Hacking', description: '', difficulty: 'hard', baseValue: 1, minValue: 1, maxValue: 10 },
     ],
     settings: {
@@ -70,8 +70,8 @@ const mockWorlds: World[] = [
     createdAt: '2023-03-05T22:00:00Z',
     updatedAt: '2023-03-06T08:00:00Z',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 3,
       maxSkills: 5,
       attributePointPool: 10,

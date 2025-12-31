@@ -33,7 +33,7 @@ const createTestWorld = () => {
       { id: 'attr-5', name: 'Wisdom', description: 'Insight and awareness', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-6', name: 'Charisma', description: 'Force of personality', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
     ],
-    skills: [
+      skills: [
       { id: 'skill-1', name: 'Swordsmanship', description: 'Skill with bladed weapons', worldId: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-2', name: 'Archery', description: 'Skill with ranged weapons', worldId: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-3', name: 'Magic', description: 'Arcane knowledge', worldId: '', difficulty: 'hard', baseValue: 1, minValue: 1, maxValue: 5 },

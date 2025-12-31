@@ -28,8 +28,8 @@ export default function LoreViewerTestPage() {
         description: 'Test world for lore viewer',
         genre: 'fantasy',
         attributes: [],
-        skills: [],
-        settings: {
+          skills: [],
+    derivedStats: [],        settings: {
           maxAttributes: 10,
           maxSkills: 15,
           attributePointPool: 30,

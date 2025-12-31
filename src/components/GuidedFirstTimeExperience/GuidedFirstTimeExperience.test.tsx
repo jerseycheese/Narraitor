@@ -32,8 +32,8 @@ jest.mock('@/lib/generators/worldGenerator', () => ({
     description: 'A test world',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {},
+      skills: [],
+    derivedStats: [],    settings: {},
   })),
 }));
 

@@ -20,8 +20,8 @@ describe('Portrait Generation Documentation Examples', () => {
           relationships: []
         },
         attributes: [],
-        skills: [],
-        inventory: {
+          skills: [],
+    derivedStats: [],        inventory: {
           characterId: 'char-123',
           items: [],
           capacity: 100,

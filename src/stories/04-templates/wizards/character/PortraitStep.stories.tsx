@@ -49,7 +49,7 @@ const defaultData = {
       { attributeId: 'strength', value: 8 },
       { attributeId: 'intelligence', value: 15 },
     ],
-    skills: [
+      skills: [
       { skillId: 'magic', level: 10, isSelected: true },
     ],
     background: {

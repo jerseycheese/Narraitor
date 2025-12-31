@@ -54,8 +54,8 @@ describe('npcPortraitService', () => {
     description: 'A test world',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,

@@ -10,8 +10,8 @@ const mockWorlds: World[] = [
     description: 'A magical world full of wonder and dangerous quests',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,
@@ -26,8 +26,8 @@ const mockWorlds: World[] = [
     description: 'A neon-lit dystopia where corporations rule and hackers fight back',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,
@@ -42,8 +42,8 @@ const mockWorlds: World[] = [
     description: 'Lawless frontiers where gunslinging and frontier justice reign',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,

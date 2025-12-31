@@ -25,8 +25,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     description: 'A world for testing',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 20,
@@ -42,8 +42,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     description: 'A test character',
     worldId: 'test-world',
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: 'A test character with no history',
       personality: 'Adventurous',
       goals: ['Test the system'],

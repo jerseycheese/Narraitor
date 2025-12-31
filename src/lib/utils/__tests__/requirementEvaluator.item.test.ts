@@ -40,8 +40,8 @@ describe('requirementEvaluator - Item Requirements', () => {
   });
 
   const mockCharacter: Character = {
-    skills: [],
-    inventory: {
+      skills: [],
+    derivedStats: [],    inventory: {
       items: [
         createMockItem('Lockpick', 1),
         createMockItem('Healing Potion', 3),
@@ -220,8 +220,8 @@ describe('requirementEvaluator - Item Requirements', () => {
   describe('edge cases', () => {
     it('should handle empty inventory gracefully', () => {
       const emptyCharacter: Character = {
-        skills: [],
-        inventory: {
+          skills: [],
+    derivedStats: [],        inventory: {
           items: [],
         },
       };

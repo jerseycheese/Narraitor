@@ -1,0 +1,142 @@
+import { useCharacterStore, type Character } from '@/state/characterStore';
+import { EntityID } from '@/types/common.types';
+import { 
+  validateName, 
+  validateText, 
+  validatePointDistribution, 
+  validateSelectionCount,
+  ValidationResult 
+} from '@/lib/utils/validationUtils';
+
+export const validateCharacterName = (name: string, worldId: EntityID): ValidationResult => {
+  // Use shared validation for basic name rules
+  const basicValidation = validateName(name);
+  if (!basicValidation.valid) {
+    return basicValidation;
+  }
+  
+  // Check uniqueness within world
+  const state = useCharacterStore.getState();
+  const characters = state.characters || {};
+  const existingCharacters = (Object.values(characters) as Character[]).filter(c => c.worldId === worldId);
+  if (existingCharacters.some(c => c.name === name)) {
+    return {
+      valid: false,
+      errors: ['A character with this name already exists in this world']
+    };
+  }
+  
+  return { valid: true, errors: [] };
+};
+
+export const validateAttributes = (
+  attributes: Array<{ value: number }>,
+  totalPoints: number
+): ValidationResult => {
+  const values = attributes.map(attr => attr.value);
+  return validatePointDistribution(values, totalPoints);
+};
+
+export const validateSkills = (
+  skills: Array<{
+    skillId: EntityID;
+    isSelected: boolean;
+    level: number;
+    name?: string;
+    minLevel?: number;
+    maxLevel?: number;
+  }>,
+  skillPointPool: number,
+  worldSkills: Array<{ id: EntityID; minValue: number; maxValue: number }> = []
+): ValidationResult => {
+  const selections = skills.map(skill => skill.isSelected);
+  const result = validateSelectionCount(selections, {
+    minSelections: 1,
+    maxSelections: 8,
+    fieldName: 'skills'
+  });
+  
+  // Update error messages to match existing test expectations
+  const updatedErrors = result.errors.map(error => {
+    if (error === 'Select at least 1 skills') {
+      return 'Select at least one skill';
+    }
+    if (error === 'Maximum 8 skills allowed') {
+      return 'Maximum 8 skills allowed';
+    }
+    return error;
+  });
+  
+  const errors = [...updatedErrors];
+
+  const getBounds = (skill: { minLevel?: number; maxLevel?: number; skillId: EntityID }) => {
+    const worldSkill = worldSkills.find(ws => ws.id === skill.skillId);
+    const minLevel = skill.minLevel ?? worldSkill?.minValue ?? 1;
+    const maxLevel = skill.maxLevel ?? worldSkill?.maxValue ?? minLevel;
+    return { minLevel, maxLevel };
+  };
+
+  const selectedSkills = skills.filter(skill => skill.isSelected);
+  const totalAllocated = selectedSkills.reduce((sum, skill) => {
+    const { minLevel } = getBounds(skill);
+    return sum + Math.max(0, (skill.level ?? minLevel) - minLevel);
+  }, 0);
+  const totalCapacity = selectedSkills.reduce((sum, skill) => {
+    const { minLevel, maxLevel } = getBounds(skill);
+    return sum + Math.max(0, maxLevel - minLevel);
+  }, 0);
+
+  selectedSkills.forEach(skill => {
+    const { minLevel, maxLevel } = getBounds(skill);
+    const skillLabel = skill.name || skill.skillId;
+    if (maxLevel === minLevel) {
+      errors.push(`Skill ${skillLabel} cannot be leveled because its configuration has no available range.`);
+    }
+    if (skill.level < minLevel) {
+      errors.push(`Skill ${skillLabel} is below its minimum level of ${minLevel}.`);
+    }
+    if (skill.level > maxLevel) {
+      errors.push(`Skill ${skillLabel} exceeds its maximum level of ${maxLevel}.`);
+    }
+  });
+
+  if (skillPointPool >= 0) {
+    const effectivePool = Math.min(skillPointPool, totalCapacity);
+    if (totalAllocated < effectivePool) {
+      errors.push('Spend all remaining skill points before continuing.');
+    } else if (totalAllocated > skillPointPool) {
+      errors.push('You have allocated more skill points than available.');
+    }
+  }
+
+  const uniqueErrors = Array.from(new Set(errors));
+
+  return {
+    valid: uniqueErrors.length === 0,
+    errors: uniqueErrors
+  };
+};
+
+export const validateBackground = (background: {
+  history: string;
+  personality: string;
+  goals: string[];
+  motivation: string;
+}): ValidationResult => {
+  const historyValidation = validateText(background.history, {
+    minLength: 50,
+    fieldName: 'Character history'
+  });
+  
+  const personalityValidation = validateText(background.personality, {
+    minLength: 20,
+    fieldName: 'Personality description'
+  });
+  
+  const allErrors = [...historyValidation.errors, ...personalityValidation.errors];
+  
+  return {
+    valid: allErrors.length === 0,
+    errors: allErrors,
+  };
+};

@@ -85,8 +85,8 @@ const setupWorlds = () => {
     description: 'A dark fantasy world filled with ancient magic and mysterious creatures',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -99,8 +99,8 @@ const setupWorlds = () => {
     description: 'A cyberpunk future where technology and humanity collide',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -113,8 +113,8 @@ const setupWorlds = () => {
     description: 'Wild west frontier town with outlaws and lawmen',
     genre: 'fantasy',
     attributes: [],
-    skills: [],
-    settings: {
+      skills: [],
+    derivedStats: [],    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -137,8 +137,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 5,
     isPlayer: true,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: 'A brave warrior with a mysterious past',
       personality: 'Noble and just, but haunted by ancient memories',
       goals: ['Protect the innocent', 'Uncover lost magic'],
@@ -171,8 +171,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 3,
     isPlayer: true,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: 'A scholar turned adventurer seeking ancient artifacts',
       personality: 'Wise and mysterious, but curious about forbidden knowledge',
       goals: ['Seek ancient knowledge', 'Master elemental magic'],
@@ -205,8 +205,8 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     level: 1,
     isPlayer: true,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: 'Former cop turned private investigator with cybernetic enhancements',
       personality: 'Cynical but determined to find the truth',
       goals: ['Uncover corporate conspiracy', 'Clear his name'],

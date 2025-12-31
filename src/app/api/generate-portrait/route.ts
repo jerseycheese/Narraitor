@@ -44,8 +44,8 @@ async function buildPortraitPrompt(
         relationships: []
       },
       attributes: [],
-      skills: [],
-      inventory: {
+        skills: [],
+    derivedStats: [],      inventory: {
         characterId: 'detection-temp',
         items: [],
         capacity: 100,

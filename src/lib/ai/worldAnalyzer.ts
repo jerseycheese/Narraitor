@@ -176,7 +176,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
         { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: true },
         { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: true },
       ],
-      skills: [
+        skills: [
         { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeNames: ['Strength'], accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },
         { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeNames: ['Agility'], accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },
         { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },

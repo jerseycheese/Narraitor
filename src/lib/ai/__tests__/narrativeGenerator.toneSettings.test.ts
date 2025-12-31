@@ -27,8 +27,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       description: 'A dramatic fantasy world',
       genre: 'fantasy',
       attributes: [],
-      skills: [],
-      settings: {
+        skills: [],
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -114,8 +114,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       description: 'A world without tone settings',
       genre: 'fantasy',
       attributes: [],
-      skills: [],
-      settings: {
+        skills: [],
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -161,8 +161,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       description: 'A world for accessible language.',
       genre: 'fantasy',
       attributes: [],
-      skills: [],
-      settings: {
+        skills: [],
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -207,8 +207,8 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       description: 'A world with balanced prose.',
       genre: 'mystery',
       attributes: [],
-      skills: [],
-      settings: {
+        skills: [],
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 80,

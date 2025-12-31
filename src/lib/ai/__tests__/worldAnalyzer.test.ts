@@ -25,8 +25,8 @@ describe('worldAnalyzer', () => {
           { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
           { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
         ],
-        skills: [],
-      }),
+          skills: [],
+    derivedStats: [],      }),
     };
 
     mockGenerateContent.mockResolvedValue(mockResponse);
@@ -50,7 +50,7 @@ describe('worldAnalyzer', () => {
           { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
           { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
         ],
-        skills: [
+          skills: [
           {
             name: 'Swordsmanship',
             description: 'Skill with bladed weapons',
@@ -145,7 +145,7 @@ describe('worldAnalyzer', () => {
             category: 'Mental',
           },
         ],
-        skills: [
+          skills: [
           {
             name: 'Meditation',
             description: 'Inner peace and focus',

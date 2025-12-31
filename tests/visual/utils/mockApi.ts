@@ -80,8 +80,8 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
         genre: 'Science Fiction',
         description: 'A test world generated for visual testing',
         attributes: [],
-        skills: [],
-        settings: {
+          skills: [],
+    derivedStats: [],        settings: {
           toneSettings: {
             complexity: 'medium',
             maturityLevel: 'teen',

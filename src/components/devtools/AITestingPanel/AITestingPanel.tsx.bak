@@ -1,0 +1,282 @@
+'use client';
+
+import React, { useState } from 'react';
+import type { AITestConfig, AIResponse } from '@/types';
+// Using a mock implementation for testing purposes
+import { createTestContext } from '@/lib/ai/contextOverride';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { getTimestamp } from '@/lib/utils';
+
+interface AITestingPanelProps {
+  className?: string;
+}
+
+export function AITestingPanel({ className = '' }: AITestingPanelProps) {
+  const [testConfig, setTestConfig] = useState<AITestConfig>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [result, setResult] = useState<AIResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Mock base data for testing
+  const mockWorld = {
+    id: 'test-world',
+    name: 'Test World',
+    description: 'A world for testing',
+    genre: 'fantasy',
+    attributes: [],
+    skills: [],
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 20,
+      skillPointPool: 20
+    },
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
+  };
+
+  const mockCharacter = {
+    id: 'test-character',
+    name: 'Test Character',
+    description: 'A test character',
+    worldId: 'test-world',
+    attributes: [],
+    skills: [],
+    background: {
+      history: 'A test character with no history',
+      personality: 'Adventurous',
+      goals: ['Test the system'],
+      fears: ['Nothing'],
+      relationships: []
+    },
+    inventory: {
+      characterId: 'test-character',
+      items: [],
+      capacity: 10,
+      categories: [],
+      itemOrder: [],
+    },
+    status: {
+      health: 100,
+      maxHealth: 100,
+      conditions: [],
+      location: 'Test Area'
+    },
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp()
+  };
+
+  const mockNarrativeContext = {
+    recentSegments: [],
+    activeCharacters: ['test-character'],
+    currentLocation: 'Test Area',
+    activeQuests: [],
+    mood: 'neutral'
+  };
+
+  const handleWorldNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTestConfig(prev => ({
+      ...prev,
+      worldOverride: {
+        ...prev.worldOverride,
+        name: e.target.value
+      }
+    }));
+  };
+
+  const handleWorldGenreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTestConfig(prev => ({
+      ...prev,
+      worldOverride: {
+        ...prev.worldOverride,
+        genre: e.target.value
+      }
+    }));
+  };
+
+  const handleCharacterNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTestConfig(prev => ({
+      ...prev,
+      characterOverride: {
+        ...prev.characterOverride,
+        name: e.target.value
+      }
+    }));
+  };
+
+
+  const handleGenerateNarrative = async () => {
+    setIsGenerating(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      // Create test context with overrides
+      const testContext = createTestContext(
+        mockWorld,
+        mockCharacter,
+        mockNarrativeContext,
+        testConfig
+      );
+
+      const startTime = Date.now();
+
+      // Add realistic delay to show loading state (1.5-3 seconds)
+      const delay = 1500 + Math.random() * 1500;
+      await new Promise(resolve => setTimeout(resolve, delay));
+
+      // Generate context-aware narrative text
+      const worldName = testContext.world.name;
+      const worldTheme = testContext.world.genre;
+      const characterName = testContext.character.name;
+      
+      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
+
+      // Generate context-aware choices based on genre
+      const generateChoices = (genre: string = 'Fantasy'): string[] => {
+        const baseChoices = [
+          `Explore the ${genre.toLowerCase()} landscape ahead`,
+          `Study the ${worldName} surroundings more carefully`,
+          `Call upon ${characterName}'s inner strength`
+        ];
+
+        if (genre.toLowerCase().includes('fantasy')) {
+          return [
+            'Venture deeper into the magical forest',
+            'Seek out the ancient temple ruins',
+            'Cast a spell to reveal hidden paths'
+          ];
+        } else if (genre.toLowerCase().includes('sci-fi') || genre.toLowerCase().includes('space')) {
+          return [
+            'Scan the area with your tech equipment',
+            'Attempt to contact the orbital station',
+            'Investigate the strange energy readings'
+          ];
+        } else if (genre.toLowerCase().includes('steampunk')) {
+          return [
+            'Fire up your mechanical contraption',
+            'Navigate using the brass compass',
+            'Repair the damaged airship engine'
+          ];
+        } else {
+          return baseChoices;
+        }
+      };
+
+      // Mock narrative generation for testing purposes
+      const response: AIResponse = {
+        text: narrativeText,
+        choices: generateChoices(worldTheme),
+        metadata: { tokens: 150 + Math.floor(Math.random() * 100) }
+      };
+
+      const responseTime = Date.now() - startTime;
+
+      // Log for debugging
+      console.log('[AI Testing Panel] Response generated in', responseTime, 'ms');
+
+      setResult(response);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className={`flex flex-col space-y-3 ${className}`}>
+      <h3 className="text-sm font-medium text-gray-900 mb-3">AI Testing Panel</h3>
+      
+      {/* World Override Section */}
+      <div className="bg-gray-100 p-3 rounded border border-gray-300">
+        <h4 className="text-xs font-medium mb-2 text-gray-900">World Override</h4>
+        <div className="space-y-1">
+          <div>
+            <label htmlFor="world-name" className="block text-xs text-gray-700 mb-0.5">World Name:</label>
+            <Input
+              id="world-name"
+              type="text"
+              value={testConfig.worldOverride?.name || ''}
+              onChange={handleWorldNameChange}
+              placeholder="Enter world name"
+              className=""
+            />
+          </div>
+          <div>
+            <label htmlFor="world-genre" className="block text-xs text-gray-700 mb-0.5">World Genre:</label>
+            <Input
+              id="world-genre"
+              type="text"
+              value={testConfig.worldOverride?.genre || ''}
+              onChange={handleWorldGenreChange}
+              placeholder="Enter world genre"
+              className=""
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Character Override Section */}
+      <div className="bg-gray-100 p-3 rounded border border-gray-300">
+        <h4 className="text-xs font-medium mb-2 text-gray-900">Character Override</h4>
+        <div>
+          <label htmlFor="character-name" className="block text-xs text-gray-700 mb-0.5">Character Name:</label>
+          <Input
+            id="character-name"
+            type="text"
+            value={testConfig.characterOverride?.name || ''}
+            onChange={handleCharacterNameChange}
+            placeholder="Enter character name"
+            className=""
+          />
+        </div>
+      </div>
+
+      {/* Generate Button */}
+      <div className="mt-3">
+        <Button
+          onClick={handleGenerateNarrative}
+          disabled={isGenerating}
+          className="w-full"
+          variant="default"
+        >
+          {isGenerating ? 'Generating...' : 'Generate Narrative'}
+        </Button>
+      </div>
+
+      {/* Results Section */}
+      {isGenerating && (
+        <div className="bg-amber-50 p-2 rounded border border-amber-200">
+          <p className="text-xs text-amber-900">Generating narrative...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 p-2 rounded border border-red-200">
+          <p className="text-xs text-red-900">Error: {error}</p>
+        </div>
+      )}
+
+      {result && (
+        <div className="bg-green-50 p-2 rounded border border-green-200">
+          <h4 className="text-xs font-medium mb-2 text-green-900">Generated Results</h4>
+          <div className="mb-2">
+            <p className="text-xs text-green-900">{result.text}</p>
+          </div>
+          {result.choices && result.choices.length > 0 && (
+            <div>
+              <h5 className="text-xs font-medium mb-1 text-green-900">Choices:</h5>
+              <ul className="text-xs text-green-900 list-none space-y-1">
+                {result.choices.map((choice, index) => (
+                  <li key={index} className="pl-2 border-l-2 border-green-500 text-xs text-green-900">• {choice}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

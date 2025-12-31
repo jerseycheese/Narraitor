@@ -21,7 +21,7 @@ const testWorlds = {
       { id: 'attr-wis', name: 'Wisdom', description: 'Awareness and insight', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-cha', name: 'Charisma', description: 'Force of personality', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
     ],
-    skills: [
+      skills: [
       { id: 'skill-1', name: 'Swordsmanship', description: 'Skill with bladed weapons', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-2', name: 'Archery', description: 'Skill with ranged weapons', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-3', name: 'Magic', description: 'Arcane knowledge and spellcasting', worldId: '', difficulty: 'hard' as const, baseValue: 1, minValue: 1, maxValue: 5 },
@@ -49,7 +49,7 @@ const testWorlds = {
       { id: 'attr-sharp', name: 'Sharpshooting', description: 'Accuracy with firearms', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-charm', name: 'Charm', description: 'Personal magnetism', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
     ],
-    skills: [
+      skills: [
       { id: 'skill-gun', name: 'Gunslinging', description: 'Skill with firearms', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-gamble', name: 'Gambling', description: 'Games of chance', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
       { id: 'skill-track', name: 'Tracking', description: 'Following trails', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },

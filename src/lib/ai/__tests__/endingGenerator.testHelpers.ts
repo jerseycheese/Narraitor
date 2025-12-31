@@ -33,8 +33,9 @@ export function createMockWorld(): World {
       skillPointPool: 40
     },
     attributes: [],
-    skills: [],
-    createdAt: getTimestamp(),
+      skills: [],
+      derivedStats: [],
+    derivedStats: [],    derivedStats: [],    createdAt: getTimestamp(),
     updatedAt: getTimestamp()
   };
 }
@@ -50,8 +51,10 @@ export function createMockCharacter(): StoreCharacter {
     description: 'A seasoned warrior with a noble heart',
     level: 10,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+      derivedStats: [],
+    derivedStats: [],    derivedStats: [],
+    derivedStats: [],background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
       goals: ['Defeat the dark lord and restore peace', 'Find inner peace'],

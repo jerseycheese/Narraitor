@@ -106,7 +106,7 @@ const mockWorld: World = {
       category: 'Social',
     },
   ],
-  skills: [
+    skills: [
     {
       id: 'swordsmanship',
       worldId: 'world-1',
@@ -260,7 +260,7 @@ export const SciFiWorld: Story = {
           category: 'Social',
         },
       ],
-      skills: [
+        skills: [
         {
           id: 'hacking',
           worldId: 'world-cyberpunk',
@@ -360,7 +360,7 @@ export const OriginalWorld: Story = {
           category: 'Physical',
         },
       ],
-      skills: [
+        skills: [
         {
           id: 'dimensional_magic',
           worldId: 'world-original',

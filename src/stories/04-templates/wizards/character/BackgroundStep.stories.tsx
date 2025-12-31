@@ -42,8 +42,8 @@ const defaultData = {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: '',
       personality: '',
       goals: [],
@@ -63,8 +63,8 @@ const mockWorldConfig = {
   description: 'A test world',
   genre: 'fantasy',
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],  settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,

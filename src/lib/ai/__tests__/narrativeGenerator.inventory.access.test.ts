@@ -110,8 +110,9 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
         relationships: []
       },
       attributes: [],
-      skills: [],
-      inventory: {
+        skills: [],
+      derivedStats: [],
+    derivedStats: [],      inventory: {
         characterId: '',
         items: [],
         capacity: 0,

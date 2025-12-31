@@ -177,7 +177,7 @@ export const worldCreationService = {
     const worldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
       ...initialWorldData,
       attributes: [], // Will be populated below
-      skills: [], // Will be populated below
+        skills: [], // Will be populated below
       settings: generatedData.settings,
       toneSettings: aiToneSettings,
     };

@@ -29,8 +29,8 @@ const mockWorld = {
   description: 'A world of magic and adventure',
   genre: 'fantasy',
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],  settings: {
     maxAttributes: 10,
     maxSkills: 20,
     attributePointPool: 27,

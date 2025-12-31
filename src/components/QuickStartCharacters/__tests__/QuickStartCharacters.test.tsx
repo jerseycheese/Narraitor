@@ -36,7 +36,7 @@ describe('QuickStartCharacters', () => {
       { id: 'str', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
       { id: 'int', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
     ],
-    skills: [
+      skills: [
       { id: 'combat', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
       { id: 'magic', name: 'Magic', description: 'Mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' },
     ],
@@ -58,7 +58,7 @@ describe('QuickStartCharacters', () => {
         { id: 'str', name: 'Strength', value: 8 },
         { id: 'int', name: 'Intelligence', value: 4 },
       ],
-      skills: [
+        skills: [
         { id: 'combat', name: 'Combat', level: 7 },
         { id: 'magic', name: 'Magic', level: 2 },
       ],
@@ -79,7 +79,7 @@ describe('QuickStartCharacters', () => {
         { id: 'str', name: 'Strength', value: 3 },
         { id: 'int', name: 'Intelligence', value: 9 },
       ],
-      skills: [
+        skills: [
         { id: 'combat', name: 'Combat', level: 3 },
         { id: 'magic', name: 'Magic', level: 8 },
       ],
@@ -100,7 +100,7 @@ describe('QuickStartCharacters', () => {
         { id: 'str', name: 'Strength', value: 6 },
         { id: 'int', name: 'Intelligence', value: 6 },
       ],
-      skills: [
+        skills: [
         { id: 'combat', name: 'Combat', level: 5 },
         { id: 'magic', name: 'Magic', level: 4 },
       ],

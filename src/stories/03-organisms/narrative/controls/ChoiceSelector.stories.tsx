@@ -155,7 +155,7 @@ const createMockCharacter = () => ({
   description: 'A test character',
   worldId: 'test-world',
   attributes: [],
-  skills: [
+    skills: [
     { id: 'skill1', characterId: 'test-char', worldSkillId: 'lockpicking', name: 'Lockpicking', level: 7 },
     { id: 'skill2', characterId: 'test-char', worldSkillId: 'strength', name: 'Strength', level: 4 },
     { id: 'skill3', characterId: 'test-char', worldSkillId: 'magic', name: 'Magic', level: 9 }

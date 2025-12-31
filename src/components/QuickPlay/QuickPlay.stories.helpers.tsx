@@ -11,8 +11,9 @@ export const mockWorld = {
   description: 'A magical world filled with wonder',
   genre: 'fantasy' as const,
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+      derivedStats: [],
+    derivedStats: [],  settings: {
     maxAttributes: 10,
     maxSkills: 10,
     attributePointPool: 100,
@@ -37,8 +38,9 @@ export const mockCharacter = {
     relationships: [],
   },
   attributes: [],
-  skills: [],
-  inventory: {
+    skills: [],
+      derivedStats: [],
+    derivedStats: [],  inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 100,

@@ -20,7 +20,7 @@ const worldConfig: World = {
       category: 'physical',
     },
   ],
-  skills: [
+    skills: [
     {
       id: 'skill-1',
       worldId: 'world-1',
@@ -71,7 +71,7 @@ export const Default: Story = {
   args: {
     data: {
       characterData: {
-        skills: [
+          skills: [
           {
             skillId: 'skill-1',
             name: 'Swordsmanship',

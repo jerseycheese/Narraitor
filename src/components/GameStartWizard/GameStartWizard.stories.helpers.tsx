@@ -12,8 +12,8 @@ const mockWorlds = {
     description: 'A magical world filled with wonder and ancient mysteries',
     genre: 'fantasy' as const,
     attributes: [],
-    skills: [],
-    createdAt: getTimestamp(),
+      skills: [],
+    derivedStats: [],    createdAt: getTimestamp(),
     updatedAt: getTimestamp(),
   },
   'world-2': {
@@ -22,8 +22,8 @@ const mockWorlds = {
     description: 'A dystopian future where technology and humanity collide',
     genre: 'fantasy' as const,
     attributes: [],
-    skills: [],
-    createdAt: getTimestamp(),
+      skills: [],
+    derivedStats: [],    createdAt: getTimestamp(),
     updatedAt: getTimestamp(),
   },
 };
@@ -42,8 +42,8 @@ const mockCharacters = {
       relationships: [],
     },
     attributes: [],
-    skills: [],
-    inventory: {
+      skills: [],
+    derivedStats: [],    inventory: {
       characterId: 'char-1',
       items: [],
       capacity: 100,
@@ -72,8 +72,8 @@ const mockCharacters = {
       relationships: [],
     },
     attributes: [],
-    skills: [],
-    inventory: {
+      skills: [],
+    derivedStats: [],    inventory: {
       characterId: 'char-2',
       items: [],
       capacity: 100,

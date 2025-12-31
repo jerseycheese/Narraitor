@@ -148,7 +148,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
           worldId: 'world-1',
           level: 1,
           attributes: [],
-          skills: [],
+            skills: [],
+    derivedStats: [],    derivedStats: [],
           background: {
             history: 'Test history',
             personality: 'Test personality',
@@ -197,7 +198,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
           worldId: 'world-1',
           level: 1,
           attributes: [],
-          skills: [],
+            skills: [],
+    derivedStats: [],    derivedStats: [],
           background: {
             history: 'Active character history',
             personality: 'Active character personality',
@@ -226,7 +228,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
           worldId: 'world-1',
           level: 2,
           attributes: [],
-          skills: [],
+            skills: [],
+    derivedStats: [],    derivedStats: [],
           background: {
             history: 'Other history',
             personality: 'Other personality',

@@ -26,7 +26,7 @@ export function createMockWorldWithSkills(): World {
     name: 'Fantasy Realm',
     description: 'A world with magic and combat',
     genre: 'fantasy',
-    skills: [
+      skills: [
       {
         id: 'athletics',
         name: 'Athletics',
@@ -96,7 +96,7 @@ export function createMockCharacterWithSkills(): Character {
       { id: 'attr-2', characterId: 'char-1', worldAttributeId: 'intelligence', name: 'Intelligence', baseValue: 14, modifiedValue: 14 },
       { id: 'attr-3', characterId: 'char-1', worldAttributeId: 'dexterity', name: 'Dexterity', baseValue: 12, modifiedValue: 12 }
     ],
-    skills: [
+      skills: [
       { id: 'skill-1', characterId: 'char-1', worldSkillId: 'athletics', name: 'Athletics', level: 6 },
       { id: 'skill-2', characterId: 'char-1', worldSkillId: 'magic', name: 'Magic', level: 4 },
       { id: 'skill-3', characterId: 'char-1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }

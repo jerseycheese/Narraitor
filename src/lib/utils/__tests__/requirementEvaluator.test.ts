@@ -74,7 +74,7 @@ describe('requirementEvaluator', () => {
         category: 'mental'
       }
     ],
-    skills: [
+      skills: [
       {
         id: 'skill-1',
         characterId: 'char-1',
@@ -232,8 +232,8 @@ describe('requirementEvaluator', () => {
     it('should handle empty character gracefully', () => {
       const emptyCharacter: Character = {
         ...mockCharacter,
-        skills: [],
-        attributes: [],
+          skills: [],
+    derivedStats: [],        attributes: [],
         level: 1
       };
 

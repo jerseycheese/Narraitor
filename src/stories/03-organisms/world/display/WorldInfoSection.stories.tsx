@@ -22,8 +22,8 @@ const baseWorld: World = {
   description: 'A fantasy world of magic and adventure',
   genre: 'fantasy',
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],  settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 27,

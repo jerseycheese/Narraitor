@@ -15,7 +15,7 @@ describe('characterArchetypes', () => {
       createMockWorldAttribute({ id: 'int', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
       createMockWorldAttribute({ id: 'agi', name: 'Agility', description: 'Speed and dexterity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' })
     ],
-    skills: [
+      skills: [
       createMockWorldSkill({ id: 'combat', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
       createMockWorldSkill({ id: 'stealth', name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' }),
       createMockWorldSkill({ id: 'magic', name: 'Magic', description: 'Mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'test-world' })

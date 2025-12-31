@@ -20,8 +20,8 @@ export function createTestWorldData(overrides?: Partial<{
     description: 'A test fantasy world',
     genre: 'fantasy',
     attributes: [] as WorldAttribute[],
-    skills: [] as WorldSkill[],
-    settings: {
+      skills: [] as WorldSkill[],
+    derivedStats: [],    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,

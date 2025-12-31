@@ -224,8 +224,8 @@ describe('extractWorldAnalysisData', () => {
       reference: 'Lord of the Rings',
       relationship: 'inspired_by',
       attributes: [],
-      skills: [],
-      settings: {
+        skills: [],
+    derivedStats: [],      settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 27,

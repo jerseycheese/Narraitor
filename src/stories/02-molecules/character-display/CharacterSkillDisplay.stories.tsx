@@ -91,7 +91,7 @@ export const WithCategories: Story = {
 
 export const VariedLevels: Story = {
   args: {
-    skills: [
+      skills: [
       {
         id: 'skill-1',
         characterId: 'char-1',

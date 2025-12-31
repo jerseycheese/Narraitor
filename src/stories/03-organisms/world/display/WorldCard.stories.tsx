@@ -13,8 +13,8 @@ const mockCharacters: Character[] = [
     worldId: '1',
     level: 15,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    derivedStats: [],    background: {
       history: 'A master of arcane arts',
       personality: 'Wise and patient',
       goals: ['Protect the realm'],
@@ -40,8 +40,8 @@ const mockCharacters: Character[] = [
     worldId: '1',
     level: 12,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    derivedStats: [],    background: {
       history: 'Champion of the royal guard',
       personality: 'Courageous and noble',
       goals: ['Uphold justice'],
@@ -67,8 +67,8 @@ const mockCharacters: Character[] = [
     worldId: '1',
     level: 10,
     attributes: [],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    derivedStats: [],    background: {
       history: 'Former thief turned hero',
       personality: 'Cunning and independent',
       goals: ['Uncover ancient secrets'],
@@ -92,8 +92,8 @@ const mockWorld: World = {
   description: 'An epic fantasy world filled with magic, dragons, and ancient prophecies. Heroes must band together to face the rising darkness.',
   genre: 'fantasy',
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],    derivedStats: [],  settings: {
     maxAttributes: 10,
     maxSkills: 10,
     attributePointPool: 100,

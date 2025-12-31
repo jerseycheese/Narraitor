@@ -27,8 +27,8 @@ export const mockWorld = {
   genre: 'fantasy',
   description: 'A magical realm',
   attributes: [],
-  skills: [],
-  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 },
+    skills: [],
+    derivedStats: [],  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 },
   toneSettings: {
     contentRating: 'teen' as const,
     narrativeStyle: 'balanced' as const,
@@ -53,8 +53,8 @@ export const mockCharacter = {
     relationships: []
   },
   attributes: [],
-  skills: [],
-  inventory: {
+    skills: [],
+    derivedStats: [],  inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 10,

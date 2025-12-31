@@ -152,8 +152,8 @@ test.describe('Character roster context', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                skills: [],
-                createdAt: now,
+                  skills: [],
+    derivedStats: [],                createdAt: now,
                 updatedAt: now,
               },
             },
@@ -161,8 +161,8 @@ test.describe('Character roster context', () => {
               [seed.world.id]: {
                 ...seed.world,
                 attributes: [],
-                skills: [],
-                createdAt: now,
+                  skills: [],
+    derivedStats: [],                createdAt: now,
                 updatedAt: now,
               },
             },
@@ -188,8 +188,8 @@ test.describe('Character roster context', () => {
               level: 3,
               isPlayer: true,
               attributes: [],
-              skills: [],
-              background: {
+                skills: [],
+    derivedStats: [],              background: {
                 history: 'A well-traveled specialist who keeps extensive notes.',
                 personality: 'Methodical yet personable',
                 goals: ['Secure the northern settlements'],

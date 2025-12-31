@@ -50,7 +50,7 @@ describe('PortraitStep Component', () => {
       attributes: [
         { attributeId: 'strength', value: 10 }
       ],
-      skills: [
+        skills: [
         { skillId: 'magic', level: 5, isSelected: true }
       ],
       background: {
@@ -174,7 +174,7 @@ describe('Character Creation Wizard with Portrait Integration', () => {
     attributes: [
       { id: 'strength', name: 'Strength', category: 'physical', min: 1, max: 20, defaultValue: 10 }
     ],
-    skills: [
+      skills: [
       { 
         id: 'magic', 
         name: 'Magic', 

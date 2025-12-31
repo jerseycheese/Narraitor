@@ -43,7 +43,7 @@ const mockCharacter = {
       category: 'Physical',
     },
   ],
-  skills: [
+    skills: [
     {
       id: 'char-skill-1',
       characterId: 'char-123',
@@ -86,8 +86,8 @@ const mockWorld = {
   description: 'A realm where magic and technology coexist',
   genre: 'fantasy',
   attributes: [],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],    derivedStats: [],  settings: {
     maxAttributes: 6,
     maxSkills: 8,
     attributePointPool: 27,

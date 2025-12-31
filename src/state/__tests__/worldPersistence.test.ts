@@ -94,8 +94,8 @@ describe('World Persistence Infrastructure', () => {
         genre: 'Fantasy',
         description: 'World created during concurrent initialization',
         attributes: [],
-        skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+          skills: [],
+    derivedStats: [],        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
       };
 
       act(() => {
@@ -139,8 +139,8 @@ describe('World Persistence Infrastructure', () => {
         genre: 'Fantasy',
         description: 'World created with storage failure',
         attributes: [],
-        skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+          skills: [],
+    derivedStats: [],        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
       };
 
       act(() => {
@@ -176,7 +176,7 @@ describe('World Persistence Infrastructure', () => {
             worldId: ''
           }
         ],
-        skills: [
+          skills: [
           {
             id: 'combat',
             name: 'Combat',
@@ -233,8 +233,8 @@ describe('World Persistence Infrastructure', () => {
         genre: 'Fantasy',
         description: 'World for testing rapid operations',
         attributes: [],
-        skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+          skills: [],
+    derivedStats: [],        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
       };
 
       let worldId: string;
@@ -293,8 +293,8 @@ describe('World Persistence Infrastructure', () => {
         genre: 'Fantasy',
         description: 'World created with storage unavailable',
         attributes: [],
-        skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+          skills: [],
+    derivedStats: [],        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
       };
 
       expect(() => {
@@ -332,8 +332,8 @@ describe('World Persistence Infrastructure', () => {
         genre: 'Fantasy',
         description: 'World that survives storage errors',
         attributes: [],
-        skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+          skills: [],
+    derivedStats: [],        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
       };
 
       // Should eventually succeed despite initial failures

@@ -21,7 +21,8 @@ describe('InventoryStore - Item Usage', () => {
       description: 'A world for testing',
       genre: 'fantasy',
       attributes: [],
-      skills: [],
+        skills: [],
+    derivedStats: [],    derivedStats: [],
       settings: {
         maxAttributes: 10,
         maxSkills: 10,
@@ -51,7 +52,8 @@ describe('InventoryStore - Item Usage', () => {
       },
       background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
-      skills: [],
+        skills: [],
+    derivedStats: [],    derivedStats: [],
     });
   });
 
@@ -208,7 +210,8 @@ describe('InventoryStore - Item Usage', () => {
         },
         background: { history: 'Another adventurer', personality: 'Mysterious', goals: [], fears: [], relationships: [] },
         attributes: [],
-        skills: [],
+          skills: [],
+    derivedStats: [],    derivedStats: [],
       });
 
       // Add item to first character

@@ -64,8 +64,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               description: 'Seeded world for fresh-session test',
               genre: 'fantasy',
               attributes: [],
-              skills: [],
-              createdAt: now,
+                skills: [],
+    derivedStats: [],              createdAt: now,
               updatedAt: now,
             },
           },
@@ -76,8 +76,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               description: 'Seeded world for fresh-session test',
               genre: 'fantasy',
               attributes: [],
-              skills: [],
-              createdAt: now,
+                skills: [],
+    derivedStats: [],              createdAt: now,
               updatedAt: now,
             },
           },
@@ -111,8 +111,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               level: 1,
               isPlayer: true,
               attributes: [],
-              skills: [],
-              background: {
+                skills: [],
+    derivedStats: [],              background: {
                 history: '',
                 personality: '',
                 goals: [],
@@ -139,8 +139,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
               level: 1,
               isPlayer: true,
               attributes: [],
-              skills: [],
-              background: {
+                skills: [],
+    derivedStats: [],              background: {
                 history: '',
                 personality: '',
                 goals: [],
@@ -218,8 +218,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             description: 'Seeded world for fresh-session test',
             genre: 'fantasy',
             attributes: [],
-            skills: [],
-            createdAt: now,
+              skills: [],
+    derivedStats: [],            createdAt: now,
             updatedAt: now,
           };
           worldHook.setState((prev: any) => ({
@@ -255,8 +255,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             level: 1,
             isPlayer: true,
             attributes: [],
-            skills: [],
-            background: {
+              skills: [],
+    derivedStats: [],            background: {
               history: '',
               personality: '',
               goals: [],
@@ -328,8 +328,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             description: 'Seeded world for fresh-session test',
             genre: 'fantasy',
             attributes: [],
-            skills: [],
-            createdAt: now,
+              skills: [],
+    derivedStats: [],            createdAt: now,
             updatedAt: now,
           };
           worldHook.setState((prev: any) => ({
@@ -350,8 +350,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
             level: 1,
             isPlayer: true,
             attributes: [],
-            skills: [],
-            background: {
+              skills: [],
+    derivedStats: [],            background: {
               history: '',
               personality: '',
               goals: [],
@@ -416,8 +416,8 @@ test.describe('Fresh GameSession skeleton → content', () => {
                   description: 'Seeded world for fresh-session test',
                   genre: 'fantasy',
                   attributes: [],
-                  skills: [],
-                  createdAt: getTimestamp(),
+                    skills: [],
+    derivedStats: [],                  createdAt: getTimestamp(),
                   updatedAt: getTimestamp(),
                 },
               },

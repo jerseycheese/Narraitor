@@ -75,8 +75,8 @@ const defaultData = {
         maxValue: 18,
       },
     ],
-    skills: [],
-    background: {
+      skills: [],
+    derivedStats: [],    background: {
       history: '',
       personality: '',
       goals: [],
@@ -125,8 +125,8 @@ const mockWorldConfig = {
       maxValue: 18,
     },
   ],
-  skills: [],
-  settings: {
+    skills: [],
+    derivedStats: [],  settings: {
     maxAttributes: 6,
     maxSkills: 12,
     attributePointPool: 48,

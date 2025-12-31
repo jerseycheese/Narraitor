@@ -1,0 +1,1 @@
+export { QuickPlay } from './QuickPlay';

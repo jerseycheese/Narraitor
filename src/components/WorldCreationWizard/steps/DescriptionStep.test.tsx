@@ -36,7 +36,7 @@ const buildSuggestions = (): {
       accepted: true,
     },
   ],
-  skills: [
+    skills: [
     {
       name: 'Spellweaving',
       description: 'Craft spells on the fly',
