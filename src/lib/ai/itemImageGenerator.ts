@@ -14,11 +14,14 @@ export class ItemImageGenerator {
    * Build an image generation prompt for an inventory item.
    *
    * @param item - The inventory item to generate an image for
+   * @param genre - Optional world genre (unused, kept for API compatibility)
    * @returns Optimized prompt string for image generation
    */
   async buildItemPrompt(
-    item: InventoryItem
+    item: InventoryItem,
+    genre?: string
   ): Promise<string> {
+    void genre;
     const parts: string[] = [];
 
     // Normalize and clean item data

@@ -7,7 +7,7 @@
     "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
     "kill": "pkill -f 'next dev' || true",
-    "build": "next build && npm run build-storybook && cp -r storybook-static public/",
+    "build": "next build && rm -rf public/storybook-static && npm run build-storybook && cp -r storybook-static public/",
     "build:app": "next build",
     "start": "next start",
     "lint": "next lint",

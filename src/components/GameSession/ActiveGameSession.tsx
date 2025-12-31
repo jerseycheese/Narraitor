@@ -78,6 +78,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
 
+  // Track choice generation for UI state
+  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+
   // Reset fatal guard and flag when session changes
   React.useEffect(() => {
     fatalEndingTriggeredRef.current = false;
@@ -848,6 +851,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <div
           className="lg:flex-1 min-h-0 flex flex-col"
           id="choices-container"
+          aria-busy={isGeneratingChoices}
         >
           <div className="player-choices-container flex-1">
             {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
