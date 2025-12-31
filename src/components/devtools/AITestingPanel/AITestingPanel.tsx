@@ -26,7 +26,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 20,

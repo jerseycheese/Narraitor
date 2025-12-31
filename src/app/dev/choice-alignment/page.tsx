@@ -28,7 +28,7 @@ export default function ChoiceAlignmentTestPage() {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,

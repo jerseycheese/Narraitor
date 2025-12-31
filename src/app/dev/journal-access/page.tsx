@@ -60,12 +60,12 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         level: 1,
         isPlayer: true,
-        attributes: [],
-          skills: [],
-      derivedStats: [],
+      attributes: [],
+        skills: [],
     derivedStats: [],
+  derivedStats: [],
 
-        derivedStats: [],
+      derivedStats: [],
     background: {
           history: 'A brave explorer testing journal access',
           personality: 'Curious and methodical',

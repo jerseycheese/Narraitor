@@ -33,7 +33,7 @@ jest.mock('@/lib/generators/worldGenerator', () => ({
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {},
+    settings: {},
   })),
 }));
 

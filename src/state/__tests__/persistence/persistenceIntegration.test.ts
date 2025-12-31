@@ -149,8 +149,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],
-        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -224,8 +223,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],
-        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -256,8 +254,7 @@ describe('Persistence Integration - MVP', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    derivedStats: [],
-        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,

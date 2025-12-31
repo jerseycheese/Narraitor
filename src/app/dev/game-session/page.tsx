@@ -38,7 +38,7 @@ const mockWorld: World = {
       maxValue: 20,
     }
   ],
-    skills: [
+  skills: [
     {
       id: 'lockpicking',
       name: 'Lockpicking',
@@ -139,7 +139,7 @@ const mockCharacter = {
       category: 'mental'
     }
   ],
-    skills: [
+  skills: [
     {
       id: 'skill1',
       characterId: 'test-character-123',

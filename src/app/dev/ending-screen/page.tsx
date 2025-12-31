@@ -16,11 +16,11 @@ const MOCK_CHARACTER_DATA = {
     worldId: 'test-world-456',
     level: 10,
     isPlayer: true,
-    attributes: [],
-      skills: [],
-      derivedStats: [],
+  attributes: [],
+    skills: [],
     derivedStats: [],
-    derivedStats: [],background: {
+  derivedStats: [],
+  derivedStats: [],background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
       goals: ['Defeat the dark lord and restore peace'],
@@ -52,10 +52,10 @@ const MOCK_WORLD_DATA = {
     name: 'Eldoria',
     description: 'A realm where magic and technology coexist',
     genre: 'fantasy',
-    attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    settings: {
+  attributes: [],
+    skills: [],
+    derivedStats: [],
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,

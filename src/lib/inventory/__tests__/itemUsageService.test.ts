@@ -41,7 +41,7 @@ describe('Item Usage Service', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    derivedStats: [],      settings: {
+    settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,

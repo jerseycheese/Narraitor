@@ -44,7 +44,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -124,7 +124,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -225,7 +225,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -312,7 +312,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -397,7 +397,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -468,7 +468,7 @@ describe('ItemImageService', () => {
         attributes: [],
           skills: [],
       derivedStats: [],
-    derivedStats: [],        settings: {
+    settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,

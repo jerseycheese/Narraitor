@@ -38,7 +38,7 @@ export function setupTestWorldAndCharacter() {
     attributes: [],
       skills: [],
       derivedStats: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 10,
