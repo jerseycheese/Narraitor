@@ -74,7 +74,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -88,7 +88,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -102,7 +102,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -126,7 +126,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'A brave warrior',
       personality: 'Noble and just',
       goals: ['Protect the innocent'],
@@ -160,7 +160,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'A skilled mage with ancient knowledge',
       personality: 'Wise and mysterious',
       goals: ['Seek ancient knowledge'],
@@ -194,7 +194,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'A cyber-enhanced detective investigating corruption',
       personality: 'Cynical but determined',
       goals: ['Uncover corporate conspiracy'],

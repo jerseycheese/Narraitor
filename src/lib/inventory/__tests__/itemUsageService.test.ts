@@ -39,9 +39,8 @@ describe('Item Usage Service', () => {
       description: 'A magical world',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
-      derivedStats: [],
-    derivedStats: [],      settings: {
+      skills: [],
+      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,
@@ -70,9 +69,9 @@ describe('Item Usage Service', () => {
       },
       background: { history: 'A courageous warrior', personality: 'Brave', goals: [], fears: [], relationships: [] },
       attributes: [],
-        skills: [],
+      skills: [],
       derivedStats: [],
-    derivedStats: [],    });
+    });
 
     // Create session ID and set up session state
     sessionId = `session-${worldId}-${characterId}-${Date.now()}`;

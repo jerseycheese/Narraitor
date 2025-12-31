@@ -449,7 +449,7 @@ export const VariedDifficulties: Story = {
 export const Empty: Story = {
   args: {
       skills: [],
-    derivedStats: [],    attributes: mockAttributes,
+    attributes: mockAttributes,
   },
 };
 

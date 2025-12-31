@@ -36,9 +36,8 @@ export function setupTestWorldAndCharacter() {
     description: 'A world for testing',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    settings: {
+    skills: [],
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 10,
@@ -67,9 +66,9 @@ export function setupTestWorldAndCharacter() {
       relationships: []
     },
     attributes: [],
-      skills: [],
-      derivedStats: [],
-    derivedStats: [],    inventory: {
+    skills: [],
+    derivedStats: [],
+    inventory: {
       characterId: '',
       items: [],
       capacity: 0,

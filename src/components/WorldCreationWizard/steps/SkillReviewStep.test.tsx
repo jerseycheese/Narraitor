@@ -46,7 +46,7 @@ const defaultWorldData: Partial<World> = {
     },
   ],
     skills: [],
-    derivedStats: [],};
+    };
 
 describe('SkillReviewStep', () => {
   beforeEach(() => {

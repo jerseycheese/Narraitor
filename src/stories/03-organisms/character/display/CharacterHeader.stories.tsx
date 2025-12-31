@@ -29,7 +29,7 @@ const mockWorld: World = {
   reference: 'Lord of the Rings',
   attributes: [],
     skills: [],
-    derivedStats: [],
+    
 settings: {
     maxAttributes: 6,
     maxSkills: 10,
@@ -48,7 +48,7 @@ const mockCharacter: StoreCharacter = {
   level: 15,
   attributes: [],
     skills: [],
-    derivedStats: [],
+    
 background: {
     history: 'Raised by elves in Rivendell, trained as a Ranger of the North.',
     personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',

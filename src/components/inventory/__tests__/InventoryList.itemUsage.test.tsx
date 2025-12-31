@@ -29,9 +29,8 @@ describe('InventoryList - Item Usage', () => {
       description: 'A world for testing',
       genre: 'fantasy',
       attributes: [],
-        skills: [],
-      derivedStats: [],
-    derivedStats: [],      settings: {
+      skills: [],
+      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,
@@ -59,9 +58,9 @@ describe('InventoryList - Item Usage', () => {
       },
       background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
       attributes: [],
-        skills: [],
+      skills: [],
       derivedStats: [],
-    derivedStats: [],    });
+    });
   });
 
   describe('Use button rendering', () => {

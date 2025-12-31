@@ -359,8 +359,8 @@ export const useWorldStore = create<WorldStore>()(
 
           get().update(worldId, {
             ...world,
-              skills: [...world.skills, newSkill],
-    derivedStats: [],          });
+            skills: [...world.skills, newSkill],
+          });
         },
 
         // Update skill

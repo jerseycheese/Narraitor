@@ -42,9 +42,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -79,9 +78,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'Health Potion',
@@ -122,9 +121,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -159,9 +157,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'Health Potion',
@@ -223,9 +221,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -260,9 +257,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'Health Potion',
@@ -310,9 +307,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -347,9 +343,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       // Add 3 items without images
       useInventoryStore.getState().addItem(characterId, {
@@ -395,9 +391,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -432,9 +427,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       // Add item WITH image
       useInventoryStore.getState().addItem(characterId, {
@@ -466,9 +461,8 @@ describe('ItemImageService', () => {
         genre: 'fantasy',
         description: 'A test world',
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],        settings: {
+        skills: [],
+        settings: {
           maxAttributes: 6,
           maxSkills: 8,
           attributePointPool: 27,
@@ -503,9 +497,9 @@ describe('ItemImageService', () => {
           relationships: [],
         },
         attributes: [],
-          skills: [],
-      derivedStats: [],
-    derivedStats: [],      });
+        skills: [],
+        derivedStats: [],
+      });
 
       // Add 2 items
       useInventoryStore.getState().addItem(characterId, {

@@ -58,11 +58,9 @@ describe('buildEndingContext', () => {
       worldId: request.worldId,
       level: 1,
       attributes: [],
-        skills: [],
+      skills: [],
       derivedStats: [],
-    derivedStats: [],
-      derivedStats: [],
-    background: {
+      background: {
         history: 'Some backstory',
         personality: 'Curious',
         goals: [],
@@ -116,11 +114,9 @@ describe('buildEndingContext', () => {
       worldId: request.worldId,
       level: 3,
       attributes: [],
-        skills: [],
+      skills: [],
       derivedStats: [],
-    derivedStats: [],
-      derivedStats: [],
-    background: {
+      background: {
         history: 'Time traveler',
         personality: 'Precise',
         goals: [],
@@ -194,11 +190,9 @@ describe('buildEndingContext', () => {
       worldId: request.worldId,
       level: 5,
       attributes: [],
-        skills: [],
+      skills: [],
       derivedStats: [],
-    derivedStats: [],
-      derivedStats: [],
-    background: {
+      background: {
         history: 'Chronicler of events',
         personality: 'Observant',
         goals: [],

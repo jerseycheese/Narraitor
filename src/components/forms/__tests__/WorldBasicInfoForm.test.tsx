@@ -13,7 +13,7 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 20,
       attributePointPool: 25,

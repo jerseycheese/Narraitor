@@ -39,8 +39,8 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
     description: 'A test world for unit testing',
     genre: 'fantasy',
     attributes: [],
-      skills: [],
-    derivedStats: [],    settings: {
+    skills: [],
+    settings: {
       maxAttributes: 10,
       maxSkills: 20,
       attributePointPool: 30,

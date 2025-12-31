@@ -86,7 +86,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -100,7 +100,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -114,7 +114,7 @@ const setupWorlds = () => {
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 6,
       maxSkills: 8,
       attributePointPool: 27,
@@ -138,7 +138,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'A brave warrior with a mysterious past',
       personality: 'Noble and just, but haunted by ancient memories',
       goals: ['Protect the innocent', 'Uncover lost magic'],
@@ -172,7 +172,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'A scholar turned adventurer seeking ancient artifacts',
       personality: 'Wise and mysterious, but curious about forbidden knowledge',
       goals: ['Seek ancient knowledge', 'Master elemental magic'],
@@ -206,7 +206,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
       skills: [],
-    derivedStats: [],    background: {
+    background: {
       history: 'Former cop turned private investigator with cybernetic enhancements',
       personality: 'Cynical but determined to find the truth',
       goals: ['Uncover corporate conspiracy', 'Clear his name'],

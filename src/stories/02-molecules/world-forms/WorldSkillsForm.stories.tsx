@@ -82,7 +82,7 @@ export const Default: Story = {
 export const Empty: Story = {
   args: {
       skills: [],
-    derivedStats: [],    attributes: mockAttributes,
+    attributes: mockAttributes,
     worldId: 'world-123',
   },
 };

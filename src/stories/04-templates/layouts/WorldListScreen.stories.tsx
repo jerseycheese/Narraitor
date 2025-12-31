@@ -14,7 +14,7 @@ const mockWorlds: World[] = [
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,
@@ -30,7 +30,7 @@ const mockWorlds: World[] = [
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,
@@ -46,7 +46,7 @@ const mockWorlds: World[] = [
     genre: 'fantasy',
     attributes: [],
       skills: [],
-    derivedStats: [],    settings: {
+    settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 100,
@@ -173,7 +173,7 @@ export const ManyWorlds: Story = {
           genre: 'fantasy',
           attributes: [],
             skills: [],
-    derivedStats: [],          settings: {
+    settings: {
             maxAttributes: 10,
             maxSkills: 10,
             attributePointPool: 100,
@@ -189,7 +189,7 @@ export const ManyWorlds: Story = {
           genre: 'fantasy',
           attributes: [],
             skills: [],
-    derivedStats: [],          settings: {
+    settings: {
             maxAttributes: 10,
             maxSkills: 10,
             attributePointPool: 100,
