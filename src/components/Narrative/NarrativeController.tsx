@@ -48,7 +48,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
   sessionId,
   characterId,
-  decisionWeight,
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
@@ -122,6 +121,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   // Initialize component state on mount
   useEffect(() => {
+    const generationLocks = initialGenerationLocksRef.current;
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -144,7 +144,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
       // Clear generation locks for this session to prevent memory leaks
-      initialGenerationLocksRef.current.delete(sessionId);
+      generationLocks.delete(sessionId);
     };
   }, [sessionId, worldId, characterId]);
 

@@ -1,6 +1,7 @@
 import { evaluateRequirement } from '../requirementEvaluator';
 import { DecisionRequirement } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
+import type { DerivedStat } from '@/types/character.types';
 
 // Character interface matching the actual store structure
 interface Character {
@@ -26,7 +27,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
-  derivedStats: any[];
+  derivedStats: DerivedStat[];
   background: {
     history: string;
     personality: string;

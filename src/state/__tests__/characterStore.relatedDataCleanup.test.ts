@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
 import { useJournalStore } from '../journalStore';
 import { useInventoryStore } from '../inventoryStore';
+import type { InventoryStore } from '../inventoryStore';
 import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
 import {
@@ -65,7 +66,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     getEntriesByType: jest.fn(),
   };
 
-  const mockInventoryStore = {
+  const mockInventoryStore: Partial<InventoryStore> = {
     items: {},
     characterInventories: {},
     clearCharacterInventory: jest.fn(),
@@ -114,10 +115,9 @@ describe('CharacterStore - Related Data Cleanup', () => {
     // Mock getState for store access
     (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState =
       jest.fn(() => mockJournalStore);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (
       useInventoryStore as jest.MockedFunction<typeof useInventoryStore>
-    ).getState = jest.fn(() => mockInventoryStore as any);
+    ).getState = jest.fn(() => mockInventoryStore as InventoryStore);
 
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());

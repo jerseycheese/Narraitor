@@ -2,8 +2,6 @@ import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
-import fs from 'fs';
-import path from 'path';
 
 const RESPONSE_SCHEMA = `{
   "segment": "2-3 sentences (50-75 words) summarizing ONLY the events provided in this checkpoint",

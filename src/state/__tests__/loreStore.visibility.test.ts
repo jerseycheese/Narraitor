@@ -60,9 +60,8 @@ describe('LoreStore - Visibility', () => {
     test('world-shared facts without sessionId are visible to all sessions', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      let factId: string;
       act(() => {
-        factId = result.current.addFact(
+        result.current.addFact(
           'world_rule',
           'Magic is forbidden',
           'rules',

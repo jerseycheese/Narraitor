@@ -7,7 +7,6 @@
 import { useCharacterStore } from '../characterStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
 import {
-  createAttributeTestCharacter,
   createSkillTestCharacter,
   setupTestTimers
 } from './characterStore.testHelpers';

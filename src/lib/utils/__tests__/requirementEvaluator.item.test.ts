@@ -1,6 +1,7 @@
 import { evaluateRequirement } from '../requirementEvaluator';
 import { DecisionRequirement } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
+import type { DerivedStat } from '@/types/character.types';
 
 // Character interface with inventory support
 interface Character {
@@ -12,7 +13,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
-  derivedStats: any[];
+  derivedStats: DerivedStat[];
   inventory: {
     items: InventoryItem[];
   };

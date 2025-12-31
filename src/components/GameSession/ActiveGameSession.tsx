@@ -54,7 +54,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   onChoiceSelected,
   onEnd,
   /* existingSegments - not currently used */
-  choices,
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
@@ -66,9 +65,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const decisionSubscriptionRef = React.useRef<(() => void) | undefined>(undefined);
 
-  // Game readiness state for coordinated loading
-  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  
   // Ending suggestion state
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
@@ -121,11 +117,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
-
-  // Simple computed state - game is ready when we have content and are not in loading states
-  // For sessions with existing narrative, we need either a current decision OR actual choices
-  // Don't show interface if we only have fallback choices (indicates failed AI generation)
-  const hasValidChoices = currentDecision || (choices && choices.length > 0);
 
   // Game is ready when:
   // 1. We're initialized

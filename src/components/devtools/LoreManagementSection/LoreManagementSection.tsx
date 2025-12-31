@@ -85,7 +85,15 @@ export const LoreManagementSection: React.FC = () => {
     }
 
     return filtered;
-  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
+  }, [
+    selectedWorldId,
+    searchQuery,
+    categoryFilter,
+    visibilityFilter,
+    effectiveSessionId,
+    getFacts,
+    searchFacts,
+  ]);
 
   const visibilityStats = useMemo(() => {
     if (!selectedWorldId) {
@@ -119,7 +127,7 @@ export const LoreManagementSection: React.FC = () => {
         narrativeSessionPrivate: 0,
       }
     );
-  }, [selectedWorldId, allFacts, getFacts]);
+  }, [selectedWorldId, getFacts]);
 
   // Group facts by category
   const factsByCategory = useMemo(() => {

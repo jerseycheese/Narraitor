@@ -6,10 +6,7 @@ import {
   ErrorType,
   createStoreError,
 } from '@/lib/utils/errorUtils';
-import {
-  logInventoryGuardSanitized,
-  logInventoryStateReset,
-} from '@/lib/inventory/inventoryTelemetry';
+import { logInventoryGuardSanitized } from '@/lib/inventory/inventoryTelemetry';
 import {
   InventoryItem,
   InventoryItemCategorization,
@@ -142,24 +139,6 @@ const sanitizeInventoryValue = (
     shouldPatch: removedCount > 0,
     shouldDelete: false,
   };
-};
-
-const normalizeCharacterInventories = (
-  characterInventories: Record<EntityID, unknown> | undefined
-): Record<EntityID, EntityID[]> => {
-  if (!characterInventories || typeof characterInventories !== 'object') {
-    return {};
-  }
-
-  return Object.entries(characterInventories).reduce<
-    Record<EntityID, EntityID[]>
-  >((acc, [characterId, value]) => {
-    const sanitized = sanitizeInventoryValue(characterId, value);
-    if (!sanitized.shouldDelete) {
-      acc[characterId] = sanitized.ids;
-    }
-    return acc;
-  }, {});
 };
 
 const validateNewItemData = (data: InventoryItemCreatePayload): void => {
