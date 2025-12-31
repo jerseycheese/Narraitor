@@ -103,6 +103,7 @@ export default function CharacterCreatePage() {
           level: skill.level,
           category: 'Generated'
         })),
+        derivedStats: [],
         background: {
           history: archetype.background.description,
           personality: archetype.background.personality,
