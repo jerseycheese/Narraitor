@@ -31,7 +31,7 @@ describe('InventoryList - Item Usage', () => {
       attributes: [],
         skills: [],
       derivedStats: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 10,

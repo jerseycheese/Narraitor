@@ -90,7 +90,7 @@ describe('debugInfoBuilder', () => {
       updatedAt: '2024-01-01',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 20,

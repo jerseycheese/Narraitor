@@ -111,10 +111,11 @@ describe('QuickPlay - Onboarding Integration', () => {
       name: 'Test World',
       description: 'A test world',
       genre: 'fantasy' as const,
-    attributes: [],
-      skills: [],
+      attributes: [],
+        skills: [],
+      derivedStats: [],
     derivedStats: [],
-    settings: {
+      settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 50,
@@ -130,12 +131,12 @@ describe('QuickPlay - Onboarding Integration', () => {
       name: 'Test Hero',
       description: 'A brave adventurer',
       level: 1,
-    attributes: [],
-      skills: [],
+      attributes: [],
+        skills: [],
+      derivedStats: [],
     derivedStats: [],
-  derivedStats: [],
 
-    derivedStats: [],
+      derivedStats: [],
     background: {
         history: 'A brave adventurer',
         personality: '',

@@ -59,7 +59,8 @@ describe('First segment checkpoint creation', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
@@ -118,7 +119,8 @@ describe('First segment checkpoint creation', () => {
       genre: 'sci-fi',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
@@ -177,7 +179,8 @@ describe('First segment checkpoint creation', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
@@ -269,7 +272,8 @@ describe('First segment checkpoint creation', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,

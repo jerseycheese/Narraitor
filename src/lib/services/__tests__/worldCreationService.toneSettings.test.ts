@@ -43,7 +43,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           genre: 'fantasy',
           attributes: [],
             skills: [],
-    settings: {
+    derivedStats: [],          settings: {
             maxAttributes: 6,
             maxSkills: 10,
             attributePointPool: 27,

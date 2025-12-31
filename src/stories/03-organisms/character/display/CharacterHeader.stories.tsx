@@ -29,7 +29,8 @@ const mockWorld: World = {
   reference: 'Lord of the Rings',
   attributes: [],
     skills: [],
-    settings: {
+    derivedStats: [],
+settings: {
     maxAttributes: 6,
     maxSkills: 10,
     attributePointPool: 27,

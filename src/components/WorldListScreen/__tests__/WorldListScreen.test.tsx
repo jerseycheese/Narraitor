@@ -189,7 +189,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    settings: {
+    derivedStats: [],        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,
@@ -205,7 +205,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    settings: {
+    derivedStats: [],        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,
@@ -253,7 +253,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
           skills: [],
-    settings: {
+    derivedStats: [],        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,

@@ -28,7 +28,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -115,7 +115,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -162,7 +162,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 100,
@@ -208,7 +208,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       genre: 'mystery',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],      settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 80,

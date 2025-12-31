@@ -55,7 +55,8 @@ describe('Narrative store world state integration', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
@@ -154,7 +155,8 @@ describe('Narrative store world state integration', () => {
       genre: 'fantasy',
       attributes: [],
         skills: [],
-    settings: {
+    derivedStats: [],
+      settings: {
         maxAttributes: 5,
         maxSkills: 5,
         attributePointPool: 10,
