@@ -57,7 +57,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
         value: 14
       }
     ],
-      skills: [
+        skills: [
       {
         skillId: mockStealthSkillId,
         level: 5,

@@ -43,7 +43,7 @@ Decision Weight: [minor]`
       name: 'Fantasy Realm',
       description: 'A medieval fantasy world',
       genre: 'fantasy',
-      skills: [
+        skills: [
         {
           id: 'lockpicking',
           name: 'Lockpicking',
@@ -65,7 +65,7 @@ Decision Weight: [minor]`
           maxValue: 5
         }
       ],
-      settings: {
+        settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
@@ -89,10 +89,10 @@ Decision Weight: [minor]`
         fears: [],
         relationships: []
       },
-      attributes: [
+        attributes: [
         { attributeId: 'dexterity', value: 8 }
       ],
-      skills: [
+        skills: [
         {
           skillId: 'lockpicking',
           level: 4, // Expert level
@@ -244,7 +244,7 @@ Decision Weight: [minor]`
         ...mockCharacter,
         id: 'char-2',
         name: 'Strong Warrior',
-          skills: [
+        skills: [
           {
             skillId: 'combat',
             level: 5, // Master

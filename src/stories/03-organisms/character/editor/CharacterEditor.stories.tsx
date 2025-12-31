@@ -78,7 +78,7 @@ The editor automatically loads character data and provides forms for all editabl
             maxValue: 10
           }
         ],
-          skills: [
+        skills: [
           {
             id: 'skill1',
             name: 'Swordsmanship',

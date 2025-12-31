@@ -75,7 +75,7 @@ describe('requirementEvaluator', () => {
         category: 'mental'
       }
     ],
-      skills: [
+        skills: [
       {
         id: 'skill-1',
         characterId: 'char-1',

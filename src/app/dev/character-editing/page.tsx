@@ -41,7 +41,7 @@ export default function CharacterEditingTestPage() {
             maxValue: 20
           }
         ],
-          skills: [
+        skills: [
           {
             id: 'sword',
             name: 'Swordsmanship',
@@ -88,7 +88,7 @@ export default function CharacterEditingTestPage() {
             modifiedValue: 8,
           }
         ],
-          skills: [
+        skills: [
           {
             id: 'char-sword',
             characterId: '',

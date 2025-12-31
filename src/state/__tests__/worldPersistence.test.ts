@@ -176,7 +176,7 @@ describe('World Persistence Infrastructure', () => {
             worldId: ''
           }
         ],
-          skills: [
+        skills: [
           {
             id: 'combat',
             name: 'Combat',

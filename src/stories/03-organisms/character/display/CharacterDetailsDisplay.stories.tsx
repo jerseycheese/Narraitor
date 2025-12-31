@@ -287,7 +287,7 @@ export const MinimalCharacter: Story = {
     character: {
       ...mockCharacter,
       name: 'Simple Character',
-      attributes: [
+        attributes: [
         {
           id: 'char-attr-str-simple',
           characterId: 'char-simple',
@@ -307,7 +307,7 @@ export const MinimalCharacter: Story = {
           category: 'Physical'
         }
       ],
-      skills: [
+        skills: [
         {
           id: 'char-skill-swordsmanship-simple',
           characterId: 'char-simple',
@@ -336,7 +336,7 @@ export const PowerfulCharacter: Story = {
       ...mockCharacter,
       name: 'Gandalf the Grey',
       level: 50,
-      attributes: [
+        attributes: [
         {
           id: 'char-attr-str-gandalf',
           characterId: 'char-gandalf',
@@ -374,7 +374,7 @@ export const PowerfulCharacter: Story = {
           category: 'Mental'
         }
       ],
-      skills: [
+        skills: [
         {
           id: 'char-skill-lore-gandalf',
           characterId: 'char-gandalf',
@@ -420,7 +420,7 @@ export const WeakCharacter: Story = {
       ...mockCharacter,
       name: 'Frodo Baggins',
       level: 1,
-      attributes: [
+        attributes: [
         {
           id: 'char-attr-str-frodo',
           characterId: 'char-frodo',
@@ -458,7 +458,7 @@ export const WeakCharacter: Story = {
           category: 'Mental'
         }
       ],
-      skills: [
+        skills: [
         {
           id: 'char-skill-stealth-frodo',
           characterId: 'char-frodo',
@@ -505,7 +505,7 @@ export const OriginalCharacter: Story = {
       id: 'char-2',
       name: 'Lyra Moonwhisper',
       level: 8,
-      attributes: [
+        attributes: [
         {
           id: 'char-attr-str-lyra',
           characterId: 'char-lyra',
@@ -543,7 +543,7 @@ export const OriginalCharacter: Story = {
           category: 'Mental'
         }
       ],
-      skills: [
+        skills: [
         {
           id: 'char-skill-lore-lyra',
           characterId: 'char-lyra',

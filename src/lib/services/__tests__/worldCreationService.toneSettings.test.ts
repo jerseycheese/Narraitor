@@ -99,7 +99,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       genre: 'science fiction',
       reference: 'Blade Runner',
       relationship: 'inspired_by',
-      attributes: [
+        attributes: [
         {
           name: 'Cybernetics',
           description: 'Integration with technology',
@@ -108,7 +108,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           maxValue: 5
         }
       ],
-      skills: [
+        skills: [
         {
           name: 'Hacking',
           description: 'Computer infiltration abilities',
@@ -119,7 +119,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           difficulty: 'medium'
         }
       ],
-      settings: {
+        settings: {
         maxAttributes: 6,
         maxSkills: 10,
         attributePointPool: 27,

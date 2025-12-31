@@ -38,13 +38,13 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         fears: ['Getting caught'],
         relationships: []
       },
-      attributes: [
+        attributes: [
         { attributeId: 'attr-dexterity', value: 9 },      // Exceptional
         { attributeId: 'attr-intelligence', value: 7 },   // High
         { attributeId: 'attr-strength', value: 3 },       // Low
         { attributeId: 'attr-charisma', value: 5 }        // Moderate (filtered out)
       ],
-      skills: [
+        skills: [
         { skillId: 'skill-lockpicking', level: 4, experience: 100, isActive: true },    // Expert
         { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true },         // Competent
         { skillId: 'skill-pickpocket', level: 2, experience: 40, isActive: true }       // Apprentice
@@ -71,7 +71,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       name: 'Fantasy Realm',
       description: 'A classic fantasy setting',
       genre: 'fantasy',
-      settings: {
+        settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
@@ -188,7 +188,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles skills with name property', () => {
       const characterWithNameSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-          skills: [
+        skills: [
           { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' }, // Expert
           { name: 'Stealth', level: 3 } // Competent
         ]

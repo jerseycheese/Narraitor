@@ -31,7 +31,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 6,
       },
     ],
-      skills: [
+        skills: [
       {
         id: 'char-skill-hacking',
         characterId: 'char-cyberpunk-hacker',
@@ -107,7 +107,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 7,
       },
     ],
-      skills: [
+        skills: [
       {
         id: 'char-skill-hacking-2',
         characterId: 'char-cyberpunk-operative',
@@ -175,7 +175,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 4,
       },
     ],
-      skills: [
+        skills: [
       {
         id: 'char-skill-spellcasting',
         characterId: 'char-fantasy-mage',
@@ -245,7 +245,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         modifiedValue: 1,
       },
     ],
-      skills: [
+        skills: [
       {
         id: 'char-skill-spellcasting-2',
         characterId: 'char-fantasy-ranger',
