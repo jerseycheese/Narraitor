@@ -45,7 +45,7 @@ describe('/api/generate-world-image', () => {
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
     attributes: [],
-      skills: [],
+    skills: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 20,

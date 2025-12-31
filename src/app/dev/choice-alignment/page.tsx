@@ -27,8 +27,8 @@ export default function ChoiceAlignmentTestPage() {
         description: 'A fantasy world for testing choice alignment',
         genre: 'fantasy',
         attributes: [],
-          skills: [],
-    settings: {
+        skills: [],
+        settings: {
           maxAttributes: 10,
           maxSkills: 10,
           attributePointPool: 100,

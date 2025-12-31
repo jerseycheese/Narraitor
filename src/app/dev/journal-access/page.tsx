@@ -61,7 +61,7 @@ export default function JournalAccessTestPage() {
         level: 1,
         isPlayer: true,
         attributes: [],
-      skills: [],
+        skills: [],
         derivedStats: [],
         background: {
           history: 'A brave explorer testing journal access',
