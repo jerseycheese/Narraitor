@@ -31,8 +31,8 @@ describe('ChoiceGenerator - Skill-Based Choices', () => {
 **Force the door** [aggressive]
 **Pick the lock** [stealthy]
 
-Decision Weight: [minor]`
-      })
+Decision Weight: [minor]`,
+      }),
     } as unknown as AIClient;
 
     choiceGenerator = new ChoiceGenerator(mockAIClient);
@@ -52,7 +52,7 @@ Decision Weight: [minor]`
           difficulty: 'medium' as const,
           baseValue: 3,
           minValue: 1,
-          maxValue: 5
+          maxValue: 5,
         },
         {
           id: 'stealth',
@@ -62,18 +62,18 @@ Decision Weight: [minor]`
           difficulty: 'medium' as const,
           baseValue: 3,
           minValue: 1,
-          maxValue: 5
-        }
+          maxValue: 5,
+        },
       ],
       settings: {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
-        skillPointPool: 40
+        skillPointPool: 40,
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
-      attributes: []
+      attributes: [],
     };
 
     // Mock character with high lockpicking skill
@@ -87,68 +87,81 @@ Decision Weight: [minor]`
         personality: 'Cunning',
         goals: [],
         fears: [],
-        relationships: []
+        relationships: [],
       },
-      attributes: [
-        { attributeId: 'dexterity', value: 8 }
-      ],
+      attributes: [{ attributeId: 'dexterity', value: 8 }],
       skills: [
         {
           skillId: 'lockpicking',
           level: 4, // Expert level
           experience: 100,
-          isActive: true
+          isActive: true,
         },
         {
           skillId: 'stealth',
           level: 3, // Competent
           experience: 60,
-          isActive: true
-        }
+          isActive: true,
+        },
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],
         capacity: 100,
         categories: [],
-        itemOrder: []
+        itemOrder: [],
       },
       status: {
         health: 100,
         maxHealth: 100,
-        conditions: []
+        conditions: [],
       },
       createdAt: '2023-01-01',
-      updatedAt: '2023-01-01'
+      updatedAt: '2023-01-01',
     };
 
     // Mock store methods
     const mockWorldStore = {
       worlds: { 'world-1': mockWorld },
-      getWorldById: jest.fn().mockReturnValue(mockWorld)
+      getWorldById: jest.fn().mockReturnValue(mockWorld),
     };
     (useWorldStore as unknown as jest.Mock).mockReturnValue(mockWorldStore);
-    (useWorldStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockWorldStore);
+    (useWorldStore.getState as jest.Mock) = jest
+      .fn()
+      .mockReturnValue(mockWorldStore);
 
     const mockCharacterStore = {
       characters: { 'char-1': mockCharacter },
-      getCharacterById: jest.fn().mockReturnValue(mockCharacter)
+      getCharacterById: jest.fn().mockReturnValue(mockCharacter),
     };
-    (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStore);
-    (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStore);
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue(
+      mockCharacterStore
+    );
+    (useCharacterStore.getState as jest.Mock) = jest
+      .fn()
+      .mockReturnValue(mockCharacterStore);
 
     // Mock inventory and NPC stores
     const mockInventoryStore = {
-      getCharacterItems: jest.fn().mockReturnValue([])
+      getCharacterItems: jest.fn().mockReturnValue([]),
     };
-    (require('@/state/inventoryStore').useInventoryStore as unknown as jest.Mock).mockReturnValue(mockInventoryStore);
-    (require('@/state/inventoryStore').useInventoryStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockInventoryStore);
+    (
+      require('@/state/inventoryStore')
+        .useInventoryStore as unknown as jest.Mock
+    ).mockReturnValue(mockInventoryStore);
+    (require('@/state/inventoryStore').useInventoryStore
+      .getState as jest.Mock) = jest.fn().mockReturnValue(mockInventoryStore);
 
     const mockNPCStore = {
-      getActiveNPCsByLocation: jest.fn().mockReturnValue([])
+      getActiveNPCsByLocation: jest.fn().mockReturnValue([]),
     };
-    (require('@/state/npcStore').useNPCStore as unknown as jest.Mock).mockReturnValue(mockNPCStore);
-    (require('@/state/npcStore').useNPCStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockNPCStore);
+    (
+      require('@/state/npcStore').useNPCStore as unknown as jest.Mock
+    ).mockReturnValue(mockNPCStore);
+    (require('@/state/npcStore').useNPCStore.getState as jest.Mock) = jest
+      .fn()
+      .mockReturnValue(mockNPCStore);
   });
 
   describe('Character Skills in Context', () => {
@@ -161,18 +174,19 @@ Decision Weight: [minor]`
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Locked Door',
-        currentSituation: 'You stand before a locked door'
+        currentSituation: 'You stand before a locked door',
       };
 
       await choiceGenerator.generateChoices({
         worldId: 'world-1',
         narrativeContext,
-        characterIds: ['char-1']
+        characterIds: ['char-1'],
       });
 
       // Verify AI client was called with context including skills
       expect(mockAIClient.generateContent).toHaveBeenCalled();
-      const prompt = (mockAIClient.generateContent as jest.Mock).mock.calls[0][0];
+      const prompt = (mockAIClient.generateContent as jest.Mock).mock
+        .calls[0][0];
 
       // Prompt should mention lockpicking skill
       expect(prompt).toMatch(/lockpicking/i);
@@ -188,16 +202,17 @@ Decision Weight: [minor]`
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Locked Chest',
-        currentSituation: 'A locked chest sits before you'
+        currentSituation: 'A locked chest sits before you',
       };
 
       await choiceGenerator.generateChoices({
         worldId: 'world-1',
         narrativeContext,
-        characterIds: ['char-1']
+        characterIds: ['char-1'],
       });
 
-      const prompt = (mockAIClient.generateContent as jest.Mock).mock.calls[0][0];
+      const prompt = (mockAIClient.generateContent as jest.Mock).mock
+        .calls[0][0];
 
       // Should include skill proficiency (Expert, Competent, etc.) using 1-5 scale labels
       expect(prompt).toMatch(/Expert|Competent|Master|Apprentice|Novice/i);
@@ -207,14 +222,19 @@ Decision Weight: [minor]`
       // Character with no skills
       const characterNoSkills = {
         ...mockCharacter,
-        skills: []
+        skills: [],
+        derivedStats: [],
       };
 
       const mockCharacterStoreNoSkills = {
-        characters: { 'char-1': characterNoSkills }
+        characters: { 'char-1': characterNoSkills },
       };
-      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStoreNoSkills);
-      (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStoreNoSkills);
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(
+        mockCharacterStoreNoSkills
+      );
+      (useCharacterStore.getState as jest.Mock) = jest
+        .fn()
+        .mockReturnValue(mockCharacterStoreNoSkills);
 
       const narrativeContext: NarrativeContext = {
         worldId: 'world-1',
@@ -224,13 +244,13 @@ Decision Weight: [minor]`
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Empty Room',
-        currentSituation: 'An empty room'
+        currentSituation: 'An empty room',
       };
 
       const result = await choiceGenerator.generateChoices({
         worldId: 'world-1',
         narrativeContext,
-        characterIds: ['char-1']
+        characterIds: ['char-1'],
       });
 
       // Should still generate choices without errors
@@ -247,19 +267,23 @@ Decision Weight: [minor]`
             skillId: 'combat',
             level: 5, // Master
             experience: 200,
-            isActive: true
-          }
-        ]
+            isActive: true,
+          },
+        ],
       };
 
       const mockCharacterStoreMultiple = {
         characters: {
           'char-1': mockCharacter,
-          'char-2': secondCharacter
-        }
+          'char-2': secondCharacter,
+        },
       };
-      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStoreMultiple);
-      (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStoreMultiple);
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(
+        mockCharacterStoreMultiple
+      );
+      (useCharacterStore.getState as jest.Mock) = jest
+        .fn()
+        .mockReturnValue(mockCharacterStoreMultiple);
 
       const narrativeContext: NarrativeContext = {
         worldId: 'world-1',
@@ -269,16 +293,17 @@ Decision Weight: [minor]`
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Ambush Point',
-        currentSituation: 'Enemies ahead'
+        currentSituation: 'Enemies ahead',
       };
 
       await choiceGenerator.generateChoices({
         worldId: 'world-1',
         narrativeContext,
-        characterIds: ['char-1', 'char-2']
+        characterIds: ['char-1', 'char-2'],
       });
 
-      const prompt = (mockAIClient.generateContent as jest.Mock).mock.calls[0][0];
+      const prompt = (mockAIClient.generateContent as jest.Mock).mock
+        .calls[0][0];
 
       // Should include skills from both characters
       expect(prompt).toMatch(/lockpicking|stealth/i);

@@ -18,18 +18,23 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
   const convertToPersonalizationCharacter = (character: Character) => ({
     id: character.id,
     name: character.name,
-    background: typeof character.background === 'object' ? character.background.history || '' : character.background,
+    background:
+      typeof character.background === 'object'
+        ? character.background.history || ''
+        : character.background,
     attributes: character.attributes,
     skills: character.skills,
     createdAt: character.createdAt,
-    updatedAt: character.updatedAt
+    updatedAt: character.updatedAt,
   });
 
   beforeEach(() => {
     personalizationEngine = new PersonalizationEngine();
-    tracker = new PlayerDecisionTracker({ storageKey: 'test_personalization_decisions' });
+    tracker = new PlayerDecisionTracker({
+      storageKey: 'test_personalization_decisions',
+    });
     tracker.clearDecisions();
-    
+
     mockCharacter = {
       id: 'char-1',
       name: 'Alex Archer',
@@ -40,16 +45,17 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         personality: 'Curious and determined',
         goals: ['Discover ancient secrets'],
         fears: ['Failure'],
-        relationships: []
+        relationships: [],
       },
       attributes: [
         { attributeId: 'attr-intelligence', value: 8 },
-        { attributeId: 'attr-dexterity', value: 6 }
+        { attributeId: 'attr-dexterity', value: 6 },
       ],
       skills: [
         { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
-        { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
+        { skillId: 'skill-2', level: 5, experience: 50, isActive: true },
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],
@@ -60,10 +66,10 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       status: {
         health: 100,
         maxHealth: 100,
-        conditions: []
+        conditions: [],
       },
       createdAt: '2023-01-01',
-      updatedAt: '2023-01-01'
+      updatedAt: '2023-01-01',
     };
 
     mockWorld = {
@@ -75,12 +81,12 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
-        skillPointPool: 40
+        skillPointPool: 40,
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
       attributes: [],
-      skills: []
+      skills: [],
     };
   });
 
@@ -93,7 +99,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       'session-1',
       'world-1'
     );
-    
+
     tracker.recordDecision(
       'How do you respond?',
       'Negotiate peacefully',
@@ -105,7 +111,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     // Get decisions for personalization
     const decisions = tracker.getWorldDecisions('world-1');
     expect(decisions).toHaveLength(2);
-    
+
     // Create personalized context
     const context = personalizationEngine.createPersonalizedContext(
       convertToPersonalizationCharacter(mockCharacter),
@@ -115,16 +121,16 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       [],
       []
     );
-    
+
     expect(context.character.personality).toBeDefined();
     expect(context.playerPreferences).toBeDefined();
-    
+
     // Generate enhancement
-    const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
+    const enhancement =
+      personalizationEngine.generateNarrativeEnhancement(context);
     expect(enhancement).toContain('Alex Archer');
     expect(enhancement).toMatch(/helpful|diplomatic/i);
   });
-
 
   test('decision patterns influence personalization', () => {
     // Record consistent diplomatic choices
@@ -137,13 +143,13 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
         'world-1'
       );
     }
-    
+
     const decisions = tracker.getWorldDecisions('world-1');
     const analysis = tracker.analyzeChoicePatterns(decisions);
-    
+
     expect(analysis.dominantChoiceTypes[0]).toBe('diplomatic');
     expect(analysis.patternStrength).toBeGreaterThan(50);
-    
+
     // Use in personalization
     const behaviorAnalysis = personalizationEngine.analyzePlayerBehavior(
       convertToPersonalizationCharacter(mockCharacter),
@@ -151,7 +157,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       [],
       []
     );
-    
+
     expect(behaviorAnalysis.detectedTraits).toContain('diplomatic');
   });
 });

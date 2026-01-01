@@ -7,6 +7,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLoreStore } from '@/state/loreStore';
+import { searchFactsImpl } from '@/state/loreStore.utils';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
@@ -38,8 +39,6 @@ export const LoreManagementSection: React.FC = () => {
   const currentSessionWorldId = useSessionStore((state) => state.worldId);
   const {
     facts: allFacts,
-    getFacts,
-    searchFacts,
     deleteFact,
     exportFacts,
     importFacts
@@ -67,17 +66,33 @@ export const LoreManagementSection: React.FC = () => {
   const facts = useMemo(() => {
     if (!selectedWorldId) return [];
 
+    const allFactsList = Object.values(allFacts);
+
     let filtered = searchQuery
-      ? searchFacts(searchQuery, {
-          worldId: selectedWorldId,
-          category: categoryFilter || undefined,
-          sessionId: effectiveSessionId
-        })
-      : getFacts({
-          worldId: selectedWorldId,
-          category: categoryFilter || undefined,
-          sessionId: effectiveSessionId
-        });
+      ? searchFactsImpl(
+          searchQuery,
+          allFactsList,
+          selectedWorldId,
+          categoryFilter || undefined,
+          effectiveSessionId
+        )
+      : allFactsList
+          .filter((fact) => fact.worldId === selectedWorldId)
+          .filter((fact) =>
+            categoryFilter ? fact.category === categoryFilter : true
+          )
+          .filter((fact) => {
+            if (!effectiveSessionId) return true;
+            if (fact.visibility === 'world-shared') return true;
+            return (
+              fact.visibility === 'session-private' &&
+              fact.sessionId === effectiveSessionId
+            );
+          })
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
 
     // Apply visibility filter
     if (visibilityFilter !== 'all') {
@@ -85,7 +100,14 @@ export const LoreManagementSection: React.FC = () => {
     }
 
     return filtered;
-  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
+  }, [
+    selectedWorldId,
+    searchQuery,
+    categoryFilter,
+    visibilityFilter,
+    effectiveSessionId,
+    allFacts,
+  ]);
 
   const visibilityStats = useMemo(() => {
     if (!selectedWorldId) {
@@ -98,7 +120,9 @@ export const LoreManagementSection: React.FC = () => {
       };
     }
 
-    const worldFacts = getFacts({ worldId: selectedWorldId });
+    const worldFacts = Object.values(allFacts).filter(
+      (fact) => fact.worldId === selectedWorldId
+    );
     return worldFacts.reduce(
       (acc, fact) => {
         acc.total += 1;
@@ -119,7 +143,7 @@ export const LoreManagementSection: React.FC = () => {
         narrativeSessionPrivate: 0,
       }
     );
-  }, [selectedWorldId, allFacts, getFacts]);
+  }, [selectedWorldId, allFacts]);
 
   // Group facts by category
   const factsByCategory = useMemo(() => {

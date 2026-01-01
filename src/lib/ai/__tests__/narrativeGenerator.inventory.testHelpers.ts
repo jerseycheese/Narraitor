@@ -7,7 +7,10 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { AIClient } from '../types';
-import { InventoryAcquisitionMethod, StandardInventoryCategory } from '@/types/inventory.types';
+import {
+  InventoryAcquisitionMethod,
+  StandardInventoryCategory,
+} from '@/types/inventory.types';
 
 /**
  * Creates a mock Gemini client for testing
@@ -63,10 +66,11 @@ export function setupTestWorldAndCharacter() {
       personality: 'Courageous',
       goals: [],
       fears: [],
-      relationships: []
+      relationships: [],
     },
     attributes: [],
     skills: [],
+    derivedStats: [],
     inventory: {
       characterId: '',
       items: [],
@@ -92,21 +96,24 @@ export function setupTestWorldAndCharacter() {
 /**
  * Creates a mock item for testing
  */
-export function createMockItem(overrides?: Partial<{
-  name: string;
-  description: string;
-  stackable: boolean;
-  quantity: number;
-  categoryId: StandardInventoryCategory;
-  method: InventoryAcquisitionMethod;
-}>) {
+export function createMockItem(
+  overrides?: Partial<{
+    name: string;
+    description: string;
+    stackable: boolean;
+    quantity: number;
+    categoryId: StandardInventoryCategory;
+    method: InventoryAcquisitionMethod;
+  }>
+) {
   return {
     name: 'Test Item',
     description: 'A test item',
     stackable: false,
     quantity: 1,
     categorization: {
-      categoryId: (overrides?.categoryId || 'equipment') as StandardInventoryCategory,
+      categoryId: (overrides?.categoryId ||
+        'equipment') as StandardInventoryCategory,
       source: 'manual' as const,
       classifiedAt: new Date().toISOString(),
     },
@@ -123,7 +130,10 @@ export function createMockItem(overrides?: Partial<{
 /**
  * Creates a basic narrative context for testing
  */
-export function createTestNarrativeContext(worldId: string, characterId: string) {
+export function createTestNarrativeContext(
+  worldId: string,
+  characterId: string
+) {
   return {
     worldId,
     currentSceneId: 'scene-1',

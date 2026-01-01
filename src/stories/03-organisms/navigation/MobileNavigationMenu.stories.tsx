@@ -13,7 +13,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
       description: {
         component: `
         Mobile navigation menu with full-screen overlay design optimized for touch interaction.
-        
+
         **Features:**
         - Touch-friendly 44px minimum button sizes
         - Swipe left gesture to close menu
@@ -46,7 +46,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
     (Story) => {
       // Reset stores before each story
       useWorldStore.getState().reset();
-      
+
       useCharacterStore.setState({
         characters: {},
         entities: {},
@@ -55,7 +55,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
         error: null,
         loading: false,
       });
-      
+
       return (
         <div className="relative h-screen">
           <Story />
@@ -65,7 +65,8 @@ const meta: Meta<typeof MobileNavigationMenu> = {
               <h2 className="text-xl font-semibold mb-4">Page Content</h2>
               <p className="text-gray-700">
                 This content is behind the mobile navigation overlay when open.
-                The overlay should cover the entire screen and prevent interaction with background content.
+                The overlay should cover the entire screen and prevent
+                interaction with background content.
               </p>
             </div>
           </div>
@@ -82,7 +83,8 @@ type Story = StoryObj<typeof meta>;
 const setupWorlds = () => {
   const fantasyWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Realm of Shadows',
-    description: 'A dark fantasy world filled with ancient magic and mysterious creatures',
+    description:
+      'A dark fantasy world filled with ancient magic and mysterious creatures',
     genre: 'fantasy',
     attributes: [],
     skills: [],
@@ -93,7 +95,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const scifiWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Neo-Tokyo 2185',
     description: 'A cyberpunk future where technology and humanity collide',
@@ -107,7 +109,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const westernWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Dustbowl County',
     description: 'Wild west frontier town with outlaws and lawmen',
@@ -121,11 +123,11 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const worldId1 = useWorldStore.getState().createWorld(fantasyWorld);
   const worldId2 = useWorldStore.getState().createWorld(scifiWorld);
   const worldId3 = useWorldStore.getState().createWorld(westernWorld);
-  
+
   return { worldId1, worldId2, worldId3 };
 };
 
@@ -138,6 +140,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A brave warrior with a mysterious past',
       personality: 'Noble and just, but haunted by ancient memories',
@@ -163,7 +166,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=1',
     },
   };
-  
+
   const character2 = {
     name: 'Zara Chen',
     description: 'A skilled mage with ancient knowledge',
@@ -172,6 +175,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A scholar turned adventurer seeking ancient artifacts',
       personality: 'Wise and mysterious, but curious about forbidden knowledge',
@@ -197,7 +201,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=2',
     },
   };
-  
+
   const character3 = {
     name: 'Jack Harrison',
     description: 'A cyber-enhanced detective investigating corruption',
@@ -206,8 +210,10 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
-      history: 'Former cop turned private investigator with cybernetic enhancements',
+      history:
+        'Former cop turned private investigator with cybernetic enhancements',
       personality: 'Cynical but determined to find the truth',
       goals: ['Uncover corporate conspiracy', 'Clear his name'],
       fears: ['Corporate retaliation', 'Technology failure'],
@@ -231,7 +237,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=3',
     },
   };
-  
+
   useCharacterStore.getState().createCharacter(character1);
   useCharacterStore.getState().createCharacter(character2);
   useCharacterStore.getState().createCharacter(character3);
@@ -246,10 +252,11 @@ export const Open: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu open with no worlds - shows basic navigation and create world button'
-      }
-    }
-  }
+        story:
+          'Mobile menu open with no worlds - shows basic navigation and create world button',
+      },
+    },
+  },
 };
 
 export const WithWorlds: Story = {
@@ -268,10 +275,11 @@ export const WithWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu with multiple worlds - shows world switcher section with character counts'
-      }
-    }
-  }
+        story:
+          'Mobile menu with multiple worlds - shows world switcher section with character counts',
+      },
+    },
+  },
 };
 
 export const WithActiveWorld: Story = {
@@ -291,8 +299,9 @@ export const WithActiveWorld: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mobile menu with active world - shows current world highlighted and play button'
-      }
-    }
-  }
+        story:
+          'Mobile menu with active world - shows current world highlighted and play button',
+      },
+    },
+  },
 };

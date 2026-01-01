@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AISuggestions } from '@/components/WorldCreationWizard/AISuggestions';
-import { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
+import {
+  AttributeSuggestion,
+  SkillSuggestion,
+} from '@/types/ai-suggestions.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof AISuggestions> = {
@@ -10,8 +13,9 @@ const meta: Meta<typeof AISuggestions> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'AI-powered suggestions for world attributes and skills based on world description'
-      }
+        component:
+          'AI-powered suggestions for world attributes and skills based on world description',
+      },
     },
   },
   tags: ['autodocs'],
@@ -60,7 +64,7 @@ const mockSkills: SkillSuggestion[] = [
     accepted: true,
     baseValue: 5,
     minValue: 1,
-    maxValue: 10
+    maxValue: 10,
   },
   {
     name: 'Dragon Riding',
@@ -71,7 +75,7 @@ const mockSkills: SkillSuggestion[] = [
     accepted: false,
     baseValue: 5,
     minValue: 1,
-    maxValue: 10
+    maxValue: 10,
   },
   {
     name: 'Alchemy',
@@ -82,7 +86,7 @@ const mockSkills: SkillSuggestion[] = [
     accepted: false,
     baseValue: 5,
     minValue: 1,
-    maxValue: 10
+    maxValue: 10,
   },
 ];
 
@@ -91,10 +95,14 @@ export const Default: Story = {
     loading: false,
     attributes: mockAttributes,
     skills: mockSkills,
-    onAcceptAttribute: (attribute: AttributeSuggestion) => console.log('Accept attribute:', attribute),
-    onRejectAttribute: (attribute: AttributeSuggestion) => console.log('Reject attribute:', attribute),
-    onAcceptSkill: (skill: SkillSuggestion) => console.log('Accept skill:', skill),
-    onRejectSkill: (skill: SkillSuggestion) => console.log('Reject skill:', skill),
+    onAcceptAttribute: (attribute: AttributeSuggestion) =>
+      console.log('Accept attribute:', attribute),
+    onRejectAttribute: (attribute: AttributeSuggestion) =>
+      console.log('Reject attribute:', attribute),
+    onAcceptSkill: (skill: SkillSuggestion) =>
+      console.log('Accept skill:', skill),
+    onRejectSkill: (skill: SkillSuggestion) =>
+      console.log('Reject skill:', skill),
   },
 };
 
@@ -103,6 +111,7 @@ export const Loading: Story = {
     loading: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -115,6 +124,7 @@ export const Empty: Story = {
     loading: false,
     attributes: [],
     skills: [],
+    derivedStats: [],
     onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -128,6 +138,7 @@ export const Error: Story = {
     error: 'Failed to generate AI suggestions. Please try again.',
     attributes: [],
     skills: [],
+    derivedStats: [],
     onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},
@@ -140,8 +151,11 @@ export const AttributesOnly: Story = {
     loading: false,
     attributes: mockAttributes,
     skills: [],
-    onAcceptAttribute: (attribute: AttributeSuggestion) => console.log('Accept attribute:', attribute),
-    onRejectAttribute: (attribute: AttributeSuggestion) => console.log('Reject attribute:', attribute),
+    derivedStats: [],
+    onAcceptAttribute: (attribute: AttributeSuggestion) =>
+      console.log('Accept attribute:', attribute),
+    onRejectAttribute: (attribute: AttributeSuggestion) =>
+      console.log('Reject attribute:', attribute),
     onAcceptSkill: () => {},
     onRejectSkill: () => {},
   },
@@ -154,16 +168,18 @@ export const SkillsOnly: Story = {
     skills: mockSkills,
     onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
-    onAcceptSkill: (skill: SkillSuggestion) => console.log('Accept skill:', skill),
-    onRejectSkill: (skill: SkillSuggestion) => console.log('Reject skill:', skill),
+    onAcceptSkill: (skill: SkillSuggestion) =>
+      console.log('Accept skill:', skill),
+    onRejectSkill: (skill: SkillSuggestion) =>
+      console.log('Reject skill:', skill),
   },
 };
 
 export const AllAccepted: Story = {
   args: {
     loading: false,
-    attributes: mockAttributes.map(attr => ({ ...attr, accepted: true })),
-    skills: mockSkills.map(skill => ({ ...skill, accepted: true })),
+    attributes: mockAttributes.map((attr) => ({ ...attr, accepted: true })),
+    skills: mockSkills.map((skill) => ({ ...skill, accepted: true })),
     onAcceptAttribute: () => {},
     onRejectAttribute: () => {},
     onAcceptSkill: () => {},

@@ -16,11 +16,14 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
   const convertToPersonalizationCharacter = (character: Character) => ({
     id: character.id,
     name: character.name,
-    background: typeof character.background === 'object' ? character.background.history || '' : character.background,
+    background:
+      typeof character.background === 'object'
+        ? character.background.history || ''
+        : character.background,
     attributes: character.attributes,
     skills: character.skills,
     createdAt: character.createdAt,
-    updatedAt: character.updatedAt
+    updatedAt: character.updatedAt,
   });
 
   beforeEach(() => {
@@ -36,33 +39,44 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         personality: 'Cunning and cautious',
         goals: ['Steal the Crown Jewels'],
         fears: ['Getting caught'],
-        relationships: []
+        relationships: [],
       },
       attributes: [
-        { attributeId: 'attr-dexterity', value: 9 },      // Exceptional
-        { attributeId: 'attr-intelligence', value: 7 },   // High
-        { attributeId: 'attr-strength', value: 3 },       // Low
-        { attributeId: 'attr-charisma', value: 5 }        // Moderate (filtered out)
+        { attributeId: 'attr-dexterity', value: 9 }, // Exceptional
+        { attributeId: 'attr-intelligence', value: 7 }, // High
+        { attributeId: 'attr-strength', value: 3 }, // Low
+        { attributeId: 'attr-charisma', value: 5 }, // Moderate (filtered out)
       ],
       skills: [
-        { skillId: 'skill-lockpicking', level: 4, experience: 100, isActive: true },    // Expert
-        { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true },         // Competent
-        { skillId: 'skill-pickpocket', level: 2, experience: 40, isActive: true }       // Apprentice
+        {
+          skillId: 'skill-lockpicking',
+          level: 4,
+          experience: 100,
+          isActive: true,
+        }, // Expert
+        { skillId: 'skill-stealth', level: 3, experience: 80, isActive: true }, // Competent
+        {
+          skillId: 'skill-pickpocket',
+          level: 2,
+          experience: 40,
+          isActive: true,
+        }, // Apprentice
       ],
+      derivedStats: [],
       inventory: {
         characterId: 'char-1',
         items: [],
         capacity: 100,
         categories: [],
-        itemOrder: []
+        itemOrder: [],
       },
       status: {
         health: 100,
         maxHealth: 100,
-        conditions: []
+        conditions: [],
       },
       createdAt: '2023-01-01',
-      updatedAt: '2023-01-01'
+      updatedAt: '2023-01-01',
     };
 
     mockWorld = {
@@ -74,12 +88,12 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 27,
-        skillPointPool: 40
+        skillPointPool: 40,
       },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
       attributes: [],
-      skills: []
+      skills: [],
     };
   });
 
@@ -118,8 +132,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         attributes: {
           dexterity: 9,
           intelligence: 7,
-          strength: 3
-        }
+          strength: 3,
+        },
       };
 
       const context = engine.createPersonalizedContext(
@@ -140,7 +154,7 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty attributes gracefully', () => {
       const characterNoAttrs = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        attributes: []
+        attributes: [],
       };
 
       const context = engine.createPersonalizedContext(
@@ -189,8 +203,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
         ...convertToPersonalizationCharacter(mockCharacter),
         skills: [
           { name: 'Lockpicking', level: 4, worldSkillId: 'skill-lockpicking' }, // Expert
-          { name: 'Stealth', level: 3 } // Competent
-        ]
+          { name: 'Stealth', level: 3 }, // Competent
+        ],
       };
 
       const context = engine.createPersonalizedContext(
@@ -211,7 +225,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
     test('handles empty skills gracefully', () => {
       const characterNoSkills = {
         ...convertToPersonalizationCharacter(mockCharacter),
-        skills: []
+        skills: [],
+        derivedStats: [],
       };
 
       const context = engine.createPersonalizedContext(
@@ -241,8 +256,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
           isActive: true,
           createdAt: '2023-01-01',
           establishedAt: '2023-01-01',
-          progress: 50
-        }
+          progress: 50,
+        },
       ];
 
       const decisions = [
@@ -256,9 +271,9 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
           worldId: 'world-1',
           context: {
             location: 'Palace Courtyard',
-            charactersPresent: ['Guard Captain']
-          }
-        }
+            charactersPresent: ['Guard Captain'],
+          },
+        },
       ];
 
       const context = engine.createPersonalizedContext(

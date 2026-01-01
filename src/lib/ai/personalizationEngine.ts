@@ -20,14 +20,12 @@ import {
   PersonalityTrait,
   ChoiceTypePreference,
 } from '@/types/personalization.types';
-import {
-  isPlayerDecisionArray,
-  sanitizeString
-} from '@/types/type-guards';
+import { isPlayerDecisionArray, sanitizeString } from '@/types/type-guards';
 import { getTimestamp } from '../utils';
 import {
   formatAttributesForNarrative,
-  formatSkillsForNarrative
+  formatSkillsForNarrative,
+  formatDerivedStatsForNarrative,
 } from './attributeSkillFormatter';
 
 // Simple character interface for personalization
@@ -35,8 +33,17 @@ interface PersonalizationCharacter {
   id: string;
   name: string;
   background: string;
-  attributes: Record<string, number> | Array<{ attributeId: string; value: number }>;
-  skills: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+  attributes:
+    | Record<string, number>
+    | Array<{ attributeId: string; value: number }>;
+  skills:
+    | Array<{ name: string; level: number; worldSkillId?: string }>
+    | Array<{ skillId: string; level: number }>;
+  derivedStats?: Array<{
+    name: string;
+    currentValue: number;
+    maxValue: number;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,7 +61,7 @@ const CHOICE_TO_TRAIT_MAP: Record<ChoiceTypePreference, PersonalityTrait[]> = {
   selfish: ['independent', 'ambitious', 'direct'],
   lawful: ['loyal', 'patient', 'logical'],
   chaotic: ['impulsive', 'independent', 'brave'],
-  neutral: ['logical', 'cautious', 'diplomatic']
+  neutral: ['logical', 'cautious', 'diplomatic'],
 };
 
 /**
@@ -79,8 +86,11 @@ export class PersonalizationEngine {
 
     // Basic preference aggregation
     const choiceTypeCounts = new Map<ChoiceTypePreference, number>();
-    decisions.forEach(d => {
-      choiceTypeCounts.set(d.choiceType, (choiceTypeCounts.get(d.choiceType) || 0) + 1);
+    decisions.forEach((d) => {
+      choiceTypeCounts.set(
+        d.choiceType,
+        (choiceTypeCounts.get(d.choiceType) || 0) + 1
+      );
     });
 
     const preferredChoiceTypes = Array.from(choiceTypeCounts.entries())
@@ -94,7 +104,7 @@ export class PersonalizationEngine {
       detailLevel: 'moderate',
       contentFocus: 'balanced',
       confidenceLevel: Math.min(85, decisions.length * 15),
-      lastUpdated: getTimestamp()
+      lastUpdated: getTimestamp(),
     };
 
     return {
@@ -103,9 +113,9 @@ export class PersonalizationEngine {
       narrativeEmphasis: {
         characterFocus: [character.background || ''],
         relationshipFocus: relationships,
-        goalFocus: goals.filter(g => g.isActive)
+        goalFocus: goals.filter((g) => g.isActive),
       },
-      confidence: decisions.length > 0 ? 75 : 20
+      confidence: decisions.length > 0 ? 75 : 20,
     };
   }
 
@@ -120,23 +130,32 @@ export class PersonalizationEngine {
     goals: CharacterGoal[] = [],
     narrativeHistory: string[] = []
   ): PersonalizedNarrativeContext {
-    const analysis = this.analyzePlayerBehavior(character, decisions, relationships, goals);
+    const analysis = this.analyzePlayerBehavior(
+      character,
+      decisions,
+      relationships,
+      goals
+    );
 
     return {
       character: {
         personality: analysis.detectedTraits,
-        goals: goals.filter(g => g.isActive),
+        goals: goals.filter((g) => g.isActive),
         relationships,
         recentDecisions: decisions.slice(-10), // Last 10 decisions
         attributes: character.attributes,
-        skills: character.skills
+        skills: character.skills,
       },
       playerPreferences: analysis.preferences,
       narrativeHistory: {
         keyEvents: narrativeHistory,
-        establishedElements: [character.name, world.name, character.background].filter(Boolean),
-        characterMilestones: []
-      }
+        establishedElements: [
+          character.name,
+          world.name,
+          character.background,
+        ].filter(Boolean),
+        characterMilestones: [],
+      },
     };
   }
 
@@ -148,14 +167,18 @@ export class PersonalizationEngine {
     const parts: string[] = [];
 
     // Character basics
-    const characterName = sanitizeString(context.narrativeHistory.establishedElements[0]);
+    const characterName = sanitizeString(
+      context.narrativeHistory.establishedElements[0]
+    );
     if (characterName) {
       parts.push(`CHARACTER: ${characterName}`);
     }
 
     // Character attributes (notable values only)
     if (context.character.attributes) {
-      const attributeString = formatAttributesForNarrative(context.character.attributes);
+      const attributeString = formatAttributesForNarrative(
+        context.character.attributes
+      );
       if (attributeString) {
         parts.push(`ATTRIBUTES: ${attributeString}`);
       }
@@ -169,12 +192,27 @@ export class PersonalizationEngine {
       }
     }
 
+    // Derived stats (calculated from attributes)
+    if (
+      context.character.derivedStats &&
+      context.character.derivedStats.length > 0
+    ) {
+      const derivedStatsString = formatDerivedStatsForNarrative(
+        context.character.derivedStats
+      );
+      if (derivedStatsString) {
+        parts.push(`DERIVED STATS: ${derivedStatsString}`);
+      }
+    }
+
     // Recent decisions (raw data for LLM to analyze)
     if (context.character.recentDecisions.length > 0) {
       const decisionList = context.character.recentDecisions
         .slice(0, 5)
-        .map(d => {
-          const location = d.context?.location ? ` at ${d.context.location}` : '';
+        .map((d) => {
+          const location = d.context?.location
+            ? ` at ${d.context.location}`
+            : '';
           const npcs = d.context?.charactersPresent?.length
             ? ` (with: ${d.context.charactersPresent.join(', ')})`
             : '';
@@ -182,20 +220,24 @@ export class PersonalizationEngine {
         })
         .join('\n');
 
-      parts.push(`RECENT PLAYER DECISIONS:\n${decisionList}\n\nBased on these decisions, adapt the narrative to match the player's style and reference past choices where relevant.`);
+      parts.push(
+        `RECENT PLAYER DECISIONS:\n${decisionList}\n\nBased on these decisions, adapt the narrative to match the player's style and reference past choices where relevant.`
+      );
     }
 
     // Personality traits (if detected)
     if (context.character.personality.length > 0) {
-      parts.push(`CHARACTER TRAITS: ${context.character.personality.join(', ')}`);
+      parts.push(
+        `CHARACTER TRAITS: ${context.character.personality.join(', ')}`
+      );
     }
 
     // Active goals (for context)
     if (context.character.goals.length > 0) {
       const goalsList = context.character.goals
-        .filter(g => g.isActive)
+        .filter((g) => g.isActive)
         .slice(0, 3)
-        .map(g => `• ${g.description} (${g.priority})`)
+        .map((g) => `• ${g.description} (${g.priority})`)
         .join('\n');
       parts.push(`ACTIVE GOALS:\n${goalsList}`);
     }
@@ -203,7 +245,9 @@ export class PersonalizationEngine {
     // Player preferences (minimal guidance)
     const prefs = context.playerPreferences;
     if (prefs.preferredChoiceTypes.length > 0) {
-      parts.push(`PREFERRED PLAY STYLE: ${prefs.preferredChoiceTypes.slice(0, 2).join(', ')}`);
+      parts.push(
+        `PREFERRED PLAY STYLE: ${prefs.preferredChoiceTypes.slice(0, 2).join(', ')}`
+      );
     }
 
     return parts.join('\n\n');
@@ -212,12 +256,14 @@ export class PersonalizationEngine {
   /**
    * Simple trait detection from choice types
    */
-  private detectPersonalityTraits(decisions: PlayerDecision[]): PersonalityTrait[] {
+  private detectPersonalityTraits(
+    decisions: PlayerDecision[]
+  ): PersonalityTrait[] {
     const traitCounts = new Map<PersonalityTrait, number>();
 
-    decisions.forEach(decision => {
+    decisions.forEach((decision) => {
       const traits = CHOICE_TO_TRAIT_MAP[decision.choiceType] || [];
-      traits.forEach(trait => {
+      traits.forEach((trait) => {
         traitCounts.set(trait, (traitCounts.get(trait) || 0) + 1);
       });
     });
@@ -240,14 +286,14 @@ export class PersonalizationEngine {
         detailLevel: 'moderate',
         contentFocus: 'balanced',
         confidenceLevel: 0,
-        lastUpdated: getTimestamp()
+        lastUpdated: getTimestamp(),
       },
       narrativeEmphasis: {
         characterFocus: [],
         relationshipFocus: [],
-        goalFocus: []
+        goalFocus: [],
       },
-      confidence: 0
+      confidence: 0,
     };
   }
 }

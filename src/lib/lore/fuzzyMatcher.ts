@@ -191,7 +191,7 @@ export async function checkFactSimilarity(
       method: 'ai',
       rationale: aiResult.rationale || 'AI semantic analysis',
     };
-  } catch (error) {
+  } catch {
     // AI check failed - fall back to Levenshtein result
     return {
       isDuplicate: similarity >= 0.7, // Use slightly higher threshold as fallback

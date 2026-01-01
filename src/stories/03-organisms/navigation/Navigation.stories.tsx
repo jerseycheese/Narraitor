@@ -15,7 +15,7 @@ const meta: Meta<typeof Navigation> = {
       description: {
         component: `
         Main navigation component with world switcher and contextual actions.
-        
+
         **Features:**
         - World switcher dropdown with character counts
         - Active world indicator (green highlight)
@@ -33,7 +33,7 @@ const meta: Meta<typeof Navigation> = {
     (Story) => {
       // Reset stores before each story
       useWorldStore.getState().reset();
-      
+
       useCharacterStore.setState({
         characters: {},
         entities: {},
@@ -42,7 +42,7 @@ const meta: Meta<typeof Navigation> = {
         error: null,
         loading: false,
       });
-      
+
       return (
         <NavigationLoadingProvider>
           <div className="min-h-screen bg-gray-100">
@@ -52,7 +52,8 @@ const meta: Meta<typeof Navigation> = {
                 <h2 className="text-xl font-semibold mb-4">Page Content</h2>
                 <p className="text-gray-700">
                   This area represents the page content below the navigation.
-                  The navigation component adapts based on the current world state and user context.
+                  The navigation component adapts based on the current world
+                  state and user context.
                 </p>
               </div>
             </div>
@@ -81,7 +82,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const scifiWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Neo-Tokyo 2185',
     description: 'Cyberpunk future',
@@ -95,7 +96,7 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const westernWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Dustbowl County',
     description: 'Wild west frontier',
@@ -109,11 +110,11 @@ const setupWorlds = () => {
       skillPointPool: 20,
     },
   };
-  
+
   const worldId1 = useWorldStore.getState().createWorld(fantasyWorld);
   const worldId2 = useWorldStore.getState().createWorld(scifiWorld);
   const worldId3 = useWorldStore.getState().createWorld(westernWorld);
-  
+
   return { worldId1, worldId2, worldId3 };
 };
 
@@ -126,6 +127,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A brave warrior',
       personality: 'Noble and just',
@@ -151,7 +153,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=1',
     },
   };
-  
+
   const character2 = {
     name: 'Zara Chen',
     description: 'A skilled mage with ancient knowledge',
@@ -160,6 +162,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A skilled mage with ancient knowledge',
       personality: 'Wise and mysterious',
@@ -185,7 +188,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=2',
     },
   };
-  
+
   const character3 = {
     name: 'Jack Harrison',
     description: 'A cyber-enhanced detective investigating corruption',
@@ -194,6 +197,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     isPlayer: true,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A cyber-enhanced detective investigating corruption',
       personality: 'Cynical but determined',
@@ -219,7 +223,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       url: 'https://i.pravatar.cc/200?img=3',
     },
   };
-  
+
   useCharacterStore.getState().createCharacter(character1);
   useCharacterStore.getState().createCharacter(character2);
   useCharacterStore.getState().createCharacter(character3);
@@ -229,10 +233,11 @@ export const NoWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation when no worlds exist - shows "Create Your First World" button'
-      }
-    }
-  }
+        story:
+          'Navigation when no worlds exist - shows "Create Your First World" button',
+      },
+    },
+  },
 };
 
 export const WithWorlds: Story = {
@@ -246,10 +251,11 @@ export const WithWorlds: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with multiple worlds - shows world switcher dropdown with character counts'
-      }
-    }
-  }
+        story:
+          'Navigation with multiple worlds - shows world switcher dropdown with character counts',
+      },
+    },
+  },
 };
 
 export const WithActiveWorld: Story = {
@@ -264,10 +270,11 @@ export const WithActiveWorld: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with an active world - shows Characters link and New Character button'
-      }
-    }
-  }
+        story:
+          'Navigation with an active world - shows Characters link and New Character button',
+      },
+    },
+  },
 };
 
 export const WorldSwitcherOpen: Story = {
@@ -276,7 +283,7 @@ export const WorldSwitcherOpen: Story = {
       const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
       useWorldStore.getState().setCurrentWorld(worldId1);
-      
+
       // Simulate opened dropdown by adding CSS to show it
       const style = document.createElement('style');
       style.textContent = `
@@ -285,17 +292,18 @@ export const WorldSwitcherOpen: Story = {
         }
       `;
       document.head.appendChild(style);
-      
+
       return <Story />;
     },
   ],
   parameters: {
     docs: {
       description: {
-        story: 'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator'
-      }
-    }
-  }
+        story:
+          'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator',
+      },
+    },
+  },
 };
 
 export const MobileView: Story = {
@@ -310,10 +318,12 @@ export const MobileView: Story = {
             <Story />
             <div className="p-8">
               <div className="bg-white rounded-lg p-6 shadow">
-                <h2 className="text-xl font-semibold mb-4">Mobile Page Content</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Mobile Page Content
+                </h2>
                 <p className="text-gray-700">
-                  This shows the mobile navigation with hamburger menu. 
-                  The menu should show when screen width is ≤768px.
+                  This shows the mobile navigation with hamburger menu. The menu
+                  should show when screen width is ≤768px.
                 </p>
               </div>
             </div>
@@ -328,8 +338,9 @@ export const MobileView: Story = {
     },
     docs: {
       description: {
-        story: 'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout'
-      }
-    }
-  }
+        story:
+          'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout',
+      },
+    },
+  },
 };

@@ -1,6 +1,7 @@
 import { evaluateRequirement } from '../requirementEvaluator';
 import { DecisionRequirement } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
+import type { DerivedStat } from '@/types/character.types';
 
 // Character interface with inventory support
 interface Character {
@@ -12,6 +13,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
+  derivedStats: DerivedStat[];
   inventory: {
     items: InventoryItem[];
   };
@@ -41,6 +43,7 @@ describe('requirementEvaluator - Item Requirements', () => {
 
   const mockCharacter: Character = {
     skills: [],
+    derivedStats: [],
     inventory: {
       items: [
         createMockItem('Lockpick', 1),
@@ -221,6 +224,7 @@ describe('requirementEvaluator - Item Requirements', () => {
     it('should handle empty inventory gracefully', () => {
       const emptyCharacter: Character = {
         skills: [],
+        derivedStats: [],
         inventory: {
           items: [],
         },

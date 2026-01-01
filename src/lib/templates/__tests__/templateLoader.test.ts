@@ -5,8 +5,10 @@ import { templates } from '../worldTemplates';
 jest.mock('../../utils/generateId', () => ({
   generateUniqueId: jest.fn().mockImplementation((prefix) => {
     if (prefix === 'world') return 'world-123';
-    if (prefix === 'attribute') return `attr-${Math.random().toString(36).substr(2, 9)}`;
-    if (prefix === 'skill') return `skill-${Math.random().toString(36).substr(2, 9)}`;
+    if (prefix === 'attribute')
+      return `attr-${Math.random().toString(36).substr(2, 9)}`;
+    if (prefix === 'skill')
+      return `skill-${Math.random().toString(36).substr(2, 9)}`;
     return `${prefix}-123`;
   }),
 }));
@@ -20,9 +22,9 @@ jest.mock('@/state/worldStore', () => ({
     getState: jest.fn(() => ({
       createWorld: mockCreateWorld,
       updateWorld: mockUpdateWorld,
-      worlds: {}
-    }))
-  }
+      worlds: {},
+    })),
+  },
 }));
 
 describe('Template Loader', () => {
@@ -51,8 +53,8 @@ describe('Template Loader', () => {
         maxAttributes: 6,
         maxSkills: 12,
         attributePointPool: 30,
-        skillPointPool: 36
-      }
+        skillPointPool: 36,
+      },
     });
 
     // Check that updateWorld was called with attributes and skills
@@ -61,16 +63,16 @@ describe('Template Loader', () => {
         expect.objectContaining({
           worldId: 'world-123',
           name: expect.any(String),
-          description: expect.any(String)
-        })
+          description: expect.any(String),
+        }),
       ]),
       skills: expect.arrayContaining([
         expect.objectContaining({
           worldId: 'world-123',
           name: expect.any(String),
-          description: expect.any(String)
-        })
-      ])
+          description: expect.any(String),
+        }),
+      ]),
     });
   });
 
@@ -84,7 +86,7 @@ describe('Template Loader', () => {
     // Check that createWorld was called with template name
     expect(mockCreateWorld).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: template.name
+        name: template.name,
       })
     );
   });
@@ -109,7 +111,7 @@ describe('Template Loader', () => {
       expect.objectContaining({
         name: template.attributes[0].name,
         description: template.attributes[0].description,
-        worldId: 'world-123'
+        worldId: 'world-123',
       })
     );
 
@@ -120,13 +122,15 @@ describe('Template Loader', () => {
         name: template.skills[0].name,
         description: template.skills[0].description,
         worldId: 'world-123',
-        difficulty: 'medium'
+        difficulty: 'medium',
       })
     );
 
     // Verify attributeIds is array or undefined
-    expect(Array.isArray(updates.skills[0].attributeIds) ||
-           typeof updates.skills[0].attributeIds === 'undefined').toBeTruthy();
+    expect(
+      Array.isArray(updates.skills[0].attributeIds) ||
+        typeof updates.skills[0].attributeIds === 'undefined'
+    ).toBeTruthy();
   });
 
   test('applyWorldTemplate accepts a template ID string', () => {
@@ -138,11 +142,11 @@ describe('Template Loader', () => {
     expect(worldId).toBe('world-123');
 
     // Check that world has correct name and description based on the template
-    const westernTemplate = templates.find(t => t.id === 'western');
+    const westernTemplate = templates.find((t) => t.id === 'western');
     expect(mockCreateWorld).toHaveBeenCalledWith(
       expect.objectContaining({
         name: westernTemplate?.name,
-        description: westernTemplate?.description
+        description: westernTemplate?.description,
       })
     );
   });

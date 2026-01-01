@@ -26,176 +26,183 @@ test.describe('Fresh GameSession skeleton → content', () => {
     const path =
       '/worlds/world_8b927b31-f6d0-4e17-8391-74033dd8323a/play?fresh=true';
     // Seed IndexedDB before any app script runs to avoid hydration overwrites
-    await page.addInitScript(({ getTimestampSource }) => {
-      const instantiateGetTimestamp = (source: string) =>
-        new Function(`return (${source});`)() as () => string;
-      const getTimestamp = instantiateGetTimestamp(getTimestampSource);
-      const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
-      const CHAR_ID = 'char-playwright-e2e';
-      const now = getTimestamp();
-      const dbName = 'narraitor-state';
-      const storeName = 'narraitor-store';
+    await page.addInitScript(
+      ({ getTimestampSource }) => {
+        const instantiateGetTimestamp = (source: string) =>
+          new Function(`return (${source});`)() as () => string;
+        const getTimestamp = instantiateGetTimestamp(getTimestampSource);
+        const WORLD_ID = 'world_8b927b31-f6d0-4e17-8391-74033dd8323a';
+        const CHAR_ID = 'char-playwright-e2e';
+        const now = getTimestamp();
+        const dbName = 'narraitor-state';
+        const storeName = 'narraitor-store';
 
-      function put(key: string, value: any): Promise<void> {
-        return new Promise((resolve) => {
-          const open = indexedDB.open(dbName, 1);
-          open.onupgradeneeded = () => {
-            const db = open.result;
-            if (!db.objectStoreNames.contains(storeName))
-              db.createObjectStore(storeName);
-          };
-          open.onsuccess = () => {
-            const db = open.result;
-            const tx = db.transaction(storeName, 'readwrite');
-            tx.objectStore(storeName).put({ id: key, value }, key);
-            tx.oncomplete = () => resolve();
-            tx.onerror = () => resolve();
-          };
-          open.onerror = () => resolve();
-        });
-      }
+        function put(key: string, value: any): Promise<void> {
+          return new Promise((resolve) => {
+            const open = indexedDB.open(dbName, 1);
+            open.onupgradeneeded = () => {
+              const db = open.result;
+              if (!db.objectStoreNames.contains(storeName))
+                db.createObjectStore(storeName);
+            };
+            open.onsuccess = () => {
+              const db = open.result;
+              const tx = db.transaction(storeName, 'readwrite');
+              tx.objectStore(storeName).put({ id: key, value }, key);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => resolve();
+            };
+            open.onerror = () => resolve();
+          });
+        }
 
-      const worldPersist = {
-        state: {
-          worlds: {
-            [WORLD_ID]: {
-              id: WORLD_ID,
-              name: 'Playwright Test World',
-              description: 'Seeded world for fresh-session test',
-              genre: 'fantasy',
-              attributes: [],
-              skills: [],
-              createdAt: now,
-              updatedAt: now,
-            },
-          },
-          entities: {
-            [WORLD_ID]: {
-              id: WORLD_ID,
-              name: 'Playwright Test World',
-              description: 'Seeded world for fresh-session test',
-              genre: 'fantasy',
-              attributes: [],
-              skills: [],
-              createdAt: now,
-              updatedAt: now,
-            },
-          },
-          worldStates: {
-            [WORLD_ID]: {
-              worldId: WORLD_ID,
-              version: 0,
-              lastModified: now,
-              npcRelationships: {},
-              majorEvents: [],
-              playerCharacterThreads: {},
-              characterRelationships: {},
-            },
-          },
-          currentWorldId: WORLD_ID,
-          currentEntityId: WORLD_ID,
-          error: null,
-          loading: false,
-        },
-        version: 2,
-      } as const;
-
-      const characterPersist = {
-        state: {
-          characters: {
-            [CHAR_ID]: {
-              id: CHAR_ID,
-              name: 'E2E Hero',
-              description: 'Playwright seeded character',
-              worldId: WORLD_ID,
-              level: 1,
-              isPlayer: true,
-              attributes: [],
-              skills: [],
-              background: {
-                history: '',
-                personality: '',
-                goals: [],
-                fears: [],
-                relationships: [],
+        const worldPersist = {
+          state: {
+            worlds: {
+              [WORLD_ID]: {
+                id: WORLD_ID,
+                name: 'Playwright Test World',
+                description: 'Seeded world for fresh-session test',
+                genre: 'fantasy',
+                attributes: [],
+                skills: [],
+                derivedStats: [],
+                createdAt: now,
+                updatedAt: now,
               },
-              status: { health: 100, maxHealth: 100, conditions: [] },
-              inventory: {
-                characterId: CHAR_ID,
-                items: [],
-                capacity: 100,
-                categories: [],
-              },
-              createdAt: now,
-              updatedAt: now,
             },
-          },
-          entities: {
-            [CHAR_ID]: {
-              id: CHAR_ID,
-              name: 'E2E Hero',
-              description: 'Playwright seeded character',
-              worldId: WORLD_ID,
-              level: 1,
-              isPlayer: true,
-              attributes: [],
-              skills: [],
-              background: {
-                history: '',
-                personality: '',
-                goals: [],
-                fears: [],
-                relationships: [],
+            entities: {
+              [WORLD_ID]: {
+                id: WORLD_ID,
+                name: 'Playwright Test World',
+                description: 'Seeded world for fresh-session test',
+                genre: 'fantasy',
+                attributes: [],
+                skills: [],
+                derivedStats: [],
+                createdAt: now,
+                updatedAt: now,
               },
-              status: { health: 100, maxHealth: 100, conditions: [] },
-              inventory: {
-                characterId: CHAR_ID,
-                items: [],
-                capacity: 100,
-                categories: [],
-              },
-              createdAt: now,
-              updatedAt: now,
             },
+            worldStates: {
+              [WORLD_ID]: {
+                worldId: WORLD_ID,
+                version: 0,
+                lastModified: now,
+                npcRelationships: {},
+                majorEvents: [],
+                playerCharacterThreads: {},
+                characterRelationships: {},
+              },
+            },
+            currentWorldId: WORLD_ID,
+            currentEntityId: WORLD_ID,
+            error: null,
+            loading: false,
           },
-          worldCharacterIds: {
-            [WORLD_ID]: [CHAR_ID],
-          },
-          currentCharacterId: CHAR_ID,
-          currentEntityId: CHAR_ID,
-          error: null,
-          loading: false,
-        },
-        version: 2,
-      } as const;
+          version: 2,
+        } as const;
 
-      const sessionPersist = {
-        state: {
-          id: null,
-          status: 'initializing',
-          currentSceneId: null,
-          playerChoices: [],
-          error: null,
-          worldId: null,
-          characterId: null,
-          savedSessions: {},
-          templateHistory: [],
-          autoSave: {
-            enabled: true,
-            lastSaveTime: null,
-            status: 'idle',
-            errorMessage: null,
-            totalSaves: 0,
+        const characterPersist = {
+          state: {
+            characters: {
+              [CHAR_ID]: {
+                id: CHAR_ID,
+                name: 'E2E Hero',
+                description: 'Playwright seeded character',
+                worldId: WORLD_ID,
+                level: 1,
+                isPlayer: true,
+                attributes: [],
+                skills: [],
+                derivedStats: [],
+                background: {
+                  history: '',
+                  personality: '',
+                  goals: [],
+                  fears: [],
+                  relationships: [],
+                },
+                status: { health: 100, maxHealth: 100, conditions: [] },
+                inventory: {
+                  characterId: CHAR_ID,
+                  items: [],
+                  capacity: 100,
+                  categories: [],
+                },
+                createdAt: now,
+                updatedAt: now,
+              },
+            },
+            entities: {
+              [CHAR_ID]: {
+                id: CHAR_ID,
+                name: 'E2E Hero',
+                description: 'Playwright seeded character',
+                worldId: WORLD_ID,
+                level: 1,
+                isPlayer: true,
+                attributes: [],
+                skills: [],
+                derivedStats: [],
+                background: {
+                  history: '',
+                  personality: '',
+                  goals: [],
+                  fears: [],
+                  relationships: [],
+                },
+                status: { health: 100, maxHealth: 100, conditions: [] },
+                inventory: {
+                  characterId: CHAR_ID,
+                  items: [],
+                  capacity: 100,
+                  categories: [],
+                },
+                createdAt: now,
+                updatedAt: now,
+              },
+            },
+            worldCharacterIds: {
+              [WORLD_ID]: [CHAR_ID],
+            },
+            currentCharacterId: CHAR_ID,
+            currentEntityId: CHAR_ID,
+            error: null,
+            loading: false,
           },
-          onboardingCompleted: false,
-        },
-        version: 2,
-      } as const;
+          version: 2,
+        } as const;
 
-      put('narraitor-world-store', worldPersist);
-      put('narraitor-character-store', characterPersist);
-      put('narraitor-session-store', sessionPersist);
-    }, { getTimestampSource: GET_TIMESTAMP_SOURCE });
+        const sessionPersist = {
+          state: {
+            id: null,
+            status: 'initializing',
+            currentSceneId: null,
+            playerChoices: [],
+            error: null,
+            worldId: null,
+            characterId: null,
+            savedSessions: {},
+            templateHistory: [],
+            autoSave: {
+              enabled: true,
+              lastSaveTime: null,
+              status: 'idle',
+              errorMessage: null,
+              totalSaves: 0,
+            },
+            onboardingCompleted: false,
+          },
+          version: 2,
+        } as const;
+
+        put('narraitor-world-store', worldPersist);
+        put('narraitor-character-store', characterPersist);
+        put('narraitor-session-store', sessionPersist);
+      },
+      { getTimestampSource: GET_TIMESTAMP_SOURCE }
+    );
     // First navigate to the app root to seed stores via localStorage
     await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded' });
 
@@ -219,6 +226,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
             genre: 'fantasy',
             attributes: [],
             skills: [],
+            derivedStats: [],
             createdAt: now,
             updatedAt: now,
           };
@@ -256,6 +264,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
             isPlayer: true,
             attributes: [],
             skills: [],
+            derivedStats: [],
             background: {
               history: '',
               personality: '',
@@ -279,7 +288,10 @@ test.describe('Fresh GameSession skeleton → content', () => {
             worldCharacterIds: {
               ...(prev?.worldCharacterIds || {}),
               [WORLD_ID]: Array.from(
-                new Set([...(prev?.worldCharacterIds?.[WORLD_ID] || []), CHAR_ID])
+                new Set([
+                  ...(prev?.worldCharacterIds?.[WORLD_ID] || []),
+                  CHAR_ID,
+                ])
               ),
             },
             currentCharacterId: CHAR_ID,
@@ -329,6 +341,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
             genre: 'fantasy',
             attributes: [],
             skills: [],
+            derivedStats: [],
             createdAt: now,
             updatedAt: now,
           };
@@ -351,6 +364,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
             isPlayer: true,
             attributes: [],
             skills: [],
+            derivedStats: [],
             background: {
               history: '',
               personality: '',
@@ -417,6 +431,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
                   genre: 'fantasy',
                   attributes: [],
                   skills: [],
+                  derivedStats: [],
                   createdAt: getTimestamp(),
                   updatedAt: getTimestamp(),
                 },

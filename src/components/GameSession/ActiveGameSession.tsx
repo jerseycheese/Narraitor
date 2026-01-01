@@ -54,7 +54,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   onChoiceSelected,
   onEnd,
   /* existingSegments - not currently used */
-  choices,
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
@@ -66,9 +65,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const decisionSubscriptionRef = React.useRef<(() => void) | undefined>(undefined);
 
-  // Game readiness state for coordinated loading
-  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  
   // Ending suggestion state
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
@@ -81,6 +77,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
+
+  // Track choice generation for UI state
+  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
 
   // Reset fatal guard and flag when session changes
   React.useEffect(() => {
@@ -121,11 +120,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
-
-  // Simple computed state - game is ready when we have content and are not in loading states
-  // For sessions with existing narrative, we need either a current decision OR actual choices
-  // Don't show interface if we only have fallback choices (indicates failed AI generation)
-  const hasValidChoices = currentDecision || (choices && choices.length > 0);
 
   // Game is ready when:
   // 1. We're initialized
@@ -857,6 +851,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <div
           className="lg:flex-1 min-h-0 flex flex-col"
           id="choices-container"
+          aria-busy={isGeneratingChoices}
         >
           <div className="player-choices-container flex-1">
             {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}

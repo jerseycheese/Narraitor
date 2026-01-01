@@ -2,9 +2,14 @@ import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
 import { useJournalStore } from '../journalStore';
 import { useInventoryStore } from '../inventoryStore';
+import type { InventoryStore } from '../inventoryStore';
 import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
-import { mockZustandStore, createMockJournalStore, createMockInventoryStore } from '@/lib/test-utils';
+import {
+  mockZustandStore,
+  createMockJournalStore,
+  createMockInventoryStore,
+} from '@/lib/test-utils';
 import { createTestCharacterData } from './characterStore.testHelpers';
 
 // Mock stores
@@ -42,7 +47,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     sessionEntries: {
       'session-1': ['entry-1'],
       'session-2': ['entry-2'],
-      'session-3': ['entry-3']
+      'session-3': ['entry-3'],
     },
     deleteSessionEntries: jest.fn(),
     getSessionEntries: jest.fn(),
@@ -61,7 +66,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     getEntriesByType: jest.fn(),
   };
 
-  const mockInventoryStore = {
+  const mockInventoryStore: Partial<InventoryStore> = {
     items: {},
     characterInventories: {},
     clearCharacterInventory: jest.fn(),
@@ -78,9 +83,15 @@ describe('CharacterStore - Related Data Cleanup', () => {
   // Initialize entries dynamically based on test character IDs
   const initializeMockEntries = (charId1: EntityID, charId2: EntityID) => {
     mockJournalStore.entries = {
-      'entry-1': createTestJournalEntry('entry-1' as EntityID, charId1, { content: 'Test entry' }),
-      'entry-2': createTestJournalEntry('entry-2' as EntityID, charId1, { content: 'Another entry' }),
-      'entry-3': createTestJournalEntry('entry-3' as EntityID, charId2, { content: 'Different character entry' })
+      'entry-1': createTestJournalEntry('entry-1' as EntityID, charId1, {
+        content: 'Test entry',
+      }),
+      'entry-2': createTestJournalEntry('entry-2' as EntityID, charId1, {
+        content: 'Another entry',
+      }),
+      'entry-3': createTestJournalEntry('entry-3' as EntityID, charId2, {
+        content: 'Different character entry',
+      }),
     };
   };
 
@@ -92,13 +103,21 @@ describe('CharacterStore - Related Data Cleanup', () => {
     testCharacterId2 = 'char-2' as EntityID;
     initializeMockEntries(testCharacterId1, testCharacterId2);
 
-    mockZustandStore(useJournalStore as jest.MockedFunction<typeof useJournalStore>, createMockJournalStore(mockJournalStore));
-    mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockInventoryStore));
+    mockZustandStore(
+      useJournalStore as jest.MockedFunction<typeof useJournalStore>,
+      createMockJournalStore(mockJournalStore)
+    );
+    mockZustandStore(
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
+      createMockInventoryStore(mockInventoryStore)
+    );
 
     // Mock getState for store access
-    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (useInventoryStore as jest.MockedFunction<typeof useInventoryStore>).getState = jest.fn(() => mockInventoryStore as any);
+    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState =
+      jest.fn(() => mockJournalStore);
+    (
+      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>
+    ).getState = jest.fn(() => mockInventoryStore as InventoryStore);
 
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());
@@ -113,11 +132,18 @@ describe('CharacterStore - Related Data Cleanup', () => {
 
       act(() => {
         testCharacterId1 = result.current.createCharacter(
-          createTestCharacterData({ name: 'Test Character 1', description: 'Test description 1' })
+          createTestCharacterData({
+            name: 'Test Character 1',
+            description: 'Test description 1',
+          })
         );
 
         testCharacterId2 = result.current.createCharacter(
-          createTestCharacterData({ name: 'Test Character 2', description: 'Test description 2', level: 2 })
+          createTestCharacterData({
+            name: 'Test Character 2',
+            description: 'Test description 2',
+            level: 2,
+          })
         );
 
         // Initialize mock journal entries with actual character IDs
@@ -133,7 +159,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
 
       expect(result.current.characters[testCharacterId1]).toBeUndefined();
       expect(result.current.characters[testCharacterId2]).toBeDefined();
-
     });
 
     test('clears currentCharacterId when active character is deleted', () => {
@@ -149,18 +174,19 @@ describe('CharacterStore - Related Data Cleanup', () => {
           level: 1,
           attributes: [],
           skills: [],
+          derivedStats: [],
           background: {
             history: 'Test history',
             personality: 'Test personality',
             goals: [],
             fears: [],
-            relationships: []
+            relationships: [],
           },
           isPlayer: true,
           status: {
             health: 100,
             maxHealth: 100,
-            conditions: []
+            conditions: [],
           },
           inventory: {
             characterId: '',
@@ -168,7 +194,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
             capacity: 20,
             categories: [],
             itemOrder: [],
-          }
+          },
         });
 
         // Set as current character
@@ -198,18 +224,19 @@ describe('CharacterStore - Related Data Cleanup', () => {
           level: 1,
           attributes: [],
           skills: [],
+          derivedStats: [],
           background: {
             history: 'Active character history',
             personality: 'Active character personality',
             goals: [],
             fears: [],
-            relationships: []
+            relationships: [],
           },
           isPlayer: true,
           status: {
             health: 100,
             maxHealth: 100,
-            conditions: []
+            conditions: [],
           },
           inventory: {
             characterId: '',
@@ -217,36 +244,37 @@ describe('CharacterStore - Related Data Cleanup', () => {
             capacity: 20,
             categories: [],
             itemOrder: [],
-          }
+          },
         });
 
         otherCharacterId = result.current.createCharacter({
           name: 'Other Character',
-          description: 'Other description', 
+          description: 'Other description',
           worldId: 'world-1',
           level: 2,
           attributes: [],
           skills: [],
+          derivedStats: [],
           background: {
             history: 'Other history',
             personality: 'Other personality',
             goals: [],
             fears: [],
-            relationships: []
+            relationships: [],
           },
           isPlayer: true,
           status: {
             health: 100,
             maxHealth: 100,
-            conditions: []
+            conditions: [],
           },
           inventory: {
             characterId: '',
             items: [],
             capacity: 20,
             categories: [],
-            itemOrder: []
-          }
+            itemOrder: [],
+          },
         });
 
         // Set first character as active
@@ -265,13 +293,17 @@ describe('CharacterStore - Related Data Cleanup', () => {
     test('handles deletion gracefully when character does not exist', () => {
       const { result } = renderHook(() => useCharacterStore());
 
-      const initialCharacterCount = Object.keys(result.current.characters).length;
+      const initialCharacterCount = Object.keys(
+        result.current.characters
+      ).length;
 
       act(() => {
         result.current.deleteCharacter('non-existent-id');
       });
 
-      expect(Object.keys(result.current.characters)).toHaveLength(initialCharacterCount);
+      expect(Object.keys(result.current.characters)).toHaveLength(
+        initialCharacterCount
+      );
     });
 
     test('cleans up character inventory when character is deleted', () => {
@@ -281,7 +313,10 @@ describe('CharacterStore - Related Data Cleanup', () => {
 
       act(() => {
         characterId = result.current.createCharacter(
-          createTestCharacterData({ name: 'Test Character', description: 'Test description' })
+          createTestCharacterData({
+            name: 'Test Character',
+            description: 'Test description',
+          })
         );
       });
 
@@ -290,7 +325,9 @@ describe('CharacterStore - Related Data Cleanup', () => {
       });
 
       // Verify inventory cleanup was called
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(characterId);
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
+        characterId
+      );
     });
 
     test('cleans up inventory for all characters when world is deleted', () => {
@@ -303,14 +340,23 @@ describe('CharacterStore - Related Data Cleanup', () => {
       act(() => {
         // Create characters in world-1
         char1Id = result.current.createCharacter(
-          createTestCharacterData({ name: 'Character 1', worldId: 'world-1' as EntityID })
+          createTestCharacterData({
+            name: 'Character 1',
+            worldId: 'world-1' as EntityID,
+          })
         );
         char2Id = result.current.createCharacter(
-          createTestCharacterData({ name: 'Character 2', worldId: 'world-1' as EntityID })
+          createTestCharacterData({
+            name: 'Character 2',
+            worldId: 'world-1' as EntityID,
+          })
         );
         // Create character in world-2 (should NOT be cleaned)
         char3Id = result.current.createCharacter(
-          createTestCharacterData({ name: 'Character 3', worldId: 'world-2' as EntityID })
+          createTestCharacterData({
+            name: 'Character 3',
+            worldId: 'world-2' as EntityID,
+          })
         );
       });
 
@@ -319,10 +365,18 @@ describe('CharacterStore - Related Data Cleanup', () => {
       });
 
       // Verify inventory cleanup was called for world-1 characters only
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(char1Id);
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(char2Id);
-      expect(mockInventoryStore.clearCharacterInventory).not.toHaveBeenCalledWith(char3Id);
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledTimes(2);
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
+        char1Id
+      );
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
+        char2Id
+      );
+      expect(
+        mockInventoryStore.clearCharacterInventory
+      ).not.toHaveBeenCalledWith(char3Id);
+      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledTimes(
+        2
+      );
     });
   });
 });

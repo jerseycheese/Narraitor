@@ -10,11 +10,14 @@ import type { JournalEntry } from '@/types/journal.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
 // Re-export centralized timer utilities
-export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+export {
+  setupTestTimers,
+  cleanupTestTimers,
+} from '@/lib/test-utils/testTimers';
 
 // Mock client for Gemini API
 export const mockGeminiClient = {
-  generateContent: jest.fn()
+  generateContent: jest.fn(),
 };
 
 /**
@@ -30,12 +33,12 @@ export function createMockWorld(): World {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,
-      skillPointPool: 40
+      skillPointPool: 40,
     },
     attributes: [],
     skills: [],
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 }
 
@@ -51,12 +54,13 @@ export function createMockCharacter(): StoreCharacter {
     level: 10,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A seasoned warrior seeking redemption',
       personality: 'Brave and honorable',
       goals: ['Defeat the dark lord and restore peace', 'Find inner peace'],
       fears: ['Failure', 'Losing allies'],
-      relationships: []
+      relationships: [],
     },
     inventory: {
       characterId: 'char-456',
@@ -70,11 +74,11 @@ export function createMockCharacter(): StoreCharacter {
       health: 100,
       maxHealth: 100,
       conditions: [],
-      location: 'Dark Castle'
+      location: 'Dark Castle',
     },
     portrait: undefined,
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 }
 
@@ -92,7 +96,7 @@ export function createMockNarrativeSegments(): NarrativeSegment[] {
       metadata: { tags: ['combat', 'castle'], mood: 'tense' },
       timestamp: new Date(),
       createdAt: getTimestamp(),
-      updatedAt: getTimestamp()
+      updatedAt: getTimestamp(),
     },
     {
       id: 'seg-2',
@@ -103,8 +107,8 @@ export function createMockNarrativeSegments(): NarrativeSegment[] {
       metadata: { tags: ['combat', 'boss-fight'], mood: 'action' },
       timestamp: new Date(),
       createdAt: getTimestamp(),
-      updatedAt: getTimestamp()
-    }
+      updatedAt: getTimestamp(),
+    },
   ];
 }
 
@@ -126,11 +130,11 @@ export function createMockJournalEntries(): JournalEntry[] {
       relatedEntities: [],
       metadata: {
         tags: ['achievement', 'dragon'],
-        automaticEntry: false
+        automaticEntry: false,
       },
       createdAt: getTimestamp(),
-      updatedAt: getTimestamp()
-    }
+      updatedAt: getTimestamp(),
+    },
   ];
 }
 

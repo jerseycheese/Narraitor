@@ -1,5 +1,9 @@
 import { buildEndingContext } from '../contextManager';
-import { createMockWorld, createMockNarrativeSegment, createMockJournalEntry } from '@/lib/test-utils/testDataFactory';
+import {
+  createMockWorld,
+  createMockNarrativeSegment,
+  createMockJournalEntry,
+} from '@/lib/test-utils/testDataFactory';
 import type { EndingGenerationRequest } from '@/types/narrative.types';
 import type { Character as StoreCharacter } from '@/state/characterStore';
 import type { SavedSessionInfo } from '@/types/game.types';
@@ -59,6 +63,7 @@ describe('buildEndingContext', () => {
       level: 1,
       attributes: [],
       skills: [],
+      derivedStats: [],
       background: {
         history: 'Some backstory',
         personality: 'Curious',
@@ -114,6 +119,7 @@ describe('buildEndingContext', () => {
       level: 3,
       attributes: [],
       skills: [],
+      derivedStats: [],
       background: {
         history: 'Time traveler',
         personality: 'Precise',
@@ -189,6 +195,7 @@ describe('buildEndingContext', () => {
       level: 5,
       attributes: [],
       skills: [],
+      derivedStats: [],
       background: {
         history: 'Chronicler of events',
         personality: 'Observant',

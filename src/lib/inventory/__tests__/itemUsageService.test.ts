@@ -1,7 +1,12 @@
 // Test item usage service
 // Verifies narrative generation and journal integration for item usage
 
-import { processItemUsage, generateItemUsageNarrative, isNarrativelySignificant, buildUsageNarrative } from '../itemUsageService';
+import {
+  processItemUsage,
+  generateItemUsageNarrative,
+  isNarrativelySignificant,
+  buildUsageNarrative,
+} from '../itemUsageService';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -14,7 +19,8 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   createDefaultGeminiClient: jest.fn(() => ({
     generateContent: jest.fn().mockResolvedValue({
-      content: 'The potion courses through your veins, restoring your vitality.',
+      content:
+        'The potion courses through your veins, restoring your vitality.',
       tokenUsage: 50,
     }),
   })),
@@ -67,9 +73,16 @@ describe('Item Usage Service', () => {
         categories: [],
         itemOrder: [],
       },
-      background: { history: 'A courageous warrior', personality: 'Brave', goals: [], fears: [], relationships: [] },
+      background: {
+        history: 'A courageous warrior',
+        personality: 'Brave',
+        goals: [],
+        fears: [],
+        relationships: [],
+      },
       attributes: [],
       skills: [],
+      derivedStats: [],
     });
 
     // Create session ID and set up session state
@@ -93,11 +106,13 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'quest',
-          acquiredAt: new Date().toISOString(),
-          quantity: 1,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'quest',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -118,11 +133,13 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'reward',
-          acquiredAt: new Date().toISOString(),
-          quantity: 1,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'reward',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -143,11 +160,13 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'purchase',
-          acquiredAt: new Date().toISOString(),
-          quantity: 5,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'purchase',
+            acquiredAt: new Date().toISOString(),
+            quantity: 5,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -168,11 +187,13 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'loot',
-          acquiredAt: new Date().toISOString(),
-          quantity: 1,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'loot',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -195,20 +216,28 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'purchase',
-          acquiredAt: new Date().toISOString(),
-          quantity: 1,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'purchase',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      const narrative = await generateItemUsageNarrative(item, characterId, worldId, sessionId, {
-        wasConsumed: false,
-        remainingQuantity: item.quantity,
-        previousQuantity: item.quantity,
-      });
+      const narrative = await generateItemUsageNarrative(
+        item,
+        characterId,
+        worldId,
+        sessionId,
+        {
+          wasConsumed: false,
+          remainingQuantity: item.quantity,
+          previousQuantity: item.quantity,
+        }
+      );
 
       expect(narrative.content).toBeTruthy();
       expect(typeof narrative.content).toBe('string');
@@ -217,11 +246,13 @@ describe('Item Usage Service', () => {
 
     it('should handle AI generation failures gracefully', async () => {
       // Mock failure
-      const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+      const { createDefaultGeminiClient } = await import(
+        '@/lib/ai/defaultGeminiClient'
+      );
       (createDefaultGeminiClient as jest.Mock).mockReturnValueOnce({
-        generateContent: jest.fn().mockRejectedValueOnce(
-          new Error('AI service unavailable')
-        ),
+        generateContent: jest
+          .fn()
+          .mockRejectedValueOnce(new Error('AI service unavailable')),
       });
 
       const item: InventoryItem = {
@@ -236,20 +267,28 @@ describe('Item Usage Service', () => {
           source: 'manual',
           classifiedAt: new Date().toISOString(),
         },
-        acquisitionHistory: [{
-          method: 'quest',
-          acquiredAt: new Date().toISOString(),
-          quantity: 1,
-        }],
+        acquisitionHistory: [
+          {
+            method: 'quest',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        ],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      const narrative = await generateItemUsageNarrative(item, characterId, worldId, sessionId, {
-        wasConsumed: true,
-        remainingQuantity: 0,
-        previousQuantity: 1,
-      });
+      const narrative = await generateItemUsageNarrative(
+        item,
+        characterId,
+        worldId,
+        sessionId,
+        {
+          wasConsumed: true,
+          remainingQuantity: 0,
+          previousQuantity: 1,
+        }
+      );
 
       // Should return fallback narrative
       expect(narrative.content).toBeTruthy();
@@ -284,10 +323,14 @@ describe('Item Usage Service', () => {
       expect(result.segmentId).toBeTruthy();
       expect(result.previousQuantity).toBe(1);
 
-      const segments = useNarrativeStore.getState().getSessionSegments(sessionId);
+      const segments = useNarrativeStore
+        .getState()
+        .getSessionSegments(sessionId);
       const segment = segments.find((seg) => seg.id === result.segmentId);
       expect(segment).toBeDefined();
-      expect(segment?.metadata.tags).toEqual(expect.arrayContaining(['item-usage']));
+      expect(segment?.metadata.tags).toEqual(
+        expect.arrayContaining(['item-usage'])
+      );
     });
 
     it('should create journal entry for significant item usage', async () => {
@@ -313,9 +356,13 @@ describe('Item Usage Service', () => {
       expect(result.previousQuantity).toBe(1);
 
       // Verify journal entry was created
-      const journalEntries = useJournalStore.getState().getSessionEntries(sessionId);
-      const usageEntry = journalEntries.find(entry =>
-        entry.title.includes('Telescope') || entry.content.includes('Telescope')
+      const journalEntries = useJournalStore
+        .getState()
+        .getSessionEntries(sessionId);
+      const usageEntry = journalEntries.find(
+        (entry) =>
+          entry.title.includes('Telescope') ||
+          entry.content.includes('Telescope')
       );
 
       expect(usageEntry).toBeDefined();
@@ -340,11 +387,15 @@ describe('Item Usage Service', () => {
         },
       });
 
-      const journalCountBefore = useJournalStore.getState().getSessionEntries(sessionId).length;
+      const journalCountBefore = useJournalStore
+        .getState()
+        .getSessionEntries(sessionId).length;
 
       const result = await processItemUsage(characterId, itemId, sessionId);
 
-      const journalCountAfter = useJournalStore.getState().getSessionEntries(sessionId).length;
+      const journalCountAfter = useJournalStore
+        .getState()
+        .getSessionEntries(sessionId).length;
 
       // Journal entry count should not increase for insignificant items
       expect(journalCountAfter).toBe(journalCountBefore);
@@ -497,10 +548,10 @@ describe('Item Usage Service', () => {
       });
 
       it('should default to simple tone when not specified', () => {
-        const result = buildUsageNarrative(
-          mockItem,
-          { wasConsumed: false, previousQuantity: 2 }
-        );
+        const result = buildUsageNarrative(mockItem, {
+          wasConsumed: false,
+          previousQuantity: 2,
+        });
 
         // Simple tone doesn't include "firmly in your grasp"
         expect(result).not.toContain('firmly in your grasp');

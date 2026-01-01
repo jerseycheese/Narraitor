@@ -13,8 +13,6 @@ import {
   calculateStringSimilarity,
   findPotentialDuplicates,
   checkFactSimilarity,
-  type DuplicateMatch,
-  type SimilarityResult
 } from '../fuzzyMatcher';
 
 describe('calculateStringSimilarity', () => {

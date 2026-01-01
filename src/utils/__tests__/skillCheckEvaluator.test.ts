@@ -14,7 +14,11 @@
  */
 
 import { evaluateSkillCheck, rollD20 } from '../skillCheckEvaluator';
-import { Character, CharacterSkill, CharacterAttribute } from '@/types/character.types';
+import {
+  Character,
+  CharacterSkill,
+  CharacterAttribute,
+} from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
 import { SkillCheck } from '../skillCheckEvaluator';
 
@@ -28,7 +32,7 @@ import { SkillCheck } from '../skillCheckEvaluator';
 const mockCharacterAttributes: CharacterAttribute[] = [
   { attributeId: 'strength', value: 20 },
   { attributeId: 'dexterity', value: 15 },
-  { attributeId: 'intelligence', value: 18 }
+  { attributeId: 'intelligence', value: 18 },
 ];
 
 /**
@@ -37,7 +41,7 @@ const mockCharacterAttributes: CharacterAttribute[] = [
 const mockCharacterSkills: CharacterSkill[] = [
   { skillId: 'athletics', level: 8, experience: 0, isActive: true },
   { skillId: 'stealth', level: 5, experience: 0, isActive: true },
-  { skillId: 'investigation', level: 12, experience: 0, isActive: true }
+  { skillId: 'investigation', level: 12, experience: 0, isActive: true },
 ];
 
 /**
@@ -47,7 +51,7 @@ const mockCharacter: Partial<Character> = {
   id: 'test-character',
   name: 'Test Character',
   attributes: mockCharacterAttributes,
-  skills: mockCharacterSkills
+  skills: mockCharacterSkills,
 };
 
 /**
@@ -64,7 +68,7 @@ const mockWorldSkills: WorldSkill[] = [
     category: 'physical',
     baseValue: 0,
     minValue: 0,
-    maxValue: 20
+    maxValue: 20,
   },
   {
     id: 'stealth',
@@ -76,7 +80,7 @@ const mockWorldSkills: WorldSkill[] = [
     category: 'physical',
     baseValue: 0,
     minValue: 0,
-    maxValue: 20
+    maxValue: 20,
   },
   {
     id: 'investigation',
@@ -88,8 +92,8 @@ const mockWorldSkills: WorldSkill[] = [
     category: 'mental',
     baseValue: 0,
     minValue: 0,
-    maxValue: 20
-  }
+    maxValue: 20,
+  },
 ];
 
 // ============================================================================
@@ -129,10 +133,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 5  // DC will be 10
+        difficulty: 5, // DC will be 10
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.diceRoll).toBe(20);
       expect(result.skillLevel).toBe(8);
@@ -149,10 +157,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 7  // DC should be 14
+        difficulty: 7, // DC should be 14
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.dc).toBe(14);
       expect(result.total).toBe(21); // 11 + 8 + 2
@@ -164,12 +176,18 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 5
+        difficulty: 5,
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
-      expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(result.timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
       expect(typeof result.timestamp).toBe('string');
     });
   });
@@ -180,16 +198,20 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const weakCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: [],  // No skills
-        attributes: [{ attributeId: 'strength', value: 1 }]  // Minimal attribute
+        skills: [], // No skills
+        attributes: [{ attributeId: 'strength', value: 1 }], // Minimal attribute
       };
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 25  // DC 50 - impossible without crit
+        difficulty: 25, // DC 50 - impossible without crit
       };
 
-      const result = evaluateSkillCheck(weakCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        weakCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.diceRoll).toBe(20);
       expect(result.skillLevel).toBe(0);
@@ -208,16 +230,23 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const expertCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: [{ skillId: 'athletics', level: 20, experience: 0, isActive: true }],
-        attributes: [{ attributeId: 'strength', value: 30 }]
+        skills: [
+          { skillId: 'athletics', level: 20, experience: 0, isActive: true },
+        ],
+        derivedStats: [],
+        attributes: [{ attributeId: 'strength', value: 30 }],
       };
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 1  // DC 2 - should be trivial
+        difficulty: 1, // DC 2 - should be trivial
       };
 
-      const result = evaluateSkillCheck(expertCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        expertCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.diceRoll).toBe(1);
       expect(result.skillLevel).toBe(20);
@@ -236,15 +265,19 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const untrainedCharacter: Partial<Character> = {
         ...mockCharacter,
-        skills: []  // No athletics skill
+        skills: [], // No athletics skill
       };
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 5  // DC 10
+        difficulty: 5, // DC 10
       };
 
-      const result = evaluateSkillCheck(untrainedCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        untrainedCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.skillLevel).toBe(0);
       expect(result.attributeBonus).toBe(2); // Still gets attribute bonus
@@ -257,10 +290,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
     it('should handle unknown skills gracefully with automatic critical failure', () => {
       const skillCheck: SkillCheck = {
         skillName: 'tunneling', // Skill that doesn't exist in world
-        difficulty: 5
+        difficulty: 5,
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.skillName).toBe('tunneling');
       expect(result.diceRoll).toBe(1);
@@ -274,10 +311,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
     it('should handle unknown skill IDs gracefully', () => {
       const skillCheck: SkillCheck = {
         skillId: 'nonexistent-skill-id',
-        difficulty: 3
+        difficulty: 3,
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.skillId).toBe('nonexistent-skill-id');
       expect(result.success).toBe(false);
@@ -292,10 +333,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       // Investigation: skill 12 + intelligence bonus (18 * 0.1 = 1.8 rounded to 2) = 14 + roll
       const skillCheck: SkillCheck = {
         skillId: 'investigation',
-        difficulty: 7  // DC 14
+        difficulty: 7, // DC 14
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.attributeBonus).toBe(2); // Math.round(18 * 0.1) = 2
       expect(result.total).toBe(25); // 11 + 12 + 2
@@ -307,11 +352,15 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       (Math.random as jest.Mock).mockReturnValue(0.5);
 
       const skillCheck: SkillCheck = {
-        difficulty: 10
+        difficulty: 10,
       };
 
       expect(() => {
-        evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+        evaluateSkillCheck(
+          mockCharacter as Character,
+          skillCheck,
+          mockWorldSkills
+        );
       }).toThrow('Skill check must have skillId or skillName');
     });
   });
@@ -322,10 +371,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
-        difficulty: 5  // DC 10
+        difficulty: 5, // DC 10
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.diceRoll).toBe(11);
       expect(result.total).toBe(21); // 11 + 8 + 2
@@ -340,10 +393,14 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       const skillCheck: SkillCheck = {
         skillId: 'stealth',
-        difficulty: 10  // DC 20
+        difficulty: 10, // DC 20
       };
 
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
+      const result = evaluateSkillCheck(
+        mockCharacter as Character,
+        skillCheck,
+        mockWorldSkills
+      );
 
       expect(result.diceRoll).toBe(2);
       expect(result.skillLevel).toBe(5);

@@ -36,7 +36,7 @@ const mockWorld: World = {
       baseValue: 1,
       minValue: 1,
       maxValue: 20,
-    }
+    },
   ],
   skills: [
     {
@@ -88,7 +88,7 @@ const mockWorld: World = {
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-    }
+    },
   ],
   settings: {
     maxAttributes: 10,
@@ -113,11 +113,11 @@ const mockCharacter = {
     goals: ['To pass all tests'],
     fears: ['Null pointer exceptions', 'Infinite loops'],
     physicalDescription: 'A well-structured test character',
-    relationships: []
+    relationships: [],
   },
   portrait: {
     type: 'placeholder' as const,
-    url: null
+    url: null,
   },
   attributes: [
     {
@@ -127,17 +127,17 @@ const mockCharacter = {
       name: 'Strength',
       baseValue: 14,
       modifiedValue: 14,
-      category: 'physical'
+      category: 'physical',
     },
     {
       id: 'attr2',
-      characterId: 'test-character-123', 
+      characterId: 'test-character-123',
       worldAttributeId: 'intelligence',
       name: 'Intelligence',
       baseValue: 16,
       modifiedValue: 16,
-      category: 'mental'
-    }
+      category: 'mental',
+    },
   ],
   skills: [
     {
@@ -146,7 +146,7 @@ const mockCharacter = {
       worldSkillId: 'lockpicking',
       name: 'Lockpicking',
       level: 8,
-      category: 'stealth'
+      category: 'stealth',
     },
     {
       id: 'skill2',
@@ -154,7 +154,7 @@ const mockCharacter = {
       worldSkillId: 'intimidation',
       name: 'Intimidation',
       level: 6,
-      category: 'social'
+      category: 'social',
     },
     {
       id: 'skill3',
@@ -162,7 +162,7 @@ const mockCharacter = {
       worldSkillId: 'stealth',
       name: 'Stealth',
       level: 4,
-      category: 'stealth'
+      category: 'stealth',
     },
     {
       id: 'skill4',
@@ -170,7 +170,7 @@ const mockCharacter = {
       worldSkillId: 'magic',
       name: 'Magic',
       level: 9,
-      category: 'arcane'
+      category: 'arcane',
     },
     {
       id: 'skill5',
@@ -178,24 +178,25 @@ const mockCharacter = {
       worldSkillId: 'persuasion',
       name: 'Persuasion',
       level: 3,
-      category: 'social'
-    }
+      category: 'social',
+    },
   ],
+  derivedStats: [],
   isPlayer: true,
   status: {
     health: 100,
     maxHealth: 100,
-    conditions: []
+    conditions: [],
   },
   inventory: {
     characterId: 'test-character-123',
     items: [],
     capacity: 20,
     categories: [],
-    itemOrder: []
+    itemOrder: [],
   },
   createdAt: getTimestamp(),
-  updatedAt: getTimestamp()
+  updatedAt: getTimestamp(),
 };
 
 type SessionStateDisplay = {
@@ -212,7 +213,7 @@ export default function GameSessionTestHarness() {
   const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
-  
+
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
     const worlds = useWorldStore.getState().worlds || {};
@@ -223,8 +224,8 @@ export default function GameSessionTestHarness() {
       useWorldStore.setState({
         worlds: {
           ...worlds,
-          [mockWorld.id]: mockWorld
-        }
+          [mockWorld.id]: mockWorld,
+        },
       });
       logger.info('Test world created');
     }
@@ -233,11 +234,11 @@ export default function GameSessionTestHarness() {
       useCharacterStore.setState({
         characters: {
           ...characters,
-          [mockCharacter.id]: mockCharacter
+          [mockCharacter.id]: mockCharacter,
         },
         currentCharacterId: mockCharacter.id,
         error: null,
-        loading: false
+        loading: false,
       });
       logger.info('Test character created');
     }
@@ -313,7 +314,7 @@ export default function GameSessionTestHarness() {
 
     logger.info('Test inventory items added');
   }, [logger]);
-  
+
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
     // Set client state
@@ -323,12 +324,14 @@ export default function GameSessionTestHarness() {
     createTestWorld();
 
     // Add test inventory items after persistence hydrates so test data is consistent
-    const inventoryPersist = (useInventoryStore as unknown as {
-      persist?: {
-        hasHydrated?: () => boolean;
-        onFinishHydration?: (callback: () => void) => () => void;
-      };
-    }).persist;
+    const inventoryPersist = (
+      useInventoryStore as unknown as {
+        persist?: {
+          hasHydrated?: () => boolean;
+          onFinishHydration?: (callback: () => void) => () => void;
+        };
+      }
+    ).persist;
     let unsubscribeHydration: (() => void) | undefined;
 
     const seedInventoryOnce = () => {
@@ -340,21 +343,24 @@ export default function GameSessionTestHarness() {
     if (inventoryPersist?.hasHydrated?.()) {
       seedInventoryOnce();
     } else if (inventoryPersist?.onFinishHydration) {
-      unsubscribeHydration = inventoryPersist.onFinishHydration(seedInventoryOnce);
+      unsubscribeHydration =
+        inventoryPersist.onFinishHydration(seedInventoryOnce);
     } else {
       seedInventoryOnce();
     }
 
     // Don't auto-start sessions - let the GameSession component handle it
     // This prevents conflicts between test harness and component initialization
-    logger.info('Test harness ready - GameSession component will handle session initialization');
+    logger.info(
+      'Test harness ready - GameSession component will handle session initialization'
+    );
 
     // Get initial state
-    setCurrentState({...useSessionStore.getState()});
+    setCurrentState({ ...useSessionStore.getState() });
 
     // Setup state display refreshing
     const intervalId = setInterval(() => {
-      setCurrentState({...useSessionStore.getState()});
+      setCurrentState({ ...useSessionStore.getState() });
     }, 1000);
 
     return () => {
@@ -363,15 +369,15 @@ export default function GameSessionTestHarness() {
       unsubscribeHydration?.();
     };
   }, [createTestWorld, addTestInventoryItems, logger]);
-  
+
   const handleSessionStart = () => {
     logger.info('Session started');
   };
-  
+
   const handleSessionEnd = () => {
     logger.info('Session ended');
   };
-  
+
   if (!isClient) {
     // Return loading placeholder to avoid hydration mismatch
     return (
@@ -381,28 +387,28 @@ export default function GameSessionTestHarness() {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
-      
+
       <div className="mb-4">
-        <button 
+        <button
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4"
           onClick={() => setShowRealComponent(!showRealComponent)}
         >
           {showRealComponent ? 'Hide Component' : 'Show Component'}
         </button>
       </div>
-      
+
       <div className="mb-4">
-        <button 
+        <button
           className="px-4 py-2 bg-green-500 text-white rounded mb-4"
           onClick={createTestWorld}
         >
           Ensure Test World & Character Exist
         </button>
-        
+
         <button
           className="px-4 py-2 bg-amber-500 text-white rounded mb-4 ml-2"
           onClick={() => {
@@ -411,7 +417,11 @@ export default function GameSessionTestHarness() {
             const store = useSessionStore.getState();
             if (store.initializeSession) {
               // Use the test character ID
-              store.initializeSession(mockWorld.id, mockCharacter.id, handleSessionStart);
+              store.initializeSession(
+                mockWorld.id,
+                mockCharacter.id,
+                handleSessionStart
+              );
             } else {
               logger.error('initializeSession method not found');
             }
@@ -436,7 +446,7 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // Reset all session state to break infinite loops
             logger.info('🔄 Resetting all session and narrative state');
-            
+
             // 1. Reset session store completely
             useSessionStore.setState({
               id: null,
@@ -453,17 +463,17 @@ export default function GameSessionTestHarness() {
                 status: 'idle',
                 errorMessage: null,
                 totalSaves: 0,
-              }
+              },
             });
-            
+
             // 2. Clear all narrative data using reset method
             const narrativeStore = useNarrativeStore.getState();
             narrativeStore.reset(); // This clears all segments, decisions, and endings
             narrativeStore.clearEnding();
-            
+
             // 3. Reset character state
             useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
-            
+
             // 4. Force page refresh to ensure clean state
             setTimeout(() => {
               logger.info('🔄 Forcing page refresh for complete reset');
@@ -474,10 +484,10 @@ export default function GameSessionTestHarness() {
           Reset State & Refresh
         </button>
       </div>
-      
+
       <div className="border p-4 rounded bg-gray-100">
         {showRealComponent ? (
-          <GameSession 
+          <GameSession
             worldId={mockWorld.id}
             onSessionStart={handleSessionStart}
             onSessionEnd={handleSessionEnd}
@@ -486,23 +496,30 @@ export default function GameSessionTestHarness() {
           <div>Component hidden</div>
         )}
       </div>
-      
+
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
         <p className="text-sm text-gray-700 mb-2">
-          Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
+          Status:{' '}
+          <span className="font-bold">{currentState.status || 'unknown'}</span>
         </p>
         <p className="text-sm text-gray-700 mb-2">
-          Store methods: {Object.keys(useSessionStore.getState()).filter(key => {
-            const value = useSessionStore.getState()[key as keyof typeof useSessionStore.getState];
-            return typeof value === 'function';
-          }).join(', ')}
+          Store methods:{' '}
+          {Object.keys(useSessionStore.getState())
+            .filter((key) => {
+              const value =
+                useSessionStore.getState()[
+                  key as keyof typeof useSessionStore.getState
+                ];
+              return typeof value === 'function';
+            })
+            .join(', ')}
         </p>
         <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
-      
+
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
         <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">

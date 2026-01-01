@@ -17,9 +17,14 @@ import { getTimestamp } from '@/lib/utils/timestamp';
 export { getTimestamp } from '@/lib/utils/timestamp';
 
 // Re-export centralized timer utilities
-export { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
+export {
+  setupTestTimers,
+  cleanupTestTimers,
+} from '@/lib/test-utils/testTimers';
 
-export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
+export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<
+  typeof playerDecisionTracker
+>;
 
 export const mockWorld = {
   id: 'world-1',
@@ -28,14 +33,20 @@ export const mockWorld = {
   description: 'A magical realm',
   attributes: [],
   skills: [],
-  settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 },
+  derivedStats: [],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 10,
+    attributePointPool: 30,
+    skillPointPool: 50,
+  },
   toneSettings: {
     contentRating: 'teen' as const,
     narrativeStyle: 'balanced' as const,
-    languageComplexity: 'moderate' as const
+    languageComplexity: 'moderate' as const,
   },
   createdAt: '2025-01-01T00:00:00.000Z',
-  updatedAt: '2025-01-01T00:00:00.000Z'
+  updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
 export const mockCharacter = {
@@ -50,24 +61,25 @@ export const mockCharacter = {
     personality: 'Courageous',
     goals: [],
     fears: [],
-    relationships: []
+    relationships: [],
   },
   attributes: [],
   skills: [],
+  derivedStats: [],
   inventory: {
     characterId: 'char-1',
     items: [],
     capacity: 10,
     categories: [],
-    itemOrder: []
+    itemOrder: [],
   },
   status: {
     health: 100,
     maxHealth: 100,
-    conditions: []
+    conditions: [],
   },
   createdAt: '2025-01-01T00:00:00.000Z',
-  updatedAt: '2025-01-01T00:00:00.000Z'
+  updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
 /**
@@ -94,7 +106,7 @@ export function createPastDecisions(): PlayerDecision[] {
       choiceText: 'Help the injured merchant',
       choiceType: 'helpful',
       timestamp: oneDayAgo,
-      context: { situation: 'moral dilemma', charactersPresent: ['merchant'] }
+      context: { situation: 'moral dilemma', charactersPresent: ['merchant'] },
     },
     {
       id: 'decision-2',
@@ -104,22 +116,27 @@ export function createPastDecisions(): PlayerDecision[] {
       choiceText: 'Negotiate instead of fighting',
       choiceType: 'diplomatic',
       timestamp: twelveHoursAgo,
-      context: { situation: 'conflict resolution', charactersPresent: ['bandit leader'] }
-    }
+      context: {
+        situation: 'conflict resolution',
+        charactersPresent: ['bandit leader'],
+      },
+    },
   ];
 }
 
 /**
  * Sets up all mocks for decision-consequences tests
  */
-export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]): void {
+export function setupDecisionConsequencesMocks(
+  pastDecisions: PlayerDecision[]
+): void {
   // Mock world store with implementation to ensure it persists
   (useWorldStore.getState as jest.Mock).mockImplementation(() => ({
     worlds: { 'world-1': mockWorld },
-    worldStates: {},  // Add worldStates to prevent undefined access
+    worldStates: {}, // Add worldStates to prevent undefined access
     currentWorldId: 'world-1',
     error: null,
-    loading: false
+    loading: false,
   }));
 
   // Mock character store
@@ -127,25 +144,25 @@ export function setupDecisionConsequencesMocks(pastDecisions: PlayerDecision[]):
     characters: { 'char-1': mockCharacter },
     currentCharacterId: 'char-1',
     error: null,
-    loading: false
+    loading: false,
   }));
 
   // Mock aiContext store for goal context
   (useAiContextStore.getState as jest.Mock).mockImplementation(() => ({
     buildContextForSession: jest.fn().mockReturnValue({
       goalContext: null,
-      activeGoals: []
-    })
+      activeGoals: [],
+    }),
   }));
 
   // Mock inventory store
   (useInventoryStore.getState as jest.Mock).mockImplementation(() => ({
-    getCharacterItems: jest.fn().mockReturnValue([])
+    getCharacterItems: jest.fn().mockReturnValue([]),
   }));
 
   // Mock NPC store
   (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
-    getNPCsByWorld: jest.fn().mockReturnValue([])
+    getNPCsByWorld: jest.fn().mockReturnValue([]),
   }));
 
   mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);

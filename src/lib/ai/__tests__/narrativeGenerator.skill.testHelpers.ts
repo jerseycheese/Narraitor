@@ -13,7 +13,7 @@ import { getTimestamp } from '@/lib/utils/timestamp';
  */
 export function createMockAIClient(): jest.Mocked<AIClient> {
   return {
-    generateContent: jest.fn()
+    generateContent: jest.fn(),
   };
 }
 
@@ -36,7 +36,7 @@ export function createMockWorldWithSkills(): World {
         difficulty: 'medium' as const,
         baseValue: 0,
         minValue: 0,
-        maxValue: 10
+        maxValue: 10,
       },
       {
         id: 'magic',
@@ -47,7 +47,7 @@ export function createMockWorldWithSkills(): World {
         difficulty: 'hard' as const,
         baseValue: 0,
         minValue: 0,
-        maxValue: 10
+        maxValue: 10,
       },
       {
         id: 'stealth',
@@ -58,18 +58,18 @@ export function createMockWorldWithSkills(): World {
         difficulty: 'easy' as const,
         baseValue: 0,
         minValue: 0,
-        maxValue: 10
-      }
+        maxValue: 10,
+      },
     ],
     attributes: [],
     settings: {
       maxAttributes: 6,
       maxSkills: 12,
       attributePointPool: 27,
-      skillPointPool: 40
+      skillPointPool: 40,
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 }
 
@@ -89,32 +89,72 @@ export function createMockCharacterWithSkills(): Character {
       personality: 'Brave and resourceful',
       goals: ['Master all skills'],
       fears: ['Failure'],
-      relationships: []
+      relationships: [],
     },
     attributes: [
-      { id: 'attr-1', characterId: 'char-1', worldAttributeId: 'strength', name: 'Strength', baseValue: 16, modifiedValue: 16 },
-      { id: 'attr-2', characterId: 'char-1', worldAttributeId: 'intelligence', name: 'Intelligence', baseValue: 14, modifiedValue: 14 },
-      { id: 'attr-3', characterId: 'char-1', worldAttributeId: 'dexterity', name: 'Dexterity', baseValue: 12, modifiedValue: 12 }
+      {
+        id: 'attr-1',
+        characterId: 'char-1',
+        worldAttributeId: 'strength',
+        name: 'Strength',
+        baseValue: 16,
+        modifiedValue: 16,
+      },
+      {
+        id: 'attr-2',
+        characterId: 'char-1',
+        worldAttributeId: 'intelligence',
+        name: 'Intelligence',
+        baseValue: 14,
+        modifiedValue: 14,
+      },
+      {
+        id: 'attr-3',
+        characterId: 'char-1',
+        worldAttributeId: 'dexterity',
+        name: 'Dexterity',
+        baseValue: 12,
+        modifiedValue: 12,
+      },
     ],
     skills: [
-      { id: 'skill-1', characterId: 'char-1', worldSkillId: 'athletics', name: 'Athletics', level: 6 },
-      { id: 'skill-2', characterId: 'char-1', worldSkillId: 'magic', name: 'Magic', level: 4 },
-      { id: 'skill-3', characterId: 'char-1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }
+      {
+        id: 'skill-1',
+        characterId: 'char-1',
+        worldSkillId: 'athletics',
+        name: 'Athletics',
+        level: 6,
+      },
+      {
+        id: 'skill-2',
+        characterId: 'char-1',
+        worldSkillId: 'magic',
+        name: 'Magic',
+        level: 4,
+      },
+      {
+        id: 'skill-3',
+        characterId: 'char-1',
+        worldSkillId: 'stealth',
+        name: 'Stealth',
+        level: 3,
+      },
     ],
+    derivedStats: [],
     inventory: {
       characterId: 'char-1',
       items: [],
       capacity: 100,
       categories: [],
-      itemOrder: []
+      itemOrder: [],
     },
     status: {
       health: 100,
       maxHealth: 100,
-      conditions: []
+      conditions: [],
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 }
 

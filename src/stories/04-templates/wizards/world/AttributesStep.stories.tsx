@@ -12,15 +12,15 @@ const meta: Meta<typeof AttributesStep> = {
     (Story) => (
       <div className="w-full max-w-2xl">
         <WizardContainer title="Create Character in Storybook Test World">
-          <WizardProgress 
+          <WizardProgress
             steps={[
               { id: 'basic-info', label: 'Basic Info' },
               { id: 'attributes', label: 'Attributes' },
               { id: 'skills', label: 'Skills' },
               { id: 'background', label: 'Background' },
-              { id: 'portrait', label: 'Portrait' }
-            ]} 
-            currentStep={1} 
+              { id: 'portrait', label: 'Portrait' },
+            ]}
+            currentStep={1}
             className="mb-6"
           />
           <div className="p-6 bg-white rounded-lg shadow">
@@ -76,6 +76,7 @@ const defaultData = {
       },
     ],
     skills: [],
+    derivedStats: [],
     background: {
       history: '',
       personality: '',

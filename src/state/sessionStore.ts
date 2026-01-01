@@ -281,9 +281,6 @@ export const useSessionStore = create<SessionStore>()(
     const state = get();
     const lifecycleUpdateTime = getTimestamp();
     
-    // Add stack trace to debug unexpected calls
-    const stack = new Error().stack;
-    
     if (state.id && state.worldId && state.characterId) {
       
       // Create session end journal entry (Issue #176)

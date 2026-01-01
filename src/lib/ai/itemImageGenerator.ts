@@ -21,6 +21,7 @@ export class ItemImageGenerator {
     item: InventoryItem,
     genre?: string
   ): Promise<string> {
+    void genre;
     const parts: string[] = [];
 
     // Normalize and clean item data

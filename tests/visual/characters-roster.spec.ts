@@ -42,7 +42,10 @@ const SEED_PAYLOAD = {
 };
 
 test.describe('Character roster context', () => {
-  test('shows narrative threads and relationships for each character', async ({ page, baseURL }) => {
+  test('shows narrative threads and relationships for each character', async ({
+    page,
+    baseURL,
+  }) => {
     await page.addInitScript(
       ({ getTimestampSource, seed }) => {
         const instantiateGetTimestamp = (source: string) =>
@@ -82,7 +85,8 @@ test.describe('Character roster context', () => {
           majorEvents: [
             {
               id: 'event-alpha-discovery',
-              description: 'Hero Alpha discovered ancient artifacts in the flooded ruins, uncovering evidence of the lost civilization',
+              description:
+                'Hero Alpha discovered ancient artifacts in the flooded ruins, uncovering evidence of the lost civilization',
               timestamp: now,
               characterId: alpha.id,
               sessionId: 'session-alpha',
@@ -99,7 +103,8 @@ test.describe('Character roster context', () => {
               crossCharacterReferences: [
                 {
                   characterId: beta.id,
-                  summary: 'Envoy Beta warned Alpha about supply shortages in the port district.',
+                  summary:
+                    'Envoy Beta warned Alpha about supply shortages in the port district.',
                   sessionId: 'session-beta',
                   lastReferencedAt: now,
                 },
@@ -116,7 +121,8 @@ test.describe('Character roster context', () => {
               crossCharacterReferences: [
                 {
                   characterId: alpha.id,
-                  summary: 'Hero Alpha requested support before entering the ruins.',
+                  summary:
+                    'Hero Alpha requested support before entering the ruins.',
                   sessionId: 'session-alpha',
                   lastReferencedAt: now,
                 },
@@ -153,6 +159,7 @@ test.describe('Character roster context', () => {
                 ...seed.world,
                 attributes: [],
                 skills: [],
+                derivedStats: [],
                 createdAt: now,
                 updatedAt: now,
               },
@@ -162,6 +169,7 @@ test.describe('Character roster context', () => {
                 ...seed.world,
                 attributes: [],
                 skills: [],
+                derivedStats: [],
                 createdAt: now,
                 updatedAt: now,
               },
@@ -189,8 +197,10 @@ test.describe('Character roster context', () => {
               isPlayer: true,
               attributes: [],
               skills: [],
+              derivedStats: [],
               background: {
-                history: 'A well-traveled specialist who keeps extensive notes.',
+                history:
+                  'A well-traveled specialist who keeps extensive notes.',
                 personality: 'Methodical yet personable',
                 goals: ['Secure the northern settlements'],
                 fears: ['Losing the trail'],
@@ -263,7 +273,13 @@ test.describe('Character roster context', () => {
     await expect(cards).toHaveCount(2);
 
     // Hero Alpha card should show the major event and connection to Envoy Beta
-    await expect(cards.first().locator('text=Hero Alpha discovered ancient artifacts in the flooded ruins')).toBeVisible();
+    await expect(
+      cards
+        .first()
+        .locator(
+          'text=Hero Alpha discovered ancient artifacts in the flooded ruins'
+        )
+    ).toBeVisible();
     await expect(cards.first().locator('text=Envoy Beta')).toBeVisible();
 
     // Envoy Beta card should show connection to Hero Alpha (no major event for Beta)

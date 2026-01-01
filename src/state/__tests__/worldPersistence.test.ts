@@ -12,40 +12,42 @@ const mockIndexedDB = () => {
     transaction: jest.fn(() => ({
       objectStore: jest.fn(() => ({
         get: jest.fn((key: string) => ({
-          onsuccess: function() {
+          onsuccess: function () {
             // @ts-expect-error - Mock IndexedDB result assignment
-            this.result = stores['worlds']?.[key] ? { value: stores['worlds'][key] } : undefined;
-          }
+            this.result = stores['worlds']?.[key]
+              ? { value: stores['worlds'][key] }
+              : undefined;
+          },
         })),
         put: jest.fn((data: { value: string }, key: string) => {
           if (!stores['worlds']) stores['worlds'] = {};
           stores['worlds'][key] = data.value;
           return {
-            onsuccess: function() {}
+            onsuccess: function () {},
           };
-        })
-      }))
-    }))
+        }),
+      })),
+    })),
   };
 
   // Mock the global indexedDB
   Object.defineProperty(global, 'indexedDB', {
     value: {
       open: jest.fn(() => ({
-        onsuccess: function() {
+        onsuccess: function () {
           // @ts-expect-error - Mock IndexedDB result assignment
           this.result = mockDB;
         },
-        onupgradeneeded: function() {
+        onupgradeneeded: function () {
           // @ts-expect-error - Mock IndexedDB result assignment
           this.result = {
             ...mockDB,
-            createObjectStore: jest.fn(() => ({}))
+            createObjectStore: jest.fn(() => ({})),
           };
-        }
-      }))
+        },
+      })),
     },
-    writable: true
+    writable: true,
   });
 
   return {
@@ -56,11 +58,13 @@ const mockIndexedDB = () => {
       initPromise = null;
     },
     simulateInitDelay: (ms: number = 100) => {
-      initPromise = new Promise(resolve => setTimeout(() => {
-        resolve();
-      }, ms));
+      initPromise = new Promise((resolve) =>
+        setTimeout(() => {
+          resolve();
+        }, ms)
+      );
       return initPromise;
-    }
+    },
   };
 };
 
@@ -70,7 +74,7 @@ describe('World Persistence Infrastructure', () => {
   beforeEach(() => {
     mockIDB = mockIndexedDB();
     jest.clearAllMocks();
-    
+
     // Reset Zustand store
     useWorldStore.getState().reset();
   });
@@ -85,7 +89,9 @@ describe('World Persistence Infrastructure', () => {
       const initDelay = mockIDB.simulateInitDelay(200);
 
       // Create multiple store instances concurrently (simulates multiple components mounting)
-      const hooks = Array.from({ length: 3 }, () => renderHook(() => useWorldStore()));
+      const hooks = Array.from({ length: 3 }, () =>
+        renderHook(() => useWorldStore())
+      );
 
       // Create a world in one instance while others are still initializing
       const worldData = {
@@ -95,7 +101,13 @@ describe('World Persistence Infrastructure', () => {
         description: 'World created during concurrent initialization',
         attributes: [],
         skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        derivedStats: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       act(() => {
@@ -105,7 +117,7 @@ describe('World Persistence Infrastructure', () => {
       // Wait for initialization to complete
       await act(async () => {
         await initDelay;
-        await new Promise(resolve => setTimeout(resolve, 100)); // Allow persistence to complete
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Allow persistence to complete
       });
 
       // Verify the world exists in all store instances
@@ -121,13 +133,13 @@ describe('World Persistence Infrastructure', () => {
       Object.defineProperty(global, 'indexedDB', {
         value: {
           open: jest.fn(() => ({
-            onerror: function() {
+            onerror: function () {
               // @ts-expect-error - Mock IndexedDB error assignment
               this.error = new Error('IndexedDB initialization failed');
-            }
-          }))
+            },
+          })),
         },
-        writable: true
+        writable: true,
       });
 
       const { result } = renderHook(() => useWorldStore());
@@ -140,7 +152,13 @@ describe('World Persistence Infrastructure', () => {
         description: 'World created with storage failure',
         attributes: [],
         skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        derivedStats: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       act(() => {
@@ -157,8 +175,10 @@ describe('World Persistence Infrastructure', () => {
   describe('Persistence Lifecycle', () => {
     test('persists world data across store recreation', async () => {
       // Create initial world
-      const { result: firstStore, unmount: unmountFirstStore } = renderHook(() => useWorldStore());
-      
+      const { result: firstStore, unmount: unmountFirstStore } = renderHook(
+        () => useWorldStore()
+      );
+
       const worldData = {
         name: 'Persistent Test World',
         theme: 'Persistence Testing',
@@ -173,8 +193,8 @@ describe('World Persistence Infrastructure', () => {
             minValue: 1,
             maxValue: 10,
             category: 'Physical',
-            worldId: ''
-          }
+            worldId: '',
+          },
         ],
         skills: [
           {
@@ -186,10 +206,15 @@ describe('World Persistence Infrastructure', () => {
             baseValue: 1,
             minValue: 1,
             maxValue: 5,
-            worldId: ''
-          }
+            worldId: '',
+          },
         ],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       let worldId: string;
@@ -199,20 +224,23 @@ describe('World Persistence Infrastructure', () => {
 
       // Allow persistence to complete
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       // Simulate store recreation (like page refresh)
       unmountFirstStore();
-      
+
       // Create new store instance
       const { result: secondStore } = renderHook(() => useWorldStore());
 
       // Wait for rehydration
-      await waitFor(() => {
-        const worlds = Object.values(secondStore.current.worlds);
-        expect(worlds.length).toBeGreaterThan(0);
-      }, { timeout: 1000 });
+      await waitFor(
+        () => {
+          const worlds = Object.values(secondStore.current.worlds);
+          expect(worlds.length).toBeGreaterThan(0);
+        },
+        { timeout: 1000 }
+      );
 
       // Verify world data persisted correctly
       const persistedWorld = secondStore.current.worlds[worldId!];
@@ -234,7 +262,13 @@ describe('World Persistence Infrastructure', () => {
         description: 'World for testing rapid operations',
         attributes: [],
         skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        derivedStats: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       let worldId: string;
@@ -242,16 +276,22 @@ describe('World Persistence Infrastructure', () => {
       // Rapid create and update operations
       act(() => {
         worldId = result.current.createWorld(baseWorldData);
-        
+
         // Immediate updates
-        result.current.updateWorld(worldId, { description: 'Updated description 1' });
-        result.current.updateWorld(worldId, { description: 'Updated description 2' });
-        result.current.updateWorld(worldId, { description: 'Final description' });
+        result.current.updateWorld(worldId, {
+          description: 'Updated description 1',
+        });
+        result.current.updateWorld(worldId, {
+          description: 'Updated description 2',
+        });
+        result.current.updateWorld(worldId, {
+          description: 'Final description',
+        });
       });
 
       // Allow all persistence operations to complete
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       });
 
       // Verify final state is correct
@@ -268,21 +308,24 @@ describe('World Persistence Infrastructure', () => {
         setItem: jest.fn().mockResolvedValue(undefined),
         getItem: jest.fn().mockResolvedValue('{"test":"data"}'),
       };
-      
+
       // Test basic storage operations with mock
       await mockStorage.setItem('test-key', JSON.stringify({ test: 'data' }));
       const retrieved = await mockStorage.getItem('test-key');
-      
+
       expect(retrieved).toBe('{"test":"data"}');
-      expect(mockStorage.setItem).toHaveBeenCalledWith('test-key', '{"test":"data"}');
+      expect(mockStorage.setItem).toHaveBeenCalledWith(
+        'test-key',
+        '{"test":"data"}'
+      );
       expect(mockStorage.getItem).toHaveBeenCalledWith('test-key');
     });
 
     test('handles storage adapter unavailability gracefully', async () => {
       // Mock storage failure
-      jest.spyOn(IndexedDBAdapter.prototype, 'initialize').mockRejectedValue(
-        new Error('Storage unavailable')
-      );
+      jest
+        .spyOn(IndexedDBAdapter.prototype, 'initialize')
+        .mockRejectedValue(new Error('Storage unavailable'));
 
       const { result } = renderHook(() => useWorldStore());
 
@@ -294,7 +337,13 @@ describe('World Persistence Infrastructure', () => {
         description: 'World created with storage unavailable',
         attributes: [],
         skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        derivedStats: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       expect(() => {
@@ -315,16 +364,24 @@ describe('World Persistence Infrastructure', () => {
 
       // Mock transient storage error
       let failCount = 0;
-      jest.spyOn(ResilientStorageMiddleware.prototype, 'setItem').mockImplementation(
-        async function(this: ResilientStorageMiddleware, key: string, value: string) {
+      jest
+        .spyOn(ResilientStorageMiddleware.prototype, 'setItem')
+        .mockImplementation(async function (
+          this: ResilientStorageMiddleware,
+          key: string,
+          value: string
+        ) {
           failCount++;
           if (failCount <= 2) {
             throw new Error('Transient storage error');
           }
           // Call original implementation on third try
-          return ResilientStorageMiddleware.prototype.setItem.call(this, key, value);
-        }
-      );
+          return ResilientStorageMiddleware.prototype.setItem.call(
+            this,
+            key,
+            value
+          );
+        });
 
       const worldData = {
         name: 'Resilient World',
@@ -333,7 +390,13 @@ describe('World Persistence Infrastructure', () => {
         description: 'World that survives storage errors',
         attributes: [],
         skills: [],
-        settings: { maxAttributes: 6, maxSkills: 10, attributePointPool: 30, skillPointPool: 50 }
+        derivedStats: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 10,
+          attributePointPool: 30,
+          skillPointPool: 50,
+        },
       };
 
       // Should eventually succeed despite initial failures
@@ -343,7 +406,7 @@ describe('World Persistence Infrastructure', () => {
 
       // Allow retry attempts to complete
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       });
 
       const worlds = Object.values(result.current.worlds);

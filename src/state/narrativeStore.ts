@@ -331,7 +331,7 @@ async function applyWorldStateThreadUpdates({
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
-  } catch (error) {
+  } catch {
   }
 }
 
@@ -827,8 +827,11 @@ export const useNarrativeStore = create<NarrativeStore>()(
       try {
         const goalStoreModule = await import('./goalStore');
         const goalStore = goalStoreModule.useGoalStore.getState();
-        const result = await goalStore.processSegmentForGoals(segmentId, segmentData.metadata?.characterIds?.[0]);
-      } catch (error) {
+        await goalStore.processSegmentForGoals(
+          segmentId,
+          segmentData.metadata?.characterIds?.[0]
+        );
+      } catch {
         // Silently fail goal processing if goalStore is not available
         // This is not critical for narrative functionality
       }

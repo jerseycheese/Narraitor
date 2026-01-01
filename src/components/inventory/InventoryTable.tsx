@@ -59,16 +59,19 @@ export function InventoryTable({
   }, [characterItems, categoryFilter]);
 
   // Handle item usage
-  const handleUseItem = async (itemId: EntityID) => {
-    setUsingItemId(itemId);
-    try {
-      await processItemUsage(characterId, itemId, sessionId || undefined);
-    } catch (error) {
-      console.error('Failed to use item:', error);
-    } finally {
-      setUsingItemId(null);
-    }
-  };
+  const handleUseItem = React.useCallback(
+    async (itemId: EntityID) => {
+      setUsingItemId(itemId);
+      try {
+        await processItemUsage(characterId, itemId, sessionId || undefined);
+      } catch (error) {
+        console.error('Failed to use item:', error);
+      } finally {
+        setUsingItemId(null);
+      }
+    },
+    [characterId, sessionId]
+  );
 
   // Define table columns
   const columns: ColumnDef<InventoryItem>[] = React.useMemo(

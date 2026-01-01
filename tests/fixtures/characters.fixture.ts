@@ -47,6 +47,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 8,
       },
     ],
+    derivedStats: [],
     background: {
       history:
         'Former Arasaka security specialist who discovered dark corporate secrets',
@@ -122,6 +123,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 5,
       },
     ],
+    derivedStats: [],
     background: {
       history:
         'A former corporate asset who disappeared from official records.',
@@ -189,6 +191,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 7,
       },
     ],
+    derivedStats: [],
     background: {
       history: 'Trained in the ancient towers of Silverwind Academy',
       personality:
@@ -258,6 +261,7 @@ export const SAMPLE_CHARACTERS: Character[] = [
         level: 9,
       },
     ],
+    derivedStats: [],
     background: {
       history: 'Guardian of the greenways and hidden glades of Aethermoor.',
       personality: 'Stoic, perceptive, and loyal',

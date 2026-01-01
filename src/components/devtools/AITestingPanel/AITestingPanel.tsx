@@ -26,14 +26,15 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     genre: 'fantasy',
     attributes: [],
     skills: [],
+    derivedStats: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 10,
       attributePointPool: 20,
-      skillPointPool: 20
+      skillPointPool: 20,
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 
   const mockCharacter = {
@@ -43,12 +44,13 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     worldId: 'test-world',
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A test character with no history',
       personality: 'Adventurous',
       goals: ['Test the system'],
       fears: ['Nothing'],
-      relationships: []
+      relationships: [],
     },
     inventory: {
       characterId: 'test-character',
@@ -61,10 +63,10 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       health: 100,
       maxHealth: 100,
       conditions: [],
-      location: 'Test Area'
+      location: 'Test Area',
     },
     createdAt: getTimestamp(),
-    updatedAt: getTimestamp()
+    updatedAt: getTimestamp(),
   };
 
   const mockNarrativeContext = {
@@ -72,39 +74,40 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     activeCharacters: ['test-character'],
     currentLocation: 'Test Area',
     activeQuests: [],
-    mood: 'neutral'
+    mood: 'neutral',
   };
 
   const handleWorldNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
+    setTestConfig((prev) => ({
       ...prev,
       worldOverride: {
         ...prev.worldOverride,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     }));
   };
 
   const handleWorldGenreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
+    setTestConfig((prev) => ({
       ...prev,
       worldOverride: {
         ...prev.worldOverride,
-        genre: e.target.value
-      }
+        genre: e.target.value,
+      },
     }));
   };
 
-  const handleCharacterNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
+  const handleCharacterNameChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTestConfig((prev) => ({
       ...prev,
       characterOverride: {
         ...prev.characterOverride,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     }));
   };
-
 
   const handleGenerateNarrative = async () => {
     setIsGenerating(true);
@@ -124,13 +127,13 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       // Add realistic delay to show loading state (1.5-3 seconds)
       const delay = 1500 + Math.random() * 1500;
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
 
       // Generate context-aware narrative text
       const worldName = testContext.world.name;
       const worldTheme = testContext.world.genre;
       const characterName = testContext.character.name;
-      
+
       const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
 
       // Generate context-aware choices based on genre
@@ -138,26 +141,29 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
         const baseChoices = [
           `Explore the ${genre.toLowerCase()} landscape ahead`,
           `Study the ${worldName} surroundings more carefully`,
-          `Call upon ${characterName}'s inner strength`
+          `Call upon ${characterName}'s inner strength`,
         ];
 
         if (genre.toLowerCase().includes('fantasy')) {
           return [
             'Venture deeper into the magical forest',
             'Seek out the ancient temple ruins',
-            'Cast a spell to reveal hidden paths'
+            'Cast a spell to reveal hidden paths',
           ];
-        } else if (genre.toLowerCase().includes('sci-fi') || genre.toLowerCase().includes('space')) {
+        } else if (
+          genre.toLowerCase().includes('sci-fi') ||
+          genre.toLowerCase().includes('space')
+        ) {
           return [
             'Scan the area with your tech equipment',
             'Attempt to contact the orbital station',
-            'Investigate the strange energy readings'
+            'Investigate the strange energy readings',
           ];
         } else if (genre.toLowerCase().includes('steampunk')) {
           return [
             'Fire up your mechanical contraption',
             'Navigate using the brass compass',
-            'Repair the damaged airship engine'
+            'Repair the damaged airship engine',
           ];
         } else {
           return baseChoices;
@@ -168,17 +174,22 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       const response: AIResponse = {
         text: narrativeText,
         choices: generateChoices(worldTheme),
-        metadata: { tokens: 150 + Math.floor(Math.random() * 100) }
+        metadata: { tokens: 150 + Math.floor(Math.random() * 100) },
       };
 
       const responseTime = Date.now() - startTime;
 
       // Log for debugging
-      console.log('[AI Testing Panel] Response generated in', responseTime, 'ms');
+      console.log(
+        '[AI Testing Panel] Response generated in',
+        responseTime,
+        'ms'
+      );
 
       setResult(response);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
     } finally {
       setIsGenerating(false);
@@ -187,14 +198,23 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
   return (
     <div className={`flex flex-col space-y-3 ${className}`}>
-      <h3 className="text-sm font-medium text-gray-900 mb-3">AI Testing Panel</h3>
-      
+      <h3 className="text-sm font-medium text-gray-900 mb-3">
+        AI Testing Panel
+      </h3>
+
       {/* World Override Section */}
       <div className="bg-gray-100 p-3 rounded border border-gray-300">
-        <h4 className="text-xs font-medium mb-2 text-gray-900">World Override</h4>
+        <h4 className="text-xs font-medium mb-2 text-gray-900">
+          World Override
+        </h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="block text-xs text-gray-700 mb-0.5">World Name:</label>
+            <label
+              htmlFor="world-name"
+              className="block text-xs text-gray-700 mb-0.5"
+            >
+              World Name:
+            </label>
             <Input
               id="world-name"
               type="text"
@@ -205,7 +225,12 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             />
           </div>
           <div>
-            <label htmlFor="world-genre" className="block text-xs text-gray-700 mb-0.5">World Genre:</label>
+            <label
+              htmlFor="world-genre"
+              className="block text-xs text-gray-700 mb-0.5"
+            >
+              World Genre:
+            </label>
             <Input
               id="world-genre"
               type="text"
@@ -220,9 +245,16 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Character Override Section */}
       <div className="bg-gray-100 p-3 rounded border border-gray-300">
-        <h4 className="text-xs font-medium mb-2 text-gray-900">Character Override</h4>
+        <h4 className="text-xs font-medium mb-2 text-gray-900">
+          Character Override
+        </h4>
         <div>
-          <label htmlFor="character-name" className="block text-xs text-gray-700 mb-0.5">Character Name:</label>
+          <label
+            htmlFor="character-name"
+            className="block text-xs text-gray-700 mb-0.5"
+          >
+            Character Name:
+          </label>
           <Input
             id="character-name"
             type="text"
@@ -261,16 +293,25 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {result && (
         <div className="bg-green-50 p-2 rounded border border-green-200">
-          <h4 className="text-xs font-medium mb-2 text-green-900">Generated Results</h4>
+          <h4 className="text-xs font-medium mb-2 text-green-900">
+            Generated Results
+          </h4>
           <div className="mb-2">
             <p className="text-xs text-green-900">{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div>
-              <h5 className="text-xs font-medium mb-1 text-green-900">Choices:</h5>
+              <h5 className="text-xs font-medium mb-1 text-green-900">
+                Choices:
+              </h5>
               <ul className="text-xs text-green-900 list-none space-y-1">
                 {result.choices.map((choice, index) => (
-                  <li key={index} className="pl-2 border-l-2 border-green-500 text-xs text-green-900">• {choice}</li>
+                  <li
+                    key={index}
+                    className="pl-2 border-l-2 border-green-500 text-xs text-green-900"
+                  >
+                    • {choice}
+                  </li>
                 ))}
               </ul>
             </div>

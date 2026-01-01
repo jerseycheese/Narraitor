@@ -2,7 +2,6 @@
 
 import { useGoalStore } from '../goalStore';
 import { GoalStatus, GoalPriority, GoalType } from '../../types/goal.types';
-import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('goalStore', () => {
   beforeEach(() => {

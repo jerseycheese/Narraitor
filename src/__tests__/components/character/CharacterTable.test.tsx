@@ -24,6 +24,7 @@ const mockCharacters: Character[] = [
     level: 10,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A ranger from the North',
       personality: 'Brave and noble',
@@ -62,6 +63,7 @@ const mockCharacters: Character[] = [
     level: 8,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'An elven prince',
       personality: 'Swift and keen-eyed',
@@ -99,6 +101,7 @@ const mockCharacters: Character[] = [
     level: 12,
     attributes: [],
     skills: [],
+    derivedStats: [],
     background: {
       history: 'A stout warrior from the mountains',
       personality: 'Gruff but loyal',
@@ -150,7 +153,9 @@ describe('CharacterTable', () => {
   it('renders table with all columns', () => {
     render(<CharacterTable {...defaultProps} />);
 
-    expect(screen.getByRole('table', { name: 'Characters table' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: 'Characters table' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Level')).toBeInTheDocument();
     expect(screen.getByText('Type')).toBeInTheDocument();
@@ -238,7 +243,9 @@ describe('CharacterTable', () => {
     render(<CharacterTable {...defaultProps} />);
 
     // Aragorn is the current character, should not have Make Active button
-    expect(screen.queryByLabelText('Make Aragorn active')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Make Aragorn active')
+    ).not.toBeInTheDocument();
 
     // But other characters should have it
     expect(screen.getByLabelText('Make Legolas active')).toBeInTheDocument();
@@ -281,7 +288,9 @@ describe('CharacterTable', () => {
     render(<CharacterTable {...defaultProps} characters={[]} />);
 
     expect(screen.getByText(/No characters found/)).toBeInTheDocument();
-    expect(screen.getByText(/Create your first character to get started!/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Create your first character to get started!/)
+    ).toBeInTheDocument();
   });
 
   it('all action buttons have aria-labels', () => {
@@ -296,7 +305,9 @@ describe('CharacterTable', () => {
   it('table has proper aria-label', () => {
     render(<CharacterTable {...defaultProps} />);
 
-    expect(screen.getByRole('table', { name: 'Characters table' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: 'Characters table' })
+    ).toBeInTheDocument();
   });
 
   it('calls onView when character name clicked', () => {
@@ -313,7 +324,9 @@ describe('CharacterTable', () => {
 
     // Find the first table row's first cell (portrait column)
     const firstRow = container.querySelector('tbody tr');
-    const portraitCell = firstRow?.querySelector('td:first-child div.cursor-pointer');
+    const portraitCell = firstRow?.querySelector(
+      'td:first-child div.cursor-pointer'
+    );
 
     // Test should fail if portrait cell isn't found
     expect(portraitCell).toBeTruthy();

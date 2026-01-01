@@ -56,9 +56,16 @@ describe('InventoryList - Item Usage', () => {
         capacity: 0,
         categories: [],
       },
-      background: { history: 'A brave adventurer', personality: 'Courageous', goals: [], fears: [], relationships: [] },
+      background: {
+        history: 'A brave adventurer',
+        personality: 'Courageous',
+        goals: [],
+        fears: [],
+        relationships: [],
+      },
       attributes: [],
       skills: [],
+      derivedStats: [],
     });
   });
 
@@ -126,7 +133,9 @@ describe('InventoryList - Item Usage', () => {
       const user = userEvent.setup();
 
       // Mock successful item usage
-      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
       mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
         // Call the real store method to update inventory
         const result = useInventoryStore.getState().useItem(charId, itemId);
@@ -158,8 +167,10 @@ describe('InventoryList - Item Usage', () => {
 
       // Verify item quantity decreased
       await waitFor(() => {
-        const items = useInventoryStore.getState().getCharacterItems(characterId);
-        const antidote = items.find(i => i.name === 'Antidote');
+        const items = useInventoryStore
+          .getState()
+          .getCharacterItems(characterId);
+        const antidote = items.find((i) => i.name === 'Antidote');
         expect(antidote?.quantity).toBe(1);
       });
     });
@@ -168,9 +179,11 @@ describe('InventoryList - Item Usage', () => {
       const user = userEvent.setup();
 
       // Mock with longer delay to catch loading state
-      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
       mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         return useInventoryStore.getState().useItem(charId, itemId);
       });
 
@@ -207,7 +220,9 @@ describe('InventoryList - Item Usage', () => {
       const user = userEvent.setup();
 
       // Mock to call the real store method
-      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
       mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
         return useInventoryStore.getState().useItem(charId, itemId);
       });
@@ -254,7 +269,9 @@ describe('InventoryList - Item Usage', () => {
       const user = userEvent.setup();
 
       // Mock successful item usage with immediate response
-      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
       mockProcessItemUsage.mockResolvedValueOnce({
         success: true,
         narrative: 'The energy drink revitalizes you',
@@ -298,7 +315,9 @@ describe('InventoryList - Item Usage', () => {
       const user = userEvent.setup();
 
       // Mock failed item usage with immediate error response
-      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<typeof processItemUsage>;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
       mockProcessItemUsage.mockResolvedValueOnce({
         success: false,
         error: {
@@ -330,7 +349,9 @@ describe('InventoryList - Item Usage', () => {
 
       // Should show error message
       await waitFor(() => {
-        expect(screen.getByText('The specified item could not be found.')).toBeInTheDocument();
+        expect(
+          screen.getByText('The specified item could not be found.')
+        ).toBeInTheDocument();
         expect(screen.getByRole('alert')).toBeInTheDocument();
       });
     });
