@@ -5,21 +5,24 @@
  * Provides developer-facing interface for managing world facts
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 import { FactEditor } from './FactEditor';
 import { FactInspector } from './FactInspector';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+import { useLoreManagementData } from './useLoreManagementData';
+import { LoreManagementBrowseTab } from './LoreManagementBrowseTab';
+import { LoreManagementSearchTab } from './LoreManagementSearchTab';
+import { LoreManagementImportExportTab } from './LoreManagementImportExportTab';
+import { LoreManagementUsageTab } from './LoreManagementUsageTab';
 import { Select } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { LoreFact, LoreCategory, LoreUsageStats } from '@/types/lore.types';
+import type { LoreCategory } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
+import { logger } from '@/lib/utils/logger';
 
 export const LoreManagementSection: React.FC = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<EntityID>('');
@@ -48,157 +51,27 @@ export const LoreManagementSection: React.FC = () => {
     clearLoreUsage
   } = useLoreStore();
 
-  const sessionOptions = useMemo(() => {
-    if (!selectedWorldId) return [];
-    const ids = new Set(
-      Object.values(allFacts)
-        .filter((fact) => fact.worldId === selectedWorldId && fact.sessionId)
-        .map((fact) => fact.sessionId as EntityID)
-    );
-    return Array.from(ids).sort();
-  }, [allFacts, selectedWorldId]);
-
-  const effectiveSessionId = useMemo(() => {
-    if (sessionFilter === 'current') {
-      return currentSessionId || undefined;
-    }
-    if (sessionFilter === 'all') return undefined;
-    return sessionFilter;
-  }, [sessionFilter, currentSessionId]);
-
-  // Get facts based on filters
-  const facts = useMemo(() => {
-    if (!selectedWorldId) return [];
-
-    let filtered = searchQuery
-      ? searchFacts(searchQuery, {
-          worldId: selectedWorldId,
-          category: categoryFilter || undefined,
-          sessionId: effectiveSessionId
-        })
-      : getFacts({
-          worldId: selectedWorldId,
-          category: categoryFilter || undefined,
-          sessionId: effectiveSessionId
-        });
-
-    // Apply visibility filter
-    if (visibilityFilter !== 'all') {
-      filtered = filtered.filter(f => f.visibility === visibilityFilter);
-    }
-
-    return filtered;
-  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
-
-  const usageFacts = useMemo(() => {
-    if (!selectedWorldId) return [];
-
-    let filtered = getFacts({
-      worldId: selectedWorldId,
-      category: categoryFilter || undefined,
-      sessionId: effectiveSessionId
-    });
-
-    if (visibilityFilter !== 'all') {
-      filtered = filtered.filter(fact => fact.visibility === visibilityFilter);
-    }
-
-    return filtered;
-  }, [selectedWorldId, categoryFilter, visibilityFilter, effectiveSessionId, getFacts]);
-
-  const usageRows = useMemo(() => {
-    return usageFacts
-      .map((fact) => {
-        const stats: LoreUsageStats = loreUsage[fact.id] ?? {
-          usageCount: 0,
-          mentionCount: 0
-        };
-        return { fact, stats };
-      })
-      .sort((a, b) => {
-        if (a.stats.usageCount !== b.stats.usageCount) {
-          return b.stats.usageCount - a.stats.usageCount;
-        }
-        return b.stats.mentionCount - a.stats.mentionCount;
-      });
-  }, [usageFacts, loreUsage]);
-
-  const usageSummary = useMemo(() => {
-    const totalFacts = usageFacts.length;
-    const usedFacts = usageRows.filter((row) => row.stats.usageCount > 0).length;
-    const totalMentions = usageRows.reduce((sum, row) => sum + row.stats.mentionCount, 0);
-    const lastUsedAt = usageRows
-      .map((row) => row.stats.lastUsedAt)
-      .filter(Boolean)
-      .sort()
-      .pop();
-
-    return {
-      totalFacts,
-      usedFacts,
-      totalMentions,
-      lastUsedAt
-    };
-  }, [usageFacts, usageRows]);
-
-  const usageEvents = useMemo(() => {
-    if (!selectedWorldId) return [];
-    let events = loreUsageEvents.filter((event) => event.worldId === selectedWorldId);
-    if (effectiveSessionId) {
-      events = events.filter((event) => event.sessionId === effectiveSessionId);
-    }
-    return events.slice(0, 20);
-  }, [selectedWorldId, effectiveSessionId, loreUsageEvents]);
-
-  const visibilityStats = useMemo(() => {
-    if (!selectedWorldId) {
-      return {
-        total: 0,
-        worldShared: 0,
-        sessionPrivate: 0,
-        narrativeWorldShared: 0,
-        narrativeSessionPrivate: 0,
-      };
-    }
-
-    const worldFacts = getFacts({ worldId: selectedWorldId });
-    return worldFacts.reduce(
-      (acc, fact) => {
-        acc.total += 1;
-        if (fact.visibility === 'world-shared') {
-          acc.worldShared += 1;
-          if (fact.source === 'narrative') acc.narrativeWorldShared += 1;
-        } else {
-          acc.sessionPrivate += 1;
-          if (fact.source === 'narrative') acc.narrativeSessionPrivate += 1;
-        }
-        return acc;
-      },
-      {
-        total: 0,
-        worldShared: 0,
-        sessionPrivate: 0,
-        narrativeWorldShared: 0,
-        narrativeSessionPrivate: 0,
-      }
-    );
-  }, [selectedWorldId, allFacts, getFacts]);
-
-  // Group facts by category
-  const factsByCategory = useMemo(() => {
-    const grouped: Record<LoreCategory, LoreFact[]> = {
-      characters: [],
-      locations: [],
-      events: [],
-      rules: []
-    };
-    
-    facts.forEach(fact => {
-      grouped[fact.category].push(fact);
-    });
-    
-    return grouped;
-  }, [facts]);
+  const {
+    sessionOptions,
+    facts,
+    factsByCategory,
+    visibilityStats,
+    usageSummary,
+    usageRows,
+    usageEvents,
+  } = useLoreManagementData({
+    selectedWorldId,
+    searchQuery,
+    categoryFilter,
+    visibilityFilter,
+    sessionFilter,
+    currentSessionId: currentSessionId || undefined,
+    allFacts,
+    getFacts,
+    searchFacts,
+    loreUsage,
+    loreUsageEvents
+  });
 
   const handleWorldChange = (worldId: EntityID) => {
     setSelectedWorldId(worldId);
@@ -239,7 +112,7 @@ export const LoreManagementSection: React.FC = () => {
       setShowImportDialog(false);
       setMessage({ type: 'success', text: 'Facts imported successfully' });
     } catch (e) {
-      console.error('Error importing facts:', e);
+      logger.error('Error importing facts', { error: e });
       setMessage({ type: 'error', text: `Failed to import facts: ${e instanceof Error ? e.message : 'Check the JSON format.'}` });
     }
   };
@@ -290,146 +163,25 @@ export const LoreManagementSection: React.FC = () => {
           </TabsList>
 
           {/* Browse Tab */}
-          <TabsContent value="browse" className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <Select
-                className="w-full sm:w-48"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value as LoreCategory | '')}
-              >
-                <option value="">All Categories</option>
-                <option value="characters">Characters</option>
-                <option value="locations">Locations</option>
-                <option value="events">Events</option>
-                <option value="rules">Rules</option>
-              </Select>
-              <Select
-                className="w-full sm:w-56"
-                value={sessionFilter}
-                onChange={(e) => setSessionFilter(e.target.value as typeof sessionFilter)}
-              >
-                <option value="all">All Sessions</option>
-                {currentSessionId && currentSessionWorldId === selectedWorldId && (
-                  <option value="current">Current Session ({currentSessionId})</option>
-                )}
-                {sessionOptions
-                  .filter((id) => id !== currentSessionId)
-                  .map((id) => (
-                    <option key={id} value={id}>
-                      {id}
-                    </option>
-                  ))}
-              </Select>
-              <Select
-                className="w-full sm:w-48"
-                value={visibilityFilter}
-                onChange={(e) => setVisibilityFilter(e.target.value as typeof visibilityFilter)}
-              >
-                <option value="all">All Visibility</option>
-                <option value="session-private">Session Private Only</option>
-                <option value="world-shared">World Shared Only</option>
-              </Select>
-              <div className="w-full sm:w-auto sm:ml-auto text-sm text-gray-700">
-                Total facts: {facts.length}
-              </div>
-            </div>
-
-            <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-              <div>
-                Visibility totals (world): {visibilityStats.total} total • {visibilityStats.worldShared} world-shared • {visibilityStats.sessionPrivate} session-private
-              </div>
-              <div>
-                Narrative facts: {visibilityStats.narrativeWorldShared} world-shared • {visibilityStats.narrativeSessionPrivate} session-private
-              </div>
-              <div>
-                Note: AI-extracted lore uses session-private visibility when a session is active.
-              </div>
-            </div>
-
-            {/* Facts Display */}
-            <div className="space-y-4">
-              {(Object.keys(factsByCategory) as LoreCategory[]).map(category => {
-                const categoryFacts = factsByCategory[category];
-                if (!categoryFilter && categoryFacts.length === 0) return null;
-                
-                return (
-                  <div key={category} className="border rounded-lg p-4">
-                    <h3 className={`font-semibold mb-2 capitalize ${categoryColors[category]}`}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </h3>
-                    <div className="space-y-2">
-                      {categoryFacts.map(fact => {
-                        const importance = fact.metadata?.importance;
-                        const importanceBadge = importance ? (
-                          <span
-                            className={`px-2 py-0.5 text-xs font-semibold rounded ${
-                              importance === 'high' ? 'bg-red-100 text-red-800' :
-                              importance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                              importance === 'low' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-200 text-gray-600'
-                            }`}
-                          >
-                            {importance.toUpperCase()}
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 text-xs font-semibold rounded bg-gray-200 text-gray-600">
-                            NO IMPORTANCE
-                          </span>
-                        );
-
-                        const visibilityBadge = (
-                          <span
-                            className={`px-2 py-0.5 text-xs font-semibold rounded ${
-                              fact.visibility === 'session-private'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}
-                          >
-                            {fact.visibility === 'session-private' ? 'Session Private' : 'World Shared'}
-                          </span>
-                        );
-
-                        return (
-                          <div
-                            key={fact.id}
-                            className="flex items-center justify-between p-2 bg-gray-100 rounded hover:bg-gray-100 cursor-pointer"
-                            onClick={() => setSelectedFactId(fact.id)}
-                          >
-                            <div className="flex-1 flex items-center gap-2">
-                              {importanceBadge}
-                              {visibilityBadge}
-                              <span>{fact.value}</span>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedFactId(fact.id);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFact(fact.id);
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <TabsContent value="browse">
+            <LoreManagementBrowseTab
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              sessionFilter={sessionFilter}
+              onSessionFilterChange={setSessionFilter}
+              visibilityFilter={visibilityFilter}
+              onVisibilityFilterChange={setVisibilityFilter}
+              currentSessionId={currentSessionId || undefined}
+              currentSessionWorldId={currentSessionWorldId || undefined}
+              selectedWorldId={selectedWorldId}
+              sessionOptions={sessionOptions}
+              facts={facts}
+              factsByCategory={factsByCategory}
+              categoryColors={categoryColors}
+              visibilityStats={visibilityStats}
+              onSelectFact={(id) => setSelectedFactId(id)}
+              onDeleteFact={handleDeleteFact}
+            />
           </TabsContent>
 
           {/* Create Tab */}
@@ -443,201 +195,46 @@ export const LoreManagementSection: React.FC = () => {
           </TabsContent>
 
           {/* Search Tab */}
-          <TabsContent value="search" className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                placeholder="Search facts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 min-w-[12rem]"
-              />
-              <Select 
-                className="w-full sm:w-48"
-                value={categoryFilter} 
-                onChange={(e) => setCategoryFilter(e.target.value as LoreCategory | '')}
-              >
-                <option value="">All Categories</option>
-                <option value="characters">Characters</option>
-                <option value="locations">Locations</option>
-                <option value="events">Events</option>
-                <option value="rules">Rules</option>
-              </Select>
-              <Select
-                className="w-full sm:w-56"
-                value={sessionFilter}
-                onChange={(e) => setSessionFilter(e.target.value as typeof sessionFilter)}
-              >
-                <option value="all">All Sessions</option>
-                {currentSessionId && currentSessionWorldId === selectedWorldId && (
-                  <option value="current">Current Session ({currentSessionId})</option>
-                )}
-                {sessionOptions
-                  .filter((id) => id !== currentSessionId)
-                  .map((id) => (
-                    <option key={id} value={id}>
-                      {id}
-                    </option>
-                  ))}
-              </Select>
-            </div>
-
-            {searchQuery && (
-              <div className="text-sm text-gray-700">
-                Found {facts.length} result(s) for &quot;{searchQuery}&quot;
-              </div>
-            )}
-
-            {/* Search Results */}
-            <div className="space-y-2">
-              {facts.map(fact => {
-                const importance = fact.metadata?.importance;
-                const importanceBadge = importance ? (
-                  <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded ${
-                      importance === 'high' ? 'bg-red-100 text-red-800' :
-                      importance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      importance === 'low' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {importance.toUpperCase()}
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded bg-gray-200 text-gray-600">
-                    NO IMPORTANCE
-                  </span>
-                );
-
-                return (
-                  <div
-                    key={fact.id}
-                    className="p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
-                    onClick={() => setSelectedFactId(fact.id)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-semibold ${categoryColors[fact.category]}`}>
-                        {fact.category}
-                      </span>
-                      {importanceBadge}
-                      <span className="font-mono text-sm">{fact.key}</span>
-                    </div>
-                    <div className="mt-1">{fact.value}</div>
-                    {fact.metadata?.description && (
-                      <div className="text-sm text-gray-700 mt-1">{fact.metadata.description}</div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          <TabsContent value="search">
+            <LoreManagementSearchTab
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              sessionFilter={sessionFilter}
+              onSessionFilterChange={setSessionFilter}
+              currentSessionId={currentSessionId || undefined}
+              currentSessionWorldId={currentSessionWorldId || undefined}
+              selectedWorldId={selectedWorldId}
+              sessionOptions={sessionOptions}
+              facts={facts}
+              categoryColors={categoryColors}
+              onSelectFact={(id) => setSelectedFactId(id)}
+            />
           </TabsContent>
 
           {/* Import/Export Tab */}
-          <TabsContent value="import-export" className="space-y-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Export Facts</h3>
-                <Button onClick={handleExport}>Export to JSON</Button>
-                {exportedData && (
-                  <div className="mt-2">
-                    <div className="text-sm text-gray-700 mb-1">Exported data (copied to clipboard):</div>
-                    <pre className="p-2 bg-gray-100 rounded text-xs overflow-auto max-h-48">
-                      {exportedData}
-                    </pre>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Import Facts</h3>
-                {!showImportDialog ? (
-                  <Button onClick={() => setShowImportDialog(true)}>Import from JSON</Button>
-                ) : (
-                  <div className="space-y-2">
-                    <Textarea
-                      className="w-full h-48 font-mono text-sm"
-                      placeholder="Paste JSON data here..."
-                      value={importData}
-                      onChange={(e) => setImportData(e.target.value)}
-                    />
-                    <div className="flex gap-2">
-                      <Button onClick={handleImport}>Confirm Import</Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setShowImportDialog(false);
-                          setImportData('');
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+          <TabsContent value="import-export">
+            <LoreManagementImportExportTab
+              exportedData={exportedData}
+              showImportDialog={showImportDialog}
+              importData={importData}
+              onExport={handleExport}
+              onImport={handleImport}
+              onShowImportDialog={setShowImportDialog}
+              onImportDataChange={setImportData}
+            />
           </TabsContent>
 
           {/* Usage Tab */}
-          <TabsContent value="usage" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-gray-900">Usage Summary</div>
-              <Button variant="outline" size="sm" onClick={handleClearUsage}>
-                Clear Usage
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
-              <div>Total Facts: {usageSummary.totalFacts}</div>
-              <div>Used in Prompts: {usageSummary.usedFacts}</div>
-              <div>Total Mentions: {usageSummary.totalMentions}</div>
-              <div>
-                Last Used: {usageSummary.lastUsedAt ? new Date(usageSummary.lastUsedAt).toLocaleString() : 'Never'}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-gray-900">Facts by Usage</div>
-              {usageRows.length === 0 ? (
-                <div className="text-xs text-gray-500">No lore facts found for this filter.</div>
-              ) : (
-                <div className="max-h-64 overflow-y-auto space-y-2">
-                  {usageRows.map(({ fact, stats }) => (
-                    <div key={fact.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
-                      <div className={`font-medium ${categoryColors[fact.category]}`}>
-                        {fact.category}: {fact.key}
-                      </div>
-                      <div className="text-gray-700">{fact.value}</div>
-                      <div className="text-gray-500 mt-1">
-                        Used: {stats.usageCount} · Mentions: {stats.mentionCount}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-gray-900">Recent Usage Events</div>
-              {usageEvents.length === 0 ? (
-                <div className="text-xs text-gray-500">No usage events recorded yet.</div>
-              ) : (
-                <div className="max-h-56 overflow-y-auto space-y-2">
-                  {usageEvents.map((event) => (
-                    <div key={event.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
-                      <div className="font-medium text-gray-900">
-                        {event.eventType === 'context' ? 'Context Used' : 'Mentioned'} · {event.source}
-                      </div>
-                      <div className="text-gray-600">
-                        {new Date(event.timestamp).toLocaleString()} · {event.factIds.length} fact(s)
-                      </div>
-                      {event.responseExcerpt && (
-                        <div className="text-gray-700 italic mt-1">"{event.responseExcerpt}"</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <TabsContent value="usage">
+            <LoreManagementUsageTab
+              usageSummary={usageSummary}
+              usageRows={usageRows}
+              usageEvents={usageEvents}
+              categoryColors={categoryColors}
+              onClearUsage={handleClearUsage}
+            />
           </TabsContent>
         </Tabs>
       )}
