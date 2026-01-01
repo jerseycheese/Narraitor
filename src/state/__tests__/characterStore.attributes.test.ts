@@ -5,16 +5,20 @@
  */
 
 import { useCharacterStore } from '../characterStore';
+import { useWorldStore } from '../worldStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
 import {
+  createAttributeTestCharacter,
   createSkillTestCharacter,
-  setupTestTimers
+  setupTestTimers,
 } from './characterStore.testHelpers';
+import { createTestAttributeData, createTestWorldData } from './worldStore.testHelpers';
 
 describe('useCharacterStore - Attribute and Skill Management', () => {
   beforeEach(() => {
     setupTestTimers();
     useCharacterStore.getState().reset();
+    useWorldStore.getState().reset();
   });
 
   afterEach(() => {
@@ -57,6 +61,81 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
         title: 'Maximum Skills Reached',
         message: 'This character has reached its maximum number of skills',
         type: ErrorType.VALIDATION
+      });
+    });
+  });
+
+  describe('attribute management', () => {
+    test('recalculates derived stats when adding and removing attributes', () => {
+      const worldId = useWorldStore.getState().createWorld(
+        createTestWorldData({
+          name: 'Derived Stat World',
+          description: 'World with derived stat formulas',
+        })
+      );
+
+      useWorldStore.getState().addAttribute(
+        worldId,
+        createTestAttributeData({
+          name: 'Strength',
+          baseValue: 5,
+        })
+      );
+
+      const worldAttributeId =
+        useWorldStore.getState().worlds[worldId].attributes[0].id;
+
+      useWorldStore.getState().updateSettings(worldId, {
+        derivedStatFormulas: [
+          {
+            id: 'formula-1',
+            worldId,
+            name: 'Vitality',
+            description: 'Vitality derived from strength',
+            baseValue: 10,
+            attributeMultipliers: {
+              [worldAttributeId]: 2,
+            },
+          },
+        ],
+      });
+
+      const characterId = useCharacterStore.getState().createCharacter(
+        createAttributeTestCharacter({
+          worldId,
+        })
+      );
+
+      useCharacterStore.getState().addAttribute(characterId, {
+        name: 'Strength',
+        baseValue: 5,
+        modifiedValue: 5,
+        worldAttributeId,
+      });
+
+      let character = useCharacterStore.getState().characters[characterId];
+
+      expect(character.derivedStats).toHaveLength(1);
+      expect(character.derivedStats[0]).toMatchObject({
+        derivedStatId: 'formula-1',
+        maxValue: 20,
+        currentValue: 20,
+      });
+
+      const characterAttributeId = character.attributes[0].id;
+
+      useCharacterStore.getState().removeAttribute(
+        characterId,
+        characterAttributeId
+      );
+
+      character = useCharacterStore.getState().characters[characterId];
+
+      expect(character.derivedStats).toHaveLength(1);
+      expect(character.derivedStats[0]).toMatchObject({
+        derivedStatId: 'formula-1',
+        maxValue: 10,
+        currentValue: 10,
       });
     });
   });

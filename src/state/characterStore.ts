@@ -581,6 +581,9 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             get().update(characterId, {
               attributes: [...character.attributes, newAttribute],
             });
+
+            // Recalculate derived stats after attribute change
+            get().recalculateDerivedStats(characterId);
           },
 
           updateAttribute: (characterId, attributeId, updates) => {
@@ -627,6 +630,9 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             get().update(characterId, {
               attributes: filteredAttributes,
             });
+
+            // Recalculate derived stats after attribute change
+            get().recalculateDerivedStats(characterId);
           },
 
           // Skill management

@@ -58,7 +58,9 @@ export function createTestCharacterData(
 /**
  * Creates a character for attribute testing
  */
-export function createAttributeTestCharacter() {
+export function createAttributeTestCharacter(
+  overrides?: Partial<CharacterInput>
+) {
   return createTestCharacterData({
     name: 'Attribute Test Character',
     description: 'Character for testing attributes',
@@ -69,6 +71,7 @@ export function createAttributeTestCharacter() {
       fears: [],
       relationships: [],
     },
+    ...overrides,
   });
 }
 
