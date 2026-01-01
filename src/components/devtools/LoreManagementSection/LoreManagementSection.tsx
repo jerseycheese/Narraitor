@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { LoreFact, LoreCategory } from '@/types/lore.types';
+import type { LoreFact, LoreCategory, LoreUsageStats } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
 
 export const LoreManagementSection: React.FC = () => {
@@ -42,7 +42,10 @@ export const LoreManagementSection: React.FC = () => {
     searchFacts,
     deleteFact,
     exportFacts,
-    importFacts
+    importFacts,
+    loreUsage,
+    loreUsageEvents,
+    clearLoreUsage
   } = useLoreStore();
 
   const sessionOptions = useMemo(() => {
@@ -86,6 +89,66 @@ export const LoreManagementSection: React.FC = () => {
 
     return filtered;
   }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
+
+  const usageFacts = useMemo(() => {
+    if (!selectedWorldId) return [];
+
+    let filtered = getFacts({
+      worldId: selectedWorldId,
+      category: categoryFilter || undefined,
+      sessionId: effectiveSessionId
+    });
+
+    if (visibilityFilter !== 'all') {
+      filtered = filtered.filter(fact => fact.visibility === visibilityFilter);
+    }
+
+    return filtered;
+  }, [selectedWorldId, categoryFilter, visibilityFilter, effectiveSessionId, getFacts]);
+
+  const usageRows = useMemo(() => {
+    return usageFacts
+      .map((fact) => {
+        const stats: LoreUsageStats = loreUsage[fact.id] ?? {
+          usageCount: 0,
+          mentionCount: 0
+        };
+        return { fact, stats };
+      })
+      .sort((a, b) => {
+        if (a.stats.usageCount !== b.stats.usageCount) {
+          return b.stats.usageCount - a.stats.usageCount;
+        }
+        return b.stats.mentionCount - a.stats.mentionCount;
+      });
+  }, [usageFacts, loreUsage]);
+
+  const usageSummary = useMemo(() => {
+    const totalFacts = usageFacts.length;
+    const usedFacts = usageRows.filter((row) => row.stats.usageCount > 0).length;
+    const totalMentions = usageRows.reduce((sum, row) => sum + row.stats.mentionCount, 0);
+    const lastUsedAt = usageRows
+      .map((row) => row.stats.lastUsedAt)
+      .filter(Boolean)
+      .sort()
+      .pop();
+
+    return {
+      totalFacts,
+      usedFacts,
+      totalMentions,
+      lastUsedAt
+    };
+  }, [usageFacts, usageRows]);
+
+  const usageEvents = useMemo(() => {
+    if (!selectedWorldId) return [];
+    let events = loreUsageEvents.filter((event) => event.worldId === selectedWorldId);
+    if (effectiveSessionId) {
+      events = events.filter((event) => event.sessionId === effectiveSessionId);
+    }
+    return events.slice(0, 20);
+  }, [selectedWorldId, effectiveSessionId, loreUsageEvents]);
 
   const visibilityStats = useMemo(() => {
     if (!selectedWorldId) {
@@ -188,6 +251,13 @@ export const LoreManagementSection: React.FC = () => {
     rules: 'text-amber-700'
   };
 
+  const handleClearUsage = () => {
+    if (!selectedWorldId) return;
+    if (window.confirm('Clear lore usage tracking for this world?')) {
+      clearLoreUsage(selectedWorldId);
+    }
+  };
+
   return (
     <DevToolsSection title="Lore Management">
       {/* World Selector */}
@@ -211,11 +281,12 @@ export const LoreManagementSection: React.FC = () => {
 
       {selectedWorldId && (
         <Tabs defaultValue="browse" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="browse">Browse</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
             <TabsTrigger value="search">Search</TabsTrigger>
             <TabsTrigger value="import-export">Import/Export</TabsTrigger>
+            <TabsTrigger value="usage">Usage</TabsTrigger>
           </TabsList>
 
           {/* Browse Tab */}
@@ -503,6 +574,69 @@ export const LoreManagementSection: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          {/* Usage Tab */}
+          <TabsContent value="usage" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold text-gray-900">Usage Summary</div>
+              <Button variant="outline" size="sm" onClick={handleClearUsage}>
+                Clear Usage
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+              <div>Total Facts: {usageSummary.totalFacts}</div>
+              <div>Used in Prompts: {usageSummary.usedFacts}</div>
+              <div>Total Mentions: {usageSummary.totalMentions}</div>
+              <div>
+                Last Used: {usageSummary.lastUsedAt ? new Date(usageSummary.lastUsedAt).toLocaleString() : 'Never'}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-sm font-semibold text-gray-900">Facts by Usage</div>
+              {usageRows.length === 0 ? (
+                <div className="text-xs text-gray-500">No lore facts found for this filter.</div>
+              ) : (
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {usageRows.map(({ fact, stats }) => (
+                    <div key={fact.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
+                      <div className={`font-medium ${categoryColors[fact.category]}`}>
+                        {fact.category}: {fact.key}
+                      </div>
+                      <div className="text-gray-700">{fact.value}</div>
+                      <div className="text-gray-500 mt-1">
+                        Used: {stats.usageCount} · Mentions: {stats.mentionCount}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-sm font-semibold text-gray-900">Recent Usage Events</div>
+              {usageEvents.length === 0 ? (
+                <div className="text-xs text-gray-500">No usage events recorded yet.</div>
+              ) : (
+                <div className="max-h-56 overflow-y-auto space-y-2">
+                  {usageEvents.map((event) => (
+                    <div key={event.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
+                      <div className="font-medium text-gray-900">
+                        {event.eventType === 'context' ? 'Context Used' : 'Mentioned'} · {event.source}
+                      </div>
+                      <div className="text-gray-600">
+                        {new Date(event.timestamp).toLocaleString()} · {event.factIds.length} fact(s)
+                      </div>
+                      {event.responseExcerpt && (
+                        <div className="text-gray-700 italic mt-1">"{event.responseExcerpt}"</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
