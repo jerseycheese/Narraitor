@@ -10,6 +10,7 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
+import { useLoreStore } from '@/state/loreStore';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
@@ -176,6 +177,12 @@ export function setupDecisionConsequencesMocks(
 
   // Mock lore context helper
   (getLoreContextForPrompt as jest.Mock).mockReturnValue('');
+
+  (useLoreStore.getState as jest.Mock).mockReturnValue({
+    getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
+    recordLoreMentions: jest.fn(),
+    recordLoreUsage: jest.fn()
+  });
 
   // Mock tone settings guidance
   (getDetailedToneInstructions as jest.Mock).mockReturnValue('');

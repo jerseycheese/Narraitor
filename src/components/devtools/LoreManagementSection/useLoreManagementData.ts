@@ -175,7 +175,7 @@ export function useLoreManagementData({
         narrativeSessionPrivate: 0,
       }
     );
-  }, [selectedWorldId, allFacts, getFacts]);
+  }, [selectedWorldId, getFacts]);
 
   const factsByCategory = useMemo(() => {
     const grouped: Record<LoreCategory, LoreFact[]> = {

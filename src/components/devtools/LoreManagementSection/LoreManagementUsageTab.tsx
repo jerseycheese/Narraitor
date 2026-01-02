@@ -74,7 +74,11 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
               <div className="text-gray-600">
                 {new Date(event.timestamp).toLocaleString()} · {event.factIds.length} fact(s)
               </div>
-              {event.responseExcerpt && <div className="text-gray-700 italic mt-1">"{event.responseExcerpt}"</div>}
+              {event.responseExcerpt && (
+                <div className="text-gray-700 italic mt-1">
+                  &ldquo;{event.responseExcerpt}&rdquo;
+                </div>
+              )}
             </div>
           ))}
         </div>
