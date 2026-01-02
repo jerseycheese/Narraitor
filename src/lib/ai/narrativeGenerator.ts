@@ -17,7 +17,7 @@ import {
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
-import { getLoreContextForPrompt } from './loreContextHelper';
+import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import {
   DEFAULT_TONE_SETTINGS,
@@ -230,7 +230,10 @@ export class NarrativeGenerator {
     sessionId?: EntityID,
     budget?: RequestBudget
   ): string {
-    const loreContext = getLoreContextForPrompt(worldId, sessionId);
+    const loreContext = getLoreContextForPrompt(worldId, sessionId, {
+      recordUsage: true,
+      source: 'narrative'
+    });
     return prompt + this.applyBudget(loreContext, 'lore-context', budget);
   }
 
@@ -895,10 +898,7 @@ Return ONLY the rewritten narrative.`;
       const prompt = template(context);
 
       // Capture lore context for debug info
-      const loreContext = getLoreContextForPrompt(
-        request.worldId,
-        request.sessionId
-      );
+      const loreContext = getLoreContextForPrompt(request.worldId, request.sessionId, { recordUsage: false });
 
       // Add tone settings, lore context, goal context, personalization, inventory, and item acquisition instructions to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
@@ -949,10 +949,9 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(
-            request.worldId,
-            request.sessionId
-          );
+          const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
+            recordUsage: false
+          });
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -991,6 +990,13 @@ Return ONLY the rewritten narrative.`;
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
+
+      try {
+        checkAndRecordLoreMentions(request.worldId, request.sessionId, result.content ?? '', 'narrative');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break narrative generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Capture debug info if enabled (dev mode only)
       if (isDebugInfoEnabled()) {
@@ -1123,10 +1129,9 @@ Return ONLY the rewritten narrative.`;
             });
           }
 
-          const existingLoreContext = getLoreContextForPrompt(
-            worldId,
-            sessionId
-          );
+          const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
+            recordUsage: false
+          });
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -1171,6 +1176,13 @@ Return ONLY the rewritten narrative.`;
       );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
+
+      try {
+        checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break narrative generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Process any acquired items from the initial scene
       if (

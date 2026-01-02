@@ -48,7 +48,8 @@ jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   }
 }));
 jest.mock('../loreContextHelper', () => ({
-  getLoreContextForPrompt: jest.fn()
+  getLoreContextForPrompt: jest.fn(),
+  checkAndRecordLoreMentions: jest.fn()
 }));
 jest.mock('../structuredLoreExtractor', () => ({
   extractStructuredLore: jest.fn()

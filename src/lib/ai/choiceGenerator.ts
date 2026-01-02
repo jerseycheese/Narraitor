@@ -8,7 +8,7 @@ import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
-import { getLoreContextForPrompt } from './loreContextHelper';
+import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -67,6 +67,13 @@ export class ChoiceGenerator {
       }
       
       const decision = this.parseChoiceResponse(response.content, narrativeContext, world);
+
+      try {
+        checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break choice generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Ensure we have the minimum number of options
       if (decision.options.length < minOptions) {
@@ -457,7 +464,10 @@ export class ChoiceGenerator {
    * Enhances a prompt with lore context for the given world
    */
   private enhancePromptWithLore(prompt: string, worldId: string, sessionId?: EntityID): string {
-    const loreContext = getLoreContextForPrompt(worldId, sessionId);
+    const loreContext = getLoreContextForPrompt(worldId, sessionId, {
+      recordUsage: true,
+      source: 'choices'
+    });
     return prompt + loreContext;
   }
 

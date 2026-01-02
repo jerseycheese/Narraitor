@@ -405,6 +405,9 @@ export function createMockLoreStore(overrides?: Partial<LoreStore>): LoreStore {
     facts: {},
     entities: {},
     factHistory: {},
+    mergeAuditLog: [],
+    loreUsage: {},
+    loreUsageEvents: [],
     currentEntityId: null,
     error: null,
     loading: false,
@@ -434,8 +437,11 @@ export function createMockLoreStore(overrides?: Partial<LoreStore>): LoreStore {
     getFactHistory: jest.fn(() => []),
     validateFact: jest.fn(() => true),
     validateKey: jest.fn(() => true),
-    getLoreContext: jest.fn(() => ({ facts: [], categories: [] })),
+    getLoreContext: jest.fn(() => ({ facts: [], factCount: 0, factIds: [] })),
     addStructuredLore: jest.fn(),
+    recordLoreUsage: jest.fn(),
+    recordLoreMentions: jest.fn(),
+    clearLoreUsage: jest.fn(),
     ...overrides,
   } as LoreStore;
 }

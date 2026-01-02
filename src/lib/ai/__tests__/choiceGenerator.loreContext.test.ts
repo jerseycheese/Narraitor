@@ -112,10 +112,10 @@ rules: magic_rule = Magic requires concentration
     await choiceGenerator.generateChoices(params);
 
     // Verify lore context was requested for the correct world and session
-    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith(
-      'world-123',
-      'session-1'
-    );
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-1', {
+      recordUsage: true,
+      source: 'choices'
+    });
 
     // Verify the AI was called with enhanced prompt that includes lore
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
@@ -152,10 +152,10 @@ rules: magic_rule = Magic requires concentration
     const result = await choiceGenerator.generateChoices(params);
 
     expect(result.options).toHaveLength(3);
-    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith(
-      'world-123',
-      'session-1'
-    );
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-1', {
+      recordUsage: true,
+      source: 'choices'
+    });
   });
 
   it('should generate choices consistent with established lore', async () => {

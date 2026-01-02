@@ -15,15 +15,18 @@ jest.mock('@/state/loreStore', () => ({
 describe('loreContextHelper', () => {
   let mockGetLoreContext: jest.Mock;
   let mockGetFacts: jest.Mock;
+  let mockRecordLoreUsage: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetLoreContext = jest.fn();
     mockGetFacts = jest.fn();
+    mockRecordLoreUsage = jest.fn();
 
     (useLoreStore.getState as jest.Mock).mockReturnValue({
       getLoreContext: mockGetLoreContext,
-      getFacts: mockGetFacts
+      getFacts: mockGetFacts,
+      recordLoreUsage: mockRecordLoreUsage
     });
   });
 
@@ -89,6 +92,26 @@ rules: magic_rule = Magic requires sacrifice
       getLoreContextForPrompt('specific-world-id');
 
       expect(mockGetLoreContext).toHaveBeenCalledWith('specific-world-id', undefined);
+    });
+
+    it('records lore usage when enabled', () => {
+      mockGetLoreContext.mockReturnValue({
+        facts: ['characters: test = value'],
+        factCount: 1,
+        factIds: ['fact-1']
+      });
+
+      getLoreContextForPrompt('world-123', 'session-1', {
+        recordUsage: true,
+        source: 'narrative'
+      });
+
+      expect(mockRecordLoreUsage).toHaveBeenCalledWith({
+        worldId: 'world-123',
+        sessionId: 'session-1',
+        factIds: ['fact-1'],
+        source: 'narrative'
+      });
     });
   });
 });

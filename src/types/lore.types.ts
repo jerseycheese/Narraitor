@@ -16,6 +16,42 @@ export type LoreCategory = 'characters' | 'locations' | 'events' | 'rules';
 export type LoreSource = 'narrative' | 'manual';
 
 /**
+ * Where lore context was used
+ */
+export type LoreUsageSource = 'narrative' | 'choices' | 'lore-extraction' | 'unknown';
+
+/**
+ * What kind of usage event was recorded
+ */
+export type LoreUsageEventType = 'context' | 'mention';
+
+/**
+ * Lore usage event entry
+ */
+export interface LoreUsageEvent {
+  id: EntityID;
+  worldId: EntityID;
+  sessionId?: EntityID;
+  source: LoreUsageSource;
+  eventType: LoreUsageEventType;
+  factIds: EntityID[];
+  timestamp: string;
+  responseExcerpt?: string;
+}
+
+/**
+ * Aggregate usage stats for a lore fact
+ */
+export interface LoreUsageStats {
+  usageCount: number;
+  mentionCount: number;
+  lastUsedAt?: string;
+  lastMentionedAt?: string;
+  lastSource?: LoreUsageSource;
+  lastSessionId?: EntityID;
+}
+
+/**
  * Lore fact entry with rich structured data
  */
 export interface LoreFact extends TimestampedEntity {
@@ -53,6 +89,7 @@ export interface LoreSearchOptions {
 export interface LoreContext {
   facts: string[]; // Array of fact strings for prompt inclusion
   factCount: number;
+  factIds?: EntityID[];
 }
 
 /**
