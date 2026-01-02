@@ -68,7 +68,12 @@ export class ChoiceGenerator {
       
       const decision = this.parseChoiceResponse(response.content, narrativeContext, world);
 
-      checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
+      try {
+        checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break choice generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Ensure we have the minimum number of options
       if (decision.options.length < minOptions) {

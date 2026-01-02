@@ -655,6 +655,12 @@ export const useLoreStore = create<LoreStore>()(
         facts: state.facts,
         factHistory: state.factHistory,
         mergeAuditLog: state.mergeAuditLog,
+        // NOTE: loreUsage and loreUsageEvents are intentionally NOT persisted
+        // These are developer-only debug data that:
+        // - Only record in non-production environments
+        // - Reset on refresh for clean debugging sessions
+        // - Are limited to 200 events to prevent storage bloat
+        // - Would add unnecessary storage overhead for ephemeral debug data
       }),
       migrate: () => getInitialState(),
     }

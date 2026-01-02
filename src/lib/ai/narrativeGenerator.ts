@@ -991,7 +991,12 @@ Return ONLY the rewritten narrative.`;
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
-      checkAndRecordLoreMentions(request.worldId, request.sessionId, result.content ?? '', 'narrative');
+      try {
+        checkAndRecordLoreMentions(request.worldId, request.sessionId, result.content ?? '', 'narrative');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break narrative generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Capture debug info if enabled (dev mode only)
       if (isDebugInfoEnabled()) {
@@ -1172,7 +1177,12 @@ Return ONLY the rewritten narrative.`;
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
-      checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
+      try {
+        checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
+      } catch (error) {
+        // Non-critical: lore mention tracking is dev-only, don't break narrative generation
+        console.warn('Failed to record lore mentions:', error);
+      }
 
       // Process any acquired items from the initial scene
       if (

@@ -126,8 +126,9 @@ export const LoreManagementSection: React.FC = () => {
 
   const handleClearUsage = () => {
     if (!selectedWorldId) return;
-    if (window.confirm('Clear lore usage tracking for this world?')) {
+    if (window.confirm('Are you sure you want to clear all lore usage data for this world? This cannot be undone.')) {
       clearLoreUsage(selectedWorldId);
+      setMessage({ type: 'success', text: 'Lore usage data cleared successfully' });
     }
   };
 
