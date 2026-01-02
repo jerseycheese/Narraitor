@@ -30,7 +30,8 @@ jest.mock('../structuredLoreExtractor', () => ({
   extractStructuredLore: jest.fn()
 }));
 jest.mock('../loreContextHelper', () => ({
-  getLoreContextForPrompt: jest.fn().mockReturnValue('')
+  getLoreContextForPrompt: jest.fn().mockReturnValue(''),
+  checkAndRecordLoreMentions: jest.fn()
 }));
 
 import { NarrativeGenerator } from '../narrativeGenerator';
