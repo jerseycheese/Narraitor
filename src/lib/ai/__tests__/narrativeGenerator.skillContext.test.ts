@@ -26,6 +26,9 @@ jest.mock('@/state/loreStore', () => ({
     getState: jest.fn()
   }
 }));
+jest.mock('../structuredLoreExtractor', () => ({
+  extractStructuredLore: jest.fn()
+}));
 jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn().mockReturnValue('')
 }));
@@ -38,6 +41,7 @@ import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
+import { extractStructuredLore } from '../structuredLoreExtractor';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 describe('NarrativeGenerator - Skill Context Integration', () => {
@@ -80,6 +84,13 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
       recordLoreMentions: jest.fn(),
       recordLoreUsage: jest.fn(),
       addStructuredLore: jest.fn()
+    });
+
+    (extractStructuredLore as jest.Mock).mockResolvedValue({
+      characters: [],
+      locations: [],
+      events: [],
+      rules: []
     });
 
     mockAIClient = createMockAIClient();
