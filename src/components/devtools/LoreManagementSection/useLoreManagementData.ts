@@ -81,7 +81,7 @@ export function useLoreManagementData({
     }
 
     return filtered;
-  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, getFacts, searchFacts]);
+  }, [selectedWorldId, searchQuery, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts, searchFacts]);
 
   const usageFacts = useMemo(() => {
     if (!selectedWorldId) return [] as LoreFact[];
@@ -97,7 +97,7 @@ export function useLoreManagementData({
     }
 
     return filtered;
-  }, [selectedWorldId, categoryFilter, visibilityFilter, effectiveSessionId, getFacts]);
+  }, [selectedWorldId, categoryFilter, visibilityFilter, effectiveSessionId, allFacts, getFacts]);
 
   const usageRows = useMemo(() => {
     return usageFacts
@@ -175,7 +175,7 @@ export function useLoreManagementData({
         narrativeSessionPrivate: 0,
       }
     );
-  }, [selectedWorldId, getFacts]);
+  }, [selectedWorldId, allFacts, getFacts]);
 
   const factsByCategory = useMemo(() => {
     const grouped: Record<LoreCategory, LoreFact[]> = {
