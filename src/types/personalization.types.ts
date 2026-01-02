@@ -8,31 +8,60 @@ import { EntityID } from './common.types';
 /**
  * Character personality traits that influence narrative generation
  */
-export type PersonalityTrait = 
-  | 'brave' | 'cautious' | 'curious' | 'diplomatic' | 'direct'
-  | 'empathetic' | 'logical' | 'impulsive' | 'patient' | 'stubborn'
-  | 'optimistic' | 'pessimistic' | 'loyal' | 'independent' | 'ambitious';
+export type PersonalityTrait =
+  | 'brave'
+  | 'cautious'
+  | 'curious'
+  | 'diplomatic'
+  | 'direct'
+  | 'empathetic'
+  | 'logical'
+  | 'impulsive'
+  | 'patient'
+  | 'stubborn'
+  | 'optimistic'
+  | 'pessimistic'
+  | 'loyal'
+  | 'independent'
+  | 'ambitious';
 
 /**
  * Types of relationships between characters
  */
-export type RelationshipType = 
-  | 'ally' | 'rival' | 'mentor' | 'enemy' | 'neutral'
-  | 'friend' | 'family' | 'romantic' | 'professional';
+export type RelationshipType =
+  | 'ally'
+  | 'rival'
+  | 'mentor'
+  | 'enemy'
+  | 'neutral'
+  | 'friend'
+  | 'family'
+  | 'romantic'
+  | 'professional';
 
 /**
  * Player narrative style preferences
  */
-export type NarrativeStylePreference = 
-  | 'action-focused' | 'character-driven' | 'exploration' 
-  | 'dialogue-heavy' | 'mystery' | 'strategic';
+export type NarrativeStylePreference =
+  | 'action-focused'
+  | 'character-driven'
+  | 'exploration'
+  | 'dialogue-heavy'
+  | 'mystery'
+  | 'strategic';
 
 /**
  * Types of choices players tend to prefer
  */
-export type ChoiceTypePreference = 
-  | 'diplomatic' | 'aggressive' | 'stealthy' | 'helpful'
-  | 'selfish' | 'lawful' | 'chaotic' | 'neutral';
+export type ChoiceTypePreference =
+  | 'diplomatic'
+  | 'aggressive'
+  | 'stealthy'
+  | 'helpful'
+  | 'selfish'
+  | 'lawful'
+  | 'chaotic'
+  | 'neutral';
 
 /**
  * Relationship between the player character and NPCs
@@ -131,9 +160,19 @@ export interface PersonalizedNarrativeContext {
     /** Recent decisions that inform characterization */
     recentDecisions: PlayerDecision[];
     /** Character attributes for narrative personalization */
-    attributes?: Record<string, number> | Array<{ attributeId: string; value: number }>;
+    attributes?:
+      | Record<string, number>
+      | Array<{ attributeId: string; value: number }>;
     /** Character skills for narrative personalization */
-    skills?: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+    skills?:
+      | Array<{ name: string; level: number; worldSkillId?: string }>
+      | Array<{ skillId: string; level: number }>;
+    /** Derived stats calculated from attributes */
+    derivedStats?: Array<{
+      name: string;
+      currentValue: number;
+      maxValue: number;
+    }>;
   };
   /** Player preferences and patterns */
   playerPreferences: PlayerPreferences;

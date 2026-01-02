@@ -15,9 +15,9 @@ jest.mock('../../promptTemplates/narrativeTemplateManager');
 jest.mock('@/state/inventoryStore', () => ({
   useInventoryStore: {
     getState: jest.fn().mockReturnValue({
-      getCharacterItems: () => []
-    })
-  }
+      getCharacterItems: () => [],
+    }),
+  },
 }));
 
 const mockWorld = {
@@ -27,41 +27,49 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
+  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
     attributePointPool: 27,
-    skillPointPool: 20
+    skillPointPool: 20,
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01',
   toneSettings: {
     contentRating: 'PG-13' as const,
     narrativeStyle: 'action-packed' as const,
-    languageComplexity: 'moderate' as const
-  }
+    languageComplexity: 'moderate' as const,
+  },
 };
 
 describe('ChoiceGenerator lore context integration', () => {
   let choiceGenerator: ChoiceGenerator;
   let mockAIClient: { generateContent: jest.Mock };
-  let mockGetLoreContextForPrompt: jest.MockedFunction<typeof getLoreContextForPrompt>;
+  let mockGetLoreContextForPrompt: jest.MockedFunction<
+    typeof getLoreContextForPrompt
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockAIClient = {
-      generateContent: jest.fn()
+      generateContent: jest.fn(),
     };
 
     choiceGenerator = new ChoiceGenerator(mockAIClient);
 
     // Setup mocks
-    mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
-    
-    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
-      worlds: { 'world-123': mockWorld }
-    }));
+    mockGetLoreContextForPrompt =
+      getLoreContextForPrompt as jest.MockedFunction<
+        typeof getLoreContextForPrompt
+      >;
+
+    (useWorldStore.getState as jest.Mock).mockReturnValue(
+      createMockWorldStore({
+        worlds: { 'world-123': mockWorld },
+      })
+    );
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base prompt template')
@@ -81,7 +89,8 @@ rules: magic_rule = Magic requires concentration
 
     // Mock AI response
     mockAIClient.generateContent.mockResolvedValue({
-      content: 'What will you do?\n\n1. Use magic to illuminate the path\n2. Search for tracks\n3. Call out for Sir Gareth'
+      content:
+        'What will you do?\n\n1. Use magic to illuminate the path\n2. Search for tracks\n3. Call out for Sir Gareth',
     });
 
     const params = {
@@ -95,9 +104,9 @@ rules: magic_rule = Magic requires concentration
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Ancient Forest',
-        recentSegments: []
+        recentSegments: [],
       },
-      characterIds: ['char-1']
+      characterIds: ['char-1'],
     };
 
     await choiceGenerator.generateChoices(params);
@@ -121,7 +130,7 @@ rules: magic_rule = Magic requires concentration
     mockGetLoreContextForPrompt.mockReturnValue('');
 
     mockAIClient.generateContent.mockResolvedValue({
-      content: 'What will you do?\n\n1. Look around\n2. Move forward\n3. Wait'
+      content: 'What will you do?\n\n1. Look around\n2. Move forward\n3. Wait',
     });
 
     const params = {
@@ -135,9 +144,9 @@ rules: magic_rule = Magic requires concentration
         currentTags: [],
         sessionId: 'session-1',
         currentLocation: 'Empty Room',
-        recentSegments: []
+        recentSegments: [],
       },
-      characterIds: ['char-1']
+      characterIds: ['char-1'],
     };
 
     const result = await choiceGenerator.generateChoices(params);
@@ -165,7 +174,7 @@ rules: travel_rule = The marshlands cannot be crossed at night
 
 1. Ask Lady Elara for guidance about the marshlands
 2. Wait until morning to cross the Cursed Marshlands
-3. Find an alternative route around the forbidden zone`
+3. Find an alternative route around the forbidden zone`,
     });
 
     const params = {
@@ -179,9 +188,9 @@ rules: travel_rule = The marshlands cannot be crossed at night
         sessionId: 'session-1',
         currentLocation: 'Edge of Cursed Marshlands',
         currentSituation: 'Approaching dangerous territory at dusk',
-        recentSegments: []
+        recentSegments: [],
       },
-      characterIds: ['char-1']
+      characterIds: ['char-1'],
     };
 
     const result = await choiceGenerator.generateChoices(params);
@@ -201,7 +210,8 @@ rules: combat_rule = Magic users become exhausted after casting spells
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
     mockAIClient.generateContent.mockResolvedValue({
-      content: 'What will you do?\n\n1. Rest to recover from spell exhaustion\n2. Proceed carefully\n3. Look for help'
+      content:
+        'What will you do?\n\n1. Rest to recover from spell exhaustion\n2. Proceed carefully\n3. Look for help',
     });
 
     const params = {
@@ -214,9 +224,9 @@ rules: combat_rule = Magic users become exhausted after casting spells
         currentTags: [],
         sessionId: 'session-1',
         currentSituation: 'Just finished casting a powerful spell',
-        recentSegments: []
+        recentSegments: [],
       },
-      characterIds: ['char-1']
+      characterIds: ['char-1'],
     };
 
     await choiceGenerator.generateChoices(params);
@@ -225,6 +235,8 @@ rules: combat_rule = Magic users become exhausted after casting spells
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
     expect(capturedPrompt).toContain('Base prompt template');
     expect(capturedPrompt).toContain('Established World Facts:');
-    expect(capturedPrompt).toContain('combat_rule = Magic users become exhausted');
+    expect(capturedPrompt).toContain(
+      'combat_rule = Magic users become exhausted'
+    );
   });
 });

@@ -154,7 +154,7 @@ describe('Lore Extraction Hardening Logic', () => {
         context: {
           addFact: jest.fn((key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, _sessionId: EntityID | undefined, metadata: LoreFact['metadata'], _visibility?: 'session-private' | 'world-shared') => {
             const factId = `fact-${addedFacts.length}` as EntityID;
-            addedFacts.push({ id: factId, worldId, category, key, value, aliases: [], source, visibility: 'world-shared', metadata, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            addedFacts.push({ id: factId, worldId, category, key, value, aliases: [], source, visibility: _visibility ?? 'world-shared', metadata, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
             return factId;
           }),
           setAliases: jest.fn(),

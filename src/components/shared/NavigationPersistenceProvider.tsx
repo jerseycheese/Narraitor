@@ -1,13 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Logger from '@/lib/utils/logger';
-
-/**
- * Create logger instance for this component
- */
-const logger = new Logger('NavigationPersistenceProvider');
-
 interface NavigationPersistenceProviderProps {
   children: React.ReactNode;
 }

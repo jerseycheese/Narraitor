@@ -79,6 +79,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
@@ -97,7 +98,10 @@ describe('ItemImageService', () => {
         },
       });
 
-      const result = await itemImageService.generateForItem(itemId, characterId);
+      const result = await itemImageService.generateForItem(
+        itemId,
+        characterId
+      );
 
       expect(result).toEqual(mockImage);
       expect(global.fetch).toHaveBeenCalledWith(
@@ -114,7 +118,6 @@ describe('ItemImageService', () => {
     });
 
     test('uses cache to prevent duplicate requests', async () => {
-
       const worldId = useWorldStore.getState().create({
         name: 'Test World',
         genre: 'fantasy',
@@ -157,6 +160,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
@@ -213,7 +217,6 @@ describe('ItemImageService', () => {
     });
 
     test('removes from cache on error', async () => {
-
       const worldId = useWorldStore.getState().create({
         name: 'Test World',
         genre: 'fantasy',
@@ -256,6 +259,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       const itemId = useInventoryStore.getState().addItem(characterId, {
@@ -298,7 +302,6 @@ describe('ItemImageService', () => {
 
   describe('bootstrapItemImages', () => {
     test('generates images for all items without images in character inventory', async () => {
-
       const worldId = useWorldStore.getState().create({
         name: 'Test World',
         genre: 'fantasy',
@@ -341,6 +344,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       // Add 3 items without images
@@ -381,7 +385,6 @@ describe('ItemImageService', () => {
     });
 
     test('skips items that already have images', async () => {
-
       const worldId = useWorldStore.getState().create({
         name: 'Test World',
         genre: 'fantasy',
@@ -424,6 +427,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       // Add item WITH image
@@ -450,7 +454,6 @@ describe('ItemImageService', () => {
     });
 
     test('continues on individual item failures', async () => {
-
       const worldId = useWorldStore.getState().create({
         name: 'Test World',
         genre: 'fantasy',
@@ -493,6 +496,7 @@ describe('ItemImageService', () => {
         },
         attributes: [],
         skills: [],
+        derivedStats: [],
       });
 
       // Add 2 items

@@ -7,7 +7,10 @@ import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
-import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
+import {
+  createMockWorldStore,
+  createMockCharacterStore,
+} from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -22,45 +25,55 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
+  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
     attributePointPool: 27,
-    skillPointPool: 20
+    skillPointPool: 20,
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01',
   toneSettings: {
     contentRating: 'PG' as const,
     narrativeStyle: 'epic' as const,
-    languageComplexity: 'moderate' as const
-  }
+    languageComplexity: 'moderate' as const,
+  },
 };
 
 describe('NarrativeGenerator lore context integration', () => {
   let narrativeGenerator: NarrativeGenerator;
   let mockAIClient: { generateContent: jest.Mock };
-  let mockGetLoreContextForPrompt: jest.MockedFunction<typeof getLoreContextForPrompt>;
+  let mockGetLoreContextForPrompt: jest.MockedFunction<
+    typeof getLoreContextForPrompt
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockAIClient = {
-      generateContent: jest.fn()
+      generateContent: jest.fn(),
     };
 
     narrativeGenerator = new NarrativeGenerator(mockAIClient);
 
     // Setup mocks
-    mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
-    
-    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
-      worlds: { 'world-123': mockWorld }
-    }));
+    mockGetLoreContextForPrompt =
+      getLoreContextForPrompt as jest.MockedFunction<
+        typeof getLoreContextForPrompt
+      >;
 
-    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
-      characters: {}
-    }));
+    (useWorldStore.getState as jest.Mock).mockReturnValue(
+      createMockWorldStore({
+        worlds: { 'world-123': mockWorld },
+      })
+    );
+
+    (useCharacterStore.getState as jest.Mock).mockReturnValue(
+      createMockCharacterStore({
+        characters: {},
+      })
+    );
 
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
@@ -81,10 +94,12 @@ rules: world_rule = Elven magic protects this realm
     // Provide responses for both initial generation and potential complexity rewrite
     mockAIClient.generateContent
       .mockResolvedValueOnce({
-        content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
+        content:
+          'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...',
       })
       .mockResolvedValueOnce({
-        content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
+        content:
+          'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...',
       });
 
     const request = {
@@ -93,8 +108,8 @@ rules: world_rule = Elven magic protects this realm
       characterIds: ['char-1'],
       generationParameters: {
         segmentType: 'scene' as const,
-        desiredLength: 'medium' as const
-      }
+        desiredLength: 'medium' as const,
+      },
     };
 
     await narrativeGenerator.generateSegment(request);
@@ -110,7 +125,9 @@ rules: world_rule = Elven magic protects this realm
     expect(capturedPrompt).toContain('Established World Facts:');
     expect(capturedPrompt).toContain('characters: mentor = Gandalf the Wise');
     expect(capturedPrompt).toContain('locations: current_location = Rivendell');
-    expect(capturedPrompt).toContain('rules: world_rule = Elven magic protects this realm');
+    expect(capturedPrompt).toContain(
+      'rules: world_rule = Elven magic protects this realm'
+    );
   });
 
   it('should include lore context in initial scene generation', async () => {
@@ -126,10 +143,12 @@ rules: journey_rule = Every hero must start their journey at dawn
     // Provide responses for both initial generation and potential complexity rewrite
     mockAIClient.generateContent
       .mockResolvedValueOnce({
-        content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
+        content:
+          'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...',
       })
       .mockResolvedValueOnce({
-        content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
+        content:
+          'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...',
       });
 
     await narrativeGenerator.generateInitialScene('world-123', ['char-1']);
@@ -151,10 +170,10 @@ rules: journey_rule = Every hero must start their journey at dawn
     // Provide responses for both initial generation and potential complexity rewrite
     mockAIClient.generateContent
       .mockResolvedValueOnce({
-        content: 'A new adventure begins in an unexplored realm...'
+        content: 'A new adventure begins in an unexplored realm...',
       })
       .mockResolvedValueOnce({
-        content: 'A new adventure begins in an unexplored realm...'
+        content: 'A new adventure begins in an unexplored realm...',
       });
 
     const request = {
@@ -163,8 +182,8 @@ rules: journey_rule = Every hero must start their journey at dawn
       characterIds: ['char-1'],
       generationParameters: {
         segmentType: 'scene' as const,
-        desiredLength: 'short' as const
-      }
+        desiredLength: 'short' as const,
+      },
     };
 
     const result = await narrativeGenerator.generateSegment(request);
@@ -192,10 +211,10 @@ events: prophecy = The chosen one will bring balance
     // Provide responses for both initial generation and potential complexity rewrite
     mockAIClient.generateContent
       .mockResolvedValueOnce({
-        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
+        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`,
       })
       .mockResolvedValueOnce({
-        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
+        content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`,
       });
 
     const request = {
@@ -211,12 +230,12 @@ events: prophecy = The chosen one will bring balance
         sessionId: 'session-789',
         currentLocation: 'Tower of Shadows',
         currentSituation: 'Final confrontation with the Shadow King',
-        recentSegments: []
+        recentSegments: [],
       },
       generationParameters: {
         segmentType: 'action' as const,
-        desiredLength: 'medium' as const
-      }
+        desiredLength: 'medium' as const,
+      },
     };
 
     const result = await narrativeGenerator.generateSegment(request);
@@ -242,10 +261,10 @@ events: ritual = Monthly blessing ceremony
     // Provide responses for both initial generation and potential complexity rewrite
     mockAIClient.generateContent
       .mockResolvedValueOnce({
-        content: 'The narrative continues...'
+        content: 'The narrative continues...',
       })
       .mockResolvedValueOnce({
-        content: 'The narrative continues...'
+        content: 'The narrative continues...',
       });
 
     const request = {
@@ -253,18 +272,18 @@ events: ritual = Monthly blessing ceremony
       sessionId: 'session-1',
       characterIds: ['char-1'],
       generationParameters: {
-        segmentType: 'scene' as const
-      }
+        segmentType: 'scene' as const,
+      },
     };
 
     await narrativeGenerator.generateSegment(request);
 
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
-    
+
     // Verify lore context appears after base template but before other enhancements
     const baseTemplateIndex = capturedPrompt.indexOf('Base narrative template');
     const loreContextIndex = capturedPrompt.indexOf('Established World Facts:');
-    
+
     expect(baseTemplateIndex).toBeLessThan(loreContextIndex);
     expect(loreContextIndex).toBeGreaterThan(-1);
   });

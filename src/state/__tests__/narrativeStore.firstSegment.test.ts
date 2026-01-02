@@ -3,7 +3,6 @@ import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
 import { useCharacterStore } from '../characterStore';
 import { createTestCharacterData } from './characterStore.testHelpers';
-
 const resetSessionStore = () => {
   useSessionStore.setState(() => ({
     id: null,
@@ -27,11 +26,9 @@ const resetSessionStore = () => {
     narrativeHeight: 600,
   }));
 };
-
 describe('First segment checkpoint creation', () => {
   // Increase timeout for these async tests
   jest.setTimeout(30000);
-
   beforeEach(() => {
     // Don't use fake timers - these tests need real async behavior for fetch
     jest.useRealTimers();
@@ -39,11 +36,9 @@ describe('First segment checkpoint creation', () => {
     useWorldStore.getState().reset();
     useNarrativeStore.getState().reset();
     resetSessionStore();
-
     // Mock fetch for validation API
     global.fetch = jest.fn();
   });
-
   afterEach(() => {
     jest.useRealTimers();
     useNarrativeStore.getState().reset();
@@ -51,7 +46,6 @@ describe('First segment checkpoint creation', () => {
     resetSessionStore();
     jest.restoreAllMocks();
   });
-
   it('creates checkpoint for first segment even without AI majorEvent', async () => {
     const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
@@ -66,14 +60,11 @@ describe('First segment checkpoint creation', () => {
         skillPointPool: 10,
       },
     });
-
     const sessionId = 'session-first-test';
-
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
-
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -81,13 +72,12 @@ describe('First segment checkpoint creation', () => {
       status: 'active',
       lastActivity: new Date().toISOString(),
     });
-
     const segmentTimestamp = new Date();
-
     // Add first segment WITHOUT majorEvent in metadata
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
-      content: 'You find yourself in a bustling tavern. The smell of ale and roasted meat fills the air.',
+      content:
+        'You find yourself in a bustling tavern. The smell of ale and roasted meat fills the air.',
       type: 'scene',
       metadata: {
         tags: ['intro'],
@@ -98,19 +88,17 @@ describe('First segment checkpoint creation', () => {
       timestamp: segmentTimestamp,
       updatedAt: segmentTimestamp.toISOString(),
     });
-
     // Allow async operations to complete (needs time for dynamic imports + async processing)
-    await new Promise(resolve => setTimeout(resolve, 500));
-
+    await new Promise((resolve) => setTimeout(resolve, 500));
     // Verify a major event was created in world state
     const worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(1);
-    expect(worldState?.majorEvents?.[0]?.description).toBe('Story begins at The Prancing Pony Tavern');
-
+    expect(worldState?.majorEvents?.[0]?.description).toBe(
+      'Story begins at The Prancing Pony Tavern'
+    );
     // Verify validation API was NOT called for first segment
     expect(global.fetch).not.toHaveBeenCalled();
   });
-
   it('uses AI majorEvent for first segment if provided', async () => {
     const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
@@ -125,14 +113,11 @@ describe('First segment checkpoint creation', () => {
         skillPointPool: 10,
       },
     });
-
     const sessionId = 'session-ai-event';
-
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
-
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -140,10 +125,8 @@ describe('First segment checkpoint creation', () => {
       status: 'active',
       lastActivity: new Date().toISOString(),
     });
-
     const segmentTimestamp = new Date();
     const aiMajorEvent = 'Your ship crashes on an uncharted planet';
-
     // Add first segment WITH AI-provided majorEvent
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
@@ -158,18 +141,14 @@ describe('First segment checkpoint creation', () => {
       timestamp: segmentTimestamp,
       updatedAt: segmentTimestamp.toISOString(),
     });
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+    await new Promise((resolve) => setTimeout(resolve, 100));
     // Verify AI's major event was used
     const worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(1);
     expect(worldState?.majorEvents?.[0]?.description).toBe(aiMajorEvent);
-
     // Verify validation API was NOT called for first segment
     expect(global.fetch).not.toHaveBeenCalled();
   });
-
   it('validates subsequent segments normally', async () => {
     const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
@@ -184,14 +163,11 @@ describe('First segment checkpoint creation', () => {
         skillPointPool: 10,
       },
     });
-
     const sessionId = 'session-validation';
-
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
-
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -199,9 +175,7 @@ describe('First segment checkpoint creation', () => {
       status: 'active',
       lastActivity: new Date().toISOString(),
     });
-
     const segmentTimestamp = new Date();
-
     // Add first segment (checkpoint created, no validation)
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
@@ -215,14 +189,11 @@ describe('First segment checkpoint creation', () => {
       timestamp: segmentTimestamp,
       updatedAt: segmentTimestamp.toISOString(),
     });
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+    await new Promise((resolve) => setTimeout(resolve, 100));
     // Verify first segment created event WITHOUT validation
     expect(global.fetch).not.toHaveBeenCalled();
     const worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(1);
-
     // Mock validation API to reject trivial event
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -231,7 +202,6 @@ describe('First segment checkpoint creation', () => {
         reason: 'This is a trivial movement event',
       }),
     });
-
     // Add second segment with trivial majorEvent
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
@@ -246,9 +216,7 @@ describe('First segment checkpoint creation', () => {
       timestamp: new Date(),
       updatedAt: new Date().toISOString(),
     });
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+    await new Promise((resolve) => setTimeout(resolve, 100));
     // Verify validation API WAS called for second segment
     expect(global.fetch).toHaveBeenCalledWith(
       '/api/narrative/validate-event-significance',
@@ -256,12 +224,10 @@ describe('First segment checkpoint creation', () => {
         method: 'POST',
       })
     );
-
     // Verify trivial event was filtered out (still only 1 major event)
     const updatedWorldState = useWorldStore.getState().worldStates[worldId];
     expect(updatedWorldState?.majorEvents).toHaveLength(1);
   });
-
   it('creates default opening event when no location provided', async () => {
     const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
@@ -276,14 +242,11 @@ describe('First segment checkpoint creation', () => {
         skillPointPool: 10,
       },
     });
-
     const sessionId = 'session-no-location';
-
     // Create character in store
-    const characterId = useCharacterStore.getState().createCharacter(
-      createTestCharacterData({ worldId })
-    );
-
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
     useSessionStore.getState().upsertSessionLifecycle({
       id: sessionId,
       worldId,
@@ -291,7 +254,6 @@ describe('First segment checkpoint creation', () => {
       status: 'active',
       lastActivity: new Date().toISOString(),
     });
-
     // Add first segment without location or majorEvent
     await useNarrativeStore.getState().addSegment(sessionId, {
       worldId,
@@ -305,12 +267,12 @@ describe('First segment checkpoint creation', () => {
       timestamp: new Date(),
       updatedAt: new Date().toISOString(),
     });
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+    await new Promise((resolve) => setTimeout(resolve, 100));
     // Verify default opening event was created
     const worldState = useWorldStore.getState().worldStates[worldId];
     expect(worldState?.majorEvents).toHaveLength(1);
-    expect(worldState?.majorEvents?.[0]?.description).toBe('Your adventure begins');
+    expect(worldState?.majorEvents?.[0]?.description).toBe(
+      'Your adventure begins'
+    );
   });
 });

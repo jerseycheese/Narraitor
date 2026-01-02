@@ -20,7 +20,7 @@ export default function CharacterCreatePage() {
   const { initializeSession } = useSessionStore();
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
-  
+
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
@@ -32,12 +32,12 @@ export default function CharacterCreatePage() {
       setCurrentWorld(worldIdFromUrl);
     }
   }, [worldIdFromUrl, currentWorldId, setCurrentWorld]);
-  
+
   // Mark mounted to make initial render independent of client-only store hydration
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   // Note: Auto-save data clearing is now handled by the CharacterCreationWizard
   // to allow for recovery dialog functionality
 
@@ -48,22 +48,28 @@ export default function CharacterCreatePage() {
           <h1 className="text-3xl font-bold mb-8">Create Character</h1>
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="w-20 h-20 bg-amber-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <AlertTriangle className="w-10 h-10 text-amber-500" aria-hidden="true" />
+              <AlertTriangle
+                className="w-10 h-10 text-amber-500"
+                aria-hidden="true"
+              />
             </div>
             <h2 className="text-xl font-semibold mb-2">World Required</h2>
             <p className="text-gray-700 mb-2">
               Characters are created within specific worlds.
             </p>
             <p className="text-gray-500 text-sm mb-6">
-              Each world defines unique attributes, skills, and rules that shape your characters.
+              Each world defines unique attributes, skills, and rules that shape
+              your characters.
             </p>
             <ActionButtonGroup
-              actions={[{
-                label: 'Select a World First',
-                onClick: () => router.push('/worlds'),
-                variant: 'primary',
-                size: 'lg'
-              }]}
+              actions={[
+                {
+                  label: 'Select a World First',
+                  onClick: () => router.push('/worlds'),
+                  variant: 'primary',
+                  size: 'lg',
+                },
+              ]}
               className="justify-center"
             />
           </div>
@@ -86,23 +92,24 @@ export default function CharacterCreatePage() {
         worldId: currentWorld.id,
         level: archetype.level,
         isPlayer: true,
-        attributes: archetype.attributes.map(attr => ({
+        attributes: archetype.attributes.map((attr) => ({
           id: `attr-${Date.now()}-${Math.random()}`,
           characterId: '', // Will be set by store
           worldAttributeId: attr.id,
           name: attr.name,
           baseValue: attr.value,
           modifiedValue: attr.value,
-          category: 'Generated'
+          category: 'Generated',
         })),
-        skills: archetype.skills.map(skill => ({
+        skills: archetype.skills.map((skill) => ({
           id: `skill-${Date.now()}-${Math.random()}`,
           characterId: '', // Will be set by store
           worldSkillId: skill.id,
           name: skill.name,
           level: skill.level,
-          category: 'Generated'
+          category: 'Generated',
         })),
+        derivedStats: [],
         background: {
           history: archetype.background.description,
           personality: archetype.background.personality,
@@ -110,21 +117,21 @@ export default function CharacterCreatePage() {
           fears: archetype.background.fears,
           physicalDescription: archetype.background.physicalDescription,
           relationships: [],
-          isKnownFigure: false
+          isKnownFigure: false,
         },
         status: {
           health: 100,
           maxHealth: 100,
           conditions: [],
-          location: currentWorld.name
+          location: currentWorld.name,
         },
         inventory: {
           characterId: '', // Will be set by store
           items: [],
           capacity: 10,
           categories: [],
-          itemOrder: []
-        }
+          itemOrder: [],
+        },
       };
 
       // Create the character
@@ -151,7 +158,8 @@ export default function CharacterCreatePage() {
   };
 
   // Determine which branch to show on initial render in a hydration-safe way
-  const shouldShowQuickStart = showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
+  const shouldShowQuickStart =
+    showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -176,7 +184,9 @@ export default function CharacterCreatePage() {
                   onCustomizeClick={handleCustomizeClick}
                 />
               ) : (
-                <div className="text-center py-12 text-gray-500">Preparing quick start options...</div>
+                <div className="text-center py-12 text-gray-500">
+                  Preparing quick start options...
+                </div>
               )}
             </div>
           </>
@@ -184,13 +194,15 @@ export default function CharacterCreatePage() {
           <>
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Create Custom Character</h1>
+                <h1 className="text-3xl font-bold mb-2">
+                  Create Custom Character
+                </h1>
                 <p className="text-gray-700">
                   Build your character from scratch with full customization
                 </p>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleBackToQuickStart}
                 className="flex items-center gap-2"
               >
@@ -198,10 +210,10 @@ export default function CharacterCreatePage() {
               </Button>
             </div>
             <div className="bg-white rounded-lg shadow p-8">
-              <CharacterCreationWizard 
-                key={`new-character-${effectiveWorldId}`} 
-                worldId={effectiveWorldId} 
-                initialStep={0} 
+              <CharacterCreationWizard
+                key={`new-character-${effectiveWorldId}`}
+                worldId={effectiveWorldId}
+                initialStep={0}
               />
             </div>
           </>

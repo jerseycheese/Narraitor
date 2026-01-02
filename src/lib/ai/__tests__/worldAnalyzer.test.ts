@@ -21,11 +21,30 @@ describe('worldAnalyzer', () => {
     const mockResponse = {
       content: JSON.stringify({
         attributes: [
-          { name: 'Magic', description: 'Control over supernatural forces', minValue: 1, maxValue: 10, category: 'Supernatural' },
-          { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
-          { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
+          {
+            name: 'Magic',
+            description: 'Control over supernatural forces',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Supernatural',
+          },
+          {
+            name: 'Medieval',
+            description: 'Reflects the technological and social level',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Setting',
+          },
+          {
+            name: 'Dragons',
+            description: 'Presence and influence of dragons',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Creatures',
+          },
         ],
         skills: [],
+        derivedStats: [],
       }),
     };
 
@@ -46,9 +65,27 @@ describe('worldAnalyzer', () => {
     const mockResponse = {
       content: JSON.stringify({
         attributes: [
-          { name: 'Magic', description: 'Control over supernatural forces', minValue: 1, maxValue: 10, category: 'Supernatural' },
-          { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
-          { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
+          {
+            name: 'Magic',
+            description: 'Control over supernatural forces',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Supernatural',
+          },
+          {
+            name: 'Medieval',
+            description: 'Reflects the technological and social level',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Setting',
+          },
+          {
+            name: 'Dragons',
+            description: 'Presence and influence of dragons',
+            minValue: 1,
+            maxValue: 10,
+            category: 'Creatures',
+          },
         ],
         skills: [
           {
@@ -68,48 +105,55 @@ describe('worldAnalyzer', () => {
 
     // Test should expect what the mock is returning
     expect(result.attributes).toHaveLength(3);
-    
+
     // Use a more flexible approach for testing - expect.objectContaining ensures we match
     // the important fields without being strict about additional calculated fields
-    expect(result.attributes[0]).toEqual(expect.objectContaining({
-      name: 'Magic',
-      description: 'Control over supernatural forces',
-      minValue: 1,
-      maxValue: 10,
-      category: 'Supernatural',
-      accepted: true,
-    }));
-    expect(result.attributes[1]).toEqual(expect.objectContaining({
-      name: 'Medieval',
-      description: 'Reflects the technological and social level',
-      minValue: 1,
-      maxValue: 10,
-      category: 'Setting',
-      accepted: true,
-    }));
-    expect(result.attributes[2]).toEqual(expect.objectContaining({
-      name: 'Dragons',
-      description: 'Presence and influence of dragons',
-      minValue: 1,
-      maxValue: 10,
-      category: 'Creatures',
-      accepted: true,
-    }));
+    expect(result.attributes[0]).toEqual(
+      expect.objectContaining({
+        name: 'Magic',
+        description: 'Control over supernatural forces',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Supernatural',
+        accepted: true,
+      })
+    );
+    expect(result.attributes[1]).toEqual(
+      expect.objectContaining({
+        name: 'Medieval',
+        description: 'Reflects the technological and social level',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Setting',
+        accepted: true,
+      })
+    );
+    expect(result.attributes[2]).toEqual(
+      expect.objectContaining({
+        name: 'Dragons',
+        description: 'Presence and influence of dragons',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Creatures',
+        accepted: true,
+      })
+    );
 
     expect(result.skills).toHaveLength(1);
-    expect(result.skills[0]).toEqual(expect.objectContaining({
-      name: 'Swordsmanship',
-      description: 'Skill with bladed weapons',
-      difficulty: 'medium',
-      category: 'Combat',
-      linkedAttributeNames: ['Strength'],
-      accepted: true,
-      baseValue: 5,
-      minValue: 1,
-      maxValue: 10,
-    }));
+    expect(result.skills[0]).toEqual(
+      expect.objectContaining({
+        name: 'Swordsmanship',
+        description: 'Skill with bladed weapons',
+        difficulty: 'medium',
+        category: 'Combat',
+        linkedAttributeNames: ['Strength'],
+        accepted: true,
+        baseValue: 5,
+        minValue: 1,
+        maxValue: 10,
+      })
+    );
   });
-
 
   test('returns default suggestions on AI failure', async () => {
     mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));

@@ -1,6 +1,11 @@
 // src/types/character.types.ts
 
-import { EntityID, GeneratedImage, NamedEntity, TimestampedEntity } from './common.types';
+import {
+  EntityID,
+  GeneratedImage,
+  NamedEntity,
+  TimestampedEntity,
+} from './common.types';
 import { Inventory } from './inventory.types';
 
 /**
@@ -10,6 +15,7 @@ export interface Character extends NamedEntity, TimestampedEntity {
   worldId: EntityID;
   attributes: CharacterAttribute[];
   skills: CharacterSkill[];
+  derivedStats: DerivedStat[];
   background: CharacterBackground;
   inventory: Inventory;
   status: CharacterStatus;
@@ -35,6 +41,19 @@ export interface CharacterSkill {
 }
 
 /**
+ * Represents a derived stat calculated from character attributes
+ */
+export interface DerivedStat {
+  id: EntityID;
+  characterId: EntityID;
+  derivedStatId: EntityID; // References formula ID in world settings
+  name: string;
+  currentValue: number; // Current amount (changes during gameplay)
+  maxValue: number; // Calculated maximum from formula
+  lastCalculated: string; // Timestamp
+}
+
+/**
  * Character background information
  */
 export interface CharacterBackground {
@@ -45,7 +64,12 @@ export interface CharacterBackground {
   fears: string[];
   relationships: CharacterRelationship[];
   isKnownFigure?: boolean; // Whether this is a real or fictional known figure
-  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
+  knownFigureType?:
+    | 'historical'
+    | 'fictional'
+    | 'celebrity'
+    | 'mythological'
+    | 'other';
 }
 
 /**

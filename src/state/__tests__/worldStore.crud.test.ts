@@ -4,7 +4,6 @@
  */
 
 import { useWorldStore } from '../worldStore';
-import { ErrorType } from '@/lib/utils/errorUtils';
 import { createTestWorldData } from './worldStore.testHelpers';
 
 describe('useWorldStore - CRUD Operations', () => {

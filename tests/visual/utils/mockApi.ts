@@ -18,7 +18,9 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
 
   // Mock narrative generation endpoint
   await page.route('**/api/narrative/generate', async (route) => {
-    console.log('🚫 Intercepted narrative generation API call - using mock data');
+    console.log(
+      '🚫 Intercepted narrative generation API call - using mock data'
+    );
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -40,7 +42,9 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
 
   // Mock choice generation endpoint
   await page.route('**/api/narrative/choices', async (route) => {
-    console.log('🚫 Intercepted narrative choices API call - using mock choices');
+    console.log(
+      '🚫 Intercepted narrative choices API call - using mock choices'
+    );
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -81,6 +85,7 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
         description: 'A test world generated for visual testing',
         attributes: [],
         skills: [],
+        derivedStats: [],
         settings: {
           toneSettings: {
             complexity: 'medium',
@@ -120,7 +125,8 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
           {
             name: 'Cyberpunk Dystopia',
             genre: 'cyberpunk',
-            description: 'A gritty future where technology and humanity collide',
+            description:
+              'A gritty future where technology and humanity collide',
           },
           {
             name: 'Epic Fantasy Realm',
@@ -155,7 +161,8 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=',
+        imageUrl:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=',
       }),
     });
   });

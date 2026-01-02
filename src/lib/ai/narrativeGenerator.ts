@@ -19,7 +19,10 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
-import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
+import {
+  DEFAULT_TONE_SETTINGS,
+  ToneSettings,
+} from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
@@ -37,12 +40,30 @@ import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { NPC } from '@/types/npc.types';
 import { PlayerDecision } from '@/types/personalization.types';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
-import { evaluateLanguageComplexity, buildLanguageComplexityReminder } from '@/lib/utils/languageComplexity';
+import {
+  evaluateLanguageComplexity,
+  buildLanguageComplexityReminder,
+} from '@/lib/utils/languageComplexity';
 import { logger } from '@/lib/utils/logger';
-import { summarizeThreadHighlight, describeCharacterRelationship } from '@/lib/utils/worldStateFormatters';
-import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
-import { TokenBudgetManager, DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, type RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
-import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
+import {
+  summarizeThreadHighlight,
+  describeCharacterRelationship,
+} from '@/lib/utils/worldStateFormatters';
+import {
+  buildPromptDebugInfo,
+  isDebugInfoEnabled,
+  type DebugInfoContext,
+} from './debugInfoBuilder';
+import {
+  TokenBudgetManager,
+  DEFAULT_ALLOCATIONS,
+  DEFAULT_TOTAL_BUDGET,
+  type RequestBudget,
+} from '@/lib/promptContext/tokenBudgetManager';
+import {
+  estimateTokenCount,
+  truncateToTokenLimit,
+} from '@/lib/promptContext/tokenUtils';
 
 const COMPLEXITY_ALERTS: Record<ToneSettings['languageComplexity'], string> = {
   simple: `
@@ -106,7 +127,7 @@ export class NarrativeGenerator {
     itemAcquisitionInstructions?: string;
     toneSettings?: Map<string, string>; // worldId -> tone instructions
   } = {
-    toneSettings: new Map()
+    toneSettings: new Map(),
   };
 
   constructor(private geminiClient: AIClient) {
@@ -273,7 +294,8 @@ export class NarrativeGenerator {
         toneSettings.customInstructions
       );
 
-      const complexityAlert = COMPLEXITY_ALERTS[toneSettings.languageComplexity] ?? '';
+      const complexityAlert =
+        COMPLEXITY_ALERTS[toneSettings.languageComplexity] ?? '';
 
       toneInstructions = detailedInstructions + complexityAlert;
 
@@ -349,6 +371,11 @@ export class NarrativeGenerator {
     skills:
       | Array<{ name: string; level: number; worldSkillId?: string }>
       | Array<{ skillId: string; level: number }>;
+    derivedStats?: Array<{
+      name: string;
+      currentValue: number;
+      maxValue: number;
+    }>;
     createdAt: string;
     updatedAt: string;
   } {
@@ -356,10 +383,11 @@ export class NarrativeGenerator {
     const background =
       typeof backgroundValue === 'string'
         ? backgroundValue
-        : (backgroundValue as { summary?: string; history?: string } | null)?.summary ??
+        : ((backgroundValue as { summary?: string; history?: string } | null)
+            ?.summary ??
           (backgroundValue as { history?: string } | null)?.history ??
           storeCharacter.description ??
-          '';
+          '');
 
     return {
       id: storeCharacter.id,
@@ -378,6 +406,13 @@ export class NarrativeGenerator {
             worldSkillId: skill.worldSkillId,
           }))
         : [],
+      derivedStats: Array.isArray(storeCharacter.derivedStats)
+        ? storeCharacter.derivedStats.map((stat) => ({
+            name: stat.name,
+            currentValue: stat.currentValue,
+            maxValue: stat.maxValue,
+          }))
+        : undefined,
       createdAt: storeCharacter.createdAt,
       updatedAt: storeCharacter.updatedAt,
     };
@@ -465,7 +500,8 @@ export class NarrativeGenerator {
         decisionHistory = formatDecisions(relevantDecisions);
       } else {
         // Fallback: get recent world decisions if no session ID
-        const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
+        const allWorldDecisions =
+          playerDecisionTracker.getWorldDecisions(worldId);
         relevantDecisions = allWorldDecisions.slice(0, 15);
         decisionHistory = formatDecisions(relevantDecisions);
       }
@@ -504,7 +540,10 @@ export class NarrativeGenerator {
         personalizationSection += decisionHistory;
       }
 
-      const otherCharacterContext = this.buildOtherCharacterContext(worldId, playerCharacterId);
+      const otherCharacterContext = this.buildOtherCharacterContext(
+        worldId,
+        playerCharacterId
+      );
       if (otherCharacterContext) {
         personalizationSection += `\n\n${otherCharacterContext}\nWeave these concurrent storylines naturally when they influence the current scene, but avoid forced references.`;
       }
@@ -517,7 +556,11 @@ export class NarrativeGenerator {
         return `${prompt}${personalizationSection}`;
       }
 
-      const limited = this.applyBudget(personalizationSection, 'personalization', budget);
+      const limited = this.applyBudget(
+        personalizationSection,
+        'personalization',
+        budget
+      );
       return safeTrim(limited) ? `${prompt}${limited}` : prompt;
     } catch {
       return prompt;
@@ -526,7 +569,7 @@ export class NarrativeGenerator {
 
   private buildOtherCharacterContext(
     worldId: EntityID,
-    activeCharacterId: EntityID,
+    activeCharacterId: EntityID
   ): string | null {
     try {
       const { worldStates } = useWorldStore.getState();
@@ -550,7 +593,8 @@ export class NarrativeGenerator {
 
       const lines = threads.map((thread) => {
         const name =
-          characters[thread.characterId]?.name ?? `Character ${thread.characterId}`;
+          characters[thread.characterId]?.name ??
+          `Character ${thread.characterId}`;
         const highlight =
           summarizeThreadHighlight(thread, PROMPT_THREAD_SUMMARY_LENGTH) ??
           'No recent activity recorded yet.';
@@ -611,13 +655,20 @@ export class NarrativeGenerator {
       }
 
       const equippedItemIds = this.getEquippedItemIds(characterIds);
-      const tokenLimit = budget && budget.isEnabled()
-        ? budget.getAllocation('inventory')
-        : undefined;
-      const { context: inventorySection, tokenCount } = buildInventoryContext(items, {
-        equippedItemIds,
-        tokenLimit: typeof tokenLimit === 'number' && Number.isFinite(tokenLimit) ? tokenLimit : undefined,
-      });
+      const tokenLimit =
+        budget && budget.isEnabled()
+          ? budget.getAllocation('inventory')
+          : undefined;
+      const { context: inventorySection, tokenCount } = buildInventoryContext(
+        items,
+        {
+          equippedItemIds,
+          tokenLimit:
+            typeof tokenLimit === 'number' && Number.isFinite(tokenLimit)
+              ? tokenLimit
+              : undefined,
+        }
+      );
 
       if (!inventorySection) {
         return prompt;
@@ -699,7 +750,10 @@ The items will be automatically added to the character's inventory with proper c
       const { characters } = useCharacterStore.getState();
       const playerCharacter = characters[characterIds[0]];
       const inventoryItems =
-        (playerCharacter?.inventory?.items as Array<{ id: string; equipped?: boolean }>) ?? [];
+        (playerCharacter?.inventory?.items as Array<{
+          id: string;
+          equipped?: boolean;
+        }>) ?? [];
 
       return inventoryItems
         .filter((item) => item?.equipped)
@@ -735,7 +789,6 @@ The items will be automatically added to the character's inventory with proper c
       if (rewritten) {
         const secondEval = evaluateLanguageComplexity(rewritten, level);
         if (secondEval.passes) {
-
           return {
             ...result,
             content: rewritten,
@@ -784,10 +837,14 @@ The items will be automatically added to the character's inventory with proper c
       const prompt = `You are revising narrative content to match STRICT ${level.toUpperCase()} language requirements.
 
 ${reminder}
-${customInstructions ? `
+${
+  customInstructions
+    ? `
 CUSTOM WORLD INSTRUCTIONS:
 ${customInstructions}
-` : ''}
+`
+    : ''
+}
 
 REVISION RULES:
 ${ruleLines}
@@ -809,7 +866,10 @@ Return ONLY the rewritten narrative.`;
 
       return rewritten && rewritten.length > 0 ? rewritten : null;
     } catch (error) {
-      logger.warn('Failed to rewrite narrative for language complexity', { level, error });
+      logger.warn('Failed to rewrite narrative for language complexity', {
+        level,
+        error,
+      });
       return null;
     }
   }
@@ -869,10 +929,11 @@ Return ONLY the rewritten narrative.`;
         request.characterIds || [],
         budget
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt,
-        budget
-      );
+      const fullyEnhancedPrompt =
+        this.enhancePromptWithItemAcquisitionInstructions(
+          inventoryEnhancedPrompt,
+          budget
+        );
 
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
@@ -884,7 +945,7 @@ Return ONLY the rewritten narrative.`;
             logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
               worldId: request.worldId,
               sessionId: request.sessionId,
-              contentLength: response.content.length
+              contentLength: response.content.length,
             });
           }
 
@@ -905,11 +966,15 @@ Return ONLY the rewritten narrative.`;
             logger.info('[NarrativeGenerator] Extracted and stored lore:', {
               worldId: request.worldId,
               sessionId: request.sessionId,
-              factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
-              characters: structuredLore.characters.map(c => c.name),
-              locations: structuredLore.locations.map(l => l.name),
+              factCount:
+                structuredLore.characters.length +
+                structuredLore.locations.length +
+                structuredLore.events.length +
+                structuredLore.rules.length,
+              characters: structuredLore.characters.map((c) => c.name),
+              locations: structuredLore.locations.map((l) => l.name),
               events: structuredLore.events.length,
-              rules: structuredLore.rules.length
+              rules: structuredLore.rules.length,
             });
           }
         } catch (error) {
@@ -930,7 +995,8 @@ Return ONLY the rewritten narrative.`;
 
       // Capture debug info if enabled (dev mode only)
       if (isDebugInfoEnabled()) {
-        const previousSegments = request.narrativeContext?.previousSegments || [];
+        const previousSegments =
+          request.narrativeContext?.previousSegments || [];
         const previousSegment = previousSegments[previousSegments.length - 1];
         // Template used is always 'scene' - final type is inferred from AI response
         const templateType = 'scene';
@@ -1038,10 +1104,11 @@ Return ONLY the rewritten narrative.`;
         characterIds,
         budget
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt,
-        budget
-      );
+      const fullyEnhancedPrompt =
+        this.enhancePromptWithItemAcquisitionInstructions(
+          inventoryEnhancedPrompt,
+          budget
+        );
 
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
@@ -1053,7 +1120,7 @@ Return ONLY the rewritten narrative.`;
             logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
               worldId,
               sessionId,
-              contentLength: response.content.length
+              contentLength: response.content.length,
             });
           }
 
@@ -1071,31 +1138,47 @@ Return ONLY the rewritten narrative.`;
           addStructuredLore(structuredLore, worldId, sessionId);
 
           if (process.env.NODE_ENV !== 'production') {
-            logger.info('[NarrativeGenerator] Extracted and stored lore from initial scene:', {
-              worldId,
-              sessionId,
-              factCount: structuredLore.characters.length + structuredLore.locations.length + structuredLore.events.length + structuredLore.rules.length,
-              characters: structuredLore.characters.map(c => c.name),
-              locations: structuredLore.locations.map(l => l.name),
-              events: structuredLore.events.length,
-              rules: structuredLore.rules.length
-            });
+            logger.info(
+              '[NarrativeGenerator] Extracted and stored lore from initial scene:',
+              {
+                worldId,
+                sessionId,
+                factCount:
+                  structuredLore.characters.length +
+                  structuredLore.locations.length +
+                  structuredLore.events.length +
+                  structuredLore.rules.length,
+                characters: structuredLore.characters.map((c) => c.name),
+                locations: structuredLore.locations.map((l) => l.name),
+                events: structuredLore.events.length,
+                rules: structuredLore.rules.length,
+              }
+            );
           }
         } catch (error) {
-          logger.error('[NarrativeGenerator] Failed to extract lore from initial scene:', error);
+          logger.error(
+            '[NarrativeGenerator] Failed to extract lore from initial scene:',
+            error
+          );
         }
       }
 
       // AI determines segment type in its JSON response
       // If AI doesn't provide a type, infer from content as fallback
-      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+      let result = await this.formatResponse(
+        response,
+        inferSegmentType(response.content || '')
+      );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
       checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
 
       // Process any acquired items from the initial scene
-      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+      if (
+        result.metadata.itemsAcquired &&
+        result.metadata.itemsAcquired.length > 0
+      ) {
         const characterId = characterIds[0];
         if (characterId && sessionId) {
           // Process items asynchronously - don't block narrative generation
@@ -1177,8 +1260,7 @@ Return ONLY the rewritten narrative.`;
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     const npcRoster = this.buildNpcRoster(world.id);
 
-    const existingImportant =
-      request.narrativeContext?.importantEntities || [];
+    const existingImportant = request.narrativeContext?.importantEntities || [];
     const rosterEntities = npcRoster.map((npc) => ({
       id: npc.id,
       type: 'npc',
@@ -1315,7 +1397,12 @@ Return ONLY the rewritten narrative.`;
             actualContent = parsed.content;
           }
           // Use AI-provided type if available, otherwise keep the parameter (which might be inferred)
-          if (parsed.type && ['scene', 'dialogue', 'action', 'transition', 'ending'].includes(parsed.type)) {
+          if (
+            parsed.type &&
+            ['scene', 'dialogue', 'action', 'transition', 'ending'].includes(
+              parsed.type
+            )
+          ) {
             segmentType = parsed.type;
           }
           if (parsed.metadata) {
@@ -1328,9 +1415,10 @@ Return ONLY the rewritten narrative.`;
               characterIds: Array.isArray(parsed?.metadata?.characterIds)
                 ? parsed?.metadata?.characterIds
                 : [],
-              speakerId: typeof parsed?.metadata?.speakerId === 'string'
-                ? parsed?.metadata?.speakerId
-                : undefined,
+              speakerId:
+                typeof parsed?.metadata?.speakerId === 'string'
+                  ? parsed?.metadata?.speakerId
+                  : undefined,
               itemsAcquired: Array.isArray(parsed?.metadata?.itemsAcquired)
                 ? parsed?.metadata?.itemsAcquired.map((item: unknown) => {
                     const rawItem = item as {
@@ -1343,7 +1431,8 @@ Return ONLY the rewritten narrative.`;
                       name: rawItem.name,
                       description: rawItem.description,
                       quantity: rawItem.quantity,
-                      acquisitionMethod: rawItem.acquisitionMethod as InventoryAcquisitionMethod,
+                      acquisitionMethod:
+                        rawItem.acquisitionMethod as InventoryAcquisitionMethod,
                     };
                   })
                 : undefined,
@@ -1366,20 +1455,31 @@ Return ONLY the rewritten narrative.`;
                       return {
                         id,
                         name,
-                        description: raw?.description ? safeTrim(String(raw.description)) : undefined,
-                        role: raw?.role ? safeTrim(String(raw.role)) : undefined,
-                        avatarPrompt: raw?.avatarPrompt ? safeTrim(String(raw.avatarPrompt)) : undefined,
-                        avatarUrl: raw?.avatarUrl ? safeTrim(String(raw.avatarUrl)) : undefined,
+                        description: raw?.description
+                          ? safeTrim(String(raw.description))
+                          : undefined,
+                        role: raw?.role
+                          ? safeTrim(String(raw.role))
+                          : undefined,
+                        avatarPrompt: raw?.avatarPrompt
+                          ? safeTrim(String(raw.avatarPrompt))
+                          : undefined,
+                        avatarUrl: raw?.avatarUrl
+                          ? safeTrim(String(raw.avatarUrl))
+                          : undefined,
                       } as GeneratedCharacterMetadata;
                     })
-                    .filter((value: GeneratedCharacterMetadata | null | undefined): value is GeneratedCharacterMetadata => Boolean(value))
+                    .filter(
+                      (
+                        value: GeneratedCharacterMetadata | null | undefined
+                      ): value is GeneratedCharacterMetadata => Boolean(value)
+                    )
                 : undefined,
               majorEvent:
                 typeof parsed?.metadata?.majorEvent === 'string'
                   ? safeTrim(String(parsed.metadata.majorEvent)).slice(0, 180)
                   : undefined,
             };
-
           }
         }
       } catch {
@@ -1450,11 +1550,19 @@ Return ONLY the rewritten narrative.`;
     // Normalize the content for consistent formatting
     let normalizedContent = normalizeText(actualContent, NORM_DESC);
 
-    if (extractedMetadata.characters && extractedMetadata.characters.length > 0 && normalizedContent) {
-      const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (
+      extractedMetadata.characters &&
+      extractedMetadata.characters.length > 0 &&
+      normalizedContent
+    ) {
+      const escapeRegExp = (value: string) =>
+        value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       extractedMetadata.characters.forEach((character) => {
         if (!character?.id) return;
-        const tokenRegex = new RegExp(`\\[${escapeRegExp(character.id)}\\]`, 'g');
+        const tokenRegex = new RegExp(
+          `\\[${escapeRegExp(character.id)}\\]`,
+          'g'
+        );
         const displayName = safeTrim(character.name) || character.id;
         const firstToken = displayName.split(/[\s,]+/)[0]?.toLowerCase();
         const canonicalDisplayName = displayName
@@ -1576,9 +1684,10 @@ Return ONLY the rewritten narrative.`;
     const characterIds = this.normalizeCharacterIds(
       extractedMetadata.characterIds
     );
-    const finalCharacterIds = speakerId && !characterIds.includes(speakerId)
-      ? [...characterIds, speakerId]
-      : characterIds;
+    const finalCharacterIds =
+      speakerId && !characterIds.includes(speakerId)
+        ? [...characterIds, speakerId]
+        : characterIds;
 
     const metadataAnalysis = await this.analyzeSegmentMetadata(
       normalizedContent,
@@ -1590,11 +1699,13 @@ Return ONLY the rewritten narrative.`;
         ? metadataAnalysis.presentCharacterIds
         : finalCharacterIds;
     const analyzedItems =
-      extractedMetadata.itemsAcquired && extractedMetadata.itemsAcquired.length > 0
+      extractedMetadata.itemsAcquired &&
+      extractedMetadata.itemsAcquired.length > 0
         ? extractedMetadata.itemsAcquired
         : metadataAnalysis.items;
     const sanitizedMajorEvent =
-      extractedMetadata.majorEvent && safeTrim(extractedMetadata.majorEvent).length > 0
+      extractedMetadata.majorEvent &&
+      safeTrim(extractedMetadata.majorEvent).length > 0
         ? safeTrim(extractedMetadata.majorEvent)
         : undefined;
 
@@ -1796,7 +1907,9 @@ ${content}
 
           return {
             name: safeTrim(item.name!),
-            description: item.description ? safeTrim(item.description) : undefined,
+            description: item.description
+              ? safeTrim(item.description)
+              : undefined,
             quantity:
               typeof item.quantity === 'number' && !Number.isNaN(item.quantity)
                 ? item.quantity
@@ -1878,7 +1991,9 @@ ${content}
       const npcStore = useNPCStore.getState();
       const { getById, createNPC, updateNPC } = npcStore as unknown as {
         getById?: (id: string) => NPC | undefined;
-        createNPC?: (npc: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: string }) => string;
+        createNPC?: (
+          npc: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: string }
+        ) => string;
         updateNPC?: (id: string, updates: Partial<NPC>) => void;
       };
 
@@ -2023,7 +2138,10 @@ ${content}
       const context = {
         worldName: world.name,
         genre: world.genre,
-        narrativeContext: this.limitNarrativeContextToBudget(narrativeContext, budget),
+        narrativeContext: this.limitNarrativeContextToBudget(
+          narrativeContext,
+          budget
+        ),
         playerCharacterName: playerCharacter?.name,
         skillUsed,
         customAction,
@@ -2046,22 +2164,29 @@ ${content}
         characterIds,
         budget
       );
-      const fullyEnhancedPrompt = this.enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt,
-        budget
-      );
+      const fullyEnhancedPrompt =
+        this.enhancePromptWithItemAcquisitionInstructions(
+          inventoryEnhancedPrompt,
+          budget
+        );
 
       const response =
         await this.geminiClient.generateContent(fullyEnhancedPrompt);
 
       // AI determines segment type in its JSON response
       // If AI doesn't provide a type, infer from content as fallback
-      let result = await this.formatResponse(response, inferSegmentType(response.content || ''));
+      let result = await this.formatResponse(
+        response,
+        inferSegmentType(response.content || '')
+      );
 
       result = await this.enforceLanguageComplexity(result, toneSettings);
 
       // Process any acquired items from skill acknowledgment
-      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
+      if (
+        result.metadata.itemsAcquired &&
+        result.metadata.itemsAcquired.length > 0
+      ) {
         const characterId = characterIds[0];
         const sessionId = narrativeContext.sessionId;
         if (characterId && sessionId) {

@@ -1,6 +1,6 @@
 // src/lib/utils/__tests__/characterArchetypes.test.ts
 
-import { generateCharacterArchetypes, getArchetypeTemplatesForGenre } from '../characterArchetypes';
+import { generateCharacterArchetypes } from '../characterArchetypes';
 import { World } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { createMockWorld as factoryCreateMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';

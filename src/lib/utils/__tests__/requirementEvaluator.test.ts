@@ -1,6 +1,7 @@
 import { evaluateRequirement } from '../requirementEvaluator';
 import { DecisionRequirement } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
+import type { DerivedStat } from '@/types/character.types';
 
 // Character interface matching the actual store structure
 interface Character {
@@ -26,6 +27,7 @@ interface Character {
     level: number;
     category?: string;
   }>;
+  derivedStats: DerivedStat[];
   background: {
     history: string;
     personality: string;
@@ -62,7 +64,7 @@ describe('requirementEvaluator', () => {
         name: 'Strength',
         baseValue: 15,
         modifiedValue: 17,
-        category: 'physical'
+        category: 'physical',
       },
       {
         id: 'attr-2',
@@ -71,8 +73,8 @@ describe('requirementEvaluator', () => {
         name: 'Intelligence',
         baseValue: 12,
         modifiedValue: 12,
-        category: 'mental'
-      }
+        category: 'mental',
+      },
     ],
     skills: [
       {
@@ -81,7 +83,7 @@ describe('requirementEvaluator', () => {
         worldSkillId: 'intimidation',
         name: 'Intimidation',
         level: 8,
-        category: 'social'
+        category: 'social',
       },
       {
         id: 'skill-2',
@@ -89,35 +91,36 @@ describe('requirementEvaluator', () => {
         worldSkillId: 'stealth',
         name: 'Stealth',
         level: 3,
-        category: 'physical'
+        category: 'physical',
       },
       {
         id: 'skill-3',
         characterId: 'char-1',
         name: 'persuasion', // lowercase name for case-insensitive testing
         level: 6,
-        category: 'social'
-      }
+        category: 'social',
+      },
     ],
+    derivedStats: [],
     background: {
       history: 'Test history',
       personality: 'Test personality',
       goals: ['Test goal'],
       fears: ['Test fear'],
-      relationships: []
+      relationships: [],
     },
     isPlayer: true,
     status: {
       health: 100,
       maxHealth: 100,
-      conditions: []
+      conditions: [],
     },
     inventory: {
       characterId: 'char-1',
       items: [],
       capacity: 10,
-      categories: []
-    }
+      categories: [],
+    },
   };
 
   describe('skill requirements', () => {
@@ -126,7 +129,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'intimidation',
         operator: 'gte',
-        value: 8
+        value: 8,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -141,7 +144,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'intimidation',
         operator: 'gte',
-        value: 6
+        value: 6,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -156,7 +159,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'stealth',
         operator: 'gte',
-        value: 5
+        value: 5,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -171,7 +174,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'PERSUASION', // uppercase
         operator: 'gte',
-        value: 5
+        value: 5,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -185,7 +188,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'nonexistent',
         operator: 'gte',
-        value: 1
+        value: 1,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -200,7 +203,7 @@ describe('requirementEvaluator', () => {
         type: 'skill',
         targetId: 'intimidation', // matches worldSkillId
         operator: 'gte',
-        value: 7
+        value: 7,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -216,7 +219,7 @@ describe('requirementEvaluator', () => {
         type: 'attribute',
         targetId: 'strength',
         operator: 'gte',
-        value: 15
+        value: 15,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);
@@ -233,15 +236,16 @@ describe('requirementEvaluator', () => {
       const emptyCharacter: Character = {
         ...mockCharacter,
         skills: [],
+        derivedStats: [],
         attributes: [],
-        level: 1
+        level: 1,
       };
 
       const requirement: DecisionRequirement = {
         type: 'skill',
         targetId: 'intimidation',
         operator: 'gte',
-        value: 5
+        value: 5,
       };
 
       const result = evaluateRequirement(requirement, emptyCharacter);
@@ -255,7 +259,7 @@ describe('requirementEvaluator', () => {
         type: 'unknown' as 'skill',
         targetId: 'test',
         operator: 'gte',
-        value: 5
+        value: 5,
       };
 
       const result = evaluateRequirement(requirement, mockCharacter);

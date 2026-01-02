@@ -4,15 +4,11 @@
  */
 
 import { useNavigationStore } from '../navigationStore';
-import { getTimestamp } from '@/lib/utils/timestamp';
 import { setupMockStorage, getDefaultNavigationState } from './navigationStore.testHelpers';
 
 describe('navigationStore - Routing', () => {
-  let mockSessionStorage: ReturnType<typeof setupMockStorage>['mockSessionStorage'];
-
   beforeEach(() => {
-    const mocks = setupMockStorage();
-    mockSessionStorage = mocks.mockSessionStorage;
+    setupMockStorage();
 
     // Reset store state
     useNavigationStore.setState(getDefaultNavigationState());

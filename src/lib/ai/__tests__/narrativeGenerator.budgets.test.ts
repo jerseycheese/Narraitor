@@ -13,7 +13,10 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
-import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
+import {
+  createMockWorldStore,
+  createMockCharacterStore,
+} from '@/lib/test-utils';
 
 jest.mock('../loreContextHelper');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -30,6 +33,7 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
+  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
