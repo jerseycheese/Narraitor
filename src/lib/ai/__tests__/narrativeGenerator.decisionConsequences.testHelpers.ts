@@ -181,7 +181,8 @@ export function setupDecisionConsequencesMocks(
   (useLoreStore.getState as jest.Mock).mockReturnValue({
     getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
     recordLoreMentions: jest.fn(),
-    recordLoreUsage: jest.fn()
+    recordLoreUsage: jest.fn(),
+    addStructuredLore: jest.fn()
   });
 
   // Mock tone settings guidance
