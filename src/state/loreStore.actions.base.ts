@@ -2,7 +2,7 @@ import type { LoreFact } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
-import { createStoreError } from '@/lib/utils/errorUtils';
+import { createStoreError, type UserFriendlyError } from '@/lib/utils/errorUtils';
 import { getInitialState } from './loreStore.state';
 import type { SetState, GetState } from './loreStore.actions.types';
 
@@ -106,7 +106,7 @@ export const createLoreBaseActions = (set: SetState, get: GetState) => ({
   getById: (id: EntityID) => get().facts[id],
   getAll: () => Object.values(get().facts),
   reset: () => set(getInitialState()),
-  setError: (error: LoreStore['error']) => set({ error }),
+  setError: (error: UserFriendlyError | null) => set({ error }),
   clearError: () => set({ error: null }),
   setLoading: (loading: boolean) => set({ loading }),
 });
