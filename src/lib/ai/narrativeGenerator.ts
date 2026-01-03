@@ -218,7 +218,8 @@ export class NarrativeGenerator {
       this.syncNpcMetadata(request.worldId, result.metadata.characters);
 
       return result;
-    } catch {
+    } catch (error) {
+      logger.error('Failed to generate narrative segment', { error });
       throw new Error('Failed to generate narrative segment');
     }
   }
@@ -369,7 +370,8 @@ export class NarrativeGenerator {
       this.syncNpcMetadata(worldId, result.metadata.characters);
 
       return result;
-    } catch {
+    } catch (error) {
+      logger.error('Failed to generate initial scene', { error });
       throw new Error('Failed to generate initial scene');
     }
   }
@@ -508,7 +510,10 @@ export class NarrativeGenerator {
       }
 
       return result;
-    } catch {
+    } catch (error) {
+      logger.error('Failed to generate skill acknowledgment narrative', {
+        error,
+      });
       throw new Error('Failed to generate skill acknowledgment narrative');
     }
   }
@@ -531,7 +536,8 @@ export class NarrativeGenerator {
       });
 
       return result;
-    } catch {
+    } catch (error) {
+      logger.error('Failed to generate player choices', { error });
       const fallbackId = `decision-fallback-${Date.now()}`;
       return {
         id: fallbackId,
