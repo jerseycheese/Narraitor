@@ -99,10 +99,6 @@ export class ChoiceGenerator {
       logger.error('❌ CHOICE GENERATOR ERROR:', errorDetails);
       logger.error('Full error object:', error);
       
-      // Add an alert to make the error visible to the user for debugging
-      if (typeof window !== 'undefined') {
-      }
-      
       const world = this.getWorld(params.worldId);
       return generateFallbackChoices(world, params.narrativeContext);
     }
