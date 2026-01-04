@@ -4,14 +4,17 @@ import React from 'react';
 import { BookOpen } from 'lucide-react';
 import { BackNavigation } from '@/components/shared/BackNavigation';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { Hero } from '@/components/shared/Hero';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { useJournalStore } from '@/state/journalStore';
+import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
 import { cn } from '@/lib/utils';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
 import { JournalEmptyState } from './JournalEmptyState';
@@ -23,6 +26,7 @@ interface JournalPageProps {
 export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
+  const world = useWorldStore((state) => state.worlds[worldId]);
   const {
     getSessionEntriesWithCharacter,
     markAsRead,
@@ -79,6 +83,8 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     : entries.length
       ? `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`
       : 'No entries yet';
+  const showEntrySummary = !!sessionId;
+  const pageTitle = world ? `Journal in ${world.name}` : 'Journal';
 
   const renderContent = () => {
     if (!sessionId) {
@@ -179,9 +185,32 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   };
 
   return (
-    <PageLayout title="Journal" description={entrySummary} className="journal-page">
-      <div className="mb-6">
+    <PageLayout
+      title={world ? undefined : pageTitle}
+      description={world ? undefined : entrySummary}
+      className="pb-0 journal-page"
+    >
+      {world && (
+        <div className="mb-6">
+          <Hero
+            title={pageTitle}
+            image={world.image?.url ? {
+              url: world.image.url,
+              alt: `${world.name} world`
+            } : undefined}
+            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
+            height="h-20 sm:h-24"
+            titleElement="h1"
+          />
+        </div>
+      )}
+
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <BackNavigation href={`/worlds/${worldId}/play`} label="Back to Play" />
+        {showEntrySummary && (
+          <span className="text-sm text-amber-700">{entrySummary}</span>
+        )}
       </div>
       {renderContent()}
     </PageLayout>

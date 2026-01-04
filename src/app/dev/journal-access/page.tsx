@@ -7,6 +7,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useWorldStore } from '@/state/worldStore';
 import { JournalEntry } from '@/types/journal.types';
 import { getTimestamp } from '@/lib/utils';
 
@@ -58,6 +59,22 @@ export default function JournalAccessTestPage() {
       });
 
       const timestamp = getTimestamp();
+      const testWorld = {
+        id: 'test-world-1',
+        name: 'Test World',
+        description: 'A lightweight world for journal testing.',
+        genre: 'modern' as const,
+        attributes: [],
+        skills: [],
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 12,
+          skillPointPool: 10,
+        },
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
       const testCharacter = {
         id: 'test-char-1',
         name: 'Test Adventurer',
@@ -102,6 +119,11 @@ export default function JournalAccessTestPage() {
         error: null,
         loading: false,
       });
+
+      useWorldStore.setState({
+        worlds: { 'test-world-1': testWorld },
+        entities: { 'test-world-1': testWorld },
+      });
     } else {
       useSessionStore.setState({
         characterId: null,
@@ -119,6 +141,11 @@ export default function JournalAccessTestPage() {
         currentCharacterId: null,
         error: null,
         loading: false,
+      });
+
+      useWorldStore.setState({
+        worlds: {},
+        entities: {},
       });
     }
   }, [hasCharacter, gameStatus]);

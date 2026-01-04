@@ -4,10 +4,13 @@ import '@testing-library/jest-dom';
 import { JournalPage } from '../JournalPage';
 import { JournalEntry } from '@/types/journal.types';
 import { useJournalStore } from '@/state/journalStore';
+import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
+import { World } from '@/types/world.types';
 
 jest.mock('@/state/journalStore');
+jest.mock('@/state/worldStore');
 jest.mock('@/state/sessionStore');
 
 jest.mock('@/components/shared/BackNavigation', () => ({
@@ -40,6 +43,24 @@ const createEntry = (overrides: Partial<JournalEntry> = {}): JournalEntry => ({
 describe('JournalPage', () => {
   const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
   const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
+  const worldId = 'world-1';
+
+  const mockWorld: World = {
+    id: worldId,
+    name: 'Test World',
+    description: 'A test world for journal rendering.',
+    genre: 'fantasy',
+    attributes: [],
+    skills: [],
+    settings: {
+      maxAttributes: 6,
+      maxSkills: 8,
+      attributePointPool: 12,
+      skillPointPool: 10,
+    },
+    createdAt: '2024-01-01T10:00:00Z',
+    updatedAt: '2024-01-01T10:00:00Z',
+  };
 
   type JournalStoreState = ReturnType<typeof useJournalStore.getState>;
   type SessionStoreState = ReturnType<typeof useSessionStore.getState>;
@@ -73,6 +94,10 @@ describe('JournalPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useWorldStore.setState({
+      worlds: { [worldId]: mockWorld },
+      entities: { [worldId]: mockWorld },
+    });
   });
 
   it('renders empty state when no entries exist', () => {
@@ -82,11 +107,11 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByText('This journal awaits its first entry')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Journal' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to Play' })).toHaveAttribute('href', '/worlds/world-1/play');
+    expect(screen.getByRole('heading', { name: 'Journal in Test World' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Play' })).toHaveAttribute('href', `/worlds/${worldId}/play`);
   });
 
   it('renders entries and marks them as read when selected', () => {
@@ -99,7 +124,7 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     const card = screen.getByRole('button', { name: /select entry: a new lead/i });
     fireEvent.click(card);
@@ -122,7 +147,7 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByText('Unable to load journal')).toBeInTheDocument();
   });
@@ -136,7 +161,7 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByText('Loading journal entries...')).toBeInTheDocument();
   });
@@ -151,7 +176,7 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     fireEvent.click(screen.getByRole('button', { name: /select entry: a new lead/i }));
     fireEvent.click(screen.getByRole('button', { name: /back to entries/i }));
@@ -167,7 +192,7 @@ describe('JournalPage', () => {
       selector(buildSessionState({ id: null, characterId: null }))
     );
 
-    render(<JournalPage worldId="world-1" />);
+    render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByRole('heading', { name: 'No active session' })).toBeInTheDocument();
   });
