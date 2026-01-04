@@ -9,8 +9,11 @@ jest.mock('@/components/Journal', () => ({
 }));
 
 describe('Journal Page Route', () => {
-  it('renders JournalPage with the worldId param', () => {
-    render(<JournalPageRoute params={{ id: 'world-123' }} />);
+  it('renders JournalPage with the worldId param', async () => {
+    const element = await JournalPageRoute({
+      params: Promise.resolve({ id: 'world-123' }),
+    });
+    render(element);
 
     expect(screen.getByTestId('journal-page')).toHaveTextContent('Journal for world-123');
   });
