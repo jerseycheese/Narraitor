@@ -12,14 +12,14 @@ export const sanitizeFormattedContent = (html: string): string => {
 
 export const getSignificanceBadgeVariant = (
   significance: string
-): 'destructive' | 'warning' | 'secondary' => {
+): 'destructive-static' | 'warning-static' | 'secondary-static' => {
   switch (significance) {
     case 'critical':
-      return 'destructive';
+      return 'destructive-static';
     case 'major':
-      return 'warning';
+      return 'warning-static';
     case 'minor':
     default:
-      return 'secondary';
+      return 'secondary-static';
   }
 };

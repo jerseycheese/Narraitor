@@ -71,7 +71,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
             {capitalize(entry.significance)}
           </Badge>
           <Badge
-            variant={isSystemEvent ? 'secondary' : 'info'}
+            variant={isSystemEvent ? 'secondary-static' : 'info-static'}
             size="sm"
             className={isSystemEvent ? 'bg-gray-200 text-gray-700' : ''}
           >

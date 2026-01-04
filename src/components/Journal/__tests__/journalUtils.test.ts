@@ -26,16 +26,16 @@ describe('journalUtils', () => {
 
   describe('getSignificanceBadgeVariant', () => {
     it('maps critical to destructive', () => {
-      expect(getSignificanceBadgeVariant('critical')).toBe('destructive');
+      expect(getSignificanceBadgeVariant('critical')).toBe('destructive-static');
     });
 
     it('maps major to warning', () => {
-      expect(getSignificanceBadgeVariant('major')).toBe('warning');
+      expect(getSignificanceBadgeVariant('major')).toBe('warning-static');
     });
 
     it('maps minor and unknown values to secondary', () => {
-      expect(getSignificanceBadgeVariant('minor')).toBe('secondary');
-      expect(getSignificanceBadgeVariant('unknown')).toBe('secondary');
+      expect(getSignificanceBadgeVariant('minor')).toBe('secondary-static');
+      expect(getSignificanceBadgeVariant('unknown')).toBe('secondary-static');
     });
   });
 });
