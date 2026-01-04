@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { JournalPage } from '../JournalPage';
 import { JournalEntry } from '@/types/journal.types';
@@ -228,12 +228,15 @@ describe('JournalPage', () => {
 
     render(<JournalPage worldId={worldId} />);
 
-    expect(screen.getByText('Entry 1')).toBeInTheDocument();
-    expect(screen.queryByText('Entry 11')).not.toBeInTheDocument();
+    const listPane = screen.getByTestId('journal-list-pane');
+    const listScope = within(listPane);
+
+    expect(listScope.getByText('Entry 1')).toBeInTheDocument();
+    expect(listScope.queryByText('Entry 11')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /load more/i }));
 
-    expect(screen.getByText('Entry 11')).toBeInTheDocument();
+    expect(listScope.getByText('Entry 11')).toBeInTheDocument();
   });
 
   it('filters entries by search query', () => {
@@ -253,7 +256,10 @@ describe('JournalPage', () => {
 
     fireEvent.change(screen.getByPlaceholderText('Search entries...'), { target: { value: 'map' } });
 
-    expect(screen.getByText('The Lost Map')).toBeInTheDocument();
-    expect(screen.queryByText('Campfire Tales')).not.toBeInTheDocument();
+    const listPane = screen.getByTestId('journal-list-pane');
+    const listScope = within(listPane);
+
+    expect(listScope.getByText('The Lost Map')).toBeInTheDocument();
+    expect(listScope.queryByText('Campfire Tales')).not.toBeInTheDocument();
   });
 });
