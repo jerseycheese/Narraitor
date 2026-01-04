@@ -37,7 +37,7 @@ test.describe('Journal Page', () => {
     await page.waitForLoadState('networkidle', { timeout: 10000 });
 
     // Verify journal page content is visible
-    await expect(page.getByRole('heading', { name: 'Journal' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Journal in/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Entries' })).toBeVisible();
 
     // Take screenshot of journal page
