@@ -41,7 +41,10 @@ describe('JournalPage', () => {
   const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
   const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
 
-  const buildStore = (overrides: Record<string, unknown> = {}) => ({
+  type JournalStoreState = ReturnType<typeof useJournalStore.getState>;
+  type SessionStoreState = ReturnType<typeof useSessionStore.getState>;
+
+  const buildStore = (overrides: Partial<JournalStoreState> = {}): JournalStoreState => ({
     getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
     markAsRead: jest.fn(),
     error: null,
@@ -58,7 +61,15 @@ describe('JournalPage', () => {
     entries: {},
     sessionEntries: {},
     ...overrides,
-  });
+  } as JournalStoreState);
+
+  const buildSessionState = (overrides: Partial<SessionStoreState> = {}): SessionStoreState => ({
+    ...overrides,
+  } as SessionStoreState);
+
+  const mockJournalSelector = (state: JournalStoreState) => (
+    selector?: (store: JournalStoreState) => unknown
+  ) => (typeof selector === 'function' ? selector(state) : state);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -66,9 +77,9 @@ describe('JournalPage', () => {
 
   it('renders empty state when no entries exist', () => {
     const journalStore = buildStore();
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: 'session-1', characterId: 'char-1' } as any)
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
     render(<JournalPage worldId="world-1" />);
@@ -83,9 +94,9 @@ describe('JournalPage', () => {
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
     });
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: 'session-1', characterId: 'char-1' } as any)
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
     render(<JournalPage worldId="world-1" />);
@@ -106,9 +117,9 @@ describe('JournalPage', () => {
         type: ErrorType.UNKNOWN,
       },
     });
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: 'session-1', characterId: 'char-1' } as any)
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
     render(<JournalPage worldId="world-1" />);
@@ -120,9 +131,9 @@ describe('JournalPage', () => {
     const journalStore = buildStore({
       loading: true,
     });
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: 'session-1', characterId: 'char-1' } as any)
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
     render(<JournalPage worldId="world-1" />);
@@ -135,9 +146,9 @@ describe('JournalPage', () => {
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
     });
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: 'session-1', characterId: 'char-1' } as any)
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
     );
 
     render(<JournalPage worldId="world-1" />);
@@ -151,13 +162,13 @@ describe('JournalPage', () => {
 
   it('shows no active session state when session is missing', () => {
     const journalStore = buildStore();
-    mockUseJournalStore.mockReturnValue(journalStore as any);
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
-      selector({ id: null, characterId: null } as any)
+      selector(buildSessionState({ id: null, characterId: null }))
     );
 
     render(<JournalPage worldId="world-1" />);
 
-    expect(screen.getByText('No active session')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'No active session' })).toBeInTheDocument();
   });
 });

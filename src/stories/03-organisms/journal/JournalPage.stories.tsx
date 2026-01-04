@@ -22,32 +22,39 @@ const meta: Meta<typeof JournalPage> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const withJournalState = (entries: JournalEntry[]) => (StoryComponent: React.ComponentType) => {
-  const { reset, addEntry, updateEntry } = useJournalStore.getState();
-  reset();
+const withJournalState = (entries: JournalEntry[]) => {
+  const JournalPageDecorator = (StoryComponent: React.ComponentType) => {
+    const { reset, addEntry, updateEntry } = useJournalStore.getState();
+    reset();
 
-  entries.forEach((entry) => {
-    const { id: _id, sessionId, createdAt, updatedAt, ...entryData } = entry;
-    const newId = addEntry(sessionId, entryData);
-    updateEntry(newId, {
-      isRead: entry.isRead,
-      createdAt,
-      updatedAt,
+    entries.forEach((entry) => {
+      const { id, sessionId, createdAt, ...entryData } = entry;
+      void id;
+      const newId = addEntry(sessionId, entryData);
+      updateEntry(newId, {
+        isRead: entry.isRead,
+        createdAt,
+        updatedAt: entry.updatedAt,
+      });
     });
-  });
 
-  useSessionStore.setState({
-    id: journalSessionId,
-    characterId: journalCharacterId,
-    worldId: journalWorldId,
-    status: 'active',
-    currentSceneId: null,
-    playerChoices: [],
-    error: null,
-    savedSessions: {},
-  });
+    useSessionStore.setState({
+      id: journalSessionId,
+      characterId: journalCharacterId,
+      worldId: journalWorldId,
+      status: 'active',
+      currentSceneId: null,
+      playerChoices: [],
+      error: null,
+      savedSessions: {},
+    });
 
-  return <StoryComponent />;
+    return <StoryComponent />;
+  };
+
+  JournalPageDecorator.displayName = 'JournalPageDecorator';
+
+  return JournalPageDecorator;
 };
 
 export const Default: Story = {
