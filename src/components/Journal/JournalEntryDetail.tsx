@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils';
 import { formatSessionDuration } from '@/lib/utils/sessionUtils';
 import { Play, Square, Settings } from 'lucide-react';
-import { getSignificanceBadgeVariant, sanitizeFormattedContent } from './journalUtils';
+import { getSignificanceBadgeVariant } from './journalUtils';
 
 interface JournalEntryDetailProps {
   entry: JournalEntry;
@@ -87,22 +87,14 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
 
       <div className="flex-1 overflow-auto">
         <div className="prose prose-gray max-w-none dark:prose-invert">
-          <div>
-            {entry.type === 'discovery' ? (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeFormattedContent(formatAIResponse(entry.detailedContent || entry.content, {
-                    paragraphSpacing: 'single',
-                    outputFormat: 'html'
-                  }))
-                }}
-              />
-            ) : (
-              <p className="whitespace-pre-wrap">
-                {entry.detailedContent || entry.content}
-              </p>
-            )}
-          </div>
+          <p className="whitespace-pre-wrap">
+            {entry.type === 'discovery'
+              ? formatAIResponse(entry.detailedContent || entry.content, {
+                paragraphSpacing: 'single',
+                outputFormat: 'text'
+              })
+              : (entry.detailedContent || entry.content)}
+          </p>
         </div>
 
         {entry.relatedEntities && entry.relatedEntities.length > 0 && (

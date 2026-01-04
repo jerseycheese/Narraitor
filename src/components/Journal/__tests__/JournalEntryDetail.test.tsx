@@ -4,14 +4,6 @@ import '@testing-library/jest-dom';
 import { JournalEntryDetail } from '../JournalEntryDetail';
 import { JournalEntry } from '@/types/journal.types';
 
-jest.mock('@/lib/utils', () => {
-  const actual = jest.requireActual('@/lib/utils');
-  return {
-    ...actual,
-    formatAIResponse: jest.fn(() => '<p>Formatted content</p><script>alert("x")</script>'),
-  };
-});
-
 const createEntry = (overrides: Partial<JournalEntry> = {}): JournalEntry => ({
   id: 'entry-1',
   sessionId: 'session-1',
@@ -46,14 +38,14 @@ describe('JournalEntryDetail', () => {
     expect(screen.getByText('Tags')).toBeInTheDocument();
   });
 
-  it('sanitizes formatted discovery content', () => {
+  it('renders discovery content as text', () => {
     const entry = createEntry({
       type: 'discovery',
       detailedContent: 'Some discovery text',
     });
     const { container } = render(<JournalEntryDetail entry={entry} />);
 
-    expect(screen.getByText('Formatted content')).toBeInTheDocument();
+    expect(screen.getByText('Some discovery text')).toBeInTheDocument();
     expect(container.querySelector('script')).toBeNull();
   });
 
