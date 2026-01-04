@@ -251,7 +251,7 @@ describe('JournalPage', () => {
 
     render(<JournalPage worldId={worldId} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Search entries'), { target: { value: 'map' } });
+    fireEvent.change(screen.getByPlaceholderText('Search entries...'), { target: { value: 'map' } });
 
     expect(screen.getByText('The Lost Map')).toBeInTheDocument();
     expect(screen.queryByText('Campfire Tales')).not.toBeInTheDocument();

@@ -20,7 +20,6 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
 import { JournalEmptyState } from './JournalEmptyState';
-import { Search } from 'lucide-react';
 
 interface JournalPageProps {
   worldId: string;
@@ -180,18 +179,15 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                 <h2 className="font-semibold text-amber-900">Entries</h2>
               </div>
               <div className="p-4 border-b border-amber-500 bg-amber-50">
-                <label htmlFor="journal-search" className="sr-only">
-                  Search journal entries
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-amber-600" aria-hidden="true" />
+                <div className="flex items-center">
                   <Input
                     id="journal-search"
                     type="search"
-                    placeholder="Search entries"
+                    placeholder="Search entries..."
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    className="pl-9"
+                    className="w-full"
+                    aria-label="Search entries"
                   />
                 </div>
               </div>
