@@ -32,7 +32,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
         return (
           <Card
             key={entry.id}
-            className={`p-3 border cursor-pointer transition-all duration-200 ${
+            className={`p-3 border cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
               isSystemEvent
                 ? selectedEntryId === entry.id
                   ? 'bg-gray-100 border-gray-300 shadow-md'
