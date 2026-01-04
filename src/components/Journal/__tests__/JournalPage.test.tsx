@@ -15,7 +15,7 @@ jest.mock('@/state/sessionStore');
 
 jest.mock('@/components/shared/BackNavigation', () => ({
   BackNavigation: ({ label, href }: { label: string; href?: string }) => (
-    <a href={href}>{label}</a>
+    <button data-href={href}>{label}</button>
   ),
 }));
 
@@ -130,7 +130,7 @@ describe('JournalPage', () => {
 
     expect(screen.getByText('This journal awaits its first entry')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Journal in Test World' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to Play' })).toHaveAttribute('href', `/worlds/${worldId}/play`);
+    expect(screen.getByRole('button', { name: 'Back to Play' })).toHaveAttribute('data-href', `/worlds/${worldId}/play`);
   });
 
   it('renders entries and marks them as read when selected', () => {
