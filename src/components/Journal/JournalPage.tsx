@@ -9,6 +9,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useJournalStore } from '@/state/journalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -19,6 +20,7 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
 import { JournalEmptyState } from './JournalEmptyState';
+import { Search } from 'lucide-react';
 
 interface JournalPageProps {
   worldId: string;
@@ -39,19 +41,46 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(null);
   const [viewMode, setViewMode] = React.useState<'list' | 'detail'>('list');
   const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
+  const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
   const entries = sessionId
     ? getSessionEntriesWithCharacter(sessionId, characterId)
     : [];
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredEntries = React.useMemo(() => {
+    if (!normalizedQuery) {
+      return entries;
+    }
+
+    return entries.filter((entry) => {
+      const tagsText = entry.metadata.tags?.join(' ') ?? '';
+      const relatedText = entry.relatedEntities
+        ?.map((entity) => `${entity.type} ${entity.name}`)
+        .join(' ') ?? '';
+      const haystack = [
+        entry.title,
+        entry.content,
+        entry.detailedContent,
+        tagsText,
+        relatedText,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(normalizedQuery);
+    });
+  }, [entries, normalizedQuery]);
+
   const selectedEntry = selectedEntryId
-    ? entries.find((entry) => entry.id === selectedEntryId) || null
+    ? filteredEntries.find((entry) => entry.id === selectedEntryId) || null
     : null;
 
   React.useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [PAGE_SIZE, sessionId]);
+  }, [PAGE_SIZE, sessionId, normalizedQuery]);
 
   React.useEffect(() => {
     if (selectedEntryId && !selectedEntry) {
@@ -92,8 +121,8 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
       : 'No entries yet';
   const showEntrySummary = !!sessionId;
   const pageTitle = world ? `Journal in ${world.name}` : 'Journal';
-  const visibleEntries = entries.slice(0, visibleCount);
-  const canLoadMore = entries.length > visibleCount;
+  const visibleEntries = filteredEntries.slice(0, visibleCount);
+  const canLoadMore = filteredEntries.length > visibleCount;
 
   const renderContent = () => {
     if (!sessionId) {
@@ -150,11 +179,33 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
               <div className="p-4 border-b border-amber-500 bg-amber-50 flex items-center justify-between">
                 <h2 className="font-semibold text-amber-900">Entries</h2>
               </div>
-              <JournalEntryList
-                entries={visibleEntries}
-                selectedEntryId={selectedEntryId}
-                onEntrySelect={handleEntrySelect}
-              />
+              <div className="p-4 border-b border-amber-500 bg-amber-50">
+                <label htmlFor="journal-search" className="sr-only">
+                  Search journal entries
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-amber-600" aria-hidden="true" />
+                  <Input
+                    id="journal-search"
+                    type="search"
+                    placeholder="Search entries"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              {filteredEntries.length === 0 ? (
+                <div className="flex-1 p-4 text-sm text-amber-700">
+                  No entries match your search.
+                </div>
+              ) : (
+                <JournalEntryList
+                  entries={visibleEntries}
+                  selectedEntryId={selectedEntryId}
+                  onEntrySelect={handleEntrySelect}
+                />
+              )}
               {canLoadMore && (
                 <div className="p-4 border-t border-amber-500 bg-amber-50">
                   <Button

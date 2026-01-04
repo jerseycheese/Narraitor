@@ -235,4 +235,25 @@ describe('JournalPage', () => {
 
     expect(screen.getByText('Entry 21')).toBeInTheDocument();
   });
+
+  it('filters entries by search query', () => {
+    const entries = [
+      createEntry({ id: 'entry-1', title: 'The Lost Map', content: 'A dusty map of ruins.' }),
+      createEntry({ id: 'entry-2', title: 'Campfire Tales', content: 'Stories by the fire.' }),
+    ];
+    const journalStore = buildStore({
+      getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+    });
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
+    mockUseSessionStore.mockImplementation((selector) =>
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
+    );
+
+    render(<JournalPage worldId={worldId} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Search entries'), { target: { value: 'map' } });
+
+    expect(screen.getByText('The Lost Map')).toBeInTheDocument();
+    expect(screen.queryByText('Campfire Tales')).not.toBeInTheDocument();
+  });
 });
