@@ -70,14 +70,6 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
           >
             {capitalize(entry.significance)}
           </Badge>
-          <Badge
-            variant={isSystemEvent ? 'secondary-static' : 'info-static'}
-            size="sm"
-            className={isSystemEvent ? 'bg-gray-200 text-gray-700' : ''}
-          >
-            {isSystemEvent && 'System: '}
-            {titleCase(entry.type.replace('_', ' '))}
-          </Badge>
           <span className={isSystemEvent ? 'text-gray-700' : 'text-amber-500'}>
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>

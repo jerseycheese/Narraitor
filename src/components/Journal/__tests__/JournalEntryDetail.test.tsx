@@ -70,7 +70,7 @@ describe('JournalEntryDetail', () => {
     render(<JournalEntryDetail entry={entry} />);
 
     expect(screen.getByText(/Duration:/i)).toBeInTheDocument();
-    expect(screen.getByText(/System:/i)).toBeInTheDocument();
+    expect(screen.getByText('Session End')).toBeInTheDocument();
   });
 
   it('renders back button when enabled', () => {
