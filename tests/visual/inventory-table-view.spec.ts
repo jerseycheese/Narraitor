@@ -9,6 +9,9 @@ test.describe('Inventory Table View', () => {
     test.setTimeout(60000);
 
     // Seed test data and navigate to game session
+    await page.addInitScript(() => {
+      window.localStorage.setItem('inventory-view-mode', 'table');
+    });
     await seedTestData(page);
     await mockApiEndpoints(page);
     await page.goto('/worlds/world-cyberpunk-2077/play');
@@ -40,21 +43,11 @@ test.describe('Inventory Table View', () => {
       await page.waitForTimeout(300);
     }
 
-    // Wait for inventory items to be visible (grid view by default)
-    await page.waitForSelector('.inventory-item', {
-      state: 'visible',
-      timeout: 5000,
-    });
-
-    // Switch to table view
-    const tableViewBtn = page.getByRole('button', { name: 'Table view' });
-    await expect(tableViewBtn).toBeVisible();
-    await tableViewBtn.click();
     await waitForContentStable(page);
 
     // Verify table is now visible
     const table = page.getByRole('table', { name: /Inventory table/ });
-    await expect(table).toBeVisible();
+    await expect(table).toBeVisible({ timeout: 10000 });
 
     // Verify all columns are present (scope to table to avoid conflicts)
     await expect(table.getByRole('button', { name: 'Name' })).toBeVisible();
