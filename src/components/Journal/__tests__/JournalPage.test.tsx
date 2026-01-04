@@ -229,11 +229,11 @@ describe('JournalPage', () => {
     render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByText('Entry 1')).toBeInTheDocument();
-    expect(screen.queryByText('Entry 21')).not.toBeInTheDocument();
+    expect(screen.queryByText('Entry 11')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /load more/i }));
 
-    expect(screen.getByText('Entry 21')).toBeInTheDocument();
+    expect(screen.getByText('Entry 11')).toBeInTheDocument();
   });
 
   it('filters entries by search query', () => {

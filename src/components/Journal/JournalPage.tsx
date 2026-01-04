@@ -26,7 +26,7 @@ interface JournalPageProps {
 }
 
 export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 10;
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
   const world = useWorldStore((state) => state.worlds[worldId]);
