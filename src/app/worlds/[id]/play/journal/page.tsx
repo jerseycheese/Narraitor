@@ -6,11 +6,12 @@ export const metadata = {
 };
 
 interface JournalPageRouteProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function JournalPageRoute({ params }: JournalPageRouteProps) {
-  return <JournalPage worldId={params.id} />;
+export default async function JournalPageRoute({ params }: JournalPageRouteProps) {
+  const { id } = await params;
+  return <JournalPage worldId={id} />;
 }

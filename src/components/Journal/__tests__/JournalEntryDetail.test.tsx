@@ -60,6 +60,7 @@ describe('JournalEntryDetail', () => {
   it('shows session duration for session end entries', () => {
     const entry = createEntry({
       type: 'session_end',
+      title: '',
       metadata: {
         tags: [],
         automaticEntry: true,

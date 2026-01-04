@@ -40,8 +40,19 @@ const createEntry = (overrides: Partial<JournalEntry> = {}): JournalEntry => ({
   ...overrides,
 });
 
+const createEntries = (count: number): JournalEntry[] =>
+  Array.from({ length: count }, (_, index) =>
+    createEntry({
+      id: `entry-${index + 1}`,
+      title: `Entry ${index + 1}`,
+      createdAt: `2024-01-01T12:${String(index).padStart(2, '0')}:00Z`,
+      updatedAt: `2024-01-01T12:${String(index).padStart(2, '0')}:00Z`,
+    })
+  );
+
 describe('JournalPage', () => {
   const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
+  const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
   const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
   const worldId = 'world-1';
 
@@ -64,6 +75,7 @@ describe('JournalPage', () => {
 
   type JournalStoreState = ReturnType<typeof useJournalStore.getState>;
   type SessionStoreState = ReturnType<typeof useSessionStore.getState>;
+  type WorldStoreState = ReturnType<typeof useWorldStore.getState>;
 
   const buildStore = (overrides: Partial<JournalStoreState> = {}): JournalStoreState => ({
     getSessionEntriesWithCharacter: jest.fn().mockReturnValue([]),
@@ -88,16 +100,23 @@ describe('JournalPage', () => {
     ...overrides,
   } as SessionStoreState);
 
+  const buildWorldState = (overrides: Partial<WorldStoreState> = {}): WorldStoreState => ({
+    worlds: { [worldId]: mockWorld },
+    entities: { [worldId]: mockWorld },
+    ...overrides,
+  } as WorldStoreState);
+
   const mockJournalSelector = (state: JournalStoreState) => (
     selector?: (store: JournalStoreState) => unknown
   ) => (typeof selector === 'function' ? selector(state) : state);
 
+  const mockWorldSelector = (state: WorldStoreState) => (
+    selector?: (store: WorldStoreState) => unknown
+  ) => (typeof selector === 'function' ? selector(state) : state);
+
   beforeEach(() => {
     jest.clearAllMocks();
-    useWorldStore.setState({
-      worlds: { [worldId]: mockWorld },
-      entities: { [worldId]: mockWorld },
-    });
+    mockUseWorldStore.mockImplementation(mockWorldSelector(buildWorldState()));
   });
 
   it('renders empty state when no entries exist', () => {
@@ -195,5 +214,25 @@ describe('JournalPage', () => {
     render(<JournalPage worldId={worldId} />);
 
     expect(screen.getByRole('heading', { name: 'No active session' })).toBeInTheDocument();
+  });
+
+  it('loads more entries when requested', () => {
+    const entries = createEntries(25);
+    const journalStore = buildStore({
+      getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+    });
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
+    mockUseSessionStore.mockImplementation((selector) =>
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
+    );
+
+    render(<JournalPage worldId={worldId} />);
+
+    expect(screen.getByText('Entry 1')).toBeInTheDocument();
+    expect(screen.queryByText('Entry 21')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /load more/i }));
+
+    expect(screen.getByText('Entry 21')).toBeInTheDocument();
   });
 });

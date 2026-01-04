@@ -8,6 +8,7 @@ import { Hero } from '@/components/shared/Hero';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { Button } from '@/components/ui/button';
 import { useJournalStore } from '@/state/journalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -24,6 +25,7 @@ interface JournalPageProps {
 }
 
 export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
+  const PAGE_SIZE = 20;
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
   const world = useWorldStore((state) => state.worlds[worldId]);
@@ -36,6 +38,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
 
   const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(null);
   const [viewMode, setViewMode] = React.useState<'list' | 'detail'>('list');
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
   const entries = sessionId
@@ -45,6 +48,10 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const selectedEntry = selectedEntryId
     ? entries.find((entry) => entry.id === selectedEntryId) || null
     : null;
+
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [PAGE_SIZE, sessionId]);
 
   React.useEffect(() => {
     if (selectedEntryId && !selectedEntry) {
@@ -85,6 +92,8 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
       : 'No entries yet';
   const showEntrySummary = !!sessionId;
   const pageTitle = world ? `Journal in ${world.name}` : 'Journal';
+  const visibleEntries = entries.slice(0, visibleCount);
+  const canLoadMore = entries.length > visibleCount;
 
   const renderContent = () => {
     if (!sessionId) {
@@ -142,10 +151,23 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                 <h2 className="font-semibold text-amber-900">Entries</h2>
               </div>
               <JournalEntryList
-                entries={entries}
+                entries={visibleEntries}
                 selectedEntryId={selectedEntryId}
                 onEntrySelect={handleEntrySelect}
               />
+              {canLoadMore && (
+                <div className="p-4 border-t border-amber-500 bg-amber-50">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, entries.length))}
+                  >
+                    Load more
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div
