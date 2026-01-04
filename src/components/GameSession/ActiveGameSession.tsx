@@ -353,6 +353,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Regex patterns for cleaning decision prompts
   const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
   const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
+  const GENERIC_PROMPT_REGEX = /^what will you do(\b.*)?$/i;
 
   /**
    * Creates a journal entry for a decision made by the character.
@@ -371,12 +372,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Format decision content for readability
     const formatDecisionContent = (choice: string, prompt: string): string => {
-      const cleanChoice = choice.toLowerCase();
-      const cleanPrompt = prompt
-        .toLowerCase()
+      const cleanChoice = safeTrim(choice).replace(/[.!?]+$/, '').toLowerCase();
+      const cleanPrompt = safeTrim(prompt)
         .replace(YOU_PREFIX_REGEX, '')
-        .replace(QUESTION_MARK_SUFFIX_REGEX, '');
-      return `Chose to ${cleanChoice} when ${cleanPrompt}`;
+        .replace(QUESTION_MARK_SUFFIX_REGEX, '')
+        .toLowerCase();
+
+      if (!cleanPrompt || GENERIC_PROMPT_REGEX.test(cleanPrompt)) {
+        return `Chose to ${cleanChoice}.`;
+      }
+
+      return `Chose to ${cleanChoice} when ${cleanPrompt}.`;
     };
     
     // Map decision weight to significance
