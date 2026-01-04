@@ -162,7 +162,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     }
 
     return (
-      <div className="flex-1 min-h-0 overflow-hidden rounded-lg border border-warning/30 bg-background dark:bg-white flex flex-col md:flex-row">
+      <div className="flex-1 min-h-0 overflow-hidden rounded-lg border border-warning/30 bg-background dark:bg-white flex flex-col md:flex-row md:h-[60vh] md:max-h-[600px]">
         {entries.length === 0 ? (
           <JournalEmptyState />
         ) : (
