@@ -3,14 +3,14 @@ import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
 /**
- * Journal Modal Visual Test
+ * Journal Page Visual Test
  *
- * Tests that the journal modal displays entries correctly
+ * Tests that the dedicated journal page displays entries correctly
  * during an active game session.
  */
 
-test.describe('Journal Modal', () => {
-  test('Should display journal entries in modal', async ({ page }) => {
+test.describe('Journal Page', () => {
+  test('Should display journal entries on the journal page', async ({ page }) => {
     // Seed all necessary test data (worlds, characters, sessions, journal entries)
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -29,20 +29,21 @@ test.describe('Journal Modal', () => {
     const journalButton = page.getByRole('button', { name: /open journal/i });
     await expect(journalButton).toBeVisible({ timeout: 10000 });
 
-    // Click the journal button to open the modal
+    // Click the journal button to open the journal page
     await journalButton.click();
 
-    // Wait for journal modal to open
-    await page.waitForSelector('[role="dialog"]', { timeout: 5000 });
+    // Wait for journal page to load
+    await page.waitForURL('**/play/journal', { timeout: 5000 });
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
 
-    // Verify journal modal is visible
-    const journalModal = page.locator('[role="dialog"]');
-    await expect(journalModal).toBeVisible();
+    // Verify journal page content is visible
+    await expect(page.getByRole('heading', { name: 'Journal' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Entries' })).toBeVisible();
 
-    // Take screenshot of journal modal
-    await page.waitForTimeout(500); // Let modal animation complete
-    await expect(page).toHaveScreenshot('journal-modal.png', {
-      fullPage: false,
+    // Take screenshot of journal page
+    await page.waitForTimeout(500); // Let layout settle
+    await expect(page).toHaveScreenshot('journal-page.png', {
+      fullPage: true,
       threshold: 0.3,
     });
   });

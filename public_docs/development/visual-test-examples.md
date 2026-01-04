@@ -302,33 +302,21 @@ test('active game session', async ({ page }) => {
 ### Journal Interface
 
 ```typescript
-test('journal modal states', async ({ page }) => {
-  await page.goto('/dev/game-session');
+test('journal page states', async ({ page }) => {
+  await page.goto('/worlds/world-cyberpunk-2077/play');
   await waitForAppReady(page);
   
-  // Start game to generate journal entries
-  await page.click('[data-testid="start-test-game"]');
-  await page.waitForSelector('[data-testid="journal-button"]');
+  // Open journal from gameplay
+  const journalButton = page.getByRole('button', { name: /open journal/i });
+  await journalButton.click();
+  await page.waitForURL('**/play/journal');
   
-  // Open journal
-  await page.click('[data-testid="journal-button"]');
-  await page.waitForSelector('[data-testid="journal-modal"]');
-  
-  // Journal with entries
-  await expect(page.locator('[data-testid="journal-modal"]')).toHaveScreenshot('journal-with-entries.png');
-  
-  // Filter by story events
-  await page.click('[data-testid="filter-story-events"]');
-  await expect(page.locator('[data-testid="journal-modal"]')).toHaveScreenshot('journal-story-filter.png');
-  
-  // Empty state (clear all entries first)
-  await page.click('[data-testid="clear-journal"]');
-  await page.click('[data-testid="confirm-clear"]');
-  await expect(page.locator('[data-testid="journal-modal"]')).toHaveScreenshot('journal-empty.png');
+  // Journal page with entries
+  await expect(page).toHaveScreenshot('journal-page.png');
 });
 ```
 
-**When to use:** Testing modal dialogs, filters, and different data states.
+**When to use:** Testing the dedicated journal page layout and entry states.
 
 ## Animation and Transition Testing
 

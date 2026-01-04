@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import ActiveGameSession from '@/components/GameSession/ActiveGameSession';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -17,7 +18,7 @@ import { getTimestamp } from '@/lib/utils';
  * - Toggle character presence
  * - Add/remove journal entries
  * - Change game session status
- * - Test journal modal functionality
+ * - Test journal page navigation
  * - Verify state preservation
  */
 export default function JournalAccessTestPage() {
@@ -26,6 +27,7 @@ export default function JournalAccessTestPage() {
     'active' | 'paused' | 'ended'
   >('active');
   const [entryCount, setEntryCount] = React.useState(3);
+  const router = useRouter();
 
   // Setup stores
   React.useEffect(() => {
@@ -280,6 +282,12 @@ export default function JournalAccessTestPage() {
           <div className="space-y-2">
             <h3 className="font-semibold text-gray-700">Journal Debug</h3>
             <button
+              onClick={() => router.push('/worlds/test-world-1/play/journal')}
+              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-500"
+            >
+              Open Journal Page
+            </button>
+            <button
               onClick={() => {
                 // Clear existing journal entries for this session
                 useJournalStore.getState().reset();
@@ -312,7 +320,7 @@ export default function JournalAccessTestPage() {
               status
             </li>
             <li>
-              🎯 <strong>AC4:</strong> Smooth modal transition with proper
+              🎯 <strong>AC4:</strong> Smooth page transition with proper
               accessibility
             </li>
             <li>
@@ -353,7 +361,7 @@ export default function JournalAccessTestPage() {
                 <li>• Toggle character presence to test AC1</li>
                 <li>• Change game status to test AC3</li>
                 <li>• Adjust entry count to test different journal states</li>
-                <li>• Click journal button to test AC4 (smooth transition)</li>
+                <li>• Click journal button to test AC4 (page transition)</li>
                 <li>
                   • Verify AC2: game state preserved during journal access
                 </li>
@@ -366,14 +374,9 @@ export default function JournalAccessTestPage() {
               </h4>
               <ul className="space-y-1 text-gray-700">
                 <li>• Journal button appears only with character</li>
-                <li>
-                  • Modal opens with role=&quot;dialog&quot; and
-                  aria-modal=&quot;true&quot;
-                </li>
+                <li>• Journal opens as a full-page view</li>
                 <li>• Journal entries display correctly</li>
-                <li>
-                  • Close button works (multiple ways: X, backdrop, Escape)
-                </li>
+                <li>• Back navigation returns to gameplay</li>
                 <li>• Game session remains intact throughout</li>
                 <li>• Accessibility features work properly</li>
               </ul>

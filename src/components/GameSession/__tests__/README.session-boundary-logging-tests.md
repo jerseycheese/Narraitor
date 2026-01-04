@@ -22,7 +22,7 @@ This document summarizes the comprehensive test suite created for **Issue #176: 
 - System events are marked with `automaticEntry: true` and `system` tags
 - Content validation prevents empty entries
 
-### 2. UI Display Tests (`JournalModal.sessionBoundaryDisplay.test.tsx`)
+### 2. UI Display Tests (`JournalEntryDetail.test.tsx`, `JournalPage.test.tsx`)
 
 **Purpose**: Verifies proper UI display of session boundary events
 
@@ -36,7 +36,7 @@ This document summarizes the comprehensive test suite created for **Issue #176: 
 **Critical Assertions**:
 - Type badges appear correctly in detail view (`Session Start`, `Session End`)
 - System tags are displayed when entries are selected
-- Proper ARIA labels for dialog and entry selection
+- Proper ARIA labels for entry selection
 - Content uses `whitespace-pre-wrap` for proper formatting
 
 ### 3. Integration Tests (`SessionBoundaryLogging.integration.test.tsx`)
@@ -115,7 +115,7 @@ mockUseSessionStore.mockReturnValue({
 ## Test Status
 
 ✅ **Journal Store Tests**: 7/7 passing
-✅ **UI Display Tests**: 6/9 passing (3 tests need minor fixes for multiple element selection)
+✅ **UI Display Tests**: Covered in journal page component tests
 ✅ **Integration Tests**: 3/4 passing (1 test needs GameSession import fix)
 
 ## Known Issues and Fixes Needed
@@ -187,17 +187,17 @@ endSession: () => {
 
 ## Next Steps
 
-1. **Fix remaining test issues** (3 UI tests, 1 integration test)
+1. **Expand UI coverage** for session boundary display in the journal page components
 2. **Implement actual session boundary logging** in session store
 3. **Add duration calculation utilities**
 4. **Enhance UI styling** for system events
-5. **Add Storybook documentation** for session boundary display
 
 ## Files Created
 
 - `src/state/__tests__/journalStore.sessionBoundaryLogging.test.ts`
-- `src/components/GameSession/__tests__/JournalModal.sessionBoundaryDisplay.test.tsx`
+- `src/components/Journal/__tests__/JournalEntryDetail.test.tsx`
+- `src/components/Journal/__tests__/JournalPage.test.tsx`
 - `src/components/GameSession/__tests__/SessionBoundaryLogging.integration.test.tsx`
-- `src/components/GameSession/JournalModal.sessionBoundary.stories.tsx`
+- `src/stories/03-organisms/journal/JournalEntryDetail.stories.tsx`
 
 These tests provide comprehensive coverage for the session boundary logging feature and serve as both verification and documentation for the implementation requirements.

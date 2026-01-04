@@ -1,0 +1,189 @@
+'use client';
+
+import React from 'react';
+import { BookOpen } from 'lucide-react';
+import { BackNavigation } from '@/components/shared/BackNavigation';
+import { PageLayout } from '@/components/shared/PageLayout';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { useJournalStore } from '@/state/journalStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { EntityID } from '@/types/common.types';
+import { JournalEntry } from '@/types/journal.types';
+import { cn } from '@/lib/utils';
+import { JournalEntryDetail } from './JournalEntryDetail';
+import { JournalEntryList } from './JournalEntryList';
+import { JournalEmptyState } from './JournalEmptyState';
+
+interface JournalPageProps {
+  worldId: string;
+}
+
+export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
+  const sessionId = useSessionStore((state) => state.id);
+  const characterId = useSessionStore((state) => state.characterId);
+  const {
+    getSessionEntriesWithCharacter,
+    markAsRead,
+    error: journalError,
+    loading: journalLoading,
+  } = useJournalStore();
+
+  const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(null);
+  const [viewMode, setViewMode] = React.useState<'list' | 'detail'>('list');
+  const detailRef = React.useRef<HTMLDivElement | null>(null);
+
+  const entries = sessionId
+    ? getSessionEntriesWithCharacter(sessionId, characterId)
+    : [];
+
+  const selectedEntry = selectedEntryId
+    ? entries.find((entry) => entry.id === selectedEntryId) || null
+    : null;
+
+  React.useEffect(() => {
+    if (selectedEntryId && !selectedEntry) {
+      setSelectedEntryId(null);
+      setViewMode('list');
+    }
+  }, [selectedEntryId, selectedEntry]);
+
+  React.useEffect(() => {
+    if (selectedEntry && detailRef.current) {
+      detailRef.current.focus();
+    }
+  }, [selectedEntry]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && viewMode === 'detail') {
+        setViewMode('list');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode]);
+
+  const handleEntrySelect = (entry: JournalEntry) => {
+    setSelectedEntryId(entry.id);
+    setViewMode('detail');
+    if (!entry.isRead) {
+      markAsRead(entry.id);
+    }
+  };
+
+  const entrySummary = !sessionId
+    ? 'No active session'
+    : entries.length
+      ? `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`
+      : 'No entries yet';
+
+  const renderContent = () => {
+    if (!sessionId) {
+      return (
+        <EmptyState
+          title="No active session"
+          description="Start or resume a session to view its journal entries."
+          variant="centered"
+          className="text-amber-700"
+        />
+      );
+    }
+
+    if (journalLoading) {
+      return (
+        <div className="rounded-lg border border-warning/30 bg-background dark:bg-white p-6">
+          <LoadingState
+            variant="skeleton"
+            size="md"
+            message="Loading journal entries..."
+            skeletonLines={6}
+            className="w-full"
+          />
+        </div>
+      );
+    }
+
+    if (journalError) {
+      return (
+        <ErrorDisplay
+          variant="section"
+          severity="warning"
+          title={journalError.title}
+          message={journalError.message}
+          className="bg-white"
+        />
+      );
+    }
+
+    return (
+      <div className="flex-1 min-h-0 overflow-hidden rounded-lg border border-warning/30 bg-background dark:bg-white flex flex-col md:flex-row">
+        {entries.length === 0 ? (
+          <JournalEmptyState />
+        ) : (
+          <>
+            <div
+              className={cn(
+                'w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-500 min-h-0 flex-col',
+                viewMode === 'list' ? 'flex' : 'hidden',
+                'md:flex'
+              )}
+              data-testid="journal-list-pane"
+            >
+              <div className="p-4 border-b border-amber-500 bg-amber-50 flex items-center justify-between">
+                <h2 className="font-semibold text-amber-900">Entries</h2>
+              </div>
+              <JournalEntryList
+                entries={entries}
+                selectedEntryId={selectedEntryId}
+                onEntrySelect={handleEntrySelect}
+              />
+            </div>
+
+            <div
+              className={cn(
+                'flex-1 min-h-0 bg-white md:w-[28rem] xl:w-[32rem] flex-col',
+                viewMode === 'detail' ? 'flex' : 'hidden',
+                'md:flex'
+              )}
+              data-testid="journal-detail-pane"
+            >
+              {selectedEntry ? (
+                <div className="p-4 md:p-6 h-full" ref={detailRef} tabIndex={-1}>
+                  <JournalEntryDetail
+                    entry={selectedEntry}
+                    showBackButton={viewMode === 'detail'}
+                    onBack={() => setViewMode('list')}
+                  />
+                </div>
+              ) : (
+                <div className="p-6 h-full flex items-center justify-center">
+                  <div className="text-center text-amber-500">
+                    <div className="flex justify-center mb-4">
+                      <BookOpen className="w-10 h-10 text-amber-300" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">Select an Entry</h3>
+                    <p className="text-sm">
+                      Choose an entry from the list to view its complete content
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <PageLayout title="Journal" description={entrySummary} className="journal-page">
+      <div className="mb-6">
+        <BackNavigation href={`/worlds/${worldId}/play`} label="Back to Play" />
+      </div>
+      {renderContent()}
+    </PageLayout>
+  );
+};
