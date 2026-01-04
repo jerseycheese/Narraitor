@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { SAMPLE_JOURNAL_ENTRIES } from '@/tests/fixtures';
 
 const SUGGESTED_ACTIONS_TITLE_LOCATOR = '[data-testid="collapsible-section-title"]';
 const SUGGESTED_ACTIONS_CONTENT_LOCATOR = '[data-testid="collapsible-section-content"]';
@@ -350,6 +351,51 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
       },
     }));
   });
+}
+
+/**
+ * Seed journal entries so the journal page renders populated content.
+ */
+export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
+  await page.evaluate((entries) => {
+    const journalStore = (window as typeof window & {
+      useJournalStore?: {
+        setState: (
+          partial: unknown,
+          replace?: boolean
+        ) => void;
+      };
+    }).useJournalStore;
+
+    if (!journalStore?.setState) {
+      return;
+    }
+
+    const entriesRecord = entries.reduce((acc: Record<string, unknown>, entry: any) => {
+      acc[entry.id] = entry;
+      return acc;
+    }, {});
+
+    const sessionEntries = entries.reduce((acc: Record<string, string[]>, entry: any) => {
+      acc[entry.sessionId] = acc[entry.sessionId] || [];
+      acc[entry.sessionId].push(entry.id);
+      return acc;
+    }, {});
+
+    journalStore.setState((state: {
+      entries: Record<string, unknown>;
+      sessionEntries: Record<string, string[]>;
+    }) => ({
+      entries: {
+        ...state.entries,
+        ...entriesRecord,
+      },
+      sessionEntries: {
+        ...state.sessionEntries,
+        ...sessionEntries,
+      },
+    }));
+  }, SAMPLE_JOURNAL_ENTRIES);
 }
 
 /**

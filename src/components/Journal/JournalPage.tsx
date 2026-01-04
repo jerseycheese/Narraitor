@@ -73,6 +73,15 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     });
   }, [entries, normalizedQuery]);
 
+  const firstEntryId = filteredEntries[0]?.id ?? null;
+  React.useEffect(() => {
+    if (selectedEntryId || !firstEntryId) {
+      return;
+    }
+
+    setSelectedEntryId(firstEntryId);
+  }, [firstEntryId, selectedEntryId]);
+
   const selectedEntry = selectedEntryId
     ? filteredEntries.find((entry) => entry.id === selectedEntryId) || null
     : null;
