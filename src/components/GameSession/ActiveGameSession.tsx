@@ -354,6 +354,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
   const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
   const GENERIC_PROMPT_REGEX = /^what will you do(\b.*)?$/i;
+  const GENERIC_PROMPT_SUFFIX_REGEX = /(,?\s*)?(what (do|will) you do( next| now)?|how do you respond|what is your move|what's your move)\??\.?$/i;
 
   /**
    * Creates a journal entry for a decision made by the character.
@@ -374,6 +375,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     const formatDecisionContent = (choice: string, prompt: string): string => {
       const cleanChoice = safeTrim(choice).replace(/[.!?]+$/, '').toLowerCase();
       const cleanPrompt = safeTrim(prompt)
+        .replace(GENERIC_PROMPT_SUFFIX_REGEX, '')
         .replace(YOU_PREFIX_REGEX, '')
         .replace(QUESTION_MARK_SUFFIX_REGEX, '')
         .toLowerCase();
