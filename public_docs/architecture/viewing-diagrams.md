@@ -70,11 +70,26 @@ Creates `public_docs/architecture/dependency-graph.svg` that opens in any browse
 
 ## Diagram Files Overview
 
-| File | Lines | Best Viewer | Description |
-|------|-------|-------------|-------------|
-| `component-dependencies.mmd` | ~112 | VS Code / Live | High-level component folders |
-| `stores-dependencies.mmd` | ~275 | VS Code / Live | Zustand store relationships |
-| `dependency-graph.mmd` | ~variable | Live Editor | Full project dependency map |
+The diagrams are generated at **multiple zoom levels** to avoid rendering issues:
+
+### Full Project Dependencies
+
+| File | Lines | Edges | VS Code | Description |
+|------|-------|-------|---------|-------------|
+| `dependency-graph-domains.mmd` | ~54 | <100 | ✅ | **Start here** - Domain level (state, components, lib, etc.) |
+| `dependency-graph-detailed.mmd` | ~5000+ | >1000 | ❌ | All files - Use Mermaid Live only |
+
+### Focused Views
+
+| File | Lines | VS Code | Description |
+|------|-------|---------|-------------|
+| `component-dependencies.mmd` | ~112 | ✅ | High-level component folders |
+| `stores-dependencies.mmd` | ~275 | ✅ | Zustand store relationships |
+
+**Recommendation:** 
+- **VS Code:** Use `*-domains.mmd` and focused views
+- **Deep dive:** Use `*-detailed.mmd` in Mermaid Live Editor
+- **Quick overview:** Always start with domains view
 
 ## Troubleshooting
 

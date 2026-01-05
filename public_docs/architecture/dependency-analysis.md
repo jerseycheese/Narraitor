@@ -4,13 +4,33 @@ This document explains how to use dependency-cruiser to analyze and visualize Na
 
 ## Generated Diagrams
 
-Three Mermaid diagrams are automatically generated:
+Diagrams are generated at **multiple zoom levels** for optimal viewing:
 
-1. **dependency-graph.mmd** - Complete project dependency graph
-2. **stores-dependencies.mmd** - Zustand store dependencies only
-3. **component-dependencies.mmd** - Component relationship map
+### 1. Domain-Level Overview (dependency-graph-domains.mmd)
+**Best for:** Understanding high-level architecture
+- Shows: state, components, lib, types, utils, etc.
+- ~54 lines, <100 edges
+- ✅ Works in VS Code
 
-These diagrams are regenerated automatically via npm scripts and can be viewed in any Mermaid-compatible viewer (GitHub, VS Code with extension, etc.).
+### 2. Component Relationships (component-dependencies.mmd)
+**Best for:** Understanding component structure
+- Shows: Major component folders and their dependencies
+- ~112 lines
+- ✅ Works in VS Code
+
+### 3. Store Dependencies (stores-dependencies.mmd)
+**Best for:** Analyzing state management
+- Shows: All Zustand stores and their relationships
+- ~275 lines
+- ✅ Works in VS Code
+
+### 4. Full Detail (dependency-graph-detailed.mmd)
+**Best for:** Deep investigation with Mermaid Live Editor
+- Shows: Every file and import
+- 5000+ lines, 1000+ edges
+- ❌ Too complex for VS Code - use https://mermaid.live
+
+These diagrams are regenerated automatically via npm scripts and can be viewed in any Mermaid-compatible viewer.
 
 ## Quick Start
 
