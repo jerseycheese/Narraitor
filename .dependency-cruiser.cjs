@@ -212,7 +212,7 @@ module.exports = {
       comment:
         "This module depends on an npm package from the 'devDependencies' section of your " +
         'package.json. It looks like something that ships to production, though. To prevent problems ' +
-        "with npm packages that aren't there on production declare it (only!) in the 'dependencies'" +
+        "with npm packages that aren't there on production declare it (only!) in the 'dependencies' " +
         'section of your package.json. If this module is development only - add it to the ' +
         'from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser configuration',
       from: {
@@ -239,7 +239,7 @@ module.exports = {
       comment:
         "This module depends on an npm package that is declared as an optional dependency " +
         "in your package.json. As this makes sense in limited situations only, it's flagged here. " +
-        "If you use an optional dependency here by design - add an exception to your" +
+        "If you use an optional dependency here by design - add an exception to your " +
         "dependency-cruiser configuration.",
       from: {},
       to: {
