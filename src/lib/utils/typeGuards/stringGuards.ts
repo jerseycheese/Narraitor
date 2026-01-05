@@ -15,10 +15,9 @@ export function sanitizeString(value: unknown, maxLength: number = 200): string 
   // First normalize the text to handle whitespace, quotes, and special characters
   let sanitized = normalizeText(value, NORM_NAME);
   
-  // Remove HTML tags and dangerous characters
+  // Remove dangerous characters (strip angle brackets to neutralize tags)
   sanitized = safeTrim(sanitized
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/[<>]/g, '') // Strip any remaining angle brackets
+    .replace(/[<>]/g, '') // Strip angle brackets
     .replace(/[&"']/g, '') // Remove dangerous characters
     .substring(0, maxLength));
     
