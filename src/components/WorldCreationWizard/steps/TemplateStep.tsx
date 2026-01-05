@@ -11,6 +11,7 @@ import { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.typ
 import { World } from '@/types/world.types';
 import { Button } from '@/components/ui/button';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
+import { toGenreValue } from '@/lib/constants/genres';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -147,7 +148,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         // World data fields go at the top level (not nested under worldData)
         name: template.name,
         description: template.description,
-        genre: template.genre,
+        genre: toGenreValue(template.genre),
         aiSuggestions: {
           attributes: convertedAttributes,
           skills: convertedSkills

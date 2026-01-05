@@ -5,7 +5,7 @@ import { generateWorldTemplatePrompt, TemplateGenerationContext } from './templa
 import type { World } from '@/types/world.types';
 import type { WorldTemplate } from '@/types/world-template.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handleAIRequest } from '@/lib/utils/aiResponseParser';
-import { normalizeGenre } from '@/lib/constants/genres';
+import { normalizeGenre, toGenreValue } from '@/lib/constants/genres';
 
 export type { WorldTemplate } from '@/types/world-template.types';
 
@@ -79,7 +79,7 @@ export class TemplateGenerator {
     return {
       name: template.name,
       description: template.description,
-      genre: template.genre,
+      genre: toGenreValue(template.genre),
       attributes: template.attributes.map((attr, index) => ({
         id: `attr-${index}`,
         worldId: '', // Will be set when world is created
