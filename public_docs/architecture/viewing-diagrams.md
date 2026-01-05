@@ -1,5 +1,11 @@
 # Viewing Architecture Diagrams
 
+> **⚠️ First Time Setup:** Diagrams are not committed to git. Generate them first:
+> ```bash
+> npm run deps:diagram:all
+> ```
+> This creates all diagram files in `public_docs/architecture/`. They're ignored by git and must be regenerated after pulling updates.
+
 All diagram files (`.mmd`) are in Mermaid format. Here are the best ways to view them:
 
 ## Recommended: Mermaid Live Editor

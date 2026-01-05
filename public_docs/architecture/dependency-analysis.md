@@ -2,6 +2,18 @@
 
 This document explains how to use dependency-cruiser to analyze and visualize Narraitor's codebase architecture.
 
+## Quick Start
+
+**Generate diagrams first (not committed to git):**
+```bash
+npm run deps:diagram:all
+```
+
+**Validate architecture rules:**
+```bash
+npm run deps:validate
+```
+
 ## Generated Diagrams
 
 Diagrams are generated at **multiple zoom levels** for optimal viewing:
