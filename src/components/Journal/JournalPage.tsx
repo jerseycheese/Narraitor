@@ -82,8 +82,9 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     setSelectedEntryId(firstEntryId);
   }, [firstEntryId, selectedEntryId]);
 
-  const selectedEntry = selectedEntryId
-    ? filteredEntries.find((entry) => entry.id === selectedEntryId) || null
+  const activeSelectedEntryId = selectedEntryId ?? firstEntryId;
+  const selectedEntry = activeSelectedEntryId
+    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) || null
     : null;
 
   React.useEffect(() => {
@@ -207,7 +208,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
               ) : (
                 <JournalEntryList
                   entries={visibleEntries}
-                  selectedEntryId={selectedEntryId}
+                  selectedEntryId={activeSelectedEntryId}
                   onEntrySelect={handleEntrySelect}
                 />
               )}

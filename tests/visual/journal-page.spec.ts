@@ -42,6 +42,9 @@ test.describe('Journal Page', () => {
     // Wait for journal page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
+    ).toBeVisible({ timeout: 10000 });
 
     // Verify journal page content is visible
     await expect(page.getByRole('heading', { level: 1, name: /Journal in/i })).toBeVisible();
