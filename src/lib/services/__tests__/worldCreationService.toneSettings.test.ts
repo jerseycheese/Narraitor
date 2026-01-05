@@ -168,7 +168,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       expect(mockGenerator.generateToneSettings).toHaveBeenCalledWith({
         name: 'Cyberpunk Metropolis',
         description: 'A dark future city where technology dominates human life',
-        genre: 'science fiction',
+        genre: 'sci-fi',
         reference: 'Blade Runner',
         relationship: 'inspired_by',
       });
@@ -179,7 +179,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           name: 'Cyberpunk Metropolis',
           description:
             'A dark future city where technology dominates human life',
-          genre: 'science fiction',
+          genre: 'sci-fi',
           toneSettings: {
             contentRating: 'R',
             narrativeStyle: 'dramatic',
@@ -248,7 +248,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         expect.objectContaining({
           name: 'Custom Cyber City',
           description: 'My custom cyberpunk world',
-          genre: 'dystopian',
+          genre: 'cyberpunk',
           toneSettings: {
             contentRating: 'PG-13',
             narrativeStyle: 'mysterious',
