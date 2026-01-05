@@ -30,7 +30,16 @@
     "test:visual:prune": "node scripts/clean-visual-snapshots.cjs",
     "test:visual:headed": "playwright test --headed",
     "test:visual:debug": "playwright test --debug",
-    "test:visual:report": "./scripts/download-playwright-report.sh"
+    "test:visual:report": "./scripts/download-playwright-report.sh",
+    "deps:validate": "depcruise src --config .dependency-cruiser.cjs",
+    "deps:diagram": "depcruise src --include-only '^src' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/dependency-graph.mmd",
+    "deps:diagram:stores": "depcruise src/state --include-only '^src/state' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/stores-dependencies.mmd",
+    "deps:diagram:components": "depcruise src/components --include-only '^src/components' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/component-dependencies.mmd",
+    "deps:diagram:svg": "depcruise src --include-only '^src' --config .dependency-cruiser.cjs --output-type dot | dot -T svg > public_docs/architecture/dependency-graph.svg",
+    "deps:diagram:all": "npm run deps:diagram && npm run deps:diagram:stores && npm run deps:diagram:components",
+    "deps:html": "depcruise src --config .dependency-cruiser.cjs --output-type err-html > public_docs/architecture/dependency-violations.html",
+    "deps:circular": "depcruise src --config .dependency-cruiser.cjs --output-type err --validate",
+    "analyze": "npm run deps:validate && npm run deps:diagram:all"
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
@@ -78,6 +87,7 @@
     "@vitest/coverage-v8": "^3.1.2",
     "autoprefixer": "^10.4.21",
     "depcheck": "^1.4.7",
+    "dependency-cruiser": "^17.3.6",
     "eslint": "^9.25.1",
     "eslint-config-next": "^15.5.7",
     "eslint-config-prettier": "^10.1.2",
