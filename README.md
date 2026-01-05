@@ -93,28 +93,10 @@ npm run storybook
 npm run test
 npm run test:prompt-templates  # AI prompt validation
 
-# Architecture validation
-npm run deps:validate           # Check architecture rules & circular dependencies
-npm run deps:diagram:all        # Generate dependency diagrams (not committed)
-npm run analyze                 # Validate + generate all diagrams
-
 # Interactive testing
 npm run dev
 # Then visit /dev routes for component testing
 ```
-
-### Architecture Rules
-
-The codebase enforces domain boundaries via dependency-cruiser:
-
-- ❌ State stores cannot import from `components/` or `app/`
-- ⚠️  Stores should not directly depend on other stores
-- ❌ Utils must be pure (no imports from `state/`)
-- ❌ Type files cannot import implementation code
-
-Run `npm run deps:validate` to check for violations. See `public_docs/architecture/dependency-analysis.md` for detailed findings and recommendations.
-
-**Visualizing dependencies**: Generate Mermaid diagrams with `npm run deps:diagram:all`. Diagrams are not committed to git (they're generated artifacts). View them in VS Code with the Mermaid extension or paste into [mermaid.live](https://mermaid.live).
 
 There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
 
