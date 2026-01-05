@@ -98,6 +98,13 @@ project-config.json
 # Use public_docs/ for committed documentation
 docs/
 
+# Generated dependency diagrams (regenerate with npm run deps:diagram:all)
+public_docs/architecture/*.mmd
+public_docs/architecture/*.svg
+public_docs/architecture/*.dot
+public_docs/architecture/*.html
+dependency-violations.html
+
 # Claude Code
 .claude/*
 .claude-workflow/
