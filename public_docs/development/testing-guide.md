@@ -142,7 +142,7 @@ tests/visual/
 ├── main-pages.spec.ts          # Navigation, homepage
 ├── character-creation.spec.ts  # Character forms
 ├── game-session.spec.ts       # Game interfaces
-└── journal-modal.spec.ts      # Dialog overlays
+└── journal-page.spec.ts       # Journal page snapshots
 ```
 
 **Handle visual failures appropriately:**

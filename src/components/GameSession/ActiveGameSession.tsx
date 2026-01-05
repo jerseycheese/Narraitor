@@ -16,7 +16,6 @@ import { EndingScreen } from './EndingScreen';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
@@ -25,6 +24,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
+import { useRouter } from 'next/navigation';
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 
@@ -74,9 +74,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Manual end story confirmation
   const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
-
-  // Journal modal state (Issue #278)
-  const [showJournalModal, setShowJournalModal] = React.useState(false);
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
@@ -135,6 +132,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
+  const router = useRouter();
   
 
   // Debug: log key state changes to help diagnose skeleton readiness
@@ -355,6 +353,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Regex patterns for cleaning decision prompts
   const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
   const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
+  const GENERIC_PROMPT_REGEX = /^what will you do(\b.*)?$/i;
+  const GENERIC_PROMPT_SUFFIX_REGEX = /(,?\s*)?(what (do|will) you do( next| now)?|how do you respond|what is your move|what's your move)\??\.?$/i;
 
   /**
    * Creates a journal entry for a decision made by the character.
@@ -373,12 +373,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Format decision content for readability
     const formatDecisionContent = (choice: string, prompt: string): string => {
-      const cleanChoice = choice.toLowerCase();
-      const cleanPrompt = prompt
-        .toLowerCase()
+      const cleanChoice = safeTrim(choice).replace(/[.!?]+$/, '').toLowerCase();
+      const cleanPrompt = safeTrim(prompt)
+        .replace(GENERIC_PROMPT_SUFFIX_REGEX, '')
         .replace(YOU_PREFIX_REGEX, '')
-        .replace(QUESTION_MARK_SUFFIX_REGEX, '');
-      return `Chose to ${cleanChoice} when ${cleanPrompt}`;
+        .replace(QUESTION_MARK_SUFFIX_REGEX, '')
+        .toLowerCase();
+
+      if (!cleanPrompt || GENERIC_PROMPT_REGEX.test(cleanPrompt)) {
+        return `Chose to ${cleanChoice}.`;
+      }
+
+      return `Chose to ${cleanChoice} when ${cleanPrompt}.`;
     };
     
     // Map decision weight to significance
@@ -944,18 +950,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         cancelText="Cancel"
       />
 
-      {/* Journal Modal - Issue #278: AC2,AC4,AC5 */}
-      <JournalModal
-        isOpen={showJournalModal}
-        onClose={() => setShowJournalModal(false)}
-        sessionId={sessionId}
-        characterId={character?.id}
-      />
-
       {/* Journal Floating Button - Issue #562 */}
       {character && (
         <JournalFloatingButton
-          onClick={() => setShowJournalModal(true)}
+          onClick={() => router.push(`/worlds/${worldId}/play/journal`)}
         />
       )}
     </div>

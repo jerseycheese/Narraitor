@@ -13,3 +13,4 @@ export { SAMPLE_WORLDS } from './worlds.fixture';
 export { SAMPLE_CHARACTERS } from './characters.fixture';
 export { SAMPLE_GAME_SESSIONS, type GameSessionFixture } from './sessions.fixture';
 export { SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } from './narrative.fixture';
+export { SAMPLE_JOURNAL_ENTRIES } from './journal.fixture';

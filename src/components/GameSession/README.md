@@ -15,7 +15,7 @@ We're using a Container/Presenter pattern where the main GameSession component o
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
 - **PlayerChoices** (`PlayerChoices.tsx`): Renders and handles player choices
 - **SessionControls** (`SessionControls.tsx`): Pause/Resume/End session controls
-- **JournalModal** (`JournalModal.tsx`): Displays persistent journal entries with accessibility features
+- **JournalPage** (`src/components/Journal/JournalPage.tsx`): Dedicated journal page for reading session entries
 
 ### Custom Hook
 
@@ -113,7 +113,7 @@ The GameSession includes a fully integrated journal system that handles persiste
 ### Core Journal Features
 - **Persistent Storage**: Journal entries persist across browser sessions using IndexedDB
 - **Automatic Entry Creation**: AI-generated journal entries from narrative events
-- **Modal Interface**: Accessible journal modal with proper ARIA attributes, including full keyboard navigation and screen reader support
+- **Dedicated Journal Page**: Full-page journal view with list-detail navigation and accessibility support
 - **Entry Organization**: Entries grouped by type with significance indicators
 - **Session Integration**: Journal access available during active gameplay
 
@@ -124,7 +124,7 @@ The GameSession includes a fully integrated journal system that handles persiste
 
 ### How It Works
 - Journal button appears when character is present
-- Click to open modal showing all session entries
+- Click to open the journal page showing all session entries
 - Entries automatically created during story progression
 - Data persists across browser refreshes and sessions
 

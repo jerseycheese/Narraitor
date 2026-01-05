@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 interface BackNavigationProps {
   href?: string;
@@ -23,23 +24,16 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
     }
   };
 
-  if (href && !onClick) {
-    return (
-      <Link 
-        href={href}
-        className="text-link-primary flex items-center gap-2 no-underline"
-      >
-        <span>←</span> {label}
-      </Link>
-    );
-  }
-
   return (
-    <button
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
       onClick={handleClick}
-      className="text-link-primary flex items-center gap-2"
+      className="flex items-center gap-2"
     >
-      <span>←</span> {label}
-    </button>
+      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+      <span>{label}</span>
+    </Button>
   );
 }
