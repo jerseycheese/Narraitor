@@ -34,7 +34,7 @@
     "deps:validate": "depcruise src --config .dependency-cruiser.cjs",
     "deps:diagram": "depcruise src --include-only '^src' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/dependency-graph.mmd",
     "deps:diagram:stores": "depcruise src/state --include-only '^src/state' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/stores-dependencies.mmd",
-    "deps:diagram:components": "depcruise src/components --include-only '^src/components' --config .dependency-cruiser.cjs --output-type mermaid > public_docs/architecture/component-dependencies.mmd",
+    "deps:diagram:components": "depcruise src/components --include-only '^src/components' --config .dependency-cruiser.cjs --output-type mermaid --collapse '^src/components/[^/]+' > public_docs/architecture/component-dependencies.mmd",
     "deps:diagram:svg": "depcruise src --include-only '^src' --config .dependency-cruiser.cjs --output-type dot | dot -T svg > public_docs/architecture/dependency-graph.svg",
     "deps:diagram:all": "npm run deps:diagram && npm run deps:diagram:stores && npm run deps:diagram:components",
     "deps:html": "depcruise src --config .dependency-cruiser.cjs --output-type err-html > public_docs/architecture/dependency-violations.html",
