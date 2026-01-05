@@ -1,5 +1,6 @@
 // src/types/world-template.types.ts
 
+import type { GenreValue } from './genre.types';
 import type { SkillDifficulty } from './skill-difficulty.types';
 
 /**
@@ -8,7 +9,7 @@ import type { SkillDifficulty } from './skill-difficulty.types';
 export interface WorldTemplate {
   name: string;
   description: string;
-  genre: string;
+  genre: GenreValue;
   attributes: Array<{
     name: string;
     description?: string;

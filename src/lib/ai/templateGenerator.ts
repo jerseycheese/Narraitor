@@ -5,7 +5,7 @@ import { generateWorldTemplatePrompt, TemplateGenerationContext } from './templa
 import type { World } from '@/types/world.types';
 import type { WorldTemplate } from '@/types/world-template.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handleAIRequest } from '@/lib/utils/aiResponseParser';
-import { normalizeGenre, toGenreValue } from '@/lib/constants/genres';
+import { toGenreValue } from '@/lib/constants/genres';
 
 export type { WorldTemplate } from '@/types/world-template.types';
 
@@ -34,8 +34,8 @@ export class TemplateGenerator {
     const templateRecord = template as Record<string, unknown>;
     validateArrayFields(templateRecord, arrayFields, 'template structure');
 
-    // Normalize genre to ensure it's a valid constant
-    templateRecord.genre = normalizeGenre(String(templateRecord.genre));
+    // Coerce genre to a supported value
+    templateRecord.genre = toGenreValue(String(templateRecord.genre));
 
     // Validate and fix each attribute
     const attributes = (templateRecord.attributes as Record<string, unknown>[]).map((attr, index) => {

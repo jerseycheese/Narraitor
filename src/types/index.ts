@@ -1,5 +1,8 @@
 /**
- * Core type definitions for the Narraitor application
+ * Core type definitions for the Narraitor application.
+ *
+ * Architecture note: keep this barrel type-only to avoid runtime coupling
+ * and circular dependencies between domains.
  */
 
 // Re-export all types from their respective files
