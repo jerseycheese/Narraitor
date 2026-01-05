@@ -1,12 +1,14 @@
 /**
  * skillDifficultyLevels.ts
- * 
+ *
  * This file defines the difficulty levels for skills in the world creation process.
  * These constants are used throughout the application to maintain consistency
  * in how skill difficulties are displayed and processed.
  */
 
-export type SkillDifficulty = 'easy' | 'medium' | 'hard';
+import type { SkillDifficulty } from '@/types/skill-difficulty.types';
+
+export type { SkillDifficulty } from '@/types/skill-difficulty.types';
 
 export interface SkillDifficultyDescription {
   value: SkillDifficulty;

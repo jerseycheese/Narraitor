@@ -1,12 +1,11 @@
-// src/types/type-guards.ts
+// src/lib/utils/typeGuards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NarrativeSegment } from './narrative.types';
-import { JournalEntry, JournalEntryType } from './journal.types';
-import { PlayerDecision, ChoiceTypePreference } from './personalization.types';
-import { safeTrim } from '@/lib/utils';
-import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
-import { ValidationResult } from '../lib/utils/validationUtils';
+import type { NarrativeSegment } from '@/types/narrative.types';
+import type { JournalEntry, JournalEntryType } from '@/types/journal.types';
+import type { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
+import { safeTrim, normalizeText, NORM_NAME } from '@/lib/utils';
+import type { ValidationResult } from '@/lib/utils';
 
 /**
  * Comprehensive World validation with detailed error messages.

@@ -2,34 +2,12 @@
 
 import { AIClient } from './types';
 import { generateWorldTemplatePrompt, TemplateGenerationContext } from './templatePrompts';
-import { World } from '@/types/world.types';
-import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import type { World } from '@/types/world.types';
+import type { WorldTemplate } from '@/types/world-template.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handleAIRequest } from '@/lib/utils/aiResponseParser';
 import { normalizeGenre } from '@/lib/constants/genres';
 
-export interface WorldTemplate {
-  name: string;
-  description: string;
-  genre: string;
-  attributes: Array<{
-    name: string;
-    description?: string;
-    baseValue: number;
-    minValue: number;
-    maxValue: number;
-    category: string;
-  }>;
-  skills: Array<{
-    name: string;
-    description?: string;
-    baseValue: number;
-    minValue: number;
-    maxValue: number;
-    difficulty: SkillDifficulty;
-    category: string;
-  }>;
-  explanation: string;
-}
+export type { WorldTemplate } from '@/types/world-template.types';
 
 export class TemplateGenerator {
   constructor(private geminiClient: AIClient) {}

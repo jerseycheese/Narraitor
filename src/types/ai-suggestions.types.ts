@@ -1,7 +1,7 @@
 /**
  * Type definitions for AI-generated suggestions
  */
-import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import type { SkillDifficulty } from './skill-difficulty.types';
 
 export interface AISuggestionBase {
   name: string;

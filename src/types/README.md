@@ -35,7 +35,7 @@ interface GameState {
 There are also type guards available for runtime validation, which is useful when you're dealing with data from external sources or local storage:
 
 ```typescript
-import { validateWorld } from '@/types';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 // Validate unknown data
 const data = JSON.parse(localStorage.getItem('savedGame'));
@@ -191,7 +191,7 @@ This pattern makes it easy to look up entities by ID and ensures the store metho
 When you're dealing with data from external sources - localStorage, API responses, user uploads - you can use validation functions to validate the shape:
 
 ```typescript
-import { validateWorld, isNarrativeSegment, isJournalEntry } from '@/types';
+import { validateWorld, isNarrativeSegment, isJournalEntry } from '@/lib/utils/typeGuards';
 
 const handleFileUpload = async (file: File) => {
   const data = JSON.parse(await file.text());

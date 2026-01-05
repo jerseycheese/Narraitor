@@ -1,7 +1,7 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { truncate } from '../utils';
-import { validateWorld } from '@/types/type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 const logger = new Logger('CharacterGenerator');
 

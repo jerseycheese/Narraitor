@@ -6,9 +6,9 @@ import {
   NamedEntity,
   TimestampedEntity,
 } from './common.types';
-import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
-import { ToneSettings } from './tone-settings.types';
-import { GenreValue } from '@/lib/constants/genres';
+import type { SkillDifficulty } from './skill-difficulty.types';
+import type { ToneSettings } from './tone-settings.types';
+import type { GenreValue } from './genre.types';
 
 /**
  * Represents a game world configuration

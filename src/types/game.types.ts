@@ -1,5 +1,5 @@
 import { EntityID } from './common.types';
-import { WorldTemplate } from '../lib/ai/templateGenerator';
+import type { WorldTemplate } from './world-template.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from './session.types';
 
 /**

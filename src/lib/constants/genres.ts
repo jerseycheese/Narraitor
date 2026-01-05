@@ -6,9 +6,12 @@
  */
 
 import { capitalize } from '@/lib/utils';
+import type { GenreValue } from '@/types/genre.types';
+
+export type { GenreValue } from '@/types/genre.types';
 
 export interface GenreOption {
-  value: string;
+  value: GenreValue;
   label: string;
   description?: string;
 }
@@ -27,11 +30,6 @@ export const GENRES: GenreOption[] = [
   { value: 'cyberpunk', label: 'Cyberpunk', description: 'High-tech dystopian futures with corporate control' },
   { value: 'other', label: 'Other', description: 'Custom or unique genres not covered by standard categories' },
 ];
-
-/**
- * Genre values as a union type for TypeScript type safety
- */
-export type GenreValue = typeof GENRES[number]['value'];
 
 /**
  * Map of genre values to their display labels for quick lookup
