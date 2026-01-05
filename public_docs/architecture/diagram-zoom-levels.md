@@ -3,25 +3,57 @@
 ## Choose Your View
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  ZOOM LEVEL          │  FILE                    │  VS CODE  │
-├─────────────────────────────────────────────────────────────┤
-│  🌍 Domains          │  *-domains.mmd           │     ✅     │
-│  (state, lib, etc)   │  ~54 lines               │           │
-│                      │  START HERE              │           │
-├─────────────────────────────────────────────────────────────┤
-│  🧩 Components       │  component-*.mmd         │     ✅     │
-│  (GameSession, etc)  │  ~112 lines              │           │
-├─────────────────────────────────────────────────────────────┤
-│  🏪 Stores           │  stores-*.mmd            │     ✅     │
-│  (sessionStore, etc) │  ~275 lines              │           │
-├─────────────────────────────────────────────────────────────┤
-│  📄 All Files        │  *-detailed.mmd          │     ❌     │
-│  (every .ts/.tsx)    │  5000+ lines             │  Use Live │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│  ZOOM LEVEL          │  FILE                    │  FORMAT       │
+├──────────────────────────────────────────────────────────────────┤
+│  🎯 Interactive      │  *-interactive.html      │  HTML (BEST)  │
+│  (hover/click)       │  Explore relationships   │               │
+│                      │  RECOMMENDED             │               │
+├──────────────────────────────────────────────────────────────────┤
+│  📁 Folders          │  *-folders.svg           │  SVG          │
+│  (directory deps)    │  Directory level only    │               │
+├──────────────────────────────────────────────────────────────────┤
+│  🌍 Domains          │  *-domains.mmd           │  Mermaid ✅   │
+│  (state, lib, etc)   │  ~54 lines               │               │
+│                      │  START HERE              │               │
+├──────────────────────────────────────────────────────────────────┤
+│  🧩 Components       │  component-*.mmd         │  Mermaid ✅   │
+│  (GameSession, etc)  │  ~112 lines              │               │
+├──────────────────────────────────────────────────────────────────┤
+│  🏪 Stores           │  stores-*.mmd            │  Mermaid ✅   │
+│  (sessionStore, etc) │  ~275 lines              │               │
+├──────────────────────────────────────────────────────────────────┤
+│  📄 All Files        │  *-detailed.mmd          │  Mermaid ❌   │
+│  (every .ts/.tsx)    │  5000+ lines             │  Use Live     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
+## ⭐ New: Interactive HTML
+
+**The best way to explore dependencies:**
+
+```bash
+npm run deps:diagram:interactive
+open public_docs/architecture/dependency-graph-interactive.html
+```
+
+- Hover to highlight connections
+- Click to "pin" relationships
+- Self-contained (works offline)
+- No size limitations
+
 ## What Each Level Shows
+
+### 📁 Folder Level (dependency-graph-folders.svg)
+```
+Shows directory-to-directory dependencies:
+
+src/state/ → src/lib/
+src/components/ → src/state/
+src/app/ → src/components/
+```
+
+**Use when:** Understanding module boundaries, finding architectural issues
 
 ### 🌍 Domain Level (dependency-graph-domains.mmd)
 ```

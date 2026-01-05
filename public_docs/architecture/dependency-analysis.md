@@ -4,9 +4,16 @@ This document explains how to use dependency-cruiser to analyze and visualize Na
 
 ## Quick Start
 
-**Generate diagrams first (not committed to git):**
+**⭐ Interactive exploration (recommended):**
 ```bash
-npm run deps:diagram:all
+npm run deps:diagram:interactive
+open public_docs/architecture/dependency-graph-interactive.html
+```
+
+**Generate all diagram formats:**
+```bash
+npm run deps:diagram:all  # Mermaid + folder SVG
+npm run deps:diagram:folders  # Folder-level SVG only
 ```
 
 **Validate architecture rules:**
@@ -14,9 +21,24 @@ npm run deps:diagram:all
 npm run deps:validate
 ```
 
+> **Note:** Dependency-cruiser v13+ auto-finds `.dependency-cruiser.cjs` - no `--config` flag needed!
+
 ## Generated Diagrams
 
 Diagrams are generated at **multiple zoom levels** for optimal viewing:
+
+### 🎯 Interactive HTML (dependency-graph-interactive.html) *NEW!*
+**Best for:** Exploring and understanding the codebase
+- **Hover** over modules to highlight dependencies
+- **Click** to "pin" relationships (ESC to clear)
+- Self-contained offline file
+- Handles any codebase size
+
+### 📁 Folder-Level SVG (dependency-graph-folders.svg) *NEW!*
+**Best for:** High-level architecture overview
+- Shows directory-to-directory dependencies
+- Cleaner than module-level view
+- Great for identifying module boundaries
 
 ### 1. Domain-Level Overview (dependency-graph-domains.mmd)
 **Best for:** Understanding high-level architecture

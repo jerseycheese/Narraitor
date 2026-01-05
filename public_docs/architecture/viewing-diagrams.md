@@ -2,11 +2,30 @@
 
 > **⚠️ First Time Setup:** Diagrams are not committed to git. Generate them first:
 > ```bash
-> npm run deps:diagram:all
+> npm run deps:diagram:all  # Mermaid + SVG + folder view
+> npm run deps:diagram:interactive  # Interactive HTML (recommended!)
 > ```
 > This creates all diagram files in `public_docs/architecture/`. They're ignored by git and must be regenerated after pulling updates.
 
-All diagram files (`.mmd`) are in Mermaid format. Here are the best ways to view them:
+All diagram files come in multiple formats optimized for different use cases.
+
+## 🎯 Recommended: Interactive HTML
+
+**Best for:** Exploration and understanding relationships
+
+```bash
+npm run deps:diagram:interactive
+open public_docs/architecture/dependency-graph-interactive.html
+```
+
+**Features:**
+- ✅ Hover over any module to see incoming/outgoing dependencies
+- ✅ Click to highlight and "pin" relationships
+- ✅ Self-contained HTML file (works offline)
+- ✅ No size limits - handles large codebases
+- ✅ Press ESC to clear highlights
+
+This is dependency-cruiser's most powerful visualization option!
 
 ## Recommended: Mermaid Live Editor
 
@@ -80,10 +99,12 @@ The diagrams are generated at **multiple zoom levels** to avoid rendering issues
 
 ### Full Project Dependencies
 
-| File | Lines | Edges | VS Code | Description |
-|------|-------|-------|---------|-------------|
-| `dependency-graph-domains.mmd` | ~54 | <100 | ✅ | **Start here** - Domain level (state, components, lib, etc.) |
-| `dependency-graph-detailed.mmd` | ~5000+ | >1000 | ❌ | All files - Use Mermaid Live only |
+| File | Format | Lines | VS Code | Description |
+|------|--------|-------|---------|-------------|
+| `dependency-graph-interactive.html` | HTML | N/A | ➖ | **Interactive** - Hover/click exploration |
+| `dependency-graph-folders.svg` | SVG | ~200 | ➖ | **Folder-level** - Directory dependencies only |
+| `dependency-graph-domains.mmd` | Mermaid | ~54 | ✅ | **Start here** - Domain level (state, components, lib, etc.) |
+| `dependency-graph-detailed.mmd` | Mermaid | ~5000+ | ❌ | All files - Use Mermaid Live only |
 
 ### Focused Views
 

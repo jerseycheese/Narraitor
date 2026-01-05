@@ -102,6 +102,7 @@ docs/
 public_docs/architecture/*.mmd
 public_docs/architecture/*.svg
 public_docs/architecture/*.dot
+public_docs/architecture/*.html
 dependency-violations.html
 
 # Claude Code
