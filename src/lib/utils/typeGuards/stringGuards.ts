@@ -18,6 +18,7 @@ export function sanitizeString(value: unknown, maxLength: number = 200): string 
   // Remove HTML tags and dangerous characters
   sanitized = safeTrim(sanitized
     .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/[<>]/g, '') // Strip any remaining angle brackets
     .replace(/[&"']/g, '') // Remove dangerous characters
     .substring(0, maxLength));
     

@@ -188,7 +188,7 @@ describe('TemplateGenerator', () => {
       expect(templateWithCapsGenre.genre).toBe('fantasy');
     });
 
-    test('normalizes mixed case genre values', () => {
+    test('coerces mixed genre values to a supported genre', () => {
       const templateWithMixedGenre = {
         name: 'Test World',
         description: 'A test world',
@@ -203,7 +203,7 @@ describe('TemplateGenerator', () => {
       };
 
       templateGenerator.validateTemplate(templateWithMixedGenre);
-      expect(templateWithMixedGenre.genre).toBe('cyberpunk-fantasy');
+      expect(templateWithMixedGenre.genre).toBe('other');
     });
   });
 });
