@@ -40,6 +40,13 @@ Diagrams are generated at **multiple zoom levels** for optimal viewing:
 - Cleaner than module-level view
 - Great for identifying module boundaries
 
+### 🏛️ Architecture Diagram (high-level.svg) *NEW!*
+**Best for:** Executive summary and onboarding
+- Ultra-high-level collapsed view
+- Shows major architectural layers
+- Generated with `archi` reporter
+- SVG format (opens in browser)
+
 ### 1. Domain-Level Overview (dependency-graph-domains.mmd)
 **Best for:** Understanding high-level architecture
 - Shows: state, components, lib, types, utils, etc.
@@ -81,64 +88,59 @@ npm run analyze
 
 ## What We Discovered
 
-Running the initial analysis on the codebase revealed:
+### Violation Management
 
-### Critical Issues: Circular Dependencies (59 warnings)
+The project uses **ignore-known violations** to manage 82 existing violations while preventing new ones:
 
-The biggest architectural concern is circular imports, primarily between:
+- **Baseline File:** `.dependency-cruiser-known-violations.json` (3340 lines, tracked in git)
+- **Known Violations:** 82 total (23 type imports, 59 circular dependencies)
+- **Strategy:** Fix incrementally while preventing new violations
 
-**Store-to-Store Circles:**
+**Daily Workflow:**
+```bash
+npm run deps:validate         # Pass/fail on NEW violations only
+npm run deps:validate:strict  # Show all violations (for reference)
+npm run deps:baseline         # Update after fixes (tracks progress)
+```
+
+### Violation Categories
+
+**Critical Issues: Circular Dependencies (59 warnings)**
+
+Store-to-store circles cause unpredictable initialization:
 - `sessionStore` ↔ `worldStore`
 - `sessionStore` ↔ `inventoryStore` ↔ `characterStore`
 - `narrativeStore` ↔ `sessionStore` ↔ `goalStore`
 
-**Type System Circles:**
-- `types/index.ts` has circular dependencies through `generateId.ts`
-- `characterStore.ts` imports from `types/` which imports back to stores
-
-**Impact:** Circular dependencies can cause:
-- Unpredictable initialization order
-- Hard-to-debug runtime errors
-- Difficult refactoring
-- Performance issues
-
-**Recommendation:** Consider these refactoring strategies:
+**Resolution Strategy:**
 1. Extract shared logic to `lib/` utilities
-2. Use dependency inversion (interfaces in types, implementation in stores)
-3. Break apart large stores into smaller, focused stores
-4. Use pub-sub patterns for cross-store communication
+2. Use dependency inversion (interfaces in types)
+3. Apply pub-sub patterns for cross-store communication
+4. Break apart monolithic stores
 
-### Type Violations (23 errors)
+**Type Violations (23 errors)**
 
-Type files are importing implementation code:
+Type files importing implementation:
+- Constants in type files
+- Type guards importing utils
+- Store types importing store implementations
 
-```
-error types-no-implementation-imports: 
-  src/types/world.types.ts → src/lib/constants/genres.ts
-  src/types/narrative.types.ts → src/state/characterStore.ts
-  src/types/type-guards.ts → src/lib/utils/index.ts
-```
+**Resolution:** Move or duplicate constants; relocate guards to utils.
 
-**Impact:** Types should be pure TypeScript - no runtime dependencies.
+**Dev Dependency Issues (Expected)**
 
-**Recommendation:**
-- Move constants out of type files or duplicate them
-- Type guards can import utils, but consider moving guards to utils
-- Store types should not import store implementations
+Storybook/test files import dev dependencies - these are safe as they never reach production. Already ignored in baseline.
 
-### Dev Dependency Issues (19 errors)
+### Progress Tracking
 
-Storybook and test files importing dev dependencies:
-
-```
-error not-to-dev-dep: 
-  src/stories/**/*.stories.tsx → @storybook/*
-  src/**/*.test.ts → @testing-library/*
+Monitor baseline file size over time:
+```bash
+wc -l .dependency-cruiser-known-violations.json
+# Current: 3340 lines (82 violations)
+# Target: < 1000 lines (reduce by 60%)
 ```
 
-**Note:** These are expected and safe - Storybook/test files are never included in production bundles.
-
-**Recommendation:** Add exceptions to `.dependency-cruiser.cjs` for these patterns if they create noise.
+Each fix shrinks the file, providing visible metrics.
 
 ## Architecture Rules
 
@@ -163,21 +165,24 @@ Type definitions should not import implementation code.
 
 ```bash
 # Validation
-npm run deps:validate              # Check all architecture rules
-npm run deps:circular             # Focus on circular dependencies only
+npm run deps:validate              # Check for NEW violations only (ignores known)
+npm run deps:validate:strict       # Show ALL violations including known ones
+npm run deps:baseline              # Regenerate baseline after fixing violations
 
 # Diagram Generation
-npm run deps:diagram              # Generate full project diagram
-npm run deps:diagram:stores       # Generate store-only diagram
-npm run deps:diagram:components   # Generate component-only diagram
-npm run deps:diagram:svg          # Generate SVG (requires graphviz)
-npm run deps:diagram:all          # Generate all diagrams
+npm run deps:diagram               # Domain-level overview
+npm run deps:diagram:archi         # High-level architecture diagram (SVG)
+npm run deps:diagram:stores        # Store dependencies only
+npm run deps:diagram:components    # Component dependencies only
+npm run deps:diagram:folders       # Folder-level SVG
+npm run deps:diagram:interactive   # Interactive HTML explorer
+npm run deps:diagram:all           # Generate all diagram formats
 
 # HTML Reports
-npm run deps:html                 # Generate interactive HTML report
+npm run deps:html                  # Generate interactive HTML report
 
 # Complete Analysis
-npm run analyze                   # Validate + generate all diagrams
+npm run analyze                    # Validate + generate all diagrams
 ```
 
 ## Configuration
@@ -191,12 +196,21 @@ Rules are defined in `.dependency-cruiser.cjs`. Key sections:
 
 ## Next Steps
 
-Based on the analysis, consider addressing issues in this order:
+**Immediate Actions:**
+1. Run `npm run deps:validate` to confirm no new violations
+2. Review `.dependency-cruiser-known-violations.json` to understand known issues
+3. Generate diagrams: `npm run deps:diagram:all`
 
-1. **High Priority:** Fix type import violations (prevents clean builds)
-2. **Medium Priority:** Break circular dependencies between stores
-3. **Low Priority:** Add exceptions for Storybook/test dev dependencies
-4. **Ongoing:** Use `npm run deps:validate` in CI to prevent regressions
+**Resolution Priority:**
+1. **High:** Fix type import violations (blocks clean architecture)
+2. **Medium:** Break circular dependencies (one store pair at a time)
+3. **Low:** Document expected dev-dependency violations
+4. **Ongoing:** Use `npm run deps:validate` to prevent new violations
+
+**Progress Tracking:**
+- Monitor baseline file line count over time
+- Celebrate when violations drop below thresholds (60, 40, 20)
+- Regenerate baseline after each fix: `npm run deps:baseline`
 
 ## Integration with CI
 

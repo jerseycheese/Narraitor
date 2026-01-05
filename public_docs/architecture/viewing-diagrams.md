@@ -7,6 +7,39 @@
 > ```
 > This creates all diagram files in `public_docs/architecture/`. They're ignored by git and must be regenerated after pulling updates.
 
+## Working with Known Violations
+
+The project uses dependency-cruiser's **ignore-known violations** mechanism to manage existing violations while preventing new ones.
+
+### Initial Setup (Already Done)
+
+The baseline file `.dependency-cruiser-known-violations.json` captures all current violations and is tracked in git.
+
+### Daily Workflow
+
+```bash
+# Normal validation (ignores known violations)
+npm run deps:validate
+# ✅ Pass: No new violations
+# ⚠️  82 known violations ignored
+
+# Strict validation (shows everything)
+npm run deps:validate:strict
+# Shows all 82+ violations including known ones
+```
+
+### When You Fix Violations
+
+After fixing violations, regenerate the baseline to track progress:
+
+```bash
+npm run deps:baseline
+git add .dependency-cruiser-known-violations.json
+git commit -m "fix: resolve circular dependencies in state stores"
+```
+
+The baseline file size will decrease as violations are fixed, providing visible progress metrics.
+
 All diagram files come in multiple formats optimized for different use cases.
 
 ## 🎯 Recommended: Interactive HTML
