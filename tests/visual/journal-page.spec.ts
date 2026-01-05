@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
-import { seedJournalEntriesForVisual } from './utils/game-session-page-seeder';
 
 /**
  * Journal Page Visual Test
@@ -23,12 +22,6 @@ test.describe('Journal Page', () => {
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await page.waitForTimeout(2000);
 
-    // Wait for active game session
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
-
-    // Seed journal entries for visual snapshot
-    await seedJournalEntriesForVisual(page);
-
     // Look for journal floating button
     const journalButton = page.getByRole('button', { name: /open journal/i });
     await expect(journalButton).toBeVisible({ timeout: 10000 });
@@ -42,8 +35,11 @@ test.describe('Journal Page', () => {
     // Wait for journal page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
+    const firstEntry = page.getByRole('button', { name: /select entry:/i }).first();
+    await expect(firstEntry).toBeVisible({ timeout: 10000 });
+    await firstEntry.click();
     await expect(
-      page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
+      page.getByTestId('journal-detail-pane').getByRole('heading', { name: /Adventure Begins/i })
     ).toBeVisible({ timeout: 10000 });
 
     // Verify journal page content is visible

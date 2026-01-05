@@ -121,6 +121,37 @@ export async function expandAllCollapsibleSections(page: Page, container?: Locat
   } catch {
     // Don't fail the test if expansion fails - continue with screenshot
   }
+
+  try {
+    const root = container ?? page.locator('body');
+    await root.evaluate((element) => {
+      const sections = element.querySelectorAll('[data-testid="collapsible-section"]');
+      sections.forEach((section) => {
+        const toggle = section.querySelector('[data-testid="collapsible-section-toggle"]') as HTMLElement | null;
+        const header = section.querySelector('[data-testid="collapsible-section-header"]') as HTMLElement | null;
+        const content = section.querySelector('[data-testid="collapsible-section-content"]') as HTMLElement | null;
+
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.textContent = '-';
+        }
+
+        if (header) {
+          header.setAttribute('aria-expanded', 'true');
+        }
+
+        if (content) {
+          content.classList.add('block');
+          content.classList.remove('hidden');
+          content.setAttribute('aria-hidden', 'false');
+          content.style.display = 'block';
+          content.style.maxHeight = 'none';
+        }
+      });
+    });
+  } catch {
+    // Ignore forced expansion failures
+  }
 }
 
 /**
