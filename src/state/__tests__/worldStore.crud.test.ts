@@ -26,7 +26,7 @@ describe('useWorldStore - CRUD Operations', () => {
       const invalidWorldData = createTestWorldData({
         name: '',
         description: '',
-        genre: '',
+        genre: 'other',
       });
       // Override settings with invalid values
       Object.assign(invalidWorldData.settings, {

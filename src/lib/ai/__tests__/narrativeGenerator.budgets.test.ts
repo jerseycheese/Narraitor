@@ -17,6 +17,7 @@ import {
   createMockWorldStore,
   createMockCharacterStore,
 } from '@/lib/test-utils';
+import type { World } from '@/types/world.types';
 
 jest.mock('../loreContextHelper');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -33,7 +34,6 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
-  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
@@ -47,7 +47,7 @@ const mockWorld = {
     narrativeStyle: 'epic' as const,
     languageComplexity: 'moderate' as const,
   },
-};
+} satisfies World;
 
 describe('NarrativeGenerator budget integration', () => {
   let narrativeGenerator: NarrativeGenerator;

@@ -3,6 +3,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '../utils/generateId';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import { toGenreValue } from '@/lib/constants/genres';
 
 /**
  * Applies a template to create a new world with pre-defined attributes, skills, and relationships
@@ -30,7 +31,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
   const worldId = createWorld({
     name: worldName || template.name,
     description: template.description,
-    genre: template.genre,
+    genre: toGenreValue(template.genre),
     attributes: [], // Will be populated in step 2
     skills: [],     // Will be populated in step 2
     settings: {

@@ -215,7 +215,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       const customizations = {
         name: 'Custom Cyber City',
         description: 'My custom cyberpunk world',
-        genre: 'dystopian',
+        genre: 'cyberpunk' as const,
       };
 
       const mockToneSettings = {
@@ -238,7 +238,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       expect(mockGenerator.generateToneSettings).toHaveBeenCalledWith({
         name: 'Custom Cyber City',
         description: 'My custom cyberpunk world',
-        genre: 'dystopian',
+        genre: 'cyberpunk',
         reference: 'Blade Runner',
         relationship: 'inspired_by',
       });

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useWorldStore } from '@/state/worldStore';
 import WorldEditor from '../WorldEditor';
 import { mockZustandStore, createMockWorldStore } from '@/lib/test-utils';
+import type { World } from '@/types/world.types';
 
 // Mock Next.js router
 const mockPush = jest.fn();
@@ -97,14 +98,13 @@ describe('WorldEditor - MVP Level Tests', () => {
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
     skills: [],
-    derivedStats: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 20,
       attributePointPool: 25,
       skillPointPool: 30,
     },
-  };
+  } satisfies World;
 
   const mockUpdateWorld = jest.fn();
 

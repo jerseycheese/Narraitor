@@ -8,6 +8,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
+import type { World } from '@/types/world.types';
 
 const meta: Meta<typeof EndingScreen> = {
   title: '05-Pages/game-session/EndingScreen',
@@ -97,7 +98,7 @@ const mockWorld = {
   },
   createdAt: getTimestamp(),
   updatedAt: getTimestamp(),
-};
+} satisfies World;
 
 // Base ending for variations
 const baseEnding: Omit<StoryEnding, 'tone'> = {

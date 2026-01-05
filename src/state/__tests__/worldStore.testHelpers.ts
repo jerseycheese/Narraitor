@@ -3,7 +3,8 @@
  * Provides reusable world data factories
  */
 
-import { WorldAttribute, WorldSkill } from '@/types/world.types';
+import type { GenreValue } from '@/types/genre.types';
+import type { WorldAttribute, WorldSkill } from '@/types/world.types';
 
 /**
  * Creates basic world test data
@@ -12,7 +13,7 @@ export function createTestWorldData(
   overrides?: Partial<{
     name: string;
     description: string;
-    genre: string;
+    genre: GenreValue;
     attributes: WorldAttribute[];
     skills: WorldSkill[];
   }>
@@ -20,7 +21,7 @@ export function createTestWorldData(
   return {
     name: 'Test World',
     description: 'A test fantasy world',
-    genre: 'fantasy',
+    genre: 'fantasy' as GenreValue,
     attributes: [] as WorldAttribute[],
     skills: [] as WorldSkill[],
     derivedStats: [],

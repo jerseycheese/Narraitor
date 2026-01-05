@@ -22,7 +22,10 @@ export interface ArchetypeTemplate {
   nameTemplates: string[];
 }
 
-export const ARCHETYPE_TEMPLATES: Record<GenreValue, ArchetypeTemplate[]> = {
+const BASE_ARCHETYPE_TEMPLATES: Record<
+  'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'western',
+  ArchetypeTemplate[]
+> = {
   fantasy: [
     {
       name: 'Warrior',
@@ -454,6 +457,13 @@ export const ARCHETYPE_TEMPLATES: Record<GenreValue, ArchetypeTemplate[]> = {
       nameTemplates: ['Crowley', 'Salem', 'Hex', 'Rune', 'Tarot', 'Witch']
     }
   ]
+};
+
+export const ARCHETYPE_TEMPLATES: Record<GenreValue, ArchetypeTemplate[]> = {
+  ...BASE_ARCHETYPE_TEMPLATES,
+  mystery: BASE_ARCHETYPE_TEMPLATES.modern,
+  cyberpunk: BASE_ARCHETYPE_TEMPLATES['sci-fi'],
+  other: BASE_ARCHETYPE_TEMPLATES.fantasy,
 };
 
 // Physical description templates by archetype name

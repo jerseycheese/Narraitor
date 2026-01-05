@@ -164,7 +164,7 @@ export const SingleWorld: Story = {
 export const ManyWorlds: Story = {
   decorators: [
     (Story) => {
-      const manyWorlds = [
+      const manyWorlds: World[] = [
         ...mockWorlds,
         {
           id: '4',

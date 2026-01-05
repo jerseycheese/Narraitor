@@ -8,6 +8,7 @@ import { useCharacterStore } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import type { World } from '@/types/world.types';
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies
@@ -64,7 +65,7 @@ describe('PortraitStep Component', () => {
 
   const mockWorldConfig = {
     genre: 'fantasy'
-  };
+  } satisfies Partial<World>;
 
   const mockOnUpdate = jest.fn();
 

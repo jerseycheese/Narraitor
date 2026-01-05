@@ -97,7 +97,7 @@ describe('World Persistence Infrastructure', () => {
       const worldData = {
         name: 'Test Race Condition World',
         theme: 'Testing',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World created during concurrent initialization',
         attributes: [],
         skills: [],
@@ -148,7 +148,7 @@ describe('World Persistence Infrastructure', () => {
       const worldData = {
         name: 'Fallback Test World',
         theme: 'Resilience Testing',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World created with storage failure',
         attributes: [],
         skills: [],
@@ -182,7 +182,7 @@ describe('World Persistence Infrastructure', () => {
       const worldData = {
         name: 'Persistent Test World',
         theme: 'Persistence Testing',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World that should survive store recreation',
         attributes: [
           {
@@ -258,7 +258,7 @@ describe('World Persistence Infrastructure', () => {
       const baseWorldData = {
         name: 'Rapid Update World',
         theme: 'Performance Testing',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World for testing rapid operations',
         attributes: [],
         skills: [],
@@ -333,7 +333,7 @@ describe('World Persistence Infrastructure', () => {
       const worldData = {
         name: 'Memory Fallback World',
         theme: 'Fallback Testing',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World created with storage unavailable',
         attributes: [],
         skills: [],
@@ -386,7 +386,7 @@ describe('World Persistence Infrastructure', () => {
       const worldData = {
         name: 'Resilient World',
         theme: 'Error Recovery',
-        genre: 'Fantasy',
+        genre: 'fantasy' as const,
         description: 'World that survives storage errors',
         attributes: [],
         skills: [],
