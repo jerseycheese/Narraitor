@@ -43,9 +43,11 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
-  const entries = sessionId
-    ? getSessionEntriesWithCharacter(sessionId, characterId)
-    : [];
+  const entries = React.useMemo(() => (
+    sessionId
+      ? getSessionEntriesWithCharacter(sessionId, characterId)
+      : []
+  ), [sessionId, characterId, getSessionEntriesWithCharacter]);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredEntries = React.useMemo(() => {
