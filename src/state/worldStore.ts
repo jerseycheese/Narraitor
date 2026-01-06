@@ -11,6 +11,7 @@ import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
 import Logger from '@/lib/utils/logger';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
 const logger = new Logger('WorldStore');
 let sessionStoreModule: typeof import('./sessionStore') | null = null;
@@ -173,14 +174,10 @@ export const useWorldStore = create<WorldStore>()(
             });
           }
 
-          // Delete all characters in the world
-          try {
-            const { useCharacterStore } = eval('require("./characterStore")');
-            const characterStore = useCharacterStore.getState();
-            await characterStore.deleteCharactersInWorld(id);
-          } catch {
-            // Handle import errors silently (e.g., in test environments)
-          }
+          // Emit event for other stores to handle cleanup
+          storeEvents.emit<WorldDeletedEvent>(StoreEventTypes.WORLD_DELETED, {
+            worldId: id,
+          });
 
           set((state) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

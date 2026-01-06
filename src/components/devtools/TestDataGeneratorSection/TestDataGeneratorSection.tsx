@@ -4,7 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
 // Using API routes for secure AI operations - combines both approaches
-import { generateFromTemplate } from '@/lib/generators/characterGenerator';
+import { generateFromTemplate } from '@/lib/generators/characterTemplates';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';

@@ -4,8 +4,10 @@ import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { DerivedStat } from '../types/character.types';
+import { DerivedStatFormula } from '../types/world.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { useWorldStore } from './worldStore';
 import {
   safeTrim,
   normalizeText,
@@ -16,10 +18,7 @@ import {
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
-
-// Module caches for dynamic imports to break circular dependencies
-let inventoryStoreModule: typeof import('./inventoryStore') | null = null;
-let worldStoreModule: typeof import('./worldStore') | null = null;
+import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type CharacterAttributeChangedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
@@ -429,20 +428,10 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               return;
             }
 
-            // Clean up related data before deleting character
-            try {
-              if (!inventoryStoreModule) {
-                inventoryStoreModule = await import('./inventoryStore');
-              }
-              const { useInventoryStore } = inventoryStoreModule;
-              const inventoryStore = useInventoryStore.getState();
-              inventoryStore.clearCharacterInventory(id);
-            } catch (error) {
-              console.warn(
-                'Failed to clean up inventory for deleted character',
-                error
-              );
-            }
+            // Emit event for other stores to handle cleanup
+            storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
+              characterId: id,
+            });
 
             set((state) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -689,18 +678,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               return;
             }
 
-            let world;
-            try {
-              if (!worldStoreModule) {
-                worldStoreModule = await import('./worldStore');
-              }
-              const { useWorldStore } = worldStoreModule;
-              world = useWorldStore.getState().worlds[character.worldId];
-            } catch (error) {
-              console.warn('Failed to load worldStore for derived stats', error);
-              get().update(characterId, { derivedStats: [] });
-              return;
-            }
+            const world = useWorldStore.getState().worlds[character.worldId];
             if (
               !world?.settings?.derivedStatFormulas ||
               world.settings.derivedStatFormulas.length === 0
@@ -713,7 +691,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             const currentDerivedStats = character.derivedStats || [];
 
             const updatedDerivedStats: DerivedStat[] = formulas.map(
-              (formula) => {
+              (formula: DerivedStatFormula) => {
                 const existingStat = currentDerivedStats.find(
                   (s) => s.derivedStatId === formula.id
                 );
@@ -843,22 +821,12 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               .filter(([, char]) => char.worldId === worldId)
               .map(([id]) => id);
 
-            // Clean up inventory for all characters in the world
-            try {
-              if (!inventoryStoreModule) {
-                inventoryStoreModule = await import('./inventoryStore');
-              }
-              const { useInventoryStore } = inventoryStoreModule;
-              const inventoryStore = useInventoryStore.getState();
-              charactersInWorld.forEach((characterId) => {
-                inventoryStore.clearCharacterInventory(characterId);
+            // Emit events for other stores to handle cleanup
+            charactersInWorld.forEach((characterId) => {
+              storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
+                characterId,
               });
-            } catch (error) {
-              console.warn(
-                'Failed to clean up inventory for deleted world characters',
-                error
-              );
-            }
+            });
 
             set((state) => {
               const charactersToKeep = Object.fromEntries(
@@ -909,3 +877,11 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).useCharacterStore = useCharacterStore;
 }
+
+// Subscribe to store events
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useCharacterStore.getState().deleteCharactersInWorld(worldId);
+  }
+);

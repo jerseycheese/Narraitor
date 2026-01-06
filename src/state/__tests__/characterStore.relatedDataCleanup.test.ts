@@ -1,20 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
-import { useJournalStore } from '../journalStore';
-import { useInventoryStore } from '../inventoryStore';
-import type { InventoryStore } from '../inventoryStore';
 import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
-import {
-  mockZustandStore,
-  createMockJournalStore,
-  createMockInventoryStore,
-} from '@/lib/test-utils';
+import { storeEvents, StoreEventTypes } from '@/lib/state/storePubSub';
 import { createTestCharacterData } from './characterStore.testHelpers';
 
-// Mock stores
-jest.mock('../journalStore');
-jest.mock('../inventoryStore');
+// Mock store events
+jest.spyOn(storeEvents, 'emit').mockImplementation(() => Promise.resolve());
 
 // Test helper for journal entries
 const createTestJournalEntry = (
@@ -42,82 +34,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
   let testCharacterId1: EntityID;
   let testCharacterId2: EntityID;
 
-  const mockJournalStore = {
-    entries: {} as Record<EntityID, JournalEntry>,
-    sessionEntries: {
-      'session-1': ['entry-1'],
-      'session-2': ['entry-2'],
-      'session-3': ['entry-3'],
-    },
-    deleteSessionEntries: jest.fn(),
-    getSessionEntries: jest.fn(),
-    error: null,
-    loading: false,
-    addEntry: jest.fn(),
-    updateEntry: jest.fn(),
-    deleteEntry: jest.fn(),
-    clearAllEntries: jest.fn(),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-    markAsRead: jest.fn(),
-    getSessionEntriesWithCharacter: jest.fn(),
-    getEntriesByType: jest.fn(),
-  };
-
-  const mockInventoryStore: Partial<InventoryStore> = {
-    items: {},
-    characterInventories: {},
-    clearCharacterInventory: jest.fn(),
-    getCharacterItems: jest.fn(() => []),
-    addItem: jest.fn(),
-    removeItem: jest.fn(),
-    updateItemQuantity: jest.fn(),
-    delete: jest.fn(),
-    error: null,
-    loading: false,
-    generatingImageFor: new Set(),
-  };
-
-  // Initialize entries dynamically based on test character IDs
-  const initializeMockEntries = (charId1: EntityID, charId2: EntityID) => {
-    mockJournalStore.entries = {
-      'entry-1': createTestJournalEntry('entry-1' as EntityID, charId1, {
-        content: 'Test entry',
-      }),
-      'entry-2': createTestJournalEntry('entry-2' as EntityID, charId1, {
-        content: 'Another entry',
-      }),
-      'entry-3': createTestJournalEntry('entry-3' as EntityID, charId2, {
-        content: 'Different character entry',
-      }),
-    };
-  };
-
   beforeEach(async () => {
     jest.clearAllMocks();
-
-    // Initialize test character IDs
-    testCharacterId1 = 'char-1' as EntityID;
-    testCharacterId2 = 'char-2' as EntityID;
-    initializeMockEntries(testCharacterId1, testCharacterId2);
-
-    mockZustandStore(
-      useJournalStore as jest.MockedFunction<typeof useJournalStore>,
-      createMockJournalStore(mockJournalStore)
-    );
-    mockZustandStore(
-      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>,
-      createMockInventoryStore(mockInventoryStore)
-    );
-
-    // Mock getState for store access
-    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState =
-      jest.fn(() => mockJournalStore);
-    (
-      useInventoryStore as jest.MockedFunction<typeof useInventoryStore>
-    ).getState = jest.fn(() => mockInventoryStore as InventoryStore);
 
     // Clear character store before each test
     const { result } = renderHook(() => useCharacterStore());
@@ -145,16 +63,13 @@ describe('CharacterStore - Related Data Cleanup', () => {
             level: 2,
           })
         );
-
-        // Initialize mock journal entries with actual character IDs
-        initializeMockEntries(testCharacterId1, testCharacterId2);
       });
 
       expect(result.current.characters[testCharacterId1]).toBeDefined();
       expect(result.current.characters[testCharacterId2]).toBeDefined();
 
       await act(async () => {
-        await await result.current.deleteCharacter(testCharacterId1);
+        await result.current.deleteCharacter(testCharacterId1);
       });
 
       expect(result.current.characters[testCharacterId1]).toBeUndefined();
@@ -306,7 +221,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
       );
     });
 
-    test('cleans up character inventory when character is deleted', async () => {
+    test('emits event to clean up character inventory when character is deleted', async () => {
       const { result } = renderHook(() => useCharacterStore());
 
       let characterId: EntityID = '' as EntityID;
@@ -324,13 +239,14 @@ describe('CharacterStore - Related Data Cleanup', () => {
         await result.current.deleteCharacter(characterId);
       });
 
-      // Verify inventory cleanup was called
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
-        characterId
+      // Verify event emission
+      expect(storeEvents.emit).toHaveBeenCalledWith(
+        StoreEventTypes.CHARACTER_DELETED,
+        { characterId }
       );
     });
 
-    test('cleans up inventory for all characters when world is deleted', async () => {
+    test('emits events to clean up inventory for all characters when world is deleted', async () => {
       const { result } = renderHook(() => useCharacterStore());
 
       let char1Id: EntityID = '' as EntityID;
@@ -364,18 +280,18 @@ describe('CharacterStore - Related Data Cleanup', () => {
         await result.current.deleteCharactersInWorld('world-1' as EntityID);
       });
 
-      // Verify inventory cleanup was called for world-1 characters only
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
-        char1Id
+      // Verify event emissions for world-1 characters
+      expect(storeEvents.emit).toHaveBeenCalledWith(
+        StoreEventTypes.CHARACTER_DELETED,
+        { characterId: char1Id }
       );
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledWith(
-        char2Id
+      expect(storeEvents.emit).toHaveBeenCalledWith(
+        StoreEventTypes.CHARACTER_DELETED,
+        { characterId: char2Id }
       );
-      expect(
-        mockInventoryStore.clearCharacterInventory
-      ).not.toHaveBeenCalledWith(char3Id);
-      expect(mockInventoryStore.clearCharacterInventory).toHaveBeenCalledTimes(
-        2
+      expect(storeEvents.emit).not.toHaveBeenCalledWith(
+        StoreEventTypes.CHARACTER_DELETED,
+        { characterId: char3Id }
       );
     });
   });
