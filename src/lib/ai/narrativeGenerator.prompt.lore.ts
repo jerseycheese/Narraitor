@@ -18,15 +18,15 @@ export const enhancePromptWithLore = (
   return prompt + applyBudget(loreContext, 'lore-context', budget);
 };
 
-export const enhancePromptWithGoalContext = (
+export const enhancePromptWithGoalContext = async (
   prompt: string,
   sessionId?: string,
   budget?: RequestBudget
-): string => {
+): Promise<string> => {
   if (!sessionId) return prompt;
 
   try {
-    const aiContext = useAiContextStore
+    const aiContext = await useAiContextStore
       .getState()
       .buildContextForSession(sessionId);
 

@@ -21,14 +21,14 @@ const MAX_OTHER_CHARACTER_THREADS = 3;
 const MAX_CROSS_CHARACTER_REFERENCES = 2;
 const PROMPT_THREAD_SUMMARY_LENGTH = 160;
 
-export const enhancePromptWithPersonalization = (
+export const enhancePromptWithPersonalization = async (
   prompt: string,
   worldId: EntityID,
   characterIds: string[],
   personalizationEngine: PersonalizationEngine,
   sessionId?: EntityID,
   budget?: RequestBudget
-): string => {
+): Promise<string> => {
   try {
     const world = getWorld(worldId);
     const { characters } = useCharacterStore.getState();
@@ -70,7 +70,7 @@ export const enhancePromptWithPersonalization = (
     }
 
     const aiContext = sessionId
-      ? useAiContextStore.getState().buildContextForSession(sessionId)
+      ? await useAiContextStore.getState().buildContextForSession(sessionId)
       : null;
     const narrativeGoals = aiContext?.activeGoals || [];
     const characterGoals = convertToCharacterGoals(

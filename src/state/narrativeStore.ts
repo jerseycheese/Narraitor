@@ -4,7 +4,7 @@ import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, Choice
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { JournalEntry } from '../types/journal.types';
-import { Character } from './characterStore';
+import type { Character } from './characterStore';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 // IMPORTANT: Do not import AI generators directly in client code.
