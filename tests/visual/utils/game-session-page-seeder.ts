@@ -218,6 +218,16 @@ export async function renderSeededSuggestedActions(page: Page): Promise<void> {
  * Seed inventory demo items so the visual snapshot reflects a populated equipment list.
  */
 export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const store = (window as typeof window & {
+      useInventoryStore?: { persist?: { hasHydrated?: () => boolean } };
+    }).useInventoryStore;
+
+    if (!store) return false;
+    if (!store.persist?.hasHydrated) return true;
+    return store.persist.hasHydrated();
+  });
+
   await page.evaluate(() => {
     const inventoryStore = (window as typeof window & {
       useInventoryStore?: {
