@@ -15,7 +15,7 @@ import {
 import { createTestAttributeData, createTestWorldData } from './worldStore.testHelpers';
 
 describe('useCharacterStore - Attribute and Skill Management', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     setupTestTimers();
     useCharacterStore.getState().reset();
     useWorldStore.getState().reset();
@@ -29,7 +29,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
   describe('skill management', () => {
     let characterId: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
       characterId = useCharacterStore.getState().createCharacter(
         createSkillTestCharacter()
       );
@@ -106,7 +106,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
         })
       );
 
-      await useCharacterStore.getState().addAttribute(characterId, {
+      useCharacterStore.getState().addAttribute(characterId, {
         name: 'Strength',
         baseValue: 5,
         modifiedValue: 5,
@@ -124,7 +124,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
 
       const characterAttributeId = character.attributes[0].id;
 
-      await useCharacterStore.getState().removeAttribute(
+      useCharacterStore.getState().removeAttribute(
         characterId,
         characterAttributeId
       );

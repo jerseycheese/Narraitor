@@ -175,7 +175,7 @@ export interface CharacterStore extends CrudStore<Character> {
     character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
   ) => EntityID;
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
-  deleteCharacter: (id: EntityID) => void;
+  deleteCharacter: (id: EntityID) => Promise<void>;
   setCurrentCharacter: (id: EntityID) => void;
 
   // Queries
@@ -186,13 +186,13 @@ export interface CharacterStore extends CrudStore<Character> {
   addAttribute: (
     characterId: EntityID,
     attribute: Omit<CharacterAttribute, 'id' | 'characterId'>
-  ) => void;
+  ) => Promise<void>;
   updateAttribute: (
     characterId: EntityID,
     attributeId: EntityID,
     updates: Partial<CharacterAttribute>
-  ) => void;
-  removeAttribute: (characterId: EntityID, attributeId: EntityID) => void;
+  ) => Promise<void>;
+  removeAttribute: (characterId: EntityID, attributeId: EntityID) => Promise<void>;
 
   // Skill management
   addSkill: (
@@ -212,7 +212,7 @@ export interface CharacterStore extends CrudStore<Character> {
   getCharactersCount: (worldId?: EntityID) => number;
 
   // Cascading delete helper
-  deleteCharactersInWorld: (worldId: EntityID) => void;
+  deleteCharactersInWorld: (worldId: EntityID) => Promise<void>;
 
   // State management
   reset: () => void;
@@ -423,28 +423,26 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
           },
 
-          delete: (id) => {
+          delete: async (id) => {
             const character = get().characters[id];
             if (!character) {
               return;
             }
 
             // Clean up related data before deleting character
-            Promise.resolve().then(async () => {
-              try {
-                if (!inventoryStoreModule) {
-                  inventoryStoreModule = await import('./inventoryStore');
-                }
-                const { useInventoryStore } = inventoryStoreModule;
-                const inventoryStore = useInventoryStore.getState();
-                inventoryStore.clearCharacterInventory(id);
-              } catch (error) {
-                console.warn(
-                  'Failed to clean up inventory for deleted character',
-                  error
-                );
+            try {
+              if (!inventoryStoreModule) {
+                inventoryStoreModule = await import('./inventoryStore');
               }
-            });
+              const { useInventoryStore } = inventoryStoreModule;
+              const inventoryStore = useInventoryStore.getState();
+              inventoryStore.clearCharacterInventory(id);
+            } catch (error) {
+              console.warn(
+                'Failed to clean up inventory for deleted character',
+                error
+              );
+            }
 
             set((state) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -563,11 +561,11 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
           // Domain-specific aliases
           createCharacter: (characterData) => get().create(characterData),
           updateCharacter: (id, updates) => get().update(id, updates),
-          deleteCharacter: (id) => get().delete(id),
+          deleteCharacter: async (id) => await get().delete(id),
           setCurrentCharacter: (id) => get().setCurrent(id),
 
           // Attribute management
-          addAttribute: (characterId, attributeData) => {
+          addAttribute: async (characterId, attributeData) => {
             const character = get().characters[characterId];
             if (!character) {
               set({
@@ -591,10 +589,10 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
 
             // Recalculate derived stats after attribute change
-            Promise.resolve().then(() => get().recalculateDerivedStats(characterId));
+            await get().recalculateDerivedStats(characterId);
           },
 
-          updateAttribute: (characterId, attributeId, updates) => {
+          updateAttribute: async (characterId, attributeId, updates) => {
             const character = get().characters[characterId];
             if (!character) {
               set({
@@ -616,10 +614,10 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
 
             // Recalculate derived stats after attribute change
-            Promise.resolve().then(() => get().recalculateDerivedStats(characterId));
+            await get().recalculateDerivedStats(characterId);
           },
 
-          removeAttribute: (characterId, attributeId) => {
+          removeAttribute: async (characterId, attributeId) => {
             const character = get().characters[characterId];
             if (!character) {
               set({
@@ -640,7 +638,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
 
             // Recalculate derived stats after attribute change
-            Promise.resolve().then(() => get().recalculateDerivedStats(characterId));
+            await get().recalculateDerivedStats(characterId);
           },
 
           // Skill management
@@ -839,30 +837,28 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             return Object.keys(characters).length;
           },
 
-          deleteCharactersInWorld: (worldId) => {
+          deleteCharactersInWorld: async (worldId) => {
             const state = get();
             const charactersInWorld = Object.entries(state.characters)
               .filter(([, char]) => char.worldId === worldId)
               .map(([id]) => id);
 
             // Clean up inventory for all characters in the world
-            Promise.resolve().then(async () => {
-              try {
-                if (!inventoryStoreModule) {
-                  inventoryStoreModule = await import('./inventoryStore');
-                }
-                const { useInventoryStore } = inventoryStoreModule;
-                const inventoryStore = useInventoryStore.getState();
-                charactersInWorld.forEach((characterId) => {
-                  inventoryStore.clearCharacterInventory(characterId);
-                });
-              } catch (error) {
-                console.warn(
-                  'Failed to clean up inventory for deleted world characters',
-                  error
-                );
+            try {
+              if (!inventoryStoreModule) {
+                inventoryStoreModule = await import('./inventoryStore');
               }
-            });
+              const { useInventoryStore } = inventoryStoreModule;
+              const inventoryStore = useInventoryStore.getState();
+              charactersInWorld.forEach((characterId) => {
+                inventoryStore.clearCharacterInventory(characterId);
+              });
+            } catch (error) {
+              console.warn(
+                'Failed to clean up inventory for deleted world characters',
+                error
+              );
+            }
 
             set((state) => {
               const charactersToKeep = Object.fromEntries(

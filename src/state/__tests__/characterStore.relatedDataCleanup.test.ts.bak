@@ -95,7 +95,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     };
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
 
     // Initialize test character IDs
