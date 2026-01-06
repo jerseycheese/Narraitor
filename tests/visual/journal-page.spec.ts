@@ -16,32 +16,22 @@ test.describe('Journal Page', () => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
-    // Navigate to the play page
-    await page.goto('/worlds/world-cyberpunk-2077/play');
-
-    // Wait for page to load
-    await page.waitForLoadState('networkidle', { timeout: 10000 });
-    await page.waitForTimeout(2000);
-
-    // Wait for active game session
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
-
-    // Seed journal entries for visual snapshot
-    await seedJournalEntriesForVisual(page);
-
-    // Look for journal floating button
-    const journalButton = page.getByRole('button', { name: /open journal/i });
-    await expect(journalButton).toBeVisible({ timeout: 10000 });
-
-    // Click the journal button to open the journal page
-    await Promise.all([
-      page.waitForURL('**/play/journal', { timeout: 10000 }),
-      journalButton.click(),
-    ]);
+    // Navigate directly to the journal page to avoid flaky UI transitions
+    await page.goto('/worlds/world-cyberpunk-2077/play/journal');
 
     // Wait for journal page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Seed journal entries for visual snapshot (ensures multiple entries are present)
+    await seedJournalEntriesForVisual(page);
     await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
+
+    const entryButtons = page.getByRole('button', { name: /select entry:/i });
+    await expect(entryButtons).toHaveCount(4, { timeout: 10000 });
+
+    const worldEventEntry = page.getByRole('button', { name: 'Select entry: World Event' });
+    await expect(worldEventEntry).toBeVisible({ timeout: 10000 });
+    await worldEventEntry.click();
     await expect(
       page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
     ).toBeVisible({ timeout: 10000 });

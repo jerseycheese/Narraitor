@@ -2,7 +2,7 @@ import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 import { normalizeGenre } from '@/lib/constants/genres';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
-import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/types/type-guards';
+import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/lib/utils/typeGuards';
 
 // Default fallback values for AI validation failures
 const DEFAULT_WORLD_ATTRIBUTE = {

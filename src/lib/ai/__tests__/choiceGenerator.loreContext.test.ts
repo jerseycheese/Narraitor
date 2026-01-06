@@ -7,6 +7,7 @@ import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { createMockWorldStore } from '@/lib/test-utils';
+import type { World } from '@/types/world.types';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -27,7 +28,6 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
-  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
@@ -41,7 +41,7 @@ const mockWorld = {
     narrativeStyle: 'action-packed' as const,
     languageComplexity: 'moderate' as const,
   },
-};
+} satisfies World;
 
 describe('ChoiceGenerator lore context integration', () => {
   let choiceGenerator: ChoiceGenerator;

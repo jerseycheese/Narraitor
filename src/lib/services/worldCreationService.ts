@@ -10,12 +10,14 @@ import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSe
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { logger } from '@/lib/utils/logger';
 import { npcPortraitService } from './npcPortraitService';
+import { toGenreValue } from '@/lib/constants/genres';
+import type { GenreValue } from '@/types/genre.types';
 
 export interface CreateWorldFromGenerationParams {
   generatedData: GeneratedWorldData;
   customizations?: {
     name?: string;
-    genre?: string;
+    genre?: GenreValue;
     description?: string;
   };
   generateImage?: boolean;
@@ -162,10 +164,14 @@ export const worldCreationService = {
     const { createWorld, updateWorld } = useWorldStore.getState();
 
     // Prepare initial world data with customizations
+    const resolvedGenre = toGenreValue(
+      customizations?.genre ? customizations.genre : generatedData.genre
+    );
+
     const initialWorldData = {
       name: customizations.name || generatedData.name,
       description: customizations.description || generatedData.description,
-      genre: customizations.genre || generatedData.genre,
+      genre: resolvedGenre,
       reference: generatedData.reference,
       relationship: generatedData.relationship,
     };

@@ -41,14 +41,14 @@ jest.mock('@/lib/ai/worldAnalyzerClient', () => ({
 const TEST_WORLD_DATA = {
   name: 'Test World Name',
   description: 'A test world description',
-  genre: 'Sci-Fi',
+  genre: 'sci-fi',
   attributes: [
     { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical' }
   ],
   skills: [
     { name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as const, category: 'Combat' }
   ]
-};
+} as const;
 
 describe('WorldCreationWizard Cancel Confirmation', () => {
   const mockPush = jest.fn();

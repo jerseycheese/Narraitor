@@ -18,7 +18,7 @@ World validation supports partial validation, which is perfect for form inputs w
 ### World Validation
 
 ```typescript
-import { validateWorld } from '@/types/type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 // Detailed validation with error messages
 const unknownData: unknown = getUserInput();
@@ -68,7 +68,7 @@ if (result.valid) {
 import {
   validateWorldAttribute,
   validateWorldSkill
-} from '@/types/type-guards';
+} from '@/lib/utils/typeGuards';
 
 // Validate world attributes with range checking
 const attribute = {
@@ -215,7 +215,7 @@ function isValidWorld(obj: any): boolean {
 }
 
 // After - comprehensive validation
-import { validateWorld } from '@/types/type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 const result = validateWorld(data);
 if (result.valid) {
@@ -230,7 +230,7 @@ if (result.valid) {
 The type guards are extensively tested and provide reliable validation:
 
 ```typescript
-import { validateWorld } from '@/types/type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 // Test data validation in your tests
 test('API returns valid world data', async () => {

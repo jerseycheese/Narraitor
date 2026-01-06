@@ -20,7 +20,7 @@ import {
   PersonalityTrait,
   ChoiceTypePreference,
 } from '@/types/personalization.types';
-import { isPlayerDecisionArray, sanitizeString } from '@/types/type-guards';
+import { isPlayerDecisionArray, sanitizeString } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 import {
   formatAttributesForNarrative,

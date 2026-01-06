@@ -44,7 +44,7 @@ describe('TemplateGenerator', () => {
       expect(result).toEqual({
         name: 'Neo-Victorian Skyport',
         description: 'A steampunk world floating in the clouds',
-        genre: 'steampunk',
+        genre: 'other',
         attributes: expect.arrayContaining([
           expect.objectContaining({ name: 'Strength' })
         ]),
@@ -84,7 +84,7 @@ describe('TemplateGenerator', () => {
         type: 'genre-mix'
       });
 
-      expect(result.genre).toBe('cyberpunk-western');
+      expect(result.genre).toBe('other');
       expect(result.attributes).toHaveLength(2);
       expect(result.skills).toHaveLength(2);
       
@@ -116,7 +116,7 @@ describe('TemplateGenerator', () => {
       });
 
       expect(result.name).toBe('Microscopic Empire');
-      expect(result.genre).toBe('micro-fantasy');
+      expect(result.genre).toBe('other');
       
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('completely unexpected')
@@ -188,7 +188,7 @@ describe('TemplateGenerator', () => {
       expect(templateWithCapsGenre.genre).toBe('fantasy');
     });
 
-    test('normalizes mixed case genre values', () => {
+    test('coerces mixed genre values to a supported genre', () => {
       const templateWithMixedGenre = {
         name: 'Test World',
         description: 'A test world',
@@ -203,7 +203,7 @@ describe('TemplateGenerator', () => {
       };
 
       templateGenerator.validateTemplate(templateWithMixedGenre);
-      expect(templateWithMixedGenre.genre).toBe('cyberpunk-fantasy');
+      expect(templateWithMixedGenre.genre).toBe('other');
     });
   });
 });

@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { AITestConfig, AIResponse } from '@/types';
+import type { AITestConfig, AIResponse, Character, GenreValue, World } from '@/types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '@/lib/ai/contextOverride';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
+import { GENRES, normalizeGenre } from '@/lib/constants/genres';
 
 interface AITestingPanelProps {
   className?: string;
@@ -18,15 +19,20 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   const [result, setResult] = useState<AIResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const toGenreValue = (value: string): GenreValue => {
+    const normalized = normalizeGenre(value);
+    const isKnownGenre = GENRES.some((genre) => genre.value === normalized);
+    return (isKnownGenre ? normalized : 'other') as GenreValue;
+  };
+
   // Mock base data for testing
-  const mockWorld = {
+  const mockWorld: World = {
     id: 'test-world',
     name: 'Test World',
     description: 'A world for testing',
     genre: 'fantasy',
     attributes: [],
     skills: [],
-    derivedStats: [],
     settings: {
       maxAttributes: 10,
       maxSkills: 10,
@@ -37,7 +43,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     updatedAt: getTimestamp(),
   };
 
-  const mockCharacter = {
+  const mockCharacter: Character = {
     id: 'test-character',
     name: 'Test Character',
     description: 'A test character',
@@ -92,7 +98,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       ...prev,
       worldOverride: {
         ...prev.worldOverride,
-        genre: e.target.value,
+        genre: toGenreValue(e.target.value),
       },
     }));
   };

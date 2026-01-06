@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { GENRES } from '@/lib/constants/genres';
+import type { GenreValue } from '@/types/genre.types';
 
 interface WorldBasicInfoFormProps {
   world: World;
@@ -47,7 +48,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
         <Select
           id="worldGenre"
           value={world.genre}
-          onChange={(e) => onChange({ genre: e.target.value })}
+          onChange={(e) => onChange({ genre: e.target.value as GenreValue })}
         >
           {GENRES.map((genre) => (
             <option key={genre.value} value={genre.value}>

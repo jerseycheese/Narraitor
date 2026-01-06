@@ -4,6 +4,7 @@ import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplat
 import { useWorldStore } from '@/state/worldStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { createMockWorldStore } from '@/lib/test-utils';
+import type { World } from '@/types/world.types';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
@@ -39,7 +40,6 @@ const mockWorld = {
     },
   ],
   skills: [],
-  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
@@ -48,7 +48,7 @@ const mockWorld = {
   },
   createdAt: '2023-01-01',
   updatedAt: '2023-01-01',
-};
+} satisfies World;
 
 describe('NarrativeGenerator', () => {
   let narrativeGenerator: NarrativeGenerator;

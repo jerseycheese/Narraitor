@@ -5,6 +5,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { generateWorld, type GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { safeTrim, capitalize } from '@/lib/utils';
 import { worldCreationService } from '@/lib/services/worldCreationService';
+import { toGenreValue } from '@/lib/constants/genres';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -50,7 +51,7 @@ export default function WorldGenerationTestPage() {
       generatedData: generatedWorld,
       customizations: {
         name: generatedWorld.name,
-        genre: generatedWorld.genre,
+        genre: toGenreValue(generatedWorld.genre),
         description: generatedWorld.description,
       },
     });

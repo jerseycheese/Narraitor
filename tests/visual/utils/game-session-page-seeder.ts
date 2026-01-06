@@ -218,6 +218,16 @@ export async function renderSeededSuggestedActions(page: Page): Promise<void> {
  * Seed inventory demo items so the visual snapshot reflects a populated equipment list.
  */
 export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const store = (window as typeof window & {
+      useInventoryStore?: { persist?: { hasHydrated?: () => boolean } };
+    }).useInventoryStore;
+
+    if (!store) return false;
+    if (!store.persist?.hasHydrated) return true;
+    return store.persist.hasHydrated();
+  });
+
   await page.evaluate(() => {
     const inventoryStore = (window as typeof window & {
       useInventoryStore?: {
@@ -357,6 +367,20 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
  * Seed journal entries so the journal page renders populated content.
  */
 export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const store = (window as typeof window & {
+      useJournalStore?: { persist?: { hasHydrated?: () => boolean } };
+    }).useJournalStore;
+    return store?.persist?.hasHydrated?.();
+  });
+
+  await page.waitForFunction(() => {
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: { getState?: () => { id?: string | null } };
+    }).useSessionStore?.getState?.();
+    return !!sessionStore?.id;
+  });
+
   await page.evaluate((entries) => {
     const journalStore = (window as typeof window & {
       useJournalStore?: {
@@ -366,34 +390,49 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
         ) => void;
       };
     }).useJournalStore;
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: { getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null } };
+    }).useSessionStore?.getState?.();
 
     if (!journalStore?.setState) {
       return;
     }
 
-    const entriesRecord = entries.reduce((acc: Record<string, unknown>, entry: any) => {
+    const targetSessionId = sessionStore?.id ?? entries[0]?.sessionId;
+    const targetWorldId = sessionStore?.worldId ?? entries[0]?.worldId;
+    const targetCharacterId = sessionStore?.characterId ?? entries[0]?.characterId;
+    const baseTimestamp = Date.now();
+    const adjustedEntries = entries.map((entry: any, index: number) => {
+      const timestamp = new Date(baseTimestamp + index * 1000).toISOString();
+      const nextMetadata = entry.metadata && entry.type === 'session_start'
+        ? { ...entry.metadata, sessionStartTime: timestamp }
+        : entry.metadata;
+
+      return {
+        ...entry,
+        sessionId: targetSessionId ?? entry.sessionId,
+        worldId: targetWorldId ?? entry.worldId,
+        characterId: targetCharacterId ?? entry.characterId,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        metadata: nextMetadata,
+      };
+    });
+
+    const entriesRecord = adjustedEntries.reduce((acc: Record<string, unknown>, entry: any) => {
       acc[entry.id] = entry;
       return acc;
     }, {});
 
-    const sessionEntries = entries.reduce((acc: Record<string, string[]>, entry: any) => {
+    const sessionEntries = adjustedEntries.reduce((acc: Record<string, string[]>, entry: any) => {
       acc[entry.sessionId] = acc[entry.sessionId] || [];
       acc[entry.sessionId].push(entry.id);
       return acc;
     }, {});
 
-    journalStore.setState((state: {
-      entries: Record<string, unknown>;
-      sessionEntries: Record<string, string[]>;
-    }) => ({
-      entries: {
-        ...state.entries,
-        ...entriesRecord,
-      },
-      sessionEntries: {
-        ...state.sessionEntries,
-        ...sessionEntries,
-      },
+    journalStore.setState(() => ({
+      entries: entriesRecord,
+      sessionEntries,
     }));
   }, SAMPLE_JOURNAL_ENTRIES);
 }

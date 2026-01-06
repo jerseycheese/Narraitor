@@ -8,6 +8,7 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
+import type { GenreValue } from '@/types/genre.types';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
@@ -20,7 +21,7 @@ const GUIDED_STEPS = [
 
 interface OnboardingData {
   name: string;
-  genre: string;
+  genre: GenreValue | '';
   worldTypeData: WorldTypeData;
   description?: string;
 }
@@ -89,7 +90,7 @@ export function GuidedFirstTimeExperience() {
         generatedData: generatedWorldData,
         customizations: {
           name: data.name,
-          genre: data.genre,
+          genre: data.genre || undefined,
           description: data.description,
         },
       });
@@ -262,7 +263,7 @@ export function GuidedFirstTimeExperience() {
                 id="world-genre"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={wizard.state.data.genre}
-                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue })}
               >
                 <option value="">Auto-detect</option>
                 {GENRES.map((genre) => (
@@ -281,7 +282,7 @@ export function GuidedFirstTimeExperience() {
                 id="world-genre"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={wizard.state.data.genre}
-                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue | '' })}
               >
                 <option value="">Select a genre</option>
                 {GENRES.map((genre) => (

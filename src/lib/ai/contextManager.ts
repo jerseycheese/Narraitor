@@ -1,6 +1,6 @@
 import { EndingGenerationRequest, NarrativeSegment } from '@/types/narrative.types';
-import { World } from '@/types/world.types';
-import { JournalEntry } from '@/types/journal.types';
+import type { World } from '@/types/world.types';
+import type { JournalEntry } from '@/types/journal.types';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -35,6 +35,7 @@ export async function buildEndingContext(
   if (!character) {
     throw new Error(`Character not found: ${request.characterId}`);
   }
+  const resolvedCharacter = character as StoreCharacter;
 
   const narrativeSegments = request.narrativeSegments ||
     Object.values(useNarrativeStore.getState().segments)
@@ -59,7 +60,7 @@ export async function buildEndingContext(
 
   return {
     world,
-    character,
+    character: resolvedCharacter,
     narrativeSegments,
     journalEntries,
     sessionStartTime,

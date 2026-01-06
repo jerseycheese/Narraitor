@@ -11,6 +11,7 @@ import {
   createMockWorldStore,
   createMockCharacterStore,
 } from '@/lib/test-utils';
+import type { World } from '@/types/world.types';
 
 // Mock dependencies
 jest.mock('../loreContextHelper');
@@ -25,7 +26,6 @@ const mockWorld = {
   genre: 'fantasy',
   attributes: [],
   skills: [],
-  derivedStats: [],
   settings: {
     maxAttributes: 10,
     maxSkills: 20,
@@ -39,7 +39,7 @@ const mockWorld = {
     narrativeStyle: 'epic' as const,
     languageComplexity: 'moderate' as const,
   },
-};
+} satisfies World;
 
 describe('NarrativeGenerator lore context integration', () => {
   let narrativeGenerator: NarrativeGenerator;

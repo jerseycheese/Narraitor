@@ -1,9 +1,9 @@
 // src/types/narrative.types.ts
 
-import { EntityID, TimestampedEntity } from './common.types';
-import { World } from './world.types';
-import { Character } from '../state/characterStore';
-import { InventoryAcquisitionMethod } from './inventory.types';
+import type { EntityID, TimestampedEntity } from './common.types';
+import type { World } from './world.types';
+import type { Character } from './character.types';
+import type { InventoryAcquisitionMethod } from './inventory.types';
 
 /**
  * Represents a segment of narrative in the game

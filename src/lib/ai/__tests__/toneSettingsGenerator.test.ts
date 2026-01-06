@@ -258,7 +258,7 @@ describe('extractWorldAnalysisData', () => {
     const minimalWorld: Partial<World> = {
       name: 'Simple World',
       description: 'A basic world',
-      genre: 'adventure'
+      genre: 'other'
     };
 
     const result = extractWorldAnalysisData(minimalWorld);
@@ -266,7 +266,7 @@ describe('extractWorldAnalysisData', () => {
     expect(result).toEqual({
       name: 'Simple World',
       description: 'A basic world',
-      genre: 'adventure',
+      genre: 'other',
       reference: undefined,
       relationship: undefined
     });

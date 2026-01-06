@@ -1,7 +1,7 @@
 // Integration tests for type validation with real data scenarios
 // Focus on boundary conditions and actual usage patterns
 
-import { validateWorld } from '../type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 
 describe('Type Validation Integration', () => {
   describe('World Validation', () => {

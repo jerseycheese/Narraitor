@@ -1,14 +1,21 @@
 /**
- * Core type definitions for the Narraitor application
+ * Core type definitions for the Narraitor application.
+ *
+ * Architecture note: keep this barrel type-only to avoid runtime coupling
+ * and circular dependencies between domains.
  */
 
 // Re-export all types from their respective files
 export type { EntityID, ISODateString, TimestampedEntity, NamedEntity, GeneratedImage } from './common.types';
-export type { World, WorldAttribute, WorldSkill, WorldSettings } from './world.types';
+export type { GenreValue } from './genre.types';
+export type { SkillDifficulty } from './skill-difficulty.types';
+export type { WorldTemplate } from './world-template.types';
+export type { World, WorldAttribute, WorldSkill, WorldSettings, DerivedStatFormula } from './world.types';
 export type {
   Character,
   CharacterAttribute,
   CharacterSkill,
+  DerivedStat,
   CharacterBackground,
   CharacterRelationship,
   CharacterStatus
@@ -96,10 +103,3 @@ export type {
   ErrorFilter,
   ErrorStatistics
 } from './runtime-error.types';
-
-// Export validation functions and remaining type guards
-export {
-  validateWorld,
-  isNarrativeSegment,
-  isJournalEntry
-} from './type-guards';

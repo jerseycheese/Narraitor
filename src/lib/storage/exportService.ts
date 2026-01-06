@@ -11,7 +11,7 @@ import { useCharacterStore, CharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
-import { validateWorld } from '../../types/type-guards';
+import { validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 
 

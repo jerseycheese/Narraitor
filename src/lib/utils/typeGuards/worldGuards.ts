@@ -1,12 +1,7 @@
-// src/types/type-guards.ts
+// src/lib/utils/typeGuards/worldGuards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NarrativeSegment } from './narrative.types';
-import { JournalEntry, JournalEntryType } from './journal.types';
-import { PlayerDecision, ChoiceTypePreference } from './personalization.types';
-import { safeTrim } from '@/lib/utils';
-import { normalizeText, NORM_NAME } from '../lib/utils/textNormalization';
-import { ValidationResult } from '../lib/utils/validationUtils';
+import type { ValidationResult } from '@/lib/utils';
 
 /**
  * Comprehensive World validation with detailed error messages.
@@ -184,7 +179,7 @@ export function validateWorldAttribute(obj: unknown): ValidationResult {
 
 export function validateWorldSkill(obj: unknown): ValidationResult {
   const errors: string[] = [];
-  const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
+  const validDifficulties = ['easy', 'medium', 'hard'];
 
   if (obj === null || obj === undefined) {
     errors.push('WorldSkill cannot be null or undefined');
@@ -330,105 +325,4 @@ export function validateGeneratedImage(obj: unknown): ValidationResult {
   }
 
   return { valid: errors.length === 0, errors };
-}
-
-// Boolean type guards for TypeScript type narrowing
-// These provide runtime type checking with narrowed return types for compatibility
-
-export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'worldId' in obj &&
-    'sessionId' in obj &&
-    'content' in obj &&
-    'type' in obj &&
-    'characterIds' in obj &&
-    'metadata' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    Array.isArray((obj as any).characterIds) &&
-    typeof (obj as any).metadata === 'object';
-}
-
-// Valid journal entry types
-const validJournalEntryTypes: JournalEntryType[] = [
-  'character_event',
-  'world_event',
-  'relationship_change',
-  'achievement',
-  'discovery',
-  'combat',
-  'dialogue',
-  'decision'
-];
-
-export function isPlayerDecisionArray(obj: unknown): obj is PlayerDecision[] {
-  return Array.isArray(obj) && obj.every(item => isPlayerDecision(item));
-}
-
-export function isJournalEntry(obj: unknown): obj is JournalEntry {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'sessionId' in obj &&
-    'worldId' in obj &&
-    'characterId' in obj &&
-    'type' in obj &&
-    'title' in obj &&
-    'content' in obj &&
-    'significance' in obj &&
-    'isRead' in obj &&
-    'relatedEntities' in obj &&
-    'metadata' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    validJournalEntryTypes.includes((obj as any).type) &&
-    Array.isArray((obj as any).relatedEntities) &&
-    typeof (obj as any).metadata === 'object';
-}
-
-export function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
-  const validChoiceTypes: ChoiceTypePreference[] = [
-    'diplomatic', 'aggressive', 'stealthy', 'helpful', 'selfish', 'lawful', 'chaotic', 'neutral'
-  ];
-  return typeof value === 'string' && validChoiceTypes.includes(value as ChoiceTypePreference);
-}
-
-export function isPlayerDecision(obj: unknown): obj is PlayerDecision {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'choiceText' in obj &&
-    'choiceType' in obj &&
-    'context' in obj &&
-    'timestamp' in obj &&
-    typeof (obj as any).choiceText === 'string' &&
-    isChoiceTypePreference((obj as any).choiceType) &&
-    typeof (obj as any).context === 'object' &&
-    typeof (obj as any).timestamp === 'string';
-}
-
-// Utility functions
-export function isSafeString(value: unknown, maxLength: number = 200): value is string {
-  return typeof value === 'string' && 
-         value.length > 0 && 
-         value.length <= maxLength;
-}
-
-export function sanitizeString(value: unknown, maxLength: number = 200): string | undefined {
-  if (typeof value !== 'string' || value.length === 0) return undefined;
-  
-  // First normalize the text to handle whitespace, quotes, and special characters
-  let sanitized = normalizeText(value, NORM_NAME);
-  
-  // Remove HTML tags and dangerous characters
-  sanitized = safeTrim(sanitized
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/[&"']/g, '') // Remove dangerous characters
-    .substring(0, maxLength));
-    
-  return sanitized.length > 0 ? sanitized : undefined;
 }

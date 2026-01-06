@@ -6,6 +6,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
+import type { World } from '@/types/world.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
@@ -59,7 +60,7 @@ const MOCK_WORLD_DATA = {
     attributePointPool: 27,
     skillPointPool: 20,
   },
-};
+} satisfies Omit<World, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Mock ending templates for different tones
 const MOCK_ENDINGS: Record<string, StoryEnding> = {

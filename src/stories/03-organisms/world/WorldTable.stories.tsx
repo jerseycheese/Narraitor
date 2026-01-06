@@ -46,7 +46,7 @@ const mockWorlds: World[] = [
     id: 'world-2',
     name: 'Neon City',
     description: 'A cyberpunk dystopia ruled by corporations.',
-    genre: 'sci_fi',
+    genre: 'sci-fi',
     createdAt: '2023-02-10T09:15:00Z',
     updatedAt: '2023-02-10T09:15:00Z',
     attributes: [
