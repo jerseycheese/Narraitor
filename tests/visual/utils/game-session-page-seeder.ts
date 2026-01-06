@@ -367,12 +367,60 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
  * Seed journal entries so the journal page renders populated content.
  */
 export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
-  await page.waitForFunction(() => {
+  // Debug: Check what stores are available
+  const availableStores = await page.evaluate(() => {
+    const w = window as typeof window & {
+      useWorldStore?: unknown;
+      useSessionStore?: unknown;
+      useJournalStore?: unknown;
+      useCharacterStore?: unknown;
+      useInventoryStore?: unknown;
+    };
+    return {
+      useWorldStore: !!w.useWorldStore,
+      useSessionStore: !!w.useSessionStore,
+      useJournalStore: !!w.useJournalStore,
+      useCharacterStore: !!w.useCharacterStore,
+      useInventoryStore: !!w.useInventoryStore,
+    };
+  });
+
+  console.log('📊 Available stores on window:', availableStores);
+
+  // If journal store isn't available, skip hydration wait and proceed directly to seeding
+  if (!availableStores.useJournalStore) {
+    console.log('⚠️ useJournalStore not available on window, skipping hydration wait');
+    // Don't wait for hydration, just proceed to the next step
+  } else {
+    // Wait for journal store to be available on window
+    await page.waitForFunction(() => {
+      const hasStore = !!(window as typeof window & {
+        useJournalStore?: unknown;
+      }).useJournalStore;
+
+      if (!hasStore) {
+        console.log('[Test] Waiting for useJournalStore to be available on window...');
+      }
+      return hasStore;
+    });
+  }
+
+  // If the store has a persist.hasHydrated method, wait for it
+  const needsHydration = await page.evaluate(() => {
     const store = (window as typeof window & {
       useJournalStore?: { persist?: { hasHydrated?: () => boolean } };
     }).useJournalStore;
-    return store?.persist?.hasHydrated?.();
+    return !!(store?.persist?.hasHydrated);
   });
+
+  if (needsHydration) {
+    await page.waitForFunction(() => {
+      const store = (window as typeof window & {
+        useJournalStore?: { persist?: { hasHydrated?: () => boolean } };
+      }).useJournalStore;
+      return store?.persist?.hasHydrated?.() ?? false;
+    });
+  }
 
   await page.waitForFunction(() => {
     const sessionStore = (window as typeof window & {
