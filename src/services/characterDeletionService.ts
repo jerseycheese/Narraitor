@@ -111,6 +111,6 @@ export class CharacterDeletionService {
       }
     }
 
-    characterStore.deleteCharacter(characterId);
+    await characterStore.deleteCharacter(characterId);
   }
 }

@@ -29,8 +29,8 @@ export default function CharacterViewPage() {
 
   useEffect(() => setMounted(true), []);
 
-  const handleDelete = () => {
-    deleteCharacter(characterId);
+  const handleDelete = async () => {
+    await deleteCharacter(characterId);
     router.push('/characters');
   };
 

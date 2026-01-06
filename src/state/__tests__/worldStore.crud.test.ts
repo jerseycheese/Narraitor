@@ -70,26 +70,26 @@ describe('useWorldStore - CRUD Operations', () => {
   });
 
   describe('deleteWorld', () => {
-    test('should remove world from store', () => {
+    test('should remove world from store', async () => {
       const worldId = useWorldStore.getState().createWorld(createTestWorldData({
         name: 'To Delete',
         description: 'World to be deleted',
       }));
 
-      useWorldStore.getState().deleteWorld(worldId);
+      await useWorldStore.getState().deleteWorld(worldId);
       const state = useWorldStore.getState();
 
       expect(state.worlds[worldId]).toBeUndefined();
     });
 
-    test('should clear currentWorldId if deleted world was current', () => {
+    test('should clear currentWorldId if deleted world was current', async () => {
       const worldId = useWorldStore.getState().createWorld(createTestWorldData({
         name: 'Current World',
         description: 'Current world test',
       }));
 
       useWorldStore.getState().setCurrentWorld(worldId);
-      useWorldStore.getState().deleteWorld(worldId);
+      await useWorldStore.getState().deleteWorld(worldId);
       const state = useWorldStore.getState();
 
       expect(state.currentWorldId).toBeNull();

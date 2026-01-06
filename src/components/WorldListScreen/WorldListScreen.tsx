@@ -110,9 +110,9 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     setWorldToDeleteId(null);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (worldToDeleteId) {
-      useWorldStore.getState().deleteWorld(worldToDeleteId);
+      await useWorldStore.getState().deleteWorld(worldToDeleteId);
       // Also remove from selection if deleted
       setSelectedWorldIds(prev => prev.filter(id => id !== worldToDeleteId));
     }

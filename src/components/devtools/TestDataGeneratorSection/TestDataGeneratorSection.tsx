@@ -781,14 +781,14 @@ export const TestDataGeneratorSection: React.FC = () => {
       // Delete all characters first
       const characterIds = Object.keys(characterStoreState.characters);
       for (const characterId of characterIds) {
-        characterStoreState.deleteCharacter(characterId);
+        await characterStoreState.deleteCharacter(characterId);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
       // Then delete all worlds
       const worldIds = Object.keys(worldStoreState.worlds);
       for (const worldId of worldIds) {
-        worldStoreState.deleteWorld(worldId);
+        await worldStoreState.deleteWorld(worldId);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
@@ -837,7 +837,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       const { deleteCharacter } = useCharacterStore.getState();
 
       for (const character of worldCharacters) {
-        deleteCharacter(character.id);
+        await deleteCharacter(character.id);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 

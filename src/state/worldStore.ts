@@ -157,7 +157,7 @@ export const useWorldStore = create<WorldStore>()(
           }));
         },
 
-        delete: (id) => {
+        delete: async (id) => {
           const world = get().worlds[id];
           if (!world) return;
 
@@ -177,7 +177,7 @@ export const useWorldStore = create<WorldStore>()(
           try {
             const { useCharacterStore } = eval('require("./characterStore")');
             const characterStore = useCharacterStore.getState();
-            characterStore.deleteCharactersInWorld(id);
+            await characterStore.deleteCharactersInWorld(id);
           } catch {
             // Handle import errors silently (e.g., in test environments)
           }
