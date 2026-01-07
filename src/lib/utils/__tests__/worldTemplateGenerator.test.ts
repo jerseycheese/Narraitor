@@ -130,10 +130,11 @@ describe('worldTemplateGenerator', () => {
     });
 
     test('should generate templates for different genres', async () => {
-      const genres = ['fantasy', 'sci-fi', 'modern', 'western', 'historical', 'horror'];
+      const genres: Array<'fantasy' | 'sci-fi' | 'modern' | 'western' | 'historical' | 'horror'> =
+        ['fantasy', 'sci-fi', 'modern', 'western', 'historical', 'horror'];
 
       for (const genre of genres) {
-        const worldWithGenre = { ...mockWorld, genre: genre as any };
+        const worldWithGenre = { ...mockWorld, genre };
         const templates = await generateWorldCharacterTemplates(worldWithGenre);
 
         expect(templates).toHaveLength(3);
@@ -145,16 +146,19 @@ describe('worldTemplateGenerator', () => {
     });
 
     test('should throw error if world is null or undefined', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(generateWorldCharacterTemplates(null as any)).rejects.toThrow(
         'World data is required'
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(generateWorldCharacterTemplates(undefined as any)).rejects.toThrow(
         'World data is required'
       );
     });
 
     test('should throw error if world genre is missing', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const worldWithoutGenre = { ...mockWorld, genre: undefined as any };
 
       await expect(generateWorldCharacterTemplates(worldWithoutGenre)).rejects.toThrow(
@@ -173,6 +177,7 @@ describe('worldTemplateGenerator', () => {
     test('should throw error if attributes is not an array', async () => {
       const worldWithInvalidAttributes = {
         ...mockWorld,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         attributes: null as any,
       };
 
@@ -190,6 +195,7 @@ describe('worldTemplateGenerator', () => {
     });
 
     test('should throw error if skills is not an array', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const worldWithInvalidSkills = { ...mockWorld, skills: null as any };
 
       await expect(
@@ -236,6 +242,7 @@ describe('worldTemplateGenerator', () => {
 
     test('should handle world with no settings gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const worldWithoutSettings = { ...mockWorld, settings: undefined as any };
 
       // Should not throw, but will warn since point pool defaults to 0

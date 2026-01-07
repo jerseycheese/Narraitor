@@ -50,7 +50,6 @@ export async function generateWorldCharacterTemplates(
 
   // Verify templates respect world point pools (safety check)
   const attributePointPool = world.settings?.attributePointPool || 0;
-  const skillPointPool = world.settings?.skillPointPool || 0;
 
   templates.forEach(template => {
     const totalAttributePoints = template.attributes.reduce(
