@@ -90,7 +90,7 @@ describe('useCharacterStore - CRUD Operations', () => {
   });
 
   describe('deleteCharacter', () => {
-    test('should remove character from store', () => {
+    test('should remove character from store', async () => {
       const characterData = createTestCharacterData({
         name: 'To Delete',
         description: 'Character to be deleted',
@@ -105,7 +105,7 @@ describe('useCharacterStore - CRUD Operations', () => {
       });
 
       const characterId = useCharacterStore.getState().createCharacter(characterData);
-      useCharacterStore.getState().deleteCharacter(characterId);
+      await useCharacterStore.getState().deleteCharacter(characterId);
 
       const state = useCharacterStore.getState();
       expect(state.characters[characterId]).toBeUndefined();

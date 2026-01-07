@@ -97,12 +97,12 @@ export class NarrativeGenerator {
         request.sessionId,
         budget
       );
-      const goalEnhancedPrompt = enhancePromptWithGoalContext(
+      const goalEnhancedPrompt = await enhancePromptWithGoalContext(
         loreEnhancedPrompt,
         request.sessionId,
         budget
       );
-      const personalizedPrompt = enhancePromptWithPersonalization(
+      const personalizedPrompt = await enhancePromptWithPersonalization(
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
@@ -273,7 +273,7 @@ export class NarrativeGenerator {
         sessionId,
         budget
       );
-      const personalizedPrompt = enhancePromptWithPersonalization(
+      const personalizedPrompt = await enhancePromptWithPersonalization(
         loreEnhancedPrompt,
         worldId,
         characterIds,

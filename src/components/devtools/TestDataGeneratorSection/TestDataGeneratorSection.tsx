@@ -4,7 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
 // Using API routes for secure AI operations - combines both approaches
-import { generateFromTemplate } from '@/lib/generators/characterGenerator';
+import { generateFromTemplate } from '@/lib/generators/characterTemplates';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
@@ -781,14 +781,14 @@ export const TestDataGeneratorSection: React.FC = () => {
       // Delete all characters first
       const characterIds = Object.keys(characterStoreState.characters);
       for (const characterId of characterIds) {
-        characterStoreState.deleteCharacter(characterId);
+        await characterStoreState.deleteCharacter(characterId);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
       // Then delete all worlds
       const worldIds = Object.keys(worldStoreState.worlds);
       for (const worldId of worldIds) {
-        worldStoreState.deleteWorld(worldId);
+        await worldStoreState.deleteWorld(worldId);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
@@ -837,7 +837,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       const { deleteCharacter } = useCharacterStore.getState();
 
       for (const character of worldCharacters) {
-        deleteCharacter(character.id);
+        await deleteCharacter(character.id);
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 

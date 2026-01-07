@@ -30,8 +30,8 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
   const world = useWorldStore((state) => state.worlds[worldId]);
+  const getSessionEntriesWithCharacter = useJournalStore((state) => state.getSessionEntriesWithCharacter);
   const {
-    getSessionEntriesWithCharacter,
     markAsRead,
     error: journalError,
     loading: journalLoading,
@@ -74,15 +74,13 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   }, [entries, normalizedQuery]);
 
   const firstEntryId = filteredEntries[0]?.id ?? null;
-  React.useEffect(() => {
-    if (selectedEntryId || !firstEntryId) {
-      return;
-    }
+  const resolvedSelectedEntryId = React.useMemo(() => (
+    selectedEntryId && filteredEntries.some((entry) => entry.id === selectedEntryId)
+      ? selectedEntryId
+      : null
+  ), [filteredEntries, selectedEntryId]);
 
-    setSelectedEntryId(firstEntryId);
-  }, [firstEntryId, selectedEntryId]);
-
-  const activeSelectedEntryId = selectedEntryId ?? firstEntryId;
+  const activeSelectedEntryId = resolvedSelectedEntryId ?? firstEntryId;
   const selectedEntry = activeSelectedEntryId
     ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) || null
     : null;
@@ -90,13 +88,6 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   React.useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [PAGE_SIZE, sessionId, normalizedQuery]);
-
-  React.useEffect(() => {
-    if (selectedEntryId && !selectedEntry) {
-      setSelectedEntryId(null);
-      setViewMode('list');
-    }
-  }, [selectedEntryId, selectedEntry]);
 
   React.useEffect(() => {
     if (selectedEntry && detailRef.current) {

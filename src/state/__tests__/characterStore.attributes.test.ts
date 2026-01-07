@@ -15,7 +15,7 @@ import {
 import { createTestAttributeData, createTestWorldData } from './worldStore.testHelpers';
 
 describe('useCharacterStore - Attribute and Skill Management', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     setupTestTimers();
     useCharacterStore.getState().reset();
     useWorldStore.getState().reset();
@@ -29,13 +29,13 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
   describe('skill management', () => {
     let characterId: string;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       characterId = useCharacterStore.getState().createCharacter(
         createSkillTestCharacter()
       );
     });
 
-    test('should enforce max skills limit', () => {
+    test('should enforce max skills limit', async () => {
       // This would need to reference world settings
       // Simplified version for the test
       const maxSkills = 2;
@@ -66,7 +66,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
   });
 
   describe('attribute management', () => {
-    test('recalculates derived stats when adding and removing attributes', () => {
+    test('recalculates derived stats when adding and removing attributes', async () => {
       const worldId = useWorldStore.getState().createWorld(
         createTestWorldData({
           name: 'Derived Stat World',
@@ -106,7 +106,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
         })
       );
 
-      useCharacterStore.getState().addAttribute(characterId, {
+      await useCharacterStore.getState().addAttribute(characterId, {
         name: 'Strength',
         baseValue: 5,
         modifiedValue: 5,
@@ -124,7 +124,7 @@ describe('useCharacterStore - Attribute and Skill Management', () => {
 
       const characterAttributeId = character.attributes[0].id;
 
-      useCharacterStore.getState().removeAttribute(
+      await useCharacterStore.getState().removeAttribute(
         characterId,
         characterAttributeId
       );

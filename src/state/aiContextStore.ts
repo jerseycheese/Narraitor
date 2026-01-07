@@ -3,7 +3,9 @@ import { EntityID } from '../types/common.types';
 import { NarrativeGoal, GoalPriority } from '../types/goal.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
-import { useGoalStore } from './goalStore';
+
+// Module cache for dynamic import to break circular dependencies
+let goalStoreModule: typeof import('./goalStore') | null = null;
 
 // Simplified AI context types
 interface AIPromptContext {
@@ -66,7 +68,7 @@ interface AIContextStore {
   clearContext: (contextId: EntityID) => void;
 
   // Goal Integration Actions
-  buildContextForSession: (sessionId: EntityID, options?: ContextBuildOptions) => AISessionContext;
+  buildContextForSession: (sessionId: EntityID, options?: ContextBuildOptions) => Promise<AISessionContext>;
   saveContextToHistory: (sessionId: EntityID, context: AISessionContext) => void;
   getContextHistory: (sessionId: EntityID) => AISessionContext[];
 
@@ -214,9 +216,28 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
     }),
 
   // Simplified goal context building
-  buildContextForSession: (sessionId, options = {}) => {
+  buildContextForSession: async (sessionId, options = {}) => {
     try {
-      const goalStore = useGoalStore.getState();
+      let goalStore;
+      try {
+        if (!goalStoreModule) {
+          goalStoreModule = await import('./goalStore');
+        }
+        const { useGoalStore } = goalStoreModule;
+        goalStore = useGoalStore.getState();
+      } catch (error) {
+        return {
+          sessionId,
+          goalContext: '',
+          contextText: '',
+          activeGoals: [],
+          criticalGoals: [],
+          recentGoals: [],
+          tokenCount: 0,
+          error: error instanceof Error ? error.message : 'Failed to load goalStore',
+          timestamp: getTimestamp(),
+        };
+      }
       const activeGoals = goalStore.getActiveGoalsBySession(sessionId);
 
       // Include goals by default unless explicitly disabled

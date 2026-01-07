@@ -114,8 +114,8 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     router.push(`/characters/${characterId}`);
   };
   
-  const handleDelete = () => {
-    useCharacterStore.getState().deleteCharacter(characterId);
+  const handleDelete = async () => {
+    await useCharacterStore.getState().deleteCharacter(characterId);
     router.push('/characters');
   };
   

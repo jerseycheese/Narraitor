@@ -2,129 +2,18 @@ import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { truncate } from '../utils';
 import { validateWorld } from '@/lib/utils/typeGuards';
+import { 
+  GeneratedCharacterData, 
+  CharacterGenerationOptions, 
+  CharacterGenerationType, 
+  CHARACTER_LEVEL_RANGE,
+  generateFromTemplate
+} from './characterTemplates';
+
+// Re-export types and template generator for backward compatibility
+export * from './characterTemplates';
 
 const logger = new Logger('CharacterGenerator');
-
-// Character level range for generated characters
-const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
-
-export interface GeneratedCharacterData {
-  name: string;
-  background: {
-    description: string;
-    personality: string;
-    motivation: string;
-    fears: string[];
-    physicalDescription?: string;
-  };
-  attributes: Array<{
-    id: string;
-    value: number;
-  }>;
-  skills: Array<{
-    id: string;
-    level: number;
-  }>;
-  level: number;
-  isKnownFigure?: boolean;
-  characterType?: 'protagonist' | 'antagonist' | 'supporting' | 'original';
-}
-
-export type CharacterGenerationMethod = 'template' | 'ai';
-export type CharacterGenerationType = 'known' | 'original' | 'specific';
-
-export interface CharacterGenerationOptions {
-  method: CharacterGenerationMethod;
-  world: World;
-  existingNames?: string[];
-  suggestedName?: string;
-  generationType?: CharacterGenerationType;
-}
-
-/**
- * Generate character from predefined templates
- */
-export function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCharacterData {
-  const { world } = options;
-  
-  // Simple template-based character generation
-  const characterNames = [
-    'Aelwyn', 'Bjorn', 'Cassandra', 'Dorian', 'Elena', 'Finn',
-    'Gwendolyn', 'Henrik', 'Isla', 'Jaxon', 'Kira', 'Lysander',
-    'Mira', 'Nolan', 'Ophelia', 'Phoenix', 'Quinn', 'Raven',
-    'Sage', 'Thorne', 'Una', 'Vex', 'Wren', 'Xara', 'Yuki', 'Zara'
-  ];
-  
-  const personalities = [
-    'Brave and determined, always ready to face danger head-on',
-    'Cunning and strategic, preferring to outthink opponents',
-    'Compassionate and healing, dedicated to helping others',
-    'Mysterious and aloof, harboring deep secrets',
-    'Cheerful and optimistic, finding hope in dark times',
-    'Stern and disciplined, following a strict code of honor'
-  ];
-  
-  const motivations = [
-    'Seeking revenge for a great wrong',
-    'Protecting loved ones from harm',
-    'Uncovering ancient mysteries',
-    'Proving their worth to others',
-    'Finding their true purpose in life',
-    'Restoring balance to the world'
-  ];
-  
-  const fears = [
-    ['Failure', 'Being alone', 'Loss of control'],
-    ['Betrayal', 'The dark', 'Being forgotten'],
-    ['Heights', 'Enclosed spaces', 'Public speaking'],
-    ['Death', 'Abandonment', 'Making the wrong choice'],
-    ['The unknown', 'Being judged', 'Losing their identity']
-  ];
-  
-  // Pick random elements
-  const baseName = options.suggestedName || characterNames[Math.floor(Math.random() * characterNames.length)];
-  let finalName = baseName;
-  
-  // Ensure unique name
-  if (options.existingNames?.includes(finalName)) {
-    let suffix = 1;
-    while (options.existingNames.includes(`${baseName} ${suffix}`)) {
-      suffix++;
-    }
-    finalName = `${baseName} ${suffix}`;
-  }
-  
-  // Generate varied attribute values
-  const attributes = world.attributes.map(attr => ({
-    id: attr.id,
-    value: Math.floor(Math.random() * (attr.maxValue - attr.minValue + 1)) + attr.minValue
-  }));
-  
-  // Generate varied skill levels (some selected, some not)
-  const selectedSkills = world.skills
-    .sort(() => Math.random() - 0.5) // Shuffle
-    .slice(0, Math.floor(world.skills.length * 0.7)) // Select 70%
-    .map(skill => ({
-      id: skill.id,
-      level: Math.floor(Math.random() * 5) + 1 // 1-5
-    }));
-  
-  return {
-    name: finalName,
-    level: Math.floor(Math.random() * (CHARACTER_LEVEL_RANGE.max - CHARACTER_LEVEL_RANGE.min + 1)) + CHARACTER_LEVEL_RANGE.min,
-    background: {
-      description: `A mysterious figure with an interesting past${world.reference ? ` from the ${world.reference} universe` : ''}.`,
-      personality: personalities[Math.floor(Math.random() * personalities.length)],
-      motivation: motivations[Math.floor(Math.random() * motivations.length)],
-      fears: fears[Math.floor(Math.random() * fears.length)],
-      physicalDescription: `${Math.floor(Math.random() * 40) + 20}-year-old human of average height and build with distinctive features befitting the ${world.genre} setting.`
-    },
-    attributes,
-    skills: selectedSkills,
-    isKnownFigure: false,
-    characterType: 'original'
-  };
-}
 
 /**
  * Generate character using AI
@@ -138,17 +27,6 @@ async function generateWithAI(options: CharacterGenerationOptions): Promise<Gene
     logger.error('CharacterGenerator', 'Invalid world data provided:', worldValidation.errors[0]);
     throw new Error(`Cannot generate character: Invalid world data - ${worldValidation.errors[0]}`);
   }
-  
-  logger.debug('CharacterGenerator', `Generating ${generationType} character for world:`, {
-    worldName: world.name,
-    worldReference: world.reference,
-    worldRelationship: world.relationship,
-    genre: world.genre,
-    attributesCount: world.attributes?.length || 0,
-    skillsCount: world.skills?.length || 0,
-    attributes: world.attributes?.map(a => ({ id: a.id, name: a.name })) || [],
-    skills: world.skills?.map(s => ({ id: s.id, name: s.name })) || []
-  });
 
   // Check if world has attributes and skills
   if (!world.attributes || world.attributes.length === 0) {
@@ -222,8 +100,6 @@ CRITICAL INSTRUCTIONS:
 - Skill levels: 1-3=beginner, 4-6=competent, 7-8=expert, 9-10=master
 - Return ONLY valid JSON with numbers, no placeholder text`;
 
-    logger.debug('CharacterGenerator', 'Generated prompt:', prompt);
-    
     // Import and use the AI client directly for server-side usage
     const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
     const client = createDefaultGeminiClient();
@@ -235,9 +111,6 @@ CRITICAL INSTRUCTIONS:
       finishReason: response.finishReason
     };
     
-    // Log the raw response for debugging
-    logger.debug('CharacterGenerator', 'Raw AI response:', apiResponse.content);
-    
     // Extract JSON from response
     const jsonMatch = apiResponse.content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
@@ -248,9 +121,6 @@ CRITICAL INSTRUCTIONS:
     // Clean the JSON string before parsing
     let jsonString = jsonMatch[0];
     
-    // Log the raw JSON before cleaning for debugging
-    logger.debug('CharacterGenerator', 'Raw JSON before cleaning:', truncate(jsonString, 200));
-    
     // Remove any comments that might have been included
     jsonString = jsonString.replace(/\/\/.*$/gm, ''); // Remove single-line comments
     jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove multi-line comments
@@ -260,13 +130,11 @@ CRITICAL INSTRUCTIONS:
       const minVal = parseInt(min, 10);
       const maxVal = parseInt(max, 10);
       const randomValue = Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
-      logger.debug('CharacterGenerator', `Replacing placeholder ${match} with ${randomValue}`);
       return String(randomValue);
     });
     
     // Fallback for any remaining number placeholders
-    jsonString = jsonString.replace(/<number>/g, (match: string) => {
-      logger.debug('CharacterGenerator', `Found unhandled placeholder ${match}, using fallback value 5`);
+    jsonString = jsonString.replace(/<number>/g, () => {
       return '5';
     });
     
@@ -288,21 +156,15 @@ CRITICAL INSTRUCTIONS:
       return `"${escapedKey}":`;
     });
     
-    logger.debug('CharacterGenerator', 'Cleaned JSON string:', truncate(jsonString, 500));
-    
     let characterData: GeneratedCharacterData;
     try {
       characterData = JSON.parse(jsonString) as GeneratedCharacterData;
-      logger.debug('CharacterGenerator', 'Parsed character data:', JSON.stringify(characterData, null, 2));
-      logger.debug('CharacterGenerator', 'Generated attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
       
       // Check if all attributes are the same value (likely all 5s) and fix it
       const attributeValues = characterData.attributes.map(a => a.value);
       const allSameValue = attributeValues.every(val => val === attributeValues[0]);
       
       if (allSameValue && attributeValues[0] === 5) {
-        logger.debug('CharacterGenerator', 'Detected all attributes are 5, applying varied distribution');
-        
         // Create a varied distribution for the character
         characterData.attributes = characterData.attributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.id);
@@ -328,11 +190,8 @@ CRITICAL INSTRUCTIONS:
           // Ensure value is within bounds
           value = Math.max(worldAttr.minValue, Math.min(worldAttr.maxValue, value));
           
-          logger.debug('CharacterGenerator', `Fixed attribute ${attr.id}: ${attr.value} -> ${value}`);
           return { ...attr, value };
         });
-        
-        logger.debug('CharacterGenerator', 'Fixed attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
       }
     } catch (parseError) {
       logger.error('CharacterGenerator', 'JSON parse error:', parseError);
@@ -366,9 +225,6 @@ CRITICAL INSTRUCTIONS:
       
       // Clamp value to valid range
       const clampedValue = Math.max(worldAttr.minValue, Math.min(worldAttr.maxValue, attr.value));
-      if (clampedValue !== attr.value) {
-        logger.debug('CharacterGenerator', `Clamped attribute ${attr.id}: ${attr.value} -> ${clampedValue} (range: ${worldAttr.minValue}-${worldAttr.maxValue})`);
-      }
       
       return { ...attr, value: clampedValue };
     }).filter(attr => attr !== null); // Remove invalid attributes
@@ -399,9 +255,6 @@ CRITICAL INSTRUCTIONS:
       }
       
       const clampedLevel = Math.max(0, Math.min(10, skill.level));
-      if (clampedLevel !== skill.level) {
-        logger.debug('CharacterGenerator', `Clamped skill ${skill.id}: ${skill.level} -> ${clampedLevel} (range: 0-10)`);
-      }
       
       return { ...skill, level: clampedLevel };
     }).filter(skill => skill !== null); // Remove invalid skills
@@ -485,7 +338,6 @@ CRITICAL INSTRUCTIONS:
     }
     
     // Only fall back to template generation for original characters
-    logger.debug('CharacterGenerator', 'Falling back to template generation for original character due to AI error');
     try {
       return generateFromTemplate({ 
         method: 'template', 

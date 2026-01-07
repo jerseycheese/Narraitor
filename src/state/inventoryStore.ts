@@ -19,6 +19,11 @@ import { createIndexedDBStorage } from './persistence';
 import { CrudStore } from './createCrudStore';
 import { isValidCategory } from '@/lib/inventory/categories';
 import { createAcquisitionJournalEntry } from '@/lib/inventory/journalIntegration';
+import {
+  storeEvents,
+  StoreEventTypes,
+  type CharacterDeletedEvent,
+} from '@/lib/state/storePubSub';
 
 export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
@@ -989,3 +994,11 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).useInventoryStore = useInventoryStore;
 }
+
+// Subscribe to store events
+storeEvents.subscribe<CharacterDeletedEvent>(
+  StoreEventTypes.CHARACTER_DELETED,
+  ({ characterId }) => {
+    useInventoryStore.getState().clearCharacterInventory(characterId);
+  }
+);
