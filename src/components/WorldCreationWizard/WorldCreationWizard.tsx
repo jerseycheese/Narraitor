@@ -351,10 +351,25 @@ export default function WorldCreationWizard({
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
       console.log('[WorldCreationWizard] Set newly created world as active:', worldId);
-      
+
       // Store the world ID in wizard state
       wizard.updateData({ createdWorldId: worldId });
-      
+
+      // Generate character templates asynchronously after creation
+      const generateTemplates = async () => {
+        try {
+          const { generateCharacterTemplates } = useWorldStore.getState();
+          await generateCharacterTemplates(worldId);
+          console.log('[WorldCreationWizard] Generated character templates for world:', worldId);
+        } catch (error) {
+          console.error('[WorldCreationWizard] Failed to generate character templates:', error);
+          // Don't block world creation if template generation fails
+        }
+      };
+
+      // Start template generation in the background
+      generateTemplates();
+
       // Generate world image asynchronously after creation (only if no image was already generated)
       if (!data.image?.url) {
         const generateWorldImage = async () => {
