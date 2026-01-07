@@ -13,6 +13,7 @@ export interface CharacterCreationData {
   name: string;
   description: string;
   portraitPlaceholder: string;
+  selectedTemplateId?: EntityID | null;  // Track which template was selected
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
@@ -50,11 +51,12 @@ export interface CharacterCreationData {
 }
 
 const steps: WizardStepType[] = [
-  { id: 'basic-info', label: 'Basic Info' },
-  { id: 'attributes', label: 'Attributes' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'background', label: 'Background' },
-  { id: 'portrait', label: 'Portrait' }
+  { id: 'template-selection', label: 'Template' },   // NEW Step 0
+  { id: 'basic-info', label: 'Basic Info' },         // Now Step 1
+  { id: 'attributes', label: 'Attributes' },         // Now Step 2
+  { id: 'skills', label: 'Skills' },                 // Now Step 3
+  { id: 'background', label: 'Background' },         // Now Step 4
+  { id: 'portrait', label: 'Portrait' }              // Now Step 5
 ];
 
 interface UseCharacterCreationWizardProps {
@@ -76,7 +78,8 @@ export function useCharacterCreationWizard({
   // Create step validators
   const stepValidators = useMemo((): Record<number, WizardStepValidator<CharacterCreationData>> => {
     return {
-      0: createWizardValidator<CharacterCreationData>()
+      0: createWizardValidator<CharacterCreationData>().build(), // Template selection - always valid (optional)
+      1: createWizardValidator<CharacterCreationData>()          // Basic Info (was step 0)
         .field('name')
         .required('Character name is required')
         .minLength(2, 'Character name must be at least 2 characters')
@@ -85,13 +88,13 @@ export function useCharacterCreationWizard({
           return result.valid;
         }, 'A character with this name already exists in this world')
         .build(),
-      1: createWizardValidator<CharacterCreationData>()
+      2: createWizardValidator<CharacterCreationData>()          // Attributes (was step 1)
         .customValidation((data) => {
           const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
           return { ...result, touched: true };
         })
         .build(),
-      2: createWizardValidator<CharacterCreationData>()
+      3: createWizardValidator<CharacterCreationData>()          // Skills (was step 2)
         .customValidation((data) => {
           const result = validateSkills(
             data.skills,
@@ -105,13 +108,13 @@ export function useCharacterCreationWizard({
           return { ...result, touched: true };
         })
         .build(),
-      3: createWizardValidator<CharacterCreationData>()
+      4: createWizardValidator<CharacterCreationData>()         // Background (was step 3)
         .customValidation((data) => {
           const result = validateBackground(data.background);
           return { ...result, touched: true };
         })
         .build(),
-      4: createWizardValidator<CharacterCreationData>().build(), // Portrait is optional
+      5: createWizardValidator<CharacterCreationData>().build(), // Portrait (was step 4) - optional
     };
   }, [worldId, world]);
 
