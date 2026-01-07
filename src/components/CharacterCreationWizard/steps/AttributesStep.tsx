@@ -33,7 +33,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
     onUpdate({ attributes: updatedAttributes });
   };
 
-  const validation = data.validation[1];
+  const validation = data.validation[2];
   const showErrors = validation?.touched && !validation?.valid;
   
   // Calculate if all points are allocated
