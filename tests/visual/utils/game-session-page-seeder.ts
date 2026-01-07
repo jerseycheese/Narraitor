@@ -422,11 +422,37 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     });
   }
 
+  // Wait for session store to hydrate (critical for JournalPage which reads sessionId)
+  const sessionStoreNeedsHydration = await page.evaluate(() => {
+    const store = (window as typeof window & {
+      useSessionStore?: { persist?: { hasHydrated?: () => boolean } };
+    }).useSessionStore;
+    return !!(store?.persist?.hasHydrated);
+  });
+
+  if (sessionStoreNeedsHydration) {
+    await page.waitForFunction(() => {
+      const store = (window as typeof window & {
+        useSessionStore?: { persist?: { hasHydrated?: () => boolean } };
+      }).useSessionStore;
+      const hydrated = store?.persist?.hasHydrated?.() ?? false;
+      if (!hydrated) {
+        console.log('[Test] Waiting for sessionStore hydration...');
+      }
+      return hydrated;
+    });
+  }
+
+  // Verify session state is actually present
   await page.waitForFunction(() => {
     const sessionStore = (window as typeof window & {
       useSessionStore?: { getState?: () => { id?: string | null } };
     }).useSessionStore?.getState?.();
-    return !!sessionStore?.id;
+    const hasSession = !!sessionStore?.id;
+    if (!hasSession) {
+      console.log('[Test] Waiting for session state to load...');
+    }
+    return hasSession;
   });
 
   await page.evaluate((entries) => {
