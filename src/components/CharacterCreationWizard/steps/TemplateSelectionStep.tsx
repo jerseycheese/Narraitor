@@ -1,6 +1,6 @@
 // src/components/CharacterCreationWizard/steps/TemplateSelectionStep.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { WizardFormSection } from '@/components/shared/wizard';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Button } from '@/components/ui/button';
@@ -69,10 +69,9 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
     data.characterData.selectedTemplateId || null
   );
 
-  // Notify parent that template selection is always valid (optional step)
-  useEffect(() => {
-    onValidation(true, []);
-  }, [onValidation]);
+  // Note: Template selection is always valid (optional step)
+  // The validator in useCharacterCreationWizard already returns valid by default
+  // No need to call onValidation here - it would create unnecessary re-renders
 
   const handleTemplateSelect = (template: CharacterTemplate) => {
     setSelectedTemplateId(template.id);
@@ -200,7 +199,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                     Key Attributes
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {template.attributes
+                    {[...template.attributes]
                       .sort((a, b) => b.value - a.value)
                       .slice(0, 3)
                       .map((attr, idx) => (
@@ -223,7 +222,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                     Best Skills
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {template.skills
+                    {[...template.skills]
                       .sort((a, b) => b.level - a.level)
                       .slice(0, 3)
                       .map((skill, idx) => (

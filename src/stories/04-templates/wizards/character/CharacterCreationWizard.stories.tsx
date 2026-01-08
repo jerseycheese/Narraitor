@@ -82,14 +82,14 @@ export const StartAtPortraitStep: Story = {
     const worldId = createTestWorld();
     return (
       <div className="min-h-screen bg-gray-100 p-8">
-        <CharacterCreationWizard worldId={worldId} initialStep={4} />
+        <CharacterCreationWizard worldId={worldId} initialStep={5} />
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: 'Character creation starting at the Portrait generation step. Shows AI portrait generation with the new integrated system.',
+        story: 'Character creation starting at the Portrait generation step (Step 5). Shows AI portrait generation with the new integrated system.',
       },
     },
   },
@@ -108,14 +108,14 @@ export const WithGeneratedCharacter: Story = {
             has occurred, where the character now has AI-generated data including portrait integration.
           </p>
         </div>
-        <CharacterCreationWizard worldId={worldId} initialStep={4} />
+        <CharacterCreationWizard worldId={worldId} initialStep={5} />
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: 'Character creation with AI-generated character data, demonstrating the new portrait generation workflow and integration with character data.',
+        story: 'Character creation with AI-generated character data at Step 5 (Portrait), demonstrating the new portrait generation workflow and integration with character data.',
       },
     },
   },
