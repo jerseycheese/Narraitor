@@ -228,6 +228,9 @@ export interface NarrativeMetadata {
   itemsAcquired?: AcquiredItemMetadata[];
   // Major event tracking
   majorEvent?: string;
+  // Decision consequence tracking (Issue #971)
+  causedByDecisionId?: EntityID;
+  causedByDecisionText?: string;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }

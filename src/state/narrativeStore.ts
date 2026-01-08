@@ -768,6 +768,25 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }
 
+    // Link to the most recent decision (if any) - Issue #971
+    const sessionDecisionIds = get().sessionDecisions[sessionId] || [];
+    const latestDecisionId = sessionDecisionIds[sessionDecisionIds.length - 1];
+
+    let causedByDecisionId: EntityID | undefined = metadata?.causedByDecisionId;
+    let causedByDecisionText: string | undefined = metadata?.causedByDecisionText;
+
+    if (latestDecisionId && !metadata?.causedByDecisionId) {
+      const latestDecision = get().decisions[latestDecisionId];
+      const selectedOption = latestDecision?.options.find(
+        opt => opt.id === latestDecision.selectedOptionId
+      );
+
+      if (selectedOption?.text) {
+        causedByDecisionId = latestDecisionId;
+        causedByDecisionText = `You ${selectedOption.text.toLowerCase()}`;
+      }
+    }
+
     const finalMetadata: NarrativeMetadata = {
       mood: metadata?.mood,
       tags: metadata?.tags ?? [],
@@ -780,6 +799,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
       endingData: metadata?.endingData,
       tone: metadata?.tone,
       majorEvent: metadata?.majorEvent,
+      causedByDecisionId,
+      causedByDecisionText,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 

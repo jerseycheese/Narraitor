@@ -7,12 +7,15 @@ import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
+import { ConsequenceBadge } from './ConsequenceBadge';
 import { useNPCStore } from '@/state/npcStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
   deriveFallbackName,
   useNarrativeParticipants,
 } from './useNarrativeParticipants';
+import { EntityID } from '@/types/common.types';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -30,6 +33,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
   const { settings } = useDevTools();
+
+  // Helper function to get segment index for consequence badge (Issue #971)
+  const getSegmentIndex = (segmentId: EntityID, sessionId: EntityID | undefined): number => {
+    if (!sessionId) return -1;
+    const sessionSegments = useNarrativeStore.getState().sessionSegments[sessionId] || [];
+    return sessionSegments.indexOf(segmentId);
+  };
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -171,6 +181,18 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
+        {/* Consequence Badge (Issue #971) */}
+        {resolvedSegment.metadata?.causedByDecisionId &&
+         resolvedSegment.metadata?.causedByDecisionText && (
+          <div className="mb-3">
+            <ConsequenceBadge
+              decisionId={resolvedSegment.metadata.causedByDecisionId}
+              decisionText={resolvedSegment.metadata.causedByDecisionText}
+              segmentIndex={getSegmentIndex(resolvedSegment.id, resolvedSegment.sessionId)}
+            />
+          </div>
+        )}
+
         <p
           className={styles.label}
           role="status"
