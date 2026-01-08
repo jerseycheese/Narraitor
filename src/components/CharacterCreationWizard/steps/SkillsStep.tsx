@@ -121,7 +121,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       worldSkillBounds
     );
 
-    const currentValidation = data.validation[2];
+    const currentValidation = data.validation[3];
     const errorsChanged =
       !currentValidation ||
       currentValidation.errors.length !== validationResult.errors.length ||
@@ -144,7 +144,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
   const effectivePool = Math.min(totalSkillPoints, totalCapacity);
   const hasUnallocatedEffectivePoints = spentPoints < effectivePool;
-  const validation = data.validation[2];
+  const validation = data.validation[3];
   const showErrors = validation?.touched && !validation?.valid;
   const selectedSkills = data.characterData.skills.filter(skill => skill.isSelected);
   const maxSelectable = Math.min(worldConfig?.settings?.maxSkills ?? MAX_SKILL_SELECTION_LIMIT, MAX_SKILL_SELECTION_LIMIT);

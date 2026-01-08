@@ -9,6 +9,13 @@ import {
 import type { SkillDifficulty } from './skill-difficulty.types';
 import type { ToneSettings } from './tone-settings.types';
 import type { GenreValue } from './genre.types';
+import type { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+
+/**
+ * Character template for quick character creation
+ * Structurally identical to CharacterArchetype but stored per-world
+ */
+export type CharacterTemplate = CharacterArchetype;
 
 /**
  * Represents a game world configuration
@@ -23,6 +30,7 @@ export interface World extends NamedEntity, TimestampedEntity {
   reference?: string;
   relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;
+  characterTemplates?: CharacterTemplate[];
 }
 
 /**

@@ -14,6 +14,7 @@ import {
 } from '@/components/shared/wizard';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -220,14 +221,16 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     switch (wizard.state.currentStep) {
       case 0:
-        return <BasicInfoStep {...props} />;
+        return <TemplateSelectionStep {...props} />;
       case 1:
-        return <AttributesStep {...props} />;
+        return <BasicInfoStep {...props} />;
       case 2:
-        return <SkillsStep {...props} />;
+        return <AttributesStep {...props} />;
       case 3:
-        return <BackgroundStep {...props} />;
+        return <SkillsStep {...props} />;
       case 4:
+        return <BackgroundStep {...props} />;
+      case 5:
         return <PortraitStep {...props} />;
       default:
         return null;

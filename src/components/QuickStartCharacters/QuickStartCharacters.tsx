@@ -42,8 +42,15 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     try {
       setLoading(true);
       setError(null);
-      const generated = await generateCharacterArchetypes(world, existingCharacterNames);
-      setArchetypes(generated);
+
+      // Use stored templates if available (faster, pre-generated during world creation)
+      if (world.characterTemplates && world.characterTemplates.length > 0) {
+        setArchetypes(world.characterTemplates);
+      } else {
+        // Fall back to on-demand generation if templates not available
+        const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+        setArchetypes(generated);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('QuickStartCharacters archetype generation failed:', {

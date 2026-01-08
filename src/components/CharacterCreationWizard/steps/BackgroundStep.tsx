@@ -62,7 +62,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     });
   };
 
-  const validation = data.validation[3];
+  const validation = data.validation[4];
   const showErrors = validation?.touched && !validation?.valid;
 
   return (

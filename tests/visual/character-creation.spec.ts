@@ -5,11 +5,11 @@ import { seedTestData } from './utils/seedTestData';
 /**
  * Character Creation Wizard Visual Regression Test (Sequential)
  *
- * Single initialization that walks through QuickStart → Steps 1–5,
+ * Single initialization that walks through QuickStart → Steps 0–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
  */
 
-test('Character creation wizard visual sequence (QuickStart → Steps 1–5)', async ({ page }) => {
+test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', async ({ page }) => {
   test.setTimeout(90000); // Extended timeout for complex wizard
   // Seed once and open worlds page so the app picks up state
   await seedTestData(page);
@@ -34,12 +34,23 @@ test('Character creation wizard visual sequence (QuickStart → Steps 1–5)', a
     await expect(page).toHaveScreenshot('character-creation-quickstart.png', { fullPage: true });
   });
 
-  await test.step('Step 1: Basic Info', async () => {
+  await test.step('Step 0: Template Selection', async () => {
     // Click Create Custom Character if visible
     const customButton = page.locator('button:has-text("Create Custom Character")');
     if (await customButton.count() > 0) {
       await customButton.click();
       await page.waitForTimeout(500); // Allow UI transition
+    }
+    await hideDynamicContent(page);
+    await expect(page).toHaveScreenshot('character-creation-step0-template-selection.png', { fullPage: true });
+  });
+
+  await test.step('Step 1: Basic Info', async () => {
+    // Skip template selection by clicking Next
+    const skipTemplateBtn = page.locator('button:has-text("Next")');
+    if (await skipTemplateBtn.count() > 0) {
+      await skipTemplateBtn.click();
+      await page.waitForTimeout(500); // Allow navigation
     }
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step1-basic-info.png', { fullPage: true });

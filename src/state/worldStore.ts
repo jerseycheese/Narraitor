@@ -61,6 +61,10 @@ export interface WorldStore extends CrudStore<World> {
   // Tone settings management
   updateToneSettings: (worldId: EntityID, toneSettings: Partial<ToneSettings>) => void;
 
+  // Character templates management
+  generateCharacterTemplates: (worldId: EntityID) => Promise<void>;
+  updateCharacterTemplates: (worldId: EntityID, templates: World['characterTemplates']) => void;
+
   // World state management
   worldStates: Record<EntityID, WorldState>;
   initializeWorldState: (worldId: EntityID) => void;
@@ -428,6 +432,36 @@ export const useWorldStore = create<WorldStore>()(
               ...toneSettings,
             } as ToneSettings,
           });
+        },
+
+        // Generate character templates
+        generateCharacterTemplates: async (worldId) => {
+          const world = get().worlds[worldId];
+          if (!world) {
+            set({ error: createStoreError('World Not Found', 'Cannot generate templates for unknown world') });
+            return;
+          }
+
+          try {
+            const { generateWorldCharacterTemplates } = await import('@/lib/utils/worldTemplateGenerator');
+            const templates = await generateWorldCharacterTemplates(world);
+            get().update(worldId, { characterTemplates: templates });
+          } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            set({ error: createStoreError('Template Generation Failed', message) });
+            logger.error('Failed to generate character templates', { worldId, error });
+          }
+        },
+
+        // Update character templates
+        updateCharacterTemplates: (worldId, templates) => {
+          const world = get().worlds[worldId];
+          if (!world) {
+            set({ error: createStoreError('World Not Found', 'Cannot update templates for unknown world') });
+            return;
+          }
+
+          get().update(worldId, { characterTemplates: templates });
         },
 
         initializeWorldState: (worldId) => {

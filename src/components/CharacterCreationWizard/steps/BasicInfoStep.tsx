@@ -59,7 +59,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     // Validation will be triggered by parent component
   };
 
-  const validation = data.validation[0];
+  const validation = data.validation[1];
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
