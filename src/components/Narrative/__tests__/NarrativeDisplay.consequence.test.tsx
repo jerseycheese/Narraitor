@@ -79,7 +79,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     expect(document.querySelector('[data-decision-id]')).not.toBeInTheDocument();
   });
 
-  it('should display badge before segment type label', () => {
+  it('should display badge before narrative content', () => {
     const segment = createMockNarrativeSegment({
       id: 'seg-1',
       sessionId: 'session-123',
@@ -94,19 +94,19 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
     const { container } = render(<NarrativeDisplay segment={segment} />);
 
-    // Find badge and segment type elements
+    // Find badge and narrative content elements
     const badge = screen.getByText(/You looked around/).closest('[data-decision-id]');
-    const segmentType = screen.getByText('action');
+    const content = screen.getByTestId('narrative-content-container');
 
     expect(badge).toBeInTheDocument();
-    expect(segmentType).toBeInTheDocument();
+    expect(content).toBeInTheDocument();
 
-    // Badge should appear before segment type in DOM order
+    // Badge should appear before narrative content in DOM order
     const allElements = Array.from(container.querySelectorAll('*'));
     const badgeIndex = allElements.indexOf(badge);
-    const typeIndex = allElements.indexOf(segmentType);
+    const contentIndex = allElements.indexOf(content);
 
-    expect(badgeIndex).toBeLessThan(typeIndex);
+    expect(badgeIndex).toBeLessThan(contentIndex);
   });
 
   it('should handle segments with partial decision metadata gracefully', () => {

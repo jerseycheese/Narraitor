@@ -38,62 +38,52 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return {
           container: 'border-l-4 border-info bg-info-background',
           text: 'italic text-muted-foreground',
-          label: 'text-xs uppercase text-info font-semibold mb-2'
         };
       case 'action':
         return {
           container: 'border-2 border-warning bg-warning-background',
           text: 'font-medium text-foreground',
-          label: 'text-xs uppercase text-foreground font-semibold mb-2'
         };
       case 'decision':
         return {
           container: 'border-2 border-info bg-info-background',
           text: 'font-medium text-foreground',
-          label: 'text-xs uppercase text-info font-semibold mb-2'
         };
       case 'combat':
         return {
           container: 'border-2 border-destructive bg-destructive/10',
           text: 'font-bold text-foreground',
-          label: 'text-xs uppercase text-foreground font-semibold mb-2'
         };
       case 'exploration':
         return {
           container: 'border-2 border-success bg-success-background',
           text: 'text-muted-foreground',
-          label: 'text-xs uppercase text-success font-semibold mb-2'
         };
       case 'resolution':
         return {
           container: 'border-2 border-info bg-info-background',
           text: 'text-muted-foreground',
-          label: 'text-xs uppercase text-info font-semibold mb-2'
         };
       case 'character_interaction':
         return {
           container: 'border-2 border-info bg-info-background',
           text: 'text-muted-foreground',
-          label: 'text-xs uppercase text-info font-semibold mb-2'
         };
       case 'revelation':
         return {
           container: 'border-2 border-destructive bg-destructive/10',
           text: 'font-medium italic text-foreground',
-          label: 'text-xs uppercase text-foreground font-semibold mb-2'
         };
       case 'transition':
         return {
           container: 'bg-muted border border-border',
           text: 'text-muted-foreground text-sm italic',
-          label: 'text-xs uppercase text-muted-foreground font-semibold mb-2'
         };
       case 'scene':
       default:
         return {
           container: 'bg-card border border-border',
           text: 'text-foreground',
-          label: 'text-xs uppercase text-muted-foreground font-semibold mb-2'
         };
     }
   };
@@ -182,14 +172,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
             />
           </div>
         )}
-
-        <p
-          className={styles.label}
-          role="status"
-          aria-label={`Segment type: ${resolvedSegment.type}`}
-        >
-          {resolvedSegment.type}
-        </p>
 
         {participants.length > 0 && (
           <div className="mb-4">
