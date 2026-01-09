@@ -17,12 +17,12 @@ describe('ConsequenceBadge', () => {
     expect(screen.getByText(/You helped the merchant/)).toBeInTheDocument();
   });
 
-  it('should show lightning icon with decision text', () => {
+  it('should show immediate icon with decision text', () => {
     render(<ConsequenceBadge {...defaultProps} />);
 
     const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
     expect(badge).toBeInTheDocument();
-    expect(screen.getByText('⚡')).toBeInTheDocument();
+    expect(screen.getByTestId('consequence-icon-immediate')).toBeInTheDocument();
     expect(screen.getByText('Immediate')).toBeInTheDocument();
   });
 
@@ -71,6 +71,7 @@ describe('ConsequenceBadge', () => {
     render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
 
     expect(screen.getByText('Longer-term')).toBeInTheDocument();
+    expect(screen.getByTestId('consequence-icon-longer-term')).toBeInTheDocument();
   });
 
   it('should use small size variant', () => {

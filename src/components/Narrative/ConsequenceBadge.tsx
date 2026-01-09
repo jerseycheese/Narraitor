@@ -4,6 +4,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntityID } from '@/types/common.types';
 import { cn } from '@/lib/utils';
+import { Clock, Zap } from 'lucide-react';
 
 interface ConsequenceBadgeProps {
   decisionId: EntityID;
@@ -27,7 +28,7 @@ export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
   const isImmediate = distanceFromDecision >= 0 && distanceFromDecision <= 2;
   const variant = isImmediate ? 'info-static' : 'secondary-static';
   const timingLabel = isImmediate ? 'Immediate' : 'Longer-term';
-  const timingIcon = isImmediate ? '⚡' : '⏳';
+  const TimingIcon = isImmediate ? Zap : Clock;
 
   return (
     <Badge
@@ -37,7 +38,11 @@ export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
       data-consequence={isImmediate ? 'immediate' : 'longer-term'}
       data-decision-id={decisionId}
     >
-      <span aria-hidden="true">{timingIcon}</span>
+      <TimingIcon
+        className="h-3 w-3"
+        aria-hidden="true"
+        data-testid={isImmediate ? 'consequence-icon-immediate' : 'consequence-icon-longer-term'}
+      />
       <span className="text-[10px] uppercase tracking-wide">{timingLabel}</span>
       <span className="sr-only">consequence:</span>
       <span>{decisionText}</span>
