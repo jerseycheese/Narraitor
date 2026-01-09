@@ -56,9 +56,9 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be visible
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveAttribute('data-consequence', 'immediate');
+    expect(badge).toHaveAttribute('data-decision-id', 'decision-1');
   });
 
   it('should not show badge when no decision link exists', () => {
@@ -76,64 +76,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // No badge should be visible
-    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
-  });
-
-  it('should show immediate consequence badge for early segments (index 0-2)', () => {
-    const testCases = [
-      { id: 'seg-0', index: 0 },
-      { id: 'seg-1', index: 1 },
-      { id: 'seg-2', index: 2 },
-    ];
-
-    testCases.forEach(({ id, index }) => {
-      const segment = createMockNarrativeSegment({
-        id,
-        sessionId: 'session-123',
-        content: `Segment at index ${index}`,
-        type: 'scene',
-        metadata: {
-          tags: [],
-          causedByDecisionId: 'decision-1',
-          causedByDecisionText: 'You investigated'
-        }
-      });
-
-      const { unmount } = render(<NarrativeDisplay segment={segment} />);
-
-      const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
-      expect(badge).toHaveAttribute('data-consequence', 'immediate');
-
-      unmount();
-    });
-  });
-
-  it('should show longer-term consequence badge for later segments (index 3+)', () => {
-    const testCases = [
-      { id: 'seg-3', index: 3 },
-      { id: 'seg-4', index: 4 },
-    ];
-
-    testCases.forEach(({ id, index }) => {
-      const segment = createMockNarrativeSegment({
-        id,
-        sessionId: 'session-123',
-        content: `Segment at index ${index}`,
-        type: 'scene',
-        metadata: {
-          tags: [],
-          causedByDecisionId: 'decision-1',
-          causedByDecisionText: 'You investigated'
-        }
-      });
-
-      const { unmount } = render(<NarrativeDisplay segment={segment} />);
-
-      const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
-      expect(badge).toHaveAttribute('data-consequence', 'longer-term');
-
-      unmount();
-    });
+    expect(document.querySelector('[data-decision-id]')).not.toBeInTheDocument();
   });
 
   it('should display badge before segment type label', () => {
@@ -152,7 +95,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     const { container } = render(<NarrativeDisplay segment={segment} />);
 
     // Find badge and segment type elements
-    const badge = screen.getByText(/You looked around/).closest('[data-consequence]');
+    const badge = screen.getByText(/You looked around/).closest('[data-decision-id]');
     const segmentType = screen.getByText('action');
 
     expect(badge).toBeInTheDocument();
@@ -182,7 +125,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
     const { unmount: unmount1 } = render(<NarrativeDisplay segment={segment1} />);
     // Should not show badge (both fields required)
-    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-decision-id]')).not.toBeInTheDocument();
     unmount1();
 
     // Only causedByDecisionText, no ID
@@ -200,7 +143,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
     const { unmount: unmount2 } = render(<NarrativeDisplay segment={segment2} />);
     // Should not show badge (both fields required)
-    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-decision-id]')).not.toBeInTheDocument();
     unmount2();
   });
 
@@ -222,8 +165,8 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be shown
-    const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'immediate');
+    const badge = screen.getByText(/You investigated/).closest('[data-decision-id]');
+    expect(badge).toHaveAttribute('data-decision-id', 'decision-1');
 
     // Other segment information should still be present
     expect(screen.getByText('action')).toBeInTheDocument();

@@ -4,12 +4,11 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntityID } from '@/types/common.types';
 import { cn } from '@/lib/utils';
-import { Clock, Zap } from 'lucide-react';
+import { Link2 } from 'lucide-react';
 
 interface ConsequenceBadgeProps {
   decisionId: EntityID;
   decisionText: string;
-  distanceFromDecision: number;
   className?: string;
 }
 
@@ -20,30 +19,21 @@ interface ConsequenceBadgeProps {
 export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
   decisionId,
   decisionText,
-  distanceFromDecision,
   className,
 }) => {
-  // Immediate = 0-2 segments from decision, Longer-term = 3+
-  // If distance is unknown (-1), default to longer-term (more conservative)
-  const isImmediate = distanceFromDecision >= 0 && distanceFromDecision <= 2;
-  const variant = isImmediate ? 'info-static' : 'secondary-static';
-  const timingLabel = isImmediate ? 'Immediate' : 'Longer-term';
-  const TimingIcon = isImmediate ? Zap : Clock;
-
   return (
     <Badge
-      variant={variant}
+      variant="secondary-static"
       size="sm"
       className={cn('consequence-badge gap-1', className)}
-      data-consequence={isImmediate ? 'immediate' : 'longer-term'}
       data-decision-id={decisionId}
     >
-      <TimingIcon
+      <Link2
         className="h-3 w-3"
         aria-hidden="true"
-        data-testid={isImmediate ? 'consequence-icon-immediate' : 'consequence-icon-longer-term'}
+        data-testid="consequence-icon"
       />
-      <span className="text-[10px] uppercase tracking-wide">{timingLabel}</span>
+      <span className="text-[10px] uppercase tracking-wide">Consequence</span>
       <span className="sr-only">consequence:</span>
       <span>{decisionText}</span>
     </Badge>

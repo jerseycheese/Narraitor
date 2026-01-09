@@ -9,13 +9,11 @@ import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
 import { ConsequenceBadge } from './ConsequenceBadge';
 import { useNPCStore } from '@/state/npcStore';
-import { useNarrativeStore } from '@/state/narrativeStore';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
   deriveFallbackName,
   useNarrativeParticipants,
 } from './useNarrativeParticipants';
-import { EntityID } from '@/types/common.types';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -33,32 +31,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   // Use selector to avoid subscribing to entire store
   const getById = useNPCStore((state) => state.getById);
   const { settings } = useDevTools();
-
-  // Helper function to get segment distance from decision for consequence badge (Issue #971)
-  const getSegmentDistanceFromDecision = (
-    segmentId: EntityID,
-    decisionId: EntityID,
-    sessionId: EntityID | undefined
-  ): number => {
-    if (!sessionId) return -1;
-
-    const state = useNarrativeStore.getState();
-    const sessionSegments = state.sessionSegments[sessionId] || [];
-    const segments = state.segments;
-
-    const currentIndex = sessionSegments.indexOf(segmentId);
-    if (currentIndex === -1) return -1;
-
-    // Find the first segment that references this decision
-    const firstDecisionSegmentIndex = sessionSegments.findIndex(id =>
-      segments[id]?.metadata?.causedByDecisionId === decisionId
-    );
-
-    if (firstDecisionSegmentIndex === -1) return -1;
-
-    // Return distance from the first segment caused by this decision
-    return currentIndex - firstDecisionSegmentIndex;
-  };
 
   const getSegmentStyles = (type: string) => {
     switch (type) {
@@ -207,11 +179,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
             <ConsequenceBadge
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
-              distanceFromDecision={getSegmentDistanceFromDecision(
-                resolvedSegment.id,
-                resolvedSegment.metadata.causedByDecisionId,
-                resolvedSegment.sessionId
-              )}
             />
           </div>
         )}

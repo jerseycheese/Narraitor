@@ -7,71 +7,21 @@ describe('ConsequenceBadge', () => {
   const defaultProps = {
     decisionId: 'decision-123',
     decisionText: 'You helped the merchant',
-    distanceFromDecision: 1,
   };
 
   it('should display decision text', () => {
     render(<ConsequenceBadge {...defaultProps} />);
 
-    // Text is split by emoji, so use partial text match
     expect(screen.getByText(/You helped the merchant/)).toBeInTheDocument();
   });
 
-  it('should show immediate icon with decision text', () => {
+  it('should show link icon with decision text', () => {
     render(<ConsequenceBadge {...defaultProps} />);
 
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
-    expect(screen.getByTestId('consequence-icon-immediate')).toBeInTheDocument();
-    expect(screen.getByText('Immediate')).toBeInTheDocument();
-  });
-
-  it('should use info-static variant for immediate consequences (segment index 0)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={0} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'immediate');
-  });
-
-  it('should use info-static variant for immediate consequences (segment index 1)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={1} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'immediate');
-  });
-
-  it('should use info-static variant for immediate consequences (segment index 2)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={2} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'immediate');
-  });
-
-  it('should use secondary-static variant for longer-term consequences (segment index 3)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
-  });
-
-  it('should use secondary-static variant for longer-term consequences (segment index 5)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={5} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
-  });
-
-  it('should include timing label for immediate consequences', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={1} />);
-
-    expect(screen.getByText('Immediate')).toBeInTheDocument();
-  });
-
-  it('should include timing label for longer-term consequences', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
-
-    expect(screen.getByText('Longer-term')).toBeInTheDocument();
-    expect(screen.getByTestId('consequence-icon-longer-term')).toBeInTheDocument();
+    expect(screen.getByTestId('consequence-icon')).toBeInTheDocument();
+    expect(screen.getByText('Consequence')).toBeInTheDocument();
   });
 
   it('should use small size variant', () => {
@@ -99,28 +49,8 @@ describe('ConsequenceBadge', () => {
 
     testCases.forEach((text) => {
       const { unmount } = render(<ConsequenceBadge {...defaultProps} decisionText={text} />);
-      // Use regex for flexible matching since text is split by emoji
       expect(screen.getByText(new RegExp(text))).toBeInTheDocument();
       unmount();
     });
-  });
-
-  it('should render without crashing for edge segment indices', () => {
-    const edgeCases = [0, 1, 2, 3, 10, 100];
-
-    edgeCases.forEach((index) => {
-      expect(() => {
-        const { unmount } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={index} />);
-        unmount();
-      }).not.toThrow();
-    });
-  });
-
-  it('should default to longer-term when distance is unknown (-1)', () => {
-    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={-1} />);
-
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
-    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
-    expect(screen.getByText('Longer-term')).toBeInTheDocument();
   });
 });
