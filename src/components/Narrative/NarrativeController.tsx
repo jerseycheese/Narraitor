@@ -11,6 +11,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import {
   Decision,
+  DecisionOutcome,
   DecisionWeight,
   NarrativeContext,
   NarrativeSegment,
@@ -1112,6 +1113,27 @@ Respond with JSON format:
         }
       });
 
+      let decisionOutcome: DecisionOutcome | undefined;
+      let decisionOutcomeSummary: string | undefined;
+      if (rollResults.length > 0) {
+        const successCount = rollResults.filter((r) => r.success).length;
+        const failureCount = rollResults.length - successCount;
+        const hasCriticalSuccess = rollResults.some((r) => r.isCriticalSuccess);
+        const hasCriticalFailure = rollResults.some((r) => r.isCriticalFailure);
+
+        if (failureCount === 0) {
+          decisionOutcome = hasCriticalSuccess ? 'critical-success' : 'success';
+        } else if (successCount === 0) {
+          decisionOutcome = hasCriticalFailure ? 'critical-failure' : 'failure';
+        } else {
+          decisionOutcome = 'mixed';
+        }
+
+        decisionOutcomeSummary = `${successCount} success${
+          successCount === 1 ? '' : 'es'
+        }, ${failureCount} failure${failureCount === 1 ? '' : 's'}`;
+      }
+
       // Fatal outcome check: Any failure on a critical decision ends the game
       // This makes critical decisions truly life-or-death
       const hasCriticalFailure =
@@ -1194,6 +1216,8 @@ Respond with JSON format:
           ...result.metadata,
           // Merge skill check tags into metadata
           tags: [...(result.metadata.tags || []), ...skillCheckTags],
+          decisionOutcome,
+          decisionOutcomeSummary,
         },
         sessionId, // Explicitly set sessionId
         worldId, // Explicitly set worldId

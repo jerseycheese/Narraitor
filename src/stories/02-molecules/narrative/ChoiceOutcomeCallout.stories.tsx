@@ -1,11 +1,11 @@
-// src/stories/02-molecules/narrative/ConsequenceBadge.stories.tsx
+// src/stories/02-molecules/narrative/ChoiceOutcomeCallout.stories.tsx
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { ConsequenceBadge } from '@/components/Narrative/ConsequenceBadge';
+import { ChoiceOutcomeCallout } from '@/components/Narrative/ChoiceOutcomeCallout';
 
-const meta: Meta<typeof ConsequenceBadge> = {
-  title: '02-Molecules/narrative/ConsequenceBadge',
-  component: ConsequenceBadge,
+const meta: Meta<typeof ChoiceOutcomeCallout> = {
+  title: '02-Molecules/narrative/ChoiceOutcomeCallout',
+  component: ChoiceOutcomeCallout,
   parameters: {
     layout: 'centered',
   },
@@ -15,12 +15,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default consequence badge
+ * Default choice outcome callout
  */
 export const Default: Story = {
- args: {
-   decisionId: 'decision-1',
-   decisionText: 'You helped the merchant',
+  args: {
+    decisionId: 'decision-1',
+    decisionText: 'You helped the merchant',
   },
 };
 
@@ -33,27 +33,27 @@ export const VariousDecisionTexts: Story = {
       <div className="text-sm font-semibold text-muted-foreground mb-2">
         Various Decision Types
       </div>
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-1"
         decisionText="You helped the merchant"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-2"
         decisionText="You attacked the bandit"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-3"
         decisionText="You ran away quickly"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-4"
         decisionText="You investigated the mysterious door"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-5"
         decisionText="You convinced the guard to let you pass"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-6"
         decisionText="You took the hidden treasure"
       />
@@ -70,14 +70,23 @@ export const MobileView: Story = {
       <div className="text-sm font-semibold text-muted-foreground mb-2">
         Mobile View (375px width)
       </div>
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-1"
         decisionText="You helped the merchant"
       />
-      <ConsequenceBadge
+      <ChoiceOutcomeCallout
         decisionId="decision-2"
         decisionText="You investigated the mysterious noise coming from behind the old wooden door"
       />
     </div>
   ),
+};
+
+export const WithOutcome: Story = {
+  args: {
+    decisionId: 'decision-7',
+    decisionText: 'You slipped past the guards',
+    decisionOutcome: 'success',
+    decisionOutcomeSummary: '2 successes, 0 failures',
+  },
 };

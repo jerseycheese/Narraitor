@@ -231,9 +231,18 @@ export interface NarrativeMetadata {
   // Decision consequence tracking (Issue #971)
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
+  decisionOutcome?: DecisionOutcome;
+  decisionOutcomeSummary?: string;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }
+
+export type DecisionOutcome =
+  | 'success'
+  | 'failure'
+  | 'mixed'
+  | 'critical-success'
+  | 'critical-failure';
 
 /**
  * Represents a narrative generation request

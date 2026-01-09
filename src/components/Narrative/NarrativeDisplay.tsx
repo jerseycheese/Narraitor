@@ -7,7 +7,7 @@ import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
-import { ConsequenceBadge } from './ConsequenceBadge';
+import { ChoiceOutcomeCallout } from './ChoiceOutcomeCallout';
 import { useNPCStore } from '@/state/npcStore';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
@@ -162,13 +162,15 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   return (
     <div className="space-y-3 snap-center">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
-        {/* Consequence Badge (Issue #971) */}
+        {/* Choice Outcome Callout (Issue #971) */}
         {resolvedSegment.metadata?.causedByDecisionId &&
          resolvedSegment.metadata?.causedByDecisionText && (
           <div className="mb-3">
-            <ConsequenceBadge
+            <ChoiceOutcomeCallout
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
+              decisionOutcome={resolvedSegment.metadata.decisionOutcome}
+              decisionOutcomeSummary={resolvedSegment.metadata.decisionOutcomeSummary}
             />
           </div>
         )}

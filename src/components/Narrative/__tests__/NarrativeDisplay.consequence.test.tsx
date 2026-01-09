@@ -10,7 +10,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 jest.mock('@/state/npcStore');
 jest.mock('@/state/narrativeStore');
 
-describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => {
+describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', () => {
   beforeEach(() => {
     // Mock NPC store (required by NarrativeDisplay)
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({

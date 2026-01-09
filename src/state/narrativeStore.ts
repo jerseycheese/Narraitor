@@ -801,6 +801,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
       majorEvent: metadata?.majorEvent,
       causedByDecisionId,
       causedByDecisionText,
+      decisionOutcome: metadata?.decisionOutcome,
+      decisionOutcomeSummary: metadata?.decisionOutcomeSummary,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 
