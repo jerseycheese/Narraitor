@@ -64,6 +64,6 @@ describe('ChoiceOutcomeCallout', () => {
       />
     );
 
-    expect(screen.getByText('Outcome: Success (2 successes, 1 failure)')).toBeInTheDocument();
+    expect(screen.getByText('Success (2 successes, 1 failure)')).toBeInTheDocument();
   });
 });

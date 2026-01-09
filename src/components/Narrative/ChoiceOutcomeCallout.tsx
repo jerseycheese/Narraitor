@@ -51,7 +51,7 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
       <span>{decisionText}</span>
       {decisionOutcome && (
         <div className={cn('mt-1 text-sm', outcomeClasses[decisionOutcome])}>
-          Outcome: {outcomeLabels[decisionOutcome]}
+          {outcomeLabels[decisionOutcome]}
           {decisionOutcomeSummary ? ` (${decisionOutcomeSummary})` : ''}
         </div>
       )}
