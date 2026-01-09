@@ -9,7 +9,6 @@ interface ChoiceOutcomeCalloutProps {
   decisionId: EntityID;
   decisionText: string;
   decisionOutcome?: DecisionOutcome;
-  decisionOutcomeSummary?: string;
   className?: string;
 }
 
@@ -25,19 +24,18 @@ const outcomeLabels: Record<DecisionOutcome, string> = {
   'critical-failure': 'Critical failure',
 };
 
-const outcomeClasses: Record<DecisionOutcome, string> = {
-  success: 'text-success',
-  failure: 'text-destructive',
-  mixed: 'text-warning',
-  'critical-success': 'text-success',
-  'critical-failure': 'text-destructive',
+const outcomeAccentClasses: Record<DecisionOutcome, string> = {
+  success: 'bg-success',
+  failure: 'bg-destructive',
+  mixed: 'bg-warning',
+  'critical-success': 'bg-success',
+  'critical-failure': 'bg-destructive',
 };
 
 export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
   decisionId,
   decisionText,
   decisionOutcome,
-  decisionOutcomeSummary,
   className,
 }) => {
   return (
@@ -50,9 +48,12 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     >
       <span>{decisionText}</span>
       {decisionOutcome && (
-        <div className={cn('mt-1 text-sm', outcomeClasses[decisionOutcome])}>
-          {outcomeLabels[decisionOutcome]}
-          {decisionOutcomeSummary ? ` (${decisionOutcomeSummary})` : ''}
+        <div className="mt-1 flex items-center gap-2 text-sm text-foreground">
+          <span
+            className={cn('h-2 w-2 rounded-full', outcomeAccentClasses[decisionOutcome])}
+            aria-hidden="true"
+          />
+          <span className="font-medium">{outcomeLabels[decisionOutcome]}</span>
         </div>
       )}
     </div>
