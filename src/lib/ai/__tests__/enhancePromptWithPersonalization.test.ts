@@ -52,6 +52,10 @@ describe('enhancePromptWithPersonalization Integration', () => {
     });
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test('uses session-specific decisions when sessionId is provided', async () => {
     // Setup: Real tracker with decisions in session-1
     playerDecisionTracker.recordDecision(
@@ -126,7 +130,10 @@ describe('enhancePromptWithPersonalization Integration', () => {
 
   test('enforces decision limit of 10', async () => {
     // Setup: Tracker with 15 decisions
+    jest.useFakeTimers();
+    const baseTime = new Date('2025-01-01T00:00:00.000Z');
     for (let i = 0; i < 15; i++) {
+      jest.setSystemTime(new Date(baseTime.getTime() + i * 1000));
       playerDecisionTracker.recordDecision(
         `Prompt ${i}`,
         `Choice ${i}`,

@@ -7,6 +7,7 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  optionCount?: number;
   worldSkills?: Array<{
     id: string;
     name: string;
@@ -16,10 +17,14 @@ interface PlayerChoiceTemplateContext {
 
 /**
  * Prompt template for generating player choices
- * Generates a decision prompt and 3-5 options based on the current narrative context
+ * Generates a decision prompt and options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills } = context;
+  const { worldName, genre, narrativeContext, worldSkills, optionCount } = context;
+  const choiceCount =
+    typeof optionCount === 'number' && Number.isFinite(optionCount)
+      ? Math.max(1, Math.floor(optionCount))
+      : 4;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -59,7 +64,7 @@ ${shortContext}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create 4 distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create ${choiceCount} distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
@@ -115,7 +120,7 @@ Decision: What will you do?
 Context Summary: [Brief 1-2 sentence summary of the current situation that led to this decision]
 
 Options:
-${Array.from({ length: 4 }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
+${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
    Hint: [Optional explanation]
    Requirements: [Optional - SkillName X+]`).join('\n\n')}
 

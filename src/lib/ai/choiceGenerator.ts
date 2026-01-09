@@ -48,6 +48,7 @@ export class ChoiceGenerator {
         sessionId,
         useAlignedChoices,
         includeDecisionHistory,
+        maxOptions,
       });
 
       const response = await this.aiClient.generateContent(prompt);

@@ -22,6 +22,7 @@ interface ChoicePromptInput {
   sessionId?: EntityID;
   useAlignedChoices?: boolean;
   includeDecisionHistory?: boolean;
+  maxOptions?: number;
 }
 
 export const buildChoicePrompt = ({
@@ -32,11 +33,12 @@ export const buildChoicePrompt = ({
   sessionId,
   useAlignedChoices = false,
   includeDecisionHistory = true,
+  maxOptions,
 }: ChoicePromptInput): string => {
   const template = getTemplate(
     useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice'
   );
-  const context = buildContext(world, narrativeContext, characterIds);
+  const context = buildContext(world, narrativeContext, characterIds, maxOptions);
   const basePrompt = template(context);
   const inventoryAwarePrompt = enhancePromptWithInventory(
     basePrompt,
@@ -75,13 +77,15 @@ const getTemplate = (templateType: string) => {
 const buildContext = (
   world: World,
   narrativeContext: NarrativeContext,
-  characterIds: string[]
+  characterIds: string[],
+  maxOptions?: number
 ) => ({
   worldName: world.name,
   worldDescription: world.description,
   genre: world.genre,
   narrativeContext,
   characterIds,
+  optionCount: maxOptions,
   worldSkills:
     world.skills?.map((skill) => ({
       id: skill.id,
