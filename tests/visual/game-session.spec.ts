@@ -269,14 +269,18 @@ test.describe('Game Session Visual Tests', () => {
           },
           {
             worldId: 'world-cyberpunk-2077',
-            content: 'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+            content: 'You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
             type: 'action',
             characterIds: ['char-cyberpunk-hacker'],
             metadata: {
               mood: 'action',
               location: 'Arasaka building interior',
               tags: [],
-              characterIds: ['char-cyberpunk-hacker']
+              characterIds: ['char-cyberpunk-hacker'],
+              causedByDecisionId: 'decision-cyberpunk-route',
+              causedByDecisionText:
+                'You choose to crawl through the ventilation system - stealthy but difficult',
+              decisionOutcome: 'success'
             },
             timestamp: new Date('2024-01-01T02:02:00.000Z'),
             updatedAt: '2024-01-01T02:02:00.000Z'
@@ -290,11 +294,7 @@ test.describe('Game Session Visual Tests', () => {
               mood: 'neutral',
               location: 'Arasaka building',
               tags: [],
-              characterIds: ['char-cyberpunk-hacker', 'npc-fixer'],
-              causedByDecisionId: 'decision-cyberpunk-route',
-              causedByDecisionText:
-                'You choose to crawl through the ventilation system - stealthy but difficult',
-              decisionOutcome: 'mixed'
+              characterIds: ['char-cyberpunk-hacker', 'npc-fixer']
             },
             timestamp: new Date('2024-01-01T02:03:00.000Z'),
             updatedAt: '2024-01-01T02:03:00.000Z'

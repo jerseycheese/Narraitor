@@ -48,7 +48,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+      'You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
     type: 'action' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {
@@ -56,6 +56,10 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
       location: 'Arasaka building interior',
       tags: [],
       characterIds: ['char-cyberpunk-hacker'],
+      causedByDecisionId: 'decision-cyberpunk-route',
+      causedByDecisionText:
+        'You choose to crawl through the ventilation system - stealthy but difficult',
+      decisionOutcome: 'success',
     },
     timestamp: new Date('2024-01-01T02:02:00.000Z'),
     createdAt: '2024-01-01T02:02:00.000Z',
@@ -78,46 +82,6 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     timestamp: new Date('2024-01-01T02:03:00.000Z'),
     createdAt: '2024-01-01T02:03:00.000Z',
     updatedAt: '2024-01-01T02:03:00.000Z',
-  },
-  {
-    id: 'segment-cyberpunk-5',
-    worldId: 'world-cyberpunk-2077',
-    sessionId: 'session-cyberpunk-ghost',
-    content:
-      'Elevator shafts and stairwells offer different advantages. The elevator requires a keycard hack but offers direct access. The emergency stairs avoid most sensors but mean a long climb. Your cybernetic legs can handle it, but time is running short.',
-    type: 'action' as const,
-    characterIds: ['char-cyberpunk-hacker'],
-    metadata: {
-      mood: 'action',
-      location: 'Arasaka building lobby',
-      tags: [],
-      characterIds: ['char-cyberpunk-hacker'],
-    },
-    timestamp: new Date('2024-01-01T02:02:30.000Z'),
-    createdAt: '2024-01-01T02:02:30.000Z',
-    updatedAt: '2024-01-01T02:02:30.000Z',
-  },
-  {
-    id: 'segment-cyberpunk-6',
-    worldId: 'world-cyberpunk-2077',
-    sessionId: 'session-cyberpunk-ghost',
-    content:
-      'Floor 47. The doors slide open to reveal a pristine corridor lined with offices. Security cameras track your every movement, but your scrambler keeps you invisible for now. The executive suite is at the end of the hall.',
-    type: 'scene' as const,
-    characterIds: ['char-cyberpunk-hacker'],
-    metadata: {
-      mood: 'tense',
-      location: 'Arasaka floor 47',
-      tags: [],
-      characterIds: ['char-cyberpunk-hacker', 'npc-fixer'],
-      causedByDecisionId: 'decision-cyberpunk-route',
-      causedByDecisionText:
-        'You choose to crawl through the ventilation system - stealthy but difficult',
-      decisionOutcome: 'mixed',
-    },
-    timestamp: new Date('2024-01-01T02:04:00.000Z'),
-    createdAt: '2024-01-01T02:04:00.000Z',
-    updatedAt: '2024-01-01T02:04:00.000Z',
   },
   {
     id: 'segment-fantasy-1',
