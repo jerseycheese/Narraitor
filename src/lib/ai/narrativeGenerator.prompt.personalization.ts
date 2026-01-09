@@ -50,22 +50,26 @@ export const enhancePromptWithPersonalization = async (
       const currentContext: SimpleNarrativeContext = { worldId, sessionId };
       relevantDecisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
-        15,
+        10,
         { worldId, sessionId }
       );
 
       if (relevantDecisions.length === 0) {
         relevantDecisions = playerDecisionTracker.getRelevantDecisions(
           currentContext,
-          15,
+          10,
           { worldId }
         );
       }
 
       decisionHistory = formatDecisions(relevantDecisions);
     } else {
-      const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
-      relevantDecisions = allWorldDecisions.slice(0, 15);
+      const currentContext: SimpleNarrativeContext = { worldId };
+      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        currentContext,
+        10,
+        { worldId }
+      );
       decisionHistory = formatDecisions(relevantDecisions);
     }
 

@@ -218,14 +218,14 @@ const enhancePromptWithDecisionHistory = (
 
     let decisions = playerDecisionTracker.getRelevantDecisions(
       currentContext,
-      15,
+      10,
       { worldId, sessionId }
     );
 
     if (decisions.length === 0) {
       decisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
-        15,
+        10,
         { worldId }
       );
     }
