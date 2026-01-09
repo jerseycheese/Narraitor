@@ -1,10 +1,8 @@
 // src/components/Narrative/ConsequenceBadge.tsx
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { EntityID } from '@/types/common.types';
 import { cn } from '@/lib/utils';
-import { Link2 } from 'lucide-react';
 
 interface ConsequenceBadgeProps {
   decisionId: EntityID;
@@ -22,20 +20,16 @@ export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
   className,
 }) => {
   return (
-    <Badge
-      variant="secondary-static"
-      size="sm"
-      className={cn('consequence-badge gap-1', className)}
+    <div
+      className={cn(
+        'consequence-badge rounded-md border border-border bg-muted px-3 py-2 text-base text-muted-foreground',
+        className
+      )}
       data-decision-id={decisionId}
     >
-      <Link2
-        className="h-3 w-3"
-        aria-hidden="true"
-        data-testid="consequence-icon"
-      />
-      <span className="text-[10px] uppercase tracking-wide">Consequence</span>
-      <span className="sr-only">consequence:</span>
-      <span>{decisionText}</span>
-    </Badge>
+      <span className="font-semibold uppercase tracking-wide">Consequence</span>
+      <span className="sr-only">:</span>
+      <span className="ml-2">{decisionText}</span>
+    </div>
   );
 };

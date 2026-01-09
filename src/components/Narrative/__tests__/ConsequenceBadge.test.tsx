@@ -15,12 +15,11 @@ describe('ConsequenceBadge', () => {
     expect(screen.getByText(/You helped the merchant/)).toBeInTheDocument();
   });
 
-  it('should show link icon with decision text', () => {
+  it('should show consequence label with decision text', () => {
     render(<ConsequenceBadge {...defaultProps} />);
 
     const badge = screen.getByText(/You helped the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
-    expect(screen.getByTestId('consequence-icon')).toBeInTheDocument();
     expect(screen.getByText('Consequence')).toBeInTheDocument();
   });
 
