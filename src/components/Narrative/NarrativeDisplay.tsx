@@ -170,7 +170,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
               decisionOutcome={resolvedSegment.metadata.decisionOutcome}
-              decisionOutcomeSummary={resolvedSegment.metadata.decisionOutcomeSummary}
             />
           </div>
         )}

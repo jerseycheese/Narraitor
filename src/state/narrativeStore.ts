@@ -28,6 +28,20 @@ let journalStoreModule: typeof import('./journalStore') | null = null;
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
 
+const normalizeDecisionText = (text: string) => {
+  const trimmed = safeTrim(text);
+  if (!trimmed) return '';
+
+  const withoutYou = trimmed.replace(/^you\b\s*/i, '');
+  const firstChar = withoutYou.charAt(0);
+  const normalized =
+    firstChar && /[A-Z]/.test(firstChar)
+      ? `${firstChar.toLowerCase()}${withoutYou.slice(1)}`
+      : withoutYou;
+
+  return `You ${normalized}`.trim();
+};
+
 const buildLocalEnding = ({
   endingType,
   params,
@@ -783,7 +797,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
       if (selectedOption?.text) {
         causedByDecisionId = latestDecisionId;
-        causedByDecisionText = `You ${selectedOption.text.toLowerCase()}`;
+        causedByDecisionText = normalizeDecisionText(selectedOption.text);
       }
     }
 
@@ -802,7 +816,6 @@ export const useNarrativeStore = create<NarrativeStore>()(
       causedByDecisionId,
       causedByDecisionText,
       decisionOutcome: metadata?.decisionOutcome,
-      decisionOutcomeSummary: metadata?.decisionOutcomeSummary,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 

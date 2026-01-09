@@ -1114,7 +1114,6 @@ Respond with JSON format:
       });
 
       let decisionOutcome: DecisionOutcome | undefined;
-      let decisionOutcomeSummary: string | undefined;
       if (rollResults.length > 0) {
         const successCount = rollResults.filter((r) => r.success).length;
         const failureCount = rollResults.length - successCount;
@@ -1128,10 +1127,6 @@ Respond with JSON format:
         } else {
           decisionOutcome = 'mixed';
         }
-
-        decisionOutcomeSummary = `${successCount} success${
-          successCount === 1 ? '' : 'es'
-        }, ${failureCount} failure${failureCount === 1 ? '' : 's'}`;
       }
 
       // Fatal outcome check: Any failure on a critical decision ends the game
@@ -1217,7 +1212,6 @@ Respond with JSON format:
           // Merge skill check tags into metadata
           tags: [...(result.metadata.tags || []), ...skillCheckTags],
           decisionOutcome,
-          decisionOutcomeSummary,
         },
         sessionId, // Explicitly set sessionId
         worldId, // Explicitly set worldId

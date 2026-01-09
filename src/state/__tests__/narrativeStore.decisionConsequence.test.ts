@@ -229,7 +229,11 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
       const testCases = [
         { optionText: 'Attack the enemy', expected: 'You attack the enemy' },
         { optionText: 'Help them', expected: 'You help them' },
-        { optionText: 'Run away quickly', expected: 'You run away quickly' }
+        { optionText: 'Run away quickly', expected: 'You run away quickly' },
+        {
+          optionText: 'Provoke Borro with a pointed insult.',
+          expected: 'You provoke Borro with a pointed insult.'
+        }
       ];
 
       testCases.forEach(({ optionText, expected }) => {

@@ -60,10 +60,9 @@ describe('ChoiceOutcomeCallout', () => {
       <ChoiceOutcomeCallout
         {...defaultProps}
         decisionOutcome="success"
-        decisionOutcomeSummary="2 successes, 1 failure"
       />
     );
 
-    expect(screen.getByText('Success (2 successes, 1 failure)')).toBeInTheDocument();
+    expect(screen.getByText('Success')).toBeInTheDocument();
   });
 });

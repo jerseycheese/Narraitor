@@ -87,6 +87,5 @@ export const WithOutcome: Story = {
     decisionId: 'decision-7',
     decisionText: 'You slipped past the guards',
     decisionOutcome: 'success',
-    decisionOutcomeSummary: '2 successes, 0 failures',
   },
 };

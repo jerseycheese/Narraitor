@@ -232,7 +232,6 @@ export interface NarrativeMetadata {
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
   decisionOutcome?: DecisionOutcome;
-  decisionOutcomeSummary?: string;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }
