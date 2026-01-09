@@ -163,13 +163,9 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     expect(segmentType).toBeInTheDocument();
 
     // Badge should appear before segment type in DOM order
-    const badgeParent = badge.parentElement;
-    const segmentTypeElement = segmentType;
-
-    // Compare positions in the DOM
     const allElements = Array.from(container.querySelectorAll('*'));
     const badgeIndex = allElements.indexOf(badge);
-    const typeIndex = allElements.indexOf(segmentTypeElement);
+    const typeIndex = allElements.indexOf(segmentType);
 
     expect(badgeIndex).toBeLessThan(typeIndex);
   });

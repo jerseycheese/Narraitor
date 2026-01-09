@@ -144,7 +144,7 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
       const worldId = 'world-456';
 
       // Add decision but don't select an option
-      const decisionId = store.addDecision(sessionId, {
+      store.addDecision(sessionId, {
         prompt: 'What do you do?',
         options: [{ id: 'opt-1', text: 'Do something' }] as DecisionOption[]
       });
