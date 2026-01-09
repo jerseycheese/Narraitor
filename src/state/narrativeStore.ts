@@ -33,13 +33,15 @@ const normalizeDecisionText = (text: string) => {
   if (!trimmed) return '';
 
   const withoutYou = trimmed.replace(/^you\b\s*/i, '');
-  const firstChar = withoutYou.charAt(0);
+  const withoutChoose = withoutYou.replace(/^(choose|decide|decided|chose)\s+to\s+/i, '');
+  const withoutTo = withoutChoose.replace(/^to\s+/i, '');
+  const firstChar = withoutTo.charAt(0);
   const normalized =
     firstChar && /[A-Z]/.test(firstChar)
-      ? `${firstChar.toLowerCase()}${withoutYou.slice(1)}`
-      : withoutYou;
+      ? `${firstChar.toLowerCase()}${withoutTo.slice(1)}`
+      : withoutTo;
 
-  return `You ${normalized}`.trim();
+  return `You choose to ${normalized}`.trim();
 };
 
 const buildLocalEnding = ({

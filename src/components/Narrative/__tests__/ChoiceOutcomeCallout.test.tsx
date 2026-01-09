@@ -6,19 +6,19 @@ import { ChoiceOutcomeCallout } from '../ChoiceOutcomeCallout';
 describe('ChoiceOutcomeCallout', () => {
   const defaultProps = {
     decisionId: 'decision-123',
-    decisionText: 'You helped the merchant',
+    decisionText: 'You choose to help the merchant',
   };
 
   it('should display decision text', () => {
     render(<ChoiceOutcomeCallout {...defaultProps} />);
 
-    expect(screen.getByText(/You helped the merchant/)).toBeInTheDocument();
+    expect(screen.getByText(/You choose to help the merchant/)).toBeInTheDocument();
   });
 
   it('should render callout container with decision id', () => {
     render(<ChoiceOutcomeCallout {...defaultProps} />);
 
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-decision-id]');
+    const badge = screen.getByText(/You choose to help the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
   });
 
@@ -40,10 +40,10 @@ describe('ChoiceOutcomeCallout', () => {
 
   it('should handle various decision text formats', () => {
     const testCases = [
-      'You attacked the enemy',
-      'You helped them',
-      'You ran away quickly',
-      'You investigated the area',
+      'You choose to attack the enemy',
+      'You choose to help them',
+      'You choose to run away quickly',
+      'You choose to investigate the area',
     ];
 
     testCases.forEach((text) => {

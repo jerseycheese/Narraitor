@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     decisionId: 'decision-1',
-    decisionText: 'You helped the merchant',
+    decisionText: 'You choose to help the merchant',
   },
 };
 
@@ -35,27 +35,27 @@ export const VariousDecisionTexts: Story = {
       </div>
       <ChoiceOutcomeCallout
         decisionId="decision-1"
-        decisionText="You helped the merchant"
+        decisionText="You choose to help the merchant"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-2"
-        decisionText="You attacked the bandit"
+        decisionText="You choose to attack the bandit"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-3"
-        decisionText="You ran away quickly"
+        decisionText="You choose to run away quickly"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-4"
-        decisionText="You investigated the mysterious door"
+        decisionText="You choose to investigate the mysterious door"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-5"
-        decisionText="You convinced the guard to let you pass"
+        decisionText="You choose to convince the guard to let you pass"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-6"
-        decisionText="You took the hidden treasure"
+        decisionText="You choose to take the hidden treasure"
       />
     </div>
   ),
@@ -72,11 +72,11 @@ export const MobileView: Story = {
       </div>
       <ChoiceOutcomeCallout
         decisionId="decision-1"
-        decisionText="You helped the merchant"
+        decisionText="You choose to help the merchant"
       />
       <ChoiceOutcomeCallout
         decisionId="decision-2"
-        decisionText="You investigated the mysterious noise coming from behind the old wooden door"
+        decisionText="You choose to investigate the mysterious noise coming from behind the old wooden door"
       />
     </div>
   ),
@@ -85,7 +85,7 @@ export const MobileView: Story = {
 export const WithOutcome: Story = {
   args: {
     decisionId: 'decision-7',
-    decisionText: 'You slipped past the guards',
+    decisionText: 'You choose to slip past the guards',
     decisionOutcome: 'success',
   },
 };

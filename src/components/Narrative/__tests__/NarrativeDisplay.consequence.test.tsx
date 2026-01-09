@@ -49,14 +49,14 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
       metadata: {
         tags: [],
         causedByDecisionId: 'decision-1',
-        causedByDecisionText: 'You helped the merchant'
+        causedByDecisionText: 'You choose to help the merchant'
       }
     });
 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be visible
-    const badge = screen.getByText(/You helped the merchant/).closest('[data-decision-id]');
+    const badge = screen.getByText(/You choose to help the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
     expect(badge).toHaveAttribute('data-decision-id', 'decision-1');
   });
@@ -88,14 +88,14 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
       metadata: {
         tags: [],
         causedByDecisionId: 'decision-1',
-        causedByDecisionText: 'You looked around'
+        causedByDecisionText: 'You choose to look around'
       }
     });
 
     const { container } = render(<NarrativeDisplay segment={segment} />);
 
     // Find badge and narrative content elements
-    const badge = screen.getByText(/You looked around/).closest('[data-decision-id]');
+    const badge = screen.getByText(/You choose to look around/).closest('[data-decision-id]');
     const content = screen.getByTestId('narrative-content-container');
 
     expect(badge).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
       metadata: {
         tags: [],
         // Missing causedByDecisionId
-        causedByDecisionText: 'You did something'
+        causedByDecisionText: 'You choose to do something'
       }
     });
 
@@ -158,14 +158,14 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
         location: 'Old warehouse',
         mood: 'mysterious' as const,
         causedByDecisionId: 'decision-1',
-        causedByDecisionText: 'You investigated'
+        causedByDecisionText: 'You choose to investigate'
       }
     });
 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be shown
-    const badge = screen.getByText(/You investigated/).closest('[data-decision-id]');
+    const badge = screen.getByText(/You choose to investigate/).closest('[data-decision-id]');
     expect(badge).toHaveAttribute('data-decision-id', 'decision-1');
 
     // Other segment information should still be present
@@ -176,10 +176,10 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
 
   it('should work with different decision text formats', () => {
     const testTexts = [
-      'You helped the merchant',
-      'You attacked the enemy',
-      'You ran away quickly',
-      'You investigated the area',
+      'You choose to help the merchant',
+      'You choose to attack the enemy',
+      'You choose to run away quickly',
+      'You choose to investigate the area',
     ];
 
     testTexts.forEach((text) => {
@@ -210,7 +210,7 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
       metadata: {
         tags: [],
         causedByDecisionId: 'decision-1',
-        causedByDecisionText: 'You did something'
+        causedByDecisionText: 'You choose to do something'
       }
     });
 

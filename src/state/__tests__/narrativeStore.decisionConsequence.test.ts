@@ -66,7 +66,7 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
 
       expect(segment).toBeDefined();
       expect(segment.metadata.causedByDecisionId).toBe(decisionId);
-      expect(segment.metadata.causedByDecisionText).toBe('You help the merchant');
+      expect(segment.metadata.causedByDecisionText).toBe('You choose to help the merchant');
     });
 
     it('should handle first segment with no prior decision', () => {
@@ -213,13 +213,13 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
       const segment2 = updatedState.segments[segment2Id];
 
       expect(segment1.metadata.causedByDecisionId).toBe(decision1Id);
-      expect(segment1.metadata.causedByDecisionText).toBe('You help the merchant');
+      expect(segment1.metadata.causedByDecisionText).toBe('You choose to help the merchant');
 
       expect(segment2.metadata.causedByDecisionId).toBe(decision2Id);
-      expect(segment2.metadata.causedByDecisionText).toBe('You buy supplies');
+      expect(segment2.metadata.causedByDecisionText).toBe('You choose to buy supplies');
     });
 
-    it('should format decision text with "You" prefix', () => {
+    it('should format decision text with "You choose to" prefix', () => {
       const store = useNarrativeStore.getState();
       const sessionId = 'session-123';
       const worldId = 'world-456';
@@ -227,12 +227,12 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
 
       // Test various decision text formats
       const testCases = [
-        { optionText: 'Attack the enemy', expected: 'You attack the enemy' },
-        { optionText: 'Help them', expected: 'You help them' },
-        { optionText: 'Run away quickly', expected: 'You run away quickly' },
+        { optionText: 'Attack the enemy', expected: 'You choose to attack the enemy' },
+        { optionText: 'Help them', expected: 'You choose to help them' },
+        { optionText: 'Run away quickly', expected: 'You choose to run away quickly' },
         {
           optionText: 'Provoke Borro with a pointed insult.',
-          expected: 'You provoke Borro with a pointed insult.'
+          expected: 'You choose to provoke Borro with a pointed insult.'
         }
       ];
 
@@ -326,7 +326,7 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
       expect(segment.metadata.mood).toBe('mysterious');
       expect(segment.metadata.characterIds).toEqual([characterId]);
       expect(segment.metadata.causedByDecisionId).toBe(decisionId);
-      expect(segment.metadata.causedByDecisionText).toBe('You investigate');
+      expect(segment.metadata.causedByDecisionText).toBe('You choose to investigate');
     });
   });
 });
