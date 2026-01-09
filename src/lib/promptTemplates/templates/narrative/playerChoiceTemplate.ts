@@ -1,5 +1,6 @@
 import { NarrativeContext } from '@/types/narrative.types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { aiConfig } from '@/lib/config/aiConfig';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -59,7 +60,7 @@ ${shortContext}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create 5 distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create ${aiConfig.choiceGenerationCount} distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
@@ -115,25 +116,9 @@ Decision: What will you do?
 Context Summary: [Brief 1-2 sentence summary of the current situation that led to this decision]
 
 Options:
-1. [NEUTRAL] [First choice - action referencing specific story elements]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-2. [NEUTRAL] [Second choice - different approach to the situation] 
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-3. [LAWFUL] [Third choice - honorable/rule-following approach when appropriate]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-4. [CHAOTIC] [Fourth choice - unexpected/disruptive alternative when appropriate]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-5. [NEUTRAL] [Fifth choice - another distinct alternative]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
+${Array.from({ length: aiConfig.choiceGenerationCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
+   Hint: [Optional explanation]
+   Requirements: [Optional - SkillName X+]`).join('\n\n')}
 
 ALIGNMENT INSTRUCTIONS: 
 - Always include alignment tags [LAWFUL], [NEUTRAL], or [CHAOTIC] at the start of each choice

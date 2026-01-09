@@ -10,6 +10,7 @@ import { buildChoicePrompt } from './choiceGenerator.prompt';
 import { parseChoiceResponse } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
 import { calculateJaccardSimilarity } from '@/lib/utils/similarity';
+import { aiConfig } from '@/lib/config/aiConfig';
 
 /**
  * Parameters for choice generation
@@ -72,14 +73,13 @@ export class ChoiceGenerator {
       };
 
       // Deduplicate options using Jaccard similarity
-      const SIMILARITY_THRESHOLD = 0.7;
       const distinctOptions: typeof decision.options = [];
 
       for (const option of decision.options) {
         let isDuplicate = false;
         for (const existing of distinctOptions) {
           const score = calculateJaccardSimilarity(option.text, existing.text);
-          if (score > SIMILARITY_THRESHOLD) {
+          if (score > aiConfig.choiceSimilarityThreshold) {
             isDuplicate = true;
             metrics.discardedCount++;
             metrics.discardedChoices.push({

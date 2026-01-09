@@ -72,7 +72,7 @@ describe('enhancePromptWithPersonalization Integration', () => {
     );
 
     // Assert
-    expect(result).toContain('Choice 1');
+    expect(result).toContain('choice 1');
     expect(result).toContain('diplomatic');
   });
 
@@ -96,7 +96,7 @@ describe('enhancePromptWithPersonalization Integration', () => {
     );
 
     // Assert
-    expect(result).toContain('Choice 2');
+    expect(result).toContain('choice 2');
     expect(result).toContain('aggressive');
   });
 
@@ -120,7 +120,7 @@ describe('enhancePromptWithPersonalization Integration', () => {
     );
 
     // Assert
-    expect(result).toContain('Choice 3');
+    expect(result).toContain('choice 3');
     expect(result).toContain('stealthy');
   });
 

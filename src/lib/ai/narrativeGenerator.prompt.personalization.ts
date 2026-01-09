@@ -12,7 +12,8 @@ import {
 } from '@/lib/utils/worldStateFormatters';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import { type SimpleNarrativeContext, DECISION_CONTEXT_LIMIT } from './simpleDecisionRelevance';
+import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { aiConfig } from '@/lib/config/aiConfig';
 import { PersonalizationEngine } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
@@ -49,7 +50,7 @@ export const enhancePromptWithPersonalization = async (
     const currentContext: SimpleNarrativeContext = { worldId, sessionId };
     relevantDecisions = playerDecisionTracker.getHybridDecisions(
       currentContext,
-      DECISION_CONTEXT_LIMIT
+      aiConfig.decisionContextLimit
     );
     decisionHistory = formatDecisions(relevantDecisions);
 

@@ -2,6 +2,7 @@ import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { playerDecisionTracker } from '../playerDecisionTracker';
+import { aiConfig } from '@/lib/config/aiConfig';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {
@@ -121,7 +122,7 @@ describe('buildChoicePrompt', () => {
 
     expect(playerDecisionTracker.getHybridDecisions).toHaveBeenCalledWith(
       expect.anything(),
-      10
+      aiConfig.decisionContextLimit
     );
   });
 });

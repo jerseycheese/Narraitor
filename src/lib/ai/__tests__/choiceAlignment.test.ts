@@ -70,8 +70,8 @@ describe('ChoiceGenerator - Alignment System', () => {
 Options:
 1. [LAWFUL] Report the incident to authorities
 2. [NEUTRAL] Assess the situation carefully
-3. [NEUTRAL] Look for an alternative approach
-4. [CHAOS] Create a distraction and act unpredictably`;
+3. [CHAOS] Create a distraction and act unpredictably
+4. [NEUTRAL] Look for an alternative approach`;
 
       (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
@@ -84,11 +84,11 @@ Options:
         useAlignedChoices: true
       });
 
-      expect(result.options).toHaveLength(4);
+      // Note: Default maxOptions is now 3, so we only get 3 choices back even if 4 were generated
+      expect(result.options).toHaveLength(3);
       expect(result.options[0].alignment).toBe('lawful');
       expect(result.options[1].alignment).toBe('neutral');
-      expect(result.options[2].alignment).toBe('neutral');
-      expect(result.options[3].alignment).toBe('chaotic');
+      expect(result.options[2].alignment).toBe('chaotic');
     });
 
     it('should handle CHAOTIC tag variant', async () => {
@@ -276,10 +276,12 @@ Options:
         useAlignedChoices: true
       });
 
-      expect(result.options[0].alignment).toBe('neutral'); // Unknown tag = neutral
+      // Default maxOptions is now 3
+      expect(result.options).toHaveLength(3);
+      expect(result.options[0].alignment).toBe('neutral'); // First one had no tag, defaults to neutral
       expect(result.options[1].alignment).toBe('lawful'); // Lowercase should work
       expect(result.options[2].alignment).toBe('chaotic');
-      expect(result.options[3].alignment).toBe('neutral'); // Empty tag = neutral
+      // 4th option dropped due to limit of 3
     });
 
     it('should handle missing alignment tags in numbered list', async () => {

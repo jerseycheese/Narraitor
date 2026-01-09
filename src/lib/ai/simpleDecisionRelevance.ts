@@ -10,8 +10,7 @@
 
 import type { PlayerDecision } from '@/types/personalization.types';
 import type { EntityID } from '@/types/common.types';
-
-export const DECISION_CONTEXT_LIMIT = 10;
+import { aiConfig } from '@/lib/config/aiConfig';
 
 /**
  * Minimal context needed for filtering decisions
@@ -26,13 +25,13 @@ export interface SimpleNarrativeContext {
  *
  * @param decisions - All available decisions
  * @param context - Current narrative context (worldId, optional sessionId)
- * @param limit - Maximum number of decisions to return (default: 10)
+ * @param limit - Maximum number of decisions to return (default from config)
  * @returns Most recent decisions filtered by context
  */
 export function getMostRelevantDecisions(
   decisions: PlayerDecision[],
   context: SimpleNarrativeContext,
-  limit: number = 10
+  limit: number = aiConfig.decisionContextLimit
 ): PlayerDecision[] {
   return decisions
     .filter(d => d.worldId === context.worldId)

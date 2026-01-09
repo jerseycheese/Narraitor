@@ -7,7 +7,8 @@ import { getLoreContextForPrompt } from './loreContextHelper';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import { type SimpleNarrativeContext, DECISION_CONTEXT_LIMIT } from './simpleDecisionRelevance';
+import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { aiConfig } from '@/lib/config/aiConfig';
 import { formatSkillsForNarrative } from './attributeSkillFormatter';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
@@ -218,7 +219,7 @@ const enhancePromptWithDecisionHistory = (
 
     const decisions = playerDecisionTracker.getHybridDecisions(
       currentContext,
-      DECISION_CONTEXT_LIMIT
+      aiConfig.decisionContextLimit
     );
 
     if (decisions.length === 0) {

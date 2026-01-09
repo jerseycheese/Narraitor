@@ -31,6 +31,7 @@ import {
   getMostRelevantDecisions as getSimpleMostRelevantDecisions,
   type SimpleNarrativeContext
 } from './simpleDecisionRelevance';
+import { aiConfig } from '@/lib/config/aiConfig';
 
 /**
  * Interface for decision tracking configuration
@@ -324,7 +325,7 @@ export class PlayerDecisionTracker {
    */
   getHybridDecisions(
     context: SimpleNarrativeContext,
-    limit: number
+    limit: number = aiConfig.decisionContextLimit
   ): PlayerDecision[] {
     if (!context.sessionId) {
       return this.getRelevantDecisions(context, limit, { worldId: context.worldId });
