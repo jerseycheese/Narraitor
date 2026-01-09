@@ -172,10 +172,7 @@ await choiceGenerator.generateChoices({
 ```
 
 **How it works:**
-- Builds snapshot of current situation (location, characters, tags)
-- Scores past decisions by relevance (location matches, similar situations, character overlap)
-- Gets top 10 decisions and formats them by recency
-- Injects formatted history into AI prompt with instructions to match player patterns
+The choice generator grabs your recent decision history (up to 10 decisions) and includes it in the prompt when generating new options. The system prioritizes decisions from your current session first, then falls back to world-wide decisions if the session is new. Decisions are sorted by recency and formatted for the AI, which uses them to generate choices that feel consistent with how you've been playing.
 
 **Token budget:** ~500 tokens (10 decisions × ~50 tokens each) for choices.
 
