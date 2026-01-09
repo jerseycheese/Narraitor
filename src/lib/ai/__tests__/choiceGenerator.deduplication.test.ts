@@ -1,6 +1,7 @@
 import { ChoiceGenerator } from '../choiceGenerator';
 import { AIClient } from '../types';
 import { NarrativeContext } from '@/types/narrative.types';
+import { logger } from '@/lib/utils/logger';
 
 // Mock the AIClient
 const mockAIClient: jest.Mocked<AIClient> = {
@@ -44,7 +45,9 @@ describe('ChoiceGenerator Deduplication', () => {
     choiceGenerator = new ChoiceGenerator(mockAIClient);
   });
 
-  it('filters out semantically similar choices', async () => {
+  it('filters out semantically similar choices and logs metrics', async () => {
+    const infoSpy = jest.spyOn(logger, 'info');
+
     // Mock response with duplicates (Similarity > 0.7)
     // "Attack the dragon" tokens: {attack, the, dragon}
     // "Attack the dragon!" tokens: {attack, the, dragon} (punctuation removed) -> Sim: 1.0
@@ -83,5 +86,17 @@ describe('ChoiceGenerator Deduplication', () => {
     
     // Option 5: "Negotiate with it" (Kept - distinct)
     expect(result.options[2].text).toBe('Negotiate with it');
+
+    // Verify metrics
+    expect(infoSpy).toHaveBeenCalledWith('Choice Deduplication Metrics', expect.objectContaining({
+        generatedCount: 5,
+        discardedCount: 2,
+        finalUniqueCount: 3,
+        returnedCount: 3,
+        discardedChoices: expect.arrayContaining([
+            expect.objectContaining({ text: 'Attack the dragon!', duplicateOf: 'Attack the dragon' }),
+            expect.objectContaining({ text: 'Attack the dragon now', duplicateOf: 'Attack the dragon' })
+        ])
+    }));
   });
 });

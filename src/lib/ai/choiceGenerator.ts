@@ -60,6 +60,17 @@ export class ChoiceGenerator {
       
       const decision = parseChoiceResponse(response.content, narrativeContext, world);
 
+      // Metrics collection for Issue #1001
+      const metrics = {
+        worldId,
+        sessionId,
+        generatedCount: decision.options.length,
+        discardedCount: 0,
+        finalUniqueCount: 0,
+        returnedCount: 0,
+        discardedChoices: [] as Array<{ text: string; duplicateOf: string; score: number }>
+      };
+
       // Deduplicate options using Jaccard similarity
       const SIMILARITY_THRESHOLD = 0.7;
       const distinctOptions: typeof decision.options = [];
@@ -67,8 +78,15 @@ export class ChoiceGenerator {
       for (const option of decision.options) {
         let isDuplicate = false;
         for (const existing of distinctOptions) {
-          if (calculateJaccardSimilarity(option.text, existing.text) > SIMILARITY_THRESHOLD) {
+          const score = calculateJaccardSimilarity(option.text, existing.text);
+          if (score > SIMILARITY_THRESHOLD) {
             isDuplicate = true;
+            metrics.discardedCount++;
+            metrics.discardedChoices.push({
+              text: option.text,
+              duplicateOf: existing.text,
+              score
+            });
             logger.warn(`Discarding duplicate choice option: "${option.text}" (similar to "${existing.text}")`);
             break;
           }
@@ -77,6 +95,8 @@ export class ChoiceGenerator {
           distinctOptions.push(option);
         }
       }
+      
+      metrics.finalUniqueCount = distinctOptions.length;
       decision.options = distinctOptions;
 
       try {
@@ -104,6 +124,8 @@ export class ChoiceGenerator {
         decision.options = decision.options.slice(0, maxOptions);
       }
       
+      metrics.returnedCount = decision.options.length;
+      logger.info('Choice Deduplication Metrics', metrics);
       
       return decision;
     } catch (error) {
