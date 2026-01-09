@@ -9,8 +9,6 @@ import { logger } from '@/lib/utils/logger';
 import { buildChoicePrompt } from './choiceGenerator.prompt';
 import { parseChoiceResponse } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
-import { calculateJaccardSimilarity } from '@/lib/utils/similarity';
-import { aiConfig } from '@/lib/config/aiConfig';
 
 /**
  * Parameters for choice generation
@@ -39,7 +37,7 @@ export class ChoiceGenerator {
   async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
 
     try {
-      const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 3, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
+      const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
 
       const world = this.getWorld(worldId);
       const prompt = buildChoicePrompt({
@@ -60,44 +58,6 @@ export class ChoiceGenerator {
       }
       
       const decision = parseChoiceResponse(response.content, narrativeContext, world);
-
-      // Metrics collection for Issue #1001
-      const metrics = {
-        worldId,
-        sessionId,
-        generatedCount: decision.options.length,
-        discardedCount: 0,
-        finalUniqueCount: 0,
-        returnedCount: 0,
-        discardedChoices: [] as Array<{ text: string; duplicateOf: string; score: number }>
-      };
-
-      // Deduplicate options using Jaccard similarity
-      const distinctOptions: typeof decision.options = [];
-
-      for (const option of decision.options) {
-        let isDuplicate = false;
-        for (const existing of distinctOptions) {
-          const score = calculateJaccardSimilarity(option.text, existing.text);
-          if (score > aiConfig.choiceSimilarityThreshold) {
-            isDuplicate = true;
-            metrics.discardedCount++;
-            metrics.discardedChoices.push({
-              text: option.text,
-              duplicateOf: existing.text,
-              score
-            });
-            logger.warn(`Discarding duplicate choice option: "${option.text}" (similar to "${existing.text}")`);
-            break;
-          }
-        }
-        if (!isDuplicate) {
-          distinctOptions.push(option);
-        }
-      }
-      
-      metrics.finalUniqueCount = distinctOptions.length;
-      decision.options = distinctOptions;
 
       try {
         checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
@@ -123,10 +83,7 @@ export class ChoiceGenerator {
       if (decision.options.length > maxOptions) {
         decision.options = decision.options.slice(0, maxOptions);
       }
-      
-      metrics.returnedCount = decision.options.length;
-      logger.info('Choice Deduplication Metrics', metrics);
-      
+
       return decision;
     } catch (error) {
       const errorDetails = {

@@ -169,7 +169,6 @@ export function setupDecisionConsequencesMocks(
 
   mockPlayerDecisionTracker.getWorldDecisions.mockReturnValue(pastDecisions);
   mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(pastDecisions);
-  mockPlayerDecisionTracker.getHybridDecisions.mockReturnValue(pastDecisions);
 
   // Mock template manager
   (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(

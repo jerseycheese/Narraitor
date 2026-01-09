@@ -13,7 +13,6 @@ import {
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
-import { aiConfig } from '@/lib/config/aiConfig';
 import { PersonalizationEngine } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
@@ -47,12 +46,35 @@ export const enhancePromptWithPersonalization = async (
     >;
     let decisionHistory = '';
 
-    const currentContext: SimpleNarrativeContext = { worldId, sessionId };
-    relevantDecisions = playerDecisionTracker.getHybridDecisions(
-      currentContext,
-      aiConfig.decisionContextLimit
-    );
-    decisionHistory = formatDecisions(relevantDecisions);
+    if (sessionId) {
+      // Try session-specific decisions first
+      const currentContext: SimpleNarrativeContext = { worldId, sessionId };
+      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        currentContext,
+        10,
+        { worldId, sessionId }
+      );
+
+      // Fallback to world-wide decisions if session has none
+      if (relevantDecisions.length === 0) {
+        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+          currentContext,
+          10,
+          { worldId }
+        );
+      }
+
+      decisionHistory = formatDecisions(relevantDecisions);
+    } else {
+      // No session context - get world-wide decisions using relevance scoring
+      const currentContext: SimpleNarrativeContext = { worldId };
+      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        currentContext,
+        10,
+        { worldId }
+      );
+      decisionHistory = formatDecisions(relevantDecisions);
+    }
 
     const aiContext = sessionId
       ? await useAiContextStore.getState().buildContextForSession(sessionId)

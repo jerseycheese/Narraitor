@@ -2,7 +2,6 @@ import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { playerDecisionTracker } from '../playerDecisionTracker';
-import { aiConfig } from '@/lib/config/aiConfig';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {
@@ -31,7 +30,6 @@ jest.mock('../attributeSkillFormatter', () => ({
 jest.mock('../playerDecisionTracker', () => ({
   playerDecisionTracker: {
     getRelevantDecisions: jest.fn(() => [{ id: 'decision-1' }]),
-    getHybridDecisions: jest.fn(() => [{ id: 'decision-1' }]),
   },
 }));
 
@@ -109,7 +107,7 @@ describe('buildChoicePrompt', () => {
     expect(prompt).toContain('DECISION_HISTORY');
   });
 
-  it('calls getHybridDecisions with limit 10', () => {
+  it('calls getRelevantDecisions with limit 10', () => {
     const world = createMockWorld({ id: 'world-1' });
     buildChoicePrompt({
       world,
@@ -120,9 +118,10 @@ describe('buildChoicePrompt', () => {
       includeDecisionHistory: true,
     });
 
-    expect(playerDecisionTracker.getHybridDecisions).toHaveBeenCalledWith(
-      expect.anything(),
-      aiConfig.decisionContextLimit
+    expect(playerDecisionTracker.getRelevantDecisions).toHaveBeenCalledWith(
+      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
+      10,
+      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' })
     );
   });
 });

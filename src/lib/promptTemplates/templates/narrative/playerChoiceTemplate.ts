@@ -1,6 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
-import { aiConfig } from '@/lib/config/aiConfig';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -60,7 +59,7 @@ ${shortContext}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create ${aiConfig.choiceGenerationCount} distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create 4 distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
@@ -116,7 +115,7 @@ Decision: What will you do?
 Context Summary: [Brief 1-2 sentence summary of the current situation that led to this decision]
 
 Options:
-${Array.from({ length: aiConfig.choiceGenerationCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
+${Array.from({ length: 4 }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
    Hint: [Optional explanation]
    Requirements: [Optional - SkillName X+]`).join('\n\n')}
 

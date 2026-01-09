@@ -84,11 +84,11 @@ Options:
         useAlignedChoices: true
       });
 
-      // Note: Default maxOptions is now 3, so we only get 3 choices back even if 4 were generated
-      expect(result.options).toHaveLength(3);
+      expect(result.options).toHaveLength(4);
       expect(result.options[0].alignment).toBe('lawful');
       expect(result.options[1].alignment).toBe('neutral');
       expect(result.options[2].alignment).toBe('chaotic');
+      expect(result.options[3].alignment).toBe('neutral');
     });
 
     it('should handle CHAOTIC tag variant', async () => {
@@ -276,12 +276,11 @@ Options:
         useAlignedChoices: true
       });
 
-      // Default maxOptions is now 3
-      expect(result.options).toHaveLength(3);
-      expect(result.options[0].alignment).toBe('neutral'); // First one had no tag, defaults to neutral
+      expect(result.options).toHaveLength(4);
+      expect(result.options[0].alignment).toBe('neutral'); // Unknown tag defaults to neutral
       expect(result.options[1].alignment).toBe('lawful'); // Lowercase should work
       expect(result.options[2].alignment).toBe('chaotic');
-      // 4th option dropped due to limit of 3
+      expect(result.options[3].alignment).toBe('neutral'); // Empty tag defaults to neutral
     });
 
     it('should handle missing alignment tags in numbered list', async () => {

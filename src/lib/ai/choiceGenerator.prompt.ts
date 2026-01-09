@@ -8,7 +8,6 @@ import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuild
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
-import { aiConfig } from '@/lib/config/aiConfig';
 import { formatSkillsForNarrative } from './attributeSkillFormatter';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
@@ -217,10 +216,19 @@ const enhancePromptWithDecisionHistory = (
   try {
     const currentContext: SimpleNarrativeContext = { worldId, sessionId };
 
-    const decisions = playerDecisionTracker.getHybridDecisions(
+    let decisions = playerDecisionTracker.getRelevantDecisions(
       currentContext,
-      aiConfig.decisionContextLimit
+      10,
+      { worldId, sessionId }
     );
+
+    if (decisions.length === 0) {
+      decisions = playerDecisionTracker.getRelevantDecisions(
+        currentContext,
+        10,
+        { worldId }
+      );
+    }
 
     if (decisions.length === 0) {
       return prompt;

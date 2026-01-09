@@ -31,7 +31,6 @@ import {
   getMostRelevantDecisions as getSimpleMostRelevantDecisions,
   type SimpleNarrativeContext
 } from './simpleDecisionRelevance';
-import { aiConfig } from '@/lib/config/aiConfig';
 
 /**
  * Interface for decision tracking configuration
@@ -318,54 +317,6 @@ export class PlayerDecisionTracker {
       maxDecisions
     );
   }
-
-  /**
-   * Gets most relevant decisions with padding
-   * Prioritizes session decisions, then fills remaining slots with world decisions
-   */
-  getHybridDecisions(
-    context: SimpleNarrativeContext,
-    limit: number = aiConfig.decisionContextLimit
-  ): PlayerDecision[] {
-    if (!context.sessionId) {
-      return this.getRelevantDecisions(context, limit, { worldId: context.worldId });
-    }
-
-    // 1. Get session decisions
-    const sessionDecisions = this.getRelevantDecisions(
-      context,
-      limit,
-      { worldId: context.worldId, sessionId: context.sessionId }
-    );
-
-    if (sessionDecisions.length >= limit) {
-      return sessionDecisions;
-    }
-
-    // 2. Padding needed
-    const existingIds = new Set(sessionDecisions.map(d => d.id));
-    
-    // Fetch extra world decisions to ensure we find unique ones
-    const worldDecisions = this.getRelevantDecisions(
-      { worldId: context.worldId }, 
-      limit * 2, 
-      { worldId: context.worldId }
-    );
-
-    for (const decision of worldDecisions) {
-      if (sessionDecisions.length >= limit) break;
-      if (!existingIds.has(decision.id)) {
-        sessionDecisions.push(decision);
-        existingIds.add(decision.id);
-      }
-    }
-
-    // 3. Re-sort by timestamp to ensure chronological order in the final list
-    return sessionDecisions.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
-  }
-
 
   /**
    * Calculates choice distribution
