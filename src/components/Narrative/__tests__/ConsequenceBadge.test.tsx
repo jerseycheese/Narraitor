@@ -20,62 +20,57 @@ describe('ConsequenceBadge', () => {
   it('should show lightning icon with decision text', () => {
     render(<ConsequenceBadge {...defaultProps} />);
 
-    // Check for badge with aria-label and verify content includes both emoji and text
-    const badge = screen.getByLabelText('Immediate consequence');
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
     expect(badge).toBeInTheDocument();
-    expect(badge.textContent).toContain('⚡');
-    expect(badge.textContent).toContain('You helped the merchant');
+    expect(screen.getByText('⚡')).toBeInTheDocument();
+    expect(screen.getByText('Immediate')).toBeInTheDocument();
   });
 
   it('should use info-static variant for immediate consequences (segment index 0)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={0} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={0} />);
 
-    // info-static uses bg-blue-700 (from badge.tsx line 26)
-    const badge = container.querySelector('.bg-blue-700');
-    expect(badge).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'immediate');
   });
 
   it('should use info-static variant for immediate consequences (segment index 1)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={1} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={1} />);
 
-    const badge = container.querySelector('.bg-blue-700');
-    expect(badge).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'immediate');
   });
 
   it('should use info-static variant for immediate consequences (segment index 2)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={2} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={2} />);
 
-    const badge = container.querySelector('.bg-blue-700');
-    expect(badge).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'immediate');
   });
 
   it('should use secondary-static variant for longer-term consequences (segment index 3)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
 
-    // secondary-static uses bg-gray-100 (from badge.tsx line 30)
-    const badge = container.querySelector('.bg-gray-100');
-    expect(badge).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
   });
 
   it('should use secondary-static variant for longer-term consequences (segment index 5)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={5} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={5} />);
 
-    const badge = container.querySelector('.bg-gray-100');
-    expect(badge).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
   });
 
-  it('should have correct ARIA label for immediate consequences', () => {
+  it('should include timing label for immediate consequences', () => {
     render(<ConsequenceBadge {...defaultProps} distanceFromDecision={1} />);
 
-    const badge = screen.getByLabelText('Immediate consequence');
-    expect(badge).toBeInTheDocument();
+    expect(screen.getByText('Immediate')).toBeInTheDocument();
   });
 
-  it('should have correct ARIA label for longer-term consequences', () => {
+  it('should include timing label for longer-term consequences', () => {
     render(<ConsequenceBadge {...defaultProps} distanceFromDecision={3} />);
 
-    const badge = screen.getByLabelText('Consequence');
-    expect(badge).toBeInTheDocument();
+    expect(screen.getByText('Longer-term')).toBeInTheDocument();
   });
 
   it('should use small size variant', () => {
@@ -121,11 +116,10 @@ describe('ConsequenceBadge', () => {
   });
 
   it('should default to longer-term when distance is unknown (-1)', () => {
-    const { container } = render(<ConsequenceBadge {...defaultProps} distanceFromDecision={-1} />);
+    render(<ConsequenceBadge {...defaultProps} distanceFromDecision={-1} />);
 
-    // Should use secondary-static (gray) when distance can't be determined
-    const badge = container.querySelector('.bg-gray-100');
-    expect(badge).toBeInTheDocument();
-    expect(screen.getByLabelText('Consequence')).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'longer-term');
+    expect(screen.getByText('Longer-term')).toBeInTheDocument();
   });
 });

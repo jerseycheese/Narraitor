@@ -3,6 +3,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntityID } from '@/types/common.types';
+import { cn } from '@/lib/utils';
 
 interface ConsequenceBadgeProps {
   decisionId: EntityID;
@@ -16,6 +17,7 @@ interface ConsequenceBadgeProps {
  * (Issue #971 - Show decision consequences in narrative UI)
  */
 export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
+  decisionId,
   decisionText,
   distanceFromDecision,
   className,
@@ -24,16 +26,21 @@ export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
   // If distance is unknown (-1), default to longer-term (more conservative)
   const isImmediate = distanceFromDecision >= 0 && distanceFromDecision <= 2;
   const variant = isImmediate ? 'info-static' : 'secondary-static';
-  const label = isImmediate ? 'Immediate consequence' : 'Consequence';
+  const timingLabel = isImmediate ? 'Immediate' : 'Longer-term';
+  const timingIcon = isImmediate ? '⚡' : '⏳';
 
   return (
     <Badge
       variant={variant}
       size="sm"
-      className={className}
-      aria-label={label}
+      className={cn('consequence-badge gap-1', className)}
+      data-consequence={isImmediate ? 'immediate' : 'longer-term'}
+      data-decision-id={decisionId}
     >
-      ⚡ {decisionText}
+      <span aria-hidden="true">{timingIcon}</span>
+      <span className="text-[10px] uppercase tracking-wide">{timingLabel}</span>
+      <span className="sr-only">consequence:</span>
+      <span>{decisionText}</span>
     </Badge>
   );
 };

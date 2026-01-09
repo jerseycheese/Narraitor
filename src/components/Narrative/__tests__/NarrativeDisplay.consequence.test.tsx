@@ -56,8 +56,9 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be visible
-    expect(screen.getByText(/You helped the merchant/)).toBeInTheDocument();
-    expect(screen.getByLabelText('Immediate consequence')).toBeInTheDocument();
+    const badge = screen.getByText(/You helped the merchant/).closest('[data-consequence]');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute('data-consequence', 'immediate');
   });
 
   it('should not show badge when no decision link exists', () => {
@@ -75,8 +76,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // No badge should be visible
-    expect(screen.queryByLabelText('Immediate consequence')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Consequence')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
   });
 
   it('should show immediate consequence badge for early segments (index 0-2)', () => {
@@ -101,10 +101,8 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
       const { unmount } = render(<NarrativeDisplay segment={segment} />);
 
-      // Should show immediate consequence badge (info-static = blue)
-      const badge = screen.getByLabelText('Immediate consequence');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-blue-700');
+      const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
+      expect(badge).toHaveAttribute('data-consequence', 'immediate');
 
       unmount();
     });
@@ -131,10 +129,8 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
       const { unmount } = render(<NarrativeDisplay segment={segment} />);
 
-      // Should show longer-term consequence badge (secondary-static = gray)
-      const badge = screen.getByLabelText('Consequence');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-gray-100');
+      const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
+      expect(badge).toHaveAttribute('data-consequence', 'longer-term');
 
       unmount();
     });
@@ -156,7 +152,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     const { container } = render(<NarrativeDisplay segment={segment} />);
 
     // Find badge and segment type elements
-    const badge = screen.getByLabelText('Immediate consequence');
+    const badge = screen.getByText(/You looked around/).closest('[data-consequence]');
     const segmentType = screen.getByText('action');
 
     expect(badge).toBeInTheDocument();
@@ -186,7 +182,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
     const { unmount: unmount1 } = render(<NarrativeDisplay segment={segment1} />);
     // Should not show badge (both fields required)
-    expect(screen.queryByLabelText('Immediate consequence')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
     unmount1();
 
     // Only causedByDecisionText, no ID
@@ -204,7 +200,7 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
 
     const { unmount: unmount2 } = render(<NarrativeDisplay segment={segment2} />);
     // Should not show badge (both fields required)
-    expect(screen.queryByLabelText('Immediate consequence')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-consequence]')).not.toBeInTheDocument();
     unmount2();
   });
 
@@ -226,7 +222,8 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
     render(<NarrativeDisplay segment={segment} />);
 
     // Badge should be shown
-    expect(screen.getByLabelText('Immediate consequence')).toBeInTheDocument();
+    const badge = screen.getByText(/You investigated/).closest('[data-consequence]');
+    expect(badge).toHaveAttribute('data-consequence', 'immediate');
 
     // Other segment information should still be present
     expect(screen.getByText('action')).toBeInTheDocument();

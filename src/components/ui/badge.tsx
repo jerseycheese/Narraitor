@@ -5,33 +5,33 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-blue-700 text-white hover:bg-blue-900",
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
         secondary:
-          "border-transparent bg-gray-100 text-gray-900 hover:bg-gray-300",
+          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
         destructive:
-          "border-transparent bg-destructive text-white hover:bg-destructive/90",
-        outline: "text-gray-900 border border-gray-300 bg-white hover:bg-gray-100",
-        "outline-static": "text-gray-900 border border-gray-300 bg-white",
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "text-foreground border border-border bg-background hover:bg-muted",
+        "outline-static": "text-foreground border border-border bg-background",
         // Entity badge variants
-        success: "border-transparent bg-green-500 text-white hover:bg-green-700",
-        warning: "border-transparent bg-amber-500 text-white hover:bg-amber-700",
-        info: "border-transparent bg-blue-700 text-white hover:bg-blue-900",
+        success: "border-transparent bg-success text-success-foreground hover:bg-success/90",
+        warning: "border-transparent bg-warning text-warning-foreground hover:bg-warning/90",
+        info: "border-transparent bg-info text-info-foreground hover:bg-info/90",
         // Static entity badge variants (no hover states)
-        "success-static": "border-transparent bg-green-500 text-white",
-        "info-static": "border-transparent bg-blue-700 text-white",
-        "default-static": "border-transparent bg-gray-700 text-white",
-        "warning-static": "border-transparent bg-amber-500 text-white",
-        "destructive-static": "border-transparent bg-destructive text-white",
-        "secondary-static": "border-transparent bg-gray-100 text-gray-900",
+        "success-static": "border-transparent bg-success text-success-foreground",
+        "info-static": "border-transparent bg-info text-info-foreground",
+        "default-static": "border-transparent bg-secondary text-secondary-foreground",
+        "warning-static": "border-transparent bg-warning text-warning-foreground",
+        "destructive-static": "border-transparent bg-destructive text-destructive-foreground",
+        "secondary-static": "border-transparent bg-muted text-muted-foreground",
         // Skill requirement variants
-        available: "border-transparent bg-green-200 text-green-700 hover:bg-green-500",
+        available: "border-transparent bg-success/20 text-success hover:bg-success/30",
         unavailable: "border-transparent bg-destructive/10 text-destructive hover:bg-destructive/20",
-        "skill-requirement": "border border-gray-300 bg-gray-100 text-gray-700",
+        "skill-requirement": "border border-border bg-muted text-muted-foreground",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",

@@ -32,7 +32,7 @@ export const Default: Story = {
 };
 
 /**
- * Immediate consequences (0-2 segments from decision) use info-static variant (blue)
+ * Immediate consequences (0-2 segments from decision) use info-static variant
  */
 export const ImmediateConsequences: Story = {
   render: () => (
@@ -60,7 +60,7 @@ export const ImmediateConsequences: Story = {
 };
 
 /**
- * Longer-term consequences (3+ segments from decision) use secondary-static variant (gray)
+ * Longer-term consequences (3+ segments from decision) use secondary-static variant
  */
 export const LongerTermConsequences: Story = {
   render: () => (
