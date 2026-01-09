@@ -17,16 +17,26 @@ describe('NarrativeDisplay - Consequence Badge Integration (Issue #971)', () => 
       npcs: {},
     }));
 
-    // Mock narrative store with session segments for index calculation
+    // Mock narrative store with session segments and segment data for distance calculation
+    const mockSegments = {
+      'seg-0': { metadata: { causedByDecisionId: 'decision-1' } },
+      'seg-1': { metadata: { causedByDecisionId: 'decision-1' } },
+      'seg-2': { metadata: { causedByDecisionId: 'decision-1' } },
+      'seg-3': { metadata: { causedByDecisionId: 'decision-1' } },
+      'seg-4': { metadata: { causedByDecisionId: 'decision-1' } },
+    };
+
     (useNarrativeStore as unknown as jest.Mock).mockReturnValue({
       sessionSegments: {
         'session-123': ['seg-0', 'seg-1', 'seg-2', 'seg-3', 'seg-4']
       },
+      segments: mockSegments,
     });
     (useNarrativeStore.getState as jest.Mock) = jest.fn(() => ({
       sessionSegments: {
         'session-123': ['seg-0', 'seg-1', 'seg-2', 'seg-3', 'seg-4']
       },
+      segments: mockSegments,
     }));
   });
 

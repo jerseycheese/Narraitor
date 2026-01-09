@@ -10,9 +10,9 @@ const meta: Meta<typeof ConsequenceBadge> = {
     layout: 'centered',
   },
   argTypes: {
-    segmentIndex: {
+    distanceFromDecision: {
       control: { type: 'range', min: 0, max: 10, step: 1 },
-      description: 'Segment index determines immediate (0-2) vs longer-term (3+) appearance',
+      description: 'Distance from decision determines immediate (0-2) vs longer-term (3+) appearance',
     },
   },
 };
@@ -27,12 +27,12 @@ export const Default: Story = {
   args: {
     decisionId: 'decision-1',
     decisionText: 'You helped the merchant',
-    segmentIndex: 1,
+    distanceFromDecision: 1,
   },
 };
 
 /**
- * Immediate consequences (index 0-2) use info-static variant (blue)
+ * Immediate consequences (0-2 segments from decision) use info-static variant (blue)
  */
 export const ImmediateConsequences: Story = {
   render: () => (
@@ -43,24 +43,24 @@ export const ImmediateConsequences: Story = {
       <ConsequenceBadge
         decisionId="decision-1"
         decisionText="You helped the merchant"
-        segmentIndex={0}
+        distanceFromDecision={0}
       />
       <ConsequenceBadge
         decisionId="decision-2"
         decisionText="You investigated the noise"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-3"
         decisionText="You attacked the enemy"
-        segmentIndex={2}
+        distanceFromDecision={2}
       />
     </div>
   ),
 };
 
 /**
- * Longer-term consequences (index 3+) use secondary-static variant (gray)
+ * Longer-term consequences (3+ segments from decision) use secondary-static variant (gray)
  */
 export const LongerTermConsequences: Story = {
   render: () => (
@@ -71,17 +71,17 @@ export const LongerTermConsequences: Story = {
       <ConsequenceBadge
         decisionId="decision-4"
         decisionText="You helped the merchant"
-        segmentIndex={3}
+        distanceFromDecision={3}
       />
       <ConsequenceBadge
         decisionId="decision-5"
         decisionText="You investigated the noise"
-        segmentIndex={5}
+        distanceFromDecision={5}
       />
       <ConsequenceBadge
         decisionId="decision-6"
         decisionText="You spared the enemy"
-        segmentIndex={10}
+        distanceFromDecision={10}
       />
     </div>
   ),
@@ -99,32 +99,32 @@ export const VariousDecisionTexts: Story = {
       <ConsequenceBadge
         decisionId="decision-1"
         decisionText="You helped the merchant"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-2"
         decisionText="You attacked the bandit"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-3"
         decisionText="You ran away quickly"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-4"
         decisionText="You investigated the mysterious door"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-5"
         decisionText="You convinced the guard to let you pass"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-6"
         decisionText="You took the hidden treasure"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
     </div>
   ),
@@ -144,7 +144,7 @@ export const TransitionFromImmediateToLongerTerm: Story = {
         <ConsequenceBadge
           decisionId="decision-1"
           decisionText="You helped the merchant"
-          segmentIndex={0}
+          distanceFromDecision={0}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -152,7 +152,7 @@ export const TransitionFromImmediateToLongerTerm: Story = {
         <ConsequenceBadge
           decisionId="decision-1"
           decisionText="You helped the merchant"
-          segmentIndex={2}
+          distanceFromDecision={2}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -160,7 +160,7 @@ export const TransitionFromImmediateToLongerTerm: Story = {
         <ConsequenceBadge
           decisionId="decision-1"
           decisionText="You helped the merchant"
-          segmentIndex={3}
+          distanceFromDecision={3}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -168,7 +168,7 @@ export const TransitionFromImmediateToLongerTerm: Story = {
         <ConsequenceBadge
           decisionId="decision-1"
           decisionText="You helped the merchant"
-          segmentIndex={7}
+          distanceFromDecision={7}
         />
       </div>
     </div>
@@ -187,12 +187,12 @@ export const MobileView: Story = {
       <ConsequenceBadge
         decisionId="decision-1"
         decisionText="You helped the merchant"
-        segmentIndex={1}
+        distanceFromDecision={1}
       />
       <ConsequenceBadge
         decisionId="decision-2"
         decisionText="You investigated the mysterious noise coming from behind the old wooden door"
-        segmentIndex={3}
+        distanceFromDecision={3}
       />
     </div>
   ),

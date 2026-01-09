@@ -7,7 +7,7 @@ import { EntityID } from '@/types/common.types';
 interface ConsequenceBadgeProps {
   decisionId: EntityID;
   decisionText: string;
-  segmentIndex: number;
+  distanceFromDecision: number;
   className?: string;
 }
 
@@ -17,11 +17,12 @@ interface ConsequenceBadgeProps {
  */
 export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
   decisionText,
-  segmentIndex,
+  distanceFromDecision,
   className,
 }) => {
   // Immediate = 0-2 segments from decision, Longer-term = 3+
-  const isImmediate = segmentIndex <= 2;
+  // If distance is unknown (-1), default to longer-term (more conservative)
+  const isImmediate = distanceFromDecision >= 0 && distanceFromDecision <= 2;
   const variant = isImmediate ? 'info-static' : 'secondary-static';
   const label = isImmediate ? 'Immediate consequence' : 'Consequence';
 

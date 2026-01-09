@@ -34,11 +34,30 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getById = useNPCStore((state) => state.getById);
   const { settings } = useDevTools();
 
-  // Helper function to get segment index for consequence badge (Issue #971)
-  const getSegmentIndex = (segmentId: EntityID, sessionId: EntityID | undefined): number => {
+  // Helper function to get segment distance from decision for consequence badge (Issue #971)
+  const getSegmentDistanceFromDecision = (
+    segmentId: EntityID,
+    decisionId: EntityID,
+    sessionId: EntityID | undefined
+  ): number => {
     if (!sessionId) return -1;
-    const sessionSegments = useNarrativeStore.getState().sessionSegments[sessionId] || [];
-    return sessionSegments.indexOf(segmentId);
+
+    const state = useNarrativeStore.getState();
+    const sessionSegments = state.sessionSegments[sessionId] || [];
+    const segments = state.segments;
+
+    const currentIndex = sessionSegments.indexOf(segmentId);
+    if (currentIndex === -1) return -1;
+
+    // Find the first segment that references this decision
+    const firstDecisionSegmentIndex = sessionSegments.findIndex(id =>
+      segments[id]?.metadata?.causedByDecisionId === decisionId
+    );
+
+    if (firstDecisionSegmentIndex === -1) return -1;
+
+    // Return distance from the first segment caused by this decision
+    return currentIndex - firstDecisionSegmentIndex;
   };
 
   const getSegmentStyles = (type: string) => {
@@ -188,7 +207,11 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
             <ConsequenceBadge
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
-              segmentIndex={getSegmentIndex(resolvedSegment.id, resolvedSegment.sessionId)}
+              distanceFromDecision={getSegmentDistanceFromDecision(
+                resolvedSegment.id,
+                resolvedSegment.metadata.causedByDecisionId,
+                resolvedSegment.sessionId
+              )}
             />
           </div>
         )}
