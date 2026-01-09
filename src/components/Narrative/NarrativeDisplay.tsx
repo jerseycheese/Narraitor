@@ -173,36 +173,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           </div>
         )}
 
-        {participants.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Characters Present
-            </p>
-            <div
-              className="mt-2 flex flex-wrap gap-2"
-              role="list"
-              aria-label="Characters present in this scene"
-            >
-              {participants.map((participant) => (
-                <div
-                  key={participant.id}
-                  className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
-                  role="listitem"
-                >
-                  <NarrativeCharacterAvatar
-                    name={participant.name}
-                    avatarUrl={participant.avatarUrl}
-                    size="sm"
-                  />
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {participant.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {isDialogue && speakerId && speakerName && (
           <div className="mb-3 flex items-center gap-2">
             <NarrativeCharacterAvatar
@@ -221,11 +191,42 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
           highlightTerms={highlightTerms}
         />
-        {resolvedSegment.metadata?.location && (
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-sm text-muted-foreground">
-              {resolvedSegment.metadata?.location}
-            </p>
+        {(participants.length > 0 || resolvedSegment.metadata?.location) && (
+          <div className="mt-4 pt-4 border-t border-border space-y-3">
+            {resolvedSegment.metadata?.location && (
+              <p className="text-sm text-muted-foreground">
+                {resolvedSegment.metadata?.location}
+              </p>
+            )}
+            {participants.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Characters Present
+                </p>
+                <div
+                  className="mt-2 flex flex-wrap gap-2"
+                  role="list"
+                  aria-label="Characters present in this scene"
+                >
+                  {participants.map((participant) => (
+                    <div
+                      key={participant.id}
+                      className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
+                      role="listitem"
+                    >
+                      <NarrativeCharacterAvatar
+                        name={participant.name}
+                        avatarUrl={participant.avatarUrl}
+                        size="sm"
+                      />
+                      <span className="text-sm font-medium text-muted-foreground">
+                        {participant.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
