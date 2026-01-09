@@ -27,9 +27,7 @@ export const ConsequenceBadge: React.FC<ConsequenceBadgeProps> = ({
       )}
       data-decision-id={decisionId}
     >
-      <span className="font-semibold">Consequence</span>
-      <span className="sr-only">:</span>
-      <span className="ml-2">{decisionText}</span>
+      <span>{decisionText}</span>
     </div>
   );
 };
