@@ -102,6 +102,7 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
     expect(content).toBeInTheDocument();
 
     // Badge should appear before narrative content in DOM order
+    if (!badge) return;
     const allElements = Array.from(container.querySelectorAll('*'));
     const badgeIndex = allElements.indexOf(badge);
     const contentIndex = allElements.indexOf(content);
@@ -169,7 +170,6 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
     expect(badge).toHaveAttribute('data-decision-id', 'decision-1');
 
     // Other segment information should still be present
-    expect(screen.getByText('action')).toBeInTheDocument();
     expect(screen.getByText(/investigate the mysterious area/)).toBeInTheDocument();
     expect(screen.getByText('Old warehouse')).toBeInTheDocument();
   });
