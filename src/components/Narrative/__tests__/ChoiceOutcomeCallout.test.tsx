@@ -65,4 +65,17 @@ describe('ChoiceOutcomeCallout', () => {
 
     expect(screen.getByText('Success')).toBeInTheDocument();
   });
+
+  it('should switch to attempt phrasing for failed outcomes', () => {
+    render(
+      <ChoiceOutcomeCallout
+        {...defaultProps}
+        decisionOutcome="failure"
+      />
+    );
+
+    expect(
+      screen.getByText(/You attempt to help the merchant/)
+    ).toBeInTheDocument();
+  });
 });
