@@ -59,12 +59,18 @@ ${shortContext}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create 3-4 distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create 5 distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
 4. Consider both the immediate situation AND the broader story context
 5. Include variety in character alignment approaches when possible
+
+NEGATIVE CONSTRAINTS (CRITICAL):
+- ENSURE each option represents a distinct physical or social action (e.g., Talk vs. Attack vs. Investigate). Do not just rephrase the same action with different attitudes.
+- If offering an "Inspect" option, do not offer another "Look" or "Examine" option unless it targets a completely different object.
+- AVOID generating synonyms. "Check the door" and "Try the handle" are the same action. Pick one.
+- DIVERSIFY the verbs used (e.g., don't start 3 choices with "Ask").
 
 ALIGNMENT VARIETY (when appropriate):
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
@@ -122,6 +128,10 @@ Options:
    Requirements: [Optional - SkillName X+]
 
 4. [CHAOTIC] [Fourth choice - unexpected/disruptive alternative when appropriate]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+5. [NEUTRAL] [Fifth choice - another distinct alternative]
    Hint: [Optional explanation of the choice]
    Requirements: [Optional - SkillName X+]
 

@@ -9,6 +9,7 @@ import { logger } from '@/lib/utils/logger';
 import { buildChoicePrompt } from './choiceGenerator.prompt';
 import { parseChoiceResponse } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
+import { calculateJaccardSimilarity } from '@/lib/utils/similarity';
 
 /**
  * Parameters for choice generation
@@ -58,6 +59,25 @@ export class ChoiceGenerator {
       }
       
       const decision = parseChoiceResponse(response.content, narrativeContext, world);
+
+      // Deduplicate options using Jaccard similarity
+      const SIMILARITY_THRESHOLD = 0.7;
+      const distinctOptions: typeof decision.options = [];
+
+      for (const option of decision.options) {
+        let isDuplicate = false;
+        for (const existing of distinctOptions) {
+          if (calculateJaccardSimilarity(option.text, existing.text) > SIMILARITY_THRESHOLD) {
+            isDuplicate = true;
+            logger.warn(`Discarding duplicate choice option: "${option.text}" (similar to "${existing.text}")`);
+            break;
+          }
+        }
+        if (!isDuplicate) {
+          distinctOptions.push(option);
+        }
+      }
+      decision.options = distinctOptions;
 
       try {
         checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
