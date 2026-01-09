@@ -240,51 +240,63 @@ test.describe('Game Session Visual Tests', () => {
         // Create segments to test all narrative segment types: scene, dialogue, action, transition
         const cyberpunkSegments = [
           {
-            id: 'segment-cyberpunk-1',
             worldId: 'world-cyberpunk-2077',
-            sessionId: 'session-cyberpunk-ghost',
             content: 'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
             type: 'scene',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'tense', location: 'Neo-Tokyo streets', timeOfDay: 'night', tags: [] },
+            metadata: {
+              mood: 'tense',
+              location: 'Neo-Tokyo streets',
+              tags: [],
+              characterIds: ['char-cyberpunk-hacker']
+            },
             timestamp: new Date('2024-01-01T02:00:00.000Z'),
-            createdAt: '2024-01-01T02:00:00.000Z',
             updatedAt: '2024-01-01T02:00:00.000Z'
           },
           {
-            id: 'segment-cyberpunk-2',
             worldId: 'world-cyberpunk-2077',
-            sessionId: 'session-cyberpunk-ghost',
             content: '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
             type: 'dialogue',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'mysterious', location: 'Neo-Tokyo alley', timeOfDay: 'night', tags: [] },
+            metadata: {
+              mood: 'mysterious',
+              location: 'Neo-Tokyo alley',
+              tags: [],
+              characterIds: ['char-cyberpunk-hacker', 'npc-fixer']
+            },
             timestamp: new Date('2024-01-01T02:01:00.000Z'),
-            createdAt: '2024-01-01T02:01:00.000Z',
             updatedAt: '2024-01-01T02:01:00.000Z'
           },
           {
-            id: 'segment-cyberpunk-3',
             worldId: 'world-cyberpunk-2077',
-            sessionId: 'session-cyberpunk-ghost',
-            content: 'You slip through the service entrance, your hacking tools making quick work of the electronic lock. Inside, the building hums with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+            content: 'You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
             type: 'action',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'action', location: 'Arasaka building interior', timeOfDay: 'night', tags: [] },
+            metadata: {
+              mood: 'action',
+              location: 'Arasaka building interior',
+              tags: [],
+              characterIds: ['char-cyberpunk-hacker'],
+              causedByDecisionId: 'decision-cyberpunk-route',
+              causedByDecisionText:
+                'You choose to crawl through the ventilation system - stealthy but difficult',
+              decisionOutcome: 'success'
+            },
             timestamp: new Date('2024-01-01T02:02:00.000Z'),
-            createdAt: '2024-01-01T02:02:00.000Z',
             updatedAt: '2024-01-01T02:02:00.000Z'
           },
           {
-            id: 'segment-cyberpunk-4',
             worldId: 'world-cyberpunk-2077',
-            sessionId: 'session-cyberpunk-ghost',
             content: 'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
             type: 'transition',
             characterIds: ['char-cyberpunk-hacker'],
-            metadata: { mood: 'neutral', location: 'Arasaka building', timeOfDay: 'night', tags: [] },
+            metadata: {
+              mood: 'neutral',
+              location: 'Arasaka building',
+              tags: [],
+              characterIds: ['char-cyberpunk-hacker', 'npc-fixer']
+            },
             timestamp: new Date('2024-01-01T02:03:00.000Z'),
-            createdAt: '2024-01-01T02:03:00.000Z',
             updatedAt: '2024-01-01T02:03:00.000Z'
           }
         ];
@@ -296,7 +308,7 @@ test.describe('Game Session Visual Tests', () => {
 
           // Add segments to the store
           cyberpunkSegments.forEach(segment => {
-            state.addSegment(segment);
+            state.addSegment('session-cyberpunk-ghost', segment);
           });
 
           console.log('✅ Directly injected segments into narrative store');

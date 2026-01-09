@@ -107,7 +107,7 @@ export const SAMPLE_JOURNAL_ENTRIES: JournalEntry[] = [
     metadata: {
       tags: ['security', 'alarms'],
       automaticEntry: true,
-      narrativeSegmentId: 'segment-cyberpunk-6',
+      narrativeSegmentId: 'segment-cyberpunk-4',
     },
     createdAt: '2024-01-01T02:04:10.000Z',
     updatedAt: '2024-01-01T02:04:10.000Z',

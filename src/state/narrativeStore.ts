@@ -28,6 +28,22 @@ let journalStoreModule: typeof import('./journalStore') | null = null;
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
 
+const normalizeDecisionText = (text: string) => {
+  const trimmed = safeTrim(text);
+  if (!trimmed) return '';
+
+  const withoutYou = trimmed.replace(/^you\b\s*/i, '');
+  const withoutChoose = withoutYou.replace(/^(choose|decide|decided|chose)\s+to\s+/i, '');
+  const withoutTo = withoutChoose.replace(/^to\s+/i, '');
+  const firstChar = withoutTo.charAt(0);
+  const normalized =
+    firstChar && /[A-Z]/.test(firstChar)
+      ? `${firstChar.toLowerCase()}${withoutTo.slice(1)}`
+      : withoutTo;
+
+  return `You choose to ${normalized}`.trim();
+};
+
 const buildLocalEnding = ({
   endingType,
   params,
@@ -768,6 +784,25 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }
 
+    // Link to the most recent decision (if any) - Issue #971
+    const sessionDecisionIds = get().sessionDecisions[sessionId] || [];
+    const latestDecisionId = sessionDecisionIds[sessionDecisionIds.length - 1];
+
+    let causedByDecisionId: EntityID | undefined = metadata?.causedByDecisionId;
+    let causedByDecisionText: string | undefined = metadata?.causedByDecisionText;
+
+    if (latestDecisionId && !metadata?.causedByDecisionId) {
+      const latestDecision = get().decisions[latestDecisionId];
+      const selectedOption = latestDecision?.options.find(
+        opt => opt.id === latestDecision.selectedOptionId
+      );
+
+      if (selectedOption?.text) {
+        causedByDecisionId = latestDecisionId;
+        causedByDecisionText = normalizeDecisionText(selectedOption.text);
+      }
+    }
+
     const finalMetadata: NarrativeMetadata = {
       mood: metadata?.mood,
       tags: metadata?.tags ?? [],
@@ -780,6 +815,9 @@ export const useNarrativeStore = create<NarrativeStore>()(
       endingData: metadata?.endingData,
       tone: metadata?.tone,
       majorEvent: metadata?.majorEvent,
+      causedByDecisionId,
+      causedByDecisionText,
+      decisionOutcome: metadata?.decisionOutcome,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
 
