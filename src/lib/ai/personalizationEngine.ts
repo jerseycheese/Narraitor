@@ -205,26 +205,6 @@ export class PersonalizationEngine {
       }
     }
 
-    // Recent decisions (raw data for LLM to analyze)
-    if (context.character.recentDecisions.length > 0) {
-      const decisionList = context.character.recentDecisions
-        .slice(0, 5)
-        .map((d) => {
-          const location = d.context?.location
-            ? ` at ${d.context.location}`
-            : '';
-          const npcs = d.context?.charactersPresent?.length
-            ? ` (with: ${d.context.charactersPresent.join(', ')})`
-            : '';
-          return `• ${d.choiceText}${location}${npcs} [${d.choiceType}]`;
-        })
-        .join('\n');
-
-      parts.push(
-        `RECENT PLAYER DECISIONS:\n${decisionList}\n\nBased on these decisions, adapt the narrative to match the player's style and reference past choices where relevant.`
-      );
-    }
-
     // Personality traits (if detected)
     if (context.character.personality.length > 0) {
       parts.push(

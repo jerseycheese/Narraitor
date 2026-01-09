@@ -36,6 +36,15 @@ Built-in protection:
 
 ## How It Works
 
+### Simple Relevance Scoring
+The system uses a straightforward recency-based approach instead of complex scoring:
+- Filters decisions by world/session context
+- Sorts by timestamp (most recent first)
+- Takes top 10 decisions
+- Lets the AI infer contextual relevance from chronological history
+
+This approach is simpler and lets the LLM do what it's good at - recognizing patterns.
+
 ### LLM-Based Pattern Recognition
 Instead of manually calculating complex heuristics, the system sends your raw decision history to Gemini and lets the AI figure out your preferences. This approach:
 
@@ -104,7 +113,10 @@ tracker.recordDecision(
 );
 
 // Get personalized context
-const decisions = tracker.getWorldDecisions('world-1');
+const decisions = tracker.getRelevantDecisions(
+  { worldId: 'world-1' },
+  10
+);
 const context = engine.createPersonalizedContext(
   character,
   world,
@@ -160,15 +172,9 @@ await choiceGenerator.generateChoices({
 ```
 
 **How it works:**
-- Builds snapshot of current situation (location, characters, tags)
-- Scores past decisions by relevance (location matches, similar situations, character overlap)
-- Gets top 15 decisions and formats them with adaptive detail levels:
-  - High relevance (≥0.7): full context
-  - Medium (0.4-0.69): compact format
-  - Low (<0.4): minimal format
-- Injects formatted history into AI prompt with instructions to match player patterns
+The choice generator grabs your recent decision history (up to 10 decisions) and includes it in the prompt when generating new options. The system prioritizes decisions from your current session first, then falls back to world-wide decisions if the session is new. Decisions are sorted by recency and formatted for the AI, which uses them to generate choices that feel consistent with how you've been playing.
 
-**Token budget:** 500 tokens for choices vs 1000 for narrative (choices need room for option descriptions). If budget exceeded, drops lowest-scoring decisions first.
+**Token budget:** ~500 tokens (10 decisions × ~50 tokens each) for choices.
 
 **Example:** If you've been diplomatic (negotiating, talking down merchants), the generator offers options like "Try to negotiate with the dragon" instead of just "attack" or "flee." If you've been aggressive, choices acknowledge your reputation: "Attack before they recognize you" or "Draw your weapon and demand answers."
 
@@ -179,8 +185,8 @@ await choiceGenerator.generateChoices({
    - `PersonalizationEngine` analyzes patterns and creates context
    - Enhanced context informs AI narrative generation
 4. During choice generation:
-   - `DecisionRelevanceCalculator` scores past decisions by current context
-   - `DecisionFormatter` creates token-efficient decision history
+   - `simpleDecisionRelevance` filters decisions by recency and context
+   - `simpleDecisionFormatter` creates token-efficient decision history
    - Enhanced prompt generates personalized player options
 5. Resulting narrative AND choices reflect player preferences
 

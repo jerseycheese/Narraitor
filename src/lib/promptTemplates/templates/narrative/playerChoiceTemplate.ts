@@ -7,6 +7,7 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  optionCount?: number;
   worldSkills?: Array<{
     id: string;
     name: string;
@@ -16,10 +17,14 @@ interface PlayerChoiceTemplateContext {
 
 /**
  * Prompt template for generating player choices
- * Generates a decision prompt and 3-5 options based on the current narrative context
+ * Generates a decision prompt and options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills } = context;
+  const { worldName, genre, narrativeContext, worldSkills, optionCount } = context;
+  const choiceCount =
+    typeof optionCount === 'number' && Number.isFinite(optionCount)
+      ? Math.max(1, Math.floor(optionCount))
+      : 4;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -59,12 +64,18 @@ ${shortContext}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create 3-4 distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create ${choiceCount} distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
 4. Consider both the immediate situation AND the broader story context
 5. Include variety in character alignment approaches when possible
+
+NEGATIVE CONSTRAINTS (CRITICAL):
+- ENSURE each option represents a distinct physical or social action (e.g., Talk vs. Attack vs. Investigate). Do not just rephrase the same action with different attitudes.
+- If offering an "Inspect" option, do not offer another "Look" or "Examine" option unless it targets a completely different object.
+- AVOID generating synonyms. "Check the door" and "Try the handle" are the same action. Pick one.
+- DIVERSIFY the verbs used (e.g., don't start 3 choices with "Ask").
 
 ALIGNMENT VARIETY (when appropriate):
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
@@ -109,21 +120,9 @@ Decision: What will you do?
 Context Summary: [Brief 1-2 sentence summary of the current situation that led to this decision]
 
 Options:
-1. [NEUTRAL] [First choice - action referencing specific story elements]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-2. [NEUTRAL] [Second choice - different approach to the situation] 
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-3. [LAWFUL] [Third choice - honorable/rule-following approach when appropriate]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
-
-4. [CHAOTIC] [Fourth choice - unexpected/disruptive alternative when appropriate]
-   Hint: [Optional explanation of the choice]
-   Requirements: [Optional - SkillName X+]
+${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
+   Hint: [Optional explanation]
+   Requirements: [Optional - SkillName X+]`).join('\n\n')}
 
 ALIGNMENT INSTRUCTIONS: 
 - Always include alignment tags [LAWFUL], [NEUTRAL], or [CHAOTIC] at the start of each choice

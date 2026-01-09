@@ -293,8 +293,8 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
       expect(enhancement).toContain('attr-dexterity (Exceptional)');
       expect(enhancement).toContain('SKILLS:');
       expect(enhancement).toContain('skill-lockpicking (Expert)');
-      expect(enhancement).toContain('RECENT PLAYER DECISIONS:');
-      expect(enhancement).toContain('Sneak past the guards');
+      // RECENT PLAYER DECISIONS are now handled by enhancePromptWithPersonalization directly
+      // not by generateNarrativeEnhancement
       expect(enhancement).toContain('ACTIVE GOALS:');
       expect(enhancement).toContain('Steal the Crown Jewels');
     });

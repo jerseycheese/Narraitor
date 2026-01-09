@@ -48,6 +48,7 @@ export class ChoiceGenerator {
         sessionId,
         useAlignedChoices,
         includeDecisionHistory,
+        maxOptions,
       });
 
       const response = await this.aiClient.generateContent(prompt);
@@ -83,8 +84,7 @@ export class ChoiceGenerator {
       if (decision.options.length > maxOptions) {
         decision.options = decision.options.slice(0, maxOptions);
       }
-      
-      
+
       return decision;
     } catch (error) {
       const errorDetails = {

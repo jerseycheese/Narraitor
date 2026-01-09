@@ -318,7 +318,6 @@ export class PlayerDecisionTracker {
     );
   }
 
-
   /**
    * Calculates choice distribution
    */

@@ -76,7 +76,7 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
   });
 
   describe('Raw Decision Data for LLM', () => {
-    test('should provide raw decision details for LLM analysis', () => {
+    test('should include preferred play style', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
@@ -103,86 +103,8 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
       const enhancement =
         personalizationEngine.generateNarrativeEnhancement(context);
 
-      // Should include decision text for LLM to analyze
-      expect(enhancement).toContain('Save the village from bandits');
-      expect(enhancement).toContain("Spare the bandit leader's life");
-
-      // Should include location context
-      expect(enhancement).toContain('Millbrook Village');
-      expect(enhancement).toContain('Bandit Camp');
-
-      // Should include NPC names for LLM to reference
-      expect(enhancement).toContain('village elder');
-      expect(enhancement).toContain('scared farmers');
-      expect(enhancement).toContain('bandit leader');
-      expect(enhancement).toContain('villagers');
-    });
-
-    test('should provide simple instruction for LLM to adapt narrative', () => {
-      const context: PersonalizedNarrativeContext = {
-        character: {
-          ...mockCharacter,
-          personality: ['empathetic'],
-          goals: [],
-          relationships: [],
-          recentDecisions: pastDecisions,
-        },
-        playerPreferences: {
-          preferredChoiceTypes: ['helpful'],
-          narrativeStyle: 'exploration',
-          detailLevel: 'detailed',
-          contentFocus: 'balanced',
-          confidenceLevel: 85,
-          lastUpdated: getTimestamp(),
-        },
-        narrativeHistory: {
-          keyEvents: [],
-          establishedElements: [],
-          characterMilestones: [],
-        },
-      };
-
-      const enhancement =
-        personalizationEngine.generateNarrativeEnhancement(context);
-
-      // Should have simple instruction for LLM to use the data
-      expect(enhancement).toMatch(/adapt.*narrative.*player.*style/i);
-      expect(enhancement).toMatch(/reference.*past.*choices/i);
-    });
-
-    test('should include choice types for pattern recognition', () => {
-      const context: PersonalizedNarrativeContext = {
-        character: {
-          ...mockCharacter,
-          personality: ['diplomatic'],
-          goals: [],
-          relationships: [],
-          recentDecisions: pastDecisions,
-        },
-        playerPreferences: {
-          preferredChoiceTypes: ['diplomatic', 'helpful'],
-          narrativeStyle: 'character-driven',
-          detailLevel: 'detailed',
-          contentFocus: 'dialogue',
-          confidenceLevel: 90,
-          lastUpdated: getTimestamp(),
-        },
-        narrativeHistory: {
-          keyEvents: [],
-          establishedElements: [],
-          characterMilestones: [],
-        },
-      };
-
-      const enhancement =
-        personalizationEngine.generateNarrativeEnhancement(context);
-
-      // Should include choice types for LLM to recognize patterns
-      expect(enhancement).toContain('[helpful]');
-      expect(enhancement).toContain('[diplomatic]');
-
       // Should include preferred play style
-      expect(enhancement).toMatch(/PREFERRED PLAY STYLE.*diplomatic/i);
+      expect(enhancement).toMatch(/PREFERRED PLAY STYLE.*helpful.*diplomatic/i);
     });
   });
 
@@ -268,55 +190,6 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
       expect(enhancement).toContain('Protect the innocent');
       expect(enhancement).toContain('Find the truth');
       expect(enhancement).toMatch(/ACTIVE GOALS/i);
-    });
-  });
-
-  describe('Decision Prioritization', () => {
-    test('should limit to most recent 5 decisions', () => {
-      // Create many decisions
-      const manyDecisions: PlayerDecision[] = Array.from(
-        { length: 15 },
-        (_, i) => ({
-          id: `decision-${i}`,
-          prompt: `What do you do in situation ${i}?`,
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          choiceText: `Choice number ${i}`,
-          choiceType: 'neutral' as const,
-          timestamp: getTimestamp(),
-          context: { situation: 'minor' },
-        })
-      );
-
-      const context: PersonalizedNarrativeContext = {
-        character: {
-          ...mockCharacter,
-          personality: ['empathetic'],
-          goals: [],
-          relationships: [],
-          recentDecisions: manyDecisions,
-        },
-        playerPreferences: {
-          preferredChoiceTypes: ['helpful'],
-          narrativeStyle: 'action-focused',
-          detailLevel: 'moderate',
-          contentFocus: 'balanced',
-          confidenceLevel: 85,
-          lastUpdated: getTimestamp(),
-        },
-        narrativeHistory: {
-          keyEvents: [],
-          establishedElements: [],
-          characterMilestones: [],
-        },
-      };
-
-      const enhancement =
-        personalizationEngine.generateNarrativeEnhancement(context);
-
-      // Should only include up to 5 decisions
-      const choiceMatches = enhancement.match(/Choice number \d+/g) || [];
-      expect(choiceMatches.length).toBeLessThanOrEqual(5);
     });
   });
 

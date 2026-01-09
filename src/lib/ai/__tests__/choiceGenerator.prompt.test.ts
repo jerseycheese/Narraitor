@@ -1,6 +1,7 @@
 import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
+import { playerDecisionTracker } from '../playerDecisionTracker';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   narrativeTemplateManager: {
@@ -104,5 +105,23 @@ describe('buildChoicePrompt', () => {
     expect(prompt).toContain('TONE_GUIDANCE');
     expect(prompt).toContain('## Past Decision History');
     expect(prompt).toContain('DECISION_HISTORY');
+  });
+
+  it('calls getRelevantDecisions with limit 10', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext,
+      characterIds: ['char-1'],
+      sessionId: 'session-1',
+      includeDecisionHistory: true,
+    });
+
+    expect(playerDecisionTracker.getRelevantDecisions).toHaveBeenCalledWith(
+      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
+      10,
+      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' })
+    );
   });
 });

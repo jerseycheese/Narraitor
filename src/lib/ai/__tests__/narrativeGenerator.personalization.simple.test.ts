@@ -109,7 +109,11 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     );
 
     // Get decisions for personalization
-    const decisions = tracker.getWorldDecisions('world-1');
+    const decisions = tracker.getRelevantDecisions(
+      { worldId: 'world-1' },
+      10,
+      { worldId: 'world-1' }
+    );
     expect(decisions).toHaveLength(2);
 
     // Create personalized context
@@ -144,7 +148,11 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       );
     }
 
-    const decisions = tracker.getWorldDecisions('world-1');
+    const decisions = tracker.getRelevantDecisions(
+      { worldId: 'world-1' },
+      10,
+      { worldId: 'world-1' }
+    );
     const analysis = tracker.analyzeChoicePatterns(decisions);
 
     expect(analysis.dominantChoiceTypes[0]).toBe('diplomatic');

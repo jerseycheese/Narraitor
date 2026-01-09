@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils/worldStateFormatters';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { PersonalizationEngine } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
@@ -47,25 +47,32 @@ export const enhancePromptWithPersonalization = async (
     let decisionHistory = '';
 
     if (sessionId) {
+      // Try session-specific decisions first
       const currentContext: SimpleNarrativeContext = { worldId, sessionId };
       relevantDecisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
-        15,
+        10,
         { worldId, sessionId }
       );
 
+      // Fallback to world-wide decisions if session has none
       if (relevantDecisions.length === 0) {
         relevantDecisions = playerDecisionTracker.getRelevantDecisions(
           currentContext,
-          15,
+          10,
           { worldId }
         );
       }
 
       decisionHistory = formatDecisions(relevantDecisions);
     } else {
-      const allWorldDecisions = playerDecisionTracker.getWorldDecisions(worldId);
-      relevantDecisions = allWorldDecisions.slice(0, 15);
+      // No session context - get world-wide decisions using relevance scoring
+      const currentContext: SimpleNarrativeContext = { worldId };
+      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+        currentContext,
+        10,
+        { worldId }
+      );
       decisionHistory = formatDecisions(relevantDecisions);
     }
 
