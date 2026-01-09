@@ -30,6 +30,7 @@ jest.mock('../attributeSkillFormatter', () => ({
 jest.mock('../playerDecisionTracker', () => ({
   playerDecisionTracker: {
     getRelevantDecisions: jest.fn(() => [{ id: 'decision-1' }]),
+    getHybridDecisions: jest.fn(() => [{ id: 'decision-1' }]),
   },
 }));
 
@@ -107,7 +108,7 @@ describe('buildChoicePrompt', () => {
     expect(prompt).toContain('DECISION_HISTORY');
   });
 
-  it('calls getRelevantDecisions with limit 10', () => {
+  it('calls getHybridDecisions with limit 10', () => {
     const world = createMockWorld({ id: 'world-1' });
     buildChoicePrompt({
       world,
@@ -118,10 +119,9 @@ describe('buildChoicePrompt', () => {
       includeDecisionHistory: true,
     });
 
-    expect(playerDecisionTracker.getRelevantDecisions).toHaveBeenCalledWith(
+    expect(playerDecisionTracker.getHybridDecisions).toHaveBeenCalledWith(
       expect.anything(),
-      10,
-      expect.anything()
+      10
     );
   });
 });

@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils/worldStateFormatters';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { type SimpleNarrativeContext, DECISION_CONTEXT_LIMIT } from './simpleDecisionRelevance';
 import { PersonalizationEngine } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
@@ -46,32 +46,12 @@ export const enhancePromptWithPersonalization = async (
     >;
     let decisionHistory = '';
 
-    if (sessionId) {
-      const currentContext: SimpleNarrativeContext = { worldId, sessionId };
-      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
-        currentContext,
-        10,
-        { worldId, sessionId }
-      );
-
-      if (relevantDecisions.length === 0) {
-        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
-          currentContext,
-          10,
-          { worldId }
-        );
-      }
-
-      decisionHistory = formatDecisions(relevantDecisions);
-    } else {
-      const currentContext: SimpleNarrativeContext = { worldId };
-      relevantDecisions = playerDecisionTracker.getRelevantDecisions(
-        currentContext,
-        10,
-        { worldId }
-      );
-      decisionHistory = formatDecisions(relevantDecisions);
-    }
+    const currentContext: SimpleNarrativeContext = { worldId, sessionId };
+    relevantDecisions = playerDecisionTracker.getHybridDecisions(
+      currentContext,
+      DECISION_CONTEXT_LIMIT
+    );
+    decisionHistory = formatDecisions(relevantDecisions);
 
     const aiContext = sessionId
       ? await useAiContextStore.getState().buildContextForSession(sessionId)

@@ -11,6 +11,8 @@
 import type { PlayerDecision } from '@/types/personalization.types';
 import type { EntityID } from '@/types/common.types';
 
+export const DECISION_CONTEXT_LIMIT = 10;
+
 /**
  * Minimal context needed for filtering decisions
  */

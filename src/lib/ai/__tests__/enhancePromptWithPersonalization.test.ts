@@ -170,4 +170,46 @@ describe('enhancePromptWithPersonalization Integration', () => {
     // Assert
     expect(result).toContain('Base prompt');
   });
+
+  test('pads session decisions with world decisions up to limit', async () => {
+    // Setup: 
+    // 1 session decision (most recent)
+    // Note: unshift order. We add world decisions first so they are older?
+    // No, recordDecision unshifts. Last added is newest (index 0).
+    
+    // We want session decision to be newest. Add it LAST.
+    
+    // Add 15 world decisions first
+    for (let i = 0; i < 15; i++) {
+      playerDecisionTracker.recordDecision(
+        `World Prompt ${i}`, `World Choice ${i}`, 'neutral', 'other-session', 'world-1'
+      );
+    }
+    
+    // Add session decision (newest)
+    playerDecisionTracker.recordDecision(
+      'Session Prompt', 'Session Choice', 'helpful', 'session-1', 'world-1'
+    );
+    
+    // Call
+    const result = await enhancePromptWithPersonalization(
+      'Base prompt',
+      'world-1',
+      ['char-1'],
+      personalizationEngine,
+      'session-1'
+    );
+
+    // Assert
+    // Should have Session Choice (1 item)
+    expect(result).toContain('session choice');
+    
+    // Should have 9 World Choices (most recent ones: 14 down to 6)
+    // Total 10 items.
+    expect(result).toContain('world choice 14');
+    expect(result).toContain('world choice 6');
+    
+    // Should NOT have World Choice 5 (would be 11th item)
+    expect(result).not.toContain('world choice 5');
+  });
 });

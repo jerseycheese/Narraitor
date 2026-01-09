@@ -7,7 +7,7 @@ import { getLoreContextForPrompt } from './loreContextHelper';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
-import type { SimpleNarrativeContext } from './simpleDecisionRelevance';
+import { type SimpleNarrativeContext, DECISION_CONTEXT_LIMIT } from './simpleDecisionRelevance';
 import { formatSkillsForNarrative } from './attributeSkillFormatter';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
@@ -216,19 +216,10 @@ const enhancePromptWithDecisionHistory = (
   try {
     const currentContext: SimpleNarrativeContext = { worldId, sessionId };
 
-    let decisions = playerDecisionTracker.getRelevantDecisions(
+    const decisions = playerDecisionTracker.getHybridDecisions(
       currentContext,
-      10,
-      { worldId, sessionId }
+      DECISION_CONTEXT_LIMIT
     );
-
-    if (decisions.length === 0) {
-      decisions = playerDecisionTracker.getRelevantDecisions(
-        currentContext,
-        10,
-        { worldId }
-      );
-    }
 
     if (decisions.length === 0) {
       return prompt;
