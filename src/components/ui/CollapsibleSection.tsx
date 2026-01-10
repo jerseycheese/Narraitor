@@ -14,6 +14,8 @@ interface CollapsibleSectionProps {
   initialCollapsed?: boolean;
   /** Optional additional class names */
   className?: string;
+  /** Optional callback when expanded state changes */
+  onToggle?: (isExpanded: boolean) => void;
 }
 
 /**
@@ -27,12 +29,17 @@ export const CollapsibleSection = ({
   title,
   children,
   initialCollapsed,
-  className = ''
+  className = '',
+  onToggle,
 }: CollapsibleSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(!initialCollapsed);
 
   const toggleExpanded = () => {
-    setIsExpanded(prev => !prev);
+    setIsExpanded((prev) => {
+      const next = !prev;
+      onToggle?.(next);
+      return next;
+    });
   };
 
   return (

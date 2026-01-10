@@ -78,6 +78,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
 
   // Reset fatal guard and flag when session changes
   React.useEffect(() => {
@@ -118,6 +119,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
+  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -820,9 +822,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <div
           className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
           id="narrative-container"
-          style={{
-            maxHeight: segmentCount > 1 ? '500px' : 'none'
-          }}
+          style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
         >
           {/* Fade-out overlay at top when multiple segments */}
           {segmentCount > 1 && (
@@ -863,21 +863,22 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <div className="player-choices-container flex-1">
             {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
             {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
-              <ChoiceSelector
-                decision={currentDecision}
-                onSelect={handleChoiceSelected}
-                onCustomSubmit={handleCustomSubmit}
-                enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                worldSkills={world?.skills || []}
-                characterSkills={characterSkills}
-                inventoryItems={inventoryItems}
-                endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-                  reason: endingSuggestionReason,
-                  onAccept: handleAcceptEndingSuggestion,
-                  onDismiss: handleRejectEndingSuggestion,
-                } : undefined}
-              />
+                <ChoiceSelector
+                  decision={currentDecision}
+                  onSelect={handleChoiceSelected}
+                  onCustomSubmit={handleCustomSubmit}
+                  enableCustomInput={true}
+                  isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                  worldSkills={world?.skills || []}
+                  characterSkills={characterSkills}
+                  inventoryItems={inventoryItems}
+                  onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
+                  endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
+                    reason: endingSuggestionReason,
+                    onAccept: handleAcceptEndingSuggestion,
+                    onDismiss: handleRejectEndingSuggestion,
+                  } : undefined}
+                />
             ) : (
               <div className="space-y-4 p-4">
                 {/* Choice decision skeleton - matches ChoiceSelector layout */}
