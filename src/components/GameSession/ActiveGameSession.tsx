@@ -12,6 +12,7 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { StorySummarySection } from './StorySummarySection';
+import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { EndingScreen } from './EndingScreen';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
@@ -921,6 +922,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
 
       <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
+
+      <ChoiceHistorySection sessionId={sessionId} />
 
       {/* Autosave indicator anchored under the main content */}
       <div className="mt-4">
