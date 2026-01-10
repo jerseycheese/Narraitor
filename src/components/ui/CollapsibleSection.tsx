@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 
 /**
  * CollapsibleSection props
@@ -34,12 +34,12 @@ export const CollapsibleSection = ({
 }: CollapsibleSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(!initialCollapsed);
 
+  useEffect(() => {
+    onToggle?.(isExpanded);
+  }, [isExpanded, onToggle]);
+
   const toggleExpanded = () => {
-    setIsExpanded((prev) => {
-      const next = !prev;
-      onToggle?.(next);
-      return next;
-    });
+    setIsExpanded(prev => !prev);
   };
 
   return (
