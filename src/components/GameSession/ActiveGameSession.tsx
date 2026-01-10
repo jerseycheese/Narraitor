@@ -818,7 +818,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
         {/* Story Column */}
         <div
-          className="lg:flex-1 min-h-0 flex flex-col lg:overflow-hidden relative"
+          className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
           id="narrative-container"
           style={{
             maxHeight: segmentCount > 1 ? '500px' : 'none'
@@ -856,7 +856,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
         {/* Choices Column */}
         <div
-          className="lg:flex-1 min-h-0 flex flex-col"
+          className="lg:flex-[1] min-h-0 flex flex-col"
           id="choices-container"
           aria-busy={isGeneratingChoices}
         >
