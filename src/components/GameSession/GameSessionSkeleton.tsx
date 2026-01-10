@@ -15,7 +15,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
       {/* Two-column layout matching ActiveGameSession */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0">
         {/* Narrative Column Skeleton */}
-        <div className="lg:flex-1 min-h-0 overflow-auto">
+        <div className="lg:flex-[2] min-h-0 overflow-auto">
           <div className="space-y-4 p-4">
             {/* Narrative segments skeleton */}
             <div className="space-y-6">
@@ -43,7 +43,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
         </div>
 
         {/* Choices Column Skeleton */}
-        <div className="lg:flex-1 min-h-0 overflow-auto">
+        <div className="lg:flex-[1] min-h-0 overflow-auto">
           <div className="space-y-4 p-4">
             {/* Choice buttons skeleton */}
             <div className="space-y-3">
