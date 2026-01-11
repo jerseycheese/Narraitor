@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 
 /**
  * CollapsibleSection props
@@ -14,6 +14,8 @@ interface CollapsibleSectionProps {
   initialCollapsed?: boolean;
   /** Optional additional class names */
   className?: string;
+  /** Optional callback when expanded state changes */
+  onToggle?: (isExpanded: boolean) => void;
 }
 
 /**
@@ -27,9 +29,14 @@ export const CollapsibleSection = ({
   title,
   children,
   initialCollapsed,
-  className = ''
+  className = '',
+  onToggle,
 }: CollapsibleSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(!initialCollapsed);
+
+  useEffect(() => {
+    onToggle?.(isExpanded);
+  }, [isExpanded, onToggle]);
 
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev);

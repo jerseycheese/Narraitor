@@ -12,6 +12,7 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { StorySummarySection } from './StorySummarySection';
+import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { EndingScreen } from './EndingScreen';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
@@ -77,6 +78,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
 
   // Reset fatal guard and flag when session changes
   React.useEffect(() => {
@@ -117,6 +119,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
+  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -817,11 +820,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
         {/* Story Column */}
         <div
-          className="lg:flex-1 min-h-0 flex flex-col lg:overflow-hidden relative"
+          className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
           id="narrative-container"
-          style={{
-            maxHeight: segmentCount > 1 ? '500px' : 'none'
-          }}
+          style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
         >
           {/* Fade-out overlay at top when multiple segments */}
           {segmentCount > 1 && (
@@ -855,28 +856,29 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
         {/* Choices Column */}
         <div
-          className="lg:flex-1 min-h-0 flex flex-col"
+          className="lg:flex-[1] min-h-0 flex flex-col"
           id="choices-container"
           aria-busy={isGeneratingChoices}
         >
           <div className="player-choices-container flex-1">
             {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
             {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
-              <ChoiceSelector
-                decision={currentDecision}
-                onSelect={handleChoiceSelected}
-                onCustomSubmit={handleCustomSubmit}
-                enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                worldSkills={world?.skills || []}
-                characterSkills={characterSkills}
-                inventoryItems={inventoryItems}
-                endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-                  reason: endingSuggestionReason,
-                  onAccept: handleAcceptEndingSuggestion,
-                  onDismiss: handleRejectEndingSuggestion,
-                } : undefined}
-              />
+                <ChoiceSelector
+                  decision={currentDecision}
+                  onSelect={handleChoiceSelected}
+                  onCustomSubmit={handleCustomSubmit}
+                  enableCustomInput={true}
+                  isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                  worldSkills={world?.skills || []}
+                  characterSkills={characterSkills}
+                  inventoryItems={inventoryItems}
+                  onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
+                  endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
+                    reason: endingSuggestionReason,
+                    onAccept: handleAcceptEndingSuggestion,
+                    onDismiss: handleRejectEndingSuggestion,
+                  } : undefined}
+                />
             ) : (
               <div className="space-y-4 p-4">
                 {/* Choice decision skeleton - matches ChoiceSelector layout */}
@@ -921,6 +923,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
 
       <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
+
+      <ChoiceHistorySection sessionId={sessionId} />
 
       {/* Autosave indicator anchored under the main content */}
       <div className="mt-4">

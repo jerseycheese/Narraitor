@@ -48,6 +48,9 @@ interface ChoiceSelectorProps {
     onAccept: () => void;
     onDismiss: () => void;
   };
+
+  // Suggested actions UI callbacks
+  onSuggestedActionsToggle?: (isExpanded: boolean) => void;
 }
 
 /**
@@ -68,6 +71,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   characterSkills = [],
   inventoryItems = [],
   endingSuggestion,
+  onSuggestedActionsToggle,
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -221,7 +225,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       )}
       
       {allOptions.length > 0 && (
-        <CollapsibleSection title="Suggested Actions" initialCollapsed={true}>
+        <CollapsibleSection
+          title="Suggested Actions"
+          initialCollapsed={true}
+          onToggle={onSuggestedActionsToggle}
+        >
           {/* Regular choice options */}
           <div 
             className="space-y-2" 

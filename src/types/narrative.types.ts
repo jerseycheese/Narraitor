@@ -44,6 +44,11 @@ export interface Decision {
   narrativeSegmentId?: EntityID;
 }
 
+export interface DecisionHistoryEntry {
+  decision: Decision;
+  outcomeSegment?: NarrativeSegment;
+}
+
 /**
  * Choice alignment types for personality-based variety
  */
