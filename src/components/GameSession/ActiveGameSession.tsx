@@ -70,6 +70,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
   
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -104,7 +105,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
-  const narrativeMaxHeight = segmentCount > 1 ? '500px' : undefined;
+  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -624,6 +625,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           inventoryItems={inventoryItems}
           onChoiceSelected={handleChoiceSelected}
           onCustomSubmit={handleCustomSubmit}
+          onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
           endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
             reason: endingSuggestionReason,
             onAccept: handleAcceptEndingSuggestion,
