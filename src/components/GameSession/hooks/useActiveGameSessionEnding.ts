@@ -23,6 +23,9 @@ interface UseActiveGameSessionEndingOptions {
   ) => Promise<void>;
 }
 
+/**
+ * Owns ending suggestion state and confirmation flows.
+ */
 export const useActiveGameSessionEnding = ({
   sessionId,
   characterId,

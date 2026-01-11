@@ -26,6 +26,10 @@ interface UseActiveGameSessionEffectsOptions {
   choiceGenerationTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
 }
 
+/**
+ * Drives session lifecycle side effects (init, fallbacks, store sync, global events).
+ * Returns only the choice fallback scheduler; the rest runs automatically.
+ */
 export const useActiveGameSessionEffects = ({
   sessionId,
   worldId,

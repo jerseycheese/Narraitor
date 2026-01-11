@@ -26,6 +26,9 @@ interface UseActiveGameSessionActionsOptions {
   createJournalEntryFromSegment: (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => void;
 }
 
+/**
+ * Encapsulates narrative + choice handlers while keeping state changes centralized.
+ */
 export const useActiveGameSessionActions = ({
   sessionId,
   characterId,

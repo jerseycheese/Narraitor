@@ -16,6 +16,9 @@ interface UseActiveGameSessionJournalOptions {
   characterId?: string;
 }
 
+/**
+ * Builds journal entries for decisions and narrative segments.
+ */
 export const useActiveGameSessionJournal = ({
   sessionId,
   worldId,
