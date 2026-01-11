@@ -7,12 +7,9 @@ import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
-import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
-import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { useJournalStore } from '@/state/journalStore';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -21,6 +18,9 @@ import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
 import ActiveGameSessionControls from './ActiveGameSessionControls';
 import { useActiveGameSessionEffects } from './hooks/useActiveGameSessionEffects';
+import { useActiveGameSessionJournal } from './hooks/useActiveGameSessionJournal';
+import { useActiveGameSessionActions } from './hooks/useActiveGameSessionActions';
+import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -57,16 +57,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  // Ending suggestion state
-  const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
-  const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
-  const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
-  const fatalEndingTriggeredRef = React.useRef(false);
-  const [isFatalEnding, setIsFatalEnding] = React.useState(false);
-  
-  // Manual end story confirmation
-  const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
@@ -116,409 +106,35 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // and the choices column will populate when ready.
   const isGameReady = initialized && hasExistingNarrative;
 
-  // Get journal store for auto-creating entries
-  const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   const router = useRouter();
 
-  // Helper function to generate AI summary for journal entries
-  const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
-    try {
-      const response = await fetch('/api/narrative/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          type,
-          location,
-          decisionWeight,
-          instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.summary && data.entryType && data.significance) {
-          return {
-            summary: data.summary,
-            entryType: data.entryType,
-            significance: data.significance
-          };
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
-    }
-    
-    // Return fallback values using decision weight for significance
-    const fallbackSignificance = decisionWeight || 'minor';
-    return {
-      summary: createFallbackSummary(content),
-      entryType: 'character_event',
-      significance: fallbackSignificance
-    };
-  };
+  const { createDecisionJournalEntry, createJournalEntryFromSegment } = useActiveGameSessionJournal({
+    sessionId,
+    worldId,
+    characterId: characterId || undefined,
+  });
 
-  // Fallback summary method when AI fails
-  const createFallbackSummary = (content: string): string => {
-    // Extract first sentence and clean it up
-    const sentences = content.split(/[.!?]+/).filter(s => safeTrim(s).length > 10);
-    if (sentences.length > 0) {
-      let summary = safeTrim(sentences[0]);
-      // Convert from second person to past tense if needed
-      summary = summary.replace(/^You\s+/, '').replace(/\byou\b/g, 'the character');
-      // Keep it concise - max 60 characters
-      return summary.length > 60 ? truncate(summary, 57) : summary + '.';
-    }
-    return 'Something happened in the adventure.';
-  };
-
-  // Regex patterns for cleaning decision prompts
-  const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
-  const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
-  const GENERIC_PROMPT_REGEX = /^what will you do(\b.*)?$/i;
-  const GENERIC_PROMPT_SUFFIX_REGEX = /(,?\s*)?(what (do|will) you do( next| now)?|how do you respond|what is your move|what's your move)\??\.?$/i;
-
-  /**
-   * Creates a journal entry for a decision made by the character.
-   *
-   * @param {Decision} decision - The decision object containing options and prompt.
-   * @param {string} selectedChoiceId - The ID of the selected choice, or the custom choice text if isCustomChoice is true.
-   * @param {boolean} isCustomChoice - If true, indicates that the selected choice is a custom user input rather than a predefined option.
-   *   When true, selectedChoiceId is treated as the custom choice text itself.
-   */
-  const createDecisionJournalEntry = (decision: Decision, selectedChoiceId: string, isCustomChoice: boolean) => {
-    if (!characterId) return;
-    
-    // Find the selected choice
-    const selectedChoice = decision.options.find(option => option.id === selectedChoiceId);
-    const choiceText = selectedChoice?.text || (isCustomChoice ? selectedChoiceId : 'Unknown choice');
-    
-    // Format decision content for readability
-    const formatDecisionContent = (choice: string, prompt: string): string => {
-      const cleanChoice = safeTrim(choice).replace(/[.!?]+$/, '').toLowerCase();
-      const cleanPrompt = safeTrim(prompt)
-        .replace(GENERIC_PROMPT_SUFFIX_REGEX, '')
-        .replace(YOU_PREFIX_REGEX, '')
-        .replace(QUESTION_MARK_SUFFIX_REGEX, '')
-        .toLowerCase();
-
-      if (!cleanPrompt || GENERIC_PROMPT_REGEX.test(cleanPrompt)) {
-        return `Chose to ${cleanChoice}.`;
-      }
-
-      return `Chose to ${cleanChoice} when ${cleanPrompt}.`;
-    };
-    
-    // Map decision weight to significance
-    const significance: 'minor' | 'major' | 'critical' = decision.decisionWeight || 'minor';
-    
-    try {
-      addEntry(sessionId, {
-        worldId: worldId,
-        characterId: characterId,
-        type: 'decision',
-        title: '', // No title for MVP - content is sufficient
-        content: formatDecisionContent(choiceText, decision.prompt),
-        significance: significance,
-        isRead: false,
-        relatedEntities: [],
-        metadata: {
-          tags: ['decision'],
-          automaticEntry: true,
-          decisionId: decision.id,
-          choiceText: choiceText,
-          decisionPrompt: decision.prompt
-        },
-        updatedAt: getTimestamp()
-      });
-    } catch (error) {
-      console.warn('Failed to create decision journal entry:', error);
-    }
-  };
-
-  // Helper function to create journal entries from narrative segments
-  const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
-    if (!characterId) return;
-
-    const cleanContent = segment.content;
-    const actualLocation = segment.metadata?.location;
-
-    // Generate AI summary, type, and significance for journal entry (async)
-    generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
-      try {
-        addEntry(sessionId, {
-          worldId: worldId,
-          characterId: characterId,
-          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event' | 'relationship_change',
-          title: '', // No title for MVP - content is sufficient
-          content: aiResult.summary,
-          significance: aiResult.significance as 'minor' | 'major' | 'critical',
-          isRead: false, // Read status no longer used but kept for type compatibility
-          relatedEntities: [],
-          metadata: {
-            tags: [segment.type],
-            automaticEntry: true,
-            narrativeSegmentId: segment.id
-          },
-          updatedAt: getTimestamp()
-        });
-      } catch (error) {
-        console.warn('Failed to create journal entry from narrative segment:', error);
-      }
-    }).catch(error => {
-      console.warn('Failed to generate journal summary, using fallback:', error);
-      // Use fallback if AI completely fails
-      try {
-        const fallbackSignificance = relatedDecisionWeight || 'minor';
-        const fallbackContent = createFallbackSummary(cleanContent);
-        addEntry(sessionId, {
-          worldId: worldId,
-          characterId: characterId,
-          type: 'character_event',
-          title: '', // No title for MVP - content is sufficient
-          content: fallbackContent,
-          significance: fallbackSignificance,
-          isRead: false, // Read status no longer used but kept for type compatibility
-          relatedEntities: [],
-          metadata: {
-            tags: [segment.type],
-            automaticEntry: true,
-            narrativeSegmentId: segment.id
-          },
-          updatedAt: getTimestamp()
-        });
-      } catch (fallbackError) {
-        console.warn('Failed to create fallback journal entry:', fallbackError);
-      }
-    });
-  };
-
-  const handleNarrativeGenerated = (segment: NarrativeSegment) => {
-    // Narrative segment was successfully generated
-    setIsGenerating(false);
-    setShouldTriggerGeneration(false); // Reset trigger
-    // Start generating choices
-    setIsGeneratingChoices(true);
-    
-    // Auto-create journal entry for significant narrative events
-    if (characterId && segment.content) {
-      // Use the current decision weight to determine journal significance
-      const decisionWeight = currentDecision?.decisionWeight;
-      createJournalEntryFromSegment(segment, decisionWeight);
-    }
-    
-    scheduleChoiceFallback(currentDecision);
-
-    void autoSave.triggerSave('scene-change');
-  };
-
-  const handleChoiceSelected = (choiceId: string) => {
-    // Check if session has ended - if so, prevent further generation
-    if (isSessionEnded(sessionId)) {
-      return;
-    }
-
-    // Player choice was selected
-    setIsGenerating(true);
-    setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(choiceId);
-    setShouldTriggerGeneration(true); // Trigger narrative generation
-    
-    // Create decision journal entry (Issue #174)
-    if (currentDecision && characterId) {
-      createDecisionJournalEntry(currentDecision, choiceId, false);
-    }
-    
-    // If we have a current decision, update its selected option
-    if (currentDecision) {
-      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined);
-    }
-    
-    // Clear current decision to prevent showing stale choices during generation
-    setCurrentDecision(null);
-    
-    onChoiceSelected(choiceId);
-
-    void autoSave.triggerSave('player-choice');
-  };
-
-  const handleCustomSubmit = (customText: string) => {
-    // Check if session has ended - if so, prevent further generation
-    if (isSessionEnded(sessionId)) {
-      return;
-    }
-    
-    // Handle custom player input
-    const customChoiceId = generateUniqueId('custom');
-    
-    // Create decision journal entry for custom choice (Issue #174)
-    if (currentDecision && characterId) {
-      createDecisionJournalEntry(currentDecision, customText, true);
-    }
-    
-    // Create a custom decision option and add it to the current decision in the store
-    if (currentDecision) {
-      const customOption = {
-        id: customChoiceId,
-        text: customText,
-        isCustomInput: true,
-        customText: customText
-      };
-      
-      // Update the decision in the store with the new custom option and select it
-      useNarrativeStore.getState().updateDecision(currentDecision.id, {
-        options: [...currentDecision.options, customOption],
-        selectedOptionId: customChoiceId
-      });
-    }
-    
-    // Clear current decision to prevent showing stale choices during generation
-    setCurrentDecision(null);
-    
-    // Trigger narrative generation with the custom choice
-    setIsGenerating(true);
-    setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(customChoiceId);
-    setShouldTriggerGeneration(true);
-    
-    onChoiceSelected(customChoiceId);
-
-    void autoSave.triggerSave('player-choice');
-  };
-  
-  // Handle newly generated player choices
-  const handleChoicesGenerated = (decision: Decision) => {
-
-    if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
-      setIsGeneratingChoices(false);
-      return;
-    }
-
-    // Clear the fallback timeout since we have real AI choices
-    if (choiceGenerationTimeoutRef.current) {
-      clearTimeout(choiceGenerationTimeoutRef.current);
-      choiceGenerationTimeoutRef.current = null;
-    }
-
-    // Force update with a new object reference to ensure React detects the change
-    const decisionCopy: Decision = {
-      id: decision.id,
-      prompt: decision.prompt,
-      options: [...decision.options],
-      selectedOptionId: decision.selectedOptionId,
-      decisionWeight: decision.decisionWeight,
-      contextSummary: decision.contextSummary,
-    };
-
-    // Update the current decision state with the copy
-    setCurrentDecision(decisionCopy);
-    // Stop the choice generation loading state
-    setIsGeneratingChoices(false);
-    
-    // Convert AI-generated decision to player choices format for the session
-    const playerChoices = decision.options.map(option => ({
-      id: option.id,
-      text: option.text,
-      isSelected: option.id === decision.selectedOptionId
-    }));
-    
-    // Update session store with AI-generated choices
-    useSessionStore.getState().setPlayerChoices(playerChoices);
-  };
-
-  // Handle ending story functionality with confirmation
-  const handleEndStory = async () => {
-    if (!characterId || !world || !character) return;
-
-    // Manual endings are never fatal
-    setIsFatalEnding(false);
-
-    try {
-      await generateEnding('player-choice', {
-        sessionId,
-        characterId,
-        worldId: world.id,
-        world: world,  // Pass the full world object
-        character: character  // Pass the full character object
-      });
-    } catch (error) {
-      console.error('Failed to load ending:', error);
-    }
-  };
-  
-  // Handle ending suggestion from AI
-  const handleEndingSuggested = (reason: string, endingType: EndingType) => {
-    setEndingSuggestionReason(reason);
-    setSuggestedEndingType(endingType);
-
-    const isFatal = reason.toLowerCase().startsWith('fatal:');
-
-    // Set fatal ending flag for loader text
-    setIsFatalEnding(isFatal);
-
-    if (isFatal && !fatalEndingTriggeredRef.current) {
-      fatalEndingTriggeredRef.current = true;
-
-      if (!characterId || !world || !character) {
-        setShowEndingSuggestion(true);
-        return;
-      }
-
-      void generateEnding(endingType, {
-        sessionId,
-        characterId,
-        worldId: world.id,
-        world: world,
-        character: character,
-        desiredTone: 'tragic',
-      }).catch((error) => {
-        console.error('Failed to auto-generate fatal ending:', error);
-        setShowEndingSuggestion(true);
-        fatalEndingTriggeredRef.current = false;
-      });
-      return;
-    }
-
-    setShowEndingSuggestion(true);
-  };
-  
-  // Accept AI ending suggestion
-  const handleAcceptEndingSuggestion = async () => {
-    setShowEndingSuggestion(false);
-    if (!characterId || !world || !character) return;
-
-    try {
-      await generateEnding(suggestedEndingType, {
-        sessionId,
-        characterId,
-        worldId: world.id,
-        world: world,  // Pass the full world object
-        character: character  // Pass the full character object
-      });
-    } catch (error) {
-      console.error('Failed to load ending:', error);
-    }
-  };
-  
-  // Reject AI ending suggestion
-  const handleRejectEndingSuggestion = () => {
-    setShowEndingSuggestion(false);
-    setIsFatalEnding(false); // Reset fatal flag when suggestion dismissed
-  };
-  
-  // Handle manual end story button click
-  const handleEndStoryClick = () => {
-    setShowEndConfirmation(true);
-  };
-  
-  // Confirm manual end story
-  const handleConfirmEndStory = () => {
-    setShowEndConfirmation(false);
-    handleEndStory();
-  };
+  const {
+    showEndingSuggestion,
+    endingSuggestionReason,
+    isFatalEnding,
+    showEndConfirmation,
+    handleEndingSuggested,
+    handleAcceptEndingSuggestion,
+    handleRejectEndingSuggestion,
+    handleEndStoryClick,
+    handleConfirmEndStory,
+    handleCloseEndStory,
+  } = useActiveGameSessionEnding({
+    sessionId,
+    characterId: characterId || undefined,
+    world,
+    character,
+    generateEnding,
+  });
 
   const { scheduleChoiceFallback } = useActiveGameSessionEffects({
     sessionId,
@@ -534,9 +150,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setInitialized,
     setCurrentDecision,
     setIsGeneratingChoices,
-    setIsFatalEnding,
-    fatalEndingTriggeredRef,
     choiceGenerationTimeoutRef,
+  });
+
+  const {
+    handleNarrativeGenerated,
+    handleChoiceSelected,
+    handleCustomSubmit,
+    handleChoicesGenerated,
+  } = useActiveGameSessionActions({
+    sessionId,
+    characterId: characterId || undefined,
+    currentDecision,
+    setCurrentDecision,
+    setIsGenerating,
+    setShouldTriggerGeneration,
+    setIsGeneratingChoices,
+    setLocalSelectedChoiceId,
+    choiceGenerationTimeoutRef,
+    scheduleChoiceFallback,
+    onChoiceSelected,
+    autoSave,
+    isSessionEnded,
+    createDecisionJournalEntry,
+    createJournalEntryFromSegment,
   });
 
   // If we have an ending, show the ending screen instead
@@ -642,7 +279,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         autoSave={autoSave}
         showEndConfirmation={showEndConfirmation}
         onConfirmEndStory={handleConfirmEndStory}
-        onCloseEndStory={() => setShowEndConfirmation(false)}
+        onCloseEndStory={handleCloseEndStory}
         onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
       />
     </div>

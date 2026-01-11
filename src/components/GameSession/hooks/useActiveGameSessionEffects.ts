@@ -23,8 +23,6 @@ interface UseActiveGameSessionEffectsOptions {
   setInitialized: Dispatch<SetStateAction<boolean>>;
   setCurrentDecision: Dispatch<SetStateAction<Decision | null>>;
   setIsGeneratingChoices: Dispatch<SetStateAction<boolean>>;
-  setIsFatalEnding: Dispatch<SetStateAction<boolean>>;
-  fatalEndingTriggeredRef: MutableRefObject<boolean>;
   choiceGenerationTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
 }
 
@@ -42,16 +40,8 @@ export const useActiveGameSessionEffects = ({
   setInitialized,
   setCurrentDecision,
   setIsGeneratingChoices,
-  setIsFatalEnding,
-  fatalEndingTriggeredRef,
   choiceGenerationTimeoutRef,
 }: UseActiveGameSessionEffectsOptions) => {
-  // Reset fatal guard and flag when session changes
-  useEffect(() => {
-    fatalEndingTriggeredRef.current = false;
-    setIsFatalEnding(false);
-  }, [sessionId, setIsFatalEnding, fatalEndingTriggeredRef]);
-
   // Safety net: if no narrative segment arrives within a reasonable window,
   // inject a minimal fallback scene so the UI can progress.
   // Only trigger if we're not actively generating content.
