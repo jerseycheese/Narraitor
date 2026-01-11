@@ -88,6 +88,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
               const decisionWeight = entry.decision.decisionWeight;
               const hasDetails = Boolean(decisionPrompt);
               const isExpanded = expandedEntries.has(entry.decision.id);
+              const detailsId = `decision-details-${entry.decision.id}`;
 
               return (
                 <Card
@@ -118,6 +119,8 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                           variant="ghost"
                           size="sm"
                           className="text-xs text-amber-700"
+                          aria-expanded={isExpanded}
+                          aria-controls={detailsId}
                           onClick={() => {
                             setExpandedEntries((previous) => buildExpandedSet(previous, entry.decision.id));
                           }}
@@ -138,7 +141,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     </div>
                   )}
                   {hasDetails && isExpanded && (
-                    <p className="mt-2 text-xs text-gray-600 whitespace-pre-wrap">
+                    <p id={detailsId} className="mt-2 text-xs text-gray-600 whitespace-pre-wrap">
                       {decisionPrompt}
                     </p>
                   )}

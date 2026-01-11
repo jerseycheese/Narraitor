@@ -21,6 +21,8 @@ export const buildDecisionHistory = ({
   const selectedDecisions = decisions.filter((decision) => decision.selectedOptionId);
   if (!selectedDecisions.length) return [];
 
+  const decisionIds = new Set(decisions.map((decision) => decision.id));
+
   const sortedSegments = [...segments].sort((a, b) => {
     const aTime = toTimestamp(a.createdAt);
     const bTime = toTimestamp(b.createdAt);
@@ -33,7 +35,7 @@ export const buildDecisionHistory = ({
   const firstOutcomeByDecision = new Map<EntityID, NarrativeSegment>();
   sortedSegments.forEach((segment) => {
     const decisionId = segment.metadata?.causedByDecisionId;
-    if (decisionId && !firstOutcomeByDecision.has(decisionId)) {
+    if (decisionId && decisionIds.has(decisionId) && !firstOutcomeByDecision.has(decisionId)) {
       firstOutcomeByDecision.set(decisionId, segment);
     }
   });
