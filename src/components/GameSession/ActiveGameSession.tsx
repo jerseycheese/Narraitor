@@ -3,31 +3,24 @@
 import React from 'react';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
-import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
-import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
-import { StorySummarySection } from './StorySummarySection';
-import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { EndingScreen } from './EndingScreen';
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
-import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import { InventoryList } from '@/components/inventory/InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useRouter } from 'next/navigation';
-
-const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
+import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
+import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
+import ActiveGameSessionControls from './ActiveGameSessionControls';
+import { useActiveGameSessionEffects } from './hooks/useActiveGameSessionEffects';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -64,7 +57,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const decisionSubscriptionRef = React.useRef<(() => void) | undefined>(undefined);
 
   // Ending suggestion state
   const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
@@ -78,14 +70,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
-
-  // Reset fatal guard and flag when session changes
-  React.useEffect(() => {
-    fatalEndingTriggeredRef.current = false;
-    setIsFatalEnding(false);
-  }, [sessionId]);
-
+  
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
@@ -119,7 +104,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
-  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
+  const narrativeMaxHeight = segmentCount > 1 ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -136,170 +121,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   const router = useRouter();
-  
-
-  // Debug: log key state changes to help diagnose skeleton readiness
-  // (Commented out to reduce console noise)
-
-  // Safety net: if no narrative segment arrives within a reasonable window,
-  // inject a minimal fallback scene so the UI can progress.
-  // Only trigger if we're not actively generating content.
-  React.useEffect(() => {
-    if (!initialized) return;
-    if (segmentCount > 0) return;
-    let cancelled = false;
-    const t = setTimeout(() => {
-      if (cancelled) return;
-      // Don't inject fallback if AI generation is still in progress
-      if (isGenerating) return;
-
-      try {
-        const now = new Date();
-        const fallback: NarrativeSegment = {
-          id: `seg-${sessionId}-bootstrap-${now.getTime()}`,
-          content: 'You take a breath as your adventure begins. The world awaits your first move.',
-          type: 'scene',
-          metadata: { location: 'Starting Location', tags: ['intro', 'bootstrap'] },
-          sessionId,
-          worldId,
-          timestamp: now,
-          createdAt: now.toISOString(),
-          updatedAt: now.toISOString(),
-        } as NarrativeSegment;
-        // Add to store only; NarrativeHistoryManager reads from store
-        useNarrativeStore.getState().addSegment(sessionId, {
-          content: fallback.content,
-          type: fallback.type,
-          characterIds: [],
-          metadata: fallback.metadata,
-          updatedAt: fallback.updatedAt,
-          timestamp: fallback.timestamp,
-        });
-        // Begin generating choices after bootstrap
-        setIsGeneratingChoices(true);
-      } catch {
-        // Ignore errors; controller may be mid-flight
-      }
-    }, 4000); // Increased timeout to 4 seconds to give AI more time
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [initialized, segmentCount, sessionId, worldId, isGenerating]);
-
-  // Ensure we eventually release the generating flag to allow safety fallbacks
-  React.useEffect(() => {
-    if (!initialized) return;
-    if (segmentCount > 0) return;
-    if (!isGenerating) return;
-
-    let cancelled = false;
-    const timeoutId = setTimeout(() => {
-      if (cancelled) return;
-      setIsGenerating(false);
-    }, INITIAL_GENERATION_MAX_WAIT_MS);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, [initialized, segmentCount, isGenerating]);
-  
-  // Initialize the narrative only once per session
-  // instead of clearing and recreating each time
-  React.useEffect(() => {
-    // Initialize session with unique controller key
-    let isMounted = true;
-    
-    // Set initial loading state
-    setIsGenerating(true);
-    
-    // Function to check existing narrative and set up if needed
-    const setupNarrative = async () => {
-      try {
-        // Dynamically import the narrativeStore to avoid circular dependencies
-        const { useNarrativeStore } = await import('@/state/narrativeStore');
-        
-        // Only proceed if still mounted
-        if (!isMounted) return;
-        
-        // Check if we already have segments for this session
-        const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-        // Check for 'intro' tag which is more stable than checking specific location strings
-        const hasInitialScene = existingSegments.some(seg =>
-          seg.metadata?.tags?.includes('intro')
-        );
-        
-        // Check for existing decisions in the store
-        const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
-        
-        // If we have existing decisions, use the latest one
-        if (existingDecisions.length > 0) {
-          const latestDecision = existingDecisions[existingDecisions.length - 1];
-          setCurrentDecision(latestDecision);
-        }
-        
-        if (hasInitialScene || existingSegments.length > 0) {
-          // If we have any segments at all, use them
-          // Don't clear existing narrative history
-          setInitialized(true);
-          setIsGenerating(false);
-          // Choice generation will be triggered by NarrativeController after narrative generation
-        }
-        else {
-          // No segments at all - normal case for new session
-          // Keep UI in generating state until first segment arrives or we explicitly fallback
-          setInitialized(true);
-          setIsGenerating(true);
-        }
-      } catch {
-        // Error setting up narrative, continue with initialization
-        setInitialized(true);
-        setIsGenerating(true);
-      }
-    };
-    
-    // Check existing narrative and set up if needed
-    setupNarrative();
-    
-    return () => {
-      // Mark component as unmounted to prevent state updates after unmounting
-      isMounted = false;
-      
-      // Clear any pending choice generation timeout
-      if (choiceGenerationTimeoutRef.current) {
-        clearTimeout(choiceGenerationTimeoutRef.current);
-        choiceGenerationTimeoutRef.current = null;
-      }
-    };
-  }, [sessionId, worldId, controllerKey]);
-
-  // Keep currentDecision synchronized with store updates (supports external generators like item usage)
-  React.useEffect(() => {
-    // Clean up previous subscription
-    decisionSubscriptionRef.current?.();
-
-    const unsubscribe = useNarrativeStore.subscribe((state) => {
-      const decisionIds = state.sessionDecisions[sessionId];
-      const ids = decisionIds || [];
-      const latestId = ids[ids.length - 1];
-      if (latestId) {
-        const latest = state.decisions[latestId] || null;
-        setCurrentDecision(latest);
-        setIsGeneratingChoices(false);
-      } else {
-        setCurrentDecision(null);
-        // If narrative already exists, surface a loading state while choices regenerate
-        const hasSegments = (state.sessionSegments[sessionId]?.length ?? 0) > 0;
-        if (hasSegments) {
-          setIsGeneratingChoices(true);
-        }
-      }
-    });
-
-    decisionSubscriptionRef.current = unsubscribe;
-    return () => {
-      unsubscribe();
-      decisionSubscriptionRef.current = undefined;
-    };
-  }, [sessionId]);
 
   // Helper function to generate AI summary for journal entries
   const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
@@ -488,34 +309,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       createJournalEntryFromSegment(segment, decisionWeight);
     }
     
-    // Set a fallback timer to ensure choices eventually appear
-    // Use a ref to track this timeout so we can clear it if AI choices arrive
-    const timeoutId = setTimeout(() => {
-      // If we're still generating choices after 15 seconds, create fallback choices
-      setIsGeneratingChoices(prev => {
-        if (prev && !currentDecision) {
-          const fallbackId = `decision-timeout-${Date.now()}`;
-          const fallbackDecision: Decision = {
-            id: fallbackId,
-            prompt: "What will you do?",
-            options: [
-              { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
-              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
-              { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
-            ],
-            decisionWeight: 'minor',
-            contextSummary: 'Waiting for player action (timeout fallback).'
-          };
-          
-          setCurrentDecision(fallbackDecision);
-          return false; // Stop generating
-        }
-        return prev;
-      });
-    }, 15000); // 15 second timeout (increased from 10)
-    
-    // Store timeout ID for potential cleanup
-    choiceGenerationTimeoutRef.current = timeoutId;
+    scheduleChoiceFallback(currentDecision);
 
     void autoSave.triggerSave('scene-change');
   };
@@ -725,44 +519,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     handleEndStory();
   };
 
-  // Global event handlers to support hero action buttons from parent pages
-  React.useEffect(() => {
-    const onEndStory = () => handleEndStoryClick();
-    const onEndSession = async () => {
-      // Dispatch event to trigger final checkpoint before ending session
-      window.dispatchEvent(new CustomEvent('narraitor:finalize-checkpoint'));
-      // Small delay to allow checkpoint to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-      if (onEnd) onEnd();
-    };
-    const onNewSession = async () => {
-      const sessionStore = useSessionStore.getState();
-      const narrativeStore = useNarrativeStore.getState();
-      narrativeStore.clearSessionSegments(sessionId);
-      narrativeStore.clearSessionDecisions(sessionId);
-      narrativeStore.clearEnding();
-      sessionStore.endSession();
-      Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
-        const savedSession = sessionStore.savedSessions[savedSessionId];
-        if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
-          sessionStore.deleteSavedSession(savedSessionId);
-        }
-      });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const url = new URL(window.location.href);
-      url.searchParams.set('fresh', 'true');
-      window.location.href = url.toString();
-    };
-
-    window.addEventListener('narraitor:end-story', onEndStory as EventListener);
-    window.addEventListener('narraitor:end-session', onEndSession as EventListener);
-    window.addEventListener('narraitor:new-session', onNewSession as EventListener);
-    return () => {
-      window.removeEventListener('narraitor:end-story', onEndStory as EventListener);
-      window.removeEventListener('narraitor:end-session', onEndSession as EventListener);
-      window.removeEventListener('narraitor:new-session', onNewSession as EventListener);
-    };
-  }, [sessionId, worldId, characterId, onEnd]);
+  const { scheduleChoiceFallback } = useActiveGameSessionEffects({
+    sessionId,
+    worldId,
+    controllerKey,
+    initialized,
+    isGenerating,
+    segmentCount,
+    characterId: characterId || undefined,
+    onEnd,
+    onEndStoryClick: handleEndStoryClick,
+    setIsGenerating,
+    setInitialized,
+    setCurrentDecision,
+    setIsGeneratingChoices,
+    setIsFatalEnding,
+    fatalEndingTriggeredRef,
+    choiceGenerationTimeoutRef,
+  });
 
   // If we have an ending, show the ending screen instead
   if (currentEnding) {
@@ -819,147 +593,56 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Two-column layout for larger screens */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
         {/* Story Column */}
-        <div
-          className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
-          id="narrative-container"
-          style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
-        >
-          {/* Fade-out overlay at top when multiple segments */}
-          {segmentCount > 1 && (
-            <div className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-b from-background to-transparent" />
-          )}
-          {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
-          <NarrativeHistoryManager
-            key={`display-${controllerKey}`}
-            sessionId={sessionId}
-            className="flex flex-col flex-1 min-h-0"
-            disableInitialAutoScroll={false}
-          />
-
-          {/* Hidden controller just to generate content - always include it but hide from view */}
-          <div aria-hidden="true" className="hidden h-0 overflow-hidden">
-            <NarrativeController
-              key={`generator-${controllerKey}`}
-              worldId={worldId}
-              sessionId={sessionId}
-              characterId={characterId || undefined}
-              decisionWeight={currentDecision?.decisionWeight}
-              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
-              choiceId={localSelectedChoiceId || selectedChoiceId}
-              onNarrativeGenerated={handleNarrativeGenerated}
-              onChoicesGenerated={handleChoicesGenerated}
-              onEndingSuggested={handleEndingSuggested}
-              generateChoices={true}
-            />
-          </div>
-        </div>
+        <ActiveGameSessionNarrativeColumn
+          controllerKey={controllerKey}
+          worldId={worldId}
+          sessionId={sessionId}
+          characterId={characterId || undefined}
+          decisionWeight={currentDecision?.decisionWeight}
+          triggerGeneration={triggerGeneration}
+          initialized={initialized}
+          shouldTriggerGeneration={shouldTriggerGeneration}
+          localSelectedChoiceId={localSelectedChoiceId}
+          selectedChoiceId={selectedChoiceId}
+          onNarrativeGenerated={handleNarrativeGenerated}
+          onChoicesGenerated={handleChoicesGenerated}
+          onEndingSuggested={handleEndingSuggested}
+          narrativeMaxHeight={narrativeMaxHeight}
+          segmentCount={segmentCount}
+        />
 
         {/* Choices Column */}
-        <div
-          className="lg:flex-[1] min-h-0 flex flex-col"
-          id="choices-container"
-          aria-busy={isGeneratingChoices}
-        >
-          <div className="player-choices-container flex-1">
-            {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
-            {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
-                <ChoiceSelector
-                  decision={currentDecision}
-                  onSelect={handleChoiceSelected}
-                  onCustomSubmit={handleCustomSubmit}
-                  enableCustomInput={true}
-                  isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-                  worldSkills={world?.skills || []}
-                  characterSkills={characterSkills}
-                  inventoryItems={inventoryItems}
-                  onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
-                  endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-                    reason: endingSuggestionReason,
-                    onAccept: handleAcceptEndingSuggestion,
-                    onDismiss: handleRejectEndingSuggestion,
-                  } : undefined}
-                />
-            ) : (
-              <div className="space-y-4 p-4">
-                {/* Choice decision skeleton - matches ChoiceSelector layout */}
-                <div className="space-y-3">
-                  {/* Choice prompt skeleton */}
-                  <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
-
-                  {/* Choice buttons skeleton */}
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="h-12 bg-gray-200 border border-gray-300 rounded-lg animate-pulse"
-                    />
-                  ))}
-
-                  {/* Custom input skeleton */}
-                  <div className="mt-4 space-y-2">
-                    <div className="h-4 bg-gray-300 rounded w-1/3 animate-pulse" />
-                    <div className="h-10 bg-gray-200 border border-gray-300 rounded animate-pulse" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Character Summary Panel below hero */}
-      {character && (
-        <div className="mt-6">
-          <CharacterSummary character={character} />
-        </div>
-      )}
-
-      {/* Inventory Display */}
-      {characterId && (
-        <div className="mt-6" data-testid="inventory-collapsible">
-          <CollapsibleSection title="Inventory" initialCollapsed>
-            <InventoryList characterId={characterId} />
-          </CollapsibleSection>
-        </div>
-      )}
-
-      <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
-
-      <ChoiceHistorySection sessionId={sessionId} />
-
-      {/* Autosave indicator anchored under the main content */}
-      <div className="mt-4">
-        <SaveIndicator
-          status={autoSave.status}
-          lastSaveTime={autoSave.lastSaveTime}
-          errorMessage={autoSave.errorMessage}
-          totalSaves={autoSave.totalSaves}
-          onManualSave={autoSave.triggerSave}
-          onRetryError={autoSave.retry}
-          retryable
-          compact
-          className="text-xs sm:text-sm"
+        <ActiveGameSessionChoicesColumn
+          currentDecision={currentDecision}
+          segmentCount={segmentCount}
+          status={status}
+          isGenerating={isGenerating}
+          isGeneratingChoices={isGeneratingChoices}
+          isSessionEnded={isSessionEnded(sessionId)}
+          worldSkills={world?.skills || []}
+          characterSkills={characterSkills}
+          inventoryItems={inventoryItems}
+          onChoiceSelected={handleChoiceSelected}
+          onCustomSubmit={handleCustomSubmit}
+          endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
+            reason: endingSuggestionReason,
+            onAccept: handleAcceptEndingSuggestion,
+            onDismiss: handleRejectEndingSuggestion,
+          } : undefined}
         />
       </div>
 
-
-      {/* Manual End Story Confirmation */}
-      <ConfirmationDialog
-        isOpen={showEndConfirmation}
-        onConfirm={handleConfirmEndStory}
-        onClose={() => setShowEndConfirmation(false)}
-        title="End Story"
-        message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
-        variant="warning"
-        confirmText="End Story"
-        cancelText="Cancel"
+      <ActiveGameSessionControls
+        character={character}
+        characterId={characterId || undefined}
+        worldId={worldId}
+        sessionId={sessionId}
+        autoSave={autoSave}
+        showEndConfirmation={showEndConfirmation}
+        onConfirmEndStory={handleConfirmEndStory}
+        onCloseEndStory={() => setShowEndConfirmation(false)}
+        onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
       />
-
-      {/* Journal Floating Button - Issue #562 */}
-      {character && (
-        <JournalFloatingButton
-          onClick={() => router.push(`/worlds/${worldId}/play/journal`)}
-        />
-      )}
     </div>
   );
 };
