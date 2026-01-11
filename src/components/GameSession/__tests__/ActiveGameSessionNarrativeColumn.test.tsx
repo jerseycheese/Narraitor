@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ActiveGameSessionNarrativeColumn from '../ActiveGameSessionNarrativeColumn';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
-import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 
 jest.mock('@/components/Narrative/NarrativeController', () => ({
