@@ -44,7 +44,7 @@ const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnPro
 }) => {
   return (
     <div
-      className="lg:flex-1 min-h-0 flex flex-col"
+      className="lg:flex-[1] min-h-0 flex flex-col"
       id="choices-container"
       aria-busy={isGeneratingChoices}
     >

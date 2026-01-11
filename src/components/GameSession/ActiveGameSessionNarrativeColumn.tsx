@@ -43,7 +43,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<ActiveGameSessionNarrativeColum
 }) => {
   return (
     <div
-      className="lg:flex-1 min-h-0 flex flex-col lg:overflow-hidden relative"
+      className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
       id="narrative-container"
       style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
     >
