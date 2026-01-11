@@ -242,3 +242,5 @@ export const useAutoSave = () => {
     retry,
   };
 };
+
+export type UseAutoSaveReturn = ReturnType<typeof useAutoSave>;
