@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { EndingType } from '@/types/narrative.types';
+import type { EndingTone, EndingType } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { Character } from '@/state/characterStore';
 
@@ -16,9 +16,10 @@ interface UseActiveGameSessionEndingOptions {
       sessionId: string;
       characterId: string;
       worldId: string;
-      world: World;
-      character: Character;
-      desiredTone?: string;
+      desiredTone?: EndingTone;
+      customPrompt?: string;
+      world?: World;
+      character?: Character;
     }
   ) => Promise<void>;
 }

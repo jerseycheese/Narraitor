@@ -45,11 +45,16 @@ jest.mock('@/components/inventory/InventoryList', () => ({
 }));
 
 const baseAutoSave = {
+  isEnabled: true,
   status: 'idle' as const,
   lastSaveTime: null,
   errorMessage: null,
   totalSaves: 0,
-  triggerSave: jest.fn(),
+  isRunning: false,
+  start: jest.fn(),
+  stop: jest.fn(),
+  triggerSave: jest.fn(async () => undefined),
+  setEnabled: jest.fn(),
   retry: jest.fn(),
 };
 
