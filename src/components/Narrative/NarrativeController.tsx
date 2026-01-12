@@ -470,11 +470,12 @@ Respond with JSON format:
     };
 
     try {
+      const choiceCharacterIds = characterId ? [characterId] : [];
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
         worldId,
         currentSceneId: `scene-${Date.now()}`,
-        characterIds: [],
+        characterIds: choiceCharacterIds,
         previousSegments: recentSegments,
         currentTags:
           recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
@@ -503,7 +504,7 @@ Respond with JSON format:
           narrativeGenerator.generatePlayerChoices(
             worldId,
             narrativeContext,
-            []
+            choiceCharacterIds
           ),
           timeoutPromise,
         ]);

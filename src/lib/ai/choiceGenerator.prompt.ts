@@ -1,6 +1,7 @@
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
@@ -14,7 +15,6 @@ import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { logger } from '@/lib/utils/logger';
-
 interface ChoicePromptInput {
   world: World;
   worldId: string;
@@ -25,7 +25,6 @@ interface ChoicePromptInput {
   includeDecisionHistory?: boolean;
   maxOptions?: number;
 }
-
 export const buildChoicePrompt = ({
   world,
   worldId,
@@ -36,22 +35,28 @@ export const buildChoicePrompt = ({
   includeDecisionHistory = true,
   maxOptions,
 }: ChoicePromptInput): string => {
+  const resolvedCharacterIds = resolveCharacterIds(characterIds, worldId);
   const template = getTemplate(
     useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice'
   );
-  const context = buildContext(world, narrativeContext, characterIds, maxOptions);
+  const context = buildContext(
+    world,
+    narrativeContext,
+    resolvedCharacterIds,
+    maxOptions
+  );
   const basePrompt = template(context);
   const inventoryAwarePrompt = enhancePromptWithInventory(
     basePrompt,
-    characterIds
+    resolvedCharacterIds
   );
   const skillAwarePrompt = enhancePromptWithCharacterSkills(
     inventoryAwarePrompt,
-    characterIds
+    resolvedCharacterIds
   );
   const personalityAwarePrompt = enhancePromptWithPersonality(
     skillAwarePrompt,
-    characterIds,
+    resolvedCharacterIds,
     useAlignedChoices
   );
   const loreEnhancedPrompt = enhancePromptWithLore(
@@ -63,15 +68,33 @@ export const buildChoicePrompt = ({
     loreEnhancedPrompt,
     world
   );
-
   return includeDecisionHistory && sessionId
     ? enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
     : toneEnhancedPrompt;
 };
-
+const resolveCharacterIds = (
+  characterIds: string[],
+  worldId: string
+): string[] => {
+  if (characterIds && characterIds.length > 0) return characterIds;
+  try {
+    const sessionCharacterId = useSessionStore.getState().characterId;
+    if (sessionCharacterId) return [sessionCharacterId];
+    const { characters, currentCharacterId, worldCharacterIds } =
+      useCharacterStore.getState();
+    if (currentCharacterId) return [currentCharacterId];
+    const roster = worldCharacterIds?.[worldId] ?? [];
+    if (roster.length > 0) return roster;
+    const playerCharacter = Object.values(characters).find(
+      (character) => character?.isPlayer
+    );
+    return playerCharacter ? [playerCharacter.id] : [];
+  } catch {
+    return [];
+  }
+};
 const getTemplate = (templateType: string) => {
   const templateKey = `narrative/${templateType}`;
-
   try {
     return narrativeTemplateManager.getTemplate(templateKey);
   } catch (error) {
@@ -79,7 +102,6 @@ const getTemplate = (templateType: string) => {
     throw error;
   }
 };
-
 const buildContext = (
   world: World,
   narrativeContext: NarrativeContext,
@@ -99,7 +121,6 @@ const buildContext = (
       description: skill.description,
     })) || [],
 });
-
 const enhancePromptWithLore = (
   prompt: string,
   worldId: string,
@@ -111,17 +132,14 @@ const enhancePromptWithLore = (
   });
   return prompt + loreContext;
 };
-
 const enhancePromptWithToneSettings = (prompt: string, world: World): string => {
   const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
-
   const detailedInstructions = getDetailedToneInstructions(
     toneSettings.contentRating,
     toneSettings.narrativeStyle,
     toneSettings.languageComplexity,
     toneSettings.customInstructions
   );
-
   const choiceSpecificGuidance = `
 
 CHOICE GENERATION FOCUS:
@@ -133,30 +151,18 @@ CHOICE GENERATION FOCUS:
 
   return prompt + detailedInstructions + choiceSpecificGuidance;
 };
-
 const enhancePromptWithInventory = (
   prompt: string,
   characterIds: string[]
 ): string => {
   try {
-    if (!characterIds || characterIds.length === 0) {
-      return prompt;
-    }
-
+    if (!characterIds || characterIds.length === 0) return prompt;
     const characterId = characterIds[0];
     const { getCharacterItems } = useInventoryStore.getState();
     const items = getCharacterItems(characterId);
-
-    if (!items || items.length === 0) {
-      return prompt;
-    }
-
+    if (!items || items.length === 0) return prompt;
     const { context: inventorySection } = buildInventoryContext(items);
-
-    if (!inventorySection) {
-      return prompt;
-    }
-
+    if (!inventorySection) return prompt;
     const guidance = `
 
 PLAYER INVENTORY CONTEXT:
@@ -172,35 +178,21 @@ CHOICE DESIGN RULES:
     return prompt;
   }
 };
-
 const enhancePromptWithCharacterSkills = (
   prompt: string,
   characterIds: string[]
 ): string => {
   try {
-    if (!characterIds || characterIds.length === 0) {
-      return prompt;
-    }
-
+    if (!characterIds || characterIds.length === 0) return prompt;
     const { characters } = useCharacterStore.getState();
     const skillSections: string[] = [];
-
     for (const characterId of characterIds) {
       const character = characters[characterId];
-      if (!character || !character.skills || character.skills.length === 0) {
-        continue;
-      }
-
+      if (!character || !character.skills || character.skills.length === 0) continue;
       const skillString = formatSkillsForNarrative(character.skills);
-      if (skillString) {
-        skillSections.push(`${character.name}: ${skillString}`);
-      }
+      if (skillString) skillSections.push(`${character.name}: ${skillString}`);
     }
-
-    if (skillSections.length === 0) {
-      return prompt;
-    }
-
+    if (skillSections.length === 0) return prompt;
     const guidance = `
 
 CHARACTER SKILLS CONTEXT:
@@ -226,13 +218,16 @@ const enhancePromptWithPersonality = (
   try {
     if (!characterIds || characterIds.length === 0) return prompt;
     const { characters } = useCharacterStore.getState();
-    let playerCharacter = undefined;
+    let playerCharacter;
     for (const characterId of characterIds) {
       const character = characters[characterId];
       if (character?.isPlayer) {
         playerCharacter = character;
         break;
       }
+    }
+    if (!playerCharacter && characterIds.length === 1) {
+      playerCharacter = characters[characterIds[0]];
     }
     if (!playerCharacter) return prompt;
     const personalitySection = formatPersonalityForChoices(
