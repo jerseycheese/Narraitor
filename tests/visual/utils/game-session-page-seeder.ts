@@ -242,9 +242,25 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         };
       };
     }).useInventoryStore;
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: {
+        getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useSessionStore;
 
     if (!inventoryStore?.setState) {
       return;
+    }
+
+    if (sessionStore?.setState) {
+      const sessionState = sessionStore.getState?.() || {};
+      sessionStore.setState({
+        ...sessionState,
+        id: sessionState.id ?? 'session-cyberpunk-ghost',
+        worldId: sessionState.worldId ?? 'world-cyberpunk-2077',
+        characterId: sessionState.characterId ?? 'char-cyberpunk-hacker',
+      });
     }
 
     const cyberpunkItems = {
@@ -464,9 +480,13 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
         ) => void;
       };
     }).useJournalStore;
-    const sessionStore = (window as typeof window & {
-      useSessionStore?: { getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null } };
-    }).useSessionStore?.getState?.();
+    const sessionStoreApi = (window as typeof window & {
+      useSessionStore?: {
+        getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useSessionStore;
+    const sessionStore = sessionStoreApi?.getState?.();
 
     if (!journalStore?.setState) {
       return;
@@ -475,6 +495,15 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     const targetSessionId = sessionStore?.id ?? entries[0]?.sessionId;
     const targetWorldId = sessionStore?.worldId ?? entries[0]?.worldId;
     const targetCharacterId = sessionStore?.characterId ?? entries[0]?.characterId;
+
+    if (sessionStoreApi?.setState) {
+      sessionStoreApi.setState((state: { id?: string | null; worldId?: string | null; characterId?: string | null }) => ({
+        ...state,
+        id: state.id ?? targetSessionId,
+        worldId: state.worldId ?? targetWorldId,
+        characterId: state.characterId ?? targetCharacterId,
+      }));
+    }
     const baseTimestamp = Date.now();
     const adjustedEntries = entries.map((entry: any, index: number) => {
       const timestamp = new Date(baseTimestamp + index * 1000).toISOString();

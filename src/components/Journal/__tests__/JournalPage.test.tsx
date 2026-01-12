@@ -96,6 +96,26 @@ describe('JournalPage', () => {
     ...overrides,
   } as JournalStoreState);
 
+  const buildJournalEntriesState = (entries: JournalEntry[]) => {
+    const entriesRecord = entries.reduce<Record<string, JournalEntry>>((acc, entry) => {
+      acc[entry.id] = entry;
+      return acc;
+    }, {});
+
+    const sessionId = entries[0]?.sessionId || 'session-1';
+    const sessionEntries = entries.reduce<Record<string, string[]>>((acc, entry) => {
+      acc[entry.sessionId] = acc[entry.sessionId] || [];
+      acc[entry.sessionId].push(entry.id);
+      return acc;
+    }, {});
+
+    if (!sessionEntries[sessionId]) {
+      sessionEntries[sessionId] = entries.map((entry) => entry.id);
+    }
+
+    return { entries: entriesRecord, sessionEntries };
+  };
+
   const buildSessionState = (overrides: Partial<SessionStoreState> = {}): SessionStoreState => ({
     ...overrides,
   } as SessionStoreState);
@@ -137,6 +157,7 @@ describe('JournalPage', () => {
     const entry = createEntry();
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
+      ...buildJournalEntriesState([entry]),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -189,6 +210,7 @@ describe('JournalPage', () => {
     const entry = createEntry();
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
+      ...buildJournalEntriesState([entry]),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -220,6 +242,7 @@ describe('JournalPage', () => {
     const entries = createEntries(25);
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -246,6 +269,7 @@ describe('JournalPage', () => {
     ];
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
