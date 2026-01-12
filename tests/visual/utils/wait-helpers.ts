@@ -75,8 +75,9 @@ export async function waitForStableScrollHeight(
   { timeout = 5000, stableDuration = 500 }: { timeout?: number; stableDuration?: number } = {}
 ): Promise<void> {
   const start = Date.now();
+  const maxWaitMs = timeout + stableDuration;
   await page.waitForFunction(
-    ({ stableDuration, start }) => {
+    ({ stableDuration, start, maxWaitMs }) => {
       const now = Date.now();
       const doc = document.documentElement;
       const height = doc.scrollHeight;
@@ -95,11 +96,11 @@ export async function waitForStableScrollHeight(
       }
 
       const isStable = now - prevTime >= stableDuration;
-      const exceeded = now - start >= (timeout + stableDuration);
+      const exceeded = now - start >= maxWaitMs;
 
       return isStable || exceeded;
     },
-    { stableDuration, start },
+    { stableDuration, start, maxWaitMs },
     { timeout }
   );
 }

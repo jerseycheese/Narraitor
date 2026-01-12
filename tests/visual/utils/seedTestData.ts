@@ -323,11 +323,15 @@ export async function seedTestData(page: Page): Promise<void> {
       const seedStoresFromFixtures = () => {
         const testWindow = window as typeof window & {
           __TEST_STORES_SEEDED__?: boolean;
+          __TEST_JOURNAL_SEEDED__?: boolean;
           useWorldStore?: { setState?: (updater: any) => void };
           useCharacterStore?: { setState?: (updater: any) => void };
           useSessionStore?: { setState?: (updater: any) => void };
           useNarrativeStore?: { setState?: (updater: any) => void };
-          useJournalStore?: { setState?: (updater: any) => void };
+          useJournalStore?: {
+            setState?: (updater: any) => void;
+            getState?: () => { entries?: Record<string, unknown>; sessionEntries?: Record<string, string[]> };
+          };
         };
 
         if (testWindow.__TEST_STORES_SEEDED__) {
@@ -476,9 +480,58 @@ export async function seedTestData(page: Page): Promise<void> {
             loading: false,
             error: null,
           }));
+          testWindow.__TEST_JOURNAL_SEEDED__ = true;
         }
 
         testWindow.__TEST_STORES_SEEDED__ = true;
+        return true;
+      };
+
+      const seedJournalStoreFromFixtures = () => {
+        const testWindow = window as typeof window & {
+          __TEST_JOURNAL_SEEDED__?: boolean;
+          useJournalStore?: {
+            setState?: (updater: any) => void;
+            getState?: () => { sessionEntries?: Record<string, string[]> };
+          };
+        };
+
+        if (testWindow.__TEST_JOURNAL_SEEDED__) {
+          return true;
+        }
+
+        if (!Object.keys(journalEntriesRecord).length) {
+          testWindow.__TEST_JOURNAL_SEEDED__ = true;
+          return true;
+        }
+
+        const journalStore = testWindow.useJournalStore;
+        if (!journalStore?.setState) {
+          return false;
+        }
+
+        const primarySessionId =
+          SAMPLE_GAME_SESSIONS[0]?.id ?? Object.keys(journalSessionEntries)[0];
+        const existingEntries =
+          journalStore.getState?.().sessionEntries?.[primarySessionId ?? ''] || [];
+
+        if (existingEntries.length > 0) {
+          testWindow.__TEST_JOURNAL_SEEDED__ = true;
+          return true;
+        }
+
+        journalStore.setState((state: any) => ({
+          ...state,
+          entries: { ...state?.entries, ...journalEntriesRecord },
+          sessionEntries: {
+            ...state?.sessionEntries,
+            ...journalSessionEntries,
+          },
+          loading: false,
+          error: null,
+        }));
+
+        testWindow.__TEST_JOURNAL_SEEDED__ = true;
         return true;
       };
 
@@ -489,6 +542,18 @@ export async function seedTestData(page: Page): Promise<void> {
         const intervalId = window.setInterval(() => {
           attempts += 1;
           if (seedStoresFromFixtures() || attempts >= maxAttempts) {
+            window.clearInterval(intervalId);
+          }
+        }, 100);
+      }
+
+      const didSeedJournalStore = seedJournalStoreFromFixtures();
+      if (!didSeedJournalStore) {
+        let attempts = 0;
+        const maxAttempts = 50;
+        const intervalId = window.setInterval(() => {
+          attempts += 1;
+          if (seedJournalStoreFromFixtures() || attempts >= maxAttempts) {
             window.clearInterval(intervalId);
           }
         }, 100);
