@@ -16,11 +16,9 @@ import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { PersonalizationEngine } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
-
 const MAX_OTHER_CHARACTER_THREADS = 3;
 const MAX_CROSS_CHARACTER_REFERENCES = 2;
 const PROMPT_THREAD_SUMMARY_LENGTH = 160;
-
 export const enhancePromptWithPersonalization = async (
   prompt: string,
   worldId: EntityID,
@@ -34,18 +32,14 @@ export const enhancePromptWithPersonalization = async (
     const { characters } = useCharacterStore.getState();
     const playerCharacterId = characterIds[0];
     const storeCharacter = playerCharacterId ? characters[playerCharacterId] : null;
-
     if (!storeCharacter) {
       return prompt;
     }
-
     const playerCharacter = convertToPersonalizationCharacter(storeCharacter);
-
     let relevantDecisions = [] as ReturnType<
       typeof playerDecisionTracker.getRelevantDecisions
     >;
     let decisionHistory = '';
-
     if (sessionId) {
       // Try session-specific decisions first
       const currentContext: SimpleNarrativeContext = { worldId, sessionId };
@@ -95,10 +89,16 @@ export const enhancePromptWithPersonalization = async (
 
     const enhancementText =
       personalizationEngine.generateNarrativeEnhancement(personalizedContext);
+    const cleanedEnhancementText = prompt.includes('CURRENT NARRATIVE GOALS:')
+      ? enhancementText
+          .split('\n\n')
+          .filter((section) => !section.startsWith('ACTIVE GOALS:'))
+          .join('\n\n')
+      : enhancementText;
 
     let personalizationSection = '';
-    if (safeTrim(enhancementText)) {
-      personalizationSection += `\n\n${enhancementText}`;
+    if (safeTrim(cleanedEnhancementText)) {
+      personalizationSection += `\n\n${cleanedEnhancementText}`;
     }
     if (decisionHistory) {
       personalizationSection += decisionHistory;
