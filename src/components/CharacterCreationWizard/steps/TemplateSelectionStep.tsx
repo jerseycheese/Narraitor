@@ -61,7 +61,6 @@ interface TemplateSelectionStepProps {
 export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
   data,
   onUpdate,
-  onValidation,
   worldConfig
 }) => {
   const templates = worldConfig.characterTemplates || [];
