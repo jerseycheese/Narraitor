@@ -42,13 +42,25 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
-  const entries = useJournalStore(
-    React.useCallback(
-      (state) =>
-        sessionId ? state.getSessionEntriesWithCharacter(sessionId, characterId) : [],
-      [sessionId, characterId]
-    )
+  const getSessionEntriesWithCharacter = useJournalStore(
+    (state) => state.getSessionEntriesWithCharacter
   );
+  const journalEntries = useJournalStore((state) => state.entries);
+  const sessionEntries = useJournalStore((state) => state.sessionEntries);
+
+  const entries = React.useMemo(() => {
+    if (!sessionId) {
+      return [];
+    }
+
+    return getSessionEntriesWithCharacter(sessionId, characterId);
+  }, [
+    sessionId,
+    characterId,
+    getSessionEntriesWithCharacter,
+    journalEntries,
+    sessionEntries,
+  ]);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredEntries = React.useMemo(() => {
