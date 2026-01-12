@@ -598,6 +598,7 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
           partial: unknown,
           replace?: boolean
         ) => void;
+        getState?: () => { entries?: Record<string, unknown>; sessionEntries?: Record<string, string[]> };
       };
     }).useJournalStore;
     const worldStore = (window as typeof window & {
@@ -678,6 +679,11 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     const targetWorldId = sessionStore?.worldId ?? resolvedWorldId ?? entries[0]?.worldId;
     const targetCharacterId = sessionStore?.characterId ?? resolvedCharacterId ?? entries[0]?.characterId;
 
+    const existingSessionEntries = journalStore.getState?.().sessionEntries?.[targetSessionId || ''] || [];
+    if (existingSessionEntries.length > 0) {
+      return;
+    }
+
     if (sessionStoreApi?.setState) {
       sessionStoreApi.setState((state: { id?: string | null; worldId?: string | null; characterId?: string | null }) => ({
         ...state,
@@ -720,6 +726,8 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     journalStore.setState(() => ({
       entries: entriesRecord,
       sessionEntries,
+      loading: false,
+      error: null,
     }));
   }, SAMPLE_JOURNAL_ENTRIES);
 

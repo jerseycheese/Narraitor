@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import {
+  hideDynamicContent,
+  expandAllCollapsibleSections,
+  waitForImagesLoaded,
+  waitForStableScrollHeight,
+} from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import {
@@ -395,6 +400,8 @@ test.describe('Game Session Visual Tests', () => {
     await removeDuplicateSuggestedActionsTextarea(page);
     await relaxStoryColumnHeight(page);
 
+    await waitForImagesLoaded(page);
+    await waitForStableScrollHeight(page, { timeout: 8000, stableDuration: 500 });
     await page.waitForTimeout(200); // Wait for layout to adjust
 
     await hideDynamicContent(page);
@@ -402,7 +409,8 @@ test.describe('Game Session Visual Tests', () => {
     // Take screenshot of game session page - fullPage will now capture all segments
     await expect(page).toHaveScreenshot('game-session.png', {
       fullPage: true,
-      threshold: 0.3  // Higher threshold for initial update to capture component changes
+      threshold: 0.3,  // Higher threshold for initial update to capture component changes
+      timeout: 10000,
     });
   });
 

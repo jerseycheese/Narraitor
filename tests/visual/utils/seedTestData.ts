@@ -5,6 +5,7 @@ import {
   SAMPLE_GAME_SESSIONS,
   SAMPLE_NARRATIVE_SEGMENTS,
   SAMPLE_DECISIONS,
+  SAMPLE_JOURNAL_ENTRIES,
 } from '@/tests/fixtures';
 
 /**
@@ -123,6 +124,7 @@ export async function seedTestData(page: Page): Promise<void> {
         SAMPLE_GAME_SESSIONS,
         SAMPLE_NARRATIVE_SEGMENTS,
         SAMPLE_DECISIONS,
+        SAMPLE_JOURNAL_ENTRIES,
       } = testData;
 
       // Single unified seeding helper
@@ -186,6 +188,24 @@ export async function seedTestData(page: Page): Promise<void> {
       const decisionsRecord = SAMPLE_DECISIONS.reduce<Record<string, any>>(
         (acc: Record<string, any>, decision: any) => {
           acc[decision.id] = decision;
+          return acc;
+        },
+        {}
+      );
+
+      const journalEntriesRecord = (SAMPLE_JOURNAL_ENTRIES || []).reduce(
+        (acc: Record<string, any>, entry: any) => {
+          acc[entry.id] = entry;
+          return acc;
+        },
+        {}
+      );
+
+      const journalSessionEntries = Object.values(journalEntriesRecord).reduce(
+        (acc: Record<string, string[]>, entry: any) => {
+          if (!entry?.sessionId) return acc;
+          acc[entry.sessionId] = acc[entry.sessionId] || [];
+          acc[entry.sessionId].push(entry.id);
           return acc;
         },
         {}
@@ -273,7 +293,7 @@ export async function seedTestData(page: Page): Promise<void> {
           version: 1,
         },
         journal: {
-          state: { entries: {}, sessionEntries: {} },
+          state: { entries: journalEntriesRecord, sessionEntries: journalSessionEntries },
           version: 1,
         },
       };
@@ -297,6 +317,7 @@ export async function seedTestData(page: Page): Promise<void> {
       (window as any).__TEST_SESSIONS__ = sessionsRecord;
       (window as any).__TEST_SEGMENTS__ = segmentsRecord;
       (window as any).__TEST_DECISIONS__ = decisionsRecord;
+      (window as any).__TEST_JOURNAL_ENTRIES__ = journalEntriesRecord;
       (window as any).__TEST_SEEDED__ = true;
 
       const seedStoresFromFixtures = () => {
@@ -306,6 +327,7 @@ export async function seedTestData(page: Page): Promise<void> {
           useCharacterStore?: { setState?: (updater: any) => void };
           useSessionStore?: { setState?: (updater: any) => void };
           useNarrativeStore?: { setState?: (updater: any) => void };
+          useJournalStore?: { setState?: (updater: any) => void };
         };
 
         if (testWindow.__TEST_STORES_SEEDED__) {
@@ -316,8 +338,9 @@ export async function seedTestData(page: Page): Promise<void> {
         const characterStore = testWindow.useCharacterStore;
         const sessionStore = testWindow.useSessionStore;
         const narrativeStore = testWindow.useNarrativeStore;
+        const journalStore = testWindow.useJournalStore;
 
-        if (!worldStore || !characterStore || !sessionStore || !narrativeStore) {
+        if (!worldStore || !characterStore || !sessionStore) {
           return false;
         }
 
@@ -420,7 +443,7 @@ export async function seedTestData(page: Page): Promise<void> {
           error: null,
         }));
 
-        narrativeStore.setState?.((state: any) => ({
+        narrativeStore?.setState?.((state: any) => ({
           ...state,
           segments: {
             ...state?.segments,
@@ -441,6 +464,19 @@ export async function seedTestData(page: Page): Promise<void> {
             [primarySessionId]: sessionDecisionIds,
           },
         }));
+
+        if (journalStore?.setState && Object.keys(journalEntriesRecord).length > 0) {
+          journalStore.setState((state: any) => ({
+            ...state,
+            entries: { ...state?.entries, ...journalEntriesRecord },
+            sessionEntries: {
+              ...state?.sessionEntries,
+              ...journalSessionEntries,
+            },
+            loading: false,
+            error: null,
+          }));
+        }
 
         testWindow.__TEST_STORES_SEEDED__ = true;
         return true;
@@ -467,6 +503,7 @@ export async function seedTestData(page: Page): Promise<void> {
         SAMPLE_GAME_SESSIONS,
         SAMPLE_NARRATIVE_SEGMENTS,
         SAMPLE_DECISIONS,
+        SAMPLE_JOURNAL_ENTRIES,
       },
     }
   );

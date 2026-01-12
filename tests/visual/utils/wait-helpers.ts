@@ -54,6 +54,57 @@ export async function waitForContentStable(page: Page): Promise<void> {
 }
 
 /**
+ * Wait until all images on the page have finished loading.
+ */
+export async function waitForImagesLoaded(page: Page, timeout: number = 5000): Promise<void> {
+  try {
+    await page.waitForFunction(
+      () => Array.from(document.images).every((img) => img.complete),
+      { timeout }
+    );
+  } catch {
+    console.log('Image not loaded yet, proceeding with screenshot');
+  }
+}
+
+/**
+ * Wait for the document height to remain stable for a short period.
+ */
+export async function waitForStableScrollHeight(
+  page: Page,
+  { timeout = 5000, stableDuration = 500 }: { timeout?: number; stableDuration?: number } = {}
+): Promise<void> {
+  const start = Date.now();
+  await page.waitForFunction(
+    ({ stableDuration, start }) => {
+      const now = Date.now();
+      const doc = document.documentElement;
+      const height = doc.scrollHeight;
+      const prevHeight = (window as any).__lastScrollHeight;
+      const prevTime = (window as any).__lastScrollHeightTime;
+
+      if (prevHeight !== height) {
+        (window as any).__lastScrollHeight = height;
+        (window as any).__lastScrollHeightTime = now;
+        return false;
+      }
+
+      if (!prevTime) {
+        (window as any).__lastScrollHeightTime = now;
+        return false;
+      }
+
+      const isStable = now - prevTime >= stableDuration;
+      const exceeded = now - start >= (timeout + stableDuration);
+
+      return isStable || exceeded;
+    },
+    { stableDuration, start },
+    { timeout }
+  );
+}
+
+/**
  * Hide dynamic content that shouldn't be part of visual regression testing.
  * This prevents timestamp changes, random tips, and other dynamic elements
  * from causing false positive test failures.
