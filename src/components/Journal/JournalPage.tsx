@@ -30,7 +30,6 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
   const world = useWorldStore((state) => state.worlds[worldId]);
-  const getSessionEntriesWithCharacter = useJournalStore((state) => state.getSessionEntriesWithCharacter);
   const {
     markAsRead,
     error: journalError,
@@ -43,9 +42,12 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
-  const entries = React.useMemo(
-    () => (sessionId ? getSessionEntriesWithCharacter(sessionId, characterId) : []),
-    [sessionId, characterId, getSessionEntriesWithCharacter]
+  const entries = useJournalStore(
+    React.useCallback(
+      (state) =>
+        sessionId ? state.getSessionEntriesWithCharacter(sessionId, characterId) : [],
+      [sessionId, characterId]
+    )
   );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
