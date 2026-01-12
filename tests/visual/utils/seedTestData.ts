@@ -299,6 +299,165 @@ export async function seedTestData(page: Page): Promise<void> {
       (window as any).__TEST_DECISIONS__ = decisionsRecord;
       (window as any).__TEST_SEEDED__ = true;
 
+      const seedStoresFromFixtures = () => {
+        const testWindow = window as typeof window & {
+          __TEST_STORES_SEEDED__?: boolean;
+          useWorldStore?: { setState?: (updater: any) => void };
+          useCharacterStore?: { setState?: (updater: any) => void };
+          useSessionStore?: { setState?: (updater: any) => void };
+          useNarrativeStore?: { setState?: (updater: any) => void };
+        };
+
+        if (testWindow.__TEST_STORES_SEEDED__) {
+          return true;
+        }
+
+        const worldStore = testWindow.useWorldStore;
+        const characterStore = testWindow.useCharacterStore;
+        const sessionStore = testWindow.useSessionStore;
+        const narrativeStore = testWindow.useNarrativeStore;
+
+        if (!worldStore || !characterStore || !sessionStore || !narrativeStore) {
+          return false;
+        }
+
+        const primaryWorldId = SAMPLE_WORLDS[0]?.id ?? Object.keys(worldsRecord)[0];
+        const primaryCharacter =
+          Object.values(charactersRecord).find((char: any) => char.worldId === primaryWorldId) ??
+          Object.values(charactersRecord)[0];
+        const primaryCharacterId = primaryCharacter?.id ?? SAMPLE_CHARACTERS[0]?.id;
+        const primarySession =
+          SAMPLE_GAME_SESSIONS.find(
+            (session) =>
+              session.worldId === primaryWorldId && session.characterId === primaryCharacterId
+          ) ?? SAMPLE_GAME_SESSIONS[0];
+        const primarySessionId = primarySession?.id ?? `session-${primaryWorldId}-${primaryCharacterId}`;
+
+        const worldCharacterIds = Object.values(charactersRecord).reduce(
+          (acc: Record<string, string[]>, char: any) => {
+            if (!char?.worldId || !char?.id) return acc;
+            acc[char.worldId] = acc[char.worldId] || [];
+            if (!acc[char.worldId].includes(char.id)) {
+              acc[char.worldId].push(char.id);
+            }
+            return acc;
+          },
+          {}
+        );
+
+        const savedSessions = SAMPLE_GAME_SESSIONS.reduce<Record<string, any>>(
+          (acc, session) => {
+            acc[session.id] = {
+              id: session.id,
+              worldId: session.worldId,
+              characterId: session.characterId,
+              lastPlayed: session.lastPlayedAt,
+              narrativeCount: session.totalTurns,
+            };
+            return acc;
+          },
+          {}
+        );
+
+        const sessionSegmentIds = Object.values(segmentsRecord)
+          .filter((segment: any) => segment?.sessionId === primarySessionId)
+          .map((segment: any) => segment.id);
+
+        const sessionDecisionIds = Object.values(decisionsRecord)
+          .filter((decision: any) => {
+            const segmentId = decision?.narrativeSegmentId;
+            return segmentId && sessionSegmentIds.includes(segmentId);
+          })
+          .map((decision: any) => decision.id);
+
+        worldStore.setState?.((state: any) => ({
+          ...state,
+          worlds: {
+            ...state?.worlds,
+            ...worldsRecord,
+          },
+          entities: {
+            ...state?.entities,
+            ...worldsRecord,
+          },
+          currentWorldId: primaryWorldId ?? state?.currentWorldId ?? null,
+          currentEntityId: primaryWorldId ?? state?.currentEntityId ?? null,
+          loading: false,
+          error: null,
+        }));
+
+        characterStore.setState?.((state: any) => ({
+          ...state,
+          characters: {
+            ...state?.characters,
+            ...charactersRecord,
+          },
+          entities: {
+            ...state?.entities,
+            ...charactersRecord,
+          },
+          worldCharacterIds: {
+            ...state?.worldCharacterIds,
+            ...worldCharacterIds,
+          },
+          currentCharacterId: primaryCharacterId ?? state?.currentCharacterId ?? null,
+          currentEntityId: primaryCharacterId ?? state?.currentEntityId ?? null,
+          loading: false,
+          error: null,
+        }));
+
+        sessionStore.setState?.((state: any) => ({
+          ...state,
+          savedSessions: Object.keys(state?.savedSessions || {}).length
+            ? state.savedSessions
+            : savedSessions,
+          onboardingCompleted: true,
+          id: primarySessionId ?? state?.id ?? null,
+          currentSessionId: primarySessionId ?? state?.currentSessionId ?? null,
+          worldId: primaryWorldId ?? state?.worldId ?? null,
+          characterId: primaryCharacterId ?? state?.characterId ?? null,
+          status: primarySession?.status ?? state?.status ?? 'active',
+          error: null,
+        }));
+
+        narrativeStore.setState?.((state: any) => ({
+          ...state,
+          segments: {
+            ...state?.segments,
+            ...segmentsRecord,
+          },
+          sessionSegments: {
+            ...state?.sessionSegments,
+            [primarySessionId]: sessionSegmentIds.length
+              ? sessionSegmentIds
+              : state?.sessionSegments?.[primarySessionId] ?? [],
+          },
+          decisions: {
+            ...state?.decisions,
+            ...decisionsRecord,
+          },
+          sessionDecisions: {
+            ...state?.sessionDecisions,
+            [primarySessionId]: sessionDecisionIds,
+          },
+        }));
+
+        testWindow.__TEST_STORES_SEEDED__ = true;
+        return true;
+      };
+
+      const didSeedStores = seedStoresFromFixtures();
+      if (!didSeedStores) {
+        let attempts = 0;
+        const maxAttempts = 50;
+        const intervalId = window.setInterval(() => {
+          attempts += 1;
+          if (seedStoresFromFixtures() || attempts >= maxAttempts) {
+            window.clearInterval(intervalId);
+          }
+        }, 100);
+      }
+
       console.log('✅ Full test data seeded');
     },
     {

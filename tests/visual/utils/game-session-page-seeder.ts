@@ -249,6 +249,16 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         };
       };
     }).useInventoryStore;
+    const worldStore = (window as typeof window & {
+      useWorldStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useWorldStore;
+    const characterStore = (window as typeof window & {
+      useCharacterStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useCharacterStore;
     const sessionStore = (window as typeof window & {
       useSessionStore?: {
         getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
@@ -269,10 +279,62 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
       return;
     }
 
+    const testWindow = window as typeof window & {
+      __TEST_WORLDS__?: Record<string, unknown>;
+      __TEST_CHARACTERS__?: Record<string, { id?: string; worldId?: string }>;
+    };
+    const testWorlds = testWindow.__TEST_WORLDS__ || {};
+    const testCharacters = testWindow.__TEST_CHARACTERS__ || {};
+    const resolvedWorldId =
+      Object.keys(testWorlds)[0] ||
+      Object.values(testCharacters)[0]?.worldId ||
+      'world-cyberpunk-2077';
+    const resolvedCharacterId =
+      Object.values(testCharacters).find((char) => char.worldId === resolvedWorldId)?.id ||
+      Object.values(testCharacters)[0]?.id ||
+      'char-cyberpunk-hacker';
+
+    if (worldStore?.setState && Object.keys(testWorlds).length > 0) {
+      worldStore.setState((state: any) => ({
+        ...state,
+        worlds: { ...state?.worlds, ...testWorlds },
+        entities: { ...state?.entities, ...testWorlds },
+        currentWorldId: resolvedWorldId ?? state?.currentWorldId ?? null,
+        currentEntityId: resolvedWorldId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
+    if (characterStore?.setState && Object.keys(testCharacters).length > 0) {
+      const worldCharacterIds = Object.values(testCharacters).reduce(
+        (acc: Record<string, string[]>, char) => {
+          if (!char?.worldId || !char?.id) return acc;
+          acc[char.worldId] = acc[char.worldId] || [];
+          if (!acc[char.worldId].includes(char.id)) {
+            acc[char.worldId].push(char.id);
+          }
+          return acc;
+        },
+        {}
+      );
+
+      characterStore.setState((state: any) => ({
+        ...state,
+        characters: { ...state?.characters, ...testCharacters },
+        entities: { ...state?.entities, ...testCharacters },
+        worldCharacterIds: { ...state?.worldCharacterIds, ...worldCharacterIds },
+        currentCharacterId: resolvedCharacterId ?? state?.currentCharacterId ?? null,
+        currentEntityId: resolvedCharacterId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
     const sessionState = sessionStore?.getState?.() || {};
     const sessionId = sessionState.id ?? 'session-cyberpunk-ghost';
-    const worldId = sessionState.worldId ?? 'world-cyberpunk-2077';
-    const characterId = sessionState.characterId ?? 'char-cyberpunk-hacker';
+    const worldId = sessionState.worldId ?? resolvedWorldId ?? 'world-cyberpunk-2077';
+    const characterId = sessionState.characterId ?? resolvedCharacterId ?? 'char-cyberpunk-hacker';
 
     if (sessionStore?.setState) {
       sessionStore.setState({
@@ -280,6 +342,8 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         id: sessionId,
         worldId,
         characterId,
+        currentSessionId: sessionId,
+        status: 'active',
       });
     }
 
@@ -536,6 +600,16 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
         ) => void;
       };
     }).useJournalStore;
+    const worldStore = (window as typeof window & {
+      useWorldStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useWorldStore;
+    const characterStore = (window as typeof window & {
+      useCharacterStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useCharacterStore;
     const sessionStoreApi = (window as typeof window & {
       useSessionStore?: {
         getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
@@ -548,9 +622,61 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
       return;
     }
 
+    const testWindow = window as typeof window & {
+      __TEST_WORLDS__?: Record<string, unknown>;
+      __TEST_CHARACTERS__?: Record<string, { id?: string; worldId?: string }>;
+    };
+    const testWorlds = testWindow.__TEST_WORLDS__ || {};
+    const testCharacters = testWindow.__TEST_CHARACTERS__ || {};
+    const resolvedWorldId =
+      Object.keys(testWorlds)[0] ||
+      Object.values(testCharacters)[0]?.worldId ||
+      entries[0]?.worldId;
+    const resolvedCharacterId =
+      Object.values(testCharacters).find((char) => char.worldId === resolvedWorldId)?.id ||
+      Object.values(testCharacters)[0]?.id ||
+      entries[0]?.characterId;
+
+    if (worldStore?.setState && Object.keys(testWorlds).length > 0) {
+      worldStore.setState((state: any) => ({
+        ...state,
+        worlds: { ...state?.worlds, ...testWorlds },
+        entities: { ...state?.entities, ...testWorlds },
+        currentWorldId: resolvedWorldId ?? state?.currentWorldId ?? null,
+        currentEntityId: resolvedWorldId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
+    if (characterStore?.setState && Object.keys(testCharacters).length > 0) {
+      const worldCharacterIds = Object.values(testCharacters).reduce(
+        (acc: Record<string, string[]>, char) => {
+          if (!char?.worldId || !char?.id) return acc;
+          acc[char.worldId] = acc[char.worldId] || [];
+          if (!acc[char.worldId].includes(char.id)) {
+            acc[char.worldId].push(char.id);
+          }
+          return acc;
+        },
+        {}
+      );
+
+      characterStore.setState((state: any) => ({
+        ...state,
+        characters: { ...state?.characters, ...testCharacters },
+        entities: { ...state?.entities, ...testCharacters },
+        worldCharacterIds: { ...state?.worldCharacterIds, ...worldCharacterIds },
+        currentCharacterId: resolvedCharacterId ?? state?.currentCharacterId ?? null,
+        currentEntityId: resolvedCharacterId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
     const targetSessionId = sessionStore?.id ?? entries[0]?.sessionId;
-    const targetWorldId = sessionStore?.worldId ?? entries[0]?.worldId;
-    const targetCharacterId = sessionStore?.characterId ?? entries[0]?.characterId;
+    const targetWorldId = sessionStore?.worldId ?? resolvedWorldId ?? entries[0]?.worldId;
+    const targetCharacterId = sessionStore?.characterId ?? resolvedCharacterId ?? entries[0]?.characterId;
 
     if (sessionStoreApi?.setState) {
       sessionStoreApi.setState((state: { id?: string | null; worldId?: string | null; characterId?: string | null }) => ({
@@ -558,6 +684,8 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
         id: targetSessionId ?? state.id,
         worldId: targetWorldId ?? state.worldId,
         characterId: targetCharacterId ?? state.characterId,
+        currentSessionId: targetSessionId ?? state.id ?? null,
+        status: 'active',
       }));
     }
     const baseTimestamp = Date.now();
