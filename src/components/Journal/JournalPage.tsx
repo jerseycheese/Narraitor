@@ -17,6 +17,7 @@ import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
 import { cn } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
 import { JournalEmptyState } from './JournalEmptyState';
@@ -42,25 +43,12 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
-  const getSessionEntriesWithCharacter = useJournalStore(
-    (state) => state.getSessionEntriesWithCharacter
+  const entries = useJournalStore(
+    React.useCallback(
+      (state) => selectSessionEntries(state, sessionId, characterId),
+      [sessionId, characterId]
+    )
   );
-  const journalEntries = useJournalStore((state) => state.entries);
-  const sessionEntries = useJournalStore((state) => state.sessionEntries);
-
-  const entries = React.useMemo(() => {
-    if (!sessionId) {
-      return [];
-    }
-
-    return getSessionEntriesWithCharacter(sessionId, characterId);
-  }, [
-    sessionId,
-    characterId,
-    getSessionEntriesWithCharacter,
-    journalEntries,
-    sessionEntries,
-  ]);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredEntries = React.useMemo(() => {
