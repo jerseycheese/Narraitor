@@ -82,6 +82,13 @@ ALIGNMENT VARIETY (when appropriate):
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response  
 - CHAOTIC: Unexpected, disruptive actions that change the situation dramatically
 
+PERSONALITY-INFORMED CHOICES (when character personality context is provided):
+- Create options that offer ways to express the character's traits
+- Reference active goals when choices can advance or challenge them
+- Consider fears when appropriate (avoidance or confrontation options)
+- Balance personality-consistent choices with growth opportunities
+- Don't force all choices to align with personality - variety matters
+
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
 SKILL REQUIREMENTS (CRITICAL FOR MVP):

@@ -9,6 +9,7 @@ import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { formatSkillsForNarrative } from './attributeSkillFormatter';
+import { formatPersonalityForChoices } from './choiceGenerator.personality';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
@@ -48,8 +49,13 @@ export const buildChoicePrompt = ({
     inventoryAwarePrompt,
     characterIds
   );
-  const loreEnhancedPrompt = enhancePromptWithLore(
+  const personalityAwarePrompt = enhancePromptWithPersonality(
     skillAwarePrompt,
+    characterIds,
+    useAlignedChoices
+  );
+  const loreEnhancedPrompt = enhancePromptWithLore(
+    personalityAwarePrompt,
     worldId,
     sessionId
   );
@@ -207,6 +213,34 @@ SKILL-BASED CHOICE GUIDANCE:
 - Don't force skill-based choices if they don't fit the narrative context`;
 
     return `${prompt}${guidance}`;
+  } catch {
+    return prompt;
+  }
+};
+
+const enhancePromptWithPersonality = (
+  prompt: string,
+  characterIds: string[],
+  useAlignedChoices: boolean
+): string => {
+  try {
+    if (!characterIds || characterIds.length === 0) return prompt;
+    const { characters } = useCharacterStore.getState();
+    let playerCharacter = undefined;
+    for (const characterId of characterIds) {
+      const character = characters[characterId];
+      if (character?.isPlayer) {
+        playerCharacter = character;
+        break;
+      }
+    }
+    if (!playerCharacter) return prompt;
+    const personalitySection = formatPersonalityForChoices(
+      playerCharacter,
+      !useAlignedChoices
+    );
+    if (!personalitySection) return prompt;
+    return `${prompt}${personalitySection}`;
   } catch {
     return prompt;
   }
