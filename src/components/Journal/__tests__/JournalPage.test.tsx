@@ -254,12 +254,12 @@ describe('JournalPage', () => {
     const listPane = screen.getByTestId('journal-list-pane');
     const listScope = within(listPane);
 
-    expect(listScope.getByText('Entry 1')).toBeInTheDocument();
-    expect(listScope.queryByText('Entry 11')).not.toBeInTheDocument();
+    expect(listScope.getByText('Entry 25')).toBeInTheDocument();
+    expect(listScope.queryByText('Entry 15')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /load more/i }));
 
-    expect(listScope.getByText('Entry 11')).toBeInTheDocument();
+    expect(listScope.getByText('Entry 15')).toBeInTheDocument();
   });
 
   it('filters entries by search query', () => {
