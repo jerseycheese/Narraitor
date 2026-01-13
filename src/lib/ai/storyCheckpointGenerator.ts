@@ -153,13 +153,6 @@ export const generateStoryCheckpointSummary = async (
   const client = createDefaultGeminiClient();
   const prompt = buildPrompt(payload);
 
-  console.log('🔍 GENERATOR DEBUG - Prompt Context:', {
-    eventsCount: payload.events.length,
-    events: payload.events.map(e => e.description),
-    previousSegmentsCount: payload.previousSegments?.length ?? 0,
-    previousSegments: payload.previousSegments?.map((seg, i) => `[${i + 1}] ${seg.substring(0, 100)}...`),
-  });
-
   const response = await client.generateContent(prompt);
 
   if (!response.content) {

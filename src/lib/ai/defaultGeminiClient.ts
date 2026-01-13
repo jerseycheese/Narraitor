@@ -14,7 +14,6 @@ import { getDefaultConfig } from './config';
 export const createDefaultGeminiClient = () => {
   // In test environment, Jest will automatically use the mock from __mocks__/geminiClient.mock.ts
   if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
-    console.log("Using mock Gemini client for testing");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { MockGeminiClient } = require('./__mocks__/geminiClient.mock');
     return new MockGeminiClient();
@@ -27,12 +26,10 @@ export const createDefaultGeminiClient = () => {
 
   // Server-side: use real client when API key is available
   if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MOCK_API_KEY') {
-    console.log("Using real Gemini client with server-side API key");
     return new GeminiClient(getDefaultConfig());
   }
 
   // Server-side fallback: use mock for local development without API key
-  console.log("Using mock Gemini client (no API key - local development)");
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { MockGeminiClient } = require('./__mocks__/geminiClient.mock');
   return new MockGeminiClient();

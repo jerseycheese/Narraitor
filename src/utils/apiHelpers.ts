@@ -110,16 +110,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
   const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
 
-  // Debug information available in development mode only
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔒 API SAFETY SETTINGS DEBUG:', {
-      promptLength: prompt.length,
-      foundContentRating: contentRating || '(none detected)',
-      extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
-      rawMatch: contentRatingMatch?.[0] || '(no match)'
-    });
-  }
-
   // Map content ratings to safety thresholds
   switch (contentRating) {
     case 'g':
@@ -130,9 +120,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
       ];
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: 'G', threshold: 'BLOCK_MEDIUM_AND_ABOVE', settingsApplied: '4 categories' });
-      }
       return gSettings;
     case 'pg':
     case 'pg-13':
@@ -143,9 +130,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
-      }
       return pgSettings;
     case 'r':
       // R-rated: Permissive for sexual content.
@@ -155,13 +139,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', {
-          contentRating: 'R',
-          threshold: 'Custom (BLOCK_NONE for explicit)',
-          settingsApplied: '4 categories'
-        });
-      }
       return rSettings;
     case 'nc-17':
       // NC-17: Highly permissive, no blocking on sexual content or harassment.
@@ -171,13 +148,6 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', {
-          contentRating: 'NC-17',
-          threshold: 'Custom (BLOCK_NONE for explicit and harassment)',
-          settingsApplied: '4 categories'
-        });
-      }
       return nc17Settings;
     default:
       // Default: Medium filtering for safety
@@ -187,15 +157,7 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
       ];
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔒 APPLIED SAFETY SETTINGS:', {
-          contentRating: `fallback-default (detected: ${contentRating || 'none'})`,
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          settingsApplied: '4 categories'
-        });
-      }
-      
+
       return defaultSettings;
   }
 }

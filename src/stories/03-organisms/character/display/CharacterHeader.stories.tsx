@@ -91,26 +91,6 @@ export const WithoutPortrait: Story = {
     world: mockWorld,
   },
 };
-export const LowLevelCharacter: Story = {
-  args: {
-    character: {
-      ...mockCharacter,
-      name: 'Pippin',
-      level: 1,
-      background: {
-        history: 'A young hobbit from the Shire who joined the Fellowship.',
-        personality:
-          'A curious and brave hobbit with a love for adventure and second breakfast.',
-        goals: ['Have adventures'],
-        fears: ['Missing second breakfast'],
-        physicalDescription: 'Young hobbit with curly hair',
-        relationships: [],
-        isKnownFigure: true,
-      },
-    },
-    world: mockWorld,
-  },
-};
 export const OriginalCharacter: Story = {
   args: {
     character: {
@@ -141,49 +121,6 @@ export const OriginalCharacter: Story = {
       description:
         'A magical realm where the boundaries between worlds are thin',
     },
-  },
-};
-export const HighLevelCharacter: Story = {
-  args: {
-    character: {
-      ...mockCharacter,
-      name: 'Gandalf the Grey',
-      level: 50,
-      background: {
-        history:
-          'One of the Istari, sent to Middle-earth to oppose the growing power of darkness.',
-        personality:
-          'A wise and powerful wizard who guides others on their journeys.',
-        goals: ['Guide the free peoples', 'Defeat darkness'],
-        fears: ['Failing his mission'],
-        physicalDescription: 'An old wizard with a long grey beard and robes',
-        relationships: [],
-        isKnownFigure: true,
-      },
-      portrait: {
-        type: 'ai-generated',
-        url: 'https://i.pravatar.cc/200?img=3',
-        prompt: 'An old wizard with a long grey beard and wise eyes',
-      },
-    },
-    world: mockWorld,
-  },
-};
-export const NoPersonality: Story = {
-  args: {
-    character: {
-      ...mockCharacter,
-      name: 'Basic Character',
-      background: {
-        history: 'A simple character with minimal background.',
-        personality: 'Basic personality.',
-        goals: [],
-        fears: [],
-        relationships: [],
-        isKnownFigure: false,
-      },
-    },
-    world: mockWorld,
   },
 };
 export const LongPersonality: Story = {
@@ -235,17 +172,5 @@ export const SciFiCharacter: Story = {
       description: 'A futuristic colony on a distant planet',
       genre: 'fantasy',
     },
-  },
-};
-export const RecentlyCreated: Story = {
-  args: {
-    character: {
-      ...mockCharacter,
-      name: 'New Character',
-      level: 1,
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
-    },
-    world: mockWorld,
   },
 };

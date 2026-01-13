@@ -94,9 +94,3 @@ export const Default: Story = {
     worlds: mockWorlds,
   },
 };
-
-export const EmptyList: Story = {
-  args: {
-    worlds: [],
-  },
-};

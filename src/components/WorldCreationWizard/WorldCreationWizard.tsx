@@ -208,33 +208,23 @@ export default function WorldCreationWizard({
   const generateAISuggestions = useCallback(async () => {
     const description = wizard.state.data.description;
     if (!description || description.trim().length < 50) {
-      console.log('No description provided for AI analysis');
       wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the AI understands your world.');
       return;
     }
-    
-    console.log('Starting AI suggestion generation for description:', truncate(description, 100));
+
     wizard.setProcessing(true);
     wizard.clearError('ai');
 
     try {
-      console.log('Calling analyzeWorldDescriptionClient...');
       const suggestions = await analyzeWorldDescriptionClient(description);
-      console.log('AI suggestions received:', {
-        attributeCount: suggestions.attributes.length,
-        skillCount: suggestions.skills.length,
-        firstAttribute: suggestions.attributes[0]?.name
-      });
       
       wizard.updateData({ 
         aiSuggestions: suggestions,
         aiSuggestionsGenerated: true,
         aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
       });
-      console.log('AI suggestions successfully applied to wizard state');
     } catch (error) {
       console.error('Error generating AI suggestions:', error);
-      console.log('Falling back to default suggestions due to error');
       
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
@@ -247,8 +237,6 @@ export default function WorldCreationWizard({
         'ai',
         'We had trouble reaching the AI service, so we loaded starter suggestions. You can generate again once the service recovers.'
       );
-
-      console.log('Default suggestions applied as fallback');
     } finally {
       wizard.setProcessing(false);
     }
@@ -350,7 +338,6 @@ export default function WorldCreationWizard({
       // Set the newly created world as the active world
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
-      console.log('[WorldCreationWizard] Set newly created world as active:', worldId);
 
       // Store the world ID in wizard state
       wizard.updateData({ createdWorldId: worldId });
@@ -360,7 +347,6 @@ export default function WorldCreationWizard({
         try {
           const { generateCharacterTemplates } = useWorldStore.getState();
           await generateCharacterTemplates(worldId);
-          console.log('[WorldCreationWizard] Generated character templates for world:', worldId);
         } catch (error) {
           console.error('[WorldCreationWizard] Failed to generate character templates:', error);
           // Don't block world creation if template generation fails

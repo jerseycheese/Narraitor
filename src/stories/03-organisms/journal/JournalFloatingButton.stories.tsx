@@ -39,19 +39,6 @@ export const Default: Story = {
   },
 };
 
-export const CustomPosition: Story = {
-  args: {
-    className: 'bottom-4 right-4', // Override default positioning
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Example with custom positioning using className prop.',
-      },
-    },
-  },
-};
-
 export const Interactive: Story = {
   args: {},
   parameters: {

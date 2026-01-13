@@ -77,15 +77,6 @@ const mockWorldConfig = {
   updatedAt: '2023-01-01',
 };
 
-export const Empty: Story = {
-  args: {
-    data: defaultData,
-    onUpdate: () => {},
-    onValidation: () => {},
-    worldConfig: mockWorldConfig,
-  },
-};
-
 export const WithData: Story = {
   args: {
     data: {
