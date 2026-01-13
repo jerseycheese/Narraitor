@@ -35,10 +35,3 @@ export const Default: Story = {
     selectedEntryId: mockEntries[1].id,
   },
 };
-
-export const Empty: Story = {
-  args: {
-    entries: [],
-    selectedEntryId: null,
-  },
-};

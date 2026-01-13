@@ -119,12 +119,6 @@ export const Default: Story = {
   ],
 };
 
-export const Empty: Story = {
-  args: {
-    characterId: 'char-story-empty',
-  },
-};
-
 export const SingleCategory: Story = {
   args: {
     characterId: 'char-story-single',

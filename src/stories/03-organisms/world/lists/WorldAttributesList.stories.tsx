@@ -294,12 +294,6 @@ export const SciFi: Story = {
   },
 };
 
-export const Empty: Story = {
-  args: {
-    attributes: [],
-  },
-};
-
 export const SingleAttribute: Story = {
   args: {
     attributes: [
