@@ -15,6 +15,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { selectSessionEntries } from '@/lib/journal/journalSelectors';
@@ -44,10 +45,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
   const entries = useJournalStore(
-    React.useCallback(
-      (state) => selectSessionEntries(state, sessionId, characterId),
-      [sessionId, characterId]
-    )
+    useShallow((state) => selectSessionEntries(state, sessionId, characterId))
   );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
