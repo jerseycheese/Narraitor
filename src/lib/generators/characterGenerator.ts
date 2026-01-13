@@ -1,6 +1,5 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
-import { truncate } from '../utils';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { 
   GeneratedCharacterData, 

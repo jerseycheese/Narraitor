@@ -18,7 +18,7 @@ import {
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
-import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type CharacterAttributeChangedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
+import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {

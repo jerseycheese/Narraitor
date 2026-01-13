@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
-import { seedJournalEntriesForVisual } from './utils/game-session-page-seeder';
 
 /**
  * Journal Page Visual Test
@@ -22,8 +21,11 @@ test.describe('Journal Page', () => {
     // Wait for journal page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
 
-    // Seed journal entries for visual snapshot (ensures multiple entries are present)
-    await seedJournalEntriesForVisual(page);
+    // Wait for journal entries to seed via runtime fixtures
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_JOURNAL_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_JOURNAL_SEEDED__);
+    });
     await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
 
     const entryButtons = page.getByRole('button', { name: /select entry:/i });

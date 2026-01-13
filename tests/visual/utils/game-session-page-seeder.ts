@@ -219,6 +219,13 @@ export async function renderSeededSuggestedActions(page: Page): Promise<void> {
  */
 export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
   await page.waitForFunction(() => {
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: unknown;
+    }).useSessionStore;
+    return !!sessionStore;
+  });
+
+  await page.waitForFunction(() => {
     const store = (window as typeof window & {
       useInventoryStore?: { persist?: { hasHydrated?: () => boolean } };
     }).useInventoryStore;
@@ -242,9 +249,150 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         };
       };
     }).useInventoryStore;
+    const worldStore = (window as typeof window & {
+      useWorldStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useWorldStore;
+    const characterStore = (window as typeof window & {
+      useCharacterStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useCharacterStore;
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: {
+        getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useSessionStore;
+    const narrativeStore = (window as typeof window & {
+      useNarrativeStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+        getState?: () => {
+          segments: Record<string, unknown>;
+          sessionSegments: Record<string, string[]>;
+        };
+      };
+    }).useNarrativeStore;
 
     if (!inventoryStore?.setState) {
       return;
+    }
+
+    const testWindow = window as typeof window & {
+      __TEST_WORLDS__?: Record<string, unknown>;
+      __TEST_CHARACTERS__?: Record<string, { id?: string; worldId?: string }>;
+    };
+    const testWorlds = testWindow.__TEST_WORLDS__ || {};
+    const testCharacters = testWindow.__TEST_CHARACTERS__ || {};
+    const resolvedWorldId =
+      Object.keys(testWorlds)[0] ||
+      Object.values(testCharacters)[0]?.worldId ||
+      'world-cyberpunk-2077';
+    const resolvedCharacterId =
+      Object.values(testCharacters).find((char) => char.worldId === resolvedWorldId)?.id ||
+      Object.values(testCharacters)[0]?.id ||
+      'char-cyberpunk-hacker';
+
+    if (worldStore?.setState && Object.keys(testWorlds).length > 0) {
+      worldStore.setState((state: any) => ({
+        ...state,
+        worlds: { ...state?.worlds, ...testWorlds },
+        entities: { ...state?.entities, ...testWorlds },
+        currentWorldId: resolvedWorldId ?? state?.currentWorldId ?? null,
+        currentEntityId: resolvedWorldId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
+    if (characterStore?.setState && Object.keys(testCharacters).length > 0) {
+      const worldCharacterIds = Object.values(testCharacters).reduce(
+        (acc: Record<string, string[]>, char) => {
+          if (!char?.worldId || !char?.id) return acc;
+          acc[char.worldId] = acc[char.worldId] || [];
+          if (!acc[char.worldId].includes(char.id)) {
+            acc[char.worldId].push(char.id);
+          }
+          return acc;
+        },
+        {}
+      );
+
+      characterStore.setState((state: any) => ({
+        ...state,
+        characters: { ...state?.characters, ...testCharacters },
+        entities: { ...state?.entities, ...testCharacters },
+        worldCharacterIds: { ...state?.worldCharacterIds, ...worldCharacterIds },
+        currentCharacterId: resolvedCharacterId ?? state?.currentCharacterId ?? null,
+        currentEntityId: resolvedCharacterId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
+    const sessionState = sessionStore?.getState?.() || {};
+    const sessionId = sessionState.id ?? 'session-cyberpunk-ghost';
+    const worldId = sessionState.worldId ?? resolvedWorldId ?? 'world-cyberpunk-2077';
+    const characterId = sessionState.characterId ?? resolvedCharacterId ?? 'char-cyberpunk-hacker';
+
+    if (sessionStore?.setState) {
+      sessionStore.setState({
+        ...sessionState,
+        id: sessionId,
+        worldId,
+        characterId,
+        currentSessionId: sessionId,
+        status: 'active',
+      });
+    }
+
+    if (narrativeStore?.setState) {
+      const testSegmentsRecord = (window as typeof window & {
+        __TEST_SEGMENTS__?: Record<string, any>;
+      }).__TEST_SEGMENTS__ || {};
+
+      const sessionSegments = Object.values(testSegmentsRecord).filter(
+        (segment: any) => segment?.sessionId === sessionId
+      );
+
+      const fallbackSegmentId = 'segment-visual-seed';
+      const fallbackSegments =
+        sessionSegments.length > 0
+          ? sessionSegments
+          : [
+              {
+                id: fallbackSegmentId,
+                worldId,
+                sessionId,
+                content: 'Seeded segment for visual inventory test.',
+                type: 'scene',
+                characterIds: [characterId],
+                metadata: { tags: ['intro'], location: 'Seeded Location', characterIds: [characterId] },
+                timestamp: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            ];
+
+      const segmentIds = fallbackSegments.map((segment: any) => segment.id);
+      const segmentsRecord = fallbackSegments.reduce((acc: Record<string, any>, segment: any) => {
+        acc[segment.id] = segment;
+        return acc;
+      }, {});
+
+      const existing = narrativeStore.getState?.() || { segments: {}, sessionSegments: {} };
+      narrativeStore.setState({
+        ...existing,
+        segments: {
+          ...existing.segments,
+          ...segmentsRecord,
+        },
+        sessionSegments: {
+          ...existing.sessionSegments,
+          [sessionId]: segmentIds,
+        },
+      });
     }
 
     const cyberpunkItems = {
@@ -443,18 +591,6 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     });
   }
 
-  // Verify session state is actually present
-  await page.waitForFunction(() => {
-    const sessionStore = (window as typeof window & {
-      useSessionStore?: { getState?: () => { id?: string | null } };
-    }).useSessionStore?.getState?.();
-    const hasSession = !!sessionStore?.id;
-    if (!hasSession) {
-      console.log('[Test] Waiting for session state to load...');
-    }
-    return hasSession;
-  });
-
   await page.evaluate((entries) => {
     const journalStore = (window as typeof window & {
       useJournalStore?: {
@@ -462,19 +598,102 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
           partial: unknown,
           replace?: boolean
         ) => void;
+        getState?: () => { entries?: Record<string, unknown>; sessionEntries?: Record<string, string[]> };
       };
     }).useJournalStore;
-    const sessionStore = (window as typeof window & {
-      useSessionStore?: { getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null } };
-    }).useSessionStore?.getState?.();
+    const worldStore = (window as typeof window & {
+      useWorldStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useWorldStore;
+    const characterStore = (window as typeof window & {
+      useCharacterStore?: {
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useCharacterStore;
+    const sessionStoreApi = (window as typeof window & {
+      useSessionStore?: {
+        getState?: () => { id?: string | null; worldId?: string | null; characterId?: string | null };
+        setState?: (partial: unknown, replace?: boolean) => void;
+      };
+    }).useSessionStore;
+    const sessionStore = sessionStoreApi?.getState?.();
 
     if (!journalStore?.setState) {
       return;
     }
 
+    const testWindow = window as typeof window & {
+      __TEST_WORLDS__?: Record<string, unknown>;
+      __TEST_CHARACTERS__?: Record<string, { id?: string; worldId?: string }>;
+    };
+    const testWorlds = testWindow.__TEST_WORLDS__ || {};
+    const testCharacters = testWindow.__TEST_CHARACTERS__ || {};
+    const resolvedWorldId =
+      Object.keys(testWorlds)[0] ||
+      Object.values(testCharacters)[0]?.worldId ||
+      entries[0]?.worldId;
+    const resolvedCharacterId =
+      Object.values(testCharacters).find((char) => char.worldId === resolvedWorldId)?.id ||
+      Object.values(testCharacters)[0]?.id ||
+      entries[0]?.characterId;
+
+    if (worldStore?.setState && Object.keys(testWorlds).length > 0) {
+      worldStore.setState((state: any) => ({
+        ...state,
+        worlds: { ...state?.worlds, ...testWorlds },
+        entities: { ...state?.entities, ...testWorlds },
+        currentWorldId: resolvedWorldId ?? state?.currentWorldId ?? null,
+        currentEntityId: resolvedWorldId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
+    if (characterStore?.setState && Object.keys(testCharacters).length > 0) {
+      const worldCharacterIds = Object.values(testCharacters).reduce(
+        (acc: Record<string, string[]>, char) => {
+          if (!char?.worldId || !char?.id) return acc;
+          acc[char.worldId] = acc[char.worldId] || [];
+          if (!acc[char.worldId].includes(char.id)) {
+            acc[char.worldId].push(char.id);
+          }
+          return acc;
+        },
+        {}
+      );
+
+      characterStore.setState((state: any) => ({
+        ...state,
+        characters: { ...state?.characters, ...testCharacters },
+        entities: { ...state?.entities, ...testCharacters },
+        worldCharacterIds: { ...state?.worldCharacterIds, ...worldCharacterIds },
+        currentCharacterId: resolvedCharacterId ?? state?.currentCharacterId ?? null,
+        currentEntityId: resolvedCharacterId ?? state?.currentEntityId ?? null,
+        loading: false,
+        error: null,
+      }));
+    }
+
     const targetSessionId = sessionStore?.id ?? entries[0]?.sessionId;
-    const targetWorldId = sessionStore?.worldId ?? entries[0]?.worldId;
-    const targetCharacterId = sessionStore?.characterId ?? entries[0]?.characterId;
+    const targetWorldId = sessionStore?.worldId ?? resolvedWorldId ?? entries[0]?.worldId;
+    const targetCharacterId = sessionStore?.characterId ?? resolvedCharacterId ?? entries[0]?.characterId;
+
+    const existingSessionEntries = journalStore.getState?.().sessionEntries?.[targetSessionId || ''] || [];
+    if (existingSessionEntries.length > 0) {
+      return;
+    }
+
+    if (sessionStoreApi?.setState) {
+      sessionStoreApi.setState((state: { id?: string | null; worldId?: string | null; characterId?: string | null }) => ({
+        ...state,
+        id: targetSessionId ?? state.id,
+        worldId: targetWorldId ?? state.worldId,
+        characterId: targetCharacterId ?? state.characterId,
+        currentSessionId: targetSessionId ?? state.id ?? null,
+        status: 'active',
+      }));
+    }
     const baseTimestamp = Date.now();
     const adjustedEntries = entries.map((entry: any, index: number) => {
       const timestamp = new Date(baseTimestamp + index * 1000).toISOString();
@@ -507,8 +726,26 @@ export async function seedJournalEntriesForVisual(page: Page): Promise<void> {
     journalStore.setState(() => ({
       entries: entriesRecord,
       sessionEntries,
+      loading: false,
+      error: null,
     }));
   }, SAMPLE_JOURNAL_ENTRIES);
+
+  await page.waitForFunction(() => {
+    const sessionStore = (window as typeof window & {
+      useSessionStore?: { getState?: () => { id?: string | null } };
+    }).useSessionStore?.getState?.();
+    const journalStore = (window as typeof window & {
+      useJournalStore?: { getState?: () => { sessionEntries?: Record<string, string[]> } };
+    }).useJournalStore?.getState?.();
+
+    if (!sessionStore?.id) {
+      return false;
+    }
+
+    const entries = journalStore?.sessionEntries?.[sessionStore.id] || [];
+    return entries.length > 0;
+  });
 }
 
 /**

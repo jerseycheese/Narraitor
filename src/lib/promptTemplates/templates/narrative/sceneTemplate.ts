@@ -20,6 +20,23 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
   ).join('\n\n');
+  const currentTags = narrativeContext?.currentTags || [];
+  const hasCriticalFailure = currentTags.some((tag: string) =>
+    tag.startsWith('skill-critical-failure:')
+  );
+  const hasFailure = currentTags.some((tag: string) =>
+    tag.startsWith('skill-failure:')
+  );
+  const hasSuccess = currentTags.some((tag: string) =>
+    tag.startsWith('skill-success:')
+  );
+  const skillResult = hasCriticalFailure
+    ? 'critical-failure'
+    : hasFailure
+      ? 'failure'
+      : hasSuccess
+        ? 'success'
+        : null;
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `
@@ -38,11 +55,11 @@ ${recentContent}
 
 ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
 
-${narrativeContext?.currentTags?.some((tag: string) => tag.includes('skill-success') || tag.includes('skill-failure')) ? `
+${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
-${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-success:')) ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
-${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-failure:')) ? '- The player FAILED at their action - show realistic consequences and setbacks' : ''}
-${narrativeContext.currentTags.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
+${skillResult === 'success' ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
+${skillResult === 'failure' || skillResult === 'critical-failure' ? '- The player FAILED at their action - show realistic consequences and setbacks' : ''}
+${skillResult === 'critical-failure' ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
 - Success = things work out, failure = things go wrong or backfire

@@ -57,6 +57,13 @@ ALIGNMENT DEFINITIONS:
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
 - CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
 
+PERSONALITY-INFORMED CHOICES (when character personality context is provided):
+- Within the REQUIRED alignment distribution (1 lawful, 2 neutral, 1 chaotic), create options that offer ways to express the character's traits
+- Reference active goals when choices can advance or challenge them
+- Consider fears when appropriate (avoidance or confrontation options)
+- Balance personality-consistent choices with growth opportunities
+- Personality context guides HOW each alignment is expressed, NOT the required distribution
+
 REQUIREMENTS:
 1. MANDATORY: Reference the SPECIFIC characters, objects, and events from the context (e.g., if there's a dragon, mention the dragon; if there's treasure, mention treasure)
 2. Offer meaningfully different paths forward in the story

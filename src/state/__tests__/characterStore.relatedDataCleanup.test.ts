@@ -1,34 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCharacterStore } from '../characterStore';
-import { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
 import { storeEvents, StoreEventTypes } from '@/lib/state/storePubSub';
 import { createTestCharacterData } from './characterStore.testHelpers';
 
 // Mock store events
 jest.spyOn(storeEvents, 'emit').mockImplementation(() => Promise.resolve());
-
-// Test helper for journal entries
-const createTestJournalEntry = (
-  id: EntityID,
-  characterId: EntityID,
-  overrides?: Partial<JournalEntry>
-): JournalEntry => ({
-  id,
-  sessionId: `session-${id.split('-')[1]}` as EntityID,
-  worldId: 'world-1' as EntityID,
-  characterId,
-  type: 'character_event' as JournalEntryType,
-  title: `Test Entry ${id.split('-')[1]}`,
-  content: `Content for ${id}`,
-  significance: 'minor' as const,
-  isRead: false,
-  relatedEntities: [],
-  metadata: { tags: [], automaticEntry: true },
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-  ...overrides,
-});
 
 describe('CharacterStore - Related Data Cleanup', () => {
   let testCharacterId1: EntityID;

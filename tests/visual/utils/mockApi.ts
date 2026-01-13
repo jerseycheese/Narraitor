@@ -73,6 +73,28 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
     });
   });
 
+  // Mock story checkpoint endpoint
+  await page.route('**/api/narrative/story-checkpoint', async (route) => {
+    console.log('🚫 Intercepted story checkpoint API call - using mock summary');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        segment:
+          'A brief checkpoint summary captures the latest events with steady focus and forward momentum.',
+        highlights: ['Checkpoint summary generated for visual tests.'],
+        majorEvents: ['Key event recorded for checkpoint.'],
+        characterDevelopment: ['The protagonist stays alert and adaptive.'],
+        nextHooks: ['A new lead emerges from the latest discovery.'],
+        themes: ['resolve', 'tension'],
+        includedEvents: 1,
+        includedDecisions: 0,
+        lastEventTimestamp: new Date().toISOString(),
+        model: 'playwright-mock',
+      }),
+    });
+  });
+
   // Mock world generation endpoint
   await page.route('**/api/generate-world', async (route) => {
     console.log('Intercepted generate-world API call');

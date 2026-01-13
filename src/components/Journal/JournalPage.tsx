@@ -15,8 +15,10 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
 import { JournalEmptyState } from './JournalEmptyState';
@@ -30,7 +32,6 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const sessionId = useSessionStore((state) => state.id);
   const characterId = useSessionStore((state) => state.characterId);
   const world = useWorldStore((state) => state.worlds[worldId]);
-  const getSessionEntriesWithCharacter = useJournalStore((state) => state.getSessionEntriesWithCharacter);
   const {
     markAsRead,
     error: journalError,
@@ -43,9 +44,9 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
-  const entries = sessionId
-    ? getSessionEntriesWithCharacter(sessionId, characterId)
-    : [];
+  const entries = useJournalStore(
+    useShallow((state) => selectSessionEntries(state, sessionId, characterId))
+  );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredEntries = React.useMemo(() => {

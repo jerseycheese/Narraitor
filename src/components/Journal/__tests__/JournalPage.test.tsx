@@ -96,6 +96,26 @@ describe('JournalPage', () => {
     ...overrides,
   } as JournalStoreState);
 
+  const buildJournalEntriesState = (entries: JournalEntry[]) => {
+    const entriesRecord = entries.reduce<Record<string, JournalEntry>>((acc, entry) => {
+      acc[entry.id] = entry;
+      return acc;
+    }, {});
+
+    const sessionId = entries[0]?.sessionId || 'session-1';
+    const sessionEntries = entries.reduce<Record<string, string[]>>((acc, entry) => {
+      acc[entry.sessionId] = acc[entry.sessionId] || [];
+      acc[entry.sessionId].push(entry.id);
+      return acc;
+    }, {});
+
+    if (!sessionEntries[sessionId]) {
+      sessionEntries[sessionId] = entries.map((entry) => entry.id);
+    }
+
+    return { entries: entriesRecord, sessionEntries };
+  };
+
   const buildSessionState = (overrides: Partial<SessionStoreState> = {}): SessionStoreState => ({
     ...overrides,
   } as SessionStoreState);
@@ -137,6 +157,7 @@ describe('JournalPage', () => {
     const entry = createEntry();
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
+      ...buildJournalEntriesState([entry]),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -189,6 +210,7 @@ describe('JournalPage', () => {
     const entry = createEntry();
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue([entry]),
+      ...buildJournalEntriesState([entry]),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -220,6 +242,7 @@ describe('JournalPage', () => {
     const entries = createEntries(25);
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
@@ -231,12 +254,12 @@ describe('JournalPage', () => {
     const listPane = screen.getByTestId('journal-list-pane');
     const listScope = within(listPane);
 
-    expect(listScope.getByText('Entry 1')).toBeInTheDocument();
-    expect(listScope.queryByText('Entry 11')).not.toBeInTheDocument();
+    expect(listScope.getByText('Entry 25')).toBeInTheDocument();
+    expect(listScope.queryByText('Entry 15')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /load more/i }));
 
-    expect(listScope.getByText('Entry 11')).toBeInTheDocument();
+    expect(listScope.getByText('Entry 15')).toBeInTheDocument();
   });
 
   it('filters entries by search query', () => {
@@ -246,6 +269,7 @@ describe('JournalPage', () => {
     ];
     const journalStore = buildStore({
       getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
     mockUseSessionStore.mockImplementation((selector) =>
