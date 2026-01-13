@@ -162,13 +162,6 @@ export async function POST(request: NextRequest) {
       toneSettings: sanitizeToneSettings(rawBody?.toneSettings),
     };
 
-    console.log('🔍 API CHECKPOINT DEBUG:', {
-      eventsCount: events.length,
-      eventDescriptions: events.map(e => e.description),
-      previousSegmentsCount: previousSegments?.length ?? 0,
-      previousSegments: previousSegments?.map((seg: string, i: number) => `[${i + 1}] ${seg.substring(0, 80)}...`),
-    });
-
     const summary = await generateStoryCheckpointSummary(payload);
     return NextResponse.json(summary);
   } catch (error) {
