@@ -254,36 +254,6 @@ export const Default: Story = {
   },
 };
 
-export const AttributesOnly: Story = {
-  args: {
-    character: mockCharacter,
-    world: mockWorld,
-    showAttributes: true,
-    showSkills: false,
-    showBackground: false,
-  },
-};
-
-export const SkillsOnly: Story = {
-  args: {
-    character: mockCharacter,
-    world: mockWorld,
-    showAttributes: false,
-    showSkills: true,
-    showBackground: false,
-  },
-};
-
-export const BackgroundOnly: Story = {
-  args: {
-    character: mockCharacter,
-    world: mockWorld,
-    showAttributes: false,
-    showSkills: false,
-    showBackground: true,
-  },
-};
-
 export const WithoutCategories: Story = {
   args: {
     character: mockCharacter,
@@ -340,7 +310,7 @@ export const MinimalCharacter: Story = {
   },
 };
 
-export const PowerfulCharacter: Story = {
+export const OriginalCharacter: Story = {
   args: {
     character: {
       ...mockCharacter,
@@ -595,24 +565,6 @@ export const OriginalCharacter: Story = {
         ],
         fears: ['The loss of magic from the world'],
         physicalDescription: 'Tall elf with flowing robes and mystical aura',
-        relationships: [],
-        isKnownFigure: false,
-      },
-    },
-    world: mockWorld,
-  },
-};
-
-export const LimitedBackground: Story = {
-  args: {
-    character: {
-      ...mockCharacter,
-      name: 'Basic Warrior',
-      background: {
-        history: 'A basic warrior with simple background.',
-        personality: 'A straightforward fighter.',
-        goals: [],
-        fears: [],
         relationships: [],
         isKnownFigure: false,
       },
