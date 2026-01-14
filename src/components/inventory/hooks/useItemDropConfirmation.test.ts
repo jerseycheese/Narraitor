@@ -36,15 +36,15 @@ describe('useItemDropConfirmation', () => {
     description: 'A test item',
     quantity: 5,
     stackable: true,
-    categoryId: 'misc',
+    categoryId: 'miscellaneous' as const,
     acquisitionHistory: [],
     categorization: {
-        categoryId: 'misc',
-        classifiedAt: 0,
+        categoryId: 'miscellaneous' as const,
+        classifiedAt: '2024-01-01T00:00:00Z',
         source: 'manual' as const,
     },
-    createdAt: 0,
-    updatedAt: 0,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   it('should initialize with default state', () => {

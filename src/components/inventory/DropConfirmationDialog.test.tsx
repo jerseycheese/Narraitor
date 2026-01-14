@@ -82,11 +82,11 @@ describe('DropConfirmationDialog', () => {
     acquisitionHistory: [],
     categorization: {
         categoryId: 'consumables',
-        classifiedAt: 0,
+        classifiedAt: '2024-01-01T00:00:00Z',
         source: 'manual' as const,
     },
-    createdAt: 0,
-    updatedAt: 0,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   const defaultProps = {
