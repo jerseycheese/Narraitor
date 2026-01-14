@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 import { DashboardProgressCard } from './DashboardProgressCard';
 import { DashboardContinueCard } from './DashboardContinueCard';
 import { DashboardRecentWorlds } from './DashboardRecentWorlds';
@@ -13,6 +12,8 @@ import { DashboardRecentCharacters } from './DashboardRecentCharacters';
 import { DashboardGettingStarted } from './DashboardGettingStarted';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 import type { DashboardState, DashboardMetrics } from '@/types/dashboard.types';
+import { Button } from '@/components/ui/button';
+import { Globe, Users, Play } from 'lucide-react';
 
 export function DashboardHome() {
   const router = useRouter();
@@ -117,9 +118,68 @@ export function DashboardHome() {
     await cleanupSessionData(sessionId);
   };
 
-  // First-time user state
+  // First-time user state - show engaging onboarding dashboard
   if (dashboardState === 'first-time') {
-    return <GuidedFirstTimeExperience />;
+    return (
+      <main className="grid grid-cols-1 gap-6" role="main">
+        {/* Welcome Message */}
+        <section className="text-center space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">Welcome to Narraitor</h2>
+          <p className="text-lg text-gray-700">
+            Create a world and start your story
+          </p>
+        </section>
+
+        {/* How it Works - 3 Step Cards */}
+        <section className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900">How It Works</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
+              <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-3xl font-bold text-primary mb-3">1</div>
+                <h4 className="text-lg font-semibold mb-2">Build Your World</h4>
+                <p className="text-sm text-muted-foreground">
+                  Create or generate unique worlds with custom rules and settings
+                </p>
+              </div>
+            </div>
+            <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
+              <Users className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-3xl font-bold text-primary mb-3">2</div>
+                <h4 className="text-lg font-semibold mb-2">Create Characters</h4>
+                <p className="text-sm text-muted-foreground">
+                  Design or generate playable characters that fit your world
+                </p>
+              </div>
+            </div>
+            <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
+              <Play className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-3xl font-bold text-primary mb-3">3</div>
+                <h4 className="text-lg font-semibold mb-2">Start Playing</h4>
+                <p className="text-sm text-muted-foreground">
+                  Make choices and shape your story
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Primary CTA */}
+        <section className="text-center">
+          <Button
+            onClick={() => handleNavigate('/worlds')}
+            variant="default"
+            size="lg"
+            className="px-8 py-4 text-lg font-medium"
+          >
+            Start New Game
+          </Button>
+        </section>
+      </main>
+    );
   }
 
   return (
