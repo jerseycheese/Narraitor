@@ -121,21 +121,21 @@ export function DashboardHome() {
   // First-time user state - show engaging onboarding dashboard
   if (dashboardState === 'first-time') {
     return (
-      <main className="grid grid-cols-1 gap-6" role="main">
+      <main className="component-dashboard-home grid grid-cols-1 gap-6">
         {/* Welcome Message */}
         <section className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Welcome to Narraitor</h2>
-          <p className="text-lg text-gray-700">
+          <h2 className="text-2xl font-bold text-foreground">Welcome to Narraitor</h2>
+          <p className="text-lg text-secondary-foreground">
             Create a world and start your story
           </p>
         </section>
 
         {/* How it Works - 3 Step Cards */}
         <section className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">How It Works</h3>
+          <h3 className="text-lg font-semibold text-foreground">How It Works</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
-              <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary/10 m-auto" aria-hidden="true" />
               <div className="relative z-10">
                 <div className="text-3xl font-bold text-primary mb-3">1</div>
                 <h4 className="text-lg font-semibold mb-2">Build Your World</h4>
@@ -145,7 +145,7 @@ export function DashboardHome() {
               </div>
             </div>
             <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
-              <Users className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <Users className="absolute inset-0 w-4/5 h-4/5 text-primary/10 m-auto" aria-hidden="true" />
               <div className="relative z-10">
                 <div className="text-3xl font-bold text-primary mb-3">2</div>
                 <h4 className="text-lg font-semibold mb-2">Create Characters</h4>
@@ -155,7 +155,7 @@ export function DashboardHome() {
               </div>
             </div>
             <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden">
-              <Play className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+              <Play className="absolute inset-0 w-4/5 h-4/5 text-primary/10 m-auto" aria-hidden="true" />
               <div className="relative z-10">
                 <div className="text-3xl font-bold text-primary mb-3">3</div>
                 <h4 className="text-lg font-semibold mb-2">Start Playing</h4>
@@ -183,7 +183,7 @@ export function DashboardHome() {
   }
 
   return (
-    <main className="grid grid-cols-1 gap-6" role="main">
+    <main className="component-dashboard-home grid grid-cols-1 gap-6">
       {/* Continue Card - Only for active session users */}
       {dashboardState === 'active-session' && mostRecentSession && (
         <DashboardContinueCard

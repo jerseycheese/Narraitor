@@ -30,7 +30,7 @@ export function DashboardRecentCharacters({
 
   if (recentCharacters.length === 0) {
     return (
-      <section className="bg-background rounded-lg border p-6 shadow-sm">
+      <section className="component-dashboard-recent-characters bg-background rounded-lg border p-6 shadow-sm">
         <h2 className="text-lg font-semibold mb-4">Recent Characters</h2>
         <div className="text-center py-8">
           <p className="text-muted-foreground mb-4">No characters yet</p>
@@ -44,7 +44,7 @@ export function DashboardRecentCharacters({
   }
 
   return (
-    <section className="bg-background rounded-lg border p-6 shadow-sm">
+    <section className="component-dashboard-recent-characters bg-background rounded-lg border p-6 shadow-sm">
       <h2 className="text-lg font-semibold mb-4">Recent Characters</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -58,6 +58,7 @@ export function DashboardRecentCharacters({
               onClick={() => onNavigate(`/characters/${character.id}`)}
               role="button"
               tabIndex={0}
+              aria-label={`View character: ${character.name}${world ? ` from ${world.name}` : ''}`}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
