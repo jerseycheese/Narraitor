@@ -14,6 +14,7 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 // Render RecentPagesDropdown only on the client to avoid SSR/client mismatches
 const RecentPagesDropdown = dynamic(() => import('./RecentPagesDropdown').then(m => ({ default: m.RecentPagesDropdown })), { ssr: false });
 import { MobileNavigationMenu } from './MobileNavigationMenu';
+import { TutorialMenu } from './TutorialMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { X, Menu, Globe, ChevronDown, Check, Plus, Play } from 'lucide-react';
@@ -176,6 +177,7 @@ export function Navigation() {
             
             {/* Right side - Quick actions and current context (hidden on mobile) */}
             <div className="hidden md:flex items-center gap-2 sm:gap-4">
+              <TutorialMenu />
               {/* World Switcher Dropdown */}
               {hasWorlds && (
                 <div className="relative" ref={dropdownRef}>

@@ -29,8 +29,9 @@ interface OnboardingData {
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
-  const setOnboardingCompleted = useSessionStore(state => state.setOnboardingCompleted);
-  const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
+  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
+  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+  const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
   const { setCurrentWorld } = useWorldStore();
 
   // Validation function for wizard steps
@@ -98,7 +99,7 @@ export function GuidedFirstTimeExperience() {
       setCurrentWorld(worldId);
       
       // Mark onboarding as completed
-      setOnboardingCompleted(true);
+      completeTutorialPhase('intro');
       
       // Navigate to character creation to continue the flow
       router.push(`/characters/create?worldId=${worldId}`);
@@ -106,13 +107,13 @@ export function GuidedFirstTimeExperience() {
       console.error('Error completing onboarding:', error);
       throw error; // Re-throw to let wizard handle it
     }
-  }, [setCurrentWorld, setOnboardingCompleted, router]);
+  }, [setCurrentWorld, completeTutorialPhase, router]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
-    setOnboardingCompleted(true);
+    updateTutorialProgress('intro', { skipped: true });
     router.push('/worlds');
-  }, [setOnboardingCompleted, router]);
+  }, [updateTutorialProgress, router]);
 
   // Initialize wizard state
   const wizard = useWizardState({
@@ -321,7 +322,7 @@ export function GuidedFirstTimeExperience() {
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
   // Don't render if onboarding shouldn't be shown
-  if (!shouldShowOnboarding()) {
+  if (!isFirstTimeUser()) {
     return null;
   }
 
