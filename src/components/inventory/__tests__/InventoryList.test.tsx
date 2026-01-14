@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -12,9 +12,16 @@ jest.mock('@/state/inventoryStore', () => ({
 
 const mockUseInventoryStore = useInventoryStore as jest.MockedFunction<typeof useInventoryStore>;
 
+interface MockDropDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  item: InventoryItem;
+}
+
 // Mock DropConfirmationDialog to avoid testing its internal logic here
 jest.mock('../DropConfirmationDialog', () => ({
-  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: any) => (
+  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: MockDropDialogProps) => (
     isOpen ? (
       <div role="dialog" aria-label="Drop Item">
         <p>Drop {item?.name}?</p>
@@ -258,7 +265,7 @@ describe('InventoryList', () => {
         selector ? selector(mockStore) : mockStore
     );
     // Mock getState needed for the hook
-    (mockUseInventoryStore as any).getState = () => mockStore;
+    (mockUseInventoryStore as unknown as { getState: () => InventoryStore }).getState = () => mockStore;
 
     render(<InventoryList characterId={characterId} />);
 

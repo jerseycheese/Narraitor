@@ -1,12 +1,40 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DropConfirmationDialog } from './DropConfirmationDialog';
 import { InventoryItem } from '@/types/inventory.types';
 
+// Define types for mock props
+interface MockSimpleModalProps {
+  isOpen: boolean;
+  title: string;
+  description: React.ReactNode;
+  footer: React.ReactNode;
+  children: React.ReactNode;
+}
+
+interface MockButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: string;
+  children?: React.ReactNode;
+}
+
+interface MockLabelProps {
+  children: React.ReactNode;
+  htmlFor?: string;
+}
+
+interface MockInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  id?: string;
+}
+
+interface MockAlertProps {
+  children: React.ReactNode;
+  variant?: string;
+}
+
 // Mock SimpleModal
 jest.mock('@/components/shared/SimpleModal', () => ({
-  SimpleModal: ({ isOpen, title, description, footer, children }: any) => (
+  SimpleModal: ({ isOpen, title, description, footer, children }: MockSimpleModalProps) => (
     isOpen ? (
       <div role="dialog" aria-label={title}>
         <h1>{title}</h1>
@@ -20,7 +48,7 @@ jest.mock('@/components/shared/SimpleModal', () => ({
 
 // Mock UI components
 jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, variant, ...props }: any) => (
+  Button: ({ children, onClick, disabled, variant, ...props }: MockButtonProps) => (
     <button onClick={onClick} disabled={disabled} data-variant={variant} {...props}>
       {children}
     </button>
@@ -28,19 +56,19 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/label', () => ({
-  Label: ({ children, htmlFor }: any) => <label htmlFor={htmlFor}>{children}</label>
+  Label: ({ children, htmlFor }: MockLabelProps) => <label htmlFor={htmlFor}>{children}</label>
 }));
 
 jest.mock('@/components/ui/input', () => ({
-  Input: ({ id, value, onChange, ...props }: any) => (
+  Input: ({ id, value, onChange, ...props }: MockInputProps) => (
     <input id={id} value={value} onChange={onChange} {...props} />
   )
 }));
 
 jest.mock('@/components/ui/alert', () => ({
-  Alert: ({ children, variant }: any) => <div role="alert" data-variant={variant}>{children}</div>,
-  AlertTitle: ({ children }: any) => <strong>{children}</strong>,
-  AlertDescription: ({ children }: any) => <span>{children}</span>,
+  Alert: ({ children, variant }: MockAlertProps) => <div role="alert" data-variant={variant}>{children}</div>,
+  AlertTitle: ({ children }: { children: React.ReactNode }) => <strong>{children}</strong>,
+  AlertDescription: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
 
 describe('DropConfirmationDialog', () => {

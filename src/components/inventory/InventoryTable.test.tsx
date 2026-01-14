@@ -17,8 +17,15 @@ import { mockZustandStore, createMockInventoryStore, createMockInventoryItem } f
 jest.mock('@/state/inventoryStore');
 
 // Mock DropConfirmationDialog
+interface MockDropDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  item: InventoryItem;
+}
+
 jest.mock('./DropConfirmationDialog', () => ({
-  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: any) => (
+  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: MockDropDialogProps) => (
     isOpen ? (
       <div role="dialog" aria-label="Drop Item">
         <p>Drop {item?.name}?</p>

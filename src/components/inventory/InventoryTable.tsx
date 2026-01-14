@@ -197,7 +197,7 @@ export function InventoryTable({
         },
       },
     ],
-    [characterId, openDropDialog, handleUseItem, usingItemId]
+    [openDropDialog, handleUseItem, usingItemId]
   );
 
   // Handle empty state

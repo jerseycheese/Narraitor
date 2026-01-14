@@ -23,7 +23,7 @@ describe('useItemDropConfirmation', () => {
     });
 
     // Setup getState for direct access
-    (useInventoryStore as unknown as any).getState = mockGetState.mockReturnValue({
+    (useInventoryStore as unknown as { getState: jest.Mock }).getState = mockGetState.mockReturnValue({
       error: null,
       removeItem: mockRemoveItem,
       clearError: mockClearError,
