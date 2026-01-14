@@ -6,14 +6,14 @@ import { DataField } from '@/components/shared/DataField';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { formatRelativeTime } from '@/lib/utils';
-import type { SavedSession } from '@/types/game.types';
-import type { World } from '@/types/world.types';
-import type { Character } from '@/types/character.types';
+import type { SavedSessionInfo } from '@/types/game.types';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 interface DashboardContinueCardProps {
-  session: SavedSession;
-  world: World;
-  character: Character;
+  session: SavedSessionInfo;
+  world: ReturnType<typeof useWorldStore.getState>["worlds"][string];
+  character: ReturnType<typeof useCharacterStore.getState>["characters"][string];
   onContinue: (sessionId: string) => void;
   onDelete: (sessionId: string) => void;
 }

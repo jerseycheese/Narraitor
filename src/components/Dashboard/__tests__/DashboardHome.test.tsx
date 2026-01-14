@@ -6,7 +6,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import type { World } from '@/types/world.types';
 import type { Character } from '@/types/character.types';
-import type { SavedSession } from '@/types/game.types';
+import type { SavedSessionInfo } from '@/types/game.types';
 
 // Mock the stores
 jest.mock('@/state/worldStore');
@@ -39,7 +39,7 @@ describe('DashboardHome', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
-  const mockSession: SavedSession = {
+  const mockSession: SavedSessionInfo = {
     id: 'session-1',
     worldId: 'world-1',
     characterId: 'char-1',
@@ -128,7 +128,7 @@ describe('DashboardHome', () => {
         savedSessions: { 'session-1': mockSession },
         onboardingCompleted: true,
         shouldShowOnboarding: () => false,
-        resumeSavedSession: jest.fn()
+        resumeSavedSessionInfo: jest.fn()
       });
     });
 
@@ -170,7 +170,7 @@ describe('DashboardHome', () => {
         savedSessions: { 'session-1': mockSession },
         onboardingCompleted: true,
         shouldShowOnboarding: () => false,
-        resumeSavedSession: jest.fn()
+        resumeSavedSessionInfo: jest.fn()
       });
     });
 

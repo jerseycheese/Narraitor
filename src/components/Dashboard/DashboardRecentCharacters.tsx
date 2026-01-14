@@ -4,12 +4,12 @@ import React, { useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import type { Character } from '@/types/character.types';
-import type { World } from '@/types/world.types';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 interface DashboardRecentCharactersProps {
-  characters: Record<string, Character>;
-  worlds: Record<string, World>;
+  characters: ReturnType<typeof useCharacterStore.getState>["characters"];
+  worlds: ReturnType<typeof useWorldStore.getState>["worlds"];
   maxItems: number;
   onNavigate: (path: string) => void;
 }

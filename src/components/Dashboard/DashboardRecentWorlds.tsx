@@ -3,10 +3,10 @@
 import React, { useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { World } from '@/types/world.types';
+import { useWorldStore } from '@/state/worldStore';
 
 interface DashboardRecentWorldsProps {
-  worlds: Record<string, World>;
+  worlds: ReturnType<typeof useWorldStore.getState>["worlds"];
   maxItems: number;
   onNavigate: (path: string) => void;
 }
