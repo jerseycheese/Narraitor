@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DashboardRecentCharacters } from '../DashboardRecentCharacters';
-import type { Character } from '@/types/character.types';
+import type { Character } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 
 describe('DashboardRecentCharacters', () => {
@@ -10,9 +10,11 @@ describe('DashboardRecentCharacters', () => {
     'world-1': {
       id: 'world-1',
       name: 'Fantasy Realm',
-      genre: 'Fantasy',
+      genre: 'fantasy',
       description: 'A magical world',
-      loreKeys: [],
+      attributes: [],
+      skills: [],
+      settings: { maxAttributes: 10, maxSkills: 20, attributePointPool: 50, skillPointPool: 30 },
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z'
     }
@@ -23,8 +25,16 @@ describe('DashboardRecentCharacters', () => {
       id: 'char-1',
       worldId: 'world-1',
       name: 'Aragorn',
+      description: 'A ranger',
       portrait: { type: 'placeholder', url: null },
-      characterSheetData: {},
+      level: 5,
+      isPlayer: true,
+      attributes: [],
+      skills: [],
+      derivedStats: [],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-03T00:00:00.000Z'
     },
@@ -32,8 +42,16 @@ describe('DashboardRecentCharacters', () => {
       id: 'char-2',
       worldId: 'world-1',
       name: 'Gandalf',
+      description: 'A wizard',
       portrait: { type: 'placeholder', url: null },
-      characterSheetData: {},
+      level: 10,
+      isPlayer: true,
+      attributes: [],
+      skills: [],
+      derivedStats: [],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      inventory: { characterId: 'char-2', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-02T00:00:00.000Z',
       updatedAt: '2024-01-05T00:00:00.000Z' // Most recent
     },
@@ -41,8 +59,16 @@ describe('DashboardRecentCharacters', () => {
       id: 'char-3',
       worldId: 'world-1',
       name: 'Frodo',
+      description: 'A hobbit',
       portrait: { type: 'placeholder', url: null },
-      characterSheetData: {},
+      level: 3,
+      isPlayer: true,
+      attributes: [],
+      skills: [],
+      derivedStats: [],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      inventory: { characterId: 'char-3', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-03T00:00:00.000Z',
       updatedAt: '2024-01-04T00:00:00.000Z'
     }

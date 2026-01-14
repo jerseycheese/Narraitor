@@ -47,7 +47,7 @@ export function DashboardGettingStarted({
   // Hide when all steps completed
   if (allComplete) {
     return (
-      <section className="bg-background rounded-lg border p-6 shadow-sm">
+      <section className="component-dashboard-getting-started bg-background rounded-lg border p-6 shadow-sm">
         <div className="text-center space-y-4">
           <CheckCircle className="w-12 h-12 text-success mx-auto" aria-hidden="true" />
           <div>
@@ -65,7 +65,7 @@ export function DashboardGettingStarted({
   }
 
   return (
-    <section className="bg-background rounded-lg border p-6 shadow-sm">
+    <section className="component-dashboard-getting-started bg-background rounded-lg border p-6 shadow-sm">
       <h2 className="text-lg font-semibold mb-4">Getting Started</h2>
 
       <div className="space-y-3 mb-6">
