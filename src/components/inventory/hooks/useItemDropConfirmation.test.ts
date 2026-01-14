@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useItemDropConfirmation } from './useItemDropConfirmation';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { InventoryItem } from '@/types/inventory.types';
 
 // Mock the inventory store
 jest.mock('@/state/inventoryStore');
@@ -30,18 +31,18 @@ describe('useItemDropConfirmation', () => {
     });
   });
 
-  const mockItem = {
+  const mockItem: InventoryItem = {
     id: 'item-1',
     name: 'Test Item',
     description: 'A test item',
     quantity: 5,
     stackable: true,
-    categoryId: 'miscellaneous' as const,
+    categoryId: 'miscellaneous',
     acquisitionHistory: [],
     categorization: {
-        categoryId: 'miscellaneous' as const,
+        categoryId: 'miscellaneous',
         classifiedAt: '2024-01-01T00:00:00Z',
-        source: 'manual' as const,
+        source: 'manual',
     },
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
