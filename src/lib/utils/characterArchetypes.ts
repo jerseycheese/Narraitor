@@ -8,30 +8,9 @@ import {
   PHYSICAL_DESCRIPTION_TEMPLATES, 
   ArchetypeTemplate as ImportedArchetypeTemplate 
 } from '@/lib/constants/characterArchetypeTemplates';
+import type { CharacterArchetype } from '@/types/archetype.types';
 
-export interface CharacterArchetype {
-  id: string;
-  name: string;
-  description: string;
-  level: number;
-  attributes: Array<{
-    id: string;
-    name: string;
-    value: number;
-  }>;
-  skills: Array<{
-    id: string;
-    name: string;
-    level: number;
-  }>;
-  background: {
-    description: string;
-    personality: string;
-    motivation: string;
-    fears: string[];
-    physicalDescription?: string;
-  };
-}
+export type { CharacterArchetype };
 
 export type ArchetypeTemplate = ImportedArchetypeTemplate;
 

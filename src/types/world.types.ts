@@ -9,7 +9,7 @@ import {
 import type { SkillDifficulty } from './skill-difficulty.types';
 import type { ToneSettings } from './tone-settings.types';
 import type { GenreValue } from './genre.types';
-import type { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+import type { CharacterArchetype } from '@/types/archetype.types';
 
 /**
  * Character template for quick character creation
