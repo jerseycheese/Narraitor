@@ -38,10 +38,9 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
 
   return (
     <section
-      className="bg-background rounded-lg border p-6 shadow-sm"
+      className="component-dashboard-progress-card bg-background rounded-lg border p-6 shadow-sm"
       aria-labelledby="progress-heading"
       role="region"
-      aria-label="Your progress metrics"
     >
       <h2 id="progress-heading" className="text-lg font-semibold mb-4">
         Your Progress

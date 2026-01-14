@@ -9,27 +9,33 @@ describe('DashboardRecentWorlds', () => {
     'world-1': {
       id: 'world-1',
       name: 'Fantasy Realm',
-      genre: 'Fantasy',
+      genre: 'fantasy',
       description: 'A magical world',
-      loreKeys: [],
+      attributes: [],
+      skills: [],
+      settings: { maxAttributes: 10, maxSkills: 20, attributePointPool: 50, skillPointPool: 30 },
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-03T00:00:00.000Z'
     },
     'world-2': {
       id: 'world-2',
       name: 'Sci-Fi Universe',
-      genre: 'Sci-Fi',
+      genre: 'sci-fi',
       description: 'A futuristic world',
-      loreKeys: [],
+      attributes: [],
+      skills: [],
+      settings: { maxAttributes: 10, maxSkills: 20, attributePointPool: 50, skillPointPool: 30 },
       createdAt: '2024-01-02T00:00:00.000Z',
       updatedAt: '2024-01-05T00:00:00.000Z' // Most recent
     },
     'world-3': {
       id: 'world-3',
       name: 'Horror Town',
-      genre: 'Horror',
+      genre: 'horror',
       description: 'A spooky world',
-      loreKeys: [],
+      attributes: [],
+      skills: [],
+      settings: { maxAttributes: 10, maxSkills: 20, attributePointPool: 50, skillPointPool: 30 },
       createdAt: '2024-01-03T00:00:00.000Z',
       updatedAt: '2024-01-04T00:00:00.000Z'
     }

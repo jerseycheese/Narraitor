@@ -43,7 +43,7 @@ export function DashboardContinueCard({
   return (
     <>
       <section
-        className="bg-background rounded-lg border-2 border-primary p-6 shadow-md"
+        className="component-dashboard-continue-card bg-background rounded-lg border-2 border-primary p-6 shadow-md"
         aria-labelledby="continue-game-heading"
       >
         <h2 id="continue-game-heading" className="text-lg font-semibold mb-4">
