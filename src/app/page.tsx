@@ -12,7 +12,7 @@ export default function HomePage() {
         {/* Visually hidden H1 for accessibility */}
         <h1 className="sr-only">Narraitor - AI-Powered Interactive Storytelling Game</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
           {/* Left Column - Dashboard Content (2/3 width) */}
           <div className="order-2 lg:order-1 lg:col-span-2">
             <SSRClientOnly>
@@ -30,10 +30,10 @@ export default function HomePage() {
                 height={240}
                 className="w-40 h-40 md:w-60 md:h-60 mb-6"
               />
-              <h2 className="text-6xl md:text-7xl text-gray-900 mb-4">
+              <h2 className="text-6xl md:text-7xl text-foreground mb-4">
                 <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-md">
+              <p className="text-xl text-muted-foreground max-w-md">
                 AI-powered interactive storytelling in any universe you can imagine
               </p>
             </div>
