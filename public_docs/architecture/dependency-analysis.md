@@ -161,17 +161,6 @@ Utility functions must be pure with no state dependencies.
 ### Rule: `types-no-implementation-imports` (error)
 Type definitions should not import implementation code.
 
-### Tutorial System Components
-
-The tutorial system introduces new components in the **Session Domain**:
-
-- **`TutorialProvider`**: Client-side context provider that manages tour state and synchronization.
-- **`TutorialProgressWidget`**: UI component for resuming paused tutorials.
-- **`TutorialMenu`**: Navigation menu item for tutorial controls.
-- **`react-joyride`**: Third-party library used for tour rendering.
-
-These components interact closely with `sessionStore` for persistence and `useWizardState` for step synchronization.
-
 ## Available Commands
 
 ```bash
