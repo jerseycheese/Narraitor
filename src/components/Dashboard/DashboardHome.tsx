@@ -23,7 +23,6 @@ export function DashboardHome() {
   const savedSessions = useSessionStore((state) => state.savedSessions);
   const resumeSavedSession = useSessionStore((state) => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore((state) => state.shouldShowOnboarding);
-  const onboardingCompleted = useSessionStore((state) => state.onboardingCompleted);
 
   // Calculate dashboard state
   const dashboardState: DashboardState = useMemo(() => {
@@ -31,9 +30,11 @@ export function DashboardHome() {
     const hasCharacters = Object.keys(characters).length > 0;
 
     // Check for onboarding
-    const showOnboarding = shouldShowOnboarding
-      ? shouldShowOnboarding()
-      : Object.keys(savedSessions).length === 0 && !onboardingCompleted;
+    // Use the store selector if available, otherwise check sessions
+    // Fallback logic for safety during migration
+    const showOnboarding = shouldShowOnboarding 
+      ? shouldShowOnboarding() 
+      : Object.keys(savedSessions).length === 0; // Simplified fallback
 
     if (showOnboarding) {
       return 'first-time';
@@ -55,7 +56,7 @@ export function DashboardHome() {
     }
 
     return 'first-time';
-  }, [worlds, characters, savedSessions, shouldShowOnboarding, onboardingCompleted]);
+  }, [worlds, characters, savedSessions, shouldShowOnboarding]);
 
   // Calculate metrics
   const metrics: DashboardMetrics = useMemo(() => {

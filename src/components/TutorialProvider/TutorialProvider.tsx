@@ -17,7 +17,6 @@ interface TutorialContextValue {
   isTourActive: boolean;
   currentTour: string | null;
   stepIndex: number;
-  canAdvanceToStep: (targetStep: number) => boolean;
   setCurrentWizardStep: (step: number) => void;
 }
 
@@ -67,7 +66,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       setActiveTour(tourId);
       
       // If resuming, check last step from store if not provided explicitly
-      const lastStep = tutorialProgress.phases[tourId]?.lastStep || 0;
+      const phaseData = tutorialProgress.phases[tourId];
+      const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
       setStepIndex(initialStepIndex > 0 ? initialStepIndex : lastStep);
       
       setRun(true);
@@ -167,7 +167,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       isTourActive: run,
       currentTour: activeTour,
       stepIndex,
-      canAdvanceToStep,
       setCurrentWizardStep,
     }}>
       {children}

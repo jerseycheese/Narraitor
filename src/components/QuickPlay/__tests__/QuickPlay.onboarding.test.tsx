@@ -60,7 +60,6 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: false,
           isFirstTimeUser: () => true,
           shouldShowOnboarding: () => true,
         })
@@ -96,7 +95,6 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: true,
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
         })
@@ -194,7 +192,6 @@ describe('QuickPlay - Onboarding Integration', () => {
           savedSessions: {
             'session-1': mockSavedSession,
           },
-          onboardingCompleted: true,
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
           resumeSavedSession: jest.fn().mockReturnValue(true),
@@ -252,7 +249,6 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: true,
           isFirstTimeUser: () => false,
           shouldShowOnboarding: () => false,
         })
@@ -286,7 +282,8 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: undefined, // Corrupted
+          // No explicit tutorialProgress, simulating corrupted/missing state
+          // but we provide the selector result
           isFirstTimeUser: () => true, // Fallback to true
           shouldShowOnboarding: () => true,
         })
@@ -306,7 +303,6 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: false,
           // Override default methods to simulate them being missing/undefined
           isFirstTimeUser: undefined as unknown as () => boolean,
           shouldShowOnboarding: undefined as unknown as () => boolean,

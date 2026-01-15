@@ -20,7 +20,8 @@ export function TutorialProgressWidget() {
   
   // Only show if user has interacted with this phase (skipped or partially done)
   // This prevents it from showing up before the user has even started
-  if (!phaseData.skipped && phaseData.lastStep === 0) return null;
+  const hasStarted = 'lastStep' in phaseData && phaseData.lastStep > 0;
+  if (!phaseData.skipped && !hasStarted) return null;
 
   return (
     <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-4 w-72 z-40 animate-in slide-in-from-bottom-5">

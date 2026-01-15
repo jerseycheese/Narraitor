@@ -406,7 +406,7 @@ export const useSessionStore = create<SessionStore>()(
         return {
           ...initialState,
           savedSessions: newSavedSessions,
-          onboardingCompleted: prevState.onboardingCompleted,
+          tutorialProgress: prevState.tutorialProgress,
           sessionLifecycle: updatedLifecycle
         };
       });
@@ -415,7 +415,7 @@ export const useSessionStore = create<SessionStore>()(
       set(prevState => ({
         ...initialState,
         savedSessions: prevState.savedSessions,
-        onboardingCompleted: prevState.onboardingCompleted,
+        tutorialProgress: prevState.tutorialProgress,
         sessionLifecycle: prevState.sessionLifecycle
       }));
     }

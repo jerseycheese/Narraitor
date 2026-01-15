@@ -6,15 +6,22 @@ import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { setOnboardingCompleted, onboardingCompleted, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
+  const { 
+    resetTutorialProgress, 
+    completeTutorialPhase, 
+    shouldShowOnboarding, 
+    isFirstTimeUser 
+  } = useSessionStore();
+
+  const showOnboarding = shouldShowOnboarding();
 
   const handleReset = () => {
-    setOnboardingCompleted(false);
+    resetTutorialProgress();
     setResetKey(prev => prev + 1);
   };
 
   const handleMarkCompleted = () => {
-    setOnboardingCompleted(true);
+    completeTutorialPhase('intro');
     setResetKey(prev => prev + 1);
   };
 
@@ -60,17 +67,17 @@ export default function GuidedFirstTimeExperienceTestHarness() {
                 Onboarding Status:
               </span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
-                onboardingCompleted 
+                !showOnboarding 
                   ? 'bg-green-100 text-green-700' 
                   : 'bg-amber-100 text-amber-700'
               }`}>
-                {onboardingCompleted ? 'Completed' : 'Not Completed'}
+                {!showOnboarding ? 'Completed' : 'Not Completed'}
               </span>
             </div>
             
             {/* Debug info */}
             <div className="text-xs text-gray-500">
-              shouldShow: {shouldShowOnboarding?.().toString() || 'undefined'} | 
+              shouldShow: {showOnboarding.toString()} | 
               isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
             </div>
             
@@ -115,7 +122,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
           <div key={resetKey} className="p-8">
             <GuidedFirstTimeExperience />
             
-            {onboardingCompleted && (
+            {!showOnboarding && (
               <div className="text-center py-8">
                 <div className="bg-gray-100 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
