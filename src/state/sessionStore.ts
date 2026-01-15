@@ -75,6 +75,7 @@ const initialState = {
     phases: {
       intro: { completed: false, skipped: false },
       worldCreation: { completed: false, skipped: false, lastStep: 0 },
+      worldGeneration: { completed: false, skipped: false, lastStep: 0 },
       characterCreation: { completed: false, skipped: false, lastStep: 0 },
       firstPlay: { completed: false, skipped: false },
     },
@@ -761,6 +762,7 @@ export const useSessionStore = create<SessionStore>()(
         phases: {
           intro: { completed: false, skipped: false },
           worldCreation: { completed: false, skipped: false, lastStep: 0 },
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 },
           characterCreation: { completed: false, skipped: false, lastStep: 0 },
           firstPlay: { completed: false, skipped: false },
         },
@@ -798,7 +800,7 @@ export const useSessionStore = create<SessionStore>()(
 
   getCurrentTutorialPhase: () => {
     const { tutorialProgress } = get();
-    const phases: TutorialPhase[] = ['intro', 'worldCreation', 'characterCreation', 'firstPlay'];
+    const phases: TutorialPhase[] = ['intro', 'worldCreation', 'worldGeneration', 'characterCreation', 'firstPlay'];
     return phases.find(p => !tutorialProgress.phases[p].completed && !tutorialProgress.phases[p].skipped) || null;
   },
 
@@ -850,7 +852,7 @@ export const useSessionStore = create<SessionStore>()(
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
-  version: 3,
+  version: 4,
   // Persist active session state to maintain continuity across browser refreshes
   partialize: (state) => ({ 
     savedSessions: state.savedSessions,
@@ -877,6 +879,7 @@ export const useSessionStore = create<SessionStore>()(
         phases: {
           intro: { completed: false, skipped: false },
           worldCreation: { completed: false, skipped: false, lastStep: 0 },
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 },
           characterCreation: { completed: false, skipped: false, lastStep: 0 },
           firstPlay: { completed: false, skipped: false },
         },
@@ -886,6 +889,14 @@ export const useSessionStore = create<SessionStore>()(
       // Remove old onboarding flag - replaced by tutorialProgress
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (nextState as any).onboardingCompleted;
+    }
+    
+    // Migration from v3 to v4: Add worldGeneration phase
+    if (typeof version === 'number' && version < 4 && nextState.tutorialProgress) {
+      nextState.tutorialProgress.phases = {
+        ...nextState.tutorialProgress.phases,
+        worldGeneration: { completed: false, skipped: false, lastStep: 0 }
+      };
     }
 
     return nextState;

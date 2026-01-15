@@ -27,6 +27,9 @@ const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping
     case 'worldCreation':
       const { worldCreationTour, tourStepToWizardStep: worldMapping } = await import('@/lib/tutorial/worldCreationTour');
       return { steps: worldCreationTour, mapping: worldMapping };
+    case 'worldGeneration':
+      const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
+      return { steps: worldGenerationTour };
     case 'characterCreation':
       const { characterCreationTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationTour');
       return { steps: characterCreationTour, mapping: charMapping };

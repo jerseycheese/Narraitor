@@ -181,7 +181,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     <div data-testid="template-step">
       <WizardFormSection
         title="Getting Started"
-        description="Choose how you'd like to create your world - use existing templates, generate with AI, or start from scratch."
+        description="Choose how you'd like to create your world - use existing templates, generate automatically, or start from scratch."
       >
         
         {/* Mode Selection */}

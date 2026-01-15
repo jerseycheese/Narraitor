@@ -227,7 +227,7 @@ export default function WorldCreationWizard({
   const generateAISuggestions = useCallback(async () => {
     const description = wizard.state.data.description;
     if (!description || description.trim().length < 50) {
-      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the AI understands your world.');
+      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the system understands your world.');
       return;
     }
 
@@ -243,7 +243,7 @@ export default function WorldCreationWizard({
         aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
       });
     } catch (error) {
-      console.error('Error generating AI suggestions:', error);
+      console.error('Error generating suggestions:', error);
       
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
@@ -254,7 +254,7 @@ export default function WorldCreationWizard({
       });
       wizard.setError(
         'ai',
-        'We had trouble reaching the AI service, so we loaded starter suggestions. You can generate again once the service recovers.'
+        'We had trouble reaching the generation service, so we loaded starter suggestions. You can generate again once the service recovers.'
       );
     } finally {
       wizard.setProcessing(false);

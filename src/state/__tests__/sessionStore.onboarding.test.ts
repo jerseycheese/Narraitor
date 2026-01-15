@@ -37,6 +37,7 @@ describe('SessionStore - Tutorial & Onboarding Functionality', () => {
         phases: {
           intro: { completed: false, skipped: false },
           worldCreation: { completed: false, skipped: false, lastStep: 0 },
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 },
           characterCreation: { completed: false, skipped: false, lastStep: 0 },
           firstPlay: { completed: false, skipped: false },
         },
