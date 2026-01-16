@@ -5,7 +5,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="template-selector"]',
     content: 'Choose a character template to get a head start, or build your hero from scratch.',
     placement: 'bottom',
-    disableBeacon: false,
+    disableBeacon: true,
   },
   {
     target: '[data-tutorial="basic-info"]',

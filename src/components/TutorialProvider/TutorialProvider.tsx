@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
 import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
@@ -10,6 +10,7 @@ import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialPr
 interface TutorialContextValue {
   startTour: (tourId: TutorialPhase, stepIndex?: number) => void;
   stopTour: () => void;
+  pauseTour: () => void;
   nextStep: () => void;
   prevStep: () => void;
   skipTour: () => void;
@@ -49,6 +50,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [activeTour, setActiveTour] = useState<TutorialPhase | null>(null);
   const [run, setRun] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
@@ -74,12 +76,24 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       setStepIndex(initialStepIndex > 0 ? initialStepIndex : lastStep);
       
       setRun(true);
+      setIsPaused(false);
     }
   }, [tutorialProgress.phases]);
 
   const stopTour = useCallback(() => {
     setRun(false);
+    setIsPaused(false);
     setActiveTour(null);
+  }, []);
+  
+  const pauseTour = useCallback(() => {
+    setRun(false);
+    setIsPaused(true);
+  }, []);
+
+  const resumeTour = useCallback(() => {
+    setRun(true);
+    setIsPaused(false);
   }, []);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
@@ -87,6 +101,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
+      setIsPaused(false);
       if (activeTour) {
         if (status === STATUS.FINISHED) {
           completeTutorialPhase(activeTour);
@@ -116,22 +131,49 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     return true; 
   }, []);
   
-  // Sync tour with wizard
+  const lastWizardStepRef = useRef<number | null>(null);
+
+  // Sync tour with wizard (only when the wizard actually changes steps)
   useEffect(() => {
-    if (activeTour && stepMapping && run) {
-      // Find tour step that corresponds to the current wizard step
-      const targetTourStepEntry = Object.entries(stepMapping)
-        .find((entry) => entry[1] === currentWizardStep);
-        
-      if (targetTourStepEntry) {
-        const newIndex = parseInt(targetTourStepEntry[0]);
-        // Only jump if we are not currently there
-        if (stepIndex !== newIndex) {
-           setStepIndex(newIndex);
+    if (!activeTour || !stepMapping) return;
+
+    // Handle paused state: resume when wizard advances
+    if (isPaused) {
+      // Only resume if wizard actually changed steps
+      if (lastWizardStepRef.current !== currentWizardStep) {
+        lastWizardStepRef.current = currentWizardStep;
+
+        const targetEntry = Object.entries(stepMapping)
+          .find((entry) => entry[1] === currentWizardStep);
+
+        if (targetEntry) {
+          const newIndex = parseInt(targetEntry[0]);
+          setStepIndex(newIndex);
+          resumeTour(); // Resume tour at new step
         }
       }
+      return; // Exit early - don't run normal sync logic while paused
     }
-  }, [currentWizardStep, activeTour, stepMapping, run, stepIndex]);
+
+    // Normal sync logic (only when running)
+    if (!run) return;
+
+    if (lastWizardStepRef.current === currentWizardStep) return;
+
+    lastWizardStepRef.current = currentWizardStep;
+
+    // Find tour step that corresponds to the current wizard step
+    const targetTourStepEntry = Object.entries(stepMapping)
+      .find((entry) => entry[1] === currentWizardStep);
+
+    if (targetTourStepEntry) {
+      const newIndex = parseInt(targetTourStepEntry[0]);
+      // Only jump if we are not currently there
+      if (stepIndex !== newIndex) {
+        setStepIndex(newIndex);
+      }
+    }
+  }, [currentWizardStep, activeTour, stepMapping, run, stepIndex, isPaused, resumeTour]);
 
   const setCurrentWizardStep = useCallback((step: number) => {
     setCurrentWizardStepState(step);
@@ -153,6 +195,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   const skipTour = useCallback(() => {
     setRun(false);
+    setIsPaused(false);
     if (activeTour) {
       updateTutorialProgress(activeTour, { skipped: true });
     }
@@ -163,6 +206,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     <TutorialContext.Provider value={{
       startTour,
       stopTour,
+      pauseTour,
       nextStep,
       prevStep,
       skipTour,

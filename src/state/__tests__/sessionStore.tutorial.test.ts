@@ -63,6 +63,7 @@ describe('sessionStore tutorial', () => {
       // Complete all phases
       store.completeTutorialPhase('intro');
       store.completeTutorialPhase('worldCreation');
+      store.completeTutorialPhase('worldGeneration');
       store.completeTutorialPhase('characterCreation');
       store.completeTutorialPhase('firstPlay');
       
@@ -77,6 +78,9 @@ describe('sessionStore tutorial', () => {
       expect(useSessionStore.getState().getCurrentTutorialPhase()).toBe('worldCreation');
       
       store.completeTutorialPhase('worldCreation');
+      expect(useSessionStore.getState().getCurrentTutorialPhase()).toBe('worldGeneration');
+
+      store.completeTutorialPhase('worldGeneration');
       expect(useSessionStore.getState().getCurrentTutorialPhase()).toBe('characterCreation');
     });
 

@@ -376,6 +376,7 @@ export default function SkillReviewStep({
       <WizardFormSection
         title="Review Skills"
         description="We've suggested skills for your world. At least one skill is required to proceed. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
+        dataTutorial="skill-editor"
       >
         {showClearButton && (
           <div className="mb-4 flex justify-end">

@@ -174,17 +174,24 @@ interface WizardFormSectionProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
+  dataTutorial?: string;
 }
 
 export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
   title,
   description,
   children,
+  dataTutorial,
 }) => {
+  const headerProps = dataTutorial ? { 'data-tutorial': dataTutorial } : undefined;
+  const sectionProps = !title && !description && dataTutorial
+    ? { 'data-tutorial': dataTutorial }
+    : undefined;
+
   return (
-    <div className="space-y-4 my-4">
+    <div className="space-y-4 my-4" {...sectionProps}>
       {(title || description) && (
-        <div className="mb-4">
+        <div className="mb-4" {...headerProps}>
           {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
           {description && <p className={wizardStyles.step.description}>{description}</p>}
         </div>

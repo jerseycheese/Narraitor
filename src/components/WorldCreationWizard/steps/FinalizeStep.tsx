@@ -262,6 +262,7 @@ export default function FinalizeStep({
         <Button
           type="button"
           data-testid="step-complete-button"
+          data-tutorial="finalize-world"
           onClick={() => {
             log('[FinalizeStep.tsx - inline onClick] Button raw click detected.');
             handleComplete();
@@ -273,4 +274,3 @@ export default function FinalizeStep({
     </div>
   );
 }
-

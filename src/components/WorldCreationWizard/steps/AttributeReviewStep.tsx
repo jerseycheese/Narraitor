@@ -258,6 +258,7 @@ export default function AttributeReviewStep({
       <WizardFormSection
         title="Review Attributes"
         description="We've suggested attributes for your world. At least one attribute is required to proceed. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
+        dataTutorial="attribute-editor"
       >
         {showClearButton && (
           <div className="mb-4 flex justify-end">

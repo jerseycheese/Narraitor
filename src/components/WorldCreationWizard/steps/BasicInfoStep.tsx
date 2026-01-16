@@ -59,18 +59,20 @@ export default function BasicInfoStep({
           />
         </WizardFormGroup>
 
-        <WizardFormGroup
-          label="Genre"
-          required
-          helpText={guidance.tagline}
-        >
-        <WizardSelect
-          value={worldData.genre || 'fantasy'}
-          onChange={(value) => onUpdate({ ...worldData, genre: value as GenreValue })}
-          options={GENRE_OPTIONS}
-          testId="world-genre-select"
-        />
-        </WizardFormGroup>
+        <div data-tutorial="genre-picker">
+          <WizardFormGroup
+            label="Genre"
+            required
+            helpText={guidance.tagline}
+          >
+            <WizardSelect
+              value={worldData.genre || 'fantasy'}
+              onChange={(value) => onUpdate({ ...worldData, genre: value as GenreValue })}
+              options={GENRE_OPTIONS}
+              testId="world-genre-select"
+            />
+          </WizardFormGroup>
+        </div>
 
         <WizardFormGroup
           label="World Type"

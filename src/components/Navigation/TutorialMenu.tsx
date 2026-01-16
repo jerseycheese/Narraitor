@@ -27,11 +27,15 @@ export function TutorialMenu() {
     }
   }, [isOpen]);
 
-  const handleRestart = () => {
+  const handleRestart = async () => {
     if (confirm('Are you sure you want to reset all tutorial progress?')) {
       resetTutorial();
       setIsOpen(false);
-      // Optional: Refresh or navigate to ensure state is picked up
+      // Best-effort delay for IndexedDB persist to complete
+      // Zustand persist doesn't expose a flush/ready API for writes,
+      // so we use a small delay. 100ms is generally sufficient for
+      // IndexedDB operations on modern browsers.
+      await new Promise(resolve => setTimeout(resolve, 100));
       window.location.reload(); 
     }
   };
@@ -62,8 +66,10 @@ export function TutorialMenu() {
                   <CheckCircle className="w-4 h-4 text-green-500" />
                 ) : data.skipped ? (
                   <span className="text-xs text-gray-400">Skipped</span>
-                ) : (
+                ) : ('lastStep' in data && (data as any).lastStep > 0) ? (
                   <span className="text-xs text-blue-500">In Progress</span>
+                ) : (
+                  <span className="text-xs text-gray-400">Not Started</span>
                 )}
               </div>
             ))}

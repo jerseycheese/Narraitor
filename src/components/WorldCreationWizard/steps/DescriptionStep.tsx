@@ -137,25 +137,27 @@ export default function DescriptionStep({
         title="Describe Your World"
         description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects. This will help us suggest appropriate attributes and skills."
       >
-        <WizardFormGroup
-          label="Full Description"
-          error={errors.description}
-          required
-          helpText={guidance.descriptionPrompt}
-        >
-          <WizardTextArea
-            value={description}
-            onChange={handleDescriptionChange}
-            placeholder="Describe your world in detail..."
-            rows={12}
+        <div data-tutorial="world-description">
+          <WizardFormGroup
+            label="Full Description"
             error={errors.description}
-            disabled={isProcessing}
-            testId="world-full-description"
-          />
-          <div className="mt-1 text-right text-sm" data-testid="description-char-count">
-            {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
-          </div>
-        </WizardFormGroup>
+            required
+            helpText={guidance.descriptionPrompt}
+          >
+            <WizardTextArea
+              value={description}
+              onChange={handleDescriptionChange}
+              placeholder="Describe your world in detail..."
+              rows={12}
+              error={errors.description}
+              disabled={isProcessing}
+              testId="world-full-description"
+            />
+            <div className="mt-1 text-right text-sm" data-testid="description-char-count">
+              {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
+            </div>
+          </WizardFormGroup>
+        </div>
       </WizardFormSection>
 
       <WizardFormSection

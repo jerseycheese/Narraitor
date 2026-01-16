@@ -477,7 +477,7 @@ export default function WorldCreationWizard({
     switch (wizard.state.currentStep) {
       case 0:
         return (
-          <div data-tutorial="world-type-selector">
+          <div>
             <TemplateStep
               selectedTemplateId={wizard.state.data.selectedTemplateId}
               onUpdate={updateWizardState}
@@ -489,13 +489,13 @@ export default function WorldCreationWizard({
         );
       case 1:
         return (
-          <div data-tutorial="genre-picker">
+          <div>
             <BasicInfoStep {...stepProps} />
           </div>
         );
       case 2:
         return (
-          <div data-tutorial="world-description">
+          <div>
             <DescriptionStep
               {...stepProps}
               isProcessing={wizard.state.isProcessing || false}
@@ -508,7 +508,7 @@ export default function WorldCreationWizard({
         );
       case 3:
         return (
-          <div data-tutorial="attribute-editor">
+          <div>
             <AttributeReviewStep
               {...stepProps}
               suggestions={wizard.state.data.aiSuggestions?.attributes || []}
@@ -518,7 +518,7 @@ export default function WorldCreationWizard({
         );
       case 4:
         return (
-          <div data-tutorial="skill-editor">
+          <div>
             <SkillReviewStep
               {...stepProps}
               suggestions={wizard.state.data.aiSuggestions?.skills || []}
@@ -528,7 +528,7 @@ export default function WorldCreationWizard({
         );
       case 5:
         return (
-          <div data-tutorial="finalize-world">
+          <div>
             <FinalizeStep
               {...stepProps}
               onComplete={handleComplete}
