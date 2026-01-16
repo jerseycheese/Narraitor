@@ -81,25 +81,33 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   }, [tutorialProgress.phases]);
 
   const stopTour = useCallback(() => {
+    setSteps([]);
     setRun(false);
     setIsPaused(false);
     setActiveTour(null);
   }, []);
   
   const pauseTour = useCallback(() => {
+    setSteps([]);
     setRun(false);
     setIsPaused(true);
   }, []);
 
-  const resumeTour = useCallback(() => {
+  const resumeTour = useCallback(async () => {
+    // Re-load steps to ensure they are fresh and correctly targeted
+    if (activeTour) {
+      const { steps: loadedSteps } = await loadTour(activeTour);
+      setSteps(loadedSteps);
+    }
     setRun(true);
     setIsPaused(false);
-  }, []);
+  }, [activeTour]);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, type, index, action } = data;
     
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setSteps([]);
       setRun(false);
       setIsPaused(false);
       if (activeTour) {
@@ -194,6 +202,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   }, []);
 
   const skipTour = useCallback(() => {
+    setSteps([]);
     setRun(false);
     setIsPaused(false);
     if (activeTour) {
@@ -211,27 +220,29 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       prevStep,
       skipTour,
       resetTutorial,
-      isTourActive: run,
+      isTourActive: run || isPaused,
       currentTour: activeTour,
       stepIndex,
       setCurrentWizardStep,
     }}>
       {children}
       <TutorialProgressWidget />
-      <Joyride
-        steps={steps}
-        run={run}
-        stepIndex={stepIndex}
-        continuous={joyrideOptions.continuous}
-        scrollToFirstStep={joyrideOptions.scrollToFirstStep}
-        showProgress={joyrideOptions.showProgress}
-        showSkipButton={joyrideOptions.showSkipButton}
-        disableScrolling={joyrideOptions.disableScrolling}
-        styles={joyrideStyles}
-        callback={handleJoyrideCallback}
-        disableOverlayClose={true}
-        spotlightClicks={true}
-      />
+      {steps.length > 0 && (
+        <Joyride
+          steps={steps}
+          run={run && !isPaused}
+          stepIndex={stepIndex}
+          continuous={joyrideOptions.continuous}
+          scrollToFirstStep={joyrideOptions.scrollToFirstStep}
+          showProgress={joyrideOptions.showProgress}
+          showSkipButton={joyrideOptions.showSkipButton}
+          disableScrolling={joyrideOptions.disableScrolling}
+          styles={joyrideStyles}
+          callback={handleJoyrideCallback}
+          disableOverlayClose={true}
+          spotlightClicks={true}
+        />
+      )}
     </TutorialContext.Provider>
   );
 }

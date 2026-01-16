@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { TooltipRenderProps } from 'react-joyride';
+import { X } from 'lucide-react';
 import { useTutorial } from './useTutorial';
 
 const CONTINUE_LABEL = 'Continue';
@@ -90,7 +91,9 @@ export function WorldCreationStartTooltip({
           style={styles.buttonClose}
           type="button"
           {...closeProps}
-        />
+        >
+          <X className="w-3 h-3" />
+        </button>
       )}
     </div>
   );
