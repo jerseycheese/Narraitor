@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { World } from '@/types/world.types';
-import { WorldTemplate } from '@/types/world-template.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';

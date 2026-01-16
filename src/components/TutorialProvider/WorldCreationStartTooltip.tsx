@@ -8,6 +8,11 @@ import { useTutorial } from './useTutorial';
 
 const CONTINUE_LABEL = 'Continue';
 
+/** Custom data attached to tour steps via Joyride's Step.data property */
+interface TourStepData {
+  isEndOfPage?: boolean;
+}
+
 export function WorldCreationStartTooltip({
   backProps,
   closeProps,
@@ -40,21 +45,18 @@ export function WorldCreationStartTooltip({
         ? content
         : 'Tutorial step';
 
-  const isEndOfPage = (step as any).data?.isEndOfPage;
+  const stepData = step.data as TourStepData | undefined;
+  const isEndOfPage = stepData?.isEndOfPage;
 
   const primaryLabel =
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
   const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip';
 
-  const {
-    top: _closeTop,
-    right: _closeRight,
-    width: _closeWidth,
-    height: _closeHeight,
-    padding: _closePadding,
-    ...closeButtonStyle
-  } = styles.buttonClose;
+  // Exclude positioning/sizing props from Joyride's buttonClose style
+  // since we apply our own positioning via Tailwind classes
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { top, right, width, height, padding, ...closeButtonStyle } = styles.buttonClose;
 
   return (
     <div

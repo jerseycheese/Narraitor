@@ -66,7 +66,7 @@ export function TutorialMenu() {
                   <CheckCircle className="w-4 h-4 text-green-500" />
                 ) : data.skipped ? (
                   <span className="text-xs text-gray-400">Skipped</span>
-                ) : ('lastStep' in data && (data as any).lastStep > 0) ? (
+                ) : ('lastStep' in data && (data as { lastStep: number }).lastStep > 0) ? (
                   <span className="text-xs text-blue-500">In Progress</span>
                 ) : (
                   <span className="text-xs text-gray-400">Not Started</span>

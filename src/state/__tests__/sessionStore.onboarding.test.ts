@@ -1,5 +1,4 @@
 import { useSessionStore } from '../sessionStore';
-import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the logger to avoid console output during tests
 jest.mock('@/lib/utils/logger', () => ({
