@@ -21,6 +21,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
 
   // Ensure main structure is present
   await page.waitForSelector('h1', { timeout: 10000 });
+  await hideDynamicContent(page);
 
   await test.step('QuickStart screenshot', async () => {
     // Allow archetype generation to complete - this needs extra time
@@ -30,7 +31,6 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await page.waitForTimeout(2000); // Give extra time for archetype generation
     }
 
-    await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-quickstart.png', { fullPage: true });
   });
 
@@ -41,7 +41,6 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await customButton.click();
       await page.waitForTimeout(500); // Allow UI transition
     }
-    await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step0-template-selection.png', { fullPage: true });
   });
 

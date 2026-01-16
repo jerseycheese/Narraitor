@@ -17,9 +17,9 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
 
   await page.goto('/worlds/create');
   await waitForContentStable(page);
+  await hideDynamicContent(page);
 
   await test.step('Step 1: Template', async () => {
-    await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('world-creation-step1-template.png', { fullPage: true });
   });
 

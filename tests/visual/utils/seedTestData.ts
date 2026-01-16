@@ -439,6 +439,13 @@ export async function seedTestData(page: Page): Promise<void> {
             ? state.savedSessions
             : savedSessions,
           onboardingCompleted: true,
+          tutorialProgress: {
+            ...state?.tutorialProgress,
+            phases: {
+              ...state?.tutorialProgress?.phases,
+              intro: { completed: true, skipped: false },
+            },
+          },
           id: primarySessionId ?? state?.id ?? null,
           currentSessionId: primarySessionId ?? state?.currentSessionId ?? null,
           worldId: primaryWorldId ?? state?.worldId ?? null,
@@ -538,10 +545,13 @@ export async function seedTestData(page: Page): Promise<void> {
       const didSeedStores = seedStoresFromFixtures();
       if (!didSeedStores) {
         let attempts = 0;
-        const maxAttempts = 50;
+        const maxAttempts = 150; // Increased to 15s for slower environments
         const intervalId = window.setInterval(() => {
           attempts += 1;
-          if (seedStoresFromFixtures() || attempts >= maxAttempts) {
+          if (seedStoresFromFixtures()) {
+            window.clearInterval(intervalId);
+          } else if (attempts >= maxAttempts) {
+            console.error('❌ Failed to seed stores after 15s timeout');
             window.clearInterval(intervalId);
           }
         }, 100);
@@ -550,10 +560,13 @@ export async function seedTestData(page: Page): Promise<void> {
       const didSeedJournalStore = seedJournalStoreFromFixtures();
       if (!didSeedJournalStore) {
         let attempts = 0;
-        const maxAttempts = 50;
+        const maxAttempts = 150;
         const intervalId = window.setInterval(() => {
           attempts += 1;
-          if (seedJournalStoreFromFixtures() || attempts >= maxAttempts) {
+          if (seedJournalStoreFromFixtures()) {
+            window.clearInterval(intervalId);
+          } else if (attempts >= maxAttempts) {
+            console.error('❌ Failed to seed journal store after 15s timeout');
             window.clearInterval(intervalId);
           }
         }, 100);
