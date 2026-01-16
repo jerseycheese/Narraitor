@@ -17,6 +17,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Sparkles, Plus } from 'lucide-react';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 const SELECTION_DELAY_MS = 300;
 
@@ -109,7 +110,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         <LoadingSkeleton
           size="md"
           skeletonLines={6}
-          message={`Creating archetypes for your ${world.genre} world...`}
+          message={`Creating archetypes for your ${getGenreLabel(world.genre)} world...`}
           centered={true}
           className="py-12"
         />
@@ -145,7 +146,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           Jump straight into your adventure with {world.name}
         </p>
         <p className="text-sm text-gray-500">
-          Choose from these pre-generated {world.genre} archetypes or create your own
+          Choose from these pre-generated {getGenreLabel(world.genre)} archetypes or create your own
         </p>
       </div>
 

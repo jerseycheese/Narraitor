@@ -5,17 +5,39 @@ import { useSessionStore } from '@/state/sessionStore';
 
 // Mock React Joyride
 jest.mock('react-joyride', () => {
+  const STATUS = {
+    FINISHED: 'finished',
+    SKIPPED: 'skipped',
+  };
+
+  const EVENTS = {
+    TARGET_NOT_FOUND: 'target_not_found',
+  };
+
+  const ACTIONS = {
+    PREV: 'prev',
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return function DummyJoyride({ run, stepIndex, steps, callback }: any) {
+  const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
     if (!run) return null;
     return (
       <div data-testid="joyride-mock">
         <div>Step Index: {stepIndex}</div>
         <div>Total Steps: {steps.length}</div>
-        <button onClick={() => callback({ status: 'finished' })}>Complete Tour</button>
-        <button onClick={() => callback({ status: 'skipped' })}>Skip Tour</button>
+        <button onClick={() => callback({ status: STATUS.FINISHED })}>Complete Tour</button>
+        <button onClick={() => callback({ status: STATUS.SKIPPED })}>Skip Tour</button>
+        <button onClick={() => callback({ type: EVENTS.TARGET_NOT_FOUND })}>Target Missing</button>
       </div>
     );
+  };
+
+  return {
+    __esModule: true,
+    default: DummyJoyride,
+    STATUS,
+    EVENTS,
+    ACTIONS,
   };
 });
 
@@ -26,7 +48,7 @@ jest.mock('@/lib/tutorial/worldCreationTour', () => ({
 }));
 
 const TestComponent = () => {
-  const { startTour, stopTour, isTourActive, stepIndex } = useTutorial();
+  const { startTour, stopTour, isTourActive, stepIndex, setCurrentWizardStep } = useTutorial();
   
   return (
     <div>
@@ -34,6 +56,7 @@ const TestComponent = () => {
       <div data-testid="step-index">{stepIndex}</div>
       <button onClick={() => startTour('worldCreation')}>Start World Tour</button>
       <button onClick={stopTour}>Stop Tour</button>
+      <button onClick={() => setCurrentWizardStep(1)}>Wizard Step 1</button>
     </div>
   );
 };
@@ -85,5 +108,68 @@ describe('TutorialProvider', () => {
     
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Inactive');
     expect(screen.queryByTestId('joyride-mock')).not.toBeInTheDocument();
+  });
+
+  it('pauses the world creation tour when the target is not found', async () => {
+    jest.useFakeTimers();
+
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start World Tour').click();
+    });
+
+    expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
+
+    await act(async () => {
+      screen.getByText('Target Missing').click();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    expect(screen.queryByTestId('joyride-mock')).not.toBeInTheDocument();
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+
+    jest.useRealTimers();
+  });
+
+  it('resumes the world creation tour when the wizard advances after a pause', async () => {
+    jest.useFakeTimers();
+
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start World Tour').click();
+    });
+
+    await act(async () => {
+      screen.getByText('Target Missing').click();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    expect(screen.queryByTestId('joyride-mock')).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+
+    await act(async () => {
+      screen.getByText('Wizard Step 1').click();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
+    expect(screen.getByTestId('step-index')).toHaveTextContent('1');
   });
 });

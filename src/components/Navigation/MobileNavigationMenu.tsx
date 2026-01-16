@@ -6,6 +6,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
 interface MobileNavigationMenuProps {
@@ -192,7 +193,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                   >
                     <div>
                       <div className="font-medium">{world.name}</div>
-                      <div className="text-sm opacity-75">{world.genre} • {worldCharacters} characters</div>
+                      <div className="text-sm opacity-75">{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
                     </div>
                     {world.id === currentWorldId && (
                       <Check className="w-5 h-5 text-white" aria-hidden="true" />

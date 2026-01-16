@@ -54,6 +54,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
+  const runRef = useRef(false);
+  const isPausedRef = useRef(false);
 
   const { 
     tutorialProgress, 
@@ -61,6 +63,14 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     completeTutorialPhase,
     resetTutorialProgress: resetStoreProgress
   } = useSessionStore();
+
+  useEffect(() => {
+    runRef.current = run;
+  }, [run]);
+
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
@@ -126,10 +136,17 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-        // If target not found, we generally just wait or let the user navigate
-        // We don't advance automatically to avoid infinite loops if target never appears
+      if (activeTour !== 'worldCreation') return;
+      // If target not found, we pause the world creation tour after a short delay.
+      // This gives the UI a chance to render if it's currently transitioning.
+      setTimeout(() => {
+        // Double check we are still in a state where we should pause
+        if (runRef.current && !isPausedRef.current) {
+          pauseTour();
+        }
+      }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress]);
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const canAdvanceToStep = useCallback((_targetStep: number) => {
@@ -229,6 +246,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       <TutorialProgressWidget />
       {steps.length > 0 && (
         <Joyride
+          key={`${activeTour}-${isPaused}`}
           steps={steps}
           run={run && !isPaused}
           stepIndex={stepIndex}

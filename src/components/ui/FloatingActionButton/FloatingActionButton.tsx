@@ -12,6 +12,7 @@ export interface FloatingActionButtonProps {
   variant?: 'primary' | 'secondary' | 'amber';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  dataTutorialId?: string;
 }
 
 const positionClasses = {
@@ -45,12 +46,14 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   variant = 'primary',
   size = 'lg',
   className,
+  dataTutorialId,
 }) => {
   return (
     <Button
       onClick={onClick}
       aria-label={label}
       title={label}
+      data-tutorial={dataTutorialId}
       className={cn(
         'component-floating-action-button',
         'fixed z-40',

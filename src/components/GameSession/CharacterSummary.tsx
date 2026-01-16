@@ -98,6 +98,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           variant="link"
           size="sm"
           className="p-0 h-auto"
+          data-tutorial="character-sheet-toggle"
           onClick={(e) => {
             e.stopPropagation();
             setIsExpanded(!isExpanded);

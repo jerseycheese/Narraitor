@@ -8,7 +8,6 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { GenreSelector } from '@/components/shared/GenreSelector/GenreSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
@@ -136,12 +135,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       {/* Template Preview Modal */}
       {templatePreviewModal}
       
-      <div className={wizardStyles.container}>
-        <div className={wizardStyles.header}>
-          <h2 className={wizardStyles.title}>Smart World Templates</h2>
-          <p className="text-gray-700">Get creative starting points for your world with AI assistance</p>
-        </div>
-
+      <div className="space-y-5">
       {aiGeneration.error && (
         <ErrorDisplay 
           message={aiGeneration.error}
@@ -155,27 +149,27 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       )}
 
       {!aiGeneration.isGenerating && (
-        <div className="space-y-8">
+        <div className="space-y-5">
           {/* Mode Selection */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Tab-style Mode Selection */}
-            <div className="mb-6">
+            <div className="mb-4">
               <TabNavigation
                 options={tabOptions}
                 activeValue={mode}
                 onChange={setMode}
-                className="mb-6"
+                size="sm"
               />
             </div>
 
             {/* Inspired By Mode */}
             {mode === 'inspired-by' && (
-            <div className={wizardStyles.card.base}>
-              <div className="space-y-4">
+            <div>
+              <div className="space-y-3">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Describe Your World</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <Input
                     type="text"
                     placeholder="Steampunk Victorian London, Space pirates, etc."
@@ -186,7 +180,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                     onClick={handleGenerateInspiredBy}
                     disabled={!userInput.trim()}
                     variant="default"
-                    size="default"
+                    size="sm"
                   >
                     Generate World
                   </Button>
@@ -197,27 +191,27 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
             {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
-            <div className={wizardStyles.card.base}>
-              <div className="space-y-4">
+            <div>
+              <div className="space-y-3">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
-                  <p className="text-sm text-gray-700 mb-4">Select 2 or more genres to blend together</p>
+                  <h3 className="text-sm font-semibold text-foreground">Mix Genres Together</h3>
+                  <p className="text-sm text-muted-foreground">Select 2 or more genres to blend together</p>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <GenreSelector
                     selectedGenres={selectedGenres}
                     onToggleGenre={toggleGenre}
                     excludeOther={true}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-muted-foreground">
                       {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                     </span>
                     <Button
                       onClick={handleGenerateGenreMix}
                       disabled={selectedGenres.length < 2}
                       variant="default"
-                      size="default"
+                      size="sm"
                     >
                       Mix Genres
                     </Button>
@@ -229,17 +223,17 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
             {/* Surprise Me Mode */}
             {mode === 'surprise-me' && (
-            <div className={wizardStyles.card.base}>
-              <div className="space-y-4">
+            <div>
+              <div className="space-y-3">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
-                  <p className="text-sm text-gray-700 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                  <h3 className="text-sm font-semibold text-foreground">Random World Generation</h3>
+                  <p className="text-sm text-muted-foreground">Generate a completely unexpected world with unique themes and attributes.</p>
                 </div>
                 <div>
                   <Button
                     onClick={handleSurpriseMe}
                     variant="default"
-                    size="default"
+                    size="sm"
                   >
                     Generate Random World
                   </Button>

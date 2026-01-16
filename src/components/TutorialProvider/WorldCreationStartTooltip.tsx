@@ -3,6 +3,7 @@
 import React from 'react';
 import type { TooltipRenderProps } from 'react-joyride';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useTutorial } from './useTutorial';
 
 const CONTINUE_LABEL = 'Continue';
@@ -39,6 +40,22 @@ export function WorldCreationStartTooltip({
         ? content
         : 'Tutorial step';
 
+  const isEndOfPage = (step as any).data?.isEndOfPage;
+
+  const primaryLabel =
+    primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
+  const backLabel = backProps.title || backProps['aria-label'] || 'Back';
+  const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip';
+
+  const {
+    top: _closeTop,
+    right: _closeRight,
+    width: _closeWidth,
+    height: _closeHeight,
+    padding: _closePadding,
+    ...closeButtonStyle
+  } = styles.buttonClose;
+
   return (
     <div
       key="JoyrideTooltip"
@@ -55,45 +72,73 @@ export function WorldCreationStartTooltip({
         <div style={styles.tooltipFooter}>
           <div style={styles.tooltipFooterSpacer}>
             {showSkipButton && !isLastStep && (
-              <button
+              <Button
                 aria-live="off"
                 data-test-id="button-skip"
                 style={styles.buttonSkip}
                 type="button"
+                variant="ghost"
+                size="sm"
                 {...skipProps}
-              />
+              >
+                {skipLabel}
+              </Button>
             )}
           </div>
           {!hideBackButton && index > 0 && (
-            <button
+            <Button
               data-test-id="button-back"
               style={styles.buttonBack}
               type="button"
+              variant="ghost"
+              size="sm"
               {...backProps}
-            />
+            >
+              {backLabel}
+            </Button>
           )}
-          <button
-            data-test-id="button-primary"
-            style={styles.buttonNext}
-            type="button"
-            {...primaryProps}
-            aria-label={CONTINUE_LABEL}
-            title={CONTINUE_LABEL}
-            onClick={handleContinueClick}
-          >
-            {CONTINUE_LABEL}
-          </button>
+          
+          <div className="flex gap-2">
+            {isEndOfPage && !isLastStep ? (
+              <Button
+                data-test-id="button-pause"
+                style={styles.buttonNext}
+                type="button"
+                aria-label="Got it!"
+                title="Got it!"
+                variant="default"
+                size="sm"
+                onClick={handleContinueClick}
+              >
+                Got it!
+              </Button>
+            ) : (
+              <Button
+                data-test-id="button-primary"
+                style={styles.buttonNext}
+                type="button"
+                variant="default"
+                size="sm"
+                {...primaryProps}
+              >
+                {primaryLabel}
+              </Button>
+            )}
+          </div>
         </div>
       )}
       {!hideCloseButton && (
-        <button
+        <Button
           data-test-id="button-close"
-          style={styles.buttonClose}
+          style={closeButtonStyle}
           type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-3 top-3 h-6 w-6 p-0 z-10"
           {...closeProps}
         >
           <X className="w-3 h-3" />
-        </button>
+        </Button>
       )}
     </div>
   );

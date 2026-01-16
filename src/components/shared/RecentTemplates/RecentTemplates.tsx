@@ -6,6 +6,7 @@ import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { formatDate } from '@/lib/utils';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 interface RecentTemplatesProps {
   onTemplateSelect: (entry: TemplateHistoryEntry) => void;
@@ -20,7 +21,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
   onTemplateSelect,
   selectedTemplateId = null,
   title = "Recent Templates",
-  description = "Recently generated AI templates you can reuse",
+  description = "Recently generated templates you can reuse",
   className = "",
   maxTemplates = 5
 }) => {
@@ -58,7 +59,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
       {description && (
         <p className="text-sm text-gray-700 mb-4">{description}</p>
       )}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="space-y-2">
         {templateHistoryManager.getRecent().map((entry, index) => (
           <div 
             key={index}
@@ -68,25 +69,20 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
             onKeyPress={(e) => handleKeyPress(e, entry)}
             role="button"
             tabIndex={0}
-            aria-label={`Use template: ${entry.template.name} (${entry.template.genre})`}
+            aria-label={`Use template: ${entry.template.name} (${getGenreLabel(entry.template.genre)})`}
             data-testid={`recent-template-${index}`}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="space-y-2">
+              <div>
                 <h4 className="font-medium text-lg">{entry.template.name}</h4>
-                <p className="text-sm text-gray-700 mt-1 line-clamp-2">{entry.template.description}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-sm font-medium text-gray-700">{entry.template.genre}</span>
-                  <span className="text-xs text-gray-500">•</span>
-                  <span className="text-xs text-gray-500">
-                    {entry.template.attributes.length} attributes · {entry.template.skills.length} skills
-                  </span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm font-medium text-gray-700">{getGenreLabel(entry.template.genre)}</span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
                   Generated {formatDate(entry.generatedAt)}
                 </p>
               </div>
-              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary} ml-2 shrink-0`}>
+              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary} self-start`}>
                 {entry.generationType === 'inspired-by' ? 'Inspired' : 
                  entry.generationType === 'genre-mix' ? 'Mixed' : 'Surprise'}
               </span>

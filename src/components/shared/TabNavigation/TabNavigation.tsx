@@ -1,6 +1,7 @@
 // src/components/shared/TabNavigation/TabNavigation.tsx
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 export interface TabOption<T = string> {
   value: T;
@@ -14,6 +15,7 @@ interface TabNavigationProps<T = string> {
   onChange: (value: T) => void;
   className?: string;
   disabled?: boolean;
+  size?: 'sm' | 'md';
   /** 
    * Mobile behavior: 'wrap' allows tabs to wrap to multiple lines, 
    * 'scroll' enables horizontal scrolling 
@@ -27,43 +29,48 @@ export function TabNavigation<T = string>({
   onChange, 
   className = '', 
   disabled = false,
+  size = 'md',
   mobileLayout = 'wrap'
 }: TabNavigationProps<T>) {
   const containerClasses = mobileLayout === 'scroll' 
-    ? `component-tab-navigation flex gap-1 sm:gap-2 overflow-x-auto pb-1 ${className}` 
-    : `component-tab-navigation flex flex-wrap gap-1 sm:gap-2 ${className}`;
+    ? `component-tab-navigation flex gap-2 overflow-x-auto border-b border-border ${className}` 
+    : `component-tab-navigation flex flex-wrap gap-2 border-b border-border ${className}`;
 
   return (
-    <div className={containerClasses}>
+    <div className={containerClasses} role="tablist">
       {options.map((option) => {
         const isActive = option.value === activeValue;
         const isDisabled = disabled || option.disabled;
         
         return (
-          <button
+          <Button
             key={String(option.value)}
             type="button"
             onClick={() => !isDisabled && onChange(option.value)}
             disabled={isDisabled}
-            className={`
-              px-2 py-1.5 sm:px-4 sm:py-2 
-              text-sm sm:text-base 
-              rounded-md 
-              transition-colors 
-              whitespace-nowrap
-              ${mobileLayout === 'scroll' ? 'flex-shrink-0' : ''}
-              ${isActive
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              } 
-              ${isDisabled 
-                ? 'opacity-50 cursor-not-allowed' 
-                : 'cursor-pointer'
-              }
-            `}
+            role="tab"
+            aria-selected={isActive}
+            variant="ghost"
+            size="sm"
+            className={[
+              size === 'sm' ? 'px-1.5 py-1.5 sm:px-2' : 'px-1 py-2 sm:px-3',
+              size === 'sm' ? 'text-xs sm:text-sm' : 'text-sm sm:text-base',
+              'rounded-none',
+              'transition-colors',
+              'whitespace-nowrap',
+              'focus-visible:ring-offset-0',
+              'border-b-2',
+              '-mb-px',
+              'bg-transparent',
+              mobileLayout === 'scroll' ? 'flex-shrink-0' : '',
+              isActive
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+              isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            ].join(' ')}
           >
             {option.label}
-          </button>
+          </Button>
         );
       })}
     </div>

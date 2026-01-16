@@ -46,7 +46,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
 
       {/* Inventory Display */}
       {characterId && (
-        <div className="mt-6" data-testid="inventory-collapsible">
+        <div className="mt-6" data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
           </CollapsibleSection>
@@ -88,6 +88,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       {character && (
         <JournalFloatingButton
           onClick={onOpenJournal}
+          dataTutorialId="journal-toggle"
         />
       )}
     </>

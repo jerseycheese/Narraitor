@@ -10,6 +10,7 @@ import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 interface FinalizeStepProps {
   worldData: Partial<World>;
@@ -122,7 +123,7 @@ export default function FinalizeStep({
             />
             <DataField 
               label="Genre" 
-              value={<span data-testid="review-world-genre">{worldData.genre}</span>}
+              value={<span data-testid="review-world-genre">{worldData.genre ? getGenreLabel(worldData.genre) : 'Unknown'}</span>}
               variant="inline"
               size="md"
             />

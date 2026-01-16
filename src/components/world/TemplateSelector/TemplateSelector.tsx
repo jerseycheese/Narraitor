@@ -55,34 +55,31 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     >
       {/* Traditional Templates */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Pre-built Templates</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div 
+          className="space-y-2"
+          data-tutorial="template-list"
+        >
           {displayTemplates.map((template) => (
             <div
               key={template.id}
-              className={`border rounded-lg p-4 cursor-pointer transition-all hover:border-blue-500 hover:shadow-md
+              className={`border rounded-md p-3 cursor-pointer transition-all hover:border-blue-500
                 ${selectedTemplateId === template.id ? 'selected-template border-blue-500 bg-blue-50 shadow-md' : 'border-gray-300'}`}
               onClick={() => handleSelectTemplate(template.id)}
               data-testid={`template-card-${template.id}`}
             >
               <h3 
-                className="text-lg font-bold mb-2"
+                className="text-base font-semibold"
                 data-testid={`template-name-${template.id}`}
               >
                 {template.name}
               </h3>
               
               <p
-                className="text-gray-700 mb-3 text-sm"
+                className="text-gray-700 mt-1 text-sm"
                 data-testid={`template-description-${template.id}`}
               >
                 {template.description}
               </p>
-              
-              <div className="text-sm text-gray-500 space-y-1">
-                <p className="font-medium">{template.genre}</p>
-                <p>{template.attributes.length} attributes · {template.skills.length} skills</p>
-              </div>
             </div>
           ))}
         </div>

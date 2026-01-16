@@ -5,10 +5,29 @@ import { WorldCreationStartTooltip } from '@/components/TutorialProvider/WorldCr
 export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-type-selector"]',
-    content: 'Start here! Choose a template for a quick start, "Create My Own World" for total control, or switch to the "Generate" tab to let the system build a foundation for you.',
+    content: 'Welcome to the World Creation Wizard! Choose a path: start from scratch on the left, or use a template on the right.',
     placement: 'top',
     disableBeacon: true,
     tooltipComponent: WorldCreationStartTooltip,
+  },
+  {
+    target: '[data-tutorial="create-own-world-btn"]',
+    content: 'Start from scratch with Create My Own World and define everything yourself.',
+    placement: 'top',
+    tooltipComponent: WorldCreationStartTooltip,
+  },
+  {
+    target: '[data-tutorial="generate-tab"]',
+    content: 'Switch to Generate to create a new template you can customize.',
+    placement: 'top',
+    tooltipComponent: WorldCreationStartTooltip,
+  },
+  {
+    target: '[data-tutorial="template-list"]',
+    content: 'Browse the pre-built templates here to jump-start your world with a curated setup.',
+    placement: 'top',
+    tooltipComponent: WorldCreationStartTooltip,
+    data: { isEndOfPage: true },
   },
   {
     target: '[data-tutorial="genre-picker"]',
@@ -39,9 +58,12 @@ export const worldCreationTour: Step[] = [
 
 export const tourStepToWizardStep: Record<number, number> = {
   0: 0,
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 1,
+  5: 2,
+  6: 3,
+  7: 4,
+  8: 5,
 };

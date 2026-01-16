@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { useWorldStore } from '@/state/worldStore';
 
 interface DashboardRecentWorldsProps {
@@ -52,7 +53,7 @@ export function DashboardRecentWorlds({
             onClick={() => onNavigate(`/worlds/${world.id}`)}
             role="button"
             tabIndex={0}
-            aria-label={`View world: ${world.name}, genre: ${world.genre}`}
+            aria-label={`View world: ${world.name}, genre: ${getGenreLabel(world.genre)}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -63,7 +64,7 @@ export function DashboardRecentWorlds({
             <h3 className="font-semibold mb-2 truncate">{world.name}</h3>
             <div className="flex items-center justify-between">
               <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-                {world.genre}
+                {getGenreLabel(world.genre)}
               </span>
             </div>
           </div>
