@@ -54,7 +54,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await briefDescTextarea.fill('A test world created for visual regression testing.');
       await page.waitForTimeout(150);
     }
-    const nextButton = page.locator('button:has-text("Next")');
+    const nextButton = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await nextButton.count() > 0) {
       await nextButton.click();
       await page.waitForTimeout(700);
@@ -70,7 +70,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await descriptionInput.fill('A test world created for visual regression testing.');
       await page.waitForTimeout(150);
     }
-    const nextButton2 = page.locator('button:has-text("Next")');
+    const nextButton2 = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await nextButton2.count() > 0) {
       await nextButton2.click();
       await page.waitForTimeout(700);
@@ -96,7 +96,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
         }
       }
     }
-    const nextButton3 = page.locator('button:has-text("Next")');
+    const nextButton3 = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await nextButton3.count() > 0) {
       await nextButton3.click();
       await page.waitForTimeout(700);
@@ -132,7 +132,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
         }
       }
     }
-    const nextButton4 = page.locator('button:has-text("Next")');
+    const nextButton4 = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await nextButton4.count() > 0) {
       await nextButton4.click();
       await page.waitForTimeout(700);

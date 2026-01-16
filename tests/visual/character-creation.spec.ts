@@ -46,7 +46,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
 
   await test.step('Step 1: Basic Info', async () => {
     // Skip template selection by clicking Next
-    const skipTemplateBtn = page.locator('button:has-text("Next")');
+    const skipTemplateBtn = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await skipTemplateBtn.count() > 0) {
       await skipTemplateBtn.click();
       await page.waitForTimeout(500); // Allow navigation
@@ -62,7 +62,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await nameInput.fill('Test Character');
       await page.waitForTimeout(200); // Allow input to register
     }
-    const nextBtn1 = page.locator('button:has-text("Next")');
+    const nextBtn1 = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await nextBtn1.count() > 0) {
       await nextBtn1.click();
       await page.waitForTimeout(800); // Allow navigation
@@ -84,7 +84,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     }
     await waitForContentStable(page);
 
-    const proceedToSkillsBtn = page.locator('button:has-text("Next")');
+    const proceedToSkillsBtn = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await proceedToSkillsBtn.count() > 0) {
       await proceedToSkillsBtn.click();
       await page.waitForTimeout(800);
@@ -128,7 +128,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step3-skills.png', { fullPage: true });
 
-    const proceedToBackgroundBtn = page.locator('button:has-text("Next")');
+    const proceedToBackgroundBtn = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await proceedToBackgroundBtn.count() > 0) {
       await expect(proceedToBackgroundBtn).toBeEnabled();
       await proceedToBackgroundBtn.click();
@@ -152,7 +152,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step4-background.png', { fullPage: true });
 
-    const proceedToPortraitBtn = page.locator('button:has-text("Next")');
+    const proceedToPortraitBtn = page.locator('button:has-text("Next"):not([data-test-id="button-primary"])');
     if (await proceedToPortraitBtn.count() > 0) {
       await expect(proceedToPortraitBtn).toBeEnabled();
       await proceedToPortraitBtn.click();
