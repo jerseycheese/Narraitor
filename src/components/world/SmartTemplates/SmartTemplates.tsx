@@ -162,6 +162,8 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               />
             </div>
 
+            {/* Tab Content - fixed min-height to prevent layout shift */}
+            <div className="min-h-[180px]">
             {/* Inspired By Mode */}
             {mode === 'inspired-by' && (
             <div>
@@ -241,6 +243,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               </div>
             </div>
             )}
+            </div>
           </div>
 
           {/* Recent Templates */}
