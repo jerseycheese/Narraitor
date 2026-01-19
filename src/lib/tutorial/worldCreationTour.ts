@@ -37,7 +37,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="world-name"]',
     content: TutorialContent({
       children: 'Give your world a name so it feels distinct.',
-      example: '"The Shattered Realms" or "Neo-Tokyo 2185"',
+      example: '"The Shattered Realms" to evoke a fractured fantasy kingdom',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -46,7 +46,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="genre-picker"]',
     content: TutorialContent({
       children: 'Select a genre to define the tone and available options.',
-      example: 'Fantasy, Sci-Fi, Horror, Mystery, Western, Cyberpunk, or Historical',
+      example: 'Cyberpunk for neon-lit dystopias with hackers and megacorps',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -55,7 +55,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="world-type"]',
     content: TutorialContent({
       children: 'Choose whether your world is original, inspired by, or set within an existing setting.',
-      example: '"Set Within" Middle-earth or "Inspired By" Blade Runner',
+      example: 'Inspired By to create your own spin on a favorite universe',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -64,7 +64,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="world-reference"]',
     content: TutorialContent({
       children: 'Enter the setting you want the AI to follow.',
-      example: '"Star Wars during the Old Republic era" or "Victorian London with steampunk elements"',
+      example: '"Star Wars during the Old Republic era" for that specific time period',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -74,7 +74,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-content-rating"]',
     content: TutorialContent({
       children: 'Set the content rating to match your audience.',
-      example: 'G (general), PG (mild themes), PG-13 (moderate), R (strong themes), or NC-17 (explicit)',
+      example: 'PG-13 for moderate themes and action without explicit content',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -83,7 +83,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-narrative-style"]',
     content: TutorialContent({
       children: 'Pick the narrative style that fits your world.',
-      example: 'Dramatic, Epic, Mysterious, Action-Packed, Humorous, Lighthearted, or Contemplative',
+      example: 'Epic for grand-scale stories with heroic themes',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -92,7 +92,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-language-complexity"]',
     content: TutorialContent({
       children: 'Adjust language complexity to match your reading preference.',
-      example: 'Simple (accessible), Moderate (standard), Advanced (rich vocabulary), or Literary (sophisticated)',
+      example: 'Literary for sophisticated prose with artistic expression',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -101,7 +101,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-custom-instructions"]',
     content: TutorialContent({
       children: 'Add extra guidance for the AI.',
-      example: '"Include subtle humor" or "Emphasize moral dilemmas in dialogue"',
+      example: '"Emphasize moral dilemmas" to make choices feel meaningful',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -111,7 +111,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="world-description"]',
     content: TutorialContent({
       children: 'Describe your world in detail. This will be used to generate rich lore, locations, and history.',
-      example: '"A war-torn kingdom where magic is fading, and ancient dragons have returned after a thousand-year slumber"',
+      example: '"A war-torn kingdom where magic is fading" sets up conflict and stakes',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -120,7 +120,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="ai-suggestions-actions"]',
     content: TutorialContent({
       children: 'Click Generate to get AI-suggested attributes and skills based on your description.',
-      example: 'A fantasy world might suggest "Arcane Power" and "Swordsmanship"',
+      example: 'A cyberpunk world might suggest "Hacking" and "Street Cred"',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -136,7 +136,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="attribute-editor"]',
     content: TutorialContent({
       children: 'Review and customize the core attributes that define characters.',
-      example: 'Strength, Intelligence, Charisma, or custom ones like "Psionic Potential"',
+      example: '"Willpower" to represent mental fortitude in a horror setting',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -145,7 +145,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="attribute-suggestions"]',
     content: TutorialContent({
       children: 'Use the suggested attributes or customize them.',
-      example: 'Rename "Strength" to "Brawn" or adjust the description to fit your world',
+      example: 'Rename "Strength" to "Might" for a more fantasy feel',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -154,7 +154,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="attribute-custom"]',
     content: TutorialContent({
       children: 'Add custom attributes unique to your setting.',
-      example: '"Corruption" for a dark fantasy world or "Tech Affinity" for cyberpunk',
+      example: '"Corruption" to track dark magic influence in your world',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -170,7 +170,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="skill-editor"]',
     content: TutorialContent({
       children: 'Define the skills characters can learn.',
-      example: '"Lockpicking", "Persuasion", or "Starship Piloting" depending on your genre',
+      example: '"Persuasion" for social encounters and negotiations',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -179,7 +179,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="skill-suggestions"]',
     content: TutorialContent({
       children: 'Review the suggested skills and tweak them.',
-      example: 'Change "Melee Combat" to "Blade Dancing" for a more unique feel',
+      example: 'Rename "Melee Combat" to "Blade Dancing" for a unique feel',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -188,7 +188,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="skill-custom"]',
     content: TutorialContent({
       children: 'Create custom skills for your world.',
-      example: '"Dragon Riding" for a fantasy setting or "Hacking" for cyberpunk',
+      example: '"Dragon Riding" to enable aerial adventures in your fantasy world',
     }),
     placement: 'top',
     disableBeacon: true,

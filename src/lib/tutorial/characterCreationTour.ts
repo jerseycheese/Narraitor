@@ -7,7 +7,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="template-selector"]',
     content: TutorialContent({
       children: 'Choose a character template to get a head start, or build your hero from scratch.',
-      example: 'Pick "Warrior" for a combat-focused character or "Mystic" for magic users',
+      example: 'Warrior for a combat-focused character with high Strength',
     }),
     placement: 'bottom',
     disableBeacon: true,
@@ -17,7 +17,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="basic-info"]',
     content: TutorialContent({
       children: 'Give your character a name and description.',
-      example: '"Kira Nightshade, a cunning rogue with a mysterious past and a talent for getting into trouble"',
+      example: '"Kira Nightshade" with a backstory hint like "a cunning rogue with a mysterious past"',
     }),
     placement: 'right',
     disableBeacon: true,
@@ -26,7 +26,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="attribute-allocation"]',
     content: TutorialContent({
       children: 'Allocate points to your core attributes. These determine your natural strengths and weaknesses.',
-      example: 'A warrior might prioritize Strength and Constitution, while a mage focuses on Intelligence',
+      example: 'High Strength for a fighter who relies on physical power',
     }),
     placement: 'left',
     disableBeacon: true,
@@ -35,7 +35,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="skill-selection"]',
     content: TutorialContent({
       children: 'Select skills that define what your character excels at.',
-      example: 'A thief might choose Lockpicking, Stealth, and Perception',
+      example: 'Stealth for a character who prefers avoiding direct confrontation',
     }),
     placement: 'left',
     disableBeacon: true,
@@ -44,7 +44,7 @@ export const characterCreationTour: Step[] = [
     target: '[data-tutorial="background-editor"]',
     content: TutorialContent({
       children: 'Flesh out your backstory. Where are you from? What motivates you?',
-      example: '"Raised on the streets of the capital, they learned to survive by their wits before joining a secret guild"',
+      example: '"Orphaned during the war" to explain their distrust of authority',
     }),
     placement: 'bottom',
     disableBeacon: true,
