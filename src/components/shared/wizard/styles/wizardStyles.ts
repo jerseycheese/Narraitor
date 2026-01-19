@@ -4,7 +4,7 @@
 
 export const wizardStyles = {
   // Container styles
-  container: "max-w-7xl mx-auto p-6",
+  container: "w-full max-w-7xl mx-auto p-6 overflow-hidden",
   
   // Header styles  
   header: "mb-8",

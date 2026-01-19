@@ -229,7 +229,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               <div className="space-y-3">
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">Random World Generation</h3>
-                  <p className="text-sm text-muted-foreground">Generate a completely unexpected world with unique themes and attributes.</p>
+                  <p className="text-sm text-muted-foreground">Let AI surprise you with a unique world concept.</p>
                 </div>
                 <div>
                   <Button
