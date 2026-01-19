@@ -111,14 +111,18 @@ dependency-violations.html
 .clauderc
 CLAUDE.md
 CLAUDE.local.md
+
+# Codex
+.codex/
+AGENTS.local.md
+AGENTS.md
+
+# Gemini CLI
+.gemini/
 GEMINI.md
 
 # MCP local config (do not commit)
 .mcp.json
-
-# Agent guidelines
-AGENTS.local.md
-AGENTS.md
 
 # Personal paths (security)
 **/Users/*/
@@ -130,8 +134,4 @@ worktrees/
 # Serena (local tooling)
 .serena/
 build-output.log
-# Codex
-.codex/
 
-# Gemini CLI
-.gemini/
