@@ -45,8 +45,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     storeTemplateDataForWizard(templateData);
     onSelect(templateData.selectedTemplateId!);
   }, [onSelect]);
-  
-  const selectedTemplate = displayTemplates.find(t => t.id === selectedTemplateId);
 
   return (
     <div 
@@ -92,44 +90,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
         title="Recent Templates"
         description="Recently generated AI templates you can reuse"
       />
-
-      {/* Show preview for selected template in a separate section */}
-      {selectedTemplate && (
-        <div 
-          className="border rounded-lg bg-gray-100 p-6"
-          data-testid={`template-preview-${selectedTemplate.id}`}
-        >
-          <h3 className="text-lg font-bold mb-4">Template Details: {selectedTemplate.name}</h3>
-          
-          <div className="space-y-4">
-            {/* Attributes Section */}
-            <div data-testid={`template-preview-attributes-${selectedTemplate.id}`}>
-              <h4 className="font-semibold mb-2 text-gray-700">Attributes ({selectedTemplate.attributes.length})</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {selectedTemplate.attributes.map((attr) => (
-                  <div key={attr.name} className="bg-white rounded p-2 border border-gray-200">
-                    <span className="font-medium text-sm text-gray-900">{attr.name}</span>
-                    <p className="text-xs text-gray-700 mt-0.5">{attr.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Skills Section */}
-            <div data-testid={`template-preview-skills-${selectedTemplate.id}`}>
-              <h4 className="font-semibold mb-2 text-gray-700">Skills ({selectedTemplate.skills.length})</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {selectedTemplate.skills.map((skill) => (
-                  <div key={skill.name} className="bg-white rounded p-2 border border-gray-200">
-                    <span className="font-medium text-sm text-gray-900">{skill.name}</span>
-                    <p className="text-xs text-gray-700 mt-0.5">{skill.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
