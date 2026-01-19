@@ -185,8 +185,8 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         
         {/* Mode Selection */}
         <div className="mb-6" data-tutorial="world-type-selector">
-          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-stretch">
-            <div className="rounded-lg border border-border bg-card p-4">
+          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch">
+            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-foreground">Start from Scratch</h4>
                 <p className="text-sm text-muted-foreground">
@@ -212,7 +212,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
               </div>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-4">
+            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-foreground">Use a Template</h4>
                 <p className="text-sm text-muted-foreground">
