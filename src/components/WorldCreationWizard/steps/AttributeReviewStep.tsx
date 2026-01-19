@@ -138,17 +138,7 @@ export default function AttributeReviewStep({
 
       // Only update if we don't already have attributes or if the count is different
       if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
-        console.log('[AttributeReviewStep] Auto-applying accepted AI suggestions:', {
-          suggestionsCount: suggestions.length,
-          acceptedCount: acceptedAttributes.length,
-          worldDataAttributesCount: worldData.attributes?.length || 0
-        });
         onUpdate({ ...worldData, attributes: acceptedAttributes });
-      } else {
-        console.log('[AttributeReviewStep] Skipping auto-apply - attributes already match:', {
-          existingCount: worldData.attributes.length,
-          acceptedCount: acceptedAttributes.length
-        });
       }
     } else {
       // Clear AI suggestions when they are removed (preserves custom attributes)

@@ -85,7 +85,6 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
               aiSuggestionsGenerated: true,
               aiSuggestionMeta: templateData.aiSuggestionMeta ?? createSuggestionMeta(templateData.description || '', 'template'),
             });
-            console.log('Applied recent AI template:', templateData.name);
             
             // Proceed to next step
             setTimeout(() => {

@@ -147,14 +147,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       }, 100);
     }
   }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const canAdvanceToStep = useCallback((_targetStep: number) => {
-    // This function is intended to be used by the Wizard to check if it's allowed to move?
-    // Or just to report validity?
-    // For now, return true
-    return true; 
-  }, []);
   
   const lastWizardStepRef = useRef<number | null>(null);
 

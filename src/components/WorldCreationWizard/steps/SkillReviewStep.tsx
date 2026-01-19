@@ -217,17 +217,7 @@ export default function SkillReviewStep({
 
       // Only update if we don't already have skills or if the count is different
       if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
-        console.log('[SkillReviewStep] Auto-applying accepted AI suggestions:', {
-          suggestionsCount: suggestions.length,
-          acceptedCount: acceptedSkills.length,
-          worldDataSkillsCount: worldData.skills?.length || 0
-        });
         onUpdate({ ...worldData, skills: acceptedSkills });
-      } else {
-        console.log('[SkillReviewStep] Skipping auto-apply - skills already match:', {
-          existingCount: worldData.skills.length,
-          acceptedCount: acceptedSkills.length
-        });
       }
     } else {
       // Clear AI suggestions when they are removed (preserves custom skills)
