@@ -68,9 +68,10 @@ export default function BasicInfoStep({
             helpText={guidance.tagline}
           >
             <WizardSelect
-              value={worldData.genre || 'fantasy'}
+              value={worldData.genre || ''}
               onChange={(value) => onUpdate({ ...worldData, genre: value as GenreValue })}
               options={GENRE_OPTIONS}
+              placeholder="Choose a genre..."
               testId="world-genre-select"
             />
           </WizardFormGroup>
