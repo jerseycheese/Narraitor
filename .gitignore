@@ -130,3 +130,9 @@ worktrees/
 # Serena (local tooling)
 .serena/
 build-output.log
+
+# Codex
+.codex/
+
+# Gemini CLI
+.gemini/
