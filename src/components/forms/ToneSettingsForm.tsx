@@ -64,7 +64,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
         {/* Tone Settings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Content Rating */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-tutorial="tone-content-rating">
             <Label htmlFor="content-rating">Content Rating</Label>
             <p id="content-rating-description" className="text-xs text-muted-foreground">Set the age-appropriate content level for generated narratives</p>
             <Select
@@ -82,7 +82,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Narrative Style */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-tutorial="tone-narrative-style">
             <Label htmlFor="narrative-style">Narrative Style</Label>
             <p id="narrative-style-description" className="text-xs text-muted-foreground">Choose how the story will be told and presented</p>
             <Select
@@ -100,7 +100,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Language Complexity */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-tutorial="tone-language-complexity">
             <Label htmlFor="language-complexity">Language Complexity</Label>
             <p id="language-complexity-description" className="text-xs text-muted-foreground">Set the vocabulary and sentence complexity level</p>
             <Select
@@ -118,7 +118,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Custom Instructions */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-tutorial="tone-custom-instructions">
             <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
             <p id="custom-instructions-description" className="text-xs text-muted-foreground">Add specific guidance for tone, style, or narrative elements</p>
             <Textarea

@@ -5,7 +5,6 @@ export const worldGenerationTour: Step[] = [
     target: '[aria-describedby="generate-world-desc"]',
     content: 'This tool lets you instantly generate a complete world setup. Perfect for quick starts!',
     placement: 'center',
-    disableBeacon: true,
   },
   {
     target: 'input[placeholder="e.g., The Lost Kingdom"]',

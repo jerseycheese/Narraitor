@@ -5,7 +5,6 @@ export const firstPlayTour: Step[] = [
     target: '[data-tutorial="narrative-display"]',
     content: 'This is where your story unfolds. Read the narrative carefully as it adapts to your choices.',
     placement: 'right',
-    disableBeacon: true,
   },
   {
     target: '[data-tutorial="player-choices"]',

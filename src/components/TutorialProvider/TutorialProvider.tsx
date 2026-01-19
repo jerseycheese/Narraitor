@@ -7,10 +7,12 @@ import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 
+type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
+
 interface TutorialContextValue {
   startTour: (tourId: TutorialPhase, stepIndex?: number) => void;
   stopTour: () => void;
-  pauseTour: () => void;
+  pauseTour: (reason?: PauseReason) => void;
   nextStep: () => void;
   prevStep: () => void;
   skipTour: () => void;
@@ -51,11 +53,13 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [activeTour, setActiveTour] = useState<TutorialPhase | null>(null);
   const [run, setRun] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [pauseReason, setPauseReason] = useState<PauseReason>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
+  const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
 
   const { 
     tutorialProgress, 
@@ -79,6 +83,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       setSteps(loadedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
+      setPauseReason(null);
       
       // If resuming, check last step from store if not provided explicitly
       const phaseData = tutorialProgress.phases[tourId];
@@ -94,13 +99,18 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setSteps([]);
     setRun(false);
     setIsPaused(false);
+    setPauseReason(null);
     setActiveTour(null);
   }, []);
   
-  const pauseTour = useCallback(() => {
+  const pauseTour = useCallback((reason: PauseReason = 'end-of-page') => {
     setSteps([]);
     setRun(false);
     setIsPaused(true);
+    setPauseReason(reason);
+    if (reason !== 'missing-target') {
+      missingTargetRef.current = null;
+    }
   }, []);
 
   const resumeTour = useCallback(async () => {
@@ -111,6 +121,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
     setRun(true);
     setIsPaused(false);
+    setPauseReason(null);
+    missingTargetRef.current = null;
   }, [activeTour]);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
@@ -120,6 +132,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       setSteps([]);
       setRun(false);
       setIsPaused(false);
+      setPauseReason(null);
+      missingTargetRef.current = null;
       if (activeTour) {
         if (status === STATUS.FINISHED) {
           completeTutorialPhase(activeTour);
@@ -137,20 +151,61 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
       if (activeTour !== 'worldCreation') return;
-      // If target not found, we pause the world creation tour after a short delay.
-      // This gives the UI a chance to render if it's currently transitioning.
+      const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
+      if (stepData?.skipIfMissing) {
+        const nextIndex = index + 1;
+        if (nextIndex < steps.length) {
+          setStepIndex(nextIndex);
+        }
+        return;
+      }
+      const mappedWizardStep = stepMapping?.[index];
+      const isSameWizardStep = mappedWizardStep === currentWizardStep;
+      const target = steps[index]?.target;
+
+      if (isSameWizardStep) {
+        missingTargetRef.current = {
+          index,
+          target: typeof target === 'string' ? target : null,
+        };
+        setTimeout(() => {
+          if (runRef.current && !isPausedRef.current) {
+            pauseTour('missing-target');
+          }
+        }, 100);
+        return;
+      }
+
       setTimeout(() => {
-        // Double check we are still in a state where we should pause
         if (runRef.current && !isPausedRef.current) {
-          pauseTour();
+          pauseTour('wizard-transition');
         }
       }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour]);
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stepMapping, currentWizardStep, steps]);
   
   const lastWizardStepRef = useRef<number | null>(null);
 
   // Sync tour with wizard (only when the wizard actually changes steps)
+  useEffect(() => {
+    if (!isPaused || pauseReason !== 'missing-target' || activeTour !== 'worldCreation') return;
+    const missingTarget = missingTargetRef.current;
+    if (!missingTarget?.target) return;
+
+    const retryInterval = window.setInterval(() => {
+      if (!isPausedRef.current || pauseReason !== 'missing-target') return;
+      const element = document.querySelector(missingTarget.target as string);
+      if (element) {
+        missingTargetRef.current = null;
+        resumeTour();
+      }
+    }, 250);
+
+    return () => {
+      window.clearInterval(retryInterval);
+    };
+  }, [isPaused, pauseReason, activeTour, resumeTour]);
+
   useEffect(() => {
     if (!activeTour || !stepMapping) return;
 
@@ -214,6 +269,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setSteps([]);
     setRun(false);
     setIsPaused(false);
+    setPauseReason(null);
+    missingTargetRef.current = null;
     if (activeTour) {
       updateTutorialProgress(activeTour, { skipped: true });
     }
@@ -247,10 +304,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           showProgress={joyrideOptions.showProgress}
           showSkipButton={joyrideOptions.showSkipButton}
           disableScrolling={joyrideOptions.disableScrolling}
+          disableBeacon={true}
           styles={joyrideStyles}
           callback={handleJoyrideCallback}
           disableOverlayClose={true}
           spotlightClicks={true}
+          scrollOffset={joyrideOptions.scrollOffset}
         />
       )}
     </TutorialContext.Provider>

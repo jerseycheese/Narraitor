@@ -111,7 +111,7 @@ export default function FinalizeStep({
       >
 
       <div className="space-y-6 my-4">
-        <div>
+        <div data-tutorial="finalize-review">
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
           <div className="space-y-3">
             <DataField 
@@ -136,7 +136,7 @@ export default function FinalizeStep({
         </div>
 
         {/* World Image Section */}
-        <div className={wizardStyles.divider}>
+        <div className={wizardStyles.divider} data-tutorial="finalize-image">
           <h3 className={wizardStyles.subheading}>World Image</h3>
           {onUpdateWorldData ? (
             <ImageGenerationSection
@@ -178,7 +178,7 @@ export default function FinalizeStep({
           )}
         </div>
 
-        <div className={wizardStyles.divider} data-testid="review-attributes-section">
+        <div className={wizardStyles.divider} data-testid="review-attributes-section" data-tutorial="finalize-attributes">
           <h3 className={wizardStyles.subheading}>Attributes ({worldData.attributes?.length || 0})</h3>
         {worldData.attributes && worldData.attributes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,7 +197,7 @@ export default function FinalizeStep({
         )}
         </div>
 
-        <div className={wizardStyles.divider} data-testid="review-skills-section">
+        <div className={wizardStyles.divider} data-testid="review-skills-section" data-tutorial="finalize-skills">
           <h3 className={wizardStyles.subheading}>Skills ({worldData.skills?.length || 0})</h3>
         {worldData.skills && worldData.skills.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

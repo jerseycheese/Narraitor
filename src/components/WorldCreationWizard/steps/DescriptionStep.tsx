@@ -78,7 +78,10 @@ export default function DescriptionStep({
   const renderSuggestionPreview = () => {
     if (!hasAISuggestions) {
       return (
-        <div className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-foreground" data-testid="ai-suggestion-empty">
+        <div
+          className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-foreground"
+          data-testid="ai-suggestion-empty"
+        >
           {canGenerateSuggestions ? (
             meetsAIMinimumLength
               ? 'Generate suggestions to see examples tailored to your description.'
@@ -165,7 +168,7 @@ export default function DescriptionStep({
         description="AI-generated suggestions for attributes and skills based on your world description."
       >
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3" data-tutorial="ai-suggestions-actions">
             <Button
               type="button"
               onClick={() => {
@@ -203,7 +206,9 @@ export default function DescriptionStep({
             </Alert>
           )}
 
-          {renderSuggestionPreview()}
+          <div data-tutorial="ai-suggestions-preview">
+            {renderSuggestionPreview()}
+          </div>
         </div>
       </WizardFormSection>
 

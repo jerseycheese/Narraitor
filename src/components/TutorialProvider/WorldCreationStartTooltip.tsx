@@ -35,7 +35,7 @@ export function WorldCreationStartTooltip({
     event.preventDefault();
     event.stopPropagation();
     // Hide tooltip, keep tour state
-    pauseTour();
+    pauseTour('end-of-page');
   };
 
   const ariaLabel =

@@ -383,188 +383,191 @@ export default function SkillReviewStep({
         )}
 
       <div className="space-y-4 my-4">
-        {localSuggestions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-lg mb-2">No skill suggestions available</p>
-            <p className="text-sm">You can add skills to your world later in the world editor.</p>
-          </div>
-        ) : (
-          localSuggestions.map((suggestion, index) => (
-          <div 
-            key={index} 
-            className={wizardStyles.card.base} 
-            data-testid={`skill-card-${index}`}
-          >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium">
-                  {suggestion.name}
-                </span>
-                <span className={`${wizardStyles.badge.base} ${
-                  suggestion.difficulty === 'easy' ? wizardStyles.badge.success :
-                  suggestion.difficulty === 'medium' ? wizardStyles.badge.warning : 
-                  wizardStyles.badge.danger
-                }`}>
-                  {suggestion.difficulty}
-                </span>
-                {suggestion.isModified && (
-                  <span className="text-xs text-info bg-info/20 px-2 py-1 rounded">
-                    Modified
+        <div>
+          {localSuggestions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-lg mb-2">No skill suggestions available</p>
+              <p className="text-sm">You can add skills to your world later in the world editor.</p>
+            </div>
+          ) : (
+            localSuggestions.map((suggestion, index) => (
+            <div 
+              key={index} 
+              className={wizardStyles.card.base} 
+              data-testid={`skill-card-${index}`}
+              {...(index === 0 ? { 'data-tutorial': 'skill-suggestions' } : {})}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">
+                    {suggestion.name}
                   </span>
-                )}
-                {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    Linked: {suggestion.selectedAttributeNames.join(', ')}
+                  <span className={`${wizardStyles.badge.base} ${
+                    suggestion.difficulty === 'easy' ? wizardStyles.badge.success :
+                    suggestion.difficulty === 'medium' ? wizardStyles.badge.warning : 
+                    wizardStyles.badge.danger
+                  }`}>
+                    {suggestion.difficulty}
                   </span>
-                )}
+                  {suggestion.isModified && (
+                    <span className="text-xs text-info bg-info/20 px-2 py-1 rounded">
+                      Modified
+                    </span>
+                  )}
+                  {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      Linked: {suggestion.selectedAttributeNames.join(', ')}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button 
+                    type="button" 
+                    variant="link"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newSuggestions = [...localSuggestions];
+                      newSuggestions[index] = {
+                        ...newSuggestions[index],
+                        showDetails: !newSuggestions[index].showDetails
+                      };
+                      setLocalSuggestions(newSuggestions);
+                    }}
+                  >
+                    {suggestion.showDetails ? 'Hide details' : 'Customize'}
+                  </Button>
+                  <Button
+                    type="button"
+                    data-testid={`skill-toggle-${index}`}
+                    onClick={() => handleToggleSkill(index)}
+                    variant={suggestion.accepted ? "default" : "outline"}
+                    size="sm"
+                  >
+                    {suggestion.accepted ? 'Selected' : 'Excluded'}
+                  </Button>
+                </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <Button 
-                  type="button" 
-                  variant="link"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newSuggestions = [...localSuggestions];
-                    newSuggestions[index] = {
-                      ...newSuggestions[index],
-                      showDetails: !newSuggestions[index].showDetails
-                    };
-                    setLocalSuggestions(newSuggestions);
-                  }}
-                >
-                  {suggestion.showDetails ? 'Hide details' : 'Customize'}
-                </Button>
-                <Button
-                  type="button"
-                  data-testid={`skill-toggle-${index}`}
-                  onClick={() => handleToggleSkill(index)}
-                  variant={suggestion.accepted ? "default" : "outline"}
-                  size="sm"
-                >
-                  {suggestion.accepted ? 'Selected' : 'Excluded'}
-                </Button>
-              </div>
-            </div>
-            
-            {suggestion.showDetails && (
-              <div 
-                key={`skill-expanded-${index}`}
-                className="mt-4 pl-7">
-                <WizardFormGroup label="Name">
-                  <WizardTextField
-                    value={suggestion.name}
-                    onChange={(value) => handleModifySkill(index, 'name', value)}
-                    testId={`skill-name-input-${index}`}
-                  />
-                </WizardFormGroup>
-                
-                <WizardFormGroup label="Description">
-                  <WizardTextArea
-                    value={suggestion.description}
-                    onChange={(value) => handleModifySkill(index, 'description', value)}
-                    rows={2}
-                    testId={`skill-description-textarea-${index}`}
-                  />
-                </WizardFormGroup>
-                
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <WizardFormGroup label="Difficulty">
-                      <WizardSelect
-                        value={suggestion.difficulty}
-                        onChange={(value) => handleModifySkill(index, 'difficulty', value)}
-                        options={SKILL_DIFFICULTIES.map(difficulty => ({
-                          value: difficulty.value,
-                          label: difficulty.label
-                        }))}
-                        testId={`skill-difficulty-select-${index}`}
-                      />
-                    </WizardFormGroup>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <WizardFormGroup label="Linked Attributes">
-                      <div className="text-sm text-gray-700 mb-3">
-                        Select one or more attributes this skill depends on
-                      </div>
-                      <div className="space-y-2" data-testid={`skill-attributes-${index}`}>
-                        {worldData.attributes && worldData.attributes.length > 0 ? (
-                          worldData.attributes.map((attribute) => (
-                            <div key={attribute.id} className="space-y-1">
-                              <Checkbox
-                                id={`skill-${index}-attribute-${attribute.id}`}
-                                checked={suggestion.selectedAttributeNames?.includes(attribute.name) || false}
-                                onChange={() => handleAttributeToggle(index, attribute.name)}
-                                label={attribute.name}
-                                data-testid={`skill-${index}-attribute-${attribute.name}-checkbox`}
-                              />
-                              {attribute.description && (
-                                <div className="ml-6 text-xs text-gray-500">
-                                  {attribute.description}
-                                </div>
-                              )}
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500 italic">
-                            No attributes available. Skills will not be linked to any attributes.
-                          </p>
-                        )}
-                      </div>
-                      {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                        <div className="mt-2 text-xs text-info">
-                          Selected: {suggestion.selectedAttributeNames.join(', ')}
-                        </div>
-                      )}
-                    </WizardFormGroup>
-                  </div>
-                </div>
-                
-                {/* Default Value Range Editor */}
-                <div className="mt-4">
-                  {/* Create a temporary skill object for the range editor */}
-                  {worldData.skills?.some(skill => skill.name === suggestion.name) && (
-                    <SkillRangeEditor
-                      skill={{
-                        id: worldData.skills.find(skill => skill.name === suggestion.name)?.id || '',
-                        worldId: '',
-                        name: suggestion.name,
-                        description: suggestion.description,
-                        difficulty: suggestion.difficulty,
-                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || SKILL_DEFAULT_VALUE,
-                        minValue: SKILL_MIN_VALUE,
-                        maxValue: SKILL_MAX_VALUE,
-                        category: suggestion.category,
-                        attributeIds: worldData.skills.find(skill => skill.name === suggestion.name)?.attributeIds || []
-                      }}
-                      onChange={(updates) => {
-                        // Find the skill in the worldData and update it
-                        const updatedSkills = worldData.skills?.map(skill => {
-                          if (skill.name === suggestion.name) {
-                            return { ...skill, ...updates };
-                          }
-                          return skill;
-                        });
-                        onUpdate({ ...worldData, skills: updatedSkills });
-                      }}
-                      showLevelDescriptions={true}
+              {suggestion.showDetails && (
+                <div 
+                  key={`skill-expanded-${index}`}
+                  className="mt-4 pl-7">
+                  <WizardFormGroup label="Name">
+                    <WizardTextField
+                      value={suggestion.name}
+                      onChange={(value) => handleModifySkill(index, 'name', value)}
+                      testId={`skill-name-input-${index}`}
                     />
-                  )}
+                  </WizardFormGroup>
                   
-                  <div className="text-xs text-gray-500">
-                    <p>Values range from 1 (Novice) to 5 (Master).</p>
+                  <WizardFormGroup label="Description">
+                    <WizardTextArea
+                      value={suggestion.description}
+                      onChange={(value) => handleModifySkill(index, 'description', value)}
+                      rows={2}
+                      testId={`skill-description-textarea-${index}`}
+                    />
+                  </WizardFormGroup>
+                  
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <WizardFormGroup label="Difficulty">
+                        <WizardSelect
+                          value={suggestion.difficulty}
+                          onChange={(value) => handleModifySkill(index, 'difficulty', value)}
+                          options={SKILL_DIFFICULTIES.map(difficulty => ({
+                            value: difficulty.value,
+                            label: difficulty.label
+                          }))}
+                          testId={`skill-difficulty-select-${index}`}
+                        />
+                      </WizardFormGroup>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <WizardFormGroup label="Linked Attributes">
+                        <div className="text-sm text-gray-700 mb-3">
+                          Select one or more attributes this skill depends on
+                        </div>
+                        <div className="space-y-2" data-testid={`skill-attributes-${index}`}>
+                          {worldData.attributes && worldData.attributes.length > 0 ? (
+                            worldData.attributes.map((attribute) => (
+                              <div key={attribute.id} className="space-y-1">
+                                <Checkbox
+                                  id={`skill-${index}-attribute-${attribute.id}`}
+                                  checked={suggestion.selectedAttributeNames?.includes(attribute.name) || false}
+                                  onChange={() => handleAttributeToggle(index, attribute.name)}
+                                  label={attribute.name}
+                                  data-testid={`skill-${index}-attribute-${attribute.name}-checkbox`}
+                                />
+                                {attribute.description && (
+                                  <div className="ml-6 text-xs text-gray-500">
+                                    {attribute.description}
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-500 italic">
+                              No attributes available. Skills will not be linked to any attributes.
+                            </p>
+                          )}
+                        </div>
+                        {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
+                          <div className="mt-2 text-xs text-info">
+                            Selected: {suggestion.selectedAttributeNames.join(', ')}
+                          </div>
+                        )}
+                      </WizardFormGroup>
+                    </div>
+                  </div>
+                  
+                  {/* Default Value Range Editor */}
+                  <div className="mt-4">
+                    {/* Create a temporary skill object for the range editor */}
+                    {worldData.skills?.some(skill => skill.name === suggestion.name) && (
+                      <SkillRangeEditor
+                        skill={{
+                          id: worldData.skills.find(skill => skill.name === suggestion.name)?.id || '',
+                          worldId: '',
+                          name: suggestion.name,
+                          description: suggestion.description,
+                          difficulty: suggestion.difficulty,
+                          baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || SKILL_DEFAULT_VALUE,
+                          minValue: SKILL_MIN_VALUE,
+                          maxValue: SKILL_MAX_VALUE,
+                          category: suggestion.category,
+                          attributeIds: worldData.skills.find(skill => skill.name === suggestion.name)?.attributeIds || []
+                        }}
+                        onChange={(updates) => {
+                          // Find the skill in the worldData and update it
+                          const updatedSkills = worldData.skills?.map(skill => {
+                            if (skill.name === suggestion.name) {
+                              return { ...skill, ...updates };
+                            }
+                            return skill;
+                          });
+                          onUpdate({ ...worldData, skills: updatedSkills });
+                        }}
+                        showLevelDescriptions={true}
+                      />
+                    )}
+                    
+                    <div className="text-xs text-gray-500">
+                      <p>Values range from 1 (Novice) to 5 (Master).</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-          ))
-        )}
+              )}
+            </div>
+            ))
+          )}
+        </div>
         
         {/* Custom Skills Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
+        <div className="mt-8 pt-6 border-t border-gray-200" data-tutorial="skill-custom">
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900">Custom Skills</h3>
@@ -670,7 +673,11 @@ export default function SkillReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="skill-count-summary">
+      <div
+        className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20"
+        data-testid="skill-count-summary"
+        data-tutorial="skill-summary"
+      >
         <div className="flex justify-between items-center">
           <div>
             <span className="text-sm font-medium text-gray-900">
