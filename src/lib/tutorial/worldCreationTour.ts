@@ -46,7 +46,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="genre-picker"]',
     content: TutorialContent({
       children: 'Select a genre to define the tone and available options.',
-      example: 'Pick "Sci-Fi" for space exploration or "Fantasy" for magic and dragons',
+      example: 'Fantasy, Sci-Fi, Horror, Mystery, Western, Cyberpunk, or Historical',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -74,7 +74,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-content-rating"]',
     content: TutorialContent({
       children: 'Set the content rating to match your audience.',
-      example: '"Family-Friendly" for lighter stories or "Mature" for grittier narratives',
+      example: 'G (general), PG (mild themes), PG-13 (moderate), R (strong themes), or NC-17 (explicit)',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -83,7 +83,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-narrative-style"]',
     content: TutorialContent({
       children: 'Pick the narrative style that fits your world.',
-      example: '"Cinematic" for dramatic scenes or "Conversational" for casual storytelling',
+      example: 'Dramatic, Epic, Mysterious, Action-Packed, Humorous, Lighthearted, or Contemplative',
     }),
     placement: 'top',
     disableBeacon: true,
@@ -92,7 +92,7 @@ export const worldCreationTour: Step[] = [
     target: '[data-tutorial="tone-language-complexity"]',
     content: TutorialContent({
       children: 'Adjust language complexity to match your reading preference.',
-      example: '"Simple" for accessible prose or "Literary" for rich, descriptive text',
+      example: 'Simple (accessible), Moderate (standard), Advanced (rich vocabulary), or Literary (sophisticated)',
     }),
     placement: 'top',
     disableBeacon: true,
