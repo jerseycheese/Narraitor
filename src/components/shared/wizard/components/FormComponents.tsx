@@ -49,6 +49,7 @@ interface WizardTextFieldProps {
   autoFocus?: boolean;
   maxLength?: number;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardTextField: React.FC<WizardTextFieldProps> = ({
@@ -61,6 +62,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
   autoFocus = false,
   maxLength,
   testId,
+  dataTutorial,
 }) => {
   return (
     <Input
@@ -74,6 +76,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
       maxLength={maxLength}
       className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     />
   );
 };

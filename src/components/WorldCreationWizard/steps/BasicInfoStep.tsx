@@ -45,21 +45,20 @@ export default function BasicInfoStep({
         title="World Details"
         description="Essential information about your world."
       >
-        <div data-tutorial="world-name">
-          <WizardFormGroup
-            label="World Name (optional)"
+        <WizardFormGroup
+          label="World Name (optional)"
+          error={combinedErrors.name}
+          helpText={guidance.nameExamples.length ? `Examples: ${guidance.nameExamples.slice(0, 3).join(', ')}` : 'Choose a genre below to see name examples'}
+        >
+          <WizardTextField
+            value={worldData.name || ''}
+            onChange={(value) => onUpdate({ ...worldData, name: value })}
+            placeholder="Enter your world's name"
             error={combinedErrors.name}
-            helpText={guidance.nameExamples.length ? `Examples: ${guidance.nameExamples.slice(0, 3).join(', ')}` : 'Choose a genre below to see name examples'}
-          >
-            <WizardTextField
-              value={worldData.name || ''}
-              onChange={(value) => onUpdate({ ...worldData, name: value })}
-              placeholder="Enter your world's name"
-              error={combinedErrors.name}
-              testId="world-name-input"
-            />
-          </WizardFormGroup>
-        </div>
+            testId="world-name-input"
+            dataTutorial="world-name"
+          />
+        </WizardFormGroup>
 
         <div data-tutorial="genre-picker">
           <WizardFormGroup
