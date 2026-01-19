@@ -1,46 +1,57 @@
 import { Step } from 'react-joyride';
 
+import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
+
 export const characterCreationTour: Step[] = [
   {
     target: '[data-tutorial="template-selector"]',
-    content:
-      'Choose a character template to get a head start, or build your hero from scratch. Example: Pick "Warrior" for a combat-focused character or "Mystic" for magic users.',
+    content: TutorialContent({
+      children: 'Choose a character template to get a head start, or build your hero from scratch.',
+      example: 'Pick "Warrior" for a combat-focused character or "Mystic" for magic users',
+    }),
     placement: 'bottom',
     disableBeacon: true,
     data: { isEndOfPage: true },
   },
   {
     target: '[data-tutorial="basic-info"]',
-    content:
-      'Give your character a name and description. Example: "Kira Nightshade, a cunning rogue with a mysterious past and a talent for getting into trouble".',
+    content: TutorialContent({
+      children: 'Give your character a name and description.',
+      example: '"Kira Nightshade, a cunning rogue with a mysterious past and a talent for getting into trouble"',
+    }),
     placement: 'right',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="attribute-allocation"]',
-    content:
-      'Allocate points to your core attributes. Example: A warrior might prioritize Strength and Constitution, while a mage focuses on Intelligence and Willpower.',
+    content: TutorialContent({
+      children: 'Allocate points to your core attributes. These determine your natural strengths and weaknesses.',
+      example: 'A warrior might prioritize Strength and Constitution, while a mage focuses on Intelligence',
+    }),
     placement: 'left',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="skill-selection"]',
-    content:
-      'Select skills that define what your character excels at. Example: A thief might choose Lockpicking, Stealth, and Perception.',
+    content: TutorialContent({
+      children: 'Select skills that define what your character excels at.',
+      example: 'A thief might choose Lockpicking, Stealth, and Perception',
+    }),
     placement: 'left',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="background-editor"]',
-    content:
-      'Flesh out your backstory. Example: "Raised on the streets of the capital, they learned to survive by their wits before being recruited by a secret guild".',
+    content: TutorialContent({
+      children: 'Flesh out your backstory. Where are you from? What motivates you?',
+      example: '"Raised on the streets of the capital, they learned to survive by their wits before joining a secret guild"',
+    }),
     placement: 'bottom',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="portrait-generator"]',
-    content:
-      'Generate a unique portrait using AI based on your character description, or upload your own image.',
+    content: 'Generate a unique portrait using AI based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,
   },
