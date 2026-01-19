@@ -39,7 +39,7 @@ export const worldCreationTour: Step[] = [
       children: 'Give your world a name so it feels distinct.',
       example: '"The Shattered Realms" to evoke a fractured fantasy kingdom',
     }),
-    placement: 'top',
+    placement: 'right',
     disableBeacon: true,
   },
   {
