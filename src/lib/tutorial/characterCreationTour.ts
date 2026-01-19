@@ -51,7 +51,7 @@ export const characterCreationTour: Step[] = [
   },
   {
     target: '[data-tutorial="portrait-generator"]',
-    content: 'Generate a unique portrait using AI based on your character description, or upload your own image.',
+    content: 'Generate a unique portrait based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,
   },

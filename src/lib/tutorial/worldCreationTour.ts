@@ -63,7 +63,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-reference"]',
     content: TutorialContent({
-      children: 'Enter the setting you want the AI to follow.',
+      children: 'Enter the setting your world should follow.',
       example: '"Star Wars during the Old Republic era" for that specific time period',
     }),
     placement: 'top',
@@ -100,7 +100,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="tone-custom-instructions"]',
     content: TutorialContent({
-      children: 'Add extra guidance for the AI.',
+      children: 'Add extra guidance for how stories should be told.',
       example: '"Emphasize moral dilemmas" to make choices feel meaningful',
     }),
     placement: 'top',
@@ -119,7 +119,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="ai-suggestions-actions"]',
     content: TutorialContent({
-      children: 'Click Generate to get AI-suggested attributes and skills based on your description.',
+      children: 'Click Generate to get suggested attributes and skills based on your description.',
       example: 'A cyberpunk world might suggest "Hacking" and "Street Cred"',
     }),
     placement: 'top',
@@ -208,7 +208,7 @@ export const worldCreationTour: Step[] = [
   },
   {
     target: '[data-tutorial="finalize-image"]',
-    content: 'Generate a world image to visualize your setting. The AI creates art based on your world description and genre.',
+    content: 'Generate a world image to visualize your setting based on your description and genre.',
     placement: 'top',
     disableBeacon: true,
   },
