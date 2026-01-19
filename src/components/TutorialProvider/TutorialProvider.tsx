@@ -293,11 +293,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }}>
       {children}
       <TutorialProgressWidget />
-      {steps.length > 0 && (
+      {steps.length > 0 && run && (
         <Joyride
           key={`${activeTour}-${isPaused}`}
           steps={steps}
-          run={run && !isPaused}
+          run={!isPaused}
           stepIndex={stepIndex}
           continuous={joyrideOptions.continuous}
           scrollToFirstStep={joyrideOptions.scrollToFirstStep}
