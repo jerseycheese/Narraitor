@@ -6,8 +6,12 @@ import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
+import Logger from '@/lib/utils/logger';
+import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 
 type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
+
+const logger = new Logger('TutorialProvider');
 
 interface TutorialContextValue {
   startTour: (tourId: TutorialPhase, stepIndex?: number) => void;
@@ -18,7 +22,7 @@ interface TutorialContextValue {
   skipTour: () => void;
   resetTutorial: () => void;
   isTourActive: boolean;
-  currentTour: string | null;
+  currentTour: TutorialPhase | null;
   stepIndex: number;
   setCurrentWizardStep: (step: number) => void;
 }
@@ -26,21 +30,26 @@ interface TutorialContextValue {
 export const TutorialContext = createContext<TutorialContextValue | null>(null);
 
 const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
-  switch (tourId) {
-    case 'worldCreation':
-      const { worldCreationTour, tourStepToWizardStep: worldMapping } = await import('@/lib/tutorial/worldCreationTour');
-      return { steps: worldCreationTour, mapping: worldMapping };
-    case 'worldGeneration':
-      const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
-      return { steps: worldGenerationTour };
-    case 'characterCreation':
-      const { characterCreationTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationTour');
-      return { steps: characterCreationTour, mapping: charMapping };
-    case 'firstPlay':
-      const { firstPlayTour } = await import('@/lib/tutorial/firstPlayTour');
-      return { steps: firstPlayTour };
-    default:
-      return { steps: [] };
+  try {
+    switch (tourId) {
+      case 'worldCreation':
+        const { worldCreationTour, tourStepToWizardStep: worldMapping } = await import('@/lib/tutorial/worldCreationTour');
+        return { steps: worldCreationTour, mapping: worldMapping };
+      case 'worldGeneration':
+        const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
+        return { steps: worldGenerationTour };
+      case 'characterCreation':
+        const { characterCreationTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationTour');
+        return { steps: characterCreationTour, mapping: charMapping };
+      case 'firstPlay':
+        const { firstPlayTour } = await import('@/lib/tutorial/firstPlayTour');
+        return { steps: firstPlayTour };
+      default:
+        return { steps: [] };
+    }
+  } catch (error) {
+    logger.error(`Failed to load tour: ${tourId}`, error);
+    return { steps: [] };
   }
 };
 
@@ -60,8 +69,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
-  const prevStepIndexRef = useRef<number | null>(null);
-  const lastStepIndexRef = useRef<number | null>(null);
+
+  useTutorialAutoScroll(run, steps, stepIndex);
 
   const { 
     tutorialProgress, 
@@ -238,12 +247,27 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     const missingTarget = missingTargetRef.current;
     if (!missingTarget?.target) return;
 
+    let retries = 0;
+    const maxRetries = 40; // 10 seconds
+
     const retryInterval = window.setInterval(() => {
-      if (!isPausedRef.current || pauseReason !== 'missing-target') return;
+      if (!isPausedRef.current || pauseReason !== 'missing-target') {
+         window.clearInterval(retryInterval);
+         return;
+      }
+
       const element = document.querySelector(missingTarget.target as string);
       if (element) {
         missingTargetRef.current = null;
         resumeTour();
+        window.clearInterval(retryInterval);
+        return;
+      }
+
+      retries++;
+      if (retries >= maxRetries) {
+        logger.warn('Tutorial missing target timeout', { target: missingTarget.target });
+        window.clearInterval(retryInterval);
       }
     }, 250);
 
@@ -293,59 +317,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
   }, [currentWizardStep, activeTour, stepMapping, run, stepIndex, isPaused, resumeTour]);
 
-  useEffect(() => {
-    prevStepIndexRef.current = lastStepIndexRef.current;
-    lastStepIndexRef.current = stepIndex;
-  }, [stepIndex]);
 
-  useEffect(() => {
-    if (!run || !steps[stepIndex]) return;
-    const stepData = steps[stepIndex]?.data as { autoScroll?: boolean | 'down' | 'up' } | undefined;
-    if (!stepData?.autoScroll) return;
-    const prevIndex = prevStepIndexRef.current;
-    const isForward = prevIndex === null || stepIndex > prevIndex;
-    const isBackward = prevIndex !== null && stepIndex < prevIndex;
-    if (!isForward && !isBackward) return;
-    const target = steps[stepIndex].target;
-    if (typeof target !== 'string') return;
-    const element = document.querySelector(target);
-    if (!element) return;
-    const getScrollParent = (node: Element | null) => {
-      let current = node?.parentElement || null;
-      while (current) {
-        const style = window.getComputedStyle(current);
-        if (/(auto|scroll)/.test(style.overflowY)) {
-          return current;
-        }
-        current = current.parentElement;
-      }
-      return document.scrollingElement instanceof HTMLElement ? document.scrollingElement : null;
-    };
-
-    const scrollParent = getScrollParent(element);
-    const parentRect = scrollParent?.getBoundingClientRect();
-    const rect = element.getBoundingClientRect();
-    const topBoundary = parentRect?.top ?? 0;
-    const bottomBoundary = parentRect?.bottom ?? (window.innerHeight || document.documentElement.clientHeight);
-    const isAbove = rect.top < topBoundary;
-    const isBelow = rect.bottom > bottomBoundary;
-
-    if (stepData.autoScroll === 'down') {
-      if (!isForward) return;
-      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      return;
-    }
-
-    if (stepData.autoScroll === 'up') {
-      if (!isBackward) return;
-      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      return;
-    }
-
-    if (isForward && !isBelow) return;
-    if (isBackward && !isAbove) return;
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }, [run, steps, stepIndex]);
 
   const setCurrentWizardStep = useCallback((step: number) => {
     setCurrentWizardStepState(step);
@@ -404,7 +376,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           showProgress={joyrideOptions.showProgress}
           showSkipButton={joyrideOptions.showSkipButton}
           disableScrolling={joyrideOptions.disableScrolling}
-          disableBeacon={true}
           styles={joyrideStyles}
           callback={handleJoyrideCallback}
           disableOverlayClose={true}
@@ -415,7 +386,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
               ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
               : undefined
           }
-          styles={joyrideStyles}
         />
       )}
     </TutorialContext.Provider>

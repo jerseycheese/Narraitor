@@ -5,6 +5,9 @@
 
 import { PersistStorage } from 'zustand/middleware';
 import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('Persistence');
 
 /**
  * Single resilient storage promise with lazy initialization pattern.
@@ -48,8 +51,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       if (!result) return null;
       // Parse the JSON string into a StorageValue object
       return JSON.parse(result) as { state: unknown; version?: number };
-    } catch {
-      // Gracefully handle retrieval errors by returning null
+    } catch (error) {
+      logger.error('Failed to get item', error);
       return null;
     }
   },
@@ -59,8 +62,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       const storage = await getResilientStorage();
       // Convert the StorageValue object to a JSON string
       await storage.setItem(name, JSON.stringify(value));
-    } catch {
-      // Resilient storage handles errors internally
+    } catch (error) {
+      logger.error('Failed to set item', error);
     }
   },
   
@@ -68,8 +71,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
     try {
       const storage = await getResilientStorage();
       await storage.removeItem(name);
-    } catch {
-      // Resilient storage handles errors internally
+    } catch (error) {
+      logger.error('Failed to remove item', error);
     }
   }
 });

@@ -11,16 +11,16 @@ export const joyrideStyles = {
     backgroundColor: 'hsl(var(--card))',
     borderRadius: 'var(--radius)',
     color: 'hsl(var(--card-foreground))',
-    textAlign: 'left',
+    textAlign: 'left' as const,
   },
   tooltipContent: {
-    textAlign: 'left',
+    textAlign: 'left' as const,
   },
   tooltipTitle: {
-    textAlign: 'left',
+    textAlign: 'left' as const,
   },
   spotlight: {
-    pointerEvents: 'none',
+    pointerEvents: 'none' as const,
   },
   buttonNext: {
     backgroundColor: 'hsl(var(--primary))',

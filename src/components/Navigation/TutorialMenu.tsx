@@ -5,6 +5,9 @@ import { useTutorial } from '@/components/TutorialProvider';
 import { useSessionStore } from '@/state/sessionStore';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, RefreshCw, CheckCircle } from 'lucide-react';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('TutorialMenu');
 
 export function TutorialMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,14 +32,18 @@ export function TutorialMenu() {
 
   const handleRestart = async () => {
     if (confirm('Are you sure you want to reset all tutorial progress?')) {
-      resetTutorial();
-      setIsOpen(false);
-      // Best-effort delay for IndexedDB persist to complete
-      // Zustand persist doesn't expose a flush/ready API for writes,
-      // so we use a small delay. 100ms is generally sufficient for
-      // IndexedDB operations on modern browsers.
-      await new Promise(resolve => setTimeout(resolve, 100));
-      window.location.reload(); 
+      try {
+        resetTutorial();
+        setIsOpen(false);
+        // Best-effort delay for IndexedDB persist to complete
+        // Zustand persist doesn't expose a flush/ready API for writes,
+        // so we use a small delay. 100ms is generally sufficient for
+        // IndexedDB operations on modern browsers.
+        await new Promise(resolve => setTimeout(resolve, 100));
+        window.location.reload(); 
+      } catch (error) {
+        logger.error('Failed to reset tutorial', error);
+      }
     }
   };
 
@@ -76,13 +83,14 @@ export function TutorialMenu() {
           </div>
           
           <div className="border-t border-gray-100 mt-1 pt-1">
-            <button
+            <Button
+              variant="ghost"
               onClick={handleRestart}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full justify-start px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50 h-auto font-normal rounded-none"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 mr-2" />
               Reset All Tutorials
-            </button>
+            </Button>
           </div>
         </div>
       )}

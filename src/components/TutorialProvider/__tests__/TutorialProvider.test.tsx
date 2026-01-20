@@ -43,8 +43,12 @@ jest.mock('react-joyride', () => {
 
 // Mock dynamic imports for tours
 jest.mock('@/lib/tutorial/worldCreationTour', () => ({
-  worldCreationTour: [{ target: 'body', content: 'Step 1' }, { target: 'body', content: 'Step 2' }],
-  tourStepToWizardStep: { 0: 0, 1: 1 }
+  worldCreationTour: [
+    { target: 'body', content: 'Step 1' }, 
+    { target: 'body', content: 'Step 2' },
+    { target: 'body', content: 'Step 3' }
+  ],
+  tourStepToWizardStep: { 0: 0, 1: 0, 2: 1 }
 }));
 
 const TestComponent = () => {
@@ -170,6 +174,6 @@ describe('TutorialProvider', () => {
     });
 
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
-    expect(screen.getByTestId('step-index')).toHaveTextContent('1');
+    expect(screen.getByTestId('step-index')).toHaveTextContent('2');
   });
 });

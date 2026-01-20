@@ -870,36 +870,41 @@ export const useSessionStore = create<SessionStore>()(
     tutorialProgress: state.tutorialProgress
   }),
   migrate: (persistedState: unknown, version?: number) => {
-    const nextState = persistedState as Partial<SessionStore>;
+    try {
+      const nextState = persistedState as Partial<SessionStore>;
 
-    // Migration from v2 to v3: Add tutorialProgress
-    // CLEAN BREAK: No backward compatibility - all users get fresh tutorial state
-    if (typeof version === 'number' && version < 3) {
-      nextState.tutorialProgress = {
-        phases: {
-          intro: { completed: false, skipped: false },
-          worldCreation: { completed: false, skipped: false, lastStep: 0 },
-          worldGeneration: { completed: false, skipped: false, lastStep: 0 },
-          characterCreation: { completed: false, skipped: false, lastStep: 0 },
-          firstPlay: { completed: false, skipped: false },
-        },
-        dismissedHints: [],
-        lastActiveStep: null,
-      };
-      // Remove old onboarding flag - replaced by tutorialProgress
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (nextState as any).onboardingCompleted;
-    }
-    
-    // Migration from v3 to v4: Add worldGeneration phase
-    if (typeof version === 'number' && version < 4 && nextState.tutorialProgress) {
-      nextState.tutorialProgress.phases = {
-        ...nextState.tutorialProgress.phases,
-        worldGeneration: { completed: false, skipped: false, lastStep: 0 }
-      };
-    }
+      // Migration from v2 to v3: Add tutorialProgress
+      // CLEAN BREAK: No backward compatibility - all users get fresh tutorial state
+      if (typeof version === 'number' && version < 3) {
+        nextState.tutorialProgress = {
+          phases: {
+            intro: { completed: false, skipped: false },
+            worldCreation: { completed: false, skipped: false, lastStep: 0 },
+            worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+            characterCreation: { completed: false, skipped: false, lastStep: 0 },
+            firstPlay: { completed: false, skipped: false },
+          },
+          dismissedHints: [],
+          lastActiveStep: null,
+        };
+        // Remove old onboarding flag - replaced by tutorialProgress
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (nextState as any).onboardingCompleted;
+      }
+      
+      // Migration from v3 to v4: Add worldGeneration phase
+      if (typeof version === 'number' && version < 4 && nextState.tutorialProgress) {
+        nextState.tutorialProgress.phases = {
+          ...nextState.tutorialProgress.phases,
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 }
+        };
+      }
 
-    return nextState;
+      return nextState;
+    } catch (error) {
+      logger.error('State migration failed', error);
+      return initialState;
+    }
   },
 }
 ));

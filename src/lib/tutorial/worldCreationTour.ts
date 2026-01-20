@@ -213,7 +213,6 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
-    scrollToFirstStep: true,
     data: { autoScroll: 'down' },
   },
   {

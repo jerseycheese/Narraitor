@@ -53,7 +53,8 @@ export function WorldCreationStartTooltip({
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
   const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip world creation tutorial';
-  const { style: _skipStyle, className: skipClassName, ...skipButtonProps } = skipProps;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { className: skipClassName, ...skipButtonProps } = skipProps as any;
 
   return (
     <div
