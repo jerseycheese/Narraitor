@@ -30,7 +30,11 @@ export function DashboardHome() {
     const hasCharacters = Object.keys(characters).length > 0;
 
     // Check for onboarding
-    const showOnboarding = shouldShowOnboarding();
+    // Use the store selector if available, otherwise check sessions
+    // Fallback logic for safety during migration
+    const showOnboarding = shouldShowOnboarding 
+      ? shouldShowOnboarding() 
+      : Object.keys(savedSessions).length === 0; // Simplified fallback
 
     if (showOnboarding) {
       return 'first-time';

@@ -4,7 +4,8 @@
 
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { World, CharacterArchetype } from '@/types/world.types';
+import { World } from '@/types/world.types';
+import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -31,16 +32,8 @@ export default function QuickStartStep({
   const setCurrentCharacter = useCharacterStore((state: any) => state.setCurrentCharacter);
   const initializeSession = useSessionStore((state) => state.initializeSession);
 
-  const handleTutorialCompletion = () => {
-    if (useSessionStore.getState().shouldShowTutorialPhase('worldCreation')) {
-      useSessionStore.getState().completeTutorialPhase('worldCreation');
-    }
-  };
-
   const handleCharacterSelect = async (archetype: CharacterArchetype) => {
     try {
-      handleTutorialCompletion();
-
       // Convert archetype to character format
       const characterData = {
         name: archetype.name,
@@ -104,7 +97,6 @@ export default function QuickStartStep({
   };
 
   const handleCustomizeClick = () => {
-    handleTutorialCompletion();
     onCustomizeCharacter();
   };
 
@@ -136,10 +128,7 @@ export default function QuickStartStep({
 
       {/* Alternative Actions */}
       <div className="flex justify-center pt-8 border-t">
-        <Button variant="outline" onClick={() => {
-          handleTutorialCompletion();
-          onComplete();
-        }} data-tutorial="quickstart-skip">
+        <Button variant="outline" onClick={onComplete} data-tutorial="quickstart-skip">
           Skip Character Creation for Now
         </Button>
       </div>

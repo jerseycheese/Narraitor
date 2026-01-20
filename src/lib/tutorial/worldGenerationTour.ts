@@ -1,6 +1,6 @@
-import { TutorialStep } from '@/types/tutorial.types';
+import { Step } from 'react-joyride';
 
-export const worldGenerationTour: TutorialStep[] = [
+export const worldGenerationTour: Step[] = [
   {
     target: '[aria-describedby="generate-world-desc"]',
     content: 'This tool lets you instantly generate a complete world setup. Perfect for quick starts!',
@@ -17,11 +17,8 @@ export const worldGenerationTour: TutorialStep[] = [
     placement: 'auto',
   },
   {
-    target: '[data-tutorial="generate-world-submit"]', // Targets the primary action button
+    target: 'button:has-text("Generate")', // Targets the primary action button
     content: 'Click here to create your world! The system will generate attributes, skills, and a cover image automatically.',
     placement: 'auto',
-    data: {
-      hideNextButton: false,
-    },
   },
 ];

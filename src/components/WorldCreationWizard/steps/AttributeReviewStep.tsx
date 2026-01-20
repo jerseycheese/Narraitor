@@ -122,24 +122,23 @@ export default function AttributeReviewStep({
 
       setLocalSuggestions(newSuggestions);
 
-      const normalizeAttributes = (attributes: WorldAttribute[]) =>
-        attributes.map((attribute) => ({
-          name: attribute.name,
-          description: attribute.description,
-          baseValue: attribute.baseValue,
-          minValue: attribute.minValue,
-          maxValue: attribute.maxValue,
-          category: attribute.category,
+      // Automatically save the initially selected attributes to parent state
+      const acceptedAttributes = newSuggestions
+        .filter(s => s.accepted)
+        .map(s => ({
+          id: generateUniqueId('attr'),
+          worldId: '',
+          name: s.name,
+          description: s.description,
+          baseValue: s.baseValue,
+          minValue: s.minValue,
+          maxValue: s.maxValue,
+          category: s.category,
         }));
 
-      const nextAttributes = mergeAllAttributes(newSuggestions.filter(s => s.accepted));
-      const currentAttributes = worldData.attributes || [];
-      const hasChanges =
-        JSON.stringify(normalizeAttributes(currentAttributes)) !==
-        JSON.stringify(normalizeAttributes(nextAttributes));
-
-      if (hasChanges) {
-        onUpdate({ ...worldData, attributes: nextAttributes });
+      // Only update if we don't already have attributes or if the count is different
+      if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
+        onUpdate({ ...worldData, attributes: acceptedAttributes });
       }
     } else {
       // Clear AI suggestions when they are removed (preserves custom attributes)

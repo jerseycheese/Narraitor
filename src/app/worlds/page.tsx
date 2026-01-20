@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Plus, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
@@ -16,6 +16,7 @@ import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { useTutorial } from '@/components/TutorialProvider';
 import { useSessionStore } from '@/state/sessionStore';
+import { useEffect } from 'react';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function WorldsPage() {
   const [showPrompt, setShowPrompt] = useState(false);
   
   // Tutorial integration
-  const { startTour, stopTour, isTourActive, resetCount } = useTutorial();
+  const { startTour, stopTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldGeneration'));
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
 
@@ -39,7 +40,7 @@ export default function WorldsPage() {
     } else if (!showPrompt && isTourActive) {
       stopTour();
     }
-  }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour, resetCount]);
+  }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour]);
 
   const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
   const [worldName, setWorldName] = useState('');
@@ -205,7 +206,6 @@ export default function WorldsPage() {
               onClick: handleGenerateWorld,
               variant: 'primary',
               disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-              dataTutorial: 'generate-world-submit',
               icon: (
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
               )
