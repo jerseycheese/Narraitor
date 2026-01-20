@@ -30,6 +30,7 @@ import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { useTutorial } from '@/components/TutorialProvider';
+import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
 
 // Efficient deep comparison for arrays of objects
 const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
@@ -100,7 +101,7 @@ export default function WorldCreationWizard({
   const router = useRouter();
   const createWorld = useWorldStore((state) => state.createWorld);
   const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
-  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldCreation'));
+  const worldCreationProgress = useSessionStore(state => state.tutorialProgress.phases.worldCreation);
   
   // Initialize world creation data
   // Note: initialData spread at the end takes precedence over defaults,
@@ -190,16 +191,35 @@ export default function WorldCreationWizard({
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
 
+  const shouldAutoStartTour = useMemo(() => {
+    if (worldCreationProgress.skipped) return false;
+    if (!worldCreationProgress.completed) return true;
+
+    const stepIndices = Object.entries(tourStepToWizardStep)
+      .filter(([, step]) => step === wizard.state.currentStep)
+      .map(([index]) => parseInt(index, 10));
+
+    if (stepIndices.length === 0) return false;
+    const maxIndexForWizardStep = Math.max(...stepIndices);
+
+    return worldCreationProgress.lastStep < maxIndexForWizardStep;
+  }, [
+    worldCreationProgress.completed,
+    worldCreationProgress.skipped,
+    worldCreationProgress.lastStep,
+    wizard.state.currentStep,
+  ]);
+
   // Auto-start tour if needed
   React.useEffect(() => {
-    if (shouldShowTour && !isTourActive) {
+    if (shouldAutoStartTour && !isTourActive) {
       // Small delay to ensure components are mounted
       const timer = setTimeout(() => {
         startTour('worldCreation');
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [shouldShowTour, isTourActive, startTour]);
+  }, [shouldAutoStartTour, isTourActive, startTour, wizard.state.currentStep]);
 
   // Cancel confirmation dialog state
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);

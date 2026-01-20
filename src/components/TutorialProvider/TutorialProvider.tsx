@@ -165,7 +165,20 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       missingTargetRef.current = null;
       if (activeTour) {
         if (status === STATUS.FINISHED) {
-          completeTutorialPhase(activeTour);
+          if (activeTour === 'worldCreation' && stepMapping) {
+            const wizardStepValues = Object.values(stepMapping);
+            const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
+            const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
+            const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
+
+            if (isFinalWizardStep && isFinalTourStep) {
+              completeTutorialPhase(activeTour);
+            } else {
+              updateTutorialProgress(activeTour, { lastStep: index });
+            }
+          } else {
+            completeTutorialPhase(activeTour);
+          }
         } else {
           updateTutorialProgress(activeTour, { skipped: true });
         }

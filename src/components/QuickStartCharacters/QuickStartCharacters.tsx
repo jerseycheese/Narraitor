@@ -154,6 +154,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       <div 
         className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
         data-testid="archetypes-grid"
+        data-tutorial="quickstart-archetypes"
       >
         {archetypes.map((archetype) => (
           <ActiveStateCard
@@ -268,7 +269,8 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               ) : (
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
               ),
-              disabled: loading
+              disabled: loading,
+              dataTutorial: 'quickstart-random',
             },
             {
               label: 'Create Custom Character',
@@ -277,7 +279,8 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               size: 'lg',
               icon: (
                 <Plus className="w-4 h-4" aria-hidden="true" />
-              )
+              ),
+              dataTutorial: 'quickstart-custom',
             }
           ]}
         />
