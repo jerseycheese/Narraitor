@@ -49,6 +49,7 @@ interface WizardTextFieldProps {
   autoFocus?: boolean;
   maxLength?: number;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardTextField: React.FC<WizardTextFieldProps> = ({
@@ -61,6 +62,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
   autoFocus = false,
   maxLength,
   testId,
+  dataTutorial,
 }) => {
   return (
     <Input
@@ -74,6 +76,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
       maxLength={maxLength}
       className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     />
   );
 };
@@ -88,6 +91,7 @@ interface WizardTextAreaProps {
   rows?: number;
   maxLength?: number;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
@@ -100,6 +104,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
   rows = 4,
   maxLength,
   testId,
+  dataTutorial,
 }) => {
   return (
     <Textarea
@@ -112,6 +117,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
       maxLength={maxLength}
       className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     />
   );
 };
@@ -125,6 +131,7 @@ interface WizardSelectProps {
   error?: string;
   disabled?: boolean;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardSelect: React.FC<WizardSelectProps> = ({
@@ -136,6 +143,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
   error,
   disabled = false,
   testId,
+  dataTutorial,
 }) => {
   return (
     <select
@@ -145,6 +153,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
       disabled={disabled}
       className={`${wizardStyles.form.select} ${error ? wizardStyles.form.inputError : ''}`}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     >
       <option value="" disabled>
         {placeholder}
@@ -174,17 +183,24 @@ interface WizardFormSectionProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
+  dataTutorial?: string;
 }
 
 export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
   title,
   description,
   children,
+  dataTutorial,
 }) => {
+  const headerProps = dataTutorial ? { 'data-tutorial': dataTutorial } : undefined;
+  const sectionProps = !title && !description && dataTutorial
+    ? { 'data-tutorial': dataTutorial }
+    : undefined;
+
   return (
-    <div className="space-y-4 my-4">
+    <div className="space-y-4 my-4" {...sectionProps}>
       {(title || description) && (
-        <div className="mb-4">
+        <div className="mb-4" {...headerProps}>
           {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
           {description && <p className={wizardStyles.step.description}>{description}</p>}
         </div>

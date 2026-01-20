@@ -98,27 +98,13 @@ describe('TemplateSelector', () => {
   });
 
   // Test with preselected template
-  test('renders with preselected template', () => {
+  test('renders with preselected template and highlights it', () => {
     const onSelect = jest.fn();
-    
+
     render(<TemplateSelector onSelect={onSelect} selectedTemplateId="western" />);
-    
-    // Check if preview is shown for selected template
-    expect(screen.getByTestId('template-preview-western')).toBeInTheDocument();
-  });
-  
-  // Test that preview is shown for selected template
-  test('shows preview for selected template', () => {
-    const onSelect = jest.fn();
-    
-    render(
-      <TemplateSelector 
-        onSelect={onSelect} 
-        selectedTemplateId="western" 
-      />
-    );
-    
-    // Check that preview is shown for the selected template
-    expect(screen.getByTestId('template-preview-western')).toBeInTheDocument();
+
+    // Check that the selected template card has the selected styling class
+    const westernCard = screen.getByTestId('template-card-western');
+    expect(westernCard).toHaveClass('selected-template');
   });
 });

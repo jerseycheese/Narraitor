@@ -16,6 +16,7 @@ import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
 import { semanticColors, primitiveColors } from '@/lib/design-tokens';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 interface WorldTableProps {
   worlds: World[];
@@ -167,7 +168,7 @@ export function WorldTable({
           const genre = row.getValue('genre') as string;
           return (
             <Badge variant="secondary" className="capitalize">
-              {genre.replace('_', ' ')}
+              {getGenreLabel(genre)}
             </Badge>
           );
         },

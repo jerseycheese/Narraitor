@@ -200,7 +200,7 @@ THREE-STAGE VERIFICATION:
 
 TOOLS TO USE:
 - ./scripts/playwright-verify.sh for automated testing
-- Playwright MCP tools for interactive testing
+- Chrome DevTools MCP tools for interactive testing
 - Screenshot and content analysis tools
 
 DELIVERABLES:
