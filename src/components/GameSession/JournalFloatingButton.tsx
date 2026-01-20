@@ -7,6 +7,7 @@ import { FloatingActionButton } from '@/components/ui/FloatingActionButton/Float
 interface JournalFloatingButtonProps {
   onClick: () => void;
   className?: string;
+  dataTutorialId?: string;
 }
 
 // Journal book icon
@@ -19,6 +20,7 @@ const JournalIcon = (<BookOpen className="h-6 w-6" aria-hidden="true" />);
 export const JournalFloatingButton: React.FC<JournalFloatingButtonProps> = ({
   onClick,
   className,
+  dataTutorialId,
 }) => {
   return (
     <FloatingActionButton
@@ -29,6 +31,7 @@ export const JournalFloatingButton: React.FC<JournalFloatingButtonProps> = ({
       position="bottom-right"
       size="lg"
       className={className}
+      dataTutorialId={dataTutorialId}
     />
   );
 };

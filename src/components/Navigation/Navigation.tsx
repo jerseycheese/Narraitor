@@ -14,8 +14,10 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 // Render RecentPagesDropdown only on the client to avoid SSR/client mismatches
 const RecentPagesDropdown = dynamic(() => import('./RecentPagesDropdown').then(m => ({ default: m.RecentPagesDropdown })), { ssr: false });
 import { MobileNavigationMenu } from './MobileNavigationMenu';
+import { TutorialMenu } from './TutorialMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { X, Menu, Globe, ChevronDown, Check, Plus, Play } from 'lucide-react';
 
 /**
@@ -109,9 +111,10 @@ export function Navigation() {
   
   return (
     <>
-      <nav className="bg-gray-900 text-white shadow-lg" role="banner">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header role="banner">
+        <nav className="bg-gray-900 text-white shadow-lg" role="navigation" aria-label="Main">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
             {/* Left side - Logo and mobile menu button */}
             <div className="flex items-center space-x-4">
               {/* Mobile menu button */}
@@ -176,6 +179,7 @@ export function Navigation() {
             
             {/* Right side - Quick actions and current context (hidden on mobile) */}
             <div className="hidden md:flex items-center gap-2 sm:gap-4">
+              <TutorialMenu />
               {/* World Switcher Dropdown */}
               {hasWorlds && (
                 <div className="relative" ref={dropdownRef}>
@@ -214,7 +218,7 @@ export function Navigation() {
                           >
                             <div>
                               <div className="font-medium text-gray-900">{world.name}</div>
-                              <div className="text-sm text-gray-500">{world.genre} • {worldCharacters} characters</div>
+                              <div className="text-sm text-gray-500">{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
                             </div>
                             {world.id === currentWorldId && (
                               <Check className="w-5 h-5 text-green-500" aria-hidden="true" />
@@ -268,7 +272,8 @@ export function Navigation() {
             </div>
           </div>
         </div>
-      </nav>
+        </nav>
+      </header>
 
       {/* Mobile Navigation Menu */}
       <MobileNavigationMenu 

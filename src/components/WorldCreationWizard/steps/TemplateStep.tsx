@@ -85,7 +85,6 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
               aiSuggestionsGenerated: true,
               aiSuggestionMeta: templateData.aiSuggestionMeta ?? createSuggestionMeta(templateData.description || '', 'template'),
             });
-            console.log('Applied recent AI template:', templateData.name);
             
             // Proceed to next step
             setTimeout(() => {
@@ -181,31 +180,66 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     <div data-testid="template-step">
       <WizardFormSection
         title="Getting Started"
-        description="Choose how you'd like to create your world - use existing templates, generate with AI, or start from scratch."
+        description="Choose how you'd like to create your world - use existing templates, generate automatically, or start from scratch."
       >
         
         {/* Mode Selection */}
-        <div className="mb-6">
-          <TabNavigation
-            options={tabOptions}
-            activeValue={currentMode}
-            onChange={setCurrentMode}
-            className="mb-4"
-          />
+        <div className="mb-6" data-tutorial="world-type-selector">
+          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch">
+            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-foreground">Start from Scratch</h4>
+                <p className="text-sm text-muted-foreground">
+                  Build your world without a template and define everything as you go.
+                </p>
+                <Button
+                  type="button"
+                  onClick={handleCreateOwnWorld}
+                  variant="outline"
+                  data-testid="create-own-button"
+                  data-tutorial="create-own-world-btn"
+                >
+                  Create My Own World
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+                <span className="h-px w-6 bg-border" />
+                <span>or</span>
+                <span className="h-px w-6 bg-border" />
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-foreground">Use a Template</h4>
+                <p className="text-sm text-muted-foreground">
+                  Pick a curated template or generate one to jump-start your world.
+                </p>
+                <div data-tutorial="generate-tab">
+                  <TabNavigation
+                    options={tabOptions}
+                    activeValue={currentMode}
+                    onChange={setCurrentMode}
+                  />
+                </div>
+                <div className="pt-3">
+                  {currentMode === 'traditional' ? (
+                    <TemplateSelector
+                      onSelect={handleSelectTemplate}
+                      selectedTemplateId={selectedTemplateId}
+                    />
+                  ) : (
+                    <SmartTemplates onTemplateGenerated={handleSmartTemplateGenerated} />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Content based on mode */}
-        {currentMode === 'traditional' ? (
-          <TemplateSelector
-            onSelect={handleSelectTemplate}
-            selectedTemplateId={selectedTemplateId}
-          />
-        ) : (
-          <div className="border rounded-lg p-4">
-            <SmartTemplates onTemplateGenerated={handleSmartTemplateGenerated} />
-          </div>
-        )}
-      
       </WizardFormSection>
       
       {errors.template && (
@@ -222,28 +256,17 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         >
           Cancel
         </Button>
-        
-        <div className="flex gap-2">
+
+        {currentMode === 'traditional' && (
           <Button
             type="button"
-            onClick={handleCreateOwnWorld}
-            variant="outline"
-            data-testid="create-own-button"
+            onClick={handleApplyTemplate}
+            disabled={!selectedTemplateId || isApplying}
+            data-testid="next-button"
           >
-            Create My Own World
+            {isApplying ? 'Applying Template...' : 'Use Selected Template'}
           </Button>
-          
-          {currentMode === 'traditional' && (
-            <Button
-              type="button"
-              onClick={handleApplyTemplate}
-              disabled={!selectedTemplateId || isApplying}
-              data-testid="next-button"
-            >
-              {isApplying ? 'Applying Template...' : 'Use Selected Template'}
-            </Button>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

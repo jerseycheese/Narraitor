@@ -28,10 +28,12 @@ jest.mock('@/components/ConfirmationDialog', () => ({
   ),
 }));
 
+const mockJournalFloatingButton = jest.fn(({ onClick, dataTutorialId }: { onClick: () => void; dataTutorialId?: string }) => (
+  <button data-testid="journal-floating" data-tutorial={dataTutorialId} onClick={onClick} />
+));
+
 jest.mock('../JournalFloatingButton', () => ({
-  JournalFloatingButton: ({ onClick }: { onClick: () => void }) => (
-    <button data-testid="journal-floating" onClick={onClick} />
-  ),
+  JournalFloatingButton: (props: { onClick: () => void; dataTutorialId?: string }) => mockJournalFloatingButton(props),
 }));
 
 jest.mock('@/components/ui/CollapsibleSection', () => ({
@@ -89,6 +91,10 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.getByTestId('choice-history')).toBeInTheDocument();
     expect(screen.getByTestId('save-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('journal-floating')).toHaveAttribute('data-tutorial', 'journal-toggle');
+
+    const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');
+    expect(inventoryAnchor).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('journal-floating'));
     expect(baseProps.onOpenJournal).toHaveBeenCalled();

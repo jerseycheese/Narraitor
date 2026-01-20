@@ -37,6 +37,14 @@ jest.mock('@/lib/ai/worldAnalyzerClient', () => ({
   analyzeWorldDescriptionClient: jest.fn(),
 }));
 
+jest.mock('@/components/TutorialProvider', () => ({
+  useTutorial: jest.fn(() => ({
+    startTour: jest.fn(),
+    setCurrentWizardStep: jest.fn(),
+    isTourActive: false,
+  })),
+}));
+
 // Test data constants
 const TEST_WORLD_DATA = {
   name: 'Test World Name',

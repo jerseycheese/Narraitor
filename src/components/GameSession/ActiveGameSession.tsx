@@ -21,6 +21,7 @@ import { useActiveGameSessionEffects } from './hooks/useActiveGameSessionEffects
 import { useActiveGameSessionJournal } from './hooks/useActiveGameSessionJournal';
 import { useActiveGameSessionActions } from './hooks/useActiveGameSessionActions';
 import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
+import { useTutorial } from '@/components/TutorialProvider';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -110,6 +111,19 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   const autoSave = useAutoSave();
   const router = useRouter();
+  const { startTour, isTourActive } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
+
+  React.useEffect(() => {
+    if (!isGameReady) return;
+    if (!shouldShowTour || isTourActive) return;
+
+    const timer = setTimeout(() => {
+      startTour('firstPlay');
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [isGameReady, shouldShowTour, isTourActive, startTour]);
 
   const { createDecisionJournalEntry, createJournalEntryFromSegment } = useActiveGameSessionJournal({
     sessionId,

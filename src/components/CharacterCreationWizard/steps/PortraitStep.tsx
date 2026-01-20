@@ -156,8 +156,8 @@ export function PortraitStep({
         <h3 className="text-lg font-semibold mb-2">Character Portrait</h3>
         <p className="text-sm text-gray-700">
           {data.characterData.background?.isKnownFigure
-            ? `Generate an AI portrait of ${data.characterData.name} as they are commonly recognized`
-            : 'Generate an AI portrait for your character or use a placeholder'}
+            ? `Generate a portrait of ${data.characterData.name} as they are commonly recognized`
+            : 'Generate a portrait for your character or use a placeholder'}
         </p>
       </div>
 

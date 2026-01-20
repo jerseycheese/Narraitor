@@ -48,7 +48,7 @@ const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnPro
       id="choices-container"
       aria-busy={isGeneratingChoices}
     >
-      <div className="player-choices-container flex-1">
+      <div className="player-choices-container flex-1" data-tutorial="player-choices">
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
           <ChoiceSelector

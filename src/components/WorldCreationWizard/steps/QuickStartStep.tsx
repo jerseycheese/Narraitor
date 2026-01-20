@@ -127,7 +127,7 @@ export default function QuickStartStep({
 
       {/* Alternative Actions */}
       <div className="flex justify-center pt-8 border-t">
-        <Button variant="outline" onClick={onComplete}>
+        <Button variant="outline" onClick={onComplete} data-tutorial="quickstart-skip">
           Skip Character Creation for Now
         </Button>
       </div>

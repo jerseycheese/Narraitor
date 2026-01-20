@@ -3,6 +3,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
@@ -27,8 +28,9 @@ import { getTimestamp } from '@/lib/utils';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
-import { truncate } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import { useTutorial } from '@/components/TutorialProvider';
+import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
 
 // Efficient deep comparison for arrays of objects
 const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
@@ -90,14 +92,16 @@ const buildSuggestionMeta = (
   descriptionSnapshot: (description || '').trim(),
 });
 
-export default function WorldCreationWizard({ 
-  onComplete, 
+export default function WorldCreationWizard({
+  onComplete,
   onCancel,
   initialStep = 0,
   initialData
 }: WorldCreationWizardProps) {
   const router = useRouter();
   const createWorld = useWorldStore((state) => state.createWorld);
+  const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
+  const worldCreationProgress = useSessionStore(state => state.tutorialProgress.phases.worldCreation);
   
   // Initialize world creation data
   // Note: initialData spread at the end takes precedence over defaults,
@@ -182,9 +186,43 @@ export default function WorldCreationWizard({
     },
   });
 
+  // Sync wizard step with tutorial provider
+  React.useEffect(() => {
+    setCurrentWizardStep(wizard.state.currentStep);
+  }, [wizard.state.currentStep, setCurrentWizardStep]);
+
+  const shouldAutoStartTour = useMemo(() => {
+    if (worldCreationProgress.skipped) return false;
+    if (!worldCreationProgress.completed) return true;
+
+    const stepIndices = Object.entries(tourStepToWizardStep)
+      .filter(([, step]) => step === wizard.state.currentStep)
+      .map(([index]) => parseInt(index, 10));
+
+    if (stepIndices.length === 0) return false;
+    const maxIndexForWizardStep = Math.max(...stepIndices);
+
+    return worldCreationProgress.lastStep < maxIndexForWizardStep;
+  }, [
+    worldCreationProgress.completed,
+    worldCreationProgress.skipped,
+    worldCreationProgress.lastStep,
+    wizard.state.currentStep,
+  ]);
+
+  // Auto-start tour if needed
+  React.useEffect(() => {
+    if (shouldAutoStartTour && !isTourActive) {
+      // Small delay to ensure components are mounted
+      const timer = setTimeout(() => {
+        startTour('worldCreation');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAutoStartTour, isTourActive, startTour, wizard.state.currentStep]);
+
   // Cancel confirmation dialog state
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
-
   // Dirty state detection - check if user has made meaningful changes
   const isDirty = useMemo(() => {
     const currentData = wizard.state.data;
@@ -208,7 +246,7 @@ export default function WorldCreationWizard({
   const generateAISuggestions = useCallback(async () => {
     const description = wizard.state.data.description;
     if (!description || description.trim().length < 50) {
-      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the AI understands your world.');
+      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the system understands your world.');
       return;
     }
 
@@ -224,7 +262,7 @@ export default function WorldCreationWizard({
         aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
       });
     } catch (error) {
-      console.error('Error generating AI suggestions:', error);
+      console.error('Error generating suggestions:', error);
       
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
@@ -235,7 +273,7 @@ export default function WorldCreationWizard({
       });
       wizard.setError(
         'ai',
-        'We had trouble reaching the AI service, so we loaded starter suggestions. You can generate again once the service recovers.'
+        'We had trouble reaching the generation service, so we loaded starter suggestions. You can generate again once the service recovers.'
       );
     } finally {
       wizard.setProcessing(false);
@@ -458,52 +496,66 @@ export default function WorldCreationWizard({
     switch (wizard.state.currentStep) {
       case 0:
         return (
-          <TemplateStep
-            selectedTemplateId={wizard.state.data.selectedTemplateId}
-            onUpdate={updateWizardState}
-            onComplete={handleNext}
-            onCancel={handleCancel}
-            errors={wizard.state.errors || {}}
-          />
+          <div>
+            <TemplateStep
+              selectedTemplateId={wizard.state.data.selectedTemplateId}
+              onUpdate={updateWizardState}
+              onComplete={handleNext}
+              onCancel={handleCancel}
+              errors={wizard.state.errors || {}}
+            />
+          </div>
         );
       case 1:
-        return <BasicInfoStep {...stepProps} />;
+        return (
+          <div>
+            <BasicInfoStep {...stepProps} />
+          </div>
+        );
       case 2:
         return (
-          <DescriptionStep
-            {...stepProps}
-            isProcessing={wizard.state.isProcessing || false}
-            aiSuggestions={wizard.state.data.aiSuggestions}
-            suggestionMeta={wizard.state.data.aiSuggestionMeta}
-            canGenerateSuggestions
-            onGenerateSuggestions={generateAISuggestions}
-          />
+          <div>
+            <DescriptionStep
+              {...stepProps}
+              isProcessing={wizard.state.isProcessing || false}
+              aiSuggestions={wizard.state.data.aiSuggestions}
+              suggestionMeta={wizard.state.data.aiSuggestionMeta}
+              canGenerateSuggestions
+              onGenerateSuggestions={generateAISuggestions}
+            />
+          </div>
         );
       case 3:
         return (
-          <AttributeReviewStep
-            {...stepProps}
-            suggestions={wizard.state.data.aiSuggestions?.attributes || []}
-            onClearSuggestions={clearAISuggestions}
-          />
+          <div>
+            <AttributeReviewStep
+              {...stepProps}
+              suggestions={wizard.state.data.aiSuggestions?.attributes || []}
+              onClearSuggestions={clearAISuggestions}
+            />
+          </div>
         );
       case 4:
         return (
-          <SkillReviewStep
-            {...stepProps}
-            suggestions={wizard.state.data.aiSuggestions?.skills || []}
-            onClearSuggestions={clearAISuggestions}
-          />
+          <div>
+            <SkillReviewStep
+              {...stepProps}
+              suggestions={wizard.state.data.aiSuggestions?.skills || []}
+              onClearSuggestions={clearAISuggestions}
+            />
+          </div>
         );
       case 5:
         return (
-          <FinalizeStep
-            {...stepProps}
-            onComplete={handleComplete}
-            onBack={handleBack}
-            onCancel={handleCancel}
-            onUpdateWorldData={updateWorldData}
-          />
+          <div>
+            <FinalizeStep
+              {...stepProps}
+              onComplete={handleComplete}
+              onBack={handleBack}
+              onCancel={handleCancel}
+              onUpdateWorldData={updateWorldData}
+            />
+          </div>
         );
       case 6:
         // Quick Start Step

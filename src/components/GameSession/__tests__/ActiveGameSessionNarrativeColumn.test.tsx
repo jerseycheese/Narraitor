@@ -69,4 +69,12 @@ describe('ActiveGameSessionNarrativeColumn', () => {
     expect(container).not.toBeNull();
     expect(container?.style.maxHeight).toBe('500px');
   });
+
+  it('sets the tutorial anchor on the narrative container', () => {
+    render(<ActiveGameSessionNarrativeColumn {...baseProps} />);
+
+    const container = document.getElementById('narrative-container');
+    expect(container).not.toBeNull();
+    expect(container).toHaveAttribute('data-tutorial', 'narrative-display');
+  });
 });

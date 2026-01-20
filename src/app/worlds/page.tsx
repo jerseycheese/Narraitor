@@ -14,11 +14,34 @@ import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector/utils';
 import { SimpleModal } from '@/components/shared/SimpleModal';
+import { useTutorial } from '@/components/TutorialProvider';
+import { useSessionStore } from '@/state/sessionStore';
+import { useEffect } from 'react';
+
 export default function WorldsPage() {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
+  
+  // Tutorial integration
+  const { startTour, stopTour, isTourActive } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldGeneration'));
+  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+
+  // Start tour when modal opens if needed
+  useEffect(() => {
+    if (showPrompt && shouldShowTour && !isTourActive) {
+      // Small delay to allow modal animation
+      const timer = setTimeout(() => {
+        startTour('worldGeneration');
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (!showPrompt && isTourActive) {
+      stopTour();
+    }
+  }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour]);
+
   const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +63,12 @@ export default function WorldsPage() {
     setIsGenerating(true);
     setGeneratingStatus('Generating world configuration...');
     setError(null);
+    
+    // Complete tutorial phase if active
+    if (shouldShowTour) {
+      completeTutorialPhase('worldGeneration');
+      stopTour();
+    }
 
     try {
       // Get existing world names to ensure uniqueness

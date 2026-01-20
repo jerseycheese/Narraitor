@@ -47,7 +47,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
   if (attributes.length === 0 && skills.length === 0) {
     return (
       <div className="p-4 bg-gray-100 border border-gray-200 rounded-md">
-        <p className="text-gray-700">No AI suggestions available</p>
+        <p className="text-gray-700">No suggestions available</p>
       </div>
     );
   }

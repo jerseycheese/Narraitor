@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { World, CharacterTemplate } from '@/types/world.types';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 interface CharacterWizardData {
   characterData: {
@@ -156,7 +157,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       {/* Info banner */}
       <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-700">
-          These templates are tailored to your <strong>{worldConfig.genre}</strong> world.
+          These templates are tailored to your <strong>{getGenreLabel(worldConfig.genre)}</strong> world.
           Select one to get started quickly, or skip to create your own character from scratch.
           You can customize any template values in the following steps.
         </p>
