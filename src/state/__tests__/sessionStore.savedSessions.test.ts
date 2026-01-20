@@ -39,17 +39,7 @@ const resetSessionStore = () => {
       totalSaves: 0,
     },
     narrativeHeight: 600,
-    tutorialProgress: {
-      phases: {
-        intro: { completed: false, skipped: false },
-        worldCreation: { completed: false, skipped: false, lastStep: 0 },
-        worldGeneration: { completed: false, skipped: false, lastStep: 0 },
-        characterCreation: { completed: false, skipped: false, lastStep: 0 },
-        firstPlay: { completed: false, skipped: false },
-      },
-      dismissedHints: [],
-      lastActiveStep: null,
-    },
+    onboardingCompleted: false,
   });
 };
 
