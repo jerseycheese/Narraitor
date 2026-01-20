@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
@@ -52,6 +52,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await waitForContentStable(page);
     await page.goto('/worlds/create');
     await waitForContentStable(page);
+    await hideDynamicContent(page);
     // Navigate to the Basic Info step by clicking "Create My Own World"
     const createOwnButton = page.getByRole('button', { name: 'Create My Own World' });
     await expect(createOwnButton).toBeEnabled({ timeout: 15000 });

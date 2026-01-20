@@ -12,7 +12,9 @@ export default function GuidedFirstTimeExperienceTestHarness() {
     shouldShowOnboarding,
     isFirstTimeUser,
   } = useSessionStore();
+
   const isCompleted = !shouldShowOnboarding();
+  const showOnboarding = shouldShowOnboarding();
 
   const handleReset = () => {
     resetTutorialProgress();
@@ -66,18 +68,31 @@ export default function GuidedFirstTimeExperienceTestHarness() {
                 Onboarding Status:
               </span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
+<<<<<<< HEAD
                 isCompleted 
                   ? 'bg-green-100 text-green-700' 
                   : 'bg-amber-100 text-amber-700'
               }`}>
                 {isCompleted ? 'Completed' : 'Not Completed'}
+=======
+                !showOnboarding 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-amber-100 text-amber-700'
+              }`}>
+                {!showOnboarding ? 'Completed' : 'Not Completed'}
+>>>>>>> ef6bd1f1 (test: visual regression suite and dev tools)
               </span>
             </div>
             
             {/* Debug info */}
             <div className="text-xs text-gray-500">
+<<<<<<< HEAD
               shouldShow: {shouldShowOnboarding().toString()} | 
               isFirstTime: {isFirstTimeUser().toString()}
+=======
+              shouldShow: {showOnboarding.toString()} | 
+              isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
+>>>>>>> ef6bd1f1 (test: visual regression suite and dev tools)
             </div>
             
             <button
@@ -121,7 +136,11 @@ export default function GuidedFirstTimeExperienceTestHarness() {
           <div key={resetKey} className="p-8">
             <GuidedFirstTimeExperience />
             
+<<<<<<< HEAD
             {isCompleted && (
+=======
+            {!showOnboarding && (
+>>>>>>> ef6bd1f1 (test: visual regression suite and dev tools)
               <div className="text-center py-8">
                 <div className="bg-gray-100 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">

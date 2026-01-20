@@ -29,10 +29,16 @@ test.describe('Main Pages Visual Tests', () => {
     // Seed test data to show returning user with recent game session
     await seedTestData(page);
     await page.goto('/');
+    // Wait for seeding to complete before stabilizing
+    await page.waitForFunction(() => (window as any).__TEST_STORES_SEEDED__ === true, { timeout: 15000 });
+    
+    // Reload to ensure localStorage is picked up cleanly
+    await page.reload();
+    
     await waitForContentStable(page);
+    await hideDynamicContent(page);
     // Ensure the Continue section appears (seeded session present)
     await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
-    await hideDynamicContent(page);
     
     // Verify page loaded with expected content
     await expect(page).toHaveTitle(/Narraitor/i);
