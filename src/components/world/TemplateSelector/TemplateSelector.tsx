@@ -88,7 +88,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
         onTemplateSelect={handleHistoryTemplate}
         selectedTemplateId={selectedTemplateId}
         title="Recent Templates"
-        description="Recently generated AI templates you can reuse"
+        description="Recently generated templates you can reuse"
       />
     </div>
   );

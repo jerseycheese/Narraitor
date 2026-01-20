@@ -259,7 +259,7 @@ export default function AttributeReviewStep({
               size="sm"
               data-testid="clear-ai-suggestions-button"
             >
-              Clear AI Suggestions
+              Clear Suggestions
             </Button>
           </div>
         )}
@@ -504,13 +504,13 @@ export default function AttributeReviewStep({
         <div className={wizardStyles.form.error}>{errors.attributes}</div>
       )}
 
-      {/* Clear AI Suggestions Confirmation Dialog */}
+      {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
           <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear Suggestions?</h3>
             <p className="text-sm text-gray-700 mb-4">
-              This will remove all AI-generated attribute suggestions. You can still add custom attributes or regenerate suggestions later.
+              This will remove all attribute suggestions. You can still add custom attributes or regenerate suggestions later.
             </p>
             <div className="flex justify-end gap-3">
               <Button

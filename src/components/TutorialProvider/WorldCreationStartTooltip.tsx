@@ -2,7 +2,6 @@
 
 import React from 'react';
 import type { TooltipRenderProps } from 'react-joyride';
-import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTutorial } from './useTutorial';
 
@@ -15,7 +14,6 @@ interface TourStepData {
 
 export function WorldCreationStartTooltip({
   backProps,
-  closeProps,
   index,
   isLastStep,
   primaryProps,
@@ -23,7 +21,7 @@ export function WorldCreationStartTooltip({
   step,
   tooltipProps,
 }: TooltipRenderProps) {
-  const { content, hideBackButton, hideCloseButton, hideFooter, showSkipButton, styles, title } =
+  const { content, hideBackButton, hideFooter, showSkipButton, styles, title } =
     step;
   const { pauseTour } = useTutorial();
 
@@ -51,12 +49,7 @@ export function WorldCreationStartTooltip({
   const primaryLabel =
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
-  const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip';
-
-  // Exclude positioning/sizing props from Joyride's buttonClose style
-  // since we apply our own positioning via Tailwind classes
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { top, right, width, height, padding, ...closeButtonStyle } = styles.buttonClose;
+  const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip world creation tutorial';
 
   return (
     <div
@@ -66,7 +59,7 @@ export function WorldCreationStartTooltip({
       style={styles.tooltip}
       {...tooltipProps}
     >
-      <div style={styles.tooltipContainer}>
+      <div style={styles.tooltipContainer} className="text-left">
         {title && <h1 style={styles.tooltipTitle}>{title}</h1>}
         <div style={styles.tooltipContent}>{content}</div>
       </div>
@@ -77,9 +70,8 @@ export function WorldCreationStartTooltip({
               <Button
                 aria-live="off"
                 data-test-id="button-skip"
-                style={styles.buttonSkip}
                 type="button"
-                variant="ghost"
+                variant="link"
                 size="sm"
                 {...skipProps}
               >
@@ -106,13 +98,13 @@ export function WorldCreationStartTooltip({
                 data-test-id="button-pause"
                 style={styles.buttonNext}
                 type="button"
-                aria-label="Got it!"
-                title="Got it!"
+                aria-label="Continue"
+                title="Continue"
                 variant="default"
                 size="sm"
                 onClick={handleContinueClick}
               >
-                Got it!
+                Continue
               </Button>
             ) : (
               <Button
@@ -128,19 +120,6 @@ export function WorldCreationStartTooltip({
             )}
           </div>
         </div>
-      )}
-      {!hideCloseButton && (
-        <Button
-          data-test-id="button-close"
-          style={closeButtonStyle}
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="absolute right-3 top-3 h-6 w-6 p-0 z-10"
-          {...closeProps}
-        >
-          <X className="w-3 h-3" />
-        </Button>
       )}
     </div>
   );

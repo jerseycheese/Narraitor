@@ -310,6 +310,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           disableOverlayClose={true}
           spotlightClicks={true}
           scrollOffset={joyrideOptions.scrollOffset}
+          locale={
+            activeTour === 'worldCreation'
+              ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
+              : undefined
+          }
         />
       )}
     </TutorialContext.Provider>

@@ -15,10 +15,12 @@ interface TutorialContentProps {
  */
 export function TutorialContent({ children, example }: TutorialContentProps) {
   return (
-    <div className="tutorial-content">
-      <p>{children}</p>
+    <div className="tutorial-content text-left">
+      <p className="text-left">{children}</p>
       {example && (
-        <p className="mt-2 text-xs text-muted-foreground italic">Example: {example}</p>
+        <p className="mt-2 text-xs text-muted-foreground italic text-left">
+          Example: {example}
+        </p>
       )}
     </div>
   );

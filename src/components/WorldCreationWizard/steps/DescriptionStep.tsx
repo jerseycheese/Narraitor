@@ -34,7 +34,7 @@ interface DescriptionStepProps {
 }
 
 const SUGGESTION_SOURCE_LABELS: Record<AIGuidanceSource, string> = {
-  ai: 'AI generated from your description',
+  ai: 'Generated from your description',
   fallback: 'Using fallback starter suggestions',
   template: 'Copied from the selected template',
   initial: 'Loaded from saved data',
@@ -85,7 +85,7 @@ export default function DescriptionStep({
           {canGenerateSuggestions ? (
             meetsAIMinimumLength
               ? 'Generate suggestions to see examples tailored to your description.'
-              : 'Add at least 50 characters so the AI can understand your world before generating suggestions.'
+              : 'Add at least 50 characters so we can understand your world before generating suggestions.'
           ) : 'Suggestions are pre-filled from your chosen template.'}
         </div>
       );
@@ -164,7 +164,7 @@ export default function DescriptionStep({
 
       <WizardFormSection
         title="Attribute & Skill Suggestions"
-        description="AI-generated suggestions for attributes and skills based on your world description."
+        description="Suggested attributes and skills based on your world description."
       >
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
@@ -187,8 +187,8 @@ export default function DescriptionStep({
               {hasAISuggestions && suggestionMeta?.source
                 ? SUGGESTION_SOURCE_LABELS[suggestionMeta.source]
                 : meetsAIMinimumLength
-                  ? 'AI suggestions need a detailed description to stay accurate.'
-                  : 'Once the description reaches 50+ characters, the AI can help with ideas.'}
+                  ? 'Suggestions need a detailed description to stay accurate.'
+                  : 'Once the description reaches 50+ characters, suggestions can help with ideas.'}
             </span>
           </div>
 
@@ -201,7 +201,7 @@ export default function DescriptionStep({
           {descriptionOutdated && (
             <Alert variant="warning" data-testid="ai-description-outdated" aria-live="polite">
               <AlertDescription>
-                Your description has changed since the last AI run. Regenerate suggestions to keep them aligned.
+                Your description has changed since the last generation. Regenerate suggestions to keep them aligned.
               </AlertDescription>
             </Alert>
           )}

@@ -79,7 +79,7 @@ export default function BasicInfoStep({
           <WizardFormGroup
             label="World Type"
             error={combinedErrors.relationship}
-            helpText="Pick how closely this world should track an existing setting. The choice controls whether the AI invents new canon or leans on established material."
+            helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
             <div className="space-y-4 my-4">
               <div className="flex items-start space-x-3">

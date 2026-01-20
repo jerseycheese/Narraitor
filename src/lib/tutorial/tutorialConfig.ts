@@ -13,6 +13,12 @@ export const joyrideStyles = {
     color: 'hsl(var(--card-foreground))',
     textAlign: 'left',
   },
+  tooltipContent: {
+    textAlign: 'left',
+  },
+  tooltipTitle: {
+    textAlign: 'left',
+  },
   buttonNext: {
     backgroundColor: 'hsl(var(--primary))',
     color: 'hsl(var(--primary-foreground))',
@@ -22,6 +28,9 @@ export const joyrideStyles = {
   },
   buttonSkip: {
     color: 'hsl(var(--muted-foreground))',
+  },
+  buttonClose: {
+    display: 'none',
   },
 };
 

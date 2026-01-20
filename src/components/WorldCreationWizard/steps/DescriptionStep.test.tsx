@@ -96,7 +96,7 @@ describe('DescriptionStep', () => {
     expect(screen.getByText(/Add at least 50 characters/i)).toBeInTheDocument();
 
     const textarea = screen.getByTestId('world-full-description');
-    const newDescription = 'This is now a much longer description that should satisfy the requirement for AI analysis.';
+    const newDescription = 'This is now a much longer description that should satisfy the suggestion requirements.';
     await userEvent.clear(textarea);
     await userEvent.type(textarea, newDescription);
 
@@ -108,14 +108,14 @@ describe('DescriptionStep', () => {
 
     render(
       <DescriptionStep
-        worldData={{ ...baseWorldData, description: 'A long enough description for the AI.' }}
+        worldData={{ ...baseWorldData, description: 'A long enough description for suggestions.' }}
         errors={{}}
         isProcessing={false}
         aiSuggestions={suggestions}
         suggestionMeta={{
           source: 'ai',
           generatedAt: '2025-10-01T12:00:00.000Z',
-          descriptionSnapshot: 'A long enough description for the AI.',
+          descriptionSnapshot: 'A long enough description for suggestions.',
         }}
         onUpdate={mockOnUpdate}
         onGenerateSuggestions={mockOnGenerate}

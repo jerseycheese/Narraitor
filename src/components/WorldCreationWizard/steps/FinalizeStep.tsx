@@ -141,7 +141,7 @@ export default function FinalizeStep({
           {onUpdateWorldData ? (
             <ImageGenerationSection
               title=""
-              description="Generate an AI image that represents your world. This will be displayed on world cards and as a hero image."
+              description="Generate a world image that represents your world. This will be displayed on world cards and as a hero image."
               currentImageUrl={worldData.image?.url}
               currentImageType={worldData.image?.type}
               generatedAt={worldData.image?.generatedAt}
