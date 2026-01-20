@@ -57,8 +57,9 @@
     "fastest-levenshtein": "^1.0.16",
     "lucide-react": "^0.548.0",
     "next": "^15.5.7",
-    "react": "^19.2.0",
+    "react": "^19.2.3",
     "react-dom": "^19.2.0",
+    "react-joyride": "^3.0.0-7",
     "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.8"
   },
@@ -86,6 +87,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-joyride": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "@vitest/browser": "^3.1.2",
@@ -116,6 +118,22 @@
     "typescript": "^5.9.3",
     "vite": "^6.0.7",
     "vitest": "^3.1.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "overrides": {
+    "react-joyride": {
+      "react": "$react",
+      "react-dom": "$react-dom",
+      "react-floater": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      }
+    }
   },
   "eslintConfig": {
     "extends": [
