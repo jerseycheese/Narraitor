@@ -1,6 +1,6 @@
 // src/lib/utils/characterArchetypes.ts
 
-import { World, CharacterArchetype } from '@/types/world.types.ts';
+import { World, CharacterArchetype } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { generateUniqueId } from './generateId';
 import { 

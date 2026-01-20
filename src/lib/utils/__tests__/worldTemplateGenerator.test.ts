@@ -1,8 +1,7 @@
 // src/lib/utils/__tests__/worldTemplateGenerator.test.ts
 
 import { generateWorldCharacterTemplates } from '../worldTemplateGenerator';
-import { World } from '@/types/world.types';
-import { CharacterArchetype } from '../characterArchetypes';
+import { World, CharacterArchetype } from '@/types/world.types';
 import * as characterArchetypes from '../characterArchetypes';
 import { createMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';
 
