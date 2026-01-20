@@ -5,9 +5,9 @@ import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joy
 import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
+import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
-import { TutorialTooltip } from './TutorialTooltip';
 
 type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
 
@@ -21,11 +21,9 @@ interface TutorialContextValue {
   prevStep: () => void;
   skipTour: () => void;
   resetTutorial: () => void;
-  refreshTourLayout: () => void;
   isTourActive: boolean;
   currentTour: TutorialPhase | null;
   stepIndex: number;
-  resetCount: number;
   setCurrentWizardStep: (step: number) => void;
 }
 
@@ -55,93 +53,6 @@ const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping
   }
 };
 
-const normalizeSteps = (steps: Step[], mapping?: Record<number, number>): Step[] => {
-  const endOfPageIndices = new Set<number>();
-
-  if (mapping) {
-    const lastStepByWizard = new Map<number, number>();
-    Object.entries(mapping).forEach(([tourIndex, wizardStep]) => {
-      const index = Number(tourIndex);
-      const current = lastStepByWizard.get(wizardStep);
-      if (current === undefined || index > current) {
-        lastStepByWizard.set(wizardStep, index);
-      }
-    });
-
-    lastStepByWizard.forEach((index) => endOfPageIndices.add(index));
-  }
-
-  return steps.map((step, index) => {
-    const existingData =
-      step.data && typeof step.data === 'object' ? (step.data as Record<string, unknown>) : {};
-    const shouldMarkEnd = endOfPageIndices.has(index);
-    const data = shouldMarkEnd && existingData.isEndOfPage === undefined
-      ? { ...existingData, isEndOfPage: true }
-      : existingData;
-    const hasData = Object.keys(data).length > 0;
-
-    return {
-      ...step,
-      disableBeacon: true,
-      data: hasData ? data : step.data,
-    };
-  });
-};
-
-const getTourTargetElement = (step?: Step | null): Element | null => {
-  if (!step) {
-    return null;
-  }
-
-  const target = step.target;
-
-  if (typeof target === 'string') {
-    try {
-      return document.querySelector(target);
-    } catch {
-      return null;
-    }
-  }
-
-  if (target instanceof Element) {
-    return target;
-  }
-
-  return null;
-};
-
-const getLayoutObservationTargets = (element: Element): Element[] => {
-  const targets = new Set<Element>();
-
-  targets.add(element);
-
-  const dialogContainer = element.closest('[role="dialog"]');
-  if (dialogContainer) {
-    targets.add(dialogContainer);
-  }
-
-  let current: Element | null = element.parentElement;
-  while (current) {
-    const style = window.getComputedStyle(current);
-    if (/(auto|scroll)/.test(style.overflowY)) {
-      targets.add(current);
-      break;
-    }
-    current = current.parentElement;
-  }
-
-  if (element.parentElement) {
-    targets.add(element.parentElement);
-  }
-
-  const scrollingElement = document.scrollingElement;
-  if (scrollingElement instanceof Element) {
-    targets.add(scrollingElement);
-  }
-
-  return Array.from(targets);
-};
-
 interface TutorialProviderProps {
   children: ReactNode;
 }
@@ -153,15 +64,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [pauseReason, setPauseReason] = useState<PauseReason>(null);
   const [stepIndex, setStepIndex] = useState(0);
-  const [resetCount, setResetCount] = useState(0);
-  const [layoutRefreshKey, setLayoutRefreshKey] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
-  const layoutRafRef = useRef<number | null>(null);
-  const lastLayoutRectRef = useRef<DOMRect | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
 
@@ -180,108 +87,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
-  const refreshTourLayout = useCallback(() => {
-    if (!run && !isPaused) {
-      return;
-    }
-    setLayoutRefreshKey((count) => count + 1);
-  }, [run, isPaused]);
-
-  useEffect(() => {
-    if (!run || isPaused) {
-      return undefined;
-    }
-
-    const step = steps[stepIndex];
-    const targetElement = getTourTargetElement(step);
-
-    if (!step || !targetElement) {
-      return undefined;
-    }
-
-    lastLayoutRectRef.current = targetElement.getBoundingClientRect();
-    let isActive = true;
-
-    const scheduleLayoutRefresh = () => {
-      if (!isActive) {
-        return;
-      }
-
-      if (layoutRafRef.current !== null) {
-        return;
-      }
-
-      layoutRafRef.current = window.requestAnimationFrame(() => {
-        layoutRafRef.current = null;
-
-        if (!isActive) {
-          return;
-        }
-
-        const currentTarget = getTourTargetElement(step);
-        if (!currentTarget) {
-          return;
-        }
-
-        const rect = currentTarget.getBoundingClientRect();
-        const previousRect = lastLayoutRectRef.current;
-        const hasChanged = !previousRect
-          || rect.top !== previousRect.top
-          || rect.left !== previousRect.left
-          || rect.width !== previousRect.width
-          || rect.height !== previousRect.height;
-
-        lastLayoutRectRef.current = rect;
-
-        if (hasChanged) {
-          refreshTourLayout();
-        }
-      });
-    };
-
-    const observationTargets = getLayoutObservationTargets(targetElement);
-    const resizeObserver = typeof ResizeObserver !== 'undefined'
-      ? new ResizeObserver(scheduleLayoutRefresh)
-      : null;
-
-    observationTargets.forEach((target) => resizeObserver?.observe(target));
-
-    const mutationRoot = observationTargets[0] ?? targetElement;
-    const mutationObserver = typeof MutationObserver !== 'undefined'
-      ? new MutationObserver(scheduleLayoutRefresh)
-      : null;
-
-    mutationObserver?.observe(mutationRoot, {
-      attributes: true,
-      attributeFilter: ['class', 'style', 'hidden', 'aria-hidden'],
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      isActive = false;
-      if (layoutRafRef.current !== null) {
-        window.cancelAnimationFrame(layoutRafRef.current);
-        layoutRafRef.current = null;
-      }
-      resizeObserver?.disconnect();
-      mutationObserver?.disconnect();
-    };
-  }, [run, isPaused, steps, stepIndex, refreshTourLayout]);
-
   const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
-    if (typeof window !== 'undefined' && (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__) {
-      return;
-    }
-    // Disable tutorial in E2E testing environments
-    if (process.env.NEXT_PUBLIC_DISABLE_TUTORIAL === 'true') {
-      return;
-    }
-
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
-    const normalizedSteps = normalizeSteps(loadedSteps, mapping);
     
-    if (normalizedSteps.length > 0) {
+    if (loadedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
       const phaseData = tutorialProgress.phases[tourId];
       const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
@@ -299,7 +108,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }
 
-      setSteps(normalizedSteps);
+      setSteps(loadedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
       setPauseReason(null);
@@ -345,17 +154,14 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const resumeTour = useCallback(async () => {
     // Re-load steps to ensure they are fresh and correctly targeted
     if (activeTour) {
-      const { steps: loadedSteps, mapping } = await loadTour(activeTour);
-      if (mapping) {
-        setStepMapping(mapping);
-      }
-      setSteps(normalizeSteps(loadedSteps, mapping ?? stepMapping));
+      const { steps: loadedSteps } = await loadTour(activeTour);
+      setSteps(loadedSteps);
     }
     setRun(true);
     setIsPaused(false);
     setPauseReason(null);
     missingTargetRef.current = null;
-  }, [activeTour, stepMapping]);
+  }, [activeTour]);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, type, index, action } = data;
@@ -398,7 +204,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (activeTour !== 'worldCreation' && activeTour !== 'characterCreation') return;
+      if (activeTour !== 'worldCreation') return;
       const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
       if (stepData?.skipIfMissing) {
         const direction = action === ACTIONS.PREV ? -1 : 1;
@@ -412,7 +218,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const isSameWizardStep = mappedWizardStep === currentWizardStep;
       const target = steps[index]?.target;
 
-      if (isSameWizardStep || activeTour === 'characterCreation') {
+      if (isSameWizardStep) {
         missingTargetRef.current = {
           index,
           target: typeof target === 'string' ? target : null,
@@ -437,7 +243,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   // Sync tour with wizard (only when the wizard actually changes steps)
   useEffect(() => {
-    if (!isPaused || pauseReason !== 'missing-target' || (activeTour !== 'worldCreation' && activeTour !== 'characterCreation')) return;
+    if (!isPaused || pauseReason !== 'missing-target' || activeTour !== 'worldCreation') return;
     const missingTarget = missingTargetRef.current;
     if (!missingTarget?.target) return;
 
@@ -521,7 +327,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     resetStoreProgress();
     stopTour();
     setStepIndex(0);
-    setResetCount(count => count + 1);
   }, [resetStoreProgress, stopTour]);
 
   const nextStep = useCallback(() => {
@@ -553,17 +358,16 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       prevStep,
       skipTour,
       resetTutorial,
-      refreshTourLayout,
       isTourActive: run || isPaused,
       currentTour: activeTour,
       stepIndex,
-      resetCount,
       setCurrentWizardStep,
     }}>
       {children}
+      <TutorialProgressWidget />
       {steps.length > 0 && run && (
         <Joyride
-          key={`${activeTour}-${isPaused}-${layoutRefreshKey}`}
+          key={`${activeTour}-${isPaused}`}
           steps={steps}
           run={!isPaused}
           stepIndex={stepIndex}
@@ -577,7 +381,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           disableOverlayClose={true}
           spotlightClicks={true}
           scrollOffset={joyrideOptions.scrollOffset}
-          tooltipComponent={TutorialTooltip}
           locale={
             activeTour === 'worldCreation'
               ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
