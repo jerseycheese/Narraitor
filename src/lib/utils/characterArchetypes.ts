@@ -1,6 +1,6 @@
 // src/lib/utils/characterArchetypes.ts
 
-import { World } from '@/types/world.types';
+import { World, CharacterArchetype } from '@/types/world.types.ts';
 import { GenreValue } from '@/lib/constants/genres';
 import { generateUniqueId } from './generateId';
 import { 
@@ -8,30 +8,6 @@ import {
   PHYSICAL_DESCRIPTION_TEMPLATES, 
   ArchetypeTemplate as ImportedArchetypeTemplate 
 } from '@/lib/constants/characterArchetypeTemplates';
-
-export interface CharacterArchetype {
-  id: string;
-  name: string;
-  description: string;
-  level: number;
-  attributes: Array<{
-    id: string;
-    name: string;
-    value: number;
-  }>;
-  skills: Array<{
-    id: string;
-    name: string;
-    level: number;
-  }>;
-  background: {
-    description: string;
-    personality: string;
-    motivation: string;
-    fears: string[];
-    physicalDescription?: string;
-  };
-}
 
 export type ArchetypeTemplate = ImportedArchetypeTemplate;
 

@@ -4,8 +4,7 @@
 
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { World } from '@/types/world.types';
-import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+import { World, CharacterArchetype } from '@/types/world.types';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
