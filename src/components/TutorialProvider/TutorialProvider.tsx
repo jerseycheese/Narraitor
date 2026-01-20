@@ -60,6 +60,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
+  const prevStepIndexRef = useRef<number | null>(null);
+  const lastStepIndexRef = useRef<number | null>(null);
 
   const { 
     tutorialProgress, 
@@ -80,20 +82,47 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
     
     if (loadedSteps.length > 0) {
+      // If resuming, check last step from store if not provided explicitly
+      const phaseData = tutorialProgress.phases[tourId];
+      const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
+
+      if (tourId === 'worldCreation' && mapping && initialStepIndex === 0) {
+        const stepIndices = Object.entries(mapping)
+          .filter((entry) => entry[1] === currentWizardStep)
+          .map((entry) => parseInt(entry[0], 10));
+        const maxIndexForWizardStep = stepIndices.length > 0
+          ? Math.max(...stepIndices)
+          : null;
+
+        if (maxIndexForWizardStep !== null && lastStep >= maxIndexForWizardStep) {
+          return;
+        }
+      }
+
       setSteps(loadedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
       setPauseReason(null);
-      
-      // If resuming, check last step from store if not provided explicitly
-      const phaseData = tutorialProgress.phases[tourId];
-      const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
-      setStepIndex(initialStepIndex > 0 ? initialStepIndex : lastStep);
+
+      let nextStepIndex = initialStepIndex > 0 ? initialStepIndex : lastStep;
+
+      if (tourId === 'worldCreation' && mapping) {
+        const mappedWizardStep = mapping[nextStepIndex];
+        if (mappedWizardStep !== currentWizardStep) {
+          const mappedEntry = Object.entries(mapping)
+            .find((entry) => entry[1] === currentWizardStep);
+          if (mappedEntry) {
+            nextStepIndex = parseInt(mappedEntry[0], 10);
+          }
+        }
+      }
+
+      setStepIndex(nextStepIndex);
       
       setRun(true);
       setIsPaused(false);
     }
-  }, [tutorialProgress.phases]);
+  }, [tutorialProgress.phases, currentWizardStep]);
 
   const stopTour = useCallback(() => {
     setSteps([]);
@@ -142,6 +171,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }
       setActiveTour(null);
+    } else if (type === EVENTS.STEP_BEFORE && action === ACTIONS.PREV) {
+      // Some Joyride versions emit STEP_BEFORE on back; keep stepIndex in sync.
+      setStepIndex(index);
     } else if (type === EVENTS.STEP_AFTER) {
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
@@ -153,8 +185,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       if (activeTour !== 'worldCreation') return;
       const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
       if (stepData?.skipIfMissing) {
-        const nextIndex = index + 1;
-        if (nextIndex < steps.length) {
+        const direction = action === ACTIONS.PREV ? -1 : 1;
+        const nextIndex = index + direction;
+        if (nextIndex >= 0 && nextIndex < steps.length) {
           setStepIndex(nextIndex);
         }
         return;
@@ -247,6 +280,60 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
   }, [currentWizardStep, activeTour, stepMapping, run, stepIndex, isPaused, resumeTour]);
 
+  useEffect(() => {
+    prevStepIndexRef.current = lastStepIndexRef.current;
+    lastStepIndexRef.current = stepIndex;
+  }, [stepIndex]);
+
+  useEffect(() => {
+    if (!run || !steps[stepIndex]) return;
+    const stepData = steps[stepIndex]?.data as { autoScroll?: boolean | 'down' | 'up' } | undefined;
+    if (!stepData?.autoScroll) return;
+    const prevIndex = prevStepIndexRef.current;
+    const isForward = prevIndex === null || stepIndex > prevIndex;
+    const isBackward = prevIndex !== null && stepIndex < prevIndex;
+    if (!isForward && !isBackward) return;
+    const target = steps[stepIndex].target;
+    if (typeof target !== 'string') return;
+    const element = document.querySelector(target);
+    if (!element) return;
+    const getScrollParent = (node: Element | null) => {
+      let current = node?.parentElement || null;
+      while (current) {
+        const style = window.getComputedStyle(current);
+        if (/(auto|scroll)/.test(style.overflowY)) {
+          return current;
+        }
+        current = current.parentElement;
+      }
+      return document.scrollingElement instanceof HTMLElement ? document.scrollingElement : null;
+    };
+
+    const scrollParent = getScrollParent(element);
+    const parentRect = scrollParent?.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
+    const topBoundary = parentRect?.top ?? 0;
+    const bottomBoundary = parentRect?.bottom ?? (window.innerHeight || document.documentElement.clientHeight);
+    const isAbove = rect.top < topBoundary;
+    const isBelow = rect.bottom > bottomBoundary;
+
+    if (stepData.autoScroll === 'down') {
+      if (!isForward) return;
+      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+
+    if (stepData.autoScroll === 'up') {
+      if (!isBackward) return;
+      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+
+    if (isForward && !isBelow) return;
+    if (isBackward && !isAbove) return;
+    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [run, steps, stepIndex]);
+
   const setCurrentWizardStep = useCallback((step: number) => {
     setCurrentWizardStepState(step);
   }, []);
@@ -315,6 +402,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
               ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
               : undefined
           }
+          styles={joyrideStyles}
         />
       )}
     </TutorialContext.Provider>

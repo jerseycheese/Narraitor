@@ -10,6 +10,7 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="create-own-world-btn"]',
@@ -41,6 +42,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'right',
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="genre-picker"]',
@@ -78,6 +80,8 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
+    data: { autoScroll: true },
   },
   {
     target: '[data-tutorial="tone-narrative-style"]',
@@ -87,6 +91,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="tone-language-complexity"]',
@@ -96,6 +101,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="tone-custom-instructions"]',
@@ -106,6 +112,7 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
+    disableScrolling: true,
     data: { isEndOfPage: true },
   },
   {
@@ -116,6 +123,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="ai-suggestions-actions"]',
@@ -124,6 +132,8 @@ export const worldCreationTour: Step[] = [
       example: 'A cyberpunk world might suggest "Hacking" and "Street Cred"',
     }),
     placement: 'top',
+    offset: 12,
+    spotlightPadding: 8,
     disableBeacon: true,
   },
   {
@@ -132,6 +142,7 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
+    disableScrolling: true,
     data: { isEndOfPage: true },
   },
   {
@@ -142,6 +153,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="attribute-suggestions"]',
@@ -160,6 +172,8 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
+    data: { autoScroll: 'down' },
   },
   {
     target: '[data-tutorial="attribute-summary"]',
@@ -167,6 +181,7 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
+    disableScrolling: true,
     data: { isEndOfPage: true },
   },
   {
@@ -177,6 +192,7 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="skill-suggestions"]',
@@ -184,7 +200,8 @@ export const worldCreationTour: Step[] = [
       children: 'Review the suggested skills and tweak them.',
       example: 'Rename "Melee Combat" to "Blade Dancing" for a unique feel',
     }),
-    placement: 'top',
+    placement: 'bottom',
+    offset: 12,
     disableBeacon: true,
   },
   {
@@ -195,6 +212,9 @@ export const worldCreationTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
+    scrollToFirstStep: true,
+    data: { autoScroll: 'down' },
   },
   {
     target: '[data-tutorial="skill-summary"]',
@@ -202,6 +222,7 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
+    disableScrolling: true,
     data: { isEndOfPage: true },
   },
   {
@@ -209,6 +230,7 @@ export const worldCreationTour: Step[] = [
     content: 'Review the core world details before you finalize.',
     placement: 'top',
     disableBeacon: true,
+    hideBackButton: true,
   },
   {
     target: '[data-tutorial="finalize-image"]',
@@ -221,18 +243,22 @@ export const worldCreationTour: Step[] = [
     content: 'Double-check the attributes you\'ve chosen. You can still go back to make changes.',
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="finalize-skills"]',
     content: 'Confirm the skills list before creating the world. You can still go back to make changes.',
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
+    data: { autoScroll: 'down' },
   },
   {
     target: '[data-tutorial="finalize-world"]',
     content: 'Review your world details and create it! You\'re just one step away from your adventure.',
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
 ];
 

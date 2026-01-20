@@ -19,6 +19,9 @@ export const joyrideStyles = {
   tooltipTitle: {
     textAlign: 'left',
   },
+  spotlight: {
+    pointerEvents: 'none',
+  },
   buttonNext: {
     backgroundColor: 'hsl(var(--primary))',
     color: 'hsl(var(--primary-foreground))',
@@ -27,7 +30,10 @@ export const joyrideStyles = {
     color: 'hsl(var(--muted-foreground))',
   },
   buttonSkip: {
-    color: 'hsl(var(--muted-foreground))',
+    color: 'hsl(var(--primary))',
+    textDecoration: 'underline',
+    backgroundColor: 'transparent',
+    padding: 0,
   },
   buttonClose: {
     display: 'none',
@@ -39,6 +45,6 @@ export const joyrideOptions = {
   scrollToFirstStep: true,
   showProgress: false,
   showSkipButton: true,
-  disableScrolling: true,
+  disableScrolling: false,
   scrollOffset: 150,
 };

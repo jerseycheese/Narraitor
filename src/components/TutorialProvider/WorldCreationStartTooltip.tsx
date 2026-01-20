@@ -4,6 +4,7 @@ import React from 'react';
 import type { TooltipRenderProps } from 'react-joyride';
 import { Button } from '@/components/ui/button';
 import { useTutorial } from './useTutorial';
+import { useSessionStore } from '@/state/sessionStore';
 
 const CONTINUE_LABEL = 'Continue';
 
@@ -24,6 +25,7 @@ export function WorldCreationStartTooltip({
   const { content, hideBackButton, hideFooter, showSkipButton, styles, title } =
     step;
   const { pauseTour } = useTutorial();
+  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
 
   // Don't advance Joyride - the wizard-to-tour sync in TutorialProvider
   // will update the step index when the user advances through the wizard UI.
@@ -32,6 +34,7 @@ export function WorldCreationStartTooltip({
   const handleContinueClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    updateTutorialProgress('worldCreation', { lastStep: index });
     // Hide tooltip, keep tour state
     pauseTour('end-of-page');
   };
@@ -50,6 +53,7 @@ export function WorldCreationStartTooltip({
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
   const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip world creation tutorial';
+  const { style: _skipStyle, className: skipClassName, ...skipButtonProps } = skipProps;
 
   return (
     <div
@@ -73,7 +77,8 @@ export function WorldCreationStartTooltip({
                 type="button"
                 variant="link"
                 size="sm"
-                {...skipProps}
+                className={skipClassName ? `p-0 h-auto ${skipClassName}` : 'p-0 h-auto'}
+                {...skipButtonProps}
               >
                 {skipLabel}
               </Button>
