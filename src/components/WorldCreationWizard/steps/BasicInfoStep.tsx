@@ -60,21 +60,20 @@ export default function BasicInfoStep({
           />
         </WizardFormGroup>
 
-        <div data-tutorial="genre-picker">
-          <WizardFormGroup
-            label="Genre"
-            required
-            helpText={guidance.tagline}
-          >
-            <WizardSelect
-              value={worldData.genre || ''}
-              onChange={(value) => onUpdate({ ...worldData, genre: value as GenreValue })}
-              options={GENRE_OPTIONS}
-              placeholder="Choose a genre..."
-              testId="world-genre-select"
-            />
-          </WizardFormGroup>
-        </div>
+        <WizardFormGroup
+          label="Genre"
+          required
+          helpText={guidance.tagline}
+        >
+          <WizardSelect
+            value={worldData.genre || ''}
+            onChange={(value) => onUpdate({ ...worldData, genre: value as GenreValue })}
+            options={GENRE_OPTIONS}
+            placeholder="Choose a genre..."
+            testId="world-genre-select"
+            dataTutorial="genre-picker"
+          />
+        </WizardFormGroup>
 
         <div data-tutorial="world-type">
           <WizardFormGroup
@@ -149,28 +148,27 @@ export default function BasicInfoStep({
         </div>
 
         {worldData.relationship && (
-          <div data-tutorial="world-reference">
-            <WizardFormGroup
-              label="Existing Setting"
+          <WizardFormGroup
+            label="Existing Setting"
+            error={combinedErrors.reference}
+            required
+            helpText="Name the fictional universe (e.g., Star Wars, Forgotten Realms), era (e.g., Victorian London, Ancient Rome), or reference material. This helps produce examples that match the tone and canon."
+          >
+            <WizardTextField
+              value={worldData.reference || ''}
+              onChange={(value) => onUpdate({ ...worldData, reference: value })}
+              placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York"
               error={combinedErrors.reference}
-              required
-              helpText="Name the fictional universe (e.g., Star Wars, Forgotten Realms), era (e.g., Victorian London, Ancient Rome), or reference material the AI should respect. This helps us produce examples that match the tone and canon."
-            >
-              <WizardTextField
-                value={worldData.reference || ''}
-                onChange={(value) => onUpdate({ ...worldData, reference: value })}
-                placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York"
-                error={combinedErrors.reference}
-                testId="world-reference-input"
-              />
-              <div className="text-sm text-gray-500 mt-1">
-                {worldData.relationship === 'set_within' 
-                  ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
-                  : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
-                }
-              </div>
-            </WizardFormGroup>
-          </div>
+              testId="world-reference-input"
+              dataTutorial="world-reference"
+            />
+            <div className="text-sm text-gray-500 mt-1">
+              {worldData.relationship === 'set_within'
+                ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
+                : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
+              }
+            </div>
+          </WizardFormGroup>
         )}
       </WizardFormSection>
 

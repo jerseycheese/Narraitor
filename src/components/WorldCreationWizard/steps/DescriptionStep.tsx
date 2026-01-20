@@ -140,27 +140,26 @@ export default function DescriptionStep({
         title="Describe Your World"
         description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects. This will help us suggest appropriate attributes and skills."
       >
-        <div data-tutorial="world-description">
-          <WizardFormGroup
-            label="Full Description"
+        <WizardFormGroup
+          label="Full Description"
+          error={errors.description}
+          required
+          helpText={guidance.descriptionPrompt}
+        >
+          <WizardTextArea
+            value={description}
+            onChange={handleDescriptionChange}
+            placeholder="Describe your world in detail..."
+            rows={12}
             error={errors.description}
-            required
-            helpText={guidance.descriptionPrompt}
-          >
-            <WizardTextArea
-              value={description}
-              onChange={handleDescriptionChange}
-              placeholder="Describe your world in detail..."
-              rows={12}
-              error={errors.description}
-              disabled={isProcessing}
-              testId="world-full-description"
-            />
-            <div className="mt-1 text-right text-sm" data-testid="description-char-count">
-              {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
-            </div>
-          </WizardFormGroup>
-        </div>
+            disabled={isProcessing}
+            testId="world-full-description"
+            dataTutorial="world-description"
+          />
+          <div className="mt-1 text-right text-sm" data-testid="description-char-count">
+            {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
+          </div>
+        </WizardFormGroup>
       </WizardFormSection>
 
       <WizardFormSection
@@ -168,7 +167,7 @@ export default function DescriptionStep({
         description="AI-generated suggestions for attributes and skills based on your world description."
       >
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3" data-tutorial="ai-suggestions-actions">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               type="button"
               onClick={() => {
@@ -176,6 +175,7 @@ export default function DescriptionStep({
               }}
               disabled={!canTriggerGeneration}
               data-testid="generate-ai-suggestions"
+              data-tutorial="ai-suggestions-actions"
             >
               {isProcessing
                 ? 'Analyzing description...'

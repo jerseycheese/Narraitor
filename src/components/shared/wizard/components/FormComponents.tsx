@@ -91,6 +91,7 @@ interface WizardTextAreaProps {
   rows?: number;
   maxLength?: number;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
@@ -103,6 +104,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
   rows = 4,
   maxLength,
   testId,
+  dataTutorial,
 }) => {
   return (
     <Textarea
@@ -115,6 +117,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
       maxLength={maxLength}
       className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     />
   );
 };
@@ -128,6 +131,7 @@ interface WizardSelectProps {
   error?: string;
   disabled?: boolean;
   testId?: string;
+  dataTutorial?: string;
 }
 
 export const WizardSelect: React.FC<WizardSelectProps> = ({
@@ -139,6 +143,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
   error,
   disabled = false,
   testId,
+  dataTutorial,
 }) => {
   return (
     <select
@@ -148,6 +153,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
       disabled={disabled}
       className={`${wizardStyles.form.select} ${error ? wizardStyles.form.inputError : ''}`}
       data-testid={testId}
+      data-tutorial={dataTutorial}
     >
       <option value="" disabled>
         {placeholder}
