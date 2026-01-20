@@ -11,6 +11,7 @@ export const joyrideStyles = {
     backgroundColor: 'hsl(var(--card))',
     borderRadius: 'var(--radius)',
     color: 'hsl(var(--card-foreground))',
+    textAlign: 'left',
   },
   buttonNext: {
     backgroundColor: 'hsl(var(--primary))',
