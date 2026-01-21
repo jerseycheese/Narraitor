@@ -88,6 +88,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   }, [isPaused]);
 
   const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
+    // Disable tutorial in E2E testing environments
+    if (process.env.NEXT_PUBLIC_DISABLE_TUTORIAL === 'true') {
+      return;
+    }
+
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
     
     if (loadedSteps.length > 0) {
