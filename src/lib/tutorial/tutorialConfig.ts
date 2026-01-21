@@ -3,6 +3,7 @@ export const joyrideStyles = {
     primaryColor: 'hsl(var(--primary))',
     backgroundColor: 'hsl(var(--background))',
     textColor: 'hsl(var(--foreground))',
+    arrowColor: 'hsl(var(--card))',
     // eslint-disable-next-line design-tokens/no-hardcoded-colors
     overlayColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 10000,
