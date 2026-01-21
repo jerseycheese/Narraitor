@@ -12,8 +12,7 @@ const config = {
   ],
   addons: [
     '@storybook/addon-essentials',
-    '@storybook/addon-a11y',
-    '@storybook/addon-styling-webpack'
+    '@storybook/addon-a11y'
   ],
   framework: {
     name: '@storybook/nextjs',
