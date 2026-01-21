@@ -20,17 +20,21 @@ export function TutorialProgressWidget() {
   const { tutorialProgress } = useSessionStore();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
-  const isPhaseFinished = (phase: TutorialPhase) => {
+  const phaseStates = PHASES.map((phase) => {
     const data = tutorialProgress.phases[phase];
-    return data.completed || data.skipped;
-  };
+    return {
+      phase,
+      data,
+      isFinished: data.completed || data.skipped,
+    };
+  });
 
   // Don't show if all relevant phases are completed or skipped
-  const allFinished = PHASES.every(isPhaseFinished);
+  const allFinished = phaseStates.every(({ isFinished }) => isFinished);
   if (allFinished) return null;
 
-  const finishedCount = PHASES.filter(isPhaseFinished).length;
-  const progressValue = (finishedCount / PHASES.length) * 100;
+  const finishedCount = phaseStates.filter(({ isFinished }) => isFinished).length;
+  const progressValue = (finishedCount / phaseStates.length) * 100;
 
   return (
     <div 
@@ -85,9 +89,8 @@ export function TutorialProgressWidget() {
           </div>
           
           <div className="space-y-3">
-            {PHASES.map((phase) => {
-              const isFinished = isPhaseFinished(phase);
-              const isSkipped = tutorialProgress.phases[phase].skipped;
+            {phaseStates.map(({ phase, data, isFinished }) => {
+              const isSkipped = data.skipped;
               return (
                 <div key={phase} className="flex items-center gap-3">
                   {isFinished ? (
