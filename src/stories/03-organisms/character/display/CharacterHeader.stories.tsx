@@ -6,7 +6,6 @@ type StoreCharacter = ReturnType<
   typeof useCharacterStore.getState
 >['characters'][string];
 import { World } from '@/types/world.types';
-import { getTimestamp } from '@/lib/utils';
 const meta = {
   title: '03-Organisms/character/display/CharacterHeader',
   component: CharacterHeader,
