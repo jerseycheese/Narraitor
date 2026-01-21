@@ -99,7 +99,9 @@ export function QuickPlay() {
   };
 
   // Show guided experience for first-time users using store methods
-  const showOnboarding = shouldShowOnboarding();
+  const showOnboarding = typeof shouldShowOnboarding === 'function'
+    ? shouldShowOnboarding()
+    : (Object.keys(actualSavedSessions).length === 0);
     
   if (showOnboarding) {
     return <GuidedFirstTimeExperience />;

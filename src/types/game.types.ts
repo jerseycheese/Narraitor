@@ -108,7 +108,7 @@ export interface SessionStore {
   recordAutoSave: (timestamp: string) => void;
   
   // Tutorial actions
-  updateTutorialProgress: (phase: import('./tutorial.types').TutorialPhase, updates: Partial<import('./tutorial.types').TutorialProgress['phases']['intro']>) => void;
+  updateTutorialProgress: (phase: import('./tutorial.types').TutorialPhase, updates: Partial<{ completed: boolean; skipped: boolean; lastStep: number }>) => void;
   dismissTutorialHint: (hintId: string) => void;
   resetTutorialProgress: () => void;
   completeTutorialPhase: (phase: import('./tutorial.types').TutorialPhase) => void;
