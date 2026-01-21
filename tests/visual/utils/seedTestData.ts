@@ -252,11 +252,21 @@ export async function seedTestData(page: Page): Promise<void> {
               },
               {}
             ),
-            onboardingCompleted: true,
+            tutorialProgress: {
+              phases: {
+                intro: { completed: true, skipped: false },
+                worldCreation: { completed: true, skipped: false, lastStep: 6 },
+                worldGeneration: { completed: true, skipped: false, lastStep: 0 },
+                characterCreation: { completed: true, skipped: false, lastStep: 5 },
+                firstPlay: { completed: true, skipped: false },
+              },
+              dismissedHints: [],
+              lastActiveStep: null,
+            },
             error: null,
             loading: false,
           },
-          version: 2,
+          version: 4,
         },
         narrative: {
           state: {
@@ -438,7 +448,17 @@ export async function seedTestData(page: Page): Promise<void> {
           savedSessions: Object.keys(state?.savedSessions || {}).length
             ? state.savedSessions
             : savedSessions,
-          onboardingCompleted: true,
+          tutorialProgress: {
+            phases: {
+              intro: { completed: true, skipped: false },
+              worldCreation: { completed: true, skipped: false, lastStep: 6 },
+              worldGeneration: { completed: true, skipped: false, lastStep: 0 },
+              characterCreation: { completed: true, skipped: false, lastStep: 5 },
+              firstPlay: { completed: true, skipped: false },
+            },
+            dismissedHints: [],
+            lastActiveStep: null,
+          },
           id: primarySessionId ?? state?.id ?? null,
           currentSessionId: primarySessionId ?? state?.currentSessionId ?? null,
           worldId: primaryWorldId ?? state?.worldId ?? null,
