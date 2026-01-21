@@ -14,18 +14,23 @@ const PHASE_LABELS: Record<TutorialPhase, string> = {
   firstPlay: 'First Session',
 };
 
-const PHASES: TutorialPhase[] = ['worldCreation', 'characterCreation', 'firstPlay'];
+const PHASES: TutorialPhase[] = ['worldCreation', 'worldGeneration', 'characterCreation', 'firstPlay'];
 
 export function TutorialProgressWidget() {
   const { tutorialProgress } = useSessionStore();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
-  // Don't show if all relevant phases are completed
-  const allCompleted = PHASES.every(p => tutorialProgress.phases[p].completed);
-  if (allCompleted) return null;
+  const isPhaseFinished = (phase: TutorialPhase) => {
+    const data = tutorialProgress.phases[phase];
+    return data.completed || data.skipped;
+  };
 
-  const completedCount = PHASES.filter(p => tutorialProgress.phases[p].completed).length;
-  const progressValue = (completedCount / PHASES.length) * 100;
+  // Don't show if all relevant phases are completed or skipped
+  const allFinished = PHASES.every(isPhaseFinished);
+  if (allFinished) return null;
+
+  const finishedCount = PHASES.filter(isPhaseFinished).length;
+  const progressValue = (finishedCount / PHASES.length) * 100;
 
   return (
     <div 
@@ -61,7 +66,7 @@ export function TutorialProgressWidget() {
             />
           </svg>
           <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
-            {completedCount}/{PHASES.length}
+            {finishedCount}/{PHASES.length}
           </span>
         </div>
       ) : (
@@ -81,19 +86,21 @@ export function TutorialProgressWidget() {
           
           <div className="space-y-3">
             {PHASES.map((phase) => {
-              const isCompleted = tutorialProgress.phases[phase].completed;
+              const isFinished = isPhaseFinished(phase);
+              const isSkipped = tutorialProgress.phases[phase].skipped;
               return (
                 <div key={phase} className="flex items-center gap-3">
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  {isFinished ? (
+                    <CheckCircle2 className={cn("w-4 h-4", isSkipped ? "text-gray-400" : "text-green-500")} />
                   ) : (
                     <Circle className="w-4 h-4 text-gray-300" />
                   )}
                   <span className={cn(
                     "text-xs",
-                    isCompleted ? "text-gray-400 line-through" : "text-gray-700"
+                    isFinished ? "text-gray-400 line-through" : "text-gray-700"
                   )}>
                     {PHASE_LABELS[phase]}
+                    {isSkipped && <span className="ml-1 text-[10px] no-underline">(skipped)</span>}
                   </span>
                 </div>
               );
