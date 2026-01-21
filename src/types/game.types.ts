@@ -72,7 +72,7 @@ export interface SessionStore {
   sessionLifecycle: Record<string, SessionLifecycleMetadata>;
   templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
-  onboardingCompleted: boolean;
+  tutorialProgress: import('./tutorial.types').TutorialProgress;
   narrativeHeight: number; // Persisted height for narrative container
 
   // Actions
@@ -107,8 +107,14 @@ export interface SessionStore {
   updateAutoSaveStatus: (status: AutoSaveState['status'], errorMessage?: string) => void;
   recordAutoSave: (timestamp: string) => void;
   
-  // Onboarding actions
-  setOnboardingCompleted: (completed: boolean) => void;
+  // Tutorial actions
+  updateTutorialProgress: (phase: import('./tutorial.types').TutorialPhase, updates: Partial<import('./tutorial.types').TutorialProgress['phases']['intro']>) => void;
+  dismissTutorialHint: (hintId: string) => void;
+  resetTutorialProgress: () => void;
+  completeTutorialPhase: (phase: import('./tutorial.types').TutorialPhase) => void;
+  shouldShowTutorialPhase: (phase: import('./tutorial.types').TutorialPhase) => boolean;
+  isTutorialComplete: () => boolean;
+  getCurrentTutorialPhase: () => import('./tutorial.types').TutorialPhase | null;
   isFirstTimeUser: () => boolean;
   shouldShowOnboarding: () => boolean;
 }

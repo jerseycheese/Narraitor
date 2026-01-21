@@ -24,12 +24,10 @@ export function QuickPlay() {
   const savedSessions = useSessionStore(state => state.savedSessions);
   const resumeSavedSession = useSessionStore(state => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
-  const onboardingCompleted = useSessionStore(state => state.onboardingCompleted);
   const fixExistingSessionNarrativeCounts = useSessionStore(state => state.fixExistingSessionNarrativeCounts);
   const actualWorlds = worlds;
   const actualCharacters = characters;
   const actualSavedSessions = savedSessions;
-  const actualOnboardingCompleted = onboardingCompleted;
   
   // Fix existing session narrative counts on component mount
   useEffect(() => {
@@ -101,9 +99,7 @@ export function QuickPlay() {
   };
 
   // Show guided experience for first-time users using store methods
-  const showOnboarding = shouldShowOnboarding
-    ? shouldShowOnboarding()
-    : (Object.keys(actualSavedSessions).length === 0 && !actualOnboardingCompleted);
+  const showOnboarding = shouldShowOnboarding();
     
   if (showOnboarding) {
     return <GuidedFirstTimeExperience />;

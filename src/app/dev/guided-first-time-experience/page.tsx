@@ -6,15 +6,19 @@ import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { setOnboardingCompleted, onboardingCompleted, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
+  const { completeTutorialPhase, resetTutorialProgress, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
+  
+  // Use isFirstTimeUser as the indicator for onboarding status (inverted: true = not completed)
+  // Or check shouldShowOnboarding directly
+  const isCompleted = !shouldShowOnboarding();
 
   const handleReset = () => {
-    setOnboardingCompleted(false);
+    resetTutorialProgress();
     setResetKey(prev => prev + 1);
   };
 
   const handleMarkCompleted = () => {
-    setOnboardingCompleted(true);
+    completeTutorialPhase('intro');
     setResetKey(prev => prev + 1);
   };
 
@@ -60,11 +64,11 @@ export default function GuidedFirstTimeExperienceTestHarness() {
                 Onboarding Status:
               </span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
-                onboardingCompleted 
+                isCompleted 
                   ? 'bg-green-100 text-green-700' 
                   : 'bg-amber-100 text-amber-700'
               }`}>
-                {onboardingCompleted ? 'Completed' : 'Not Completed'}
+                {isCompleted ? 'Completed' : 'Not Completed'}
               </span>
             </div>
             
@@ -115,7 +119,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
           <div key={resetKey} className="p-8">
             <GuidedFirstTimeExperience />
             
-            {onboardingCompleted && (
+            {isCompleted && (
               <div className="text-center py-8">
                 <div className="bg-gray-100 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
