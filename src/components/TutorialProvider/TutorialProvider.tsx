@@ -8,6 +8,7 @@ import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
+import { TutorialTooltip } from './TutorialTooltip';
 
 type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
 
@@ -386,6 +387,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           disableOverlayClose={true}
           spotlightClicks={true}
           scrollOffset={joyrideOptions.scrollOffset}
+          tooltipComponent={TutorialTooltip}
           locale={
             activeTour === 'worldCreation'
               ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
