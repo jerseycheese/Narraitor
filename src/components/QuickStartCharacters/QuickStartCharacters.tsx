@@ -3,9 +3,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { World } from '@/types/world.types';
+import { World, CharacterArchetype } from '@/types/world.types';
 import { 
-  CharacterArchetype, 
   generateCharacterArchetypes, 
   generateRandomArchetype 
 } from '@/lib/utils/characterArchetypes';

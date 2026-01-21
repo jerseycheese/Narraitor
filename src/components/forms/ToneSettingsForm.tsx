@@ -72,6 +72,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
               value={toneSettings.contentRating}
               onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
               aria-describedby="content-rating-description"
+              data-tutorial="tone-content-rating"
             >
               {contentRatingOptions.map((option) => (
                 <option key={option.value} value={option.value} title={option.description}>
@@ -90,6 +91,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
               value={toneSettings.narrativeStyle}
               onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
               aria-describedby="narrative-style-description"
+              data-tutorial="tone-narrative-style"
             >
               {narrativeStyleOptions.map((option) => (
                 <option key={option.value} value={option.value} title={option.description}>
@@ -108,6 +110,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
               value={toneSettings.languageComplexity}
               onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
               aria-describedby="language-complexity-description"
+              data-tutorial="tone-language-complexity"
             >
               {languageComplexityOptions.map((option) => (
                 <option key={option.value} value={option.value} title={option.description}>
@@ -128,6 +131,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
               onChange={(e) => handleCustomInstructionsChange(e.target.value)}
               className="h-20"
               aria-describedby="custom-instructions-description"
+              data-tutorial="tone-custom-instructions"
             />
           </div>
         </div>

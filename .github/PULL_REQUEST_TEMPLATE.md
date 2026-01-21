@@ -42,7 +42,7 @@ Closes #
 ## Code Review Summary (if applicable)
 <!-- For automated implementations, include code review analysis -->
 
-## Playwright MCP Verification Summary (if applicable)
+## Chrome DevTools MCP Verification Summary (if applicable)
 <!-- For browser automation testing, include verification results -->
 
 ## Quality Checks (if applicable)

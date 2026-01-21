@@ -10,7 +10,7 @@ import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
-import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+import { CharacterArchetype } from '@/types/world.types';
 
 export default function CharacterCreatePage() {
   const router = useRouter();
