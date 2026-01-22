@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useTutorial } from '@/components/TutorialProvider';
-import { useSessionStore } from '@/state/sessionStore';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, RefreshCw, CheckCircle } from 'lucide-react';
+import { HelpCircle, RefreshCw } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
+import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 
 const logger = new Logger('TutorialMenu');
 
@@ -14,8 +14,6 @@ export function TutorialMenu() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { resetTutorial } = useTutorial();
-  const tutorialProgress = useSessionStore(state => state.tutorialProgress);
-  
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,7 +51,7 @@ export function TutorialMenu() {
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size="icon"
-        className="text-gray-300 hover:text-white"
+        className="text-muted-foreground hover:text-foreground"
         aria-label="Help & Tutorials"
       >
         <HelpCircle className="w-5 h-5" />
@@ -65,21 +63,8 @@ export function TutorialMenu() {
             <h4 className="font-semibold text-sm">Tutorial Progress</h4>
           </div>
           
-          <div className="py-2">
-            {Object.entries(tutorialProgress.phases).map(([phase, data]) => (
-              <div key={phase} className="px-4 py-1.5 flex items-center justify-between text-sm">
-                <span className="capitalize">{phase.replace(/([A-Z])/g, ' $1')}</span>
-                {data.completed ? (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                ) : data.skipped ? (
-                  <span className="text-xs text-gray-400">Skipped</span>
-                ) : ('lastStep' in data && (data as { lastStep: number }).lastStep > 0) ? (
-                  <span className="text-xs text-blue-500">In Progress</span>
-                ) : (
-                  <span className="text-xs text-gray-400">Not Started</span>
-                )}
-              </div>
-            ))}
+          <div className="px-4 py-3">
+            <TutorialProgressWidget variant="menu" />
           </div>
           
           <div className="border-t border-gray-100 mt-1 pt-1">

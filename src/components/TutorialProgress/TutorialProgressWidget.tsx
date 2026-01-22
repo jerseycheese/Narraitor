@@ -14,11 +14,19 @@ const PHASE_LABELS: Record<TutorialPhase, string> = {
   firstPlay: 'First Session',
 };
 
-const PHASES: TutorialPhase[] = ['worldCreation', 'worldGeneration', 'characterCreation', 'firstPlay'];
+const PHASES: TutorialPhase[] = ['intro', 'worldCreation', 'worldGeneration', 'characterCreation', 'firstPlay'];
 
-export function TutorialProgressWidget() {
+interface TutorialProgressWidgetProps {
+  variant?: 'floating' | 'menu';
+  className?: string;
+}
+
+export function TutorialProgressWidget({
+  variant = 'floating',
+  className = '',
+}: TutorialProgressWidgetProps) {
   const { tutorialProgress } = useSessionStore();
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(variant !== 'floating');
 
   const phaseStates = PHASES.map((phase) => {
     const data = tutorialProgress.phases[phase];
@@ -36,56 +44,71 @@ export function TutorialProgressWidget() {
   const finishedCount = phaseStates.filter(({ isFinished }) => isFinished).length;
   const progressValue = (finishedCount / phaseStates.length) * 100;
 
+  const ProgressRing = ({ size = 40 }: { size?: number }) => (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="w-full h-full transform -rotate-90">
+        <circle
+          cx="50%"
+          cy="50%"
+          r="16"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="transparent"
+          className="text-gray-200"
+        />
+        <circle
+          cx="50%"
+          cy="50%"
+          r="16"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="transparent"
+          strokeDasharray={100}
+          strokeDashoffset={100 - progressValue}
+          className="text-primary"
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
+        {finishedCount}/{PHASES.length}
+      </span>
+    </div>
+  );
+
   return (
     <div 
       className={cn(
-        "fixed bottom-6 left-6 z-50 transition-all duration-300 ease-in-out",
-        "bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden",
-        isExpanded ? "w-64" : "w-12 h-12 flex items-center justify-center cursor-pointer"
+        variant === 'floating'
+          ? 'fixed bottom-6 left-6 z-50 transition-all duration-300 ease-in-out'
+          : 'w-full',
+        'bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden',
+        isExpanded ? 'w-64' : 'w-12 h-12 flex items-center justify-center cursor-pointer',
+        className
       )}
-      onClick={() => !isExpanded && setIsExpanded(true)}
+      onClick={() => {
+        if (variant !== 'floating') return;
+        if (!isExpanded) setIsExpanded(true);
+      }}
     >
       {!isExpanded ? (
-        <div className="relative">
-          <svg className="w-10 h-10 transform -rotate-90">
-            <circle
-              cx="20"
-              cy="20"
-              r="16"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="transparent"
-              className="text-gray-200"
-            />
-            <circle
-              cx="20"
-              cy="20"
-              r="16"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="transparent"
-              strokeDasharray={100}
-              strokeDashoffset={100 - progressValue}
-              className="text-primary"
-            />
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
-            {finishedCount}/{PHASES.length}
-          </span>
-        </div>
+        <ProgressRing />
       ) : (
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-sm">Tutorial Progress</h3>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(false);
-              }}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              ×
-            </button>
+            <div className="flex items-center gap-2">
+              <ProgressRing size={32} />
+              <h3 className="font-bold text-sm">Tutorial Progress</h3>
+            </div>
+            {variant === 'floating' && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(false);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            )}
           </div>
           
           <div className="space-y-3">
@@ -94,13 +117,13 @@ export function TutorialProgressWidget() {
               return (
                 <div key={phase} className="flex items-center gap-3">
                   {isFinished ? (
-                    <CheckCircle2 className={cn("w-4 h-4", isSkipped ? "text-gray-400" : "text-green-500")} />
+                    <CheckCircle2 className={cn('w-4 h-4', isSkipped ? 'text-gray-400' : 'text-green-500')} />
                   ) : (
                     <Circle className="w-4 h-4 text-gray-300" />
                   )}
                   <span className={cn(
-                    "text-xs",
-                    isFinished ? "text-gray-400 line-through" : "text-gray-700"
+                    'text-xs',
+                    isFinished ? 'text-gray-400 line-through' : 'text-gray-700'
                   )}>
                     {PHASE_LABELS[phase]}
                     {isSkipped && <span className="ml-1 text-[10px] no-underline">(skipped)</span>}

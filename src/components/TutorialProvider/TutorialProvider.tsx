@@ -373,7 +373,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       setCurrentWizardStep,
     }}>
       {children}
-      <TutorialProgressWidget />
       {steps.length > 0 && run && (
         <Joyride
           key={`${activeTour}-${isPaused}`}
