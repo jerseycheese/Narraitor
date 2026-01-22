@@ -91,18 +91,13 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       ) as HTMLInputElement[];
       if (!inputs.length) return;
 
-      const getRemaining = () => {
+      const getRemaining = (): number => {
         const text = document.querySelector('.component-attributes-step')?.textContent || '';
         const match = text.match(/Remaining:\\s*(-?\\d+)/);
-        return match ? Number(match[1]) : null;
+        return match ? Number(match[1]) : 0;
       };
 
       let remaining = getRemaining();
-      if (remaining === null) {
-        const fallbackText = document.body.textContent || '';
-        const match = fallbackText.match(/Remaining:\\s*(-?\\d+)/);
-        remaining = match ? Number(match[1]) : 0;
-      }
 
       inputs.forEach((input) => {
         const min = Number(input.min);
