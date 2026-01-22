@@ -624,6 +624,7 @@ Respond with JSON format:
   }, [
     sessionId,
     worldId,
+    characterId,
     onChoicesGenerated,
     narrativeGenerator,
     warnMissingSessionId,

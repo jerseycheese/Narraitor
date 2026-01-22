@@ -6,15 +6,21 @@ import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { setOnboardingCompleted, onboardingCompleted, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
+  const {
+    completeTutorialPhase,
+    resetTutorialProgress,
+    shouldShowOnboarding,
+    isFirstTimeUser,
+  } = useSessionStore();
+  const onboardingCompleted = !shouldShowOnboarding();
 
   const handleReset = () => {
-    setOnboardingCompleted(false);
+    resetTutorialProgress();
     setResetKey(prev => prev + 1);
   };
 
   const handleMarkCompleted = () => {
-    setOnboardingCompleted(true);
+    completeTutorialPhase('intro');
     setResetKey(prev => prev + 1);
   };
 
@@ -70,8 +76,8 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             
             {/* Debug info */}
             <div className="text-xs text-gray-500">
-              shouldShow: {shouldShowOnboarding?.().toString() || 'undefined'} | 
-              isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
+              shouldShow: {shouldShowOnboarding().toString()} | 
+              isFirstTime: {isFirstTimeUser().toString()}
             </div>
             
             <button
