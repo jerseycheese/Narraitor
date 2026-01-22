@@ -31,7 +31,7 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
-  const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
+  const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const { setCurrentWorld } = useWorldStore();
 
   // Validation function for wizard steps
@@ -322,7 +322,7 @@ export function GuidedFirstTimeExperience() {
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
   // Don't render if onboarding shouldn't be shown
-  if (!isFirstTimeUser()) {
+  if (!shouldShowOnboarding()) {
     return null;
   }
 

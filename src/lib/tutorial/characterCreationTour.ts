@@ -1,5 +1,4 @@
 import { Step } from 'react-joyride';
-
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
 export const characterCreationTour: Step[] = [

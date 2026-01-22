@@ -1,7 +1,6 @@
 import { EntityID } from './common.types';
 import type { WorldTemplate } from './world-template.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from './session.types';
-import { TutorialProgress, TutorialPhase } from './tutorial.types';
 
 /**
  * Player choice interface
@@ -73,7 +72,7 @@ export interface SessionStore {
   sessionLifecycle: Record<string, SessionLifecycleMetadata>;
   templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
-  tutorialProgress: TutorialProgress;
+  tutorialProgress: import('./tutorial.types').TutorialProgress;
   narrativeHeight: number; // Persisted height for narrative container
 
   // Actions
@@ -109,15 +108,13 @@ export interface SessionStore {
   recordAutoSave: (timestamp: string) => void;
   
   // Tutorial actions
-  updateTutorialProgress: (phase: TutorialPhase, updates: Partial<TutorialProgress['phases'][TutorialPhase]>) => void;
+  updateTutorialProgress: (phase: import('./tutorial.types').TutorialPhase, updates: Partial<{ completed: boolean; skipped: boolean; lastStep: number }>) => void;
   dismissTutorialHint: (hintId: string) => void;
   resetTutorialProgress: () => void;
-  completeTutorialPhase: (phase: TutorialPhase) => void;
-  
-  // Tutorial selectors
-  shouldShowTutorialPhase: (phase: TutorialPhase) => boolean;
+  completeTutorialPhase: (phase: import('./tutorial.types').TutorialPhase) => void;
+  shouldShowTutorialPhase: (phase: import('./tutorial.types').TutorialPhase) => boolean;
   isTutorialComplete: () => boolean;
-  getCurrentTutorialPhase: () => TutorialPhase | null;
+  getCurrentTutorialPhase: () => import('./tutorial.types').TutorialPhase | null;
   isFirstTimeUser: () => boolean;
   shouldShowOnboarding: () => boolean; // Computed selector, keeps same name but logic changes
 }

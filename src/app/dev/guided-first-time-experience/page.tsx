@@ -12,7 +12,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
     shouldShowOnboarding,
     isFirstTimeUser,
   } = useSessionStore();
-  const onboardingCompleted = !shouldShowOnboarding();
+  const isCompleted = !shouldShowOnboarding();
 
   const handleReset = () => {
     resetTutorialProgress();
@@ -66,11 +66,11 @@ export default function GuidedFirstTimeExperienceTestHarness() {
                 Onboarding Status:
               </span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
-                onboardingCompleted 
+                isCompleted 
                   ? 'bg-green-100 text-green-700' 
                   : 'bg-amber-100 text-amber-700'
               }`}>
-                {onboardingCompleted ? 'Completed' : 'Not Completed'}
+                {isCompleted ? 'Completed' : 'Not Completed'}
               </span>
             </div>
             
@@ -121,7 +121,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
           <div key={resetKey} className="p-8">
             <GuidedFirstTimeExperience />
             
-            {onboardingCompleted && (
+            {isCompleted && (
               <div className="text-center py-8">
                 <div className="bg-gray-100 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">

@@ -25,6 +25,7 @@ export function createMockSessionStore(
       phases: {
         intro: { completed: false, skipped: false },
         worldCreation: { completed: false, skipped: false, lastStep: 0 },
+        worldGeneration: { completed: false, skipped: false, lastStep: 0 },
         characterCreation: { completed: false, skipped: false, lastStep: 0 },
         firstPlay: { completed: false, skipped: false },
       },
@@ -62,9 +63,9 @@ export function createMockSessionStore(
     dismissTutorialHint: jest.fn(),
     resetTutorialProgress: jest.fn(),
     completeTutorialPhase: jest.fn(),
-    getCurrentTutorialPhase: jest.fn(() => null),
     isTutorialComplete: jest.fn(() => false),
     shouldShowTutorialPhase: jest.fn(() => false),
+    getCurrentTutorialPhase: jest.fn(() => 'intro'),
     isFirstTimeUser: jest.fn(() => true),
     shouldShowOnboarding: jest.fn(() => false),
     ...overrides,
