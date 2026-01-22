@@ -30,6 +30,20 @@ test.describe('Inventory Table View', () => {
     await expandAllCollapsibleSections(page);
     await waitForContentStable(page);
 
+    const inventorySection = page.locator('[data-testid="collapsible-section-title"]', {
+      hasText: 'Inventory',
+    });
+    if (await inventorySection.count() > 0) {
+      await inventorySection.first().scrollIntoViewIfNeeded();
+      await expandAllCollapsibleSections(page, inventorySection.first().locator('..').locator('..'));
+    }
+
+    const tableViewToggle = page.getByRole('button', { name: 'Table view' });
+    if (await tableViewToggle.count() > 0) {
+      await tableViewToggle.click();
+      await page.waitForTimeout(200);
+    }
+
     // Verify table is now visible
     const table = page.getByRole('table', { name: /Inventory table/ });
     await expect(table).toBeVisible({ timeout: 10000 });

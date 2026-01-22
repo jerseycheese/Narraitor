@@ -79,13 +79,47 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       const slider = attributeSliders.nth(i);
       await slider.evaluate((element) => {
         const input = element as HTMLInputElement;
-        const max = Number(input.max);
-        input.value = String(max);
+        const min = Number(input.min);
+        input.value = String(min);
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
       });
     }
+    await page.evaluate(() => {
+      const inputs = Array.from(
+        document.querySelectorAll('[data-testid^="allocation-slider-"] input[type="range"]')
+      ) as HTMLInputElement[];
+      if (!inputs.length) return;
+
+      const getRemaining = () => {
+        const text = document.querySelector('.component-attributes-step')?.textContent || '';
+        const match = text.match(/Remaining:\\s*(-?\\d+)/);
+        return match ? Number(match[1]) : null;
+      };
+
+      let remaining = getRemaining();
+      if (remaining === null) {
+        const fallbackText = document.body.textContent || '';
+        const match = fallbackText.match(/Remaining:\\s*(-?\\d+)/);
+        remaining = match ? Number(match[1]) : 0;
+      }
+
+      inputs.forEach((input) => {
+        const min = Number(input.min);
+        const max = Number(input.max);
+        const capacity = max - min;
+        if (remaining <= 0) return;
+        const allocation = Math.min(remaining, capacity);
+        input.value = String(min + allocation);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        remaining -= allocation;
+      });
+    });
     await waitForContentStable(page);
+
+    const attributeRemaining = page.locator('.component-attributes-step').getByText(/Remaining:/);
+    await expect(attributeRemaining).toContainText('Remaining: 0', { timeout: 10000 });
 
     const proceedToSkillsBtn = page.locator('button:has-text("Next")');
     if (await proceedToSkillsBtn.count() > 0) {
@@ -96,6 +130,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
   });
 
   await test.step('Step 3: Skills', async () => {
+    await page.locator('.component-skills-step').waitFor({ state: 'visible', timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'Allocate Skill Points' })).toBeVisible();
 
     // Select the first two skills to enable point allocation
@@ -130,10 +165,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     }
     await waitForContentStable(page);
 
-    const remainingBadge = page
-      .getByRole('heading', { name: 'Skill Points' })
-      .locator('..')
-      .getByText(/Remaining:/);
+    const remainingBadge = page.locator('.component-skills-step').getByText(/Remaining:/);
     await expect(remainingBadge).toContainText('Remaining: 0', { timeout: 10000 });
     await expect(page.getByText(/^Allocated Points:/).first()).toBeVisible();
 
