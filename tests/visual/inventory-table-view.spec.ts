@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import { seedInventoryItemsForVisual } from './utils/game-session-page-seeder';
@@ -26,23 +26,8 @@ test.describe('Inventory Table View', () => {
     // Seed inventory items
     await seedInventoryItemsForVisual(page);
 
-    // Expand the inventory collapsible section
-    const inventoryTitle = page.locator('[data-testid="collapsible-section-title"]', {
-      hasText: 'Inventory',
-    });
-    await inventoryTitle.waitFor({ state: 'visible', timeout: 5000 });
-
-    const inventoryToggle = inventoryTitle
-      .locator('..')
-      .locator('..')
-      .locator('[data-testid="collapsible-section-toggle"]');
-
-    const isExpanded = await inventoryToggle.getAttribute('aria-expanded');
-    if (isExpanded !== 'true') {
-      await inventoryToggle.click();
-      await page.waitForTimeout(300);
-    }
-
+    // Expand all collapsible sections so the inventory table is visible
+    await expandAllCollapsibleSections(page);
     await waitForContentStable(page);
 
     // Verify table is now visible

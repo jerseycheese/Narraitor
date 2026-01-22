@@ -1,7 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { seedTestData } from './utils/seedTestData';
 
 test.describe('Worlds Generate Modal - Visual', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedTestData(page);
+  });
+
   test('default state', async ({ page }) => {
     await page.goto('/worlds');
     await waitForContentStable(page);
@@ -36,4 +41,3 @@ test.describe('Worlds Generate Modal - Visual', () => {
     await expect(dialog).toHaveScreenshot('worlds-generate-modal-set-within.png');
   });
 });
-

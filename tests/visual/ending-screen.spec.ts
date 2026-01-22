@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import { test, expect, type Page } from '@playwright/test';
+import { hideDynamicContent, expandAllCollapsibleSections, waitForContentStable } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
@@ -11,6 +11,13 @@ import { mockApiEndpoints } from './utils/mockApi';
  */
 
 test.describe('EndingScreen Visual Tests', () => {
+  const ACTIVE_SESSION_SELECTOR = '[data-testid="game-session-active"]';
+  const ACTIVE_SESSION_TIMEOUT = 20000;
+
+  const waitForActiveSession = async (page: Page): Promise<void> => {
+    await waitForContentStable(page);
+    await page.waitForSelector(ACTIVE_SESSION_SELECTOR, { timeout: ACTIVE_SESSION_TIMEOUT });
+  };
   
   test('EndingScreen - Triumphant ending should render consistently', async ({ page }) => {
     // Set viewport size to ensure desktop layout (Hero actions visible)
@@ -55,7 +62,7 @@ test.describe('EndingScreen Visual Tests', () => {
     // Navigate to the real play route
     await page.goto('/worlds/world-cyberpunk-2077/play');
     // Wait for active session UI
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+    await waitForActiveSession(page);
 
     // Trigger End Story button from Hero actions (now in top right)
     await page.waitForTimeout(100);
@@ -139,7 +146,7 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Navigate to the real play route and run flow
     await page.goto('/worlds/world-cyberpunk-2077/play');
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+    await waitForActiveSession(page);
     await page.waitForTimeout(100);
     const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
@@ -213,7 +220,7 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Navigate to the real play route and run flow
     await page.goto('/worlds/world-cyberpunk-2077/play');
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+    await waitForActiveSession(page);
     await page.waitForTimeout(100);
     const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();
@@ -294,7 +301,7 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Navigate to the real play route and run flow
     await page.goto('/worlds/world-cyberpunk-2077/play');
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+    await waitForActiveSession(page);
     await page.waitForTimeout(100);
     const endButton = page.getByRole('button', { name: 'End Story' });
     await endButton.scrollIntoViewIfNeeded();

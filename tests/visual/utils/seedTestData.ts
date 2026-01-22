@@ -255,7 +255,7 @@ export async function seedTestData(page: Page): Promise<void> {
             tutorialProgress: {
               phases: {
                 intro: { completed: true, skipped: false },
-                worldCreation: { completed: true, skipped: false, lastStep: 6 },
+                worldCreation: { completed: true, skipped: false, lastStep: 999 },
                 worldGeneration: { completed: true, skipped: false, lastStep: 0 },
                 characterCreation: { completed: true, skipped: false, lastStep: 5 },
                 firstPlay: { completed: true, skipped: false },
