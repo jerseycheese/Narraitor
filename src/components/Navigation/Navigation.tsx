@@ -207,7 +207,7 @@ export function Navigation() {
                   </Button>
                   
                   {showWorldSwitcher && (
-                    <div className={`${headerDropdownMenuClass} w-64 py-1 max-h-96 overflow-y-auto`}>
+                    <div className={`${headerDropdownMenuClass} w-64 py-0 max-h-96 overflow-y-auto`}>
                       {Object.values(worlds).map(world => {
                         const worldCharacters = (Object.values(characters) as Character[]).filter(
                           char => char.worldId === world.id
@@ -218,7 +218,7 @@ export function Navigation() {
                             key={world.id}
                             onClick={() => handleWorldSwitch(world.id)}
                             variant="ghost"
-                            className={`${headerDropdownItemClass} flex items-center justify-between ${
+                            className={`${headerDropdownItemClass} flex items-center justify-between rounded-none ${
                               world.id === currentWorldId ? 'bg-green-50 border-l-4 border-green-500' : ''
                             }`}
                           >
@@ -236,7 +236,7 @@ export function Navigation() {
                       <div className={headerDropdownDividerClass}>
                         <Link
                           href="/worlds"
-                          className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav`}
+                          className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav rounded-none`}
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <Plus className="w-5 h-5" aria-hidden="true" />
