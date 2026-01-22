@@ -5,7 +5,6 @@ import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joy
 import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
-import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 import { TutorialTooltip } from './TutorialTooltip';
@@ -54,11 +53,38 @@ const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping
   }
 };
 
-const normalizeSteps = (steps: Step[]): Step[] =>
-  steps.map((step) => ({
-    ...step,
-    disableBeacon: true,
-  }));
+const normalizeSteps = (steps: Step[], mapping?: Record<number, number>): Step[] => {
+  const endOfPageIndices = new Set<number>();
+
+  if (mapping) {
+    const lastStepByWizard = new Map<number, number>();
+    Object.entries(mapping).forEach(([tourIndex, wizardStep]) => {
+      const index = Number(tourIndex);
+      const current = lastStepByWizard.get(wizardStep);
+      if (current === undefined || index > current) {
+        lastStepByWizard.set(wizardStep, index);
+      }
+    });
+
+    lastStepByWizard.forEach((index) => endOfPageIndices.add(index));
+  }
+
+  return steps.map((step, index) => {
+    const existingData =
+      step.data && typeof step.data === 'object' ? (step.data as Record<string, unknown>) : {};
+    const shouldMarkEnd = endOfPageIndices.has(index);
+    const data = shouldMarkEnd && existingData.isEndOfPage === undefined
+      ? { ...existingData, isEndOfPage: true }
+      : existingData;
+    const hasData = Object.keys(data).length > 0;
+
+    return {
+      ...step,
+      disableBeacon: true,
+      data: hasData ? data : step.data,
+    };
+  });
+};
 
 interface TutorialProviderProps {
   children: ReactNode;
@@ -104,7 +130,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
 
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
-    const normalizedSteps = normalizeSteps(loadedSteps);
+    const normalizedSteps = normalizeSteps(loadedSteps, mapping);
     
     if (normalizedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
@@ -170,14 +196,17 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const resumeTour = useCallback(async () => {
     // Re-load steps to ensure they are fresh and correctly targeted
     if (activeTour) {
-      const { steps: loadedSteps } = await loadTour(activeTour);
-      setSteps(normalizeSteps(loadedSteps));
+      const { steps: loadedSteps, mapping } = await loadTour(activeTour);
+      if (mapping) {
+        setStepMapping(mapping);
+      }
+      setSteps(normalizeSteps(loadedSteps, mapping ?? stepMapping));
     }
     setRun(true);
     setIsPaused(false);
     setPauseReason(null);
     missingTargetRef.current = null;
-  }, [activeTour]);
+  }, [activeTour, stepMapping]);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, type, index, action } = data;

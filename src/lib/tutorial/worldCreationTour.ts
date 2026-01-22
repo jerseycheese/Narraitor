@@ -32,7 +32,10 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
-    data: { isEndOfPage: true },
+    data: {
+      isEndOfPage: true,
+      nextStepHint: 'Choose a template or click Create My Own World to continue.',
+    },
   },
   {
     target: '[data-tutorial="world-name"]',
@@ -258,6 +261,9 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
+    data: {
+      nextStepHint: 'Click Create World to finish setup and move to Quick Start.',
+    },
   },
   {
     target: '[data-tutorial="quickstart-archetypes"]',
@@ -285,6 +291,9 @@ export const worldCreationTour: Step[] = [
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
+    data: {
+      nextStepHint: 'Pick a character, customize one, or click Skip Character Creation for Now to start playing.',
+    },
   },
 ];
 

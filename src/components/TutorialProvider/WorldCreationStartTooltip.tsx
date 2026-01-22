@@ -11,6 +11,7 @@ const CONTINUE_LABEL = 'Continue';
 /** Custom data attached to tour steps via Joyride's Step.data property */
 interface TourStepData {
   isEndOfPage?: boolean;
+  nextStepHint?: string;
 }
 
 export function WorldCreationStartTooltip({
@@ -48,6 +49,7 @@ export function WorldCreationStartTooltip({
 
   const stepData = step.data as TourStepData | undefined;
   const isEndOfPage = stepData?.isEndOfPage;
+  const nextStepHint = stepData?.nextStepHint;
 
   const primaryLabel =
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
@@ -66,7 +68,14 @@ export function WorldCreationStartTooltip({
     >
       <div style={styles.tooltipContainer} className="text-left">
         {title && <h1 style={styles.tooltipTitle}>{title}</h1>}
-        <div style={styles.tooltipContent}>{content}</div>
+        <div style={styles.tooltipContent}>
+          {content}
+          {isEndOfPage && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              {nextStepHint || 'Complete this step, then click Next to continue.'}
+            </div>
+          )}
+        </div>
       </div>
       {!hideFooter && (
         <div style={styles.tooltipFooter}>

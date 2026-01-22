@@ -10,7 +10,10 @@ export const characterCreationTour: Step[] = [
     }),
     placement: 'bottom',
     disableBeacon: true,
-    data: { isEndOfPage: true },
+    data: {
+      isEndOfPage: true,
+      nextStepHint: 'Select a template (or leave it blank) and click Next to continue.',
+    },
   },
   {
     target: '[data-tutorial="basic-info"]',
@@ -53,6 +56,9 @@ export const characterCreationTour: Step[] = [
     content: 'Generate a unique portrait based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,
+    data: {
+      nextStepHint: 'Click Create Character to finish and start playing.',
+    },
   },
 ];
 
