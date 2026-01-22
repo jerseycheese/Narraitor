@@ -18,7 +18,7 @@ interface UseActiveGameSessionActionsOptions {
   setIsGeneratingChoices: Dispatch<SetStateAction<boolean>>;
   setLocalSelectedChoiceId: Dispatch<SetStateAction<string | undefined>>;
   choiceGenerationTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
-  scheduleChoiceFallback: (decisionAtSchedule: Decision | null) => void;
+  scheduleChoiceFallback: () => void;
   onChoiceSelected: (choiceId: string) => void;
   autoSave: UseAutoSaveReturn;
   isSessionEnded: (sessionId: string) => boolean;
@@ -60,7 +60,7 @@ export const useActiveGameSessionActions = ({
       createJournalEntryFromSegment(segment, decisionWeight);
     }
 
-    scheduleChoiceFallback(currentDecision);
+    scheduleChoiceFallback();
 
     void autoSave.triggerSave('scene-change');
   }, [autoSave, characterId, createJournalEntryFromSegment, currentDecision, scheduleChoiceFallback, setIsGenerating, setIsGeneratingChoices, setShouldTriggerGeneration]);

@@ -199,25 +199,26 @@ export default function SkillReviewStep({
 
       setLocalSuggestions(newSuggestions);
 
-      // Automatically save the initially selected skills to parent state
-      const acceptedSkills = newSuggestions
-        .filter(s => s.accepted)
-        .map(s => ({
-          id: generateUniqueId('skill'),
-          worldId: '',
-          name: s.name,
-          description: s.description,
-          difficulty: s.difficulty,
-          category: s.category,
-          baseValue: SKILL_DEFAULT_VALUE,
-          minValue: SKILL_MIN_VALUE,
-          maxValue: SKILL_MAX_VALUE,
-          attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
+      const normalizeSkills = (skills: WorldSkill[]) =>
+        skills.map((skill) => ({
+          name: skill.name,
+          description: skill.description,
+          difficulty: skill.difficulty,
+          category: skill.category,
+          baseValue: skill.baseValue,
+          minValue: skill.minValue,
+          maxValue: skill.maxValue,
+          attributeIds: skill.attributeIds,
         }));
 
-      // Only update if we don't already have skills or if the count is different
-      if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
-        onUpdate({ ...worldData, skills: acceptedSkills });
+      const nextSkills = mergeAllSkills(newSuggestions.filter(s => s.accepted));
+      const currentSkills = worldData.skills || [];
+      const hasChanges =
+        JSON.stringify(normalizeSkills(currentSkills)) !==
+        JSON.stringify(normalizeSkills(nextSkills));
+
+      if (hasChanges) {
+        onUpdate({ ...worldData, skills: nextSkills });
       }
     } else {
       // Clear AI suggestions when they are removed (preserves custom skills)

@@ -45,7 +45,7 @@ describe('useActiveGameSessionEffects', () => {
     });
 
     act(() => {
-      result.current.scheduleChoiceFallback(null);
+      result.current.scheduleChoiceFallback();
       jest.advanceTimersByTime(15000);
     });
 
