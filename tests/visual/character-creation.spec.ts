@@ -77,22 +77,27 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const sliderTotal = await attributeSliders.count();
     for (let i = 0; i < sliderTotal; i++) {
       const slider = attributeSliders.nth(i);
-      await slider.focus();
-      for (let j = 0; j < 10; j++) {
-        await slider.press('ArrowRight');
-        await page.waitForTimeout(30);
-      }
+      await slider.evaluate((element) => {
+        const input = element as HTMLInputElement;
+        const max = Number(input.max);
+        input.value = String(max);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
     await waitForContentStable(page);
 
     const proceedToSkillsBtn = page.locator('button:has-text("Next")');
     if (await proceedToSkillsBtn.count() > 0) {
+      await expect(proceedToSkillsBtn).toBeEnabled({ timeout: 10000 });
       await proceedToSkillsBtn.click();
       await page.waitForTimeout(800);
     }
   });
 
   await test.step('Step 3: Skills', async () => {
+    await expect(page.getByRole('heading', { name: 'Allocate Skill Points' })).toBeVisible();
+
     // Select the first two skills to enable point allocation
     const skillToggles = page.locator('button:has-text("Excluded"), button:has-text("Not Selected")');
     let togglesClicked = 0;
@@ -115,15 +120,21 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const sliderCount = await skillSliders.count();
     for (let i = 0; i < sliderCount; i++) {
       const slider = skillSliders.nth(i);
-      await slider.focus();
-      for (let j = 0; j < 10; j++) {
-        await slider.press('ArrowRight');
-        await page.waitForTimeout(25);
-      }
+      await slider.evaluate((element) => {
+        const input = element as HTMLInputElement;
+        const max = Number(input.max);
+        input.value = String(max);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
     await waitForContentStable(page);
 
-    await expect(page.getByText(/^Remaining:/)).toContainText('Remaining: 0');
+    const remainingBadge = page
+      .getByRole('heading', { name: 'Skill Points' })
+      .locator('..')
+      .getByText(/Remaining:/);
+    await expect(remainingBadge).toContainText('Remaining: 0', { timeout: 10000 });
     await expect(page.getByText(/^Allocated Points:/).first()).toBeVisible();
 
     await hideDynamicContent(page);

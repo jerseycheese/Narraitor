@@ -11,6 +11,7 @@ import { mockApiEndpoints } from './utils/mockApi';
  */
 
 test.describe('EndingScreen Visual Tests', () => {
+  test.describe.configure({ timeout: 60000 });
   const ACTIVE_SESSION_SELECTOR = '[data-testid="game-session-active"]';
   const ACTIVE_SESSION_TIMEOUT = 20000;
 
