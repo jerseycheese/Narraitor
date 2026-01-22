@@ -86,28 +86,28 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       });
     }
     await page.evaluate(() => {
-      const inputs = Array.from(
+      const sliders = Array.from(
         document.querySelectorAll('[data-testid^="allocation-slider-"] input[type="range"]')
       ) as HTMLInputElement[];
-      if (!inputs.length) return;
+      if (!sliders.length) return;
 
-      const getRemaining = (): number => {
+      const totalPoints = (() => {
         const text = document.querySelector('.component-attributes-step')?.textContent || '';
-        const match = text.match(/Remaining:\\s*(-?\\d+)/);
+        const match = text.match(/Total:\\s*(\\d+)/);
         return match ? Number(match[1]) : 0;
-      };
+      })();
 
-      let remaining = getRemaining();
+      const mins = sliders.map((slider) => Number(slider.min));
+      const maxes = sliders.map((slider) => Number(slider.max));
+      const minSum = mins.reduce((sum, value) => sum + value, 0);
+      let remaining = Math.max(0, totalPoints - minSum);
 
-      inputs.forEach((input) => {
-        const min = Number(input.min);
-        const max = Number(input.max);
-        const capacity = max - min;
-        if (remaining <= 0) return;
-        const allocation = Math.min(remaining, capacity);
-        input.value = String(min + allocation);
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      sliders.forEach((slider, index) => {
+        const capacity = maxes[index] - mins[index];
+        const allocation = remaining > 0 ? Math.min(remaining, capacity) : 0;
+        slider.value = String(mins[index] + allocation);
+        slider.dispatchEvent(new Event('input', { bubbles: true }));
+        slider.dispatchEvent(new Event('change', { bubbles: true }));
         remaining -= allocation;
       });
     });
