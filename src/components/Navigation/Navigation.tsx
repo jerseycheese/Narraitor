@@ -19,6 +19,12 @@ import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { X, Menu, Globe, ChevronDown, Check, Plus, Play } from 'lucide-react';
+import {
+  headerDropdownDividerClass,
+  headerDropdownItemClass,
+  headerDropdownMenuClass,
+  headerDropdownTriggerClass,
+} from './navigationDropdownStyles';
 
 /**
  * Navigation - Main application navigation component
@@ -186,7 +192,7 @@ export function Navigation() {
                   <Button
                     onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
                     variant="ghost"
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-900 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md transition-colors h-auto"
+                    className={headerDropdownTriggerClass}
                   >
                     <Globe className="w-4 h-4" aria-hidden="true" />
                     <span className="hidden sm:inline">
@@ -201,7 +207,7 @@ export function Navigation() {
                   </Button>
                   
                   {showWorldSwitcher && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto">
+                    <div className={`${headerDropdownMenuClass} w-64 py-1 max-h-96 overflow-y-auto`}>
                       {Object.values(worlds).map(world => {
                         const worldCharacters = (Object.values(characters) as Character[]).filter(
                           char => char.worldId === world.id
@@ -212,7 +218,7 @@ export function Navigation() {
                             key={world.id}
                             onClick={() => handleWorldSwitch(world.id)}
                             variant="ghost"
-                            className={`w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center justify-between h-auto ${
+                            className={`${headerDropdownItemClass} flex items-center justify-between ${
                               world.id === currentWorldId ? 'bg-green-50 border-l-4 border-green-500' : ''
                             }`}
                           >
@@ -227,10 +233,10 @@ export function Navigation() {
                         );
                       })}
                       
-                      <div className="border-t border-gray-200 mt-1 pt-1">
+                      <div className={headerDropdownDividerClass}>
                         <Link
                           href="/worlds"
-                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav"
+                          className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav`}
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <Plus className="w-5 h-5" aria-hidden="true" />
