@@ -27,7 +27,6 @@ import { getTimestamp } from '@/lib/utils';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
-import { truncate } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
 // Efficient deep comparison for arrays of objects

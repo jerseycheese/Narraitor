@@ -29,7 +29,7 @@ interface OnboardingData {
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
-  const setOnboardingCompleted = useSessionStore(state => state.setOnboardingCompleted);
+  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const { setCurrentWorld } = useWorldStore();
 
@@ -98,7 +98,7 @@ export function GuidedFirstTimeExperience() {
       setCurrentWorld(worldId);
       
       // Mark onboarding as completed
-      setOnboardingCompleted(true);
+      completeTutorialPhase('intro');
       
       // Navigate to character creation to continue the flow
       router.push(`/characters/create?worldId=${worldId}`);
@@ -106,13 +106,13 @@ export function GuidedFirstTimeExperience() {
       console.error('Error completing onboarding:', error);
       throw error; // Re-throw to let wizard handle it
     }
-  }, [setCurrentWorld, setOnboardingCompleted, router]);
+  }, [setCurrentWorld, completeTutorialPhase, router]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
-    setOnboardingCompleted(true);
+    completeTutorialPhase('intro');
     router.push('/worlds');
-  }, [setOnboardingCompleted, router]);
+  }, [completeTutorialPhase, router]);
 
   // Initialize wizard state
   const wizard = useWizardState({

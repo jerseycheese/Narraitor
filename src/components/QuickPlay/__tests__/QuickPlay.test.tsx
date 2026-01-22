@@ -44,7 +44,6 @@ describe('QuickPlay', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
-          onboardingCompleted: true,
           shouldShowOnboarding: () => false,
           resumeSavedSession: jest.fn().mockReturnValue(true),
         })
@@ -151,7 +150,6 @@ describe('QuickPlay', () => {
             'session-1': mockSavedSession,
           },
           resumeSavedSession: jest.fn().mockReturnValue(true),
-          onboardingCompleted: true,
           shouldShowOnboarding: () => false,
         })
       );
@@ -201,7 +199,6 @@ describe('QuickPlay', () => {
             'session-1': mockSavedSession,
           },
           resumeSavedSession: mockResume,
-          onboardingCompleted: true,
           shouldShowOnboarding: () => false,
         })
       );
@@ -233,7 +230,6 @@ describe('QuickPlay', () => {
             'session-1': mockSavedSession,
           },
           resumeSavedSession: jest.fn().mockReturnValue(true),
-          onboardingCompleted: true,
           shouldShowOnboarding: () => false,
         })
       );
@@ -261,7 +257,6 @@ describe('QuickPlay', () => {
             },
             resumeSavedSession: jest.fn().mockReturnValue(true),
             deleteSavedSession: mockDeleteSavedSession,
-            onboardingCompleted: true,
             shouldShowOnboarding: () => false,
           })
         );
@@ -325,7 +320,6 @@ describe('QuickPlay', () => {
             savedSessions: {},
             resumeSavedSession: jest.fn().mockReturnValue(true),
             deleteSavedSession: mockDeleteSavedSession,
-            onboardingCompleted: true,
             shouldShowOnboarding: () => false,
           })
         );
@@ -357,7 +351,6 @@ describe('QuickPlay', () => {
             },
           },
           resumeSavedSession: jest.fn().mockReturnValue(true),
-          onboardingCompleted: true,
           shouldShowOnboarding: () => false,
         })
       );
