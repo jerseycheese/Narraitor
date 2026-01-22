@@ -77,13 +77,6 @@ export function TutorialProgressWidget({
   if (variant === 'menu') {
     return (
       <div className={cn('space-y-4', className)}>
-        <div className="flex items-center gap-3">
-          <ProgressRing size={32} />
-          <div className="text-sm text-gray-700">
-            {finishedCount} of {PHASES.length} completed
-          </div>
-        </div>
-
         <div className="space-y-3">
           {phaseStates.map(({ phase, data, isFinished }) => {
             const isSkipped = data.skipped;
@@ -108,7 +101,7 @@ export function TutorialProgressWidget({
 
         <div>
           <div className="flex justify-between text-[10px] text-gray-500 mb-1">
-            <span>Overall Progress</span>
+            <span>Progress</span>
             <span>{Math.round(progressValue)}%</span>
           </div>
           <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
@@ -180,7 +173,7 @@ export function TutorialProgressWidget({
           
           <div className="mt-4">
             <div className="flex justify-between text-[10px] text-gray-500 mb-1">
-              <span>Overall Progress</span>
+              <span>Progress</span>
               <span>{Math.round(progressValue)}%</span>
             </div>
             <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
