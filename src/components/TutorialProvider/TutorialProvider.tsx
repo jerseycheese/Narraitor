@@ -89,6 +89,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   }, [isPaused]);
 
   const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
+    if (typeof window !== 'undefined' && (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__) {
+      return;
+    }
     // Disable tutorial in E2E testing environments
     if (process.env.NEXT_PUBLIC_DISABLE_TUTORIAL === 'true') {
       return;
