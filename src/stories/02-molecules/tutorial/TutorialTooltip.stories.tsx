@@ -7,7 +7,7 @@ import { TutorialContext } from '@/components/TutorialProvider/TutorialProvider'
 import { joyrideStyles } from '@/lib/tutorial/tutorialConfig';
 
 const meta: Meta<typeof TutorialTooltip> = {
-  title: 'Molecules/Tutorial/TutorialTooltip',
+  title: '02-Molecules/tutorial/TutorialTooltip',
   component: TutorialTooltip,
   decorators: [
     (Story) => (
