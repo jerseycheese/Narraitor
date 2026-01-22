@@ -74,18 +74,63 @@ export function TutorialProgressWidget({
     </div>
   );
 
+  if (variant === 'menu') {
+    return (
+      <div className={cn('space-y-4', className)}>
+        <div className="flex items-center gap-3">
+          <ProgressRing size={32} />
+          <div className="text-sm text-gray-700">
+            {finishedCount} of {PHASES.length} completed
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {phaseStates.map(({ phase, data, isFinished }) => {
+            const isSkipped = data.skipped;
+            return (
+              <div key={phase} className="flex items-center gap-3">
+                {isFinished ? (
+                  <CheckCircle2 className={cn('w-4 h-4', isSkipped ? 'text-gray-400' : 'text-green-500')} />
+                ) : (
+                  <Circle className="w-4 h-4 text-gray-300" />
+                )}
+                <span className={cn(
+                  'text-xs',
+                  isFinished ? 'text-gray-400 line-through' : 'text-gray-700'
+                )}>
+                  {PHASE_LABELS[phase]}
+                  {isSkipped && <span className="ml-1 text-[10px] no-underline">(skipped)</span>}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div>
+          <div className="flex justify-between text-[10px] text-gray-500 mb-1">
+            <span>Overall Progress</span>
+            <span>{Math.round(progressValue)}%</span>
+          </div>
+          <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-300" 
+              style={{ width: `${progressValue}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className={cn(
-        variant === 'floating'
-          ? 'fixed bottom-6 left-6 z-50 transition-all duration-300 ease-in-out'
-          : 'w-full',
+        'fixed bottom-6 left-6 z-50 transition-all duration-300 ease-in-out',
         'bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden',
         isExpanded ? 'w-64' : 'w-12 h-12 flex items-center justify-center cursor-pointer',
         className
       )}
       onClick={() => {
-        if (variant !== 'floating') return;
         if (!isExpanded) setIsExpanded(true);
       }}
     >
