@@ -64,7 +64,7 @@ export function TutorialMenu() {
       </Button>
       
       {isOpen && (
-        <div className={`${headerDropdownMenuClass} w-64 py-2`}>
+        <div className={`${headerDropdownMenuClass} w-64 py-0`}>
           <div className={headerDropdownHeaderClass}>
             <h4 className="font-semibold text-sm">Tutorial Progress</h4>
           </div>
