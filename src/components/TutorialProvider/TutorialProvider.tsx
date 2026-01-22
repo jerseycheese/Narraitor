@@ -54,6 +54,12 @@ const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping
   }
 };
 
+const normalizeSteps = (steps: Step[]): Step[] =>
+  steps.map((step) => ({
+    ...step,
+    disableBeacon: true,
+  }));
+
 interface TutorialProviderProps {
   children: ReactNode;
 }
@@ -98,8 +104,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
 
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
+    const normalizedSteps = normalizeSteps(loadedSteps);
     
-    if (loadedSteps.length > 0) {
+    if (normalizedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
       const phaseData = tutorialProgress.phases[tourId];
       const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
@@ -117,7 +124,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }
 
-      setSteps(loadedSteps);
+      setSteps(normalizedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
       setPauseReason(null);
@@ -164,7 +171,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     // Re-load steps to ensure they are fresh and correctly targeted
     if (activeTour) {
       const { steps: loadedSteps } = await loadTour(activeTour);
-      setSteps(loadedSteps);
+      setSteps(normalizeSteps(loadedSteps));
     }
     setRun(true);
     setIsPaused(false);
