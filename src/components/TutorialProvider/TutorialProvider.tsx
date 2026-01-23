@@ -21,6 +21,7 @@ interface TutorialContextValue {
   prevStep: () => void;
   skipTour: () => void;
   resetTutorial: () => void;
+  refreshTourLayout: () => void;
   isTourActive: boolean;
   currentTour: TutorialPhase | null;
   stepIndex: number;
@@ -87,6 +88,60 @@ const normalizeSteps = (steps: Step[], mapping?: Record<number, number>): Step[]
   });
 };
 
+const getTourTargetElement = (step?: Step | null): Element | null => {
+  if (!step) {
+    return null;
+  }
+
+  const target = step.target;
+
+  if (typeof target === 'string') {
+    try {
+      return document.querySelector(target);
+    } catch {
+      return null;
+    }
+  }
+
+  if (target instanceof Element) {
+    return target;
+  }
+
+  return null;
+};
+
+const getLayoutObservationTargets = (element: Element): Element[] => {
+  const targets = new Set<Element>();
+
+  targets.add(element);
+
+  const dialogContainer = element.closest('[role="dialog"]');
+  if (dialogContainer) {
+    targets.add(dialogContainer);
+  }
+
+  let current: Element | null = element.parentElement;
+  while (current) {
+    const style = window.getComputedStyle(current);
+    if (/(auto|scroll)/.test(style.overflowY)) {
+      targets.add(current);
+      break;
+    }
+    current = current.parentElement;
+  }
+
+  if (element.parentElement) {
+    targets.add(element.parentElement);
+  }
+
+  const scrollingElement = document.scrollingElement;
+  if (scrollingElement instanceof Element) {
+    targets.add(scrollingElement);
+  }
+
+  return Array.from(targets);
+};
+
 interface TutorialProviderProps {
   children: ReactNode;
 }
@@ -99,11 +154,14 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [pauseReason, setPauseReason] = useState<PauseReason>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [resetCount, setResetCount] = useState(0);
+  const [layoutRefreshKey, setLayoutRefreshKey] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
+  const layoutRafRef = useRef<number | null>(null);
+  const lastLayoutRectRef = useRef<DOMRect | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
 
@@ -121,6 +179,95 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
+
+  const refreshTourLayout = useCallback(() => {
+    if (!run && !isPaused) {
+      return;
+    }
+    setLayoutRefreshKey((count) => count + 1);
+  }, [run, isPaused]);
+
+  useEffect(() => {
+    if (!run || isPaused) {
+      return undefined;
+    }
+
+    const step = steps[stepIndex];
+    const targetElement = getTourTargetElement(step);
+
+    if (!step || !targetElement) {
+      return undefined;
+    }
+
+    lastLayoutRectRef.current = targetElement.getBoundingClientRect();
+    let isActive = true;
+
+    const scheduleLayoutRefresh = () => {
+      if (!isActive) {
+        return;
+      }
+
+      if (layoutRafRef.current !== null) {
+        return;
+      }
+
+      layoutRafRef.current = window.requestAnimationFrame(() => {
+        layoutRafRef.current = null;
+
+        if (!isActive) {
+          return;
+        }
+
+        const currentTarget = getTourTargetElement(step);
+        if (!currentTarget) {
+          return;
+        }
+
+        const rect = currentTarget.getBoundingClientRect();
+        const previousRect = lastLayoutRectRef.current;
+        const hasChanged = !previousRect
+          || rect.top !== previousRect.top
+          || rect.left !== previousRect.left
+          || rect.width !== previousRect.width
+          || rect.height !== previousRect.height;
+
+        lastLayoutRectRef.current = rect;
+
+        if (hasChanged) {
+          refreshTourLayout();
+        }
+      });
+    };
+
+    const observationTargets = getLayoutObservationTargets(targetElement);
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(scheduleLayoutRefresh)
+      : null;
+
+    observationTargets.forEach((target) => resizeObserver?.observe(target));
+
+    const mutationRoot = observationTargets[0] ?? targetElement;
+    const mutationObserver = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(scheduleLayoutRefresh)
+      : null;
+
+    mutationObserver?.observe(mutationRoot, {
+      attributes: true,
+      attributeFilter: ['class', 'style', 'hidden', 'aria-hidden'],
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      isActive = false;
+      if (layoutRafRef.current !== null) {
+        window.cancelAnimationFrame(layoutRafRef.current);
+        layoutRafRef.current = null;
+      }
+      resizeObserver?.disconnect();
+      mutationObserver?.disconnect();
+    };
+  }, [run, isPaused, steps, stepIndex, refreshTourLayout]);
 
   const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
     if (typeof window !== 'undefined' && (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__) {
@@ -251,7 +398,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (activeTour !== 'worldCreation') return;
+      if (activeTour !== 'worldCreation' && activeTour !== 'characterCreation') return;
       const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
       if (stepData?.skipIfMissing) {
         const direction = action === ACTIONS.PREV ? -1 : 1;
@@ -265,7 +412,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const isSameWizardStep = mappedWizardStep === currentWizardStep;
       const target = steps[index]?.target;
 
-      if (isSameWizardStep) {
+      if (isSameWizardStep || activeTour === 'characterCreation') {
         missingTargetRef.current = {
           index,
           target: typeof target === 'string' ? target : null,
@@ -290,7 +437,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   // Sync tour with wizard (only when the wizard actually changes steps)
   useEffect(() => {
-    if (!isPaused || pauseReason !== 'missing-target' || activeTour !== 'worldCreation') return;
+    if (!isPaused || pauseReason !== 'missing-target' || (activeTour !== 'worldCreation' && activeTour !== 'characterCreation')) return;
     const missingTarget = missingTargetRef.current;
     if (!missingTarget?.target) return;
 
@@ -406,6 +553,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       prevStep,
       skipTour,
       resetTutorial,
+      refreshTourLayout,
       isTourActive: run || isPaused,
       currentTour: activeTour,
       stepIndex,
@@ -415,7 +563,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       {children}
       {steps.length > 0 && run && (
         <Joyride
-          key={`${activeTour}-${isPaused}`}
+          key={`${activeTour}-${isPaused}-${layoutRefreshKey}`}
           steps={steps}
           run={!isPaused}
           stepIndex={stepIndex}
