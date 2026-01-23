@@ -72,28 +72,28 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step2-attributes.png', { fullPage: true });
 
-    // Allocate required points (10 + 10) so we can advance to the skills step
-    const attributeSliders = page.locator('[data-testid^="allocation-slider-"] input[type="range"]');
-    const sliderTotal = await attributeSliders.count();
-    for (let i = 0; i < sliderTotal; i++) {
-      const slider = attributeSliders.nth(i);
-      await slider.evaluate((element) => {
-        const input = element as HTMLInputElement;
-        const min = Number(input.min);
-        input.value = String(min);
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-    }
+    // Allocate required points so we can advance to the skills step.
+    // Use the native value setter so React's onChange fires reliably.
     await page.evaluate(() => {
       const sliders = Array.from(
         document.querySelectorAll('[data-testid^="allocation-slider-"] input[type="range"]')
       ) as HTMLInputElement[];
       if (!sliders.length) return;
 
+      const setValue = (input: HTMLInputElement, value: number) => {
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        if (setter) {
+          setter.call(input, String(value));
+        } else {
+          input.value = String(value);
+        }
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+
       const totalPoints = (() => {
         const text = document.querySelector('.component-attributes-step')?.textContent || '';
-        const match = text.match(/Total:\\s*(\\d+)/);
+        const match = text.match(/Total:\s*(\d+)/);
         return match ? Number(match[1]) : 0;
       })();
 
@@ -105,9 +105,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       sliders.forEach((slider, index) => {
         const capacity = maxes[index] - mins[index];
         const allocation = remaining > 0 ? Math.min(remaining, capacity) : 0;
-        slider.value = String(mins[index] + allocation);
-        slider.dispatchEvent(new Event('input', { bubbles: true }));
-        slider.dispatchEvent(new Event('change', { bubbles: true }));
+        setValue(slider, mins[index] + allocation);
         remaining -= allocation;
       });
     });
@@ -153,7 +151,12 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await slider.evaluate((element) => {
         const input = element as HTMLInputElement;
         const max = Number(input.max);
-        input.value = String(max);
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        if (setter) {
+          setter.call(input, String(max));
+        } else {
+          input.value = String(max);
+        }
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
       });
