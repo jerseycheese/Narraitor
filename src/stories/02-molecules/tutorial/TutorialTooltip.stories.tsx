@@ -23,6 +23,7 @@ const meta: Meta<typeof TutorialTooltip> = {
           isTourActive: true,
           currentTour: 'worldCreation',
           stepIndex: 0,
+          resetCount: 0,
           setCurrentWizardStep: () => {},
         }}
       >

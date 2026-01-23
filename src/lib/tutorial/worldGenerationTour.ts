@@ -20,5 +20,8 @@ export const worldGenerationTour: Step[] = [
     target: 'button:has-text("Generate")', // Targets the primary action button
     content: 'Click here to create your world! The system will generate attributes, skills, and a cover image automatically.',
     placement: 'auto',
+    data: {
+      hideNextButton: true,
+    },
   },
 ];

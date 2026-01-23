@@ -24,6 +24,7 @@ interface TutorialContextValue {
   isTourActive: boolean;
   currentTour: TutorialPhase | null;
   stepIndex: number;
+  resetCount: number;
   setCurrentWizardStep: (step: number) => void;
 }
 
@@ -97,6 +98,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [pauseReason, setPauseReason] = useState<PauseReason>(null);
   const [stepIndex, setStepIndex] = useState(0);
+  const [resetCount, setResetCount] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
   const runRef = useRef(false);
@@ -372,6 +374,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     resetStoreProgress();
     stopTour();
     setStepIndex(0);
+    setResetCount(count => count + 1);
   }, [resetStoreProgress, stopTour]);
 
   const nextStep = useCallback(() => {
@@ -406,6 +409,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       isTourActive: run || isPaused,
       currentTour: activeTour,
       stepIndex,
+      resetCount,
       setCurrentWizardStep,
     }}>
       {children}

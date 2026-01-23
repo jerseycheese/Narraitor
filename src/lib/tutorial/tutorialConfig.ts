@@ -13,6 +13,10 @@ export const joyrideStyles = {
     borderRadius: 'var(--radius)',
     color: 'hsl(var(--card-foreground))',
     textAlign: 'left' as const,
+    pointerEvents: 'auto' as const,
+  },
+  overlay: {
+    pointerEvents: 'none' as const,
   },
   tooltipContent: {
     textAlign: 'left' as const,
