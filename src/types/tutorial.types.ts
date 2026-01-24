@@ -1,3 +1,5 @@
+import { Step } from 'react-joyride';
+
 export interface TutorialProgress {
   phases: {
     intro: { completed: boolean; skipped: boolean };
@@ -11,3 +13,10 @@ export interface TutorialProgress {
 }
 
 export type TutorialPhase = 'intro' | 'worldCreation' | 'worldGeneration' | 'characterCreation' | 'firstPlay';
+
+export interface TutorialStep extends Step {
+  advanceOn?: {
+    selector: string;
+    event: 'click' | 'change' | 'keydown';
+  };
+}

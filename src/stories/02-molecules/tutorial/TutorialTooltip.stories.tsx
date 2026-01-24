@@ -20,6 +20,7 @@ const meta: Meta<typeof TutorialTooltip> = {
           prevStep: () => {},
           skipTour: () => {},
           resetTutorial: () => {},
+          refreshTourLayout: () => {},
           isTourActive: true,
           currentTour: 'worldCreation',
           stepIndex: 0,

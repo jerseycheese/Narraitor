@@ -1,9 +1,9 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
 
 import { WorldCreationStartTooltip } from '@/components/TutorialProvider/WorldCreationStartTooltip';
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-export const worldCreationTour: Step[] = [
+export const worldCreationTour: TutorialStep[] = [
   {
     target: '[data-tutorial="world-type-selector"]',
     content: 'Welcome to the World Creation Wizard! Choose a path: start from scratch on the left, or use a template on the right.',

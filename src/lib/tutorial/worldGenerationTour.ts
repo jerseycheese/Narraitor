@@ -1,6 +1,6 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
 
-export const worldGenerationTour: Step[] = [
+export const worldGenerationTour: TutorialStep[] = [
   {
     target: '[aria-describedby="generate-world-desc"]',
     content: 'This tool lets you instantly generate a complete world setup. Perfect for quick starts!',

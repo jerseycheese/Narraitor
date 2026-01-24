@@ -1,7 +1,7 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-export const characterCreationTour: Step[] = [
+export const characterCreationTour: TutorialStep[] = [
   {
     target: '[data-tutorial="quickstart-archetypes"]',
     content: 'Pick a pre-made character to jump straight into the story.',

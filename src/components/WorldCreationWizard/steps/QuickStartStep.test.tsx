@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import QuickStartStep from './QuickStartStep';
-import { World } from '@/types/world.types';
+import { World, CharacterArchetype } from '@/types/world.types';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
@@ -14,8 +14,13 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/sessionStore');
 jest.mock('@/state/characterStore');
 
+interface QuickStartCharactersProps {
+  onCharacterSelect: (archetype: CharacterArchetype) => void;
+  onCustomizeClick: () => void;
+}
+
 jest.mock('@/components/QuickStartCharacters/QuickStartCharacters', () => ({
-  QuickStartCharacters: ({ onCharacterSelect, onCustomizeClick }: any) => (
+  QuickStartCharacters: ({ onCharacterSelect, onCustomizeClick }: QuickStartCharactersProps) => (
     <div data-testid="quick-start-characters">
       <button onClick={() => onCharacterSelect({
         name: 'Test Archetype',
@@ -28,7 +33,7 @@ jest.mock('@/components/QuickStartCharacters/QuickStartCharacters', () => ({
             description: '',
             personality: '',
             motivation: '',
-            fears: '',
+            fears: [],
             physicalDescription: '',
         }
       })}>
@@ -42,7 +47,7 @@ jest.mock('@/components/QuickStartCharacters/QuickStartCharacters', () => ({
 }));
 
 describe('QuickStartStep Tutorial Completion', () => {
-  const mockWorld: World = {
+  const mockWorld = {
     id: 'world-1',
     name: 'Test World',
     description: 'Test Desc',
@@ -50,7 +55,9 @@ describe('QuickStartStep Tutorial Completion', () => {
     settings: {},
     createdAt: '',
     updatedAt: '',
-  } as any;
+    attributes: [],
+    skills: []
+  } as unknown as World;
 
   const mockOnBack = jest.fn();
   const mockOnComplete = jest.fn();
@@ -74,12 +81,13 @@ describe('QuickStartStep Tutorial Completion', () => {
         shouldShowTutorialPhase: mockShouldShowTutorialPhase,
     };
 
-    (useSessionStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+    (useSessionStore as unknown as jest.Mock).mockImplementation((selector: (state: typeof mockSessionState) => unknown) => {
         return selector(mockSessionState);
     });
     
     // Add getState to the mock
-    (useSessionStore as any).getState = jest.fn().mockReturnValue(mockSessionState);
+    const storeMock = useSessionStore as unknown as jest.Mocked<typeof useSessionStore>;
+    storeMock.getState = jest.fn().mockReturnValue(mockSessionState);
 
 
     // Setup Character Store Mock
@@ -89,11 +97,12 @@ describe('QuickStartStep Tutorial Completion', () => {
          characters: {}
     };
 
-    (useCharacterStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+    (useCharacterStore as unknown as jest.Mock).mockImplementation((selector: (state: typeof mockCharacterState) => unknown) => {
          return selector(mockCharacterState);
     });
     
-     (useCharacterStore as any).getState = jest.fn().mockReturnValue(mockCharacterState);
+    const charStoreMock = useCharacterStore as unknown as jest.Mocked<typeof useCharacterStore>;
+    charStoreMock.getState = jest.fn().mockReturnValue(mockCharacterState);
 
     // Default: tutorial phase should be shown
     mockShouldShowTutorialPhase.mockReturnValue(true);

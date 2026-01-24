@@ -4,34 +4,40 @@ import { TutorialProvider, useTutorial } from '../index';
 import { useSessionStore } from '@/state/sessionStore';
 
 let joyrideMounts = 0;
-let joyrideUnmounts = 0;
 let resizeObserverCallback: ResizeObserverCallback | null = null;
 
 // Mock React Joyride
 jest.mock('react-joyride', () => {
   const React = require('react');
   const STATUS = {
-    FINISHED: 'finished',
-    SKIPPED: 'skipped',
+    FINISHED: 'finished' as const,
+    SKIPPED: 'skipped' as const,
   };
 
   const EVENTS = {
-    TARGET_NOT_FOUND: 'target_not_found',
+    TARGET_NOT_FOUND: 'target_not_found' as import('react-joyride').Events,
   };
 
   const ACTIONS = {
-    PREV: 'prev',
+    PREV: 'prev' as const,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
-    if (!run) return null;
+  interface DummyJoyrideProps {
+    run: boolean;
+    stepIndex: number;
+    steps: Array<{ target: string; content: string }>;
+    callback: (data: Partial<import('react-joyride').CallBackProps>) => void;
+  }
+
+  const DummyJoyride = ({ run, stepIndex, steps, callback }: DummyJoyrideProps) => {
     React.useEffect(() => {
-      joyrideMounts += 1;
-      return () => {
-        joyrideUnmounts += 1;
-      };
-    }, []);
+      if (run) {
+        joyrideMounts += 1;
+      }
+    }, [run]);
+
+    if (!run) return null;
+
     return (
       <div data-testid="joyride-mock">
         <div>Step Index: {stepIndex}</div>
@@ -81,7 +87,6 @@ describe('TutorialProvider', () => {
   beforeEach(() => {
     useSessionStore.getState().resetTutorialProgress();
     joyrideMounts = 0;
-    joyrideUnmounts = 0;
     resizeObserverCallback = null;
     global.ResizeObserver = class ResizeObserver {
       private readonly callback: ResizeObserverCallback;

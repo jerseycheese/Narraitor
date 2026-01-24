@@ -1,6 +1,6 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
 
-export const firstPlayTour: Step[] = [
+export const firstPlayTour: TutorialStep[] = [
   {
     target: '[data-tutorial="narrative-display"]',
     content: 'This is where your story unfolds. Read the narrative carefully as it adapts to your choices.',
