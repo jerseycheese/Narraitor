@@ -45,6 +45,14 @@ interface SimpleModalProps {
   tone?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
 }
 
+export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  return Boolean(target.closest('.react-joyride__tooltip'));
+};
+
 const SIZE_CLASSES: Record<NonNullable<SimpleModalProps['size']>, string> = {
   sm: '!max-w-sm',
   md: '!max-w-md',
@@ -139,6 +147,11 @@ export function SimpleModal({
           className,
         )}
         onInteractOutside={event => {
+          if (isJoyrideTooltipTarget(event.target)) {
+            event.preventDefault();
+            return;
+          }
+
           if (!closeOnBackdropClick) {
             event.preventDefault();
           }

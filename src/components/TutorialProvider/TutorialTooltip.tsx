@@ -92,7 +92,7 @@ export function TutorialTooltip({
       {!hideFooter && (
         <div style={styles.tooltipFooter}>
           <div style={styles.tooltipFooterSpacer}>
-            {showSkipButton && !isLastStep && (
+            {showSkipButton && (!isLastStep || hideNextButton) && (
               <Button
                 aria-live="off"
                 data-test-id="button-skip"

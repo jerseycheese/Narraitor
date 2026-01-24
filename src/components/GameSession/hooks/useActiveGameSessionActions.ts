@@ -46,6 +46,13 @@ export const useActiveGameSessionActions = ({
   createDecisionJournalEntry,
   createJournalEntryFromSegment,
 }: UseActiveGameSessionActionsOptions) => {
+  const maybeCompleteFirstPlay = useCallback(() => {
+    const sessionStore = useSessionStore.getState();
+    if (sessionStore.shouldShowTutorialPhase?.('firstPlay')) {
+      sessionStore.completeTutorialPhase('firstPlay');
+    }
+  }, []);
+
   const handleNarrativeGenerated = useCallback((segment: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
@@ -90,10 +97,11 @@ export const useActiveGameSessionActions = ({
     // Clear current decision to prevent showing stale choices during generation
     setCurrentDecision(null);
 
+    maybeCompleteFirstPlay();
     onChoiceSelected(choiceId);
 
     void autoSave.triggerSave('player-choice');
-  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleCustomSubmit = useCallback((customText: string) => {
     // Check if session has ended - if so, prevent further generation
@@ -134,10 +142,11 @@ export const useActiveGameSessionActions = ({
     setLocalSelectedChoiceId(customChoiceId);
     setShouldTriggerGeneration(true);
 
+    maybeCompleteFirstPlay();
     onChoiceSelected(customChoiceId);
 
     void autoSave.triggerSave('player-choice');
-  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleChoicesGenerated = useCallback((decision: Decision) => {
     if (!decision || !decision.options || (decision.options?.length || 0) === 0) {

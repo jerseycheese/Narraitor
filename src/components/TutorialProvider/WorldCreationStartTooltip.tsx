@@ -25,7 +25,7 @@ export function WorldCreationStartTooltip({
 }: TooltipRenderProps) {
   const { content, hideBackButton, hideFooter, showSkipButton, styles, title } =
     step;
-  const { pauseTour } = useTutorial();
+  const { pauseTour, skipTour } = useTutorial();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
 
   // Don't advance Joyride - the wizard-to-tour sync in TutorialProvider
@@ -38,6 +38,17 @@ export function WorldCreationStartTooltip({
     updateTutorialProgress('worldCreation', { lastStep: index });
     // Hide tooltip, keep tour state
     pauseTour('end-of-page');
+  };
+
+  const handleSkipClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (typeof skipProps.onClick === 'function') {
+      skipProps.onClick(event);
+    }
+
+    skipTour();
   };
 
   const ariaLabel =
@@ -89,6 +100,7 @@ export function WorldCreationStartTooltip({
                 size="sm"
                 className={skipClassName ? `p-0 h-auto ${skipClassName}` : 'p-0 h-auto'}
                 {...skipButtonProps}
+                onClick={handleSkipClick}
               >
                 {skipLabel}
               </Button>

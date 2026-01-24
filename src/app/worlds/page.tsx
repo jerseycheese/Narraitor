@@ -205,6 +205,7 @@ export default function WorldsPage() {
               onClick: handleGenerateWorld,
               variant: 'primary',
               disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+              dataTutorial: 'generate-world-submit',
               icon: (
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
               )
