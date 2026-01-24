@@ -142,8 +142,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     worldSkillBounds
   ]);
 
-  const effectivePool = Math.min(totalSkillPoints, totalCapacity);
-  const hasUnallocatedEffectivePoints = spentPoints < effectivePool;
+  const hasUnallocatedPoints = remainingPoints > 0;
   const validation = data.validation[3];
   const showErrors = validation?.touched && !validation?.valid;
   const selectedSkills = data.characterData.skills.filter(skill => skill.isSelected);
@@ -199,7 +198,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
         <p className="text-sm text-blue-900">
           Each selected skill starts at its minimum level. Increase levels to invest skill points. 
-          You must spend all available skill points before continuing.
+          You have extra skill points. It's fine to leave some unspent.
         </p>
       </div>
 
@@ -209,8 +208,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           <div className="flex flex-wrap items-center gap-6 text-sm">
             <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
             <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
-            <span className={`${wizardStyles.badge.secondary} ${(remainingPoints <= 0 || !hasUnallocatedEffectivePoints) ? 'text-green-700 border-green-300' : 'text-amber-700 border-amber-300'}`}>
-              Remaining: {Math.max(remainingPoints, effectivePool - spentPoints)}
+            <span className={`${wizardStyles.badge.secondary} ${remainingPoints <= 0 ? 'text-green-700 border-green-300' : 'text-amber-700 border-amber-300'}`}>
+              Remaining: {Math.max(remainingPoints, 0)}
             </span>
             {totalSkillPoints > totalCapacity && (
               <span className={wizardStyles.badge.secondary}>
@@ -297,12 +296,12 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         })}
       </div>
 
-      {totalSkillPoints > 0 && hasUnallocatedEffectivePoints && (
+      {totalSkillPoints > 0 && hasUnallocatedPoints && (
         <div className={`${wizardStyles.card.base} border-amber-300 bg-amber-50 mt-6`}>
           <p className="text-sm text-amber-800">
             {totalSkillPoints > totalCapacity
-              ? 'Skill point pool exceeds the current skill caps. Maximize existing skills or adjust world settings to spend the remaining pool.'
-              : 'Spend all remaining skill points before continuing.'}
+              ? 'You have extra skill points. It\'s fine to leave some unspent.'
+              : 'You still have unspent skill points. You can continue or spend more if you want.'}
           </p>
         </div>
       )}
