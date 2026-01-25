@@ -65,21 +65,20 @@ describe('finalizeCharacterCreation', () => {
         name: 'Hero',
         worldId: 'world-1',
         description: '',
+        portraitPlaceholder: '',
         background: {
           history: 'History',
           personality: 'Personality',
           motivation: 'Motivation',
           goals: [],
-          fears: [],
           physicalDescription: '',
         },
         attributes: [
-          { attributeId: 'attr-1', value: 3 },
+          { attributeId: 'attr-1', name: 'Strength', description: 'Power', value: 3, minValue: 1, maxValue: 5 },
         ],
         skills: [
-          { skillId: 'skill-1', level: 2, isSelected: true },
+          { skillId: 'skill-1', name: 'Combat', description: 'Fighting', level: 2, minLevel: 1, maxLevel: 5, isSelected: true },
         ],
-        portrait: null,
       },
       world
     );

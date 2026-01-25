@@ -3,10 +3,11 @@
 import { World, CharacterArchetype } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { generateUniqueId } from './generateId';
-import { 
-  ARCHETYPE_TEMPLATES, 
-  PHYSICAL_DESCRIPTION_TEMPLATES, 
-  ArchetypeTemplate as ImportedArchetypeTemplate 
+import { calculateCharacterLevel } from './characterLevel';
+import {
+  ARCHETYPE_TEMPLATES,
+  PHYSICAL_DESCRIPTION_TEMPLATES,
+  ArchetypeTemplate as ImportedArchetypeTemplate
 } from '@/lib/constants/characterArchetypeTemplates';
 
 export type ArchetypeTemplate = ImportedArchetypeTemplate;
@@ -62,13 +63,17 @@ export async function generateCharacterArchetypes(
       const motivation = template.motivations[Math.floor(globalRandom() * template.motivations.length)];
       const fears = template.fears[Math.floor(globalRandom() * template.fears.length)];
       
+      const attributes = distributeAttributes(world.attributes, template, world.settings.attributePointPool);
+      const skills = distributeSkills(world.skills, template, world.settings.skillPointPool);
+      const level = calculateCharacterLevel(world, attributes);
+
       const archetype: CharacterArchetype = {
         id: generateUniqueId('archetype'),
         name,
         description: template.description,
-        level: 1, // All quick start characters are level 1
-        attributes: distributeAttributes(world.attributes, template),
-        skills: distributeSkills(world.skills, template),
+        level,
+        attributes,
+        skills,
         background: {
           description: `${template.description} who has found their way to ${world.name}. ${personality}`,
           personality,
@@ -199,23 +204,25 @@ function generateCharacterName(template: ArchetypeTemplate, existingNames: strin
  * Distribute attribute points based on archetype preferences
  */
 function distributeAttributes(
-  worldAttributes: World['attributes'], 
-  template: ArchetypeTemplate
+  worldAttributes: World['attributes'],
+  template: ArchetypeTemplate,
+  pointPool: number
 ): CharacterArchetype['attributes'] {
-  return worldAttributes.map(attr => {
-    const isPrimary = template.primaryAttributes.some(primary => 
+  // First, calculate ideal values based on template priorities
+  const idealAttributes = worldAttributes.map(attr => {
+    const isPrimary = template.primaryAttributes.some(primary =>
       attr.name.toLowerCase().includes(primary.toLowerCase()) ||
       primary.toLowerCase().includes(attr.name.toLowerCase())
     );
-    
-    const isSecondary = template.secondaryAttributes.some(secondary => 
+
+    const isSecondary = template.secondaryAttributes.some(secondary =>
       attr.name.toLowerCase().includes(secondary.toLowerCase()) ||
       secondary.toLowerCase().includes(attr.name.toLowerCase())
     );
-    
+
     let value: number;
     const range = attr.maxValue - attr.minValue;
-    
+
     if (isPrimary) {
       // Primary attributes: 70-100% of range
       value = Math.floor(attr.minValue + range * 0.7 + globalRandom() * range * 0.3);
@@ -226,14 +233,53 @@ function distributeAttributes(
       // Other attributes: 20-60% of range
       value = Math.floor(attr.minValue + range * 0.2 + globalRandom() * range * 0.4);
     }
-    
+
     // Ensure within bounds
     value = Math.max(attr.minValue, Math.min(attr.maxValue, value));
-    
+
     return {
       id: attr.id,
       name: attr.name,
-      value
+      value,
+      minValue: attr.minValue,
+      maxValue: attr.maxValue
+    };
+  });
+
+  // Calculate total and scale down if it exceeds the pool
+  const idealTotal = idealAttributes.reduce((sum, attr) => sum + attr.value, 0);
+
+  if (idealTotal <= pointPool) {
+    // Under budget, use ideal values
+    return idealAttributes.map(({ id, name, value }) => ({ id, name, value }));
+  }
+
+  // Over budget, scale down proportionally while maintaining minimums
+  const minimumTotal = idealAttributes.reduce((sum, attr) => sum + attr.minValue, 0);
+  const availablePoints = pointPool - minimumTotal;
+  const idealPointsAboveMin = idealTotal - minimumTotal;
+
+  if (availablePoints <= 0 || idealPointsAboveMin <= 0) {
+    // Pool is too small or at minimum, return minimum values
+    return idealAttributes.map(attr => ({
+      id: attr.id,
+      name: attr.name,
+      value: attr.minValue
+    }));
+  }
+
+  // Scale down proportionally
+  const scaleFactor = availablePoints / idealPointsAboveMin;
+
+  return idealAttributes.map(attr => {
+    const pointsAboveMin = attr.value - attr.minValue;
+    const scaledPointsAboveMin = Math.floor(pointsAboveMin * scaleFactor);
+    const finalValue = attr.minValue + scaledPointsAboveMin;
+
+    return {
+      id: attr.id,
+      name: attr.name,
+      value: Math.max(attr.minValue, Math.min(attr.maxValue, finalValue))
     };
   });
 }
@@ -242,17 +288,19 @@ function distributeAttributes(
  * Distribute skill levels based on archetype preferences
  */
 function distributeSkills(
-  worldSkills: World['skills'], 
-  template: ArchetypeTemplate
+  worldSkills: World['skills'],
+  template: ArchetypeTemplate,
+  pointPool: number
 ): CharacterArchetype['skills'] {
-  return worldSkills.map(skill => {
-    const isPreferred = template.preferredSkills.some(preferred => 
+  // First, calculate ideal levels based on template preferences
+  const idealSkills = worldSkills.map(skill => {
+    const isPreferred = template.preferredSkills.some(preferred =>
       skill.name.toLowerCase().includes(preferred.toLowerCase()) ||
       preferred.toLowerCase().includes(skill.name.toLowerCase())
     );
-    
+
     let level: number;
-    
+
     if (isPreferred) {
       // Preferred skills: 6-9 (competent to expert)
       level = Math.floor(globalRandom() * 4) + 6;
@@ -260,14 +308,55 @@ function distributeSkills(
       // Other skills: 1-6 (beginner to competent)
       level = Math.floor(globalRandom() * 6) + 1;
     }
-    
-    // Ensure within bounds
-    level = Math.max(1, Math.min(10, level));
-    
+
+    // Ensure within bounds (1-10 default, but respect world skill bounds if provided)
+    const minLevel = skill.minValue ?? 1;
+    const maxLevel = skill.maxValue ?? 10;
+    level = Math.max(minLevel, Math.min(maxLevel, level));
+
     return {
       id: skill.id,
       name: skill.name,
-      level
+      level,
+      minLevel,
+      maxLevel
+    };
+  });
+
+  // Calculate total and scale down if it exceeds the pool
+  const idealTotal = idealSkills.reduce((sum, skill) => sum + skill.level, 0);
+
+  if (idealTotal <= pointPool) {
+    // Under budget, use ideal levels
+    return idealSkills.map(({ id, name, level }) => ({ id, name, level }));
+  }
+
+  // Over budget, scale down proportionally while maintaining minimums
+  const minimumTotal = idealSkills.reduce((sum, skill) => sum + skill.minLevel, 0);
+  const availablePoints = pointPool - minimumTotal;
+  const idealPointsAboveMin = idealTotal - minimumTotal;
+
+  if (availablePoints <= 0 || idealPointsAboveMin <= 0) {
+    // Pool is too small or at minimum, return minimum levels
+    return idealSkills.map(skill => ({
+      id: skill.id,
+      name: skill.name,
+      level: skill.minLevel
+    }));
+  }
+
+  // Scale down proportionally
+  const scaleFactor = availablePoints / idealPointsAboveMin;
+
+  return idealSkills.map(skill => {
+    const pointsAboveMin = skill.level - skill.minLevel;
+    const scaledPointsAboveMin = Math.floor(pointsAboveMin * scaleFactor);
+    const finalLevel = skill.minLevel + scaledPointsAboveMin;
+
+    return {
+      id: skill.id,
+      name: skill.name,
+      level: Math.max(skill.minLevel, Math.min(skill.maxLevel, finalLevel))
     };
   });
 }

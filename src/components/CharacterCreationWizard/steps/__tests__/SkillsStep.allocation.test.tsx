@@ -97,7 +97,7 @@ describe('SkillsStep - skill point allocation', () => {
     renderSkillsStep();
 
     expect(
-      screen.getByText(/You have extra skill points. It\'s fine to leave some unspent./)
+      screen.getByText(/Unspent points are allowed if you want to create a less experienced character/)
     ).toBeInTheDocument();
   });
 
