@@ -7,6 +7,7 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { TutorialMenu } from './TutorialMenu';
 import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
 interface MobileNavigationMenuProps {
@@ -114,15 +115,18 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           <LogoIcon size="small" className="brightness-0 invert" />
           <LogoText size="sm" className="text-white" />
         </div>
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="icon"
-          className="min-h-11 min-w-11 text-white hover:bg-gray-700"
-          aria-label="Close menu"
-        >
-          <X className="w-5 h-5" aria-hidden="true" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <TutorialMenu />
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="icon"
+            className="min-h-11 min-w-11 text-white hover:bg-gray-700"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
+          </Button>
+        </div>
       </div>
 
       {/* Main navigation items */}
