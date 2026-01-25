@@ -11,6 +11,7 @@ import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickSta
 import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CharacterArchetype } from '@/types/world.types';
+import { useTutorial } from '@/components/TutorialProvider';
 
 export default function CharacterCreatePage() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function CharacterCreatePage() {
   const { currentWorldId, setCurrentWorld, worlds } = useWorldStore();
   const { createCharacter, setCurrentCharacter } = useCharacterStore();
   const { initializeSession } = useSessionStore();
+  const { startTour, isTourActive } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -25,6 +28,16 @@ export default function CharacterCreatePage() {
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+
+  // Start tutorial tour on mount
+  useEffect(() => {
+    if (mounted && shouldShowTour && !isTourActive && showQuickStart) {
+      const timer = setTimeout(() => {
+        startTour('characterCreation');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, shouldShowTour, isTourActive, startTour, showQuickStart]);
 
   // If URL has worldId but store doesn't, set it in the store
   useEffect(() => {
