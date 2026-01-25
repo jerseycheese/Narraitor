@@ -9,7 +9,7 @@ export const characterCreationTour: Step[] = [
       children: 'Choose a character template to get a head start, or build your hero from scratch.',
       example: 'Warrior for a combat-focused character with high Strength',
     }),
-    placement: 'bottom',
+    placement: 'top',
     disableBeacon: true,
     data: { isEndOfPage: true },
   },
@@ -46,7 +46,7 @@ export const characterCreationTour: Step[] = [
       children: 'Flesh out your backstory. Where are you from? What motivates you?',
       example: '"Orphaned during the war" to explain their distrust of authority',
     }),
-    placement: 'bottom',
+    placement: 'top',
     disableBeacon: true,
   },
   {

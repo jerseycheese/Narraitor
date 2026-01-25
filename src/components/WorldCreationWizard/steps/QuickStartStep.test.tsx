@@ -108,7 +108,7 @@ describe('QuickStartStep Tutorial Completion', () => {
     mockShouldShowTutorialPhase.mockReturnValue(true);
   });
 
-  test('calls completeTutorialPhase("worldCreation") when "Skip Character Creation" is clicked', () => {
+  test('calls onComplete when "Skip Character Creation" is clicked', () => {
     render(
       <QuickStartStep
         world={mockWorld}
@@ -120,11 +120,10 @@ describe('QuickStartStep Tutorial Completion', () => {
 
     fireEvent.click(screen.getByText('Skip Character Creation for Now'));
 
-    expect(mockCompleteTutorialPhase).toHaveBeenCalledWith('worldCreation');
     expect(mockOnComplete).toHaveBeenCalled();
   });
 
-  test('calls completeTutorialPhase("worldCreation") when "Customize Character" is clicked', () => {
+  test('calls onCustomizeCharacter when "Customize Character" is clicked', () => {
     render(
       <QuickStartStep
         world={mockWorld}
@@ -136,11 +135,10 @@ describe('QuickStartStep Tutorial Completion', () => {
 
     fireEvent.click(screen.getByText('Customize Character'));
 
-    expect(mockCompleteTutorialPhase).toHaveBeenCalledWith('worldCreation');
     expect(mockOnCustomizeCharacter).toHaveBeenCalled();
   });
 
-  test('calls completeTutorialPhase("worldCreation") when an archetype is selected', async () => {
+  test('initializes session and navigates to play when an archetype is selected', async () => {
     mockInitializeSession.mockImplementation((wId, cId, cb) => cb && cb());
 
     render(
@@ -158,25 +156,6 @@ describe('QuickStartStep Tutorial Completion', () => {
         expect(mockInitializeSession).toHaveBeenCalled();
     });
 
-    expect(mockCompleteTutorialPhase).toHaveBeenCalledWith('worldCreation');
     expect(mockRouterPush).toHaveBeenCalledWith('/play');
-  });
-
-   test('does NOT call completeTutorialPhase("worldCreation") if shouldShowTutorialPhase returns false', () => {
-    mockShouldShowTutorialPhase.mockReturnValue(false);
-
-    render(
-      <QuickStartStep
-        world={mockWorld}
-        onBack={mockOnBack}
-        onComplete={mockOnComplete}
-        onCustomizeCharacter={mockOnCustomizeCharacter}
-      />
-    );
-
-    fireEvent.click(screen.getByText('Skip Character Creation for Now'));
-
-    expect(mockCompleteTutorialPhase).not.toHaveBeenCalled();
-    expect(mockOnComplete).toHaveBeenCalled();
   });
 });
