@@ -197,8 +197,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       >
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
         <p className="text-sm text-blue-900">
-          Each selected skill starts at its minimum level. Increase levels to invest skill points. 
-          You have extra skill points. It's fine to leave some unspent.
+          Each selected skill starts at its minimum level. Increase levels to invest skill points.
+          Unspent points are allowed if you want to create a less experienced character.
         </p>
       </div>
 
@@ -300,8 +300,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         <div className={`${wizardStyles.card.base} border-amber-300 bg-amber-50 mt-6`}>
           <p className="text-sm text-amber-800">
             {totalSkillPoints > totalCapacity
-              ? 'You have extra skill points. It\'s fine to leave some unspent.'
-              : 'You still have unspent skill points. You can continue or spend more if you want.'}
+              ? 'Your skill point pool exceeds the current skill caps. You can maximize existing skills or leave points unspent.'
+              : `You have ${remainingPoints} unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}
           </p>
         </div>
       )}

@@ -85,7 +85,7 @@ export const validateSkills = (
   const errors = [...updatedErrors];
 
   const getBounds = (skill: { minLevel?: number; maxLevel?: number; skillId: EntityID }) => {
-    const worldSkill = worldSkills.find(ws => ws.id === skill.id || ws.id === skill.skillId);
+    const worldSkill = worldSkills.find(ws => ws.id === skill.skillId);
     const minLevel = skill.minLevel ?? worldSkill?.minValue ?? 1;
     const maxLevel = skill.maxLevel ?? worldSkill?.maxValue ?? minLevel;
     return { minLevel, maxLevel };
