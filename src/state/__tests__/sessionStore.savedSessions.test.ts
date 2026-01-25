@@ -39,7 +39,6 @@ const resetSessionStore = () => {
       totalSaves: 0,
     },
     narrativeHeight: 600,
-    onboardingCompleted: false,
   });
 };
 
