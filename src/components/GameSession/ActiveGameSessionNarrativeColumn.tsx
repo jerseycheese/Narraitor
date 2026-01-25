@@ -45,6 +45,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<ActiveGameSessionNarrativeColum
     <div
       className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
       id="narrative-container"
+      data-tutorial="narrative-display"
       style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
     >
       {/* Fade-out overlay at top when multiple segments */}

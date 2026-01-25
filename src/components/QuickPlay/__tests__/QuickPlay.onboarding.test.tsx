@@ -282,6 +282,8 @@ describe('QuickPlay - Onboarding Integration', () => {
         useSessionStore as jest.MockedFunction<typeof useSessionStore>,
         createMockSessionStore({
           savedSessions: {},
+          // No explicit tutorialProgress, simulating corrupted/missing state
+          // but we provide the selector result
           isFirstTimeUser: () => true, // Fallback to true
           shouldShowOnboarding: () => true,
         })

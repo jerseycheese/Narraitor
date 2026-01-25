@@ -1,58 +1,93 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
+import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-/**
- * Character Creation Tour Steps
- * Guides the user through the process of creating a new character.
- */
-export const characterCreationTour: Step[] = [
+export const characterCreationTour: TutorialStep[] = [
   {
-    target: '[data-testid="template-card"]',
-    content: 'Start by choosing a character template that fits your playstyle, or skip ahead to create your hero from scratch.',
+    target: '[data-tutorial="quickstart-archetypes"]',
+    content: 'Pick a pre-made character to jump straight into the story.',
+    placement: 'top',
+    disableBeacon: true,
+    hideBackButton: true,
+  },
+  {
+    target: '[data-tutorial="quickstart-random"]',
+    content: 'Generate a fresh random character if you want a new option.',
     placement: 'top',
     disableBeacon: true,
   },
   {
-    target: '[data-testid="character-name-input"]',
-    content: 'Give your character a name and a brief description. This helps define their presence in the world.',
+    target: '[data-tutorial="quickstart-custom"]',
+    content: 'Create a custom character with full control over details.',
     placement: 'top',
+    disableBeacon: true,
+    disableScrolling: true,
+    advanceOn: { selector: '[data-tutorial="quickstart-custom"]', event: 'click' },
   },
   {
-    target: '[data-testid="attributes-step"]',
-    content: 'Allocate points to your core attributes. These define your character\'s innate strengths and weaknesses.',
+    target: '[data-tutorial="template-selector"]',
+    content: TutorialContent({
+      children: 'Choose a character template to get a head start, or build your hero from scratch.',
+      example: 'Warrior for a combat-focused character with high Strength',
+    }),
     placement: 'top',
+    disableBeacon: true,
+    data: {
+      isEndOfPage: true,
+      nextStepHint: 'Select a template (or leave it blank) and click Next to continue.',
+    },
   },
   {
-    target: '[data-testid="skills-step"]',
-    content: 'Choose your skills! Skills are specialized abilities that you\'ll use to overcome challenges during your adventure.',
+    target: '[data-tutorial="basic-info"]',
+    content: TutorialContent({
+      children: 'Give your character a name and description.',
+      example: '"Kira Nightshade" with a backstory hint like "a cunning rogue with a mysterious past"',
+    }),
     placement: 'top',
+    disableBeacon: true,
   },
   {
-    target: '[data-testid="background-step"]',
-    content: 'Flesh out your character\'s history, personality, and motivations. This adds depth to your roleplaying experience.',
+    target: '[data-tutorial="attribute-allocation"]',
+    content: TutorialContent({
+      children: 'Allocate points to your core attributes. These determine your natural strengths and weaknesses.',
+      example: 'High Strength for a fighter who relies on physical power',
+    }),
     placement: 'top',
+    disableBeacon: true,
   },
   {
-    target: '[data-testid="portrait-step"]',
-    content: 'Finally, generate a unique AI portrait for your character based on their description and background.',
+    target: '[data-tutorial="skill-selection"]',
+    content: TutorialContent({
+      children: 'Select skills that define what your character excels at.',
+      example: 'Stealth for a character who prefers avoiding direct confrontation',
+    }),
     placement: 'top',
+    disableBeacon: true,
   },
   {
-    target: '[data-testid="step-complete-button"]',
-    content: 'All set! Click here to create your character and start your journey.',
+    target: '[data-tutorial="background-editor"]',
+    content: TutorialContent({
+      children: 'Flesh out your backstory. Where are you from? What motivates you?',
+      example: '"Orphaned during the war" to explain their distrust of authority',
+    }),
     placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tutorial="portrait-generator"]',
+    content: 'Generate a unique portrait based on your character description, or upload your own image.',
+    placement: 'top',
+    disableBeacon: true,
+    data: {
+      nextStepHint: 'Click Create Character to finish and start playing.',
+    },
   },
 ];
 
-/**
- * Mapping of tour step indices to wizard step indices.
- * Used by TutorialProvider to sync the tour progress with the wizard.
- */
 export const tourStepToWizardStep: Record<number, number> = {
-  0: 0, // Template
-  1: 1, // Basic Info
-  2: 2, // Attributes
-  3: 3, // Skills
-  4: 4, // Background
-  5: 5, // Portrait
-  6: 5, // Create
+  3: 0,
+  4: 1,
+  5: 2,
+  6: 3,
+  7: 4,
+  8: 5,
 };

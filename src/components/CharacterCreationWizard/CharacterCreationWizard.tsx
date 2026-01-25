@@ -21,6 +21,8 @@ import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
+import { useTutorial } from '@/components/TutorialProvider';
+import { useSessionStore } from '@/state/sessionStore';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -36,6 +38,9 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const router = useRouter();
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
+  
+  const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
 
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
@@ -110,6 +115,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     worldId,
     world
   });
+
+  // Sync wizard step with tutorial provider
+  React.useEffect(() => {
+    setCurrentWizardStep(wizard.state.currentStep);
+  }, [wizard.state.currentStep, setCurrentWizardStep]);
+
+  // Auto-start tour if needed
+  React.useEffect(() => {
+    if (shouldShowTour && !isTourActive) {
+      const timer = setTimeout(() => {
+        // Start tour at index 3 (Template Selection) since we are already in the wizard
+        // and have skipped the Quick Start screens (indices 0-2)
+        startTour('characterCreation', 3);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShowTour, isTourActive, startTour]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({
@@ -221,17 +243,41 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     switch (wizard.state.currentStep) {
       case 0:
-        return <TemplateSelectionStep {...props} />;
+        return (
+          <div data-tutorial="template-selector">
+            <TemplateSelectionStep {...props} />
+          </div>
+        );
       case 1:
-        return <BasicInfoStep {...props} />;
+        return (
+          <div data-tutorial="basic-info">
+            <BasicInfoStep {...props} />
+          </div>
+        );
       case 2:
-        return <AttributesStep {...props} />;
+        return (
+          <div data-tutorial="attribute-allocation">
+            <AttributesStep {...props} />
+          </div>
+        );
       case 3:
-        return <SkillsStep {...props} />;
+        return (
+          <div data-tutorial="skill-selection">
+            <SkillsStep {...props} />
+          </div>
+        );
       case 4:
-        return <BackgroundStep {...props} />;
+        return (
+          <div data-tutorial="background-editor">
+            <BackgroundStep {...props} />
+          </div>
+        );
       case 5:
-        return <PortraitStep {...props} />;
+        return (
+          <div data-tutorial="portrait-generator">
+            <PortraitStep {...props} />
+          </div>
+        );
       default:
         return null;
     }

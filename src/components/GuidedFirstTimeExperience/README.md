@@ -49,6 +49,8 @@ export function QuickPlay() {
 
 **Smart user detection** - Hooks into the session store to detect first-time users and track when they've completed onboarding.
 
+**Progressive Tutorial System** - After completing the intro wizard, the `GuidedFirstTimeExperience` seamlessly hands off to the `TutorialProvider`, initiating a contextual tour that guides you through the rest of the world and character creation process. This creates a continuous onboarding journey from first click to first gameplay.
+
 **Simple three-step flow** - Welcome (sets expectations), Concept (captures your idea), Details (finalizes the basics). Then you're off to character creation with your new world ready to go.
 
 ## Step Breakdown

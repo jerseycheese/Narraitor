@@ -29,8 +29,10 @@ interface OnboardingData {
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
+  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
+  const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
   const { setCurrentWorld } = useWorldStore();
 
   // Validation function for wizard steps
@@ -110,9 +112,9 @@ export function GuidedFirstTimeExperience() {
 
   // Handle skip
   const handleSkip = useCallback(() => {
-    completeTutorialPhase('intro');
+    updateTutorialProgress('intro', { skipped: true });
     router.push('/worlds');
-  }, [completeTutorialPhase, router]);
+  }, [updateTutorialProgress, router]);
 
   // Initialize wizard state
   const wizard = useWizardState({
@@ -321,7 +323,11 @@ export function GuidedFirstTimeExperience() {
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
   // Don't render if onboarding shouldn't be shown
-  if (!shouldShowOnboarding()) {
+  const showOnboarding = typeof shouldShowOnboarding === 'function'
+    ? shouldShowOnboarding()
+    : (typeof isFirstTimeUser === 'function' ? isFirstTimeUser() : true);
+
+  if (!showOnboarding) {
     return null;
   }
 

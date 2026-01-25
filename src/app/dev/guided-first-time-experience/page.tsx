@@ -6,10 +6,12 @@ import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { completeTutorialPhase, resetTutorialProgress, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
-  
-  // Use isFirstTimeUser as the indicator for onboarding status (inverted: true = not completed)
-  // Or check shouldShowOnboarding directly
+  const {
+    completeTutorialPhase,
+    resetTutorialProgress,
+    shouldShowOnboarding,
+    isFirstTimeUser,
+  } = useSessionStore();
   const isCompleted = !shouldShowOnboarding();
 
   const handleReset = () => {
@@ -74,8 +76,8 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             
             {/* Debug info */}
             <div className="text-xs text-gray-500">
-              shouldShow: {shouldShowOnboarding?.().toString() || 'undefined'} | 
-              isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
+              shouldShow: {shouldShowOnboarding().toString()} | 
+              isFirstTime: {isFirstTimeUser().toString()}
             </div>
             
             <button

@@ -122,7 +122,7 @@ export function DashboardHome() {
         {/* Welcome Message */}
         <section className="text-center space-y-4">
           <h2 className="text-2xl font-bold text-foreground">Welcome to Narraitor</h2>
-          <p className="text-lg text-secondary-foreground">
+          <p className="text-lg text-muted-foreground">
             Create a world and start your story
           </p>
         </section>

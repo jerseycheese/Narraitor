@@ -201,7 +201,7 @@ describe('AISuggestions', () => {
       />
     );
 
-    expect(screen.getByText(/No AI suggestions available/i)).toBeInTheDocument();
+    expect(screen.getByText(/No suggestions available/i)).toBeInTheDocument();
   });
 
   it('should display accepted attributes with visual indication', () => {

@@ -122,33 +122,24 @@ export default function AttributeReviewStep({
 
       setLocalSuggestions(newSuggestions);
 
-      // Automatically save the initially selected attributes to parent state
-      const acceptedAttributes = newSuggestions
-        .filter(s => s.accepted)
-        .map(s => ({
-          id: generateUniqueId('attr'),
-          worldId: '',
-          name: s.name,
-          description: s.description,
-          baseValue: s.baseValue,
-          minValue: s.minValue,
-          maxValue: s.maxValue,
-          category: s.category,
+      const normalizeAttributes = (attributes: WorldAttribute[]) =>
+        attributes.map((attribute) => ({
+          name: attribute.name,
+          description: attribute.description,
+          baseValue: attribute.baseValue,
+          minValue: attribute.minValue,
+          maxValue: attribute.maxValue,
+          category: attribute.category,
         }));
 
-      // Only update if we don't already have attributes or if the count is different
-      if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
-        console.log('[AttributeReviewStep] Auto-applying accepted AI suggestions:', {
-          suggestionsCount: suggestions.length,
-          acceptedCount: acceptedAttributes.length,
-          worldDataAttributesCount: worldData.attributes?.length || 0
-        });
-        onUpdate({ ...worldData, attributes: acceptedAttributes });
-      } else {
-        console.log('[AttributeReviewStep] Skipping auto-apply - attributes already match:', {
-          existingCount: worldData.attributes.length,
-          acceptedCount: acceptedAttributes.length
-        });
+      const nextAttributes = mergeAllAttributes(newSuggestions.filter(s => s.accepted));
+      const currentAttributes = worldData.attributes || [];
+      const hasChanges =
+        JSON.stringify(normalizeAttributes(currentAttributes)) !==
+        JSON.stringify(normalizeAttributes(nextAttributes));
+
+      if (hasChanges) {
+        onUpdate({ ...worldData, attributes: nextAttributes });
       }
     } else {
       // Clear AI suggestions when they are removed (preserves custom attributes)
@@ -258,6 +249,7 @@ export default function AttributeReviewStep({
       <WizardFormSection
         title="Review Attributes"
         description="We've suggested attributes for your world. At least one attribute is required to proceed. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
+        dataTutorial="attribute-editor"
       >
         {showClearButton && (
           <div className="mb-4 flex justify-end">
@@ -268,116 +260,119 @@ export default function AttributeReviewStep({
               size="sm"
               data-testid="clear-ai-suggestions-button"
             >
-              Clear AI Suggestions
+              Clear Suggestions
             </Button>
           </div>
         )}
 
       <div className="space-y-4 my-4">
-        {localSuggestions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-lg mb-2">No attribute suggestions available</p>
-            <p className="text-sm">You can add attributes to your world later in the world editor.</p>
-          </div>
-        ) : (
-          localSuggestions.map((suggestion, index) => (
-          <div 
-            key={index} 
-            className={wizardStyles.card.base} 
-            data-testid={`attribute-card-${index}`}
-          >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium">
-                  {suggestion.name}
-                </span>
-                {suggestion.category && (
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {suggestion.category}
-                  </span>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button 
-                  type="button" 
-                  variant="link"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newSuggestions = [...localSuggestions];
-                    newSuggestions[index] = {
-                      ...newSuggestions[index],
-                      showDetails: !newSuggestions[index].showDetails
-                    };
-                    setLocalSuggestions(newSuggestions);
-                  }}
-                >
-                  {suggestion.showDetails ? 'Hide details' : 'Customize'}
-                </Button>
-                <Button
-                  type="button"
-                  data-testid={`attribute-toggle-${index}`}
-                  onClick={() => handleToggleAttribute(index)}
-                  variant={suggestion.accepted ? "default" : "outline"}
-                  size="sm"
-                >
-                  {suggestion.accepted ? 'Selected' : 'Excluded'}
-                </Button>
-              </div>
+        <div>
+          {localSuggestions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-lg mb-2">No attribute suggestions available</p>
+              <p className="text-sm">You can add attributes to your world later in the world editor.</p>
             </div>
-            
-            {suggestion.showDetails && (
-              <div 
-                key={`attribute-expanded-${index}`}
-                className="mt-4 pl-7"
-                onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
-              >
-                <WizardFormGroup label="Name">
-                  <WizardTextField
-                    value={suggestion.name}
-                    onChange={(value) => handleModifyAttribute(index, 'name', value)}
-                    testId={`attribute-name-input-${index}`}
-                  />
-                </WizardFormGroup>
+          ) : (
+            localSuggestions.map((suggestion, index) => (
+            <div 
+              key={index} 
+              className={wizardStyles.card.base} 
+              data-testid={`attribute-card-${index}`}
+              {...(index === 0 ? { 'data-tutorial': 'attribute-suggestions' } : {})}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">
+                    {suggestion.name}
+                  </span>
+                  {suggestion.category && (
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      {suggestion.category}
+                    </span>
+                  )}
+                </div>
                 
-                <WizardFormGroup label="Description">
-                  <WizardTextArea
-                    value={suggestion.description}
-                    onChange={(value) => handleModifyAttribute(index, 'description', value)}
-                    rows={2}
-                    testId={`attribute-description-textarea-${index}`}
-                  />
-                </WizardFormGroup>
-
-                {/* Fixed min/max range controls (for MVP) */}
-                <div className="my-4">
-                  <AttributeRangeEditor
-                    attribute={{
-                      id: '',
-                      worldId: '',
-                      name: suggestion.name,
-                      description: suggestion.description,
-                      baseValue: suggestion.baseValue,
-                      minValue: 1, // Fixed for MVP
-                      maxValue: 10, // Fixed for MVP
+                <div className="flex items-center gap-2">
+                  <Button 
+                    type="button" 
+                    variant="link"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newSuggestions = [...localSuggestions];
+                      newSuggestions[index] = {
+                        ...newSuggestions[index],
+                        showDetails: !newSuggestions[index].showDetails
+                      };
+                      setLocalSuggestions(newSuggestions);
                     }}
-                    onChange={(updates) => {
-                      if (updates.baseValue !== undefined) {
-                        handleModifyAttribute(index, 'baseValue', updates.baseValue);
-                      }
-                    }}
-                    showLabels={false}
-                  />
+                  >
+                    {suggestion.showDetails ? 'Hide details' : 'Customize'}
+                  </Button>
+                  <Button
+                    type="button"
+                    data-testid={`attribute-toggle-${index}`}
+                    onClick={() => handleToggleAttribute(index)}
+                    variant={suggestion.accepted ? "default" : "outline"}
+                    size="sm"
+                  >
+                    {suggestion.accepted ? 'Selected' : 'Excluded'}
+                  </Button>
                 </div>
               </div>
-            )}
-          </div>
-          ))
-        )}
+              
+              {suggestion.showDetails && (
+                <div 
+                  key={`attribute-expanded-${index}`}
+                  className="mt-4 pl-7"
+                  onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
+                >
+                  <WizardFormGroup label="Name">
+                    <WizardTextField
+                      value={suggestion.name}
+                      onChange={(value) => handleModifyAttribute(index, 'name', value)}
+                      testId={`attribute-name-input-${index}`}
+                    />
+                  </WizardFormGroup>
+                  
+                  <WizardFormGroup label="Description">
+                    <WizardTextArea
+                      value={suggestion.description}
+                      onChange={(value) => handleModifyAttribute(index, 'description', value)}
+                      rows={2}
+                      testId={`attribute-description-textarea-${index}`}
+                    />
+                  </WizardFormGroup>
+
+                  {/* Fixed min/max range controls (for MVP) */}
+                  <div className="my-4">
+                    <AttributeRangeEditor
+                      attribute={{
+                        id: '',
+                        worldId: '',
+                        name: suggestion.name,
+                        description: suggestion.description,
+                        baseValue: suggestion.baseValue,
+                        minValue: 1, // Fixed for MVP
+                        maxValue: 10, // Fixed for MVP
+                      }}
+                      onChange={(updates) => {
+                        if (updates.baseValue !== undefined) {
+                          handleModifyAttribute(index, 'baseValue', updates.baseValue);
+                        }
+                      }}
+                      showLabels={false}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            ))
+          )}
+        </div>
         
         {/* Custom Attributes Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
+        <div className="mt-8 pt-6 border-t border-gray-200" data-tutorial="attribute-custom">
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900">Custom Attributes</h3>
@@ -473,7 +468,11 @@ export default function AttributeReviewStep({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20" data-testid="attribute-count-summary">
+      <div
+        className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20"
+        data-testid="attribute-count-summary"
+        data-tutorial="attribute-summary"
+      >
         <div className="flex justify-between items-center">
           <div>
             <span className="text-sm font-medium text-gray-900">
@@ -506,13 +505,13 @@ export default function AttributeReviewStep({
         <div className={wizardStyles.form.error}>{errors.attributes}</div>
       )}
 
-      {/* Clear AI Suggestions Confirmation Dialog */}
+      {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
           <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear AI Suggestions?</h3>
+            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear Suggestions?</h3>
             <p className="text-sm text-gray-700 mb-4">
-              This will remove all AI-generated attribute suggestions. You can still add custom attributes or regenerate suggestions later.
+              This will remove all attribute suggestions. You can still add custom attributes or regenerate suggestions later.
             </p>
             <div className="flex justify-end gap-3">
               <Button

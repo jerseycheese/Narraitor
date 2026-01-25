@@ -51,7 +51,7 @@ export function TabNavigation<T = string>({
             role="tab"
             aria-selected={isActive}
             variant="ghost"
-            size={size === 'sm' ? 'sm' : 'default'}
+            size="sm"
             className={[
               size === 'sm' ? 'px-1.5 py-1.5 sm:px-2' : 'px-1 py-2 sm:px-3',
               size === 'sm' ? 'text-xs sm:text-sm' : 'text-sm sm:text-base',

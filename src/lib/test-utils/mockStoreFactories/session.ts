@@ -64,6 +64,7 @@ export function createMockSessionStore(
     resetTutorialProgress: jest.fn(),
     completeTutorialPhase: jest.fn(),
     isTutorialComplete: jest.fn(() => false),
+    shouldShowTutorialPhase: jest.fn(() => false),
     getCurrentTutorialPhase: jest.fn(() => 'intro'),
     isFirstTimeUser: jest.fn(() => true),
     shouldShowOnboarding: jest.fn(() => false),

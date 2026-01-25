@@ -11,6 +11,8 @@ const CONTINUE_LABEL = 'Continue';
 /** Custom data attached to tour steps via Joyride's Step.data property */
 interface TourStepData {
   isEndOfPage?: boolean;
+  nextStepHint?: string;
+  hideNextButton?: boolean;
 }
 
 export function TutorialTooltip({
@@ -31,12 +33,21 @@ export function TutorialTooltip({
   const handleContinueClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    
+
     if (currentTour) {
       updateTutorialProgress(currentTour, { lastStep: index });
     }
     // Hide tooltip, keep tour state (resumes when target appears on next page)
     pauseTour('end-of-page');
+  };
+
+  const handlePrimaryClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (typeof primaryProps.onClick === 'function') {
+      primaryProps.onClick(event);
+    }
   };
 
   const ariaLabel =
@@ -48,12 +59,14 @@ export function TutorialTooltip({
 
   const stepData = step.data as TourStepData | undefined;
   const isEndOfPage = stepData?.isEndOfPage;
+  const nextStepHint = stepData?.nextStepHint;
+  const hideNextButton = stepData?.hideNextButton;
 
   const primaryLabel =
     primaryProps.title || primaryProps['aria-label'] || CONTINUE_LABEL;
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
   const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip tutorial';
-  
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { className: skipClassName, ...skipButtonProps } = skipProps as any;
 
@@ -67,12 +80,19 @@ export function TutorialTooltip({
     >
       <div style={styles.tooltipContainer} className="text-left">
         {title && <h1 style={styles.tooltipTitle}>{title}</h1>}
-        <div style={styles.tooltipContent}>{content}</div>
+        <div style={styles.tooltipContent}>
+          {content}
+          {isEndOfPage && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              {nextStepHint || 'Complete this step, then click Next to continue.'}
+            </div>
+          )}
+        </div>
       </div>
       {!hideFooter && (
         <div style={styles.tooltipFooter}>
           <div style={styles.tooltipFooterSpacer}>
-            {showSkipButton && !isLastStep && (
+            {showSkipButton && (!isLastStep || hideNextButton) && (
               <Button
                 aria-live="off"
                 data-test-id="button-skip"
@@ -98,9 +118,9 @@ export function TutorialTooltip({
               {backLabel}
             </Button>
           )}
-          
+
           <div className="flex gap-2">
-            {isEndOfPage && !isLastStep ? (
+            {isEndOfPage && !isLastStep && (
               <Button
                 data-test-id="button-pause"
                 style={styles.buttonNext}
@@ -113,7 +133,8 @@ export function TutorialTooltip({
               >
                 Continue
               </Button>
-            ) : (
+            )}
+            {!isEndOfPage && !hideNextButton && (
               <Button
                 data-test-id="button-primary"
                 style={styles.buttonNext}
@@ -121,6 +142,7 @@ export function TutorialTooltip({
                 variant="default"
                 size="sm"
                 {...primaryProps}
+                onClick={handlePrimaryClick}
               >
                 {primaryLabel}
               </Button>

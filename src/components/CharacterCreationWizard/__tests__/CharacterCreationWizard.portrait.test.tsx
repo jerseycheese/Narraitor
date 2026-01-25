@@ -96,7 +96,7 @@ describe.skip('PortraitStep Component', () => {
     );
 
     expect(screen.getByText('Character Portrait')).toBeInTheDocument();
-    expect(screen.getByText(/Generate an AI portrait/i)).toBeInTheDocument();
+    expect(screen.getByText(/Generate a portrait/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /generate portrait/i })).toBeInTheDocument();
   });
 

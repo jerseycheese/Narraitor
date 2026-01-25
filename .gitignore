@@ -97,6 +97,7 @@ project-config.json
 # Docs (private, untracked)
 # Use public_docs/ for committed documentation
 docs/
+docs/plans/
 
 # Generated dependency diagrams (regenerate with npm run deps:diagram:all)
 public_docs/architecture/*.mmd

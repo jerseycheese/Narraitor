@@ -129,7 +129,7 @@ export default function ImageGenerationStep({
               <dl className="text-sm space-y-1">
                 <div>
                   <dt className="inline font-medium">Type:</dt>
-                  <dd className="inline ml-2">{generatedImage.type === 'ai-generated' ? 'AI Generated' : 'Placeholder'}</dd>
+                  <dd className="inline ml-2">{generatedImage.type === 'ai-generated' ? 'Generated' : 'Placeholder'}</dd>
                 </div>
                 {generatedImage.generatedAt && (
                   <div>

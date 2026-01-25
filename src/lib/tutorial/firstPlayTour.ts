@@ -1,39 +1,29 @@
-import { Step } from 'react-joyride';
+import { TutorialStep } from '@/types/tutorial.types';
 
-/**
- * First Play Tour Steps
- * Guides the user through their first game session.
- */
-export const firstPlayTour: Step[] = [
+export const firstPlayTour: TutorialStep[] = [
   {
-    target: '[data-testid="game-session-active"]',
-    content: 'Your adventure begins! This is where you\'ll spend most of your time roleplaying and making decisions.',
-    placement: 'center',
-    disableBeacon: true,
-  },
-  {
-    target: '.narrative-history-container',
-    content: 'The story unfolds here. Read the narrative to understand your surroundings and the current situation.',
+    target: '[data-tutorial="narrative-display"]',
+    content: 'This is where your story unfolds. Read the narrative carefully as it adapts to your choices.',
     placement: 'right',
   },
   {
-    target: '#choices-container',
-    content: 'When the AI presents you with options, they\'ll appear here. You can pick one of the suggestions or type your own custom action!',
-    placement: 'left',
-  },
-  {
-    target: '[data-testid="character-summary"]',
-    content: 'Keep an eye on your character\'s stats and health here. You can expand this section to see your full attribute and skill list.',
+    target: '[data-tutorial="player-choices"]',
+    content: 'When the story pauses, you decide what happens next. Your choices shape the world and your character\'s fate.',
     placement: 'top',
   },
   {
-    target: '[data-testid="inventory-collapsible"]',
-    content: 'Any items you find or acquire during your journey will show up in your inventory.',
-    placement: 'top',
+    target: '[data-tutorial="character-sheet-toggle"]',
+    content: 'Check your character sheet anytime to see your stats, health, and current status.',
+    placement: 'bottom',
   },
   {
-    target: '.component-floating-action-button',
-    content: 'The journal automatically tracks your major decisions and discoveries. Open it anytime to review your story\'s history.',
-    placement: 'left',
+    target: '[data-tutorial="inventory-toggle"]',
+    content: 'Manage your inventory here. You can equip items or use consumables during your adventure.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tutorial="journal-toggle"]',
+    content: 'Your journal keeps track of your quests, important notes, and the history of your adventure.',
+    placement: 'bottom',
   },
 ];

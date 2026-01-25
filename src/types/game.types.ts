@@ -116,5 +116,5 @@ export interface SessionStore {
   isTutorialComplete: () => boolean;
   getCurrentTutorialPhase: () => import('./tutorial.types').TutorialPhase | null;
   isFirstTimeUser: () => boolean;
-  shouldShowOnboarding: () => boolean;
+  shouldShowOnboarding: () => boolean; // Computed selector, keeps same name but logic changes
 }
