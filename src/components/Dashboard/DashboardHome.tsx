@@ -13,8 +13,6 @@ import { DashboardGettingStarted } from './DashboardGettingStarted';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 import type { DashboardState, DashboardMetrics } from '@/types/dashboard.types';
-import { Button } from '@/components/ui/button';
-import { Globe, Users, Play } from 'lucide-react';
 
 export function DashboardHome() {
   const router = useRouter();
