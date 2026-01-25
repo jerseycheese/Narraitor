@@ -37,6 +37,7 @@ const mockSessionStore: SessionStore = {
     errorMessage: null,
     totalSaves: 0,
   },
+  narrativeHeight: 600,
   tutorialProgress: {
     phases: {
       intro: { completed: false, skipped: false },
@@ -48,7 +49,6 @@ const mockSessionStore: SessionStore = {
     dismissedHints: [],
     lastActiveStep: null,
   },
-  narrativeHeight: 600,
   initializeSession: jest.fn(),
   endSession: jest.fn(),
   setStatus: jest.fn(),
@@ -75,15 +75,15 @@ const mockSessionStore: SessionStore = {
   setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),
+  isFirstTimeUser: jest.fn(),
+  shouldShowOnboarding: jest.fn(),
   updateTutorialProgress: jest.fn(),
   dismissTutorialHint: jest.fn(),
   resetTutorialProgress: jest.fn(),
   completeTutorialPhase: jest.fn(),
-  getCurrentTutorialPhase: jest.fn(),
-  isTutorialComplete: jest.fn(),
   shouldShowTutorialPhase: jest.fn(),
-  isFirstTimeUser: jest.fn(),
-  shouldShowOnboarding: jest.fn(),
+  isTutorialComplete: jest.fn(),
+  getCurrentTutorialPhase: jest.fn(),
 };
 
 jest.mock('../../state/sessionStore');

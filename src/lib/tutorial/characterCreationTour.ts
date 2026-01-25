@@ -1,28 +1,8 @@
-import { TutorialStep } from '@/types/tutorial.types';
+import { Step } from 'react-joyride';
+
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-export const characterCreationTour: TutorialStep[] = [
-  {
-    target: '[data-tutorial="quickstart-archetypes"]',
-    content: 'Pick a pre-made character to jump straight into the story.',
-    placement: 'top',
-    disableBeacon: true,
-    hideBackButton: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-random"]',
-    content: 'Generate a fresh random character if you want a new option.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-custom"]',
-    content: 'Create a custom character with full control over details.',
-    placement: 'top',
-    disableBeacon: true,
-    disableScrolling: true,
-    advanceOn: { selector: '[data-tutorial="quickstart-custom"]', event: 'click' },
-  },
+export const characterCreationTour: Step[] = [
   {
     target: '[data-tutorial="template-selector"]',
     content: TutorialContent({
@@ -31,10 +11,7 @@ export const characterCreationTour: TutorialStep[] = [
     }),
     placement: 'top',
     disableBeacon: true,
-    data: {
-      isEndOfPage: true,
-      nextStepHint: 'Select a template (or leave it blank) and click Next to continue.',
-    },
+    data: { isEndOfPage: true },
   },
   {
     target: '[data-tutorial="basic-info"]',
@@ -42,7 +19,7 @@ export const characterCreationTour: TutorialStep[] = [
       children: 'Give your character a name and description.',
       example: '"Kira Nightshade" with a backstory hint like "a cunning rogue with a mysterious past"',
     }),
-    placement: 'top',
+    placement: 'right',
     disableBeacon: true,
   },
   {
@@ -51,7 +28,7 @@ export const characterCreationTour: TutorialStep[] = [
       children: 'Allocate points to your core attributes. These determine your natural strengths and weaknesses.',
       example: 'High Strength for a fighter who relies on physical power',
     }),
-    placement: 'top',
+    placement: 'left',
     disableBeacon: true,
   },
   {
@@ -60,7 +37,7 @@ export const characterCreationTour: TutorialStep[] = [
       children: 'Select skills that define what your character excels at.',
       example: 'Stealth for a character who prefers avoiding direct confrontation',
     }),
-    placement: 'top',
+    placement: 'left',
     disableBeacon: true,
   },
   {
@@ -77,17 +54,14 @@ export const characterCreationTour: TutorialStep[] = [
     content: 'Generate a unique portrait based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,
-    data: {
-      nextStepHint: 'Click Create Character to finish and start playing.',
-    },
   },
 ];
 
 export const tourStepToWizardStep: Record<number, number> = {
-  3: 0,
-  4: 1,
-  5: 2,
-  6: 3,
-  7: 4,
-  8: 5,
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
 };

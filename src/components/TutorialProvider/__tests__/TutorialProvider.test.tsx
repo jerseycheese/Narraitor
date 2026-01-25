@@ -3,41 +3,24 @@ import { render, screen, act } from '@testing-library/react';
 import { TutorialProvider, useTutorial } from '../index';
 import { useSessionStore } from '@/state/sessionStore';
 
-let joyrideMounts = 0;
-let resizeObserverCallback: ResizeObserverCallback | null = null;
-
 // Mock React Joyride
 jest.mock('react-joyride', () => {
-  const React = require('react');
   const STATUS = {
-    FINISHED: 'finished' as const,
-    SKIPPED: 'skipped' as const,
+    FINISHED: 'finished',
+    SKIPPED: 'skipped',
   };
 
   const EVENTS = {
-    TARGET_NOT_FOUND: 'target_not_found' as import('react-joyride').Events,
+    TARGET_NOT_FOUND: 'target_not_found',
   };
 
   const ACTIONS = {
-    PREV: 'prev' as const,
+    PREV: 'prev',
   };
 
-  interface DummyJoyrideProps {
-    run: boolean;
-    stepIndex: number;
-    steps: Array<{ target: string; content: string }>;
-    callback: (data: Partial<import('react-joyride').CallBackProps>) => void;
-  }
-
-  const DummyJoyride = ({ run, stepIndex, steps, callback }: DummyJoyrideProps) => {
-    React.useEffect(() => {
-      if (run) {
-        joyrideMounts += 1;
-      }
-    }, [run]);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
     if (!run) return null;
-
     return (
       <div data-testid="joyride-mock">
         <div>Step Index: {stepIndex}</div>
@@ -61,9 +44,9 @@ jest.mock('react-joyride', () => {
 // Mock dynamic imports for tours
 jest.mock('@/lib/tutorial/worldCreationTour', () => ({
   worldCreationTour: [
-    { target: '#layout-target', content: 'Step 1' }, 
-    { target: '#layout-target', content: 'Step 2' },
-    { target: '#layout-target', content: 'Step 3' }
+    { target: 'body', content: 'Step 1' }, 
+    { target: 'body', content: 'Step 2' },
+    { target: 'body', content: 'Step 3' }
   ],
   tourStepToWizardStep: { 0: 0, 1: 0, 2: 1 }
 }));
@@ -73,7 +56,6 @@ const TestComponent = () => {
   
   return (
     <div>
-      <div id="layout-target" data-testid="layout-target" />
       <div data-testid="tour-status">{isTourActive ? 'Active' : 'Inactive'}</div>
       <div data-testid="step-index">{stepIndex}</div>
       <button onClick={() => startTour('worldCreation')}>Start World Tour</button>
@@ -86,20 +68,6 @@ const TestComponent = () => {
 describe('TutorialProvider', () => {
   beforeEach(() => {
     useSessionStore.getState().resetTutorialProgress();
-    joyrideMounts = 0;
-    resizeObserverCallback = null;
-    global.ResizeObserver = class ResizeObserver {
-      private readonly callback: ResizeObserverCallback;
-
-      constructor(callback: ResizeObserverCallback) {
-        this.callback = callback;
-        resizeObserverCallback = callback;
-      }
-
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
   });
 
   it('provides tutorial context', async () => {
@@ -207,51 +175,5 @@ describe('TutorialProvider', () => {
 
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
     expect(screen.getByTestId('step-index')).toHaveTextContent('2');
-  });
-
-  it('refreshes the tour layout when the target position changes', async () => {
-    jest.useFakeTimers();
-    const originalAnimationFrame = global.requestAnimationFrame;
-    global.requestAnimationFrame = (callback: FrameRequestCallback) => {
-      return window.setTimeout(() => callback(0), 0);
-    };
-
-    render(
-      <TutorialProvider>
-        <TestComponent />
-      </TutorialProvider>
-    );
-
-    const target = screen.getByTestId('layout-target');
-    let topOffset = 0;
-    target.getBoundingClientRect = jest.fn(() => ({
-      top: topOffset,
-      left: 0,
-      width: 100,
-      height: 20,
-      right: 100,
-      bottom: topOffset + 20,
-      x: 0,
-      y: topOffset,
-      toJSON: () => ({}),
-    })) as unknown as typeof target.getBoundingClientRect;
-
-    await act(async () => {
-      screen.getByText('Start World Tour').click();
-    });
-
-    expect(joyrideMounts).toBe(1);
-
-    topOffset = 120;
-
-    act(() => {
-      resizeObserverCallback?.([], {} as ResizeObserver);
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(joyrideMounts).toBe(2);
-
-    global.requestAnimationFrame = originalAnimationFrame;
-    jest.useRealTimers();
   });
 });

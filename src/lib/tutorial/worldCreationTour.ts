@@ -1,9 +1,9 @@
-import { TutorialStep } from '@/types/tutorial.types';
+import { Step } from 'react-joyride';
 
 import { WorldCreationStartTooltip } from '@/components/TutorialProvider/WorldCreationStartTooltip';
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-export const worldCreationTour: TutorialStep[] = [
+export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-type-selector"]',
     content: 'Welcome to the World Creation Wizard! Choose a path: start from scratch on the left, or use a template on the right.',
@@ -32,10 +32,7 @@ export const worldCreationTour: TutorialStep[] = [
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
-    data: {
-      isEndOfPage: true,
-      nextStepHint: 'Choose a template or click Create My Own World to continue.',
-    },
+    data: { isEndOfPage: true },
   },
   {
     target: '[data-tutorial="world-name"]',
@@ -261,9 +258,6 @@ export const worldCreationTour: TutorialStep[] = [
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
-    data: {
-      nextStepHint: 'Click Create World to finish setup and move to Quick Start.',
-    },
   },
   {
     target: '[data-tutorial="quickstart-archetypes"]',
@@ -291,9 +285,6 @@ export const worldCreationTour: TutorialStep[] = [
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
-    data: {
-      nextStepHint: 'Pick a character, customize one, or click Skip Character Creation for Now to start playing.',
-    },
   },
 ];
 

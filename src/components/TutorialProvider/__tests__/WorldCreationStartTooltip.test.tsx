@@ -99,15 +99,22 @@ const createProps = (overrides: Partial<TooltipRenderProps> = {}): TooltipRender
 };
 
 describe('WorldCreationStartTooltip', () => {
-  beforeEach(() => {
-    mockSkipTour.mockClear();
-  });
+  it('calls skipProps.onClick when the skip button is clicked', () => {
+    const mockOnClick = jest.fn();
+    const props = createProps({
+      skipProps: {
+        'aria-label': 'Skip world creation tutorial',
+        'data-action': 'skip',
+        role: 'button',
+        title: 'Skip world creation tutorial',
+        onClick: mockOnClick,
+      },
+    });
 
-  it('calls skipTour when the skip button is clicked', () => {
-    render(<WorldCreationStartTooltip {...createProps()} />);
+    render(<WorldCreationStartTooltip {...props} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Skip world creation tutorial' }));
 
-    expect(mockSkipTour).toHaveBeenCalledTimes(1);
+    expect(mockOnClick).toHaveBeenCalledTimes(1);
   });
 });

@@ -31,7 +31,6 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
-  const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
   const { setCurrentWorld } = useWorldStore();
 
@@ -323,11 +322,7 @@ export function GuidedFirstTimeExperience() {
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
   // Don't render if onboarding shouldn't be shown
-  const showOnboarding = typeof shouldShowOnboarding === 'function'
-    ? shouldShowOnboarding()
-    : (typeof isFirstTimeUser === 'function' ? isFirstTimeUser() : true);
-
-  if (!showOnboarding) {
+  if (!isFirstTimeUser()) {
     return null;
   }
 

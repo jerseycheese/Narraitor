@@ -21,16 +21,31 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
     const overlay = page.locator('[data-test-id="overlay"]');
     if (await overlay.count() === 0) return;
 
+    // Try to find and click skip button
     const skipButton = page.locator('[data-test-id="button-skip"]');
     if (await skipButton.count() > 0) {
-      await skipButton.first().click({ force: true });
-    } else {
-      const primaryButton = page.locator('[data-test-id="button-primary"], [data-test-id="button-pause"]');
-      if (await primaryButton.count() > 0) {
-        await primaryButton.first().click({ force: true });
+      // Wait for button to be visible before clicking
+      const isVisible = await skipButton.first().isVisible().catch(() => false);
+      if (isVisible) {
+        await skipButton.first().click({ force: true });
+        await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
+        return;
       }
     }
 
+    // If skip button not visible, try primary button
+    const primaryButton = page.locator('[data-test-id="button-primary"], [data-test-id="button-pause"]');
+    if (await primaryButton.count() > 0) {
+      const isVisible = await primaryButton.first().isVisible().catch(() => false);
+      if (isVisible) {
+        await primaryButton.first().click({ force: true });
+        await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
+        return;
+      }
+    }
+
+    // If no buttons are visible, try pressing Escape as fallback
+    await page.keyboard.press('Escape');
     await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
   };
 

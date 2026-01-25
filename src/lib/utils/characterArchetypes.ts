@@ -10,6 +10,7 @@ import {
   ArchetypeTemplate as ImportedArchetypeTemplate
 } from '@/lib/constants/characterArchetypeTemplates';
 
+export type { CharacterArchetype };
 export type ArchetypeTemplate = ImportedArchetypeTemplate;
 
 /**

@@ -125,9 +125,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   React.useEffect(() => {
     if (shouldShowTour && !isTourActive) {
       const timer = setTimeout(() => {
-        // Start tour at index 3 (Template Selection) since we are already in the wizard
-        // and have skipped the Quick Start screens (indices 0-2)
-        startTour('characterCreation', 3);
+        startTour('characterCreation');
       }, 500);
       return () => clearTimeout(timer);
     }

@@ -123,6 +123,18 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         visibility: hidden !important;
       }
 
+      /* Hide Joyride tutorial overlay */
+      #react-joyride-portal,
+      .react-joyride__overlay,
+      .react-joyride__spotlight,
+      .react-joyride__tooltip,
+      [data-test-id="overlay"],
+      .react-joyride__beacon {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
       /* Hide DevTools during visual tests to avoid duplicate UI and noise */
       [data-testid="devtools-panel-container"],
       [data-testid="devtools-panel-header"],
