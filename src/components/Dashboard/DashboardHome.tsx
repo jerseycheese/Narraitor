@@ -118,8 +118,11 @@ export function DashboardHome() {
     await cleanupSessionData(sessionId);
   };
 
-  // First-time user state - show engaging onboarding dashboard
-  if (dashboardState === 'first-time') {
+  // Routing logic: First-time users see the guided tutorial wizard,
+  // while returning users see the standard dashboard with their progress
+  const isFirstTimeUser = dashboardState === 'first-time';
+
+  if (isFirstTimeUser) {
     return <GuidedFirstTimeExperience />;
   }
 

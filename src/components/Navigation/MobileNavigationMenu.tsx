@@ -116,6 +116,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           <LogoText size="sm" className="text-white" />
         </div>
         <div className="flex items-center gap-2">
+          {/* Tutorial menu for mobile feature parity with desktop */}
           <TutorialMenu />
           <Button
             onClick={onClose}
