@@ -32,6 +32,34 @@ const setTutorialProgress = async (
 };
 
 test.describe('Tutorial visual coverage', () => {
+  test('World generation tutorial overlay renders consistently', async ({ page }) => {
+    test.setTimeout(60000);
+
+    await seedTestData(page);
+    await page.goto('/worlds');
+    await waitForContentStable(page);
+    await waitForStoreReady(page);
+
+    await setTutorialProgress(page, {
+      intro: { completed: true, skipped: false },
+      worldCreation: { completed: true, skipped: false, lastStep: 999 },
+      worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+      characterCreation: { completed: true, skipped: false, lastStep: 5 },
+      firstPlay: { completed: true, skipped: false },
+    });
+
+    const generateButton = page.getByRole('button', { name: 'Generate World' });
+    await expect(generateButton).toBeVisible({ timeout: 15000 });
+    await generateButton.click();
+    await waitForContentStable(page);
+
+    const tooltip = page.locator('.react-joyride__tooltip');
+    await expect(tooltip).toBeVisible({ timeout: 10000 });
+    await expect(tooltip).toContainText('instantly generate a complete world setup');
+
+    await expect(page).toHaveScreenshot('tutorial-world-generation-step0.png', { fullPage: true });
+  });
+
   test('World creation tutorial overlays render consistently', async ({ page }) => {
     test.setTimeout(60000);
 
