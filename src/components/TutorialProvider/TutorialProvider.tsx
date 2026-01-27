@@ -95,7 +95,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const phaseData = tutorialProgress.phases[tourId];
       const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
 
-      if (tourId === 'worldCreation' && mapping && initialStepIndex === 0) {
+      if (mapping && initialStepIndex === 0) {
         const stepIndices = Object.entries(mapping)
           .filter((entry) => entry[1] === currentWizardStep)
           .map((entry) => parseInt(entry[0], 10));
@@ -115,9 +115,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
       let nextStepIndex = initialStepIndex > 0 ? initialStepIndex : lastStep;
 
-      if (tourId === 'worldCreation' && mapping) {
+      if (mapping) {
         const mappedWizardStep = mapping[nextStepIndex];
-        if (mappedWizardStep !== currentWizardStep) {
+        // Only enforce wizard sync if the current tour step is actually mapped to a wizard step
+        if (mappedWizardStep !== undefined && mappedWizardStep !== currentWizardStep) {
           const mappedEntry = Object.entries(mapping)
             .find((entry) => entry[1] === currentWizardStep);
           if (mappedEntry) {
@@ -174,7 +175,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       missingTargetRef.current = null;
       if (activeTour) {
         if (status === STATUS.FINISHED) {
-          if (activeTour === 'worldCreation' && stepMapping) {
+          if (stepMapping) {
             const wizardStepValues = Object.values(stepMapping);
             const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
             const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
@@ -204,16 +205,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (activeTour !== 'worldCreation') return;
-      const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
-      if (stepData?.skipIfMissing) {
-        const direction = action === ACTIONS.PREV ? -1 : 1;
-        const nextIndex = index + direction;
-        if (nextIndex >= 0 && nextIndex < steps.length) {
-          setStepIndex(nextIndex);
-        }
-        return;
-      }
+      if (!stepMapping) return;
+      
       const mappedWizardStep = stepMapping?.[index];
       const isSameWizardStep = mappedWizardStep === currentWizardStep;
       const target = steps[index]?.target;
@@ -243,7 +236,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   // Sync tour with wizard (only when the wizard actually changes steps)
   useEffect(() => {
-    if (!isPaused || pauseReason !== 'missing-target' || activeTour !== 'worldCreation') return;
+    if (!isPaused || pauseReason !== 'missing-target' || !stepMapping) return;
     const missingTarget = missingTargetRef.current;
     if (!missingTarget?.target) return;
 
@@ -382,8 +375,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           spotlightClicks={true}
           scrollOffset={joyrideOptions.scrollOffset}
           locale={
-            activeTour === 'worldCreation'
-              ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
+            stepMapping
+              ? { skip: 'Skip tutorial', last: 'Finish tutorial' }
               : undefined
           }
         />

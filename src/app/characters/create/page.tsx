@@ -23,21 +23,19 @@ export default function CharacterCreatePage() {
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
 
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
 
-  // Start tutorial tour on mount
+  // Start tutorial tour when content is ready
   useEffect(() => {
-    if (mounted && shouldShowTour && !isTourActive && showQuickStart) {
-      const timer = setTimeout(() => {
-        startTour('characterCreation');
-      }, 500);
-      return () => clearTimeout(timer);
+    if (mounted && shouldShowTour && !isTourActive && showQuickStart && contentReady) {
+      startTour('characterCreation');
     }
-  }, [mounted, shouldShowTour, isTourActive, startTour, showQuickStart]);
+  }, [mounted, shouldShowTour, isTourActive, startTour, showQuickStart, contentReady]);
 
   // If URL has worldId but store doesn't, set it in the store
   useEffect(() => {
@@ -195,6 +193,7 @@ export default function CharacterCreatePage() {
                   world={currentWorld}
                   onCharacterSelect={handleQuickStartSelect}
                   onCustomizeClick={handleCustomizeClick}
+                  onReady={() => setContentReady(true)}
                 />
               ) : (
                 <div className="text-center py-12 text-gray-500">

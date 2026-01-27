@@ -25,13 +25,15 @@ export interface QuickStartCharactersProps {
   onCharacterSelect: (archetype: CharacterArchetype) => void;
   onCustomizeClick: () => void;
   existingCharacterNames?: string[];
+  onReady?: () => void;
 }
 
 export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   world,
   onCharacterSelect,
   onCustomizeClick,
-  existingCharacterNames = []
+  existingCharacterNames = [],
+  onReady
 }: QuickStartCharactersProps) {
   const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       setError(`Unable to generate character options: ${errorMessage}`);
     } finally {
       setLoading(false);
+      onReady?.();
     }
   };
 

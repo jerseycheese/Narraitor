@@ -9,13 +9,16 @@ describe('characterCreationTour', () => {
   });
 
   it('includes character creation steps', () => {
-    expect(characterCreationTour.length).toBe(6);
-    expect(characterCreationTour[0].target).toBe('[data-tutorial="template-selector"]');
-    expect(characterCreationTour[1].target).toBe('[data-tutorial="basic-info"]');
-    expect(characterCreationTour[2].target).toBe('[data-tutorial="attribute-allocation"]');
-    expect(characterCreationTour[3].target).toBe('[data-tutorial="skill-selection"]');
-    expect(characterCreationTour[4].target).toBe('[data-tutorial="background-editor"]');
-    expect(characterCreationTour[5].target).toBe('[data-tutorial="portrait-generator"]');
+    expect(characterCreationTour.length).toBe(9);
+    expect(characterCreationTour[0].target).toBe('[data-tutorial="quickstart-archetypes"]');
+    expect(characterCreationTour[1].target).toBe('[data-tutorial="quickstart-random"]');
+    expect(characterCreationTour[2].target).toBe('[data-tutorial="quickstart-custom"]');
+    expect(characterCreationTour[3].target).toBe('[data-tutorial="template-selector"]');
+    expect(characterCreationTour[4].target).toBe('[data-tutorial="basic-info"]');
+    expect(characterCreationTour[5].target).toBe('[data-tutorial="attribute-allocation"]');
+    expect(characterCreationTour[6].target).toBe('[data-tutorial="skill-selection"]');
+    expect(characterCreationTour[7].target).toBe('[data-tutorial="background-editor"]');
+    expect(characterCreationTour[8].target).toBe('[data-tutorial="portrait-generator"]');
   });
 
   it('uses valid CSS selectors for all targets', () => {
