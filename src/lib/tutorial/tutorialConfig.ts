@@ -47,7 +47,7 @@ export const joyrideStyles = {
 
 export const joyrideOptions = {
   continuous: true,
-  scrollToFirstStep: true,
+  scrollToFirstStep: false,
   showProgress: false,
   showSkipButton: true,
   disableScrolling: false,

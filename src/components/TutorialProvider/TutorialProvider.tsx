@@ -208,7 +208,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       if (!stepMapping) return;
       
       const mappedWizardStep = stepMapping?.[index];
-      const isSameWizardStep = mappedWizardStep === currentWizardStep;
+      // If mappedWizardStep is undefined, it means this tour step isn't tied to a specific wizard step
+      // So we assume we are on the "correct" page and it's just a missing element (retry).
+      const isSameWizardStep = mappedWizardStep === undefined || mappedWizardStep === currentWizardStep;
       const target = steps[index]?.target;
 
       if (isSameWizardStep) {

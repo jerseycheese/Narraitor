@@ -65,7 +65,6 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       setError(`Unable to generate character options: ${errorMessage}`);
     } finally {
       setLoading(false);
-      onReady?.();
     }
   };
 
@@ -73,6 +72,17 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     generateArchetypes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
+
+  // Trigger onReady when loading is finished and content is available
+  useEffect(() => {
+    if (!loading && archetypes.length > 0) {
+      // Small timeout to ensure DOM is painted
+      const timer = setTimeout(() => {
+        onReady?.();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, archetypes, onReady]);
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
     setSelectedArchetype(archetype.id);
