@@ -53,7 +53,7 @@ export function TutorialMenu() {
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size="icon"
-        className="text-gray-300 hover:text-white"
+        className="text-gray-300 hover:text-white hover:bg-gray-700"
         aria-label="Help & Tutorials"
       >
         <HelpCircle className="w-5 h-5" />
