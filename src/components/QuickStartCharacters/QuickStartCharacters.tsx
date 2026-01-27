@@ -76,10 +76,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   // Trigger onReady when loading is finished and content is available
   useEffect(() => {
     if (!loading && archetypes.length > 0) {
-      // Small timeout to ensure DOM is painted
+      // Timeout to ensure DOM is painted and stable
       const timer = setTimeout(() => {
         onReady?.();
-      }, 100);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [loading, archetypes, onReady]);
