@@ -344,6 +344,13 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setActiveTour(null);
   }, [activeTour, updateTutorialProgress]);
 
+  // Expose startTour for testing
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' || (window as any).__PLAYWRIGHT__) {
+      (window as any).__TEST_START_TOUR__ = startTour;
+    }
+  }, [startTour]);
+
   return (
     <TutorialContext.Provider value={{
       startTour,
