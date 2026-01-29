@@ -22,7 +22,6 @@ import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
 import { useTutorial } from '@/components/TutorialProvider';
-import { useSessionStore } from '@/state/sessionStore';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -38,9 +37,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const router = useRouter();
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
-  
-  const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
-  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
+
+  const { setCurrentWizardStep } = useTutorial();
 
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
@@ -120,16 +118,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   React.useEffect(() => {
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
-
-  // Auto-start tour if needed
-  React.useEffect(() => {
-    if (shouldShowTour && !isTourActive) {
-      const timer = setTimeout(() => {
-        startTour('characterCreation');
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldShowTour, isTourActive, startTour]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({

@@ -1,35 +1,7 @@
 import { Step } from 'react-joyride';
-
 import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
-export const characterCreationTour: Step[] = [
-  {
-    target: '[data-tutorial="quickstart-archetypes"]',
-    content: TutorialContent({
-      children: 'Choose one of these pre-generated characters to start playing immediately.',
-      example: 'Each character is unique to this world',
-    }),
-    placement: 'bottom',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-random"]',
-    content: TutorialContent({
-      children: 'Generate a completely new random character with one click.',
-      example: 'Great for jumping into the action instantly',
-    }),
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-custom"]',
-    content: TutorialContent({
-      children: 'Want more control? Create a custom character from scratch.',
-      example: 'Build your hero step-by-step',
-    }),
-    placement: 'top',
-    disableBeacon: true,
-  },
+export const characterCreationWizardTour: Step[] = [
   {
     target: '[data-tutorial="template-selector"]',
     content: TutorialContent({
@@ -85,10 +57,10 @@ export const characterCreationTour: Step[] = [
 ];
 
 export const tourStepToWizardStep: Record<number, number> = {
-  3: 0,
-  4: 1,
-  5: 2,
-  6: 3,
-  7: 4,
-  8: 5,
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
 };

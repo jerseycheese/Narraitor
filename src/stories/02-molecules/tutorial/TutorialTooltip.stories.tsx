@@ -16,6 +16,7 @@ const meta: Meta<typeof TutorialTooltip> = {
           startTour: () => {},
           stopTour: () => {},
           pauseTour: () => {},
+          resumeTour: () => {},
           nextStep: () => {},
           prevStep: () => {},
           skipTour: () => {},
