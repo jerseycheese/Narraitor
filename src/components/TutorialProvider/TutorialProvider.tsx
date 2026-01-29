@@ -9,7 +9,7 @@ import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialPr
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 
-type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
+type PauseReason = 'end-of-page' | 'missing-target' | null;
 
 const logger = new Logger('TutorialProvider');
 
@@ -39,7 +39,6 @@ const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[]
       case 'worldGeneration':
         const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
         return { steps: worldGenerationTour };
-      case 'characterCreation': // Keep for backward compatibility or direct calls
       case 'quickStartSelection':
         const { quickStartTour } = await import('@/lib/tutorial/quickStartTour');
         return { steps: quickStartTour };

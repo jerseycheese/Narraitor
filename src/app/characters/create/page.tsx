@@ -19,6 +19,7 @@ export default function CharacterCreatePage() {
   const { currentWorldId, setCurrentWorld, worlds } = useWorldStore();
   const { createCharacter, setCurrentCharacter } = useCharacterStore();
   const { initializeSession } = useSessionStore();
+  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const { startTour, isTourActive, stopTour } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
   const [showQuickStart, setShowQuickStart] = useState(true);
@@ -181,7 +182,7 @@ export default function CharacterCreatePage() {
   const handleCustomizeClick = () => {
     if (isTourActive) {
       // Manually complete QuickStart if user advances via button click
-      useSessionStore.getState().updateTutorialProgress('characterCreation', { quickStartCompleted: true });
+      updateTutorialProgress('characterCreation', { quickStartCompleted: true });
       stopTour();
     }
     setShowQuickStart(false);
