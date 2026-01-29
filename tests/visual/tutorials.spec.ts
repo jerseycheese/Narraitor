@@ -90,50 +90,63 @@ test.describe('Tutorial visual coverage', () => {
     await expect(page).toHaveScreenshot('tutorial-world-creation-step1.png', { fullPage: true });
   });
 
-  // TODO: Rewrite this test for the new split tour architecture (quickStartTour + characterCreationWizardTour)
-  // The monolithic characterCreation tour was split into two independent tours to fix unmount issues.
-  // This test needs to be redesigned to test either:
-  // 1. The QuickStart tour specifically (3 steps on QuickStart screen)
-  // 2. The Wizard tour specifically (6 steps within wizard component)
-  // 3. Or both tours sequentially if that's the desired coverage
-  // For now, the wizard flow itself is covered by character-creation.spec.ts
-  test.skip('Character creation tutorial overlays render consistently', async ({ page }) => {
+  test('Character creation wizard tutorial overlay renders consistently', async ({ page }) => {
     test.setTimeout(90000);
 
     await seedTestData(page);
+
+    // Navigate directly to wizard by going to page and clicking through
     await page.goto('/characters/create?worldId=world-cyberpunk-2077');
     await waitForContentStable(page);
     await waitForStoreReady(page);
 
-    // Disable tutorials initially so they don't interfere with navigation
+    // Set clean tutorial state - all tutorials completed except characterCreation
+    // This prevents any auto-start interference
     await setTutorialProgress(page, {
       intro: { completed: true, skipped: false },
       worldCreation: { completed: true, skipped: false, lastStep: 999 },
       worldGeneration: { completed: true, skipped: false, lastStep: 0 },
-      characterCreation: { completed: true, skipped: false, lastStep: 0 },
+      characterCreation: { completed: false, skipped: false, lastStep: 0 },
       firstPlay: { completed: true, skipped: false },
     });
 
+    // Click to enter wizard (no tutorial interference)
     const customizeButton = page.locator('button:has-text("Create Custom Character")');
     await expect(customizeButton).toBeVisible({ timeout: 15000 });
     await customizeButton.click();
 
     await waitForContentStable(page);
 
-    // Wait for wizard to mount and first target element to be available
+    // Wait for wizard's first target element to be ready
     const templateSelector = page.locator('[data-tutorial="template-selector"]');
     await expect(templateSelector).toBeVisible({ timeout: 15000 });
 
-    // Wait for test API to be available and start the wizard tour
+    // Wait for test API and tutorial context to be fully initialized
     await page.waitForFunction(() => typeof (window as any).__TEST_START_TOUR__ === 'function', { timeout: 5000 });
 
-    await page.evaluate(() => {
+    // Give the wizard time to sync its current step with TutorialProvider
+    await page.waitForTimeout(500);
+
+    // Manually start the wizard tour using the test API
+    const result = await page.evaluate(() => {
       const startTour = (window as any).__TEST_START_TOUR__;
-      startTour('characterCreationWizard');
+      if (typeof startTour === 'function') {
+        try {
+          startTour('characterCreationWizard', 0);
+          return { success: true, error: null };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      }
+      return { success: false, error: '__TEST_START_TOUR__ not available' };
     });
 
-    // Wait a moment for Joyride to initialize
-    await page.waitForTimeout(500);
+    if (!result.success) {
+      throw new Error(`Failed to start tour: ${result.error}`);
+    }
+
+    // Wait for Joyride to render and position the tooltip
+    await page.waitForTimeout(1000);
 
     const tooltip = page.locator('.react-joyride__tooltip');
     await expect(tooltip).toBeVisible({ timeout: 10000 });
