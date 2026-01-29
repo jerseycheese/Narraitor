@@ -11,7 +11,7 @@ const waitForStoreReady = async (page: Page): Promise<void> => {
 
 const setTutorialProgress = async (
   page: Page,
-  phases: Record<string, { completed: boolean; skipped: boolean; lastStep?: number }>
+  phases: Record<string, { completed: boolean; skipped: boolean; lastStep?: number; quickStartCompleted?: boolean }>
 ): Promise<void> => {
   await page.evaluate((phasesState) => {
     const store = (window as any).useSessionStore;
