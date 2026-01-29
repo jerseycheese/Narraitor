@@ -98,12 +98,7 @@ test.describe('Tutorial visual coverage', () => {
     await waitForContentStable(page);
     await waitForStoreReady(page);
 
-    const customizeButton = page.locator('button:has-text("Create Custom Character")');
-    await expect(customizeButton).toBeVisible({ timeout: 15000 });
-    await customizeButton.click();
-
-    await waitForContentStable(page);
-
+    // Set tutorial progress BEFORE clicking to wizard, so auto-start effect triggers
     await setTutorialProgress(page, {
       intro: { completed: true, skipped: false },
       worldCreation: { completed: true, skipped: false, lastStep: 999 },
@@ -111,6 +106,12 @@ test.describe('Tutorial visual coverage', () => {
       characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: true },
       firstPlay: { completed: true, skipped: false },
     });
+
+    const customizeButton = page.locator('button:has-text("Create Custom Character")');
+    await expect(customizeButton).toBeVisible({ timeout: 15000 });
+    await customizeButton.click();
+
+    await waitForContentStable(page);
 
     const tooltip = page.locator('.react-joyride__tooltip');
     await expect(tooltip).toBeVisible({ timeout: 10000 });
