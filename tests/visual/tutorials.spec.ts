@@ -98,12 +98,12 @@ test.describe('Tutorial visual coverage', () => {
     await waitForContentStable(page);
     await waitForStoreReady(page);
 
-    // Set tutorial progress BEFORE clicking to wizard, so auto-start effect triggers
+    // Disable tutorials initially so they don't interfere with navigation
     await setTutorialProgress(page, {
       intro: { completed: true, skipped: false },
       worldCreation: { completed: true, skipped: false, lastStep: 999 },
       worldGeneration: { completed: true, skipped: false, lastStep: 0 },
-      characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: true },
+      characterCreation: { completed: true, skipped: false, lastStep: 0 },
       firstPlay: { completed: true, skipped: false },
     });
 
@@ -112,6 +112,14 @@ test.describe('Tutorial visual coverage', () => {
     await customizeButton.click();
 
     await waitForContentStable(page);
+
+    // Now manually start the wizard tour for testing
+    await page.evaluate(() => {
+      const startTour = (window as any).__TEST_START_TOUR__;
+      if (startTour) {
+        startTour('characterCreationWizard');
+      }
+    });
 
     const tooltip = page.locator('.react-joyride__tooltip');
     await expect(tooltip).toBeVisible({ timeout: 10000 });
