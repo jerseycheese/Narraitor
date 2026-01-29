@@ -108,7 +108,7 @@ test.describe('Tutorial visual coverage', () => {
       intro: { completed: true, skipped: false },
       worldCreation: { completed: true, skipped: false, lastStep: 999 },
       worldGeneration: { completed: true, skipped: false, lastStep: 0 },
-      characterCreation: { completed: false, skipped: false, lastStep: 0 },
+      characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: true },
       firstPlay: { completed: true, skipped: false },
     });
 
