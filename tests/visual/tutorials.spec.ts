@@ -113,13 +113,20 @@ test.describe('Tutorial visual coverage', () => {
 
     await waitForContentStable(page);
 
-    // Now manually start the wizard tour for testing
+    // Wait for wizard to mount and first target element to be available
+    const templateSelector = page.locator('[data-tutorial="template-selector"]');
+    await expect(templateSelector).toBeVisible({ timeout: 15000 });
+
+    // Wait for test API to be available and start the wizard tour
+    await page.waitForFunction(() => typeof (window as any).__TEST_START_TOUR__ === 'function', { timeout: 5000 });
+
     await page.evaluate(() => {
       const startTour = (window as any).__TEST_START_TOUR__;
-      if (startTour) {
-        startTour('characterCreationWizard');
-      }
+      startTour('characterCreationWizard');
     });
+
+    // Wait a moment for Joyride to initialize
+    await page.waitForTimeout(500);
 
     const tooltip = page.locator('.react-joyride__tooltip');
     await expect(tooltip).toBeVisible({ timeout: 10000 });
