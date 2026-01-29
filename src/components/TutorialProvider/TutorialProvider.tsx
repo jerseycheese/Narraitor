@@ -247,7 +247,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
       setTimeout(() => {
         if (runRef.current && !isPausedRef.current) {
-          pauseTour('wizard-transition');
+          pauseTour('missing-target');
         }
       }, 100);
     }
