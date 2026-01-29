@@ -100,13 +100,13 @@ test.describe('Tutorial visual coverage', () => {
     await waitForContentStable(page);
     await waitForStoreReady(page);
 
-    // Set clean tutorial state - all tutorials completed except characterCreation
-    // This prevents any auto-start interference
+    // Set all tutorials as completed to prevent ANY auto-start interference
+    // We'll manually control the wizard tour start via test API
     await setTutorialProgress(page, {
       intro: { completed: true, skipped: false },
       worldCreation: { completed: true, skipped: false, lastStep: 999 },
       worldGeneration: { completed: true, skipped: false, lastStep: 0 },
-      characterCreation: { completed: false, skipped: false, lastStep: 0 },
+      characterCreation: { completed: true, skipped: false, lastStep: 0 },
       firstPlay: { completed: true, skipped: false },
     });
 
