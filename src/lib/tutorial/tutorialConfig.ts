@@ -50,6 +50,6 @@ export const joyrideOptions = {
   scrollToFirstStep: false,
   showProgress: false,
   showSkipButton: true,
-  disableScrolling: false,
+  disableScrolling: true, // Disable auto-scroll to fix modal spotlight positioning
   scrollOffset: 150,
 };
