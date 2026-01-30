@@ -7,7 +7,7 @@ export const worldGenerationTour: Step[] = [
     placement: 'center',
   },
   {
-    target: 'input[placeholder="e.g., The Lost Kingdom"]',
+    target: '#world-name',
     content: 'Here you can name your world, or leave it blank to let the system invent one for you.',
     placement: 'auto',
   },
