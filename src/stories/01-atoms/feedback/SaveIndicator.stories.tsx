@@ -68,14 +68,6 @@ export const Saved: Story = {
   },
 };
 
-export const SavedWithTimestamp: Story = {
-  args: {
-    status: 'saved',
-    lastSaveTime: '2023-01-01T14:30:00.000Z',
-    totalSaves: 12,
-  },
-};
-
 export const Error: Story = {
   args: {
     status: 'error',
@@ -91,14 +83,6 @@ export const WithManualSave: Story = {
     status: 'saved',
     lastSaveTime: getTimestamp(),
     totalSaves: 3,
-    onManualSave: action('manual-save-triggered'),
-  },
-};
-
-export const ManualSaveWhileSaving: Story = {
-  args: {
-    status: 'saving',
-    totalSaves: 2,
     onManualSave: action('manual-save-triggered'),
   },
 };
@@ -124,12 +108,3 @@ export const CompactMode: Story = {
   },
 };
 
-export const NonRetryableError: Story = {
-  args: {
-    status: 'error',
-    errorMessage: 'Authentication failed. Please check your credentials.',
-    totalSaves: 3,
-    retryable: false,
-    onManualSave: action('manual-save-triggered'),
-  },
-};
