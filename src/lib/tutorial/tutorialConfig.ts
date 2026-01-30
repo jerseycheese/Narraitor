@@ -50,6 +50,26 @@ export const joyrideOptions = {
   scrollToFirstStep: false,
   showProgress: false,
   showSkipButton: true,
-  disableScrolling: true, // Disable auto-scroll to fix modal spotlight positioning
+  disableScrolling: false,
   scrollOffset: 150,
 };
+
+/**
+ * Tours that run inside modals need scrolling disabled to prevent
+ * the page underneath from scrolling, which breaks spotlight positioning
+ */
+export const MODAL_TOURS = [
+  'worldGeneration',
+] as const;
+
+/**
+ * Get joyride options for a specific tour
+ */
+export function getTourOptions(tourId: string) {
+  const isModalTour = MODAL_TOURS.includes(tourId as typeof MODAL_TOURS[number]);
+
+  return {
+    ...joyrideOptions,
+    disableScrolling: isModalTour,
+  };
+}

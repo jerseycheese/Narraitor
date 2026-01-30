@@ -3,7 +3,7 @@
 import React, { createContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
 import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 import { useSessionStore } from '@/state/sessionStore';
-import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
+import { joyrideStyles, getTourOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
@@ -401,29 +401,32 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }}>
       {children}
       <TutorialProgressWidget />
-      {steps.length > 0 && run && (
-        <Joyride
-          key={`${activeTour}-${isPaused}`}
-          steps={steps}
-          run={!isPaused}
-          stepIndex={stepIndex}
-          continuous={joyrideOptions.continuous}
-          scrollToFirstStep={joyrideOptions.scrollToFirstStep}
-          showProgress={joyrideOptions.showProgress}
-          showSkipButton={joyrideOptions.showSkipButton}
-          disableScrolling={joyrideOptions.disableScrolling}
-          styles={joyrideStyles}
-          callback={handleJoyrideCallback}
-          disableOverlayClose={true}
-          spotlightClicks={true}
-          scrollOffset={joyrideOptions.scrollOffset}
+      {steps.length > 0 && run && (() => {
+        const tourOptions = getTourOptions(activeTour || '');
+        return (
+          <Joyride
+            key={`${activeTour}-${isPaused}`}
+            steps={steps}
+            run={!isPaused}
+            stepIndex={stepIndex}
+            continuous={tourOptions.continuous}
+            scrollToFirstStep={tourOptions.scrollToFirstStep}
+            showProgress={tourOptions.showProgress}
+            showSkipButton={tourOptions.showSkipButton}
+            disableScrolling={tourOptions.disableScrolling}
+            styles={joyrideStyles}
+            callback={handleJoyrideCallback}
+            disableOverlayClose={true}
+            spotlightClicks={true}
+            scrollOffset={tourOptions.scrollOffset}
           locale={
             stepMapping
               ? { skip: 'Skip tutorial', last: 'Finish tutorial' }
               : undefined
           }
         />
-      )}
+        );
+      })()}
     </TutorialContext.Provider>
   );
 }
