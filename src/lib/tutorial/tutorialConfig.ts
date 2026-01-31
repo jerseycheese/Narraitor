@@ -65,8 +65,14 @@ export const joyrideOptions = {
  * Tours that run inside modals need scrolling disabled to prevent
  * the page underneath from scrolling, which breaks spotlight positioning
  */
-export const MODAL_TOURS = [
-  'worldGeneration',
+export const MODAL_TOURS = [] as const;
+
+/**
+ * Tours that use the custom useTutorialAutoScroll hook
+ * (Native Joyride scrolling must be disabled)
+ */
+export const MANUAL_SCROLL_TOURS = [
+  'firstPlay',
 ] as const;
 
 /**
@@ -74,9 +80,10 @@ export const MODAL_TOURS = [
  */
 export function getTourOptions(tourId: string) {
   const isModalTour = MODAL_TOURS.includes(tourId as typeof MODAL_TOURS[number]);
+  const isManualScrollTour = MANUAL_SCROLL_TOURS.includes(tourId as any);
 
   return {
     ...joyrideOptions,
-    disableScrolling: isModalTour,
+    disableScrolling: isModalTour || isManualScrollTour,
   };
 }

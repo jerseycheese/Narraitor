@@ -61,14 +61,17 @@ const config: Config = {
       info: {
         DEFAULT: 'hsl(var(--info))',
         foreground: 'hsl(var(--info-foreground))',
+        text: 'hsl(var(--info-text))',
       },
       success: {
         DEFAULT: 'hsl(var(--success))',
         foreground: 'hsl(var(--success-foreground))',
+        text: 'hsl(var(--success-text))',
       },
       warning: {
         DEFAULT: 'hsl(var(--warning))',
         foreground: 'hsl(var(--warning-foreground))',
+        text: 'hsl(var(--warning-text))',
       },
     },
     extend: {
