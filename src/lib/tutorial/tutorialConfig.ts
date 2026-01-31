@@ -80,7 +80,7 @@ export const MANUAL_SCROLL_TOURS = [
  */
 export function getTourOptions(tourId: string) {
   const isModalTour = MODAL_TOURS.includes(tourId as typeof MODAL_TOURS[number]);
-  const isManualScrollTour = MANUAL_SCROLL_TOURS.includes(tourId as any);
+  const isManualScrollTour = MANUAL_SCROLL_TOURS.includes(tourId as typeof MANUAL_SCROLL_TOURS[number]);
 
   return {
     ...joyrideOptions,
