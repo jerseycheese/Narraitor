@@ -22,6 +22,9 @@ export default function CharacterCreatePage() {
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const { startTour, isTourActive, stopTour } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
+  const quickStartCompleted = useSessionStore(
+    state => state.tutorialProgress.phases.characterCreation.quickStartCompleted,
+  );
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [contentReady, setContentReady] = useState(false);
@@ -33,10 +36,25 @@ export default function CharacterCreatePage() {
 
   // Start tutorial tour when content is ready
   useEffect(() => {
-    if (mounted && shouldShowTour && !isTourActive && showQuickStart && contentReady) {
+    if (
+      mounted &&
+      shouldShowTour &&
+      !isTourActive &&
+      showQuickStart &&
+      contentReady &&
+      !quickStartCompleted
+    ) {
       startTour('quickStartSelection');
     }
-  }, [mounted, shouldShowTour, isTourActive, startTour, showQuickStart, contentReady]);
+  }, [
+    mounted,
+    shouldShowTour,
+    isTourActive,
+    startTour,
+    showQuickStart,
+    contentReady,
+    quickStartCompleted,
+  ]);
 
   // Auto-start wizard tour when transitioning from QuickStart
   useEffect(() => {

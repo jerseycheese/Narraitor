@@ -19,5 +19,6 @@ export const quickStartTour: Step[] = [
     content: 'Want more control? This wizard walks you through custom character creation step-by-step.',
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
 ];
