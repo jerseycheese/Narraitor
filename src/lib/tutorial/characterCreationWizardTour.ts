@@ -18,7 +18,7 @@ export const characterCreationWizardTour: Step[] = [
       children: "Here's where you'll name your character and add a description.",
       example: '"Kira Nightshade" with a backstory hint like "a cunning rogue with a mysterious past"',
     }),
-    placement: 'right',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {

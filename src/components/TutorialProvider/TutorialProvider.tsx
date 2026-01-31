@@ -109,7 +109,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           ? Math.max(...stepIndices)
           : null;
 
-        if (maxIndexForWizardStep !== null && lastStep >= maxIndexForWizardStep) {
+        if (maxIndexForWizardStep !== null && lastStep > maxIndexForWizardStep) {
           return;
         }
       }

@@ -52,6 +52,13 @@ export const joyrideOptions = {
   showSkipButton: true,
   disableScrolling: false,
   scrollOffset: 150,
+  floaterProps: {
+    modifiers: {
+      flip: {
+        fallbackPlacements: ['bottom', 'top'],
+      },
+    },
+  },
 };
 
 /**

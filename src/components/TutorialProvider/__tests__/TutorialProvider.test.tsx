@@ -51,6 +51,14 @@ jest.mock('@/lib/tutorial/worldCreationTour', () => ({
   tourStepToWizardStep: { 0: 0, 1: 0, 2: 1 }
 }));
 
+jest.mock('@/lib/tutorial/characterCreationWizardTour', () => ({
+  characterCreationWizardTour: [
+    { target: 'body', content: 'Step 1' },
+    { target: 'body', content: 'Step 2' }
+  ],
+  tourStepToWizardStep: { 0: 0, 1: 1 }
+}));
+
 const TestComponent = () => {
   const { startTour, stopTour, isTourActive, stepIndex, setCurrentWizardStep } = useTutorial();
   
@@ -59,6 +67,7 @@ const TestComponent = () => {
       <div data-testid="tour-status">{isTourActive ? 'Active' : 'Inactive'}</div>
       <div data-testid="step-index">{stepIndex}</div>
       <button onClick={() => startTour('worldCreation')}>Start World Tour</button>
+      <button onClick={() => startTour('characterCreationWizard')}>Start Character Wizard Tour</button>
       <button onClick={stopTour}>Stop Tour</button>
       <button onClick={() => setCurrentWizardStep(1)}>Wizard Step 1</button>
     </div>
@@ -91,6 +100,21 @@ describe('TutorialProvider', () => {
       screen.getByText('Start World Tour').click();
     });
     
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+    expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
+  });
+
+  it('starts the character wizard tour when on the first step', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start Character Wizard Tour').click();
+    });
+
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
   });
