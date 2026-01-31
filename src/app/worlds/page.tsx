@@ -39,23 +39,18 @@ export default function WorldsPage() {
 
   // Start tour when modal opens if needed (only once per modal session)
   useEffect(() => {
-    console.log('[WorldsPage] useEffect:', { showPrompt, shouldShowTour, isTourActive, tourStarted: tourStartedRef.current });
     if (showPrompt && shouldShowTour && !isTourActive && !tourStartedRef.current) {
-      console.log('[WorldsPage] Scheduling tour start');
       tourStartedRef.current = true;
       // Small delay to allow modal animation
       const timer = setTimeout(() => {
         // Re-check in case tutorial was completed during the timeout
         const stillShouldShow = useSessionStore.getState().shouldShowTutorialPhase('worldGeneration');
-        console.log('[WorldsPage] Timer fired, stillShouldShow:', stillShouldShow);
         if (stillShouldShow) {
-          console.log('[WorldsPage] Starting tour');
           startTour('worldGeneration');
         }
       }, 500);
       return () => clearTimeout(timer);
     } else if (!showPrompt && isTourActive) {
-      console.log('[WorldsPage] Stopping tour because modal closed');
       stopTour();
     }
   }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour]);
