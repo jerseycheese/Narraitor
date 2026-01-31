@@ -4,6 +4,8 @@ import { TutorialProvider, useTutorial } from '../index';
 import { useSessionStore } from '@/state/sessionStore';
 
 // Mock React Joyride
+let lastJoyrideProps: Record<string, unknown> | null = null;
+
 jest.mock('react-joyride', () => {
   const STATUS = {
     FINISHED: 'finished',
@@ -20,6 +22,7 @@ jest.mock('react-joyride', () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
+    lastJoyrideProps = { run, stepIndex, steps, callback };
     if (!run) return null;
     return (
       <div data-testid="joyride-mock">
@@ -77,6 +80,7 @@ const TestComponent = () => {
 describe('TutorialProvider', () => {
   beforeEach(() => {
     useSessionStore.getState().resetTutorialProgress();
+    lastJoyrideProps = null;
   });
 
   it('provides tutorial context', async () => {
@@ -102,6 +106,23 @@ describe('TutorialProvider', () => {
     
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
+  });
+
+  it('disables beacons for all tour steps', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start World Tour').click();
+    });
+
+    const steps = lastJoyrideProps?.steps as Array<{ disableBeacon?: boolean }> | undefined;
+
+    expect(steps).toBeDefined();
+    expect(steps?.every((step) => step.disableBeacon === true)).toBe(true);
   });
 
   it('starts the character wizard tour when on the first step', async () => {

@@ -30,24 +30,30 @@ interface TutorialContextValue {
 
 export const TutorialContext = createContext<TutorialContextValue | null>(null);
 
+const normalizeSteps = (steps: Step[]) =>
+  steps.map((step) => ({
+    ...step,
+    disableBeacon: true,
+  }));
+
 const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
   try {
     switch (tourId) {
       case 'worldCreation':
         const { worldCreationTour, tourStepToWizardStep: worldMapping } = await import('@/lib/tutorial/worldCreationTour');
-        return { steps: worldCreationTour, mapping: worldMapping };
+        return { steps: normalizeSteps(worldCreationTour), mapping: worldMapping };
       case 'worldGeneration':
         const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
-        return { steps: worldGenerationTour };
+        return { steps: normalizeSteps(worldGenerationTour) };
       case 'quickStartSelection':
         const { quickStartTour } = await import('@/lib/tutorial/quickStartTour');
-        return { steps: quickStartTour };
+        return { steps: normalizeSteps(quickStartTour) };
       case 'characterCreationWizard':
         const { characterCreationWizardTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationWizardTour');
-        return { steps: characterCreationWizardTour, mapping: charMapping };
+        return { steps: normalizeSteps(characterCreationWizardTour), mapping: charMapping };
       case 'firstPlay':
         const { firstPlayTour } = await import('@/lib/tutorial/firstPlayTour');
-        return { steps: firstPlayTour };
+        return { steps: normalizeSteps(firstPlayTour) };
       default:
         return { steps: [] };
     }
