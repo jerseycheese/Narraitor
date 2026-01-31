@@ -112,7 +112,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
       onTouchEnd={handleTouchEnd}
     >
       {/* Header with close button */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <LogoIcon size="small" className="brightness-0 invert" />
           <LogoText size="sm" className="text-white" />
@@ -177,8 +177,8 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
 
         {/* World switcher section */}
         {Object.keys(worlds).length > 0 && (
-          <div className="pt-4 mt-4 border-t border-gray-700">
-            <h3 className="px-4 text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+          <div className="pt-4 mt-4 border-t border-border">
+            <h3 className="px-4 text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
               Worlds
             </h3>
             <div className="space-y-1 max-h-64 overflow-y-auto">
@@ -213,7 +213,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
         )}
 
         {/* Quick actions */}
-        <div className="pt-4 mt-4 border-t border-gray-700">
+        <div className="pt-4 mt-4 border-t border-border">
           {currentWorld ? (
             <Button
               onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}

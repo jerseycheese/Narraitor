@@ -61,8 +61,8 @@ export function TutorialMenu() {
       </Button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-2 text-gray-900 border border-gray-200">
-          <div className="px-4 py-2 border-b border-gray-100">
+        <div className="absolute right-0 mt-2 w-64 bg-popover text-popover-foreground rounded-md shadow-lg z-50 py-2 border border-border">
+          <div className="px-4 py-2 border-b border-border">
             <h4 className="font-semibold text-sm">Tutorial Progress</h4>
           </div>
           
@@ -71,23 +71,23 @@ export function TutorialMenu() {
               <div key={phase} className="px-4 py-1.5 flex items-center justify-between text-sm">
                 <span className="capitalize">{phase.replace(/([A-Z])/g, ' $1')}</span>
                 {data.completed ? (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4 text-success" />
                 ) : data.skipped ? (
-                  <span className="text-xs text-gray-400">Skipped</span>
+                  <span className="text-xs text-muted-foreground">Skipped</span>
                 ) : ('lastStep' in data && (data as { lastStep: number }).lastStep > 0) ? (
-                  <span className="text-xs text-blue-500">In Progress</span>
+                  <span className="text-xs text-info">In Progress</span>
                 ) : (
-                  <span className="text-xs text-gray-400">Not Started</span>
+                  <span className="text-xs text-muted-foreground">Not Started</span>
                 )}
               </div>
             ))}
           </div>
           
-          <div className="border-t border-gray-100 mt-1 pt-1">
+          <div className="border-t border-border mt-1 pt-1">
             <Button
               variant="ghost"
               onClick={handleRestart}
-              className="w-full justify-start px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50 h-auto font-normal rounded-none"
+              className="w-full justify-start px-4 py-2 text-destructive hover:text-destructive/90 hover:bg-accent h-auto font-normal rounded-none"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset All Tutorials
