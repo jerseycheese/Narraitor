@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 
 const mockStartTour = jest.fn();
+let triggerCustomize = false;
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -17,10 +18,20 @@ jest.mock('@/components/TutorialProvider', () => ({
 }));
 
 jest.mock('@/components/QuickStartCharacters/QuickStartCharacters', () => ({
-  QuickStartCharacters: ({ onReady }: { onReady?: () => void }) => {
+  QuickStartCharacters: ({
+    onReady,
+    onCustomizeClick,
+  }: {
+    onReady?: () => void;
+    onCustomizeClick?: () => void;
+  }) => {
     useEffect(() => {
       onReady?.();
-    }, [onReady]);
+      if (triggerCustomize) {
+        triggerCustomize = false;
+        onCustomizeClick?.();
+      }
+    }, [onReady, onCustomizeClick]);
     return <div data-testid="quickstart-characters" />;
   },
 }));
@@ -77,6 +88,10 @@ const setQuickStartCompleted = (quickStartCompleted: boolean) => {
   mockSessionStore.tutorialProgress.phases.characterCreation.quickStartCompleted = quickStartCompleted;
 };
 
+const setTriggerCustomize = (value: boolean) => {
+  triggerCustomize = value;
+};
+
 const resetSessionStore = () => ({
   initializeSession: jest.fn(),
   updateTutorialProgress: jest.fn(),
@@ -97,6 +112,7 @@ describe('CharacterCreatePage tutorial start', () => {
   beforeEach(() => {
     mockStartTour.mockClear();
     Object.assign(mockSessionStore, resetSessionStore());
+    setTriggerCustomize(false);
   });
 
   it('starts quick start tour when not completed', async () => {
@@ -117,5 +133,26 @@ describe('CharacterCreatePage tutorial start', () => {
     await waitFor(() => {
       expect(mockStartTour).not.toHaveBeenCalled();
     });
+  });
+
+  it('does not auto-start wizard tour after character creation is completed', async () => {
+    jest.useFakeTimers();
+    try {
+      setQuickStartCompleted(true);
+      mockSessionStore.tutorialProgress.phases.characterCreation.completed = true;
+      mockSessionStore.shouldShowTutorialPhase = jest.fn(() => false);
+      setTriggerCustomize(true);
+
+      const { default: Page } = await import('../page');
+      render(<Page />);
+
+      await act(async () => {
+        jest.runAllTimers();
+      });
+
+      expect(mockStartTour).not.toHaveBeenCalled();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

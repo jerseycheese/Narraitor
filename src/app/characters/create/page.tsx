@@ -61,6 +61,7 @@ export default function CharacterCreatePage() {
     if (!showQuickStart && mounted) {
       const phaseData = useSessionStore.getState().tutorialProgress.phases.characterCreation;
       const shouldAutoStart =
+        shouldShowTour &&
         phaseData.quickStartCompleted === true &&
         !phaseData.skipped &&
         !isTourActive;
@@ -72,7 +73,7 @@ export default function CharacterCreatePage() {
         return () => clearTimeout(timer);
       }
     }
-  }, [showQuickStart, mounted, isTourActive, startTour]);
+  }, [showQuickStart, mounted, isTourActive, startTour, shouldShowTour]);
 
   // If URL has worldId but store doesn't, set it in the store
   useEffect(() => {
