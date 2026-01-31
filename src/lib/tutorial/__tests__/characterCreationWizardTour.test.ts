@@ -20,6 +20,15 @@ describe('characterCreationWizardTour', () => {
     expect(step?.placement).toBe('bottom');
   });
 
+  it('keeps the skills tooltip constrained to vertical placements', () => {
+    const step = characterCreationWizardTour.find(
+      (tourStep) => tourStep.target === '[data-tutorial="skill-selection"]',
+    );
+
+    expect(step).toBeDefined();
+    expect(step?.placement).toBe('bottom');
+  });
+
   it('disables joyride scrolling for wizard steps', () => {
     const stepsWithoutDisableScrolling = characterCreationWizardTour.filter(
       (step) => step.disableScrolling !== true,

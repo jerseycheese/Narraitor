@@ -39,7 +39,7 @@ export const characterCreationWizardTour: Step[] = [
       children: "Here you can select skills that define what your character excels at.",
       example: 'Stealth for a character who prefers avoiding direct confrontation',
     }),
-    placement: 'left',
+    placement: 'bottom',
     disableBeacon: true,
     disableScrolling: true,
   },
