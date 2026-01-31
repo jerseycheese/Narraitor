@@ -34,7 +34,11 @@ export default function WorldsPage() {
     if (showPrompt && shouldShowTour && !isTourActive) {
       // Small delay to allow modal animation
       const timer = setTimeout(() => {
-        startTour('worldGeneration');
+        // Re-check in case tutorial was completed during the timeout
+        const stillShouldShow = useSessionStore.getState().shouldShowTutorialPhase('worldGeneration');
+        if (stillShouldShow) {
+          startTour('worldGeneration');
+        }
       }, 500);
       return () => clearTimeout(timer);
     } else if (!showPrompt && isTourActive) {
