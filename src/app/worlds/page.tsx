@@ -165,6 +165,34 @@ export default function WorldsPage() {
         showCloseButton={false}
         size="xl"
         ariaDescribedBy="generate-world-desc"
+        footer={
+          <ActionButtonGroup
+            actions={[
+              {
+                label: 'Cancel',
+                onClick: () => {
+                  setShowPrompt(false);
+                  setWorldTypeData(createInitialWorldTypeData());
+                  setWorldName('');
+                  setError(null);
+                },
+                variant: 'secondary',
+                disabled: isGenerating
+              },
+              {
+                label: isGenerating ? 'Generating...' : 'Generate',
+                onClick: handleGenerateWorld,
+                variant: 'primary',
+                disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+                icon: (
+                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                ),
+                dataTutorial: 'generate-world-button'
+              }
+            ]}
+            className="justify-end"
+          />
+        }
       >
         <div className="space-y-4">
           <WorldFormFields.NameInput
@@ -186,47 +214,17 @@ export default function WorldsPage() {
             layout="vertical"
             size="medium"
           />
-        </div>
-          
           {error && (
-            <div className="mb-4">
-              <InlineError error={error} />
-            </div>
+            <InlineError error={error} />
           )}
-          
+
           {isGenerating && (
-            <p className="text-primary text-sm mb-4 flex items-center gap-2">
+            <p className="text-primary text-sm flex items-center gap-2">
               <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
               {generatingStatus}
             </p>
           )}
-          
-        <ActionButtonGroup
-          actions={[
-            {
-              label: 'Cancel',
-              onClick: () => {
-                setShowPrompt(false);
-                setWorldTypeData(createInitialWorldTypeData());
-                setWorldName('');
-                setError(null);
-              },
-              variant: 'secondary',
-              disabled: isGenerating
-            },
-            {
-              label: isGenerating ? 'Generating...' : 'Generate',
-              onClick: handleGenerateWorld,
-              variant: 'primary',
-              disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-              icon: (
-                <Sparkles className="w-4 h-4" aria-hidden="true" />
-              ),
-              dataTutorial: 'generate-world-button'
-            }
-          ]}
-          className="mt-6 justify-end"
-        />
+        </div>
       </SimpleModal>
 
       <WorldListScreen onViewToggleRender={setViewToggle} />

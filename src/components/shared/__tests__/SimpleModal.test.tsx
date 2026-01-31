@@ -34,4 +34,60 @@ describe('SimpleModal', () => {
     expect(isJoyrideTooltipTarget(document.body)).toBe(false);
     expect(isJoyrideTooltipTarget(null)).toBe(false);
   });
+
+  it('uses overlay scrolling by default', () => {
+    render(
+      <SimpleModal isOpen={true} onClose={jest.fn()} title="Generate World">
+        <div>Modal content</div>
+      </SimpleModal>,
+    );
+
+    expect(document.querySelector('[data-scroll-container="overlay"]')).toBeTruthy();
+    expect(document.querySelector('[data-scroll-container="content"]')).toBeNull();
+  });
+
+  it('centers overlay content when it fits using auto margins', () => {
+    render(
+      <SimpleModal isOpen={true} onClose={jest.fn()} title="Generate World">
+        <div>Modal content</div>
+      </SimpleModal>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.className).toContain('my-auto');
+  });
+
+  it('supports content scrolling when requested', () => {
+    render(
+      <SimpleModal
+        isOpen={true}
+        onClose={jest.fn()}
+        title="Generate World"
+        scrollBehavior="content"
+      >
+        <div>Modal content</div>
+      </SimpleModal>,
+    );
+
+    expect(document.querySelector('[data-scroll-container="content"]')).toBeTruthy();
+    expect(document.querySelector('[data-scroll-container="overlay"]')).toBeNull();
+  });
+
+  it('supports overlay scrolling with a sticky footer', () => {
+    render(
+      <SimpleModal
+        isOpen={true}
+        onClose={jest.fn()}
+        title="Generate World"
+        stickyFooter={true}
+        footer={<button type="button">Generate</button>}
+      >
+        <div>Modal content</div>
+      </SimpleModal>,
+    );
+
+    expect(document.querySelector('[data-scroll-container="overlay"]')).toBeTruthy();
+    expect(document.querySelector('[data-scroll-container="content"]')).toBeNull();
+    expect(document.querySelector('[data-sticky-footer="true"]')).toBeTruthy();
+  });
 });
