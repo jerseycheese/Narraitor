@@ -226,7 +226,8 @@ export default function WorldsPage() {
               disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
               icon: (
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
-              )
+              ),
+              dataTutorial: 'generate-world-button'
             }
           ]}
           className="mt-6 justify-end"
