@@ -172,13 +172,18 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, type, index, action } = data;
-    
+
+    console.log('[TutorialProvider] Callback:', { status, type, index, action, activeTour, stepsLength: steps.length });
+
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      console.log('[TutorialProvider] Tutorial finishing/skipped');
+      console.log('[TutorialProvider] Clearing steps and stopping run');
       setSteps([]);
       setRun(false);
       setIsPaused(false);
       setPauseReason(null);
       missingTargetRef.current = null;
+      console.log('[TutorialProvider] Steps cleared, run stopped');
       if (activeTour) {
         if (status === STATUS.FINISHED) {
           if (activeTour === 'quickStartSelection') {
@@ -198,7 +203,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             }
           } else {
             // Check if it's a valid phase before completing
+            console.log('[TutorialProvider] Checking phase completion:', { activeTour, isValidPhase: activeTour in tutorialProgress.phases });
             if (activeTour in tutorialProgress.phases) {
+              console.log('[TutorialProvider] Completing tutorial phase:', activeTour);
               completeTutorialPhase(activeTour as TutorialPhase);
             }
           }
