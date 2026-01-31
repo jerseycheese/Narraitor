@@ -10,4 +10,13 @@ describe('characterCreationWizardTour', () => {
     expect(step?.placement).toBe('bottom');
     expect(step?.floaterProps).toBeUndefined();
   });
+
+  it('lets the attributes tooltip auto-place', () => {
+    const step = characterCreationWizardTour.find(
+      (tourStep) => tourStep.target === '[data-tutorial="attribute-allocation"]',
+    );
+
+    expect(step).toBeDefined();
+    expect(step?.placement).toBe('auto');
+  });
 });
