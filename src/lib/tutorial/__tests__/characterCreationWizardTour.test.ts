@@ -19,4 +19,12 @@ describe('characterCreationWizardTour', () => {
     expect(step).toBeDefined();
     expect(step?.placement).toBe('auto');
   });
+
+  it('disables joyride scrolling for wizard steps', () => {
+    const stepsWithoutDisableScrolling = characterCreationWizardTour.filter(
+      (step) => step.disableScrolling !== true,
+    );
+
+    expect(stepsWithoutDisableScrolling).toHaveLength(0);
+  });
 });

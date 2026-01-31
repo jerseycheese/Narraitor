@@ -10,6 +10,7 @@ export const characterCreationWizardTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
     data: { isEndOfPage: true },
   },
   {
@@ -20,6 +21,7 @@ export const characterCreationWizardTour: Step[] = [
     }),
     placement: 'bottom',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="attribute-allocation"]',
@@ -29,6 +31,7 @@ export const characterCreationWizardTour: Step[] = [
     }),
     placement: 'auto',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="skill-selection"]',
@@ -38,6 +41,7 @@ export const characterCreationWizardTour: Step[] = [
     }),
     placement: 'left',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="background-editor"]',
@@ -47,12 +51,14 @@ export const characterCreationWizardTour: Step[] = [
     }),
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
   {
     target: '[data-tutorial="portrait-generator"]',
     content: 'You can generate a unique portrait based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,
+    disableScrolling: true,
   },
 ];
 
