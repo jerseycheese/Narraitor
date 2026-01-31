@@ -16,7 +16,7 @@ import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { useTutorial } from '@/components/TutorialProvider';
 import { useSessionStore } from '@/state/sessionStore';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -28,10 +28,19 @@ export default function WorldsPage() {
   const { startTour, stopTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldGeneration'));
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+  const tourStartedRef = useRef(false);
 
-  // Start tour when modal opens if needed
+  // Reset tour started flag when modal closes
   useEffect(() => {
-    if (showPrompt && shouldShowTour && !isTourActive) {
+    if (!showPrompt) {
+      tourStartedRef.current = false;
+    }
+  }, [showPrompt]);
+
+  // Start tour when modal opens if needed (only once per modal session)
+  useEffect(() => {
+    if (showPrompt && shouldShowTour && !isTourActive && !tourStartedRef.current) {
+      tourStartedRef.current = true;
       // Small delay to allow modal animation
       const timer = setTimeout(() => {
         // Re-check in case tutorial was completed during the timeout
