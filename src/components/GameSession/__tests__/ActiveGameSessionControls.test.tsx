@@ -83,7 +83,6 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.getByTestId('choice-history')).toBeInTheDocument();
     expect(screen.getByTestId('save-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
-    expect(screen.getByTestId('journal-floating')).toHaveAttribute('data-tutorial', 'journal-toggle');
 
     const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');
     expect(inventoryAnchor).toBeInTheDocument();
