@@ -8,6 +8,7 @@ import { HelpCircle, RefreshCw, CheckCircle } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('TutorialMenu');
+const RESET_DELAY_MS = 100;
 
 export function TutorialMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +40,7 @@ export function TutorialMenu() {
         // Zustand persist doesn't expose a flush/ready API for writes,
         // so we use a small delay. 100ms is generally sufficient for
         // IndexedDB operations on modern browsers.
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, RESET_DELAY_MS));
         window.location.reload(); 
       } catch (error) {
         logger.error('Failed to reset tutorial', error);

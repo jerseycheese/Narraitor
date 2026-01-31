@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -12,6 +12,7 @@ import type { GenreValue } from '@/types/genre.types';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -31,8 +32,12 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
-  const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
   const { setCurrentWorld } = useWorldStore();
+  
+  const [confirmationState, setConfirmationState] = useState<{
+    isOpen: boolean;
+    pendingData: WorldTypeData | null;
+  }>({ isOpen: false, pendingData: null });
 
   // Validation function for wizard steps
   const validateStep = useCallback((step: number, data: OnboardingData) => {
@@ -202,10 +207,14 @@ export function GuidedFirstTimeExperience() {
           const isInspiredBy = worldTypeData.worldType === 'inspired_by';
           const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
           
-          wizard.handlers.updateData({ 
-            worldTypeData,
-            ...(shouldAutoDetectGenre && { genre: '' })
-          });
+          if (shouldAutoDetectGenre && wizard.state.data.genre) {
+            setConfirmationState({ isOpen: true, pendingData: worldTypeData });
+          } else {
+            wizard.handlers.updateData({ 
+              worldTypeData,
+              ...(shouldAutoDetectGenre && { genre: '' })
+            });
+          }
         }}
         size="medium"
       />
@@ -219,7 +228,7 @@ export function GuidedFirstTimeExperience() {
         </div>
       )}
     </div>
-  ), [wizard.state.data.worldTypeData, wizard.stepValidation, wizard.handlers]);
+  ), [wizard.state.data.worldTypeData, wizard.state.data.genre, wizard.stepValidation, wizard.handlers]);
 
   const renderDetailsStep = useMemo(() => {
     const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
@@ -321,10 +330,15 @@ export function GuidedFirstTimeExperience() {
     }
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
-  // Don't render if onboarding shouldn't be shown
-  if (!isFirstTimeUser()) {
-    return null;
-  }
+  const handleConfirmGenreChange = useCallback(() => {
+    if (confirmationState.pendingData) {
+      wizard.handlers.updateData({ 
+        worldTypeData: confirmationState.pendingData,
+        genre: '' 
+      });
+      setConfirmationState({ isOpen: false, pendingData: null });
+    }
+  }, [confirmationState.pendingData, wizard.handlers]);
 
   return (
     <WizardContainer title="First time?">
@@ -378,6 +392,16 @@ export function GuidedFirstTimeExperience() {
             <p className="text-sm text-destructive">{wizard.currentError}</p>
           </div>
         )}
+
+        <ConfirmationDialog
+          isOpen={confirmationState.isOpen}
+          onClose={() => setConfirmationState({ isOpen: false, pendingData: null })}
+          onConfirm={handleConfirmGenreChange}
+          title="Clear Genre?"
+          message="Changing the world type will clear your selected genre, as it will be inferred from the reference. Do you want to continue?"
+          variant="warning"
+          confirmText="Yes, change type"
+        />
       </div>
     </WizardContainer>
   );

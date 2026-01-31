@@ -10,6 +10,8 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { TutorialMenu } from './TutorialMenu';
 import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
+const SWIPE_THRESHOLD = 100;
+
 interface MobileNavigationMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -74,7 +76,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
     const diffY = startY.current - currentY;
 
     // Only close on significant horizontal swipe (left to right)
-    if (Math.abs(diffX) > Math.abs(diffY) && diffX > 100) {
+    if (Math.abs(diffX) > Math.abs(diffY) && diffX > SWIPE_THRESHOLD) {
       onClose();
     }
   }, [onClose]);

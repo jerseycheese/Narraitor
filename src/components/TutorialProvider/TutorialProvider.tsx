@@ -13,6 +13,9 @@ type PauseReason = 'end-of-page' | 'missing-target' | null;
 
 const logger = new Logger('TutorialProvider');
 
+const MAX_TARGET_RETRIES = 40; // 10 seconds total (40 * 250ms)
+const RETRY_INTERVAL_MS = 250;
+
 interface TutorialContextValue {
   startTour: (tourId: TutorialPhase | string, stepIndex?: number) => void;
   stopTour: () => void;
@@ -268,7 +271,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     if (!missingTarget?.target) return;
 
     let retries = 0;
-    const maxRetries = 40; // 10 seconds
 
     const retryInterval = window.setInterval(() => {
       if (!isPausedRef.current || pauseReason !== 'missing-target') {
@@ -293,11 +295,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       }
 
       retries++;
-      if (retries >= maxRetries) {
+      if (retries >= MAX_TARGET_RETRIES) {
         logger.warn('Tutorial missing target timeout', { target: missingTarget.target });
         window.clearInterval(retryInterval);
       }
-    }, 250);
+    }, RETRY_INTERVAL_MS);
 
     return () => {
       window.clearInterval(retryInterval);
