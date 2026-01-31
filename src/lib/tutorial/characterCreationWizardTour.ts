@@ -29,7 +29,7 @@ export const characterCreationWizardTour: Step[] = [
       children: "This is where you'll distribute points across your core attributes, which determine your character's natural strengths and weaknesses.",
       example: 'High Strength for a fighter who relies on physical power',
     }),
-    placement: 'auto',
+    placement: 'bottom',
     disableBeacon: true,
     disableScrolling: true,
   },

@@ -11,13 +11,13 @@ describe('characterCreationWizardTour', () => {
     expect(step?.floaterProps).toBeUndefined();
   });
 
-  it('lets the attributes tooltip auto-place', () => {
+  it('keeps the attributes tooltip constrained to vertical placements', () => {
     const step = characterCreationWizardTour.find(
       (tourStep) => tourStep.target === '[data-tutorial="attribute-allocation"]',
     );
 
     expect(step).toBeDefined();
-    expect(step?.placement).toBe('auto');
+    expect(step?.placement).toBe('bottom');
   });
 
   it('disables joyride scrolling for wizard steps', () => {
