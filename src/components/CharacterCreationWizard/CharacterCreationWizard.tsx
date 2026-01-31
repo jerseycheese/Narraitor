@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { EntityID } from '@/types/common.types';
@@ -38,7 +38,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
 
-  const { setCurrentWizardStep } = useTutorial();
+  const {
+    setCurrentWizardStep,
+    pauseTour,
+    resumeTour,
+    currentTour,
+    isTourActive,
+  } = useTutorial();
+  const pausedForRecoveryRef = useRef(false);
 
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
@@ -49,6 +56,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       setShowRecoveryDialog(true);
     }
   }, [hasRecoveryData]);
+
+  React.useEffect(() => {
+    if (currentTour !== 'characterCreationWizard' || !isTourActive) {
+      return;
+    }
+
+    if (showRecoveryDialog && !pausedForRecoveryRef.current) {
+      pauseTour('end-of-page');
+      pausedForRecoveryRef.current = true;
+      return;
+    }
+
+    if (!showRecoveryDialog && pausedForRecoveryRef.current) {
+      resumeTour();
+      pausedForRecoveryRef.current = false;
+    }
+  }, [currentTour, isTourActive, pauseTour, resumeTour, showRecoveryDialog]);
 
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
