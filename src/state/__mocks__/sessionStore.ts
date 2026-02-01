@@ -4,8 +4,18 @@ export const useSessionStore = jest.fn((selector) => {
     savedSessions: {},
     resumeSavedSession: jest.fn().mockReturnValue(true),
     shouldShowOnboarding: jest.fn().mockReturnValue(false),
-    onboardingCompleted: true,
-    setOnboardingCompleted: jest.fn(),
+    tutorialProgress: {
+      phases: {
+        intro: { completed: true, skipped: false },
+        worldCreation: { completed: false, skipped: false, lastStep: 0 },
+        worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+        characterCreation: { completed: false, skipped: false, lastStep: 0 },
+        firstPlay: { completed: false, skipped: false },
+      },
+      dismissedHints: [],
+      lastActiveStep: null,
+    },
+    completeTutorialPhase: jest.fn(),
     fixExistingSessionNarrativeCounts: jest.fn(),
   };
   
@@ -24,8 +34,18 @@ const mockSessionStore = {
     savedSessions: {},
     resumeSavedSession: jest.fn().mockReturnValue(true),
     shouldShowOnboarding: jest.fn().mockReturnValue(false),
-    onboardingCompleted: true,
-    setOnboardingCompleted: jest.fn(),
+    tutorialProgress: {
+      phases: {
+        intro: { completed: true, skipped: false },
+        worldCreation: { completed: false, skipped: false, lastStep: 0 },
+        worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+        characterCreation: { completed: false, skipped: false, lastStep: 0 },
+        firstPlay: { completed: false, skipped: false },
+      },
+      dismissedHints: [],
+      lastActiveStep: null,
+    },
+    completeTutorialPhase: jest.fn(),
     fixExistingSessionNarrativeCounts: jest.fn(),
   })),
   setState: jest.fn(),

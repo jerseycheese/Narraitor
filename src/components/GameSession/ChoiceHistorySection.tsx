@@ -65,7 +65,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(new Set());
 
   return (
-    <section className="mt-6" data-testid="choice-history-section">
+    <section className="mt-6" data-testid="choice-history-section" data-tutorial="choice-history-section">
       <CollapsibleSection title="Choice History" initialCollapsed={initialCollapsed}>
         {resolvedEntries.length === 0 ? (
           <p className="text-sm text-gray-500">

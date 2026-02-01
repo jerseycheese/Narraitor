@@ -1,15 +1,16 @@
 'use client';
 
 import React from 'react';
+import { BookOpen } from 'lucide-react';
 import type { Character } from '@/state/characterStore';
 import CharacterSummary from './CharacterSummary';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { JournalFloatingButton } from './JournalFloatingButton';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { InventoryList } from '@/components/inventory/InventoryList';
+import { Button } from '@/components/ui/button';
 import type { UseAutoSaveReturn } from '@/hooks/useAutoSave';
 
 interface ActiveGameSessionControlsProps {
@@ -46,7 +47,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
 
       {/* Inventory Display */}
       {characterId && (
-        <div className="mt-6" data-testid="inventory-collapsible">
+        <div className="mt-6" data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
           </CollapsibleSection>
@@ -56,6 +57,23 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
 
       <ChoiceHistorySection sessionId={sessionId} />
+
+      {/* Journal Button */}
+      {character && (
+        <div className="mt-6">
+          <Button
+            onClick={onOpenJournal}
+            variant="outline"
+            className="w-full flex items-center justify-center h-auto py-4 px-6 bg-white hover:bg-amber-50 border-amber-200 text-amber-900 group"
+            data-tutorial="journal-toggle"
+          >
+            <span className="flex items-center gap-3 font-semibold text-lg">
+              <BookOpen className="w-5 h-5" />
+              Open Journal
+            </span>
+          </Button>
+        </div>
+      )}
 
       {/* Autosave indicator anchored under the main content */}
       <div className="mt-4">
@@ -83,13 +101,6 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
         confirmText="End Story"
         cancelText="Cancel"
       />
-
-      {/* Journal Floating Button - Issue #562 */}
-      {character && (
-        <JournalFloatingButton
-          onClick={onOpenJournal}
-        />
-      )}
     </>
   );
 };

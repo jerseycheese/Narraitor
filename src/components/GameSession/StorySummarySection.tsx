@@ -37,7 +37,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
     : [];
 
   return (
-    <section className="mt-6" data-testid="story-summary-section">
+    <section className="mt-6" data-testid="story-summary-section" data-tutorial="story-summary-section">
       <CollapsibleSection title="The Story So Far" initialCollapsed>
         <div>
           {summaryParagraphs.length > 0 ? (

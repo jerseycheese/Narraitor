@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { EntityID } from '@/types/common.types';
@@ -21,6 +21,7 @@ import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
+import { useTutorial } from '@/components/TutorialProvider';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -37,6 +38,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
 
+  const {
+    setCurrentWizardStep,
+    pauseTour,
+    resumeTour,
+    currentTour,
+    isTourActive,
+  } = useTutorial();
+  const pausedForRecoveryRef = useRef(false);
+
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
@@ -46,6 +56,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       setShowRecoveryDialog(true);
     }
   }, [hasRecoveryData]);
+
+  React.useEffect(() => {
+    if (currentTour !== 'characterCreationWizard' || !isTourActive) {
+      return;
+    }
+
+    if (showRecoveryDialog && !pausedForRecoveryRef.current) {
+      pauseTour('end-of-page');
+      pausedForRecoveryRef.current = true;
+      return;
+    }
+
+    if (!showRecoveryDialog && pausedForRecoveryRef.current) {
+      resumeTour();
+      pausedForRecoveryRef.current = false;
+    }
+  }, [currentTour, isTourActive, pauseTour, resumeTour, showRecoveryDialog]);
 
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
@@ -110,6 +137,11 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     worldId,
     world
   });
+
+  // Sync wizard step with tutorial provider
+  React.useEffect(() => {
+    setCurrentWizardStep(wizard.state.currentStep);
+  }, [wizard.state.currentStep, setCurrentWizardStep]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({
@@ -221,17 +253,41 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     switch (wizard.state.currentStep) {
       case 0:
-        return <TemplateSelectionStep {...props} />;
+        return (
+          <div data-tutorial="template-selector">
+            <TemplateSelectionStep {...props} />
+          </div>
+        );
       case 1:
-        return <BasicInfoStep {...props} />;
+        return (
+          <div data-tutorial="basic-info">
+            <BasicInfoStep {...props} />
+          </div>
+        );
       case 2:
-        return <AttributesStep {...props} />;
+        return (
+          <div data-tutorial="attribute-allocation">
+            <AttributesStep {...props} />
+          </div>
+        );
       case 3:
-        return <SkillsStep {...props} />;
+        return (
+          <div data-tutorial="skill-selection">
+            <SkillsStep {...props} />
+          </div>
+        );
       case 4:
-        return <BackgroundStep {...props} />;
+        return (
+          <div data-tutorial="background-editor">
+            <BackgroundStep {...props} />
+          </div>
+        );
       case 5:
-        return <PortraitStep {...props} />;
+        return (
+          <div data-tutorial="portrait-generator">
+            <PortraitStep {...props} />
+          </div>
+        );
       default:
         return null;
     }

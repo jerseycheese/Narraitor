@@ -7,6 +7,13 @@ import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadi
 import { Button } from '@/components/ui/button';
 import { Clock, X, List } from 'lucide-react';
 import { formatRelativeTime, capitalize } from '@/lib/utils';
+import {
+  headerDropdownDividerClass,
+  headerDropdownHeaderClass,
+  headerDropdownItemClass,
+  headerDropdownMenuClass,
+  headerDropdownTriggerClass,
+} from './navigationDropdownStyles';
 
 interface RecentPagesDropdownProps {
   className?: string;
@@ -127,7 +134,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     <div className={`relative ${className}`} ref={dropdownRef}>
       <Button
         onClick={() => setShowRecentPages(!showRecentPages)}
-        className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-900 hover:bg-gray-700 rounded-md transition-colors text-gray-300 hover:text-white"
+        className={headerDropdownTriggerClass}
         aria-label="Recent pages"
         variant="ghost"
       >
@@ -139,8 +146,8 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
       </Button>
       
       {showRecentPages && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto border">
-          <div className="px-4 py-2 border-b border-gray-200 bg-gray-100">
+        <div className={`${headerDropdownMenuClass} w-80 py-1 max-h-96 overflow-y-auto`}>
+          <div className={headerDropdownHeaderClass}>
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-900">Recent Pages</h3>
               <span className="text-xs text-gray-500">{recentPages.length} pages</span>
@@ -155,7 +162,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
               <div className="flex items-center">
                 <Button
                   onClick={() => handleNavigateToPage(entry.path, entry.title)}
-                  className="flex-1 text-left px-4 py-3 hover:bg-gray-100 transition-colors"
+                  className={`${headerDropdownItemClass} flex-1`}
                   aria-label={`Navigate to ${formatPageTitle(entry)}`}
                   variant="ghost"
                 >
@@ -191,10 +198,10 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
           ))}
           
           {recentPages.length > 0 && (
-            <div className="border-t border-gray-200 mt-1 pt-1">
+            <div className={headerDropdownDividerClass}>
               <Link
                 href="/recent"
-                className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav text-sm"
+                className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav text-sm`}
                 onClick={() => setShowRecentPages(false)}
               >
                 <List className="w-4 h-4" aria-hidden="true" />

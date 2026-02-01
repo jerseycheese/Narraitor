@@ -60,14 +60,6 @@ export const Active: Story = {
   },
 };
 
-export const ActiveWithCustomText: Story = {
-  args: {
-    isActive: true,
-    activeText: 'Currently Active World',
-    children: <SampleContent />,
-  },
-};
-
 export const ActiveWithoutIndicator: Story = {
   args: {
     isActive: true,

@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { PreviewModal } from '@/components/shared/PreviewModal/PreviewModal';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 interface TemplatePreviewProps {
   template: WorldTemplate;
@@ -27,7 +28,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
           <div>
             <span className="font-medium text-gray-700">Genre:</span>
             <span className={`ml-2 ${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
-              {template.genre}
+              {getGenreLabel(template.genre)}
             </span>
           </div>
           <div>

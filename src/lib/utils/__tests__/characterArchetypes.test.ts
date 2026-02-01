@@ -1,6 +1,7 @@
 // src/lib/utils/__tests__/characterArchetypes.test.ts
 
 import { generateCharacterArchetypes } from '../characterArchetypes';
+import { calculateCharacterLevel } from '../characterLevel';
 import { World } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { createMockWorld as factoryCreateMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';
@@ -106,8 +107,8 @@ describe('characterArchetypes', () => {
       const archetypes = await generateCharacterArchetypes(world);
       
       archetypes.forEach(archetype => {
-        // Should have level 1 (starting character)
-        expect(archetype.level).toBe(1);
+        const expectedLevel = calculateCharacterLevel(world, archetype.attributes);
+        expect(archetype.level).toBe(expectedLevel);
         
         // Should have complete background
         expect(archetype.background.description).toBeTruthy();
@@ -118,6 +119,39 @@ describe('characterArchetypes', () => {
         // Should be viable for skill checks (at least one skill > 3)
         const hasViableSkills = archetype.skills.some(skill => skill.level > 3);
         expect(hasViableSkills).toBe(true);
+      });
+    });
+
+    test('does not exceed attribute or skill point pools', async () => {
+      const world = factoryCreateMockWorld({
+        id: 'low-pool-world',
+        name: 'Low Pool World',
+        genre: 'fantasy',
+        attributes: [
+          createMockWorldAttribute({ id: 'str', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' }),
+          createMockWorldAttribute({ id: 'int', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' }),
+          createMockWorldAttribute({ id: 'agi', name: 'Agility', description: 'Speed and dexterity', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' })
+        ],
+        skills: [
+          createMockWorldSkill({ id: 'combat', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' }),
+          createMockWorldSkill({ id: 'stealth', name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' }),
+          createMockWorldSkill({ id: 'magic', name: 'Magic', description: 'Mystical arts', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10, worldId: 'low-pool-world' })
+        ],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 3,
+          skillPointPool: 3
+        }
+      });
+      const archetypes = await generateCharacterArchetypes(world);
+
+      archetypes.forEach(archetype => {
+        const attributeTotal = archetype.attributes.reduce((sum, attr) => sum + attr.value, 0);
+        const skillTotal = archetype.skills.reduce((sum, skill) => sum + skill.level, 0);
+
+        expect(attributeTotal).toBeLessThanOrEqual(world.settings.attributePointPool);
+        expect(skillTotal).toBeLessThanOrEqual(world.settings.skillPointPool);
       });
     });
   });

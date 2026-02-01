@@ -1,6 +1,7 @@
 import { EntityID } from '@/types/common.types';
 import { World } from '@/types/world.types';
 import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 
@@ -79,6 +80,12 @@ export function finalizeCharacterCreation(
 
   // Set as current character
   useCharacterStore.getState().setCurrentCharacter(characterId);
+
+  // Mark character creation tutorial as completed
+  useSessionStore.getState().updateTutorialProgress('characterCreation', {
+    completed: true,
+    skipped: false,
+  });
 
   // Verify the character was set as current
   const currentCharacterId = useCharacterStore.getState().currentCharacterId;

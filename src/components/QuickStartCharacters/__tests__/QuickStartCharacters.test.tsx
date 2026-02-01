@@ -3,8 +3,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuickStartCharacters } from '../QuickStartCharacters';
-import { World } from '@/types/world.types';
-import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+import { World, CharacterArchetype } from '@/types/world.types';
 
 // Mock the character archetype generation
 jest.mock('@/lib/utils/characterArchetypes', () => ({

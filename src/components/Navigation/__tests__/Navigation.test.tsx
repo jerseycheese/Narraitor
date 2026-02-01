@@ -56,6 +56,16 @@ jest.mock('@/hooks/useKeyboardShortcuts', () => ({
   useKeyboardShortcuts: () => ({}),
 }));
 
+jest.mock('@/components/TutorialProvider', () => ({
+  useTutorial: jest.fn(() => ({
+    startTour: jest.fn(),
+    stopTour: jest.fn(),
+    setCurrentWizardStep: jest.fn(),
+    isTourActive: false,
+    currentTour: null,
+  })),
+}));
+
 // Mock child components
 jest.mock('../Breadcrumbs', () => ({
   Breadcrumbs: () => <div data-testid="breadcrumbs">Breadcrumbs</div>,

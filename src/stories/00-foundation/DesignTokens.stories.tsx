@@ -195,15 +195,15 @@ export const TokenUsageExamples: Story = {
         <div>
           <h3 className="font-semibold mb-3">Status Indicators</h3>
           <div className="space-y-3">
-            <div className="bg-success-background border border-success-border text-success-foreground p-3 rounded-md">
+            <div className="bg-success-background border border-success-border text-success-text p-3 rounded-md">
               <div className="font-medium">Success Message</div>
               <div className="text-sm">Operation completed successfully</div>
             </div>
-            <div className="bg-warning-background border border-warning-border text-warning-foreground p-3 rounded-md">
+            <div className="bg-warning-background border border-warning-border text-warning-text p-3 rounded-md">
               <div className="font-medium">Warning Message</div>
               <div className="text-sm">Please review before proceeding</div>
             </div>
-            <div className="bg-info-background border border-info-border text-info-foreground p-3 rounded-md">
+            <div className="bg-info-background border border-info-border text-info-text p-3 rounded-md">
               <div className="font-medium">Info Message</div>
               <div className="text-sm">Additional information available</div>
             </div>

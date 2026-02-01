@@ -118,6 +118,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'development',
       PORT: '3000',
+      NEXT_PUBLIC_DISABLE_TUTORIAL: 'true',
     },
   } : undefined,
 

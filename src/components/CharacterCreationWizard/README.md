@@ -57,12 +57,13 @@ CharacterCreationWizard/
 - Description: Minimum 50 characters
 
 ### Attributes
-- Must allocate all available points
+- Unspent points are allowed
 - Cannot exceed point pool
 - Respects min/max attribute values
 
 ### Skills
-- Must select exact number required by world
+- Must select between 1 and the world max
+- Unspent points are allowed
 - All skills start at level 1
 
 ### Background

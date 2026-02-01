@@ -30,11 +30,26 @@ export const validateCharacterName = (name: string, worldId: EntityID): Validati
 };
 
 export const validateAttributes = (
-  attributes: Array<{ value: number }>,
+  attributes: Array<{ value: number; maxValue?: number }>,
   totalPoints: number
 ): ValidationResult => {
   const values = attributes.map(attr => attr.value);
-  return validatePointDistribution(values, totalPoints);
+  if (attributes.length === 0) {
+    return {
+      valid: false,
+      errors: ['At least one attribute is required.'],
+    };
+  }
+
+  const pointsSpent = values.reduce((sum, value) => sum + value, 0);
+  if (pointsSpent > totalPoints) {
+    return {
+      valid: false,
+      errors: ['You have allocated more attribute points than available.'],
+    };
+  }
+
+  return { valid: true, errors: [] };
 };
 
 export const validateSkills = (
@@ -100,13 +115,8 @@ export const validateSkills = (
     }
   });
 
-  if (skillPointPool >= 0) {
-    const effectivePool = Math.min(skillPointPool, totalCapacity);
-    if (totalAllocated < effectivePool) {
-      errors.push('Spend all remaining skill points before continuing.');
-    } else if (totalAllocated > skillPointPool) {
-      errors.push('You have allocated more skill points than available.');
-    }
+  if (skillPointPool >= 0 && totalAllocated > skillPointPool) {
+    errors.push('You have allocated more skill points than available.');
   }
 
   const uniqueErrors = Array.from(new Set(errors));

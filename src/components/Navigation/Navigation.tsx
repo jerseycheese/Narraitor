@@ -14,9 +14,17 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 // Render RecentPagesDropdown only on the client to avoid SSR/client mismatches
 const RecentPagesDropdown = dynamic(() => import('./RecentPagesDropdown').then(m => ({ default: m.RecentPagesDropdown })), { ssr: false });
 import { MobileNavigationMenu } from './MobileNavigationMenu';
+import { TutorialMenu } from './TutorialMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { X, Menu, Globe, ChevronDown, Check, Plus, Play } from 'lucide-react';
+import {
+  headerDropdownDividerClass,
+  headerDropdownItemClass,
+  headerDropdownMenuClass,
+  headerDropdownTriggerClass,
+} from './navigationDropdownStyles';
 
 /**
  * Navigation - Main application navigation component
@@ -109,9 +117,10 @@ export function Navigation() {
   
   return (
     <>
-      <nav className="bg-gray-900 text-white shadow-lg" role="banner">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header role="banner">
+        <nav className="bg-gray-900 text-white shadow-lg" role="navigation" aria-label="Main">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
             {/* Left side - Logo and mobile menu button */}
             <div className="flex items-center space-x-4">
               {/* Mobile menu button */}
@@ -176,13 +185,14 @@ export function Navigation() {
             
             {/* Right side - Quick actions and current context (hidden on mobile) */}
             <div className="hidden md:flex items-center gap-2 sm:gap-4">
+              <TutorialMenu />
               {/* World Switcher Dropdown */}
               {hasWorlds && (
                 <div className="relative" ref={dropdownRef}>
                   <Button
                     onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
                     variant="ghost"
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-900 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md transition-colors h-auto"
+                    className={headerDropdownTriggerClass}
                   >
                     <Globe className="w-4 h-4" aria-hidden="true" />
                     <span className="hidden sm:inline">
@@ -197,7 +207,7 @@ export function Navigation() {
                   </Button>
                   
                   {showWorldSwitcher && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto">
+                    <div className={`${headerDropdownMenuClass} w-64 py-0 max-h-96 overflow-y-auto`}>
                       {Object.values(worlds).map(world => {
                         const worldCharacters = (Object.values(characters) as Character[]).filter(
                           char => char.worldId === world.id
@@ -208,13 +218,13 @@ export function Navigation() {
                             key={world.id}
                             onClick={() => handleWorldSwitch(world.id)}
                             variant="ghost"
-                            className={`w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center justify-between h-auto ${
+                            className={`${headerDropdownItemClass} flex items-center justify-between rounded-none ${
                               world.id === currentWorldId ? 'bg-green-50 border-l-4 border-green-500' : ''
                             }`}
                           >
                             <div>
                               <div className="font-medium text-gray-900">{world.name}</div>
-                              <div className="text-sm text-gray-500">{world.genre} • {worldCharacters} characters</div>
+                              <div className="text-sm text-gray-500">{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
                             </div>
                             {world.id === currentWorldId && (
                               <Check className="w-5 h-5 text-green-500" aria-hidden="true" />
@@ -223,10 +233,10 @@ export function Navigation() {
                         );
                       })}
                       
-                      <div className="border-t border-gray-200 mt-1 pt-1">
+                      <div className={headerDropdownDividerClass}>
                         <Link
                           href="/worlds"
-                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav"
+                          className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav rounded-none`}
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <Plus className="w-5 h-5" aria-hidden="true" />
@@ -268,7 +278,8 @@ export function Navigation() {
             </div>
           </div>
         </div>
-      </nav>
+        </nav>
+      </header>
 
       {/* Mobile Navigation Menu */}
       <MobileNavigationMenu 

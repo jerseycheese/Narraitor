@@ -11,10 +11,10 @@ jest.mock('next/navigation', () => ({
 
 // Simple store mocks
 const mockSessionStore = {
-  onboardingCompleted: false,
-  completeOnboarding: jest.fn(),
-  setOnboardingCompleted: jest.fn(),
-  shouldShowOnboarding: jest.fn(() => true),
+  tutorialProgress: { phases: { intro: { completed: false } } },
+  updateTutorialProgress: jest.fn(),
+  completeTutorialPhase: jest.fn(),
+  isFirstTimeUser: jest.fn(() => true),
 };
 
 const mockWorldStore = {
@@ -40,6 +40,12 @@ jest.mock('@/lib/generators/worldGenerator', () => ({
 // Mock other required utilities
 jest.mock('@/lib/utils/generateId', () => ({
   generateUniqueId: jest.fn(() => 'mock-id'),
+}));
+
+jest.mock('@/components/TutorialProvider', () => ({
+  useTutorial: jest.fn(() => ({
+    startTour: jest.fn(),
+  })),
 }));
 
 jest.mock('@/components/shared/WorldTypeSelector', () => ({
@@ -95,7 +101,7 @@ describe('GuidedFirstTimeExperience', () => {
 
       if (completeButton) {
         await user.click(completeButton);
-        expect(mockSessionStore.completeOnboarding).toHaveBeenCalled();
+        expect(mockSessionStore.completeTutorialPhase).toHaveBeenCalledWith('intro');
       }
     });
   });
@@ -115,12 +121,11 @@ describe('GuidedFirstTimeExperience', () => {
 
     it('navigates to appropriate page after completion', async () => {
       // Mock completed onboarding
-      mockSessionStore.onboardingCompleted = true;
-      mockSessionStore.shouldShowOnboarding = jest.fn(() => false);
+      mockSessionStore.isFirstTimeUser = jest.fn(() => false);
       
       render(<GuidedFirstTimeExperience />);
       
-      // When onboarding is completed, shouldShowOnboarding returns false, 
+      // When onboarding is completed, isFirstTimeUser returns false, 
       // so component should not render (returns null)
       expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/get started/i)).not.toBeInTheDocument();

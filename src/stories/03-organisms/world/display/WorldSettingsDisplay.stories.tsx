@@ -46,17 +46,6 @@ export const LowValues: Story = {
   },
 };
 
-export const PartialSettings: Story = {
-  args: {
-    settings: {
-      maxAttributes: 6,
-      maxSkills: 12,
-      attributePointPool: 27,
-      skillPointPool: 15,
-    },
-  },
-};
-
 export const EmptySettings: Story = {
   args: {
     settings: undefined,
@@ -70,28 +59,6 @@ export const ZeroValues: Story = {
       maxSkills: 0,
       attributePointPool: 0,
       skillPointPool: 0,
-    },
-  },
-};
-
-export const MinimalFantasy: Story = {
-  args: {
-    settings: {
-      maxAttributes: 6,
-      maxSkills: 8,
-      attributePointPool: 27,
-      skillPointPool: 12,
-    },
-  },
-};
-
-export const PowerfulFantasy: Story = {
-  args: {
-    settings: {
-      maxAttributes: 8,
-      maxSkills: 20,
-      attributePointPool: 45,
-      skillPointPool: 30,
     },
   },
 };
@@ -118,13 +85,3 @@ export const SuperheroSettings: Story = {
   },
 };
 
-export const BalancedSettings: Story = {
-  args: {
-    settings: {
-      maxAttributes: 6,
-      maxSkills: 12,
-      attributePointPool: 27,
-      skillPointPool: 15,
-    },
-  },
-};

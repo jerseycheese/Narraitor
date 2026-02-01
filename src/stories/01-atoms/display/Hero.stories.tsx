@@ -97,15 +97,6 @@ export const ShortHero: Story = {
   },
 };
 
-export const ExtraShortHero: Story = {
-  args: {
-    title: 'Character Name',
-    subtitle: 'Level 5 • Fantasy World • Fantasy',
-    image: sampleImage,
-    height: 'h-20 sm:h-24',
-  },
-};
-
 // Border radius variants (for card integration)
 export const CardTopOnly: Story = {
   args: {
@@ -137,13 +128,3 @@ export const AllBorderRadius: Story = {
   },
 };
 
-// Extra short themed variant (for character pages, breadcrumbs, etc.)
-export const ExtraShortThemed: Story = {
-  args: {
-    title: 'Character Name',
-    subtitle: 'Level 5 • Fantasy World',
-    theme: 'fantasy',
-    height: 'h-20 sm:h-24',
-    borderRadius: 'all',
-  },
-};

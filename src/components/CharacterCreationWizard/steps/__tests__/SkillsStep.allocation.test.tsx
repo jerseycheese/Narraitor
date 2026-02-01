@@ -93,11 +93,11 @@ describe('SkillsStep - skill point allocation', () => {
     jest.clearAllMocks();
   });
 
-  it('shows a warning when skill points remain to be allocated', () => {
+  it('explains that unspent skill points are allowed', () => {
     renderSkillsStep();
 
     expect(
-      screen.getByText('Spend all remaining skill points before continuing.')
+      screen.getByText(/Unspent points are allowed if you want to create a less experienced character/)
     ).toBeInTheDocument();
   });
 

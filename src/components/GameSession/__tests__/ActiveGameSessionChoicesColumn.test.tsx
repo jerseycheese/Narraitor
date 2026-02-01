@@ -65,4 +65,10 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(screen.queryByTestId('choice-selector')).toBeNull();
     expect(ChoiceSelector).not.toHaveBeenCalled();
   });
+
+  it('sets the tutorial anchor on the choices container', () => {
+    const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} />);
+    const choicesContainer = container.querySelector('[data-tutorial="player-choices"]');
+    expect(choicesContainer).toBeInTheDocument();
+  });
 });

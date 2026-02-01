@@ -14,11 +14,47 @@ import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector/utils';
 import { SimpleModal } from '@/components/shared/SimpleModal';
+import { useTutorial } from '@/components/TutorialProvider';
+import { useSessionStore } from '@/state/sessionStore';
+import { useEffect, useRef } from 'react';
+
 export default function WorldsPage() {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
+  
+  // Tutorial integration
+  const { startTour, stopTour, isTourActive } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldGeneration'));
+  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+  const tourStartedRef = useRef(false);
+
+  // Reset tour started flag when modal closes
+  useEffect(() => {
+    if (!showPrompt) {
+      tourStartedRef.current = false;
+    }
+  }, [showPrompt]);
+
+  // Start tour when modal opens if needed (only once per modal session)
+  useEffect(() => {
+    if (showPrompt && shouldShowTour && !isTourActive && !tourStartedRef.current) {
+      tourStartedRef.current = true;
+      // Small delay to allow modal animation
+      const timer = setTimeout(() => {
+        // Re-check in case tutorial was completed during the timeout
+        const stillShouldShow = useSessionStore.getState().shouldShowTutorialPhase('worldGeneration');
+        if (stillShouldShow) {
+          startTour('worldGeneration');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (!showPrompt && isTourActive) {
+      stopTour();
+    }
+  }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour]);
+
   const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +76,12 @@ export default function WorldsPage() {
     setIsGenerating(true);
     setGeneratingStatus('Generating world configuration...');
     setError(null);
+    
+    // Complete tutorial phase if active
+    if (shouldShowTour) {
+      completeTutorialPhase('worldGeneration');
+      stopTour();
+    }
 
     try {
       // Get existing world names to ensure uniqueness
@@ -123,6 +165,34 @@ export default function WorldsPage() {
         showCloseButton={false}
         size="xl"
         ariaDescribedBy="generate-world-desc"
+        footer={
+          <ActionButtonGroup
+            actions={[
+              {
+                label: 'Cancel',
+                onClick: () => {
+                  setShowPrompt(false);
+                  setWorldTypeData(createInitialWorldTypeData());
+                  setWorldName('');
+                  setError(null);
+                },
+                variant: 'secondary',
+                disabled: isGenerating
+              },
+              {
+                label: isGenerating ? 'Generating...' : 'Generate',
+                onClick: handleGenerateWorld,
+                variant: 'primary',
+                disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+                icon: (
+                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                ),
+                dataTutorial: 'generate-world-button'
+              }
+            ]}
+            className="justify-end"
+          />
+        }
       >
         <div className="space-y-4">
           <WorldFormFields.NameInput
@@ -144,46 +214,17 @@ export default function WorldsPage() {
             layout="vertical"
             size="medium"
           />
-        </div>
-          
           {error && (
-            <div className="mb-4">
-              <InlineError error={error} />
-            </div>
+            <InlineError error={error} />
           )}
-          
+
           {isGenerating && (
-            <p className="text-primary text-sm mb-4 flex items-center gap-2">
+            <p className="text-primary text-sm flex items-center gap-2">
               <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
               {generatingStatus}
             </p>
           )}
-          
-        <ActionButtonGroup
-          actions={[
-            {
-              label: 'Cancel',
-              onClick: () => {
-                setShowPrompt(false);
-                setWorldTypeData(createInitialWorldTypeData());
-                setWorldName('');
-                setError(null);
-              },
-              variant: 'secondary',
-              disabled: isGenerating
-            },
-            {
-              label: isGenerating ? 'Generating...' : 'Generate',
-              onClick: handleGenerateWorld,
-              variant: 'primary',
-              disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-              icon: (
-                <Sparkles className="w-4 h-4" aria-hidden="true" />
-              )
-            }
-          ]}
-          className="mt-6 justify-end"
-        />
+        </div>
       </SimpleModal>
 
       <WorldListScreen onViewToggleRender={setViewToggle} />

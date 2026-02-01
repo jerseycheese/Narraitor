@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
@@ -52,6 +52,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await waitForContentStable(page);
     await page.goto('/worlds/create');
     await waitForContentStable(page);
+    await hideDynamicContent(page);
     // Navigate to the Basic Info step by clicking "Create My Own World"
     const createOwnButton = page.getByRole('button', { name: 'Create My Own World' });
     await expect(createOwnButton).toBeEnabled({ timeout: 15000 });
@@ -81,7 +82,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
 
     // Initially the description is empty, so generate button should be disabled
     await expect(page.getByTestId('generate-ai-suggestions')).toBeDisabled();
-    await expect(page.getByText('Add at least 50 characters so the AI can understand your world before generating suggestions.')).toBeVisible();
+    await expect(page.getByText('Add at least 50 characters so we can understand your world before generating suggestions.')).toBeVisible();
 
     // Fill a long enough description to enable AI generation
     const longDescription = 'A world where magic and technology coexist in constant conflict. Ancient magical forces clash with futuristic tech.';
@@ -97,7 +98,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await expect(page.getByText('Attributes to explore')).toBeVisible();
     await expect(page.getByText('Skill ideas')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Regenerate suggestions' })).toBeVisible();
-    await expect(page.getByText('AI generated from your description')).toBeVisible();
+    await expect(page.getByText('Generated from your description')).toBeVisible();
   });
 
   test('should show outdated description warning after modification', async ({ page }) => {
@@ -116,7 +117,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
 
     // Verify outdated warning appears
     await expect(page.getByTestId('ai-description-outdated')).toBeVisible();
-    await expect(page.getByText('Your description has changed since the last AI run. Regenerate suggestions to keep them aligned.')).toBeVisible();
+    await expect(page.getByText('Your description has changed since the last generation. Regenerate suggestions to keep them aligned.')).toBeVisible();
 
     // Regenerate suggestions and verify warning disappears (mock responds instantly)
     await page.getByTestId('generate-ai-suggestions').click();

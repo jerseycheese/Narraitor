@@ -1,4 +1,5 @@
 import { World } from '@/types/world.types';
+import { calculateCharacterLevel } from '@/lib/utils/characterLevel';
 
 // Character level range for generated characters
 export const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
@@ -105,9 +106,11 @@ export function generateFromTemplate(options: CharacterGenerationOptions): Gener
       level: Math.floor(Math.random() * 5) + 1 // 1-5
     }));
   
+  const level = calculateCharacterLevel(world, attributes);
+
   return {
     name: finalName,
-    level: Math.floor(Math.random() * (CHARACTER_LEVEL_RANGE.max - CHARACTER_LEVEL_RANGE.min + 1)) + CHARACTER_LEVEL_RANGE.min,
+    level,
     background: {
       description: `A mysterious figure with an interesting past${world.reference ? ` from the ${world.reference} universe` : ''}.`,
       personality: personalities[Math.floor(Math.random() * personalities.length)],

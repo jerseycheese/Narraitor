@@ -4,6 +4,7 @@ import React from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 export interface GameReadyStepProps {
   worldId: string;
@@ -37,7 +38,7 @@ export function GameReadyStep({
           <div>
             <span className="text-sm text-gray-700">World:</span>
             <p className="font-medium text-gray-900">{world?.name}</p>
-            <p className="text-sm text-gray-700">{world?.genre}</p>
+            <p className="text-sm text-gray-700">{world?.genre ? getGenreLabel(world.genre) : 'Unknown'}</p>
           </div>
           <div className="pt-2 border-t">
             <span className="text-sm text-gray-700">Character:</span>

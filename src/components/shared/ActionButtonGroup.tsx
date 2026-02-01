@@ -10,6 +10,7 @@ export interface ActionButton {
   size?: 'default' | 'sm' | 'lg' | 'icon';
   icon?: React.ReactNode;
   disabled?: boolean;
+  dataTutorial?: string;
 }
 
 interface ActionButtonGroupProps {
@@ -50,6 +51,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
           size={action.size || 'default'}
           disabled={action.disabled}
           className={`flex items-center gap-2 ${getCustomStyling(action.variant)}`}
+          data-tutorial={action.dataTutorial}
         >
           {action.icon}
           {action.label}

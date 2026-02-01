@@ -72,27 +72,60 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step2-attributes.png', { fullPage: true });
 
-    // Allocate required points (10 + 10) so we can advance to the skills step
-    const attributeSliders = page.locator('[data-testid^="allocation-slider-"] input[type="range"]');
-    const sliderTotal = await attributeSliders.count();
-    for (let i = 0; i < sliderTotal; i++) {
-      const slider = attributeSliders.nth(i);
-      await slider.focus();
-      for (let j = 0; j < 10; j++) {
-        await slider.press('ArrowRight');
-        await page.waitForTimeout(30);
-      }
-    }
+    // Allocate required points so we can advance to the skills step.
+    // Use the native value setter so React's onChange fires reliably.
+    await page.evaluate(() => {
+      const sliders = Array.from(
+        document.querySelectorAll('[data-testid^="allocation-slider-"] input[type="range"]')
+      ) as HTMLInputElement[];
+      if (!sliders.length) return;
+
+      const setValue = (input: HTMLInputElement, value: number) => {
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        if (setter) {
+          setter.call(input, String(value));
+        } else {
+          input.value = String(value);
+        }
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+
+      const totalPoints = (() => {
+        const text = document.querySelector('.component-attributes-step')?.textContent || '';
+        const match = text.match(/Total:\s*(\d+)/);
+        return match ? Number(match[1]) : 0;
+      })();
+
+      const mins = sliders.map((slider) => Number(slider.min));
+      const maxes = sliders.map((slider) => Number(slider.max));
+      const minSum = mins.reduce((sum, value) => sum + value, 0);
+      let remaining = Math.max(0, totalPoints - minSum);
+
+      sliders.forEach((slider, index) => {
+        const capacity = maxes[index] - mins[index];
+        const allocation = remaining > 0 ? Math.min(remaining, capacity) : 0;
+        setValue(slider, mins[index] + allocation);
+        remaining -= allocation;
+      });
+    });
     await waitForContentStable(page);
+
+    const attributeRemaining = page.locator('.component-attributes-step').getByText(/Remaining:/);
+    await expect(attributeRemaining).toContainText('Remaining: 0', { timeout: 10000 });
 
     const proceedToSkillsBtn = page.locator('button:has-text("Next")');
     if (await proceedToSkillsBtn.count() > 0) {
+      await expect(proceedToSkillsBtn).toBeEnabled({ timeout: 10000 });
       await proceedToSkillsBtn.click();
       await page.waitForTimeout(800);
     }
   });
 
   await test.step('Step 3: Skills', async () => {
+    await page.locator('.component-skills-step').waitFor({ state: 'visible', timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'Allocate Skill Points' })).toBeVisible();
+
     // Select the first two skills to enable point allocation
     const skillToggles = page.locator('button:has-text("Excluded"), button:has-text("Not Selected")');
     let togglesClicked = 0;
@@ -115,15 +148,23 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const sliderCount = await skillSliders.count();
     for (let i = 0; i < sliderCount; i++) {
       const slider = skillSliders.nth(i);
-      await slider.focus();
-      for (let j = 0; j < 10; j++) {
-        await slider.press('ArrowRight');
-        await page.waitForTimeout(25);
-      }
+      await slider.evaluate((element) => {
+        const input = element as HTMLInputElement;
+        const max = Number(input.max);
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        if (setter) {
+          setter.call(input, String(max));
+        } else {
+          input.value = String(max);
+        }
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
     await waitForContentStable(page);
 
-    await expect(page.getByText(/^Remaining:/)).toContainText('Remaining: 0');
+    const remainingBadge = page.locator('.component-skills-step').getByText(/Remaining:/);
+    await expect(remainingBadge).toContainText('Remaining: 0', { timeout: 10000 });
     await expect(page.getByText(/^Allocated Points:/).first()).toBeVisible();
 
     await hideDynamicContent(page);

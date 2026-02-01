@@ -28,12 +28,6 @@ jest.mock('@/components/ConfirmationDialog', () => ({
   ),
 }));
 
-jest.mock('../JournalFloatingButton', () => ({
-  JournalFloatingButton: ({ onClick }: { onClick: () => void }) => (
-    <button data-testid="journal-floating" onClick={onClick} />
-  ),
-}));
-
 jest.mock('@/components/ui/CollapsibleSection', () => ({
   CollapsibleSection: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="collapsible-section">{children}</div>
@@ -90,7 +84,12 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.getByTestId('save-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId('journal-floating'));
+    const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');
+    expect(inventoryAnchor).toBeInTheDocument();
+
+    const journalButton = screen.getByRole('button', { name: /Open Journal/i });
+    expect(journalButton).toHaveAttribute('data-tutorial', 'journal-toggle');
+    fireEvent.click(journalButton);
     expect(baseProps.onOpenJournal).toHaveBeenCalled();
   });
 
@@ -105,7 +104,7 @@ describe('ActiveGameSessionControls', () => {
 
     expect(screen.queryByTestId('character-summary')).toBeNull();
     expect(screen.queryByTestId('inventory-list')).toBeNull();
-    expect(screen.queryByTestId('journal-floating')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Open Journal/i })).toBeNull();
     expect(screen.getByTestId('story-summary')).toBeInTheDocument();
   });
 });

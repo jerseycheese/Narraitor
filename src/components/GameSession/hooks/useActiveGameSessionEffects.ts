@@ -243,11 +243,18 @@ export const useActiveGameSessionEffects = ({
     };
   }, [sessionId, worldId, characterId, onEnd, onEndStoryClick]);
 
-  const scheduleChoiceFallback = useCallback((decisionAtSchedule: Decision | null) => {
+  const scheduleChoiceFallback = useCallback(() => {
     const timeoutId = setTimeout(() => {
       // If we're still generating choices after delay, create fallback choices
       setIsGeneratingChoices(prev => {
-        if (prev && !decisionAtSchedule) {
+        if (!prev) return prev;
+
+        const { decisions, sessionDecisions } = useNarrativeStore.getState();
+        const decisionIds = sessionDecisions[sessionId] || [];
+        const latestDecisionId = decisionIds[decisionIds.length - 1];
+        const currentDecision = latestDecisionId ? decisions[latestDecisionId] : null;
+
+        if (!currentDecision) {
           const fallbackId = `decision-timeout-${Date.now()}`;
           const fallbackDecision: Decision = {
             id: fallbackId,
@@ -264,12 +271,12 @@ export const useActiveGameSessionEffects = ({
           setCurrentDecision(fallbackDecision);
           return false; // Stop generating
         }
-        return prev;
+        return false;
       });
     }, CHOICE_FALLBACK_DELAY_MS);
 
     choiceGenerationTimeoutRef.current = timeoutId;
-  }, [choiceGenerationTimeoutRef, setCurrentDecision, setIsGeneratingChoices]);
+  }, [choiceGenerationTimeoutRef, sessionId, setCurrentDecision, setIsGeneratingChoices]);
 
   return {
     scheduleChoiceFallback,

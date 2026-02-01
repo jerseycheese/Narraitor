@@ -9,6 +9,7 @@ import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 export default function PlayPage() {
   const router = useRouter();
@@ -99,7 +100,7 @@ export default function PlayPage() {
   }
 
   const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
-  const pageDescription = currentWorld?.genre;
+  const pageDescription = currentWorld?.genre ? getGenreLabel(currentWorld.genre) : undefined;
 
   return (
     <PageLayout title={pageTitle} description={pageDescription} className="pb-0">

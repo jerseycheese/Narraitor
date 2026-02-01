@@ -10,7 +10,8 @@ import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
-import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
+import { CharacterArchetype } from '@/types/world.types';
+import { useTutorial } from '@/components/TutorialProvider';
 
 export default function CharacterCreatePage() {
   const router = useRouter();
@@ -18,13 +19,61 @@ export default function CharacterCreatePage() {
   const { currentWorldId, setCurrentWorld, worlds } = useWorldStore();
   const { createCharacter, setCurrentCharacter } = useCharacterStore();
   const { initializeSession } = useSessionStore();
+  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
+  const { startTour, isTourActive, stopTour } = useTutorial();
+  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
+  const quickStartCompleted = useSessionStore(
+    state => state.tutorialProgress.phases.characterCreation.quickStartCompleted,
+  );
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
 
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+
+  // Start tutorial tour when content is ready
+  useEffect(() => {
+    if (
+      mounted &&
+      shouldShowTour &&
+      !isTourActive &&
+      showQuickStart &&
+      contentReady &&
+      !quickStartCompleted
+    ) {
+      startTour('quickStartSelection');
+    }
+  }, [
+    mounted,
+    shouldShowTour,
+    isTourActive,
+    startTour,
+    showQuickStart,
+    contentReady,
+    quickStartCompleted,
+  ]);
+
+  // Auto-start wizard tour when transitioning from QuickStart
+  useEffect(() => {
+    if (!showQuickStart && mounted) {
+      const phaseData = useSessionStore.getState().tutorialProgress.phases.characterCreation;
+      const shouldAutoStart =
+        shouldShowTour &&
+        phaseData.quickStartCompleted === true &&
+        !phaseData.skipped &&
+        !isTourActive;
+
+      if (shouldAutoStart) {
+        const timer = setTimeout(() => {
+          startTour('characterCreationWizard');
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [showQuickStart, mounted, isTourActive, startTour, shouldShowTour]);
 
   // If URL has worldId but store doesn't, set it in the store
   useEffect(() => {
@@ -150,10 +199,18 @@ export default function CharacterCreatePage() {
   };
 
   const handleCustomizeClick = () => {
+    if (isTourActive) {
+      // Manually complete QuickStart if user advances via button click
+      updateTutorialProgress('characterCreation', { quickStartCompleted: true });
+      stopTour();
+    }
     setShowQuickStart(false);
   };
 
   const handleBackToQuickStart = () => {
+    if (isTourActive) {
+      stopTour();
+    }
     setShowQuickStart(true);
   };
 
@@ -182,6 +239,7 @@ export default function CharacterCreatePage() {
                   world={currentWorld}
                   onCharacterSelect={handleQuickStartSelect}
                   onCustomizeClick={handleCustomizeClick}
+                  onReady={() => setContentReady(true)}
                 />
               ) : (
                 <div className="text-center py-12 text-gray-500">

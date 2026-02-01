@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
+import { TutorialProgress, TutorialPhase } from '../types/tutorial.types';
 import { EntityID } from '../types/common.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
@@ -69,8 +70,18 @@ const initialState = {
   },
   // UI state
   narrativeHeight: 600, // Default height for narrative container
-  // Onboarding state
-  onboardingCompleted: false,
+  // Tutorial state
+  tutorialProgress: {
+    phases: {
+      intro: { completed: false, skipped: false },
+      worldCreation: { completed: false, skipped: false, lastStep: 0 },
+      worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+      characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: false },
+      firstPlay: { completed: false, skipped: false },
+    },
+    dismissedHints: [],
+    lastActiveStep: null,
+  } as TutorialProgress,
 };
 
 /**
@@ -396,7 +407,7 @@ export const useSessionStore = create<SessionStore>()(
         return {
           ...initialState,
           savedSessions: newSavedSessions,
-          onboardingCompleted: prevState.onboardingCompleted,
+          tutorialProgress: prevState.tutorialProgress,
           sessionLifecycle: updatedLifecycle
         };
       });
@@ -405,7 +416,7 @@ export const useSessionStore = create<SessionStore>()(
       set(prevState => ({
         ...initialState,
         savedSessions: prevState.savedSessions,
-        onboardingCompleted: prevState.onboardingCompleted,
+        tutorialProgress: prevState.tutorialProgress,
         sessionLifecycle: prevState.sessionLifecycle
       }));
     }
@@ -717,14 +728,86 @@ export const useSessionStore = create<SessionStore>()(
     }));
   },
   
-  // Onboarding actions
-  setOnboardingCompleted: (completed: boolean) => {
-    set({ onboardingCompleted: completed });
+  // Tutorial actions
+  updateTutorialProgress: (phase, updates) => {
+    set(state => ({
+      tutorialProgress: {
+        ...state.tutorialProgress,
+        phases: {
+          ...state.tutorialProgress.phases,
+          [phase]: {
+            ...state.tutorialProgress.phases[phase],
+            ...updates
+          }
+        }
+      }
+    }));
   },
-  
+
+  dismissTutorialHint: (hintId) => {
+    set(state => {
+      if (state.tutorialProgress.dismissedHints.includes(hintId)) return state;
+      return {
+        tutorialProgress: {
+          ...state.tutorialProgress,
+          dismissedHints: [...state.tutorialProgress.dismissedHints, hintId]
+        }
+      };
+    });
+  },
+
+  resetTutorialProgress: () => {
+    set({
+      tutorialProgress: {
+        phases: {
+          intro: { completed: false, skipped: false },
+          worldCreation: { completed: false, skipped: false, lastStep: 0 },
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+          characterCreation: { completed: false, skipped: false, lastStep: 0 },
+          firstPlay: { completed: false, skipped: false },
+        },
+        dismissedHints: [],
+        lastActiveStep: null,
+      }
+    });
+  },
+
+  completeTutorialPhase: (phase) => {
+    set(state => ({
+      tutorialProgress: {
+        ...state.tutorialProgress,
+        phases: {
+          ...state.tutorialProgress.phases,
+          [phase]: {
+            ...state.tutorialProgress.phases[phase],
+            completed: true
+          }
+        }
+      }
+    }));
+  },
+
+  // Tutorial selectors (computed)
+  shouldShowTutorialPhase: (phase) => {
+    const { tutorialProgress } = get();
+    return !tutorialProgress.phases[phase].completed && !tutorialProgress.phases[phase].skipped;
+  },
+
+  isTutorialComplete: () => {
+    const { tutorialProgress } = get();
+    return Object.values(tutorialProgress.phases).every(p => p.completed || p.skipped);
+  },
+
+  getCurrentTutorialPhase: () => {
+    const { tutorialProgress } = get();
+    const phases: TutorialPhase[] = ['intro', 'worldCreation', 'worldGeneration', 'characterCreation', 'firstPlay'];
+    return phases.find(p => !tutorialProgress.phases[p].completed && !tutorialProgress.phases[p].skipped) || null;
+  },
+
   isFirstTimeUser: () => {
     const state = get();
-    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+    // Consider a user "first time" if they haven't completed the intro phase
+    return !state.tutorialProgress.phases.intro.completed && !state.tutorialProgress.phases.intro.skipped;
   },
   
   // Fix existing session narrative counts by recalculating from narrative store
@@ -761,14 +844,14 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   shouldShowOnboarding: () => {
-    const state = get();
-    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+    // Show onboarding if intro phase is not complete/skipped
+    return get().isFirstTimeUser();
   },
 }),
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
-  version: 2,
+  version: 4,
   // Persist active session state to maintain continuity across browser refreshes
   partialize: (state) => ({ 
     savedSessions: state.savedSessions,
@@ -782,9 +865,46 @@ export const useSessionStore = create<SessionStore>()(
     playerChoices: state.playerChoices,
     // Persist auto-save state
     autoSave: state.autoSave,
-    // Persist onboarding state
-    onboardingCompleted: state.onboardingCompleted
+    // Persist tutorial state
+    tutorialProgress: state.tutorialProgress
   }),
+  migrate: (persistedState: unknown, version?: number) => {
+    try {
+      const nextState = persistedState as Partial<SessionStore>;
+
+      // Migration from v2 to v3: Add tutorialProgress
+      // CLEAN BREAK: No backward compatibility - all users get fresh tutorial state
+      if (typeof version === 'number' && version < 3) {
+        nextState.tutorialProgress = {
+          phases: {
+            intro: { completed: false, skipped: false },
+            worldCreation: { completed: false, skipped: false, lastStep: 0 },
+            worldGeneration: { completed: false, skipped: false, lastStep: 0 },
+            characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: false },
+            firstPlay: { completed: false, skipped: false },
+          },
+          dismissedHints: [],
+          lastActiveStep: null,
+        };
+        // Remove old onboarding flag - replaced by tutorialProgress
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (nextState as any).onboardingCompleted;
+      }
+      
+      // Migration from v3 to v4: Add worldGeneration phase
+      if (typeof version === 'number' && version < 4 && nextState.tutorialProgress) {
+        nextState.tutorialProgress.phases = {
+          ...nextState.tutorialProgress.phases,
+          worldGeneration: { completed: false, skipped: false, lastStep: 0 }
+        };
+      }
+
+      return nextState;
+    } catch (error) {
+      logger.error('State migration failed', error);
+      return initialState;
+    }
+  },
 }
 ));
 

@@ -10,7 +10,7 @@ export default function HomePage() {
     <main className="flex items-center justify-center py-6 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Visually hidden H1 for accessibility */}
-        <h1 className="sr-only">Narraitor - AI-Powered Interactive Storytelling Game</h1>
+        <h1 className="sr-only">Narraitor - Interactive Storytelling Game</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
           {/* Left Column - Dashboard Content (2/3 width) */}
@@ -34,7 +34,7 @@ export default function HomePage() {
                 <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
               </h2>
               <p className="text-xl text-muted-foreground max-w-md">
-                AI-powered interactive storytelling in any universe you can imagine
+                Interactive storytelling in any universe you can imagine
               </p>
             </div>
           </div>

@@ -80,18 +80,21 @@
     /* Extended semantic tokens */
     --success: 142 71% 45%; /* green-500: #22c55e */
     --success-foreground: 210 40% 98%;
+    --success-text: 154 86% 20%; /* green-800ish */
     --success-background: 142 69% 83%; /* green-200 */
     --success-border: 142 69% 83%; /* green-200 */
     --success-muted: 142 69% 83%; /* green-200 */
     
     --warning: 32 95% 44%; /* amber-500 */
     --warning-foreground: 210 40% 98%;
+    --warning-text: 21 90% 20%; /* amber-800ish */
     --warning-background: 43 76% 83%; /* amber-200 */
     --warning-border: 43 76% 83%; /* amber-200 */
     --warning-muted: 43 76% 83%; /* amber-200 */
     
     --info: 217 91% 60%; /* blue-500 */
     --info-foreground: 210 40% 98%;
+    --info-text: 224 76% 25%; /* blue-700 */
     --info-background: 214 92% 91%; /* blue-100 */
     --info-border: 214 92% 91%; /* blue-100 */
     --info-muted: 214 92% 91%; /* blue-100 */
@@ -148,18 +151,21 @@
     /* Extended semantic tokens (dark) */
     --success: 142 71% 45%; /* green-500: #22c55e */
     --success-foreground: 222.2 84% 4.9%;
+    --success-text: 142.1 76.2% 61.6%; /* green-400 */
     --success-background: 142.1 70.6% 7.3%; /* green-950 */
     --success-border: 142.1 64.2% 24.1%; /* green-800 */
     --success-muted: 142.1 69.2% 14.1%; /* green-900 */
     
     --warning: 43.3 96.4% 56.3%; /* amber-400 */
     --warning-foreground: 222.2 84% 4.9%;
+    --warning-text: 43.3 96.4% 56.3%; /* amber-400 */
     --warning-background: 25.5 95% 7.1%; /* amber-950 */
     --warning-border: 32.1 94.6% 23.7%; /* amber-800 */
     --warning-muted: 25.5 83.3% 14.7%; /* amber-900 */
     
     --info: 213.1 93.9% 67.8%; /* blue-400 */
     --info-foreground: 222.2 84% 4.9%;
+    --info-text: 213.1 93.9% 67.8%; /* blue-400 */
     --info-background: 213.1 100% 6.1%; /* blue-950 */
     --info-border: 213.1 93.7% 26.1%; /* blue-800 */
     --info-muted: 212 100% 15.7%; /* blue-900 */

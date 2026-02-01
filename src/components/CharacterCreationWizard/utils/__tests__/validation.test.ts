@@ -63,10 +63,10 @@ describe('Character Creation Validation', () => {
       { attributeId: 'attr-3', name: 'Dexterity', value: 5, minValue: 1, maxValue: 10 },
     ];
 
-    it('returns error when points spent does not match pool', () => {
-      const result = validateAttributes(mockAttributes, 20); // 15 spent, 20 required
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Must spend exactly 20 points (15 spent)');
+    it('allows under-spending attribute points', () => {
+      const result = validateAttributes(mockAttributes, 20); // 15 spent, 20 available
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
     });
 
     it('validates successfully when points match pool', () => {
@@ -75,10 +75,27 @@ describe('Character Creation Validation', () => {
       expect(result.errors).toHaveLength(0);
     });
 
+    it('returns error when points exceed the pool', () => {
+      const result = validateAttributes(mockAttributes, 10); // 15 spent, 10 available
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('You have allocated more attribute points than available.');
+    });
+
     it('handles empty attributes array', () => {
       const result = validateAttributes([], 20);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Must spend exactly 20 points (0 spent)');
+      expect(result.errors).toContain('At least one attribute is required.');
+    });
+
+    it('allows progression when pool exceeds total attribute capacity', () => {
+      const cappedAttributes = [
+        { attributeId: 'attr-1', name: 'Strength', value: 4, minValue: 1, maxValue: 5 },
+        { attributeId: 'attr-2', name: 'Intelligence', value: 4, minValue: 1, maxValue: 5 },
+        { attributeId: 'attr-3', name: 'Dexterity', value: 4, minValue: 1, maxValue: 5 },
+      ];
+      const result = validateAttributes(cappedAttributes, 30);
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
     });
   });
 
@@ -119,6 +136,18 @@ describe('Character Creation Validation', () => {
       expect(result.errors).toHaveLength(0);
     });
 
+    it('allows under-spending skill points within the pool', () => {
+      const result = validateSkills(mockSkills, 6, mockWorldSkills);
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('returns error when skill points exceed the pool', () => {
+      const result = validateSkills(mockSkills, 2, mockWorldSkills);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('You have allocated more skill points than available.');
+    });
+
     it('flags skills that cannot be leveled due to identical bounds', () => {
       const stagnantSkill = [{ skillId: 'skill-locked', name: 'Locked Skill', level: 1, isSelected: true }];
       const worldMeta = [{ id: 'skill-locked', minValue: 1, maxValue: 1 }];
@@ -142,7 +171,20 @@ describe('Character Creation Validation', () => {
       const result = validateSkills(highPoolSkills, 20, worldMeta);
 
       expect(result.valid).toBe(true);
-      expect(result.errors).not.toContain('Spend all remaining skill points before continuing.');
+    });
+
+    it('allows progression when pool exceeds total capacity even if points remain unspent', () => {
+      const highPoolSkills = [
+        { skillId: 'skill-1', name: 'Blade', level: 3, isSelected: true, minLevel: 1, maxLevel: 5 },
+        { skillId: 'skill-2', name: 'Bow', level: 3, isSelected: true, minLevel: 1, maxLevel: 5 },
+      ];
+      const worldMeta = [
+        { id: 'skill-1', minValue: 1, maxValue: 5 },
+        { id: 'skill-2', minValue: 1, maxValue: 5 },
+      ];
+      const result = validateSkills(highPoolSkills, 20, worldMeta);
+
+      expect(result.valid).toBe(true);
     });
   });
 
