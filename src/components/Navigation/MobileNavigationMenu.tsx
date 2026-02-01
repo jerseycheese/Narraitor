@@ -7,7 +7,10 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { TutorialMenu } from './TutorialMenu';
 import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
+
+const SWIPE_THRESHOLD = 100;
 
 interface MobileNavigationMenuProps {
   isOpen: boolean;
@@ -73,7 +76,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
     const diffY = startY.current - currentY;
 
     // Only close on significant horizontal swipe (left to right)
-    if (Math.abs(diffX) > Math.abs(diffY) && diffX > 100) {
+    if (Math.abs(diffX) > Math.abs(diffY) && diffX > SWIPE_THRESHOLD) {
       onClose();
     }
   }, [onClose]);
@@ -109,20 +112,24 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
       onTouchEnd={handleTouchEnd}
     >
       {/* Header with close button */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <LogoIcon size="small" className="brightness-0 invert" />
           <LogoText size="sm" className="text-white" />
         </div>
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="icon"
-          className="min-h-11 min-w-11 text-white hover:bg-gray-700"
-          aria-label="Close menu"
-        >
-          <X className="w-5 h-5" aria-hidden="true" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Tutorial menu for mobile feature parity with desktop */}
+          <TutorialMenu />
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="icon"
+            className="min-h-11 min-w-11 text-white hover:bg-gray-700"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
+          </Button>
+        </div>
       </div>
 
       {/* Main navigation items */}
@@ -170,8 +177,8 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
 
         {/* World switcher section */}
         {Object.keys(worlds).length > 0 && (
-          <div className="pt-4 mt-4 border-t border-gray-700">
-            <h3 className="px-4 text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+          <div className="pt-4 mt-4 border-t border-border">
+            <h3 className="px-4 text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
               Worlds
             </h3>
             <div className="space-y-1 max-h-64 overflow-y-auto">
@@ -206,7 +213,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
         )}
 
         {/* Quick actions */}
-        <div className="pt-4 mt-4 border-t border-gray-700">
+        <div className="pt-4 mt-4 border-t border-border">
           {currentWorld ? (
             <Button
               onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}

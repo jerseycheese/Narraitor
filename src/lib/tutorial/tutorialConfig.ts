@@ -47,9 +47,43 @@ export const joyrideStyles = {
 
 export const joyrideOptions = {
   continuous: true,
-  scrollToFirstStep: true,
+  scrollToFirstStep: false,
   showProgress: false,
   showSkipButton: true,
   disableScrolling: false,
   scrollOffset: 150,
+  floaterProps: {
+    modifiers: {
+      flip: {
+        fallbackPlacements: ['bottom', 'top'],
+      },
+    },
+  },
 };
+
+/**
+ * Tours that run inside modals need scrolling disabled to prevent
+ * the page underneath from scrolling, which breaks spotlight positioning
+ */
+export const MODAL_TOURS = [] as const;
+
+/**
+ * Tours that use the custom useTutorialAutoScroll hook
+ * (Native Joyride scrolling must be disabled)
+ */
+export const MANUAL_SCROLL_TOURS = [
+  'firstPlay',
+] as const;
+
+/**
+ * Get joyride options for a specific tour
+ */
+export function getTourOptions(tourId: string) {
+  const isModalTour = MODAL_TOURS.includes(tourId as typeof MODAL_TOURS[number]);
+  const isManualScrollTour = MANUAL_SCROLL_TOURS.includes(tourId as typeof MANUAL_SCROLL_TOURS[number]);
+
+  return {
+    ...joyrideOptions,
+    disableScrolling: isModalTour || isManualScrollTour,
+  };
+}

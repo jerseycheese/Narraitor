@@ -11,7 +11,7 @@ const waitForStoreReady = async (page: Page): Promise<void> => {
 
 const setTutorialProgress = async (
   page: Page,
-  phases: Record<string, { completed: boolean; skipped: boolean; lastStep?: number }>
+  phases: Record<string, { completed: boolean; skipped: boolean; lastStep?: number; quickStartCompleted?: boolean }>
 ): Promise<void> => {
   await page.evaluate((phasesState) => {
     const store = (window as any).useSessionStore;
@@ -85,42 +85,8 @@ test.describe('Tutorial visual coverage', () => {
     const tourNext = page.locator('[data-test-id="button-primary"]');
     await tourNext.click({ force: true });
     await expect(tooltip).toBeVisible({ timeout: 10000 });
-    await expect(tooltip).toContainText('Start from scratch');
+    await expect(tooltip).toContainText('This option lets you start from scratch');
 
     await expect(page).toHaveScreenshot('tutorial-world-creation-step1.png', { fullPage: true });
-  });
-
-  test('Character creation tutorial overlays render consistently', async ({ page }) => {
-    test.setTimeout(90000);
-
-    await seedTestData(page);
-    await page.goto('/characters/create?worldId=world-cyberpunk-2077');
-    await waitForContentStable(page);
-    await waitForStoreReady(page);
-
-    const customizeButton = page.locator('button:has-text("Create Custom Character")');
-    await expect(customizeButton).toBeVisible({ timeout: 15000 });
-    await customizeButton.click();
-
-    await waitForContentStable(page);
-
-    await setTutorialProgress(page, {
-      intro: { completed: true, skipped: false },
-      worldCreation: { completed: true, skipped: false, lastStep: 999 },
-      worldGeneration: { completed: true, skipped: false, lastStep: 0 },
-      characterCreation: { completed: false, skipped: false, lastStep: 0 },
-      firstPlay: { completed: true, skipped: false },
-    });
-
-    const tooltip = page.locator('.react-joyride__tooltip');
-    await expect(tooltip).toBeVisible({ timeout: 10000 });
-    await expect(tooltip).toContainText('character template');
-
-    await expect(page).toHaveScreenshot('tutorial-character-creation-step0.png', { fullPage: true });
-
-    await expect(tooltip).toBeVisible({ timeout: 10000 });
-    await expect(tooltip).toContainText('Choose a character template');
-
-    await expect(page).toHaveScreenshot('tutorial-character-creation-step0.png', { fullPage: true });
   });
 });

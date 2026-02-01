@@ -5,6 +5,7 @@ import type { TooltipRenderProps } from 'react-joyride';
 import { Button } from '@/components/ui/button';
 import { useTutorial } from './useTutorial';
 import { useSessionStore } from '@/state/sessionStore';
+import { TutorialPhase } from '@/types/tutorial.types';
 
 const CONTINUE_LABEL = 'Continue';
 
@@ -28,14 +29,16 @@ export function TutorialTooltip({
     step;
   const { pauseTour, currentTour } = useTutorial();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
+  const tutorialProgress = useSessionStore(state => state.tutorialProgress);
 
   // Handle special "pause/continue" logic for multi-page flows
   const handleContinueClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    if (currentTour) {
-      updateTutorialProgress(currentTour, { lastStep: index });
+    if (currentTour && currentTour in tutorialProgress.phases) {
+      // Cast is safe because we checked existence in phases
+      updateTutorialProgress(currentTour as TutorialPhase, { lastStep: index });
     }
     // Hide tooltip, keep tour state (resumes when target appears on next page)
     pauseTour('end-of-page');

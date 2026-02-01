@@ -76,7 +76,7 @@ const initialState = {
       intro: { completed: false, skipped: false },
       worldCreation: { completed: false, skipped: false, lastStep: 0 },
       worldGeneration: { completed: false, skipped: false, lastStep: 0 },
-      characterCreation: { completed: false, skipped: false, lastStep: 0 },
+      characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: false },
       firstPlay: { completed: false, skipped: false },
     },
     dismissedHints: [],
@@ -844,9 +844,8 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   shouldShowOnboarding: () => {
-    const state = get();
     // Show onboarding if intro phase is not complete/skipped
-    return !state.tutorialProgress.phases.intro.completed && !state.tutorialProgress.phases.intro.skipped;
+    return get().isFirstTimeUser();
   },
 }),
 {
@@ -881,7 +880,7 @@ export const useSessionStore = create<SessionStore>()(
             intro: { completed: false, skipped: false },
             worldCreation: { completed: false, skipped: false, lastStep: 0 },
             worldGeneration: { completed: false, skipped: false, lastStep: 0 },
-            characterCreation: { completed: false, skipped: false, lastStep: 0 },
+            characterCreation: { completed: false, skipped: false, lastStep: 0, quickStartCompleted: false },
             firstPlay: { completed: false, skipped: false },
           },
           dismissedHints: [],

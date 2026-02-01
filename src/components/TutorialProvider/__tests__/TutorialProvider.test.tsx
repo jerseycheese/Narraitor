@@ -4,6 +4,8 @@ import { TutorialProvider, useTutorial } from '../index';
 import { useSessionStore } from '@/state/sessionStore';
 
 // Mock React Joyride
+let lastJoyrideProps: Record<string, unknown> | null = null;
+
 jest.mock('react-joyride', () => {
   const STATUS = {
     FINISHED: 'finished',
@@ -20,6 +22,7 @@ jest.mock('react-joyride', () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
+    lastJoyrideProps = { run, stepIndex, steps, callback };
     if (!run) return null;
     return (
       <div data-testid="joyride-mock">
@@ -51,6 +54,14 @@ jest.mock('@/lib/tutorial/worldCreationTour', () => ({
   tourStepToWizardStep: { 0: 0, 1: 0, 2: 1 }
 }));
 
+jest.mock('@/lib/tutorial/characterCreationWizardTour', () => ({
+  characterCreationWizardTour: [
+    { target: 'body', content: 'Step 1' },
+    { target: 'body', content: 'Step 2' }
+  ],
+  tourStepToWizardStep: { 0: 0, 1: 1 }
+}));
+
 const TestComponent = () => {
   const { startTour, stopTour, isTourActive, stepIndex, setCurrentWizardStep } = useTutorial();
   
@@ -59,6 +70,7 @@ const TestComponent = () => {
       <div data-testid="tour-status">{isTourActive ? 'Active' : 'Inactive'}</div>
       <div data-testid="step-index">{stepIndex}</div>
       <button onClick={() => startTour('worldCreation')}>Start World Tour</button>
+      <button onClick={() => startTour('characterCreationWizard')}>Start Character Wizard Tour</button>
       <button onClick={stopTour}>Stop Tour</button>
       <button onClick={() => setCurrentWizardStep(1)}>Wizard Step 1</button>
     </div>
@@ -68,6 +80,7 @@ const TestComponent = () => {
 describe('TutorialProvider', () => {
   beforeEach(() => {
     useSessionStore.getState().resetTutorialProgress();
+    lastJoyrideProps = null;
   });
 
   it('provides tutorial context', async () => {
@@ -91,6 +104,38 @@ describe('TutorialProvider', () => {
       screen.getByText('Start World Tour').click();
     });
     
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+    expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
+  });
+
+  it('disables beacons for all tour steps', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start World Tour').click();
+    });
+
+    const steps = lastJoyrideProps?.steps as Array<{ disableBeacon?: boolean }> | undefined;
+
+    expect(steps).toBeDefined();
+    expect(steps?.every((step) => step.disableBeacon === true)).toBe(true);
+  });
+
+  it('starts the character wizard tour when on the first step', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start Character Wizard Tour').click();
+    });
+
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
   });

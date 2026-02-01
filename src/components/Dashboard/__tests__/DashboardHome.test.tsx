@@ -8,6 +8,12 @@ import type { World } from '@/types/world.types';
 import type { Character } from '@/state/characterStore';
 import type { SavedSessionInfo } from '@/types/game.types';
 
+jest.mock('@/components/GuidedFirstTimeExperience', () => ({
+  GuidedFirstTimeExperience: () => (
+    <div data-testid="guided-first-time-experience">Guided</div>
+  ),
+}));
+
 // Mock the stores
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
@@ -79,9 +85,7 @@ describe('DashboardHome', () => {
     it('shows GuidedFirstTimeExperience for new users', () => {
       render(<DashboardHome />);
 
-      // GuidedFirstTimeExperience should be shown
-      // We can't test its internals, but we can verify the dashboard doesn't show
-      expect(screen.queryByText(/recent worlds/i)).not.toBeInTheDocument();
+      expect(screen.getByTestId('guided-first-time-experience')).toBeInTheDocument();
     });
   });
 

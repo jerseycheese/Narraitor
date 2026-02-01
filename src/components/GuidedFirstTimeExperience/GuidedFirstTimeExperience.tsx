@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -12,6 +12,10 @@ import type { GenreValue } from '@/types/genre.types';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -31,8 +35,12 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
   const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
-  const isFirstTimeUser = useSessionStore(state => state.isFirstTimeUser);
   const { setCurrentWorld } = useWorldStore();
+  
+  const [confirmationState, setConfirmationState] = useState<{
+    isOpen: boolean;
+    pendingData: WorldTypeData | null;
+  }>({ isOpen: false, pendingData: null });
 
   // Validation function for wizard steps
   const validateStep = useCallback((step: number, data: OnboardingData) => {
@@ -137,7 +145,7 @@ export function GuidedFirstTimeExperience() {
   const renderWelcomeStep = useMemo(() => (
     <div className="text-center space-y-6" data-testid="guided-experience-container">
       <div className="max-w-md mx-auto">
-        <p className="text-lg text-gray-700 mb-6">
+        <p className="text-lg text-muted-foreground mb-6">
           Create a world and start a story
         </p>
       </div>
@@ -186,10 +194,10 @@ export function GuidedFirstTimeExperience() {
   const renderConceptStep = useMemo(() => (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           World Concept
         </h2>
-        <p className="text-gray-700">
+        <p className="text-muted-foreground">
           Create an RPG in any fictional universe or original setting
         </p>
       </div>
@@ -202,10 +210,14 @@ export function GuidedFirstTimeExperience() {
           const isInspiredBy = worldTypeData.worldType === 'inspired_by';
           const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
           
-          wizard.handlers.updateData({ 
-            worldTypeData,
-            ...(shouldAutoDetectGenre && { genre: '' })
-          });
+          if (shouldAutoDetectGenre && wizard.state.data.genre) {
+            setConfirmationState({ isOpen: true, pendingData: worldTypeData });
+          } else {
+            wizard.handlers.updateData({ 
+              worldTypeData,
+              ...(shouldAutoDetectGenre && { genre: '' })
+            });
+          }
         }}
         size="medium"
       />
@@ -219,7 +231,7 @@ export function GuidedFirstTimeExperience() {
         </div>
       )}
     </div>
-  ), [wizard.state.data.worldTypeData, wizard.stepValidation, wizard.handlers]);
+  ), [wizard.state.data.worldTypeData, wizard.state.data.genre, wizard.stepValidation, wizard.handlers]);
 
   const renderDetailsStep = useMemo(() => {
     const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
@@ -229,10 +241,10 @@ export function GuidedFirstTimeExperience() {
     return (
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-foreground mb-2">
             World Details
           </h2>
-          <p className="text-gray-700">
+          <p className="text-muted-foreground">
             {isGenreOptional 
               ? "Give your world a name and optionally override the genre"
               : "Give your world a name and genre"
@@ -242,13 +254,12 @@ export function GuidedFirstTimeExperience() {
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
+            <Label htmlFor="world-name" className="mb-2">
               World Name (optional)
-            </label>
-            <input
+            </Label>
+            <Input
               id="world-name"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="E.g., Neo-Tokyo..."
               value={wizard.state.data.name}
               onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
@@ -257,12 +268,12 @@ export function GuidedFirstTimeExperience() {
           
           {isGenreOptional ? (
             <div>
-              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
-                Genre <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>
-              </label>
+              <Label htmlFor="world-genre" className="mb-2">
+                Genre <span className="text-muted-foreground text-xs">(optional - will be inferred from your reference)</span>
+              </Label>
               <select
                 id="world-genre"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={wizard.state.data.genre}
                 onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue })}
               >
@@ -276,12 +287,12 @@ export function GuidedFirstTimeExperience() {
             </div>
           ) : (
             <div>
-              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+              <Label htmlFor="world-genre" className="mb-2">
                 Genre <span className="text-destructive">*</span>
-              </label>
+              </Label>
               <select
                 id="world-genre"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={wizard.state.data.genre}
                 onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue | '' })}
               >
@@ -321,10 +332,15 @@ export function GuidedFirstTimeExperience() {
     }
   }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
-  // Don't render if onboarding shouldn't be shown
-  if (!isFirstTimeUser()) {
-    return null;
-  }
+  const handleConfirmGenreChange = useCallback(() => {
+    if (confirmationState.pendingData) {
+      wizard.handlers.updateData({ 
+        worldTypeData: confirmationState.pendingData,
+        genre: '' 
+      });
+      setConfirmationState({ isOpen: false, pendingData: null });
+    }
+  }, [confirmationState.pendingData, wizard.handlers]);
 
   return (
     <WizardContainer title="First time?">
@@ -335,42 +351,44 @@ export function GuidedFirstTimeExperience() {
         <div className="flex justify-center items-center pt-6">
           <div className="flex gap-3">
             {!wizard.isFirstStep && (
-              <button
+              <Button
                 onClick={wizard.handlers.handleBack}
-                className="px-4 py-2 border border-gray-300 hover:border-gray-500 text-gray-700 font-medium rounded-md transition-colors"
+                variant="outline"
               >
                 Back
-              </button>
+              </Button>
             )}
             
             {wizard.isLastStep ? (
-              <button
+              <Button
                 onClick={wizard.handlers.handleComplete}
                 disabled={!wizard.stepValidation?.valid || wizard.state.isProcessing}
-                className="min-h-12 px-6 py-2 bg-green-500 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
+                variant="success"
+                className="min-h-12 px-6"
               >
                 {wizard.state.isProcessing ? 'Creating world...' : 'Create world'}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={wizard.handlers.handleNext}
                 disabled={!wizard.stepValidation?.valid}
-                className="min-h-12 px-6 py-2 bg-primary hover:bg-primary/90 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
+                className="min-h-12 px-6"
               >
                 Next
-              </button>
+              </Button>
             )}
           </div>
         </div>
         
         {/* Skip option */}
         <div className="text-center">
-          <button
+          <Button
             onClick={wizard.handlers.handleCancel}
-            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            variant="link"
+            className="text-sm"
           >
             Skip for now
-          </button>
+          </Button>
         </div>
         
         {wizard.currentError && (
@@ -378,6 +396,16 @@ export function GuidedFirstTimeExperience() {
             <p className="text-sm text-destructive">{wizard.currentError}</p>
           </div>
         )}
+
+        <ConfirmationDialog
+          isOpen={confirmationState.isOpen}
+          onClose={() => setConfirmationState({ isOpen: false, pendingData: null })}
+          onConfirm={handleConfirmGenreChange}
+          title="Clear Genre?"
+          message="Changing the world type will clear your selected genre, as it will be inferred from the reference. Do you want to continue?"
+          variant="warning"
+          confirmText="Yes, change type"
+        />
       </div>
     </WizardContainer>
   );

@@ -25,13 +25,15 @@ export interface QuickStartCharactersProps {
   onCharacterSelect: (archetype: CharacterArchetype) => void;
   onCustomizeClick: () => void;
   existingCharacterNames?: string[];
+  onReady?: () => void;
 }
 
 export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   world,
   onCharacterSelect,
   onCustomizeClick,
-  existingCharacterNames = []
+  existingCharacterNames = [],
+  onReady
 }: QuickStartCharactersProps) {
   const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +72,17 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     generateArchetypes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
+
+  // Trigger onReady when loading is finished and content is available
+  useEffect(() => {
+    if (!loading && archetypes.length > 0) {
+      // Timeout to ensure DOM is painted and stable
+      const timer = setTimeout(() => {
+        onReady?.();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, archetypes, onReady]);
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
     setSelectedArchetype(archetype.id);

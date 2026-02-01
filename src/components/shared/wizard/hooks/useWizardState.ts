@@ -167,7 +167,16 @@ export function useWizardState<T>(config: WizardConfig<T>) {
       }
     }
 
-    setState(prev => ({ ...prev, isProcessing: true }));
+    setState(prev => {
+      // Clear previous submit error before starting new attempt
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { submit: _, ...otherErrors } = prev.errors;
+      return { 
+        ...prev, 
+        isProcessing: true,
+        errors: otherErrors
+      };
+    });
     
     try {
       await onComplete(state.data);

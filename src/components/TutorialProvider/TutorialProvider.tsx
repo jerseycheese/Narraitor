@@ -3,47 +3,60 @@
 import React, { createContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
 import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 import { useSessionStore } from '@/state/sessionStore';
-import { joyrideStyles, joyrideOptions } from '@/lib/tutorial/tutorialConfig';
+import { joyrideStyles, getTourOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 
-type PauseReason = 'end-of-page' | 'missing-target' | 'wizard-transition' | null;
+type PauseReason = 'end-of-page' | 'missing-target' | null;
 
 const logger = new Logger('TutorialProvider');
 
+const MAX_TARGET_RETRIES = 40; // 10 seconds total (40 * 250ms)
+const RETRY_INTERVAL_MS = 250;
+
 interface TutorialContextValue {
-  startTour: (tourId: TutorialPhase, stepIndex?: number) => void;
+  startTour: (tourId: TutorialPhase | string, stepIndex?: number) => void;
   stopTour: () => void;
   pauseTour: (reason?: PauseReason) => void;
+  resumeTour: () => void;
   nextStep: () => void;
   prevStep: () => void;
   skipTour: () => void;
   resetTutorial: () => void;
   isTourActive: boolean;
-  currentTour: TutorialPhase | null;
+  currentTour: TutorialPhase | string | null;
   stepIndex: number;
   setCurrentWizardStep: (step: number) => void;
 }
 
 export const TutorialContext = createContext<TutorialContextValue | null>(null);
 
-const loadTour = async (tourId: TutorialPhase): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
+const normalizeSteps = (steps: Step[]) =>
+  steps.map((step) => ({
+    ...step,
+    disableBeacon: true,
+  }));
+
+const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
   try {
     switch (tourId) {
       case 'worldCreation':
         const { worldCreationTour, tourStepToWizardStep: worldMapping } = await import('@/lib/tutorial/worldCreationTour');
-        return { steps: worldCreationTour, mapping: worldMapping };
+        return { steps: normalizeSteps(worldCreationTour), mapping: worldMapping };
       case 'worldGeneration':
         const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
-        return { steps: worldGenerationTour };
-      case 'characterCreation':
-        const { characterCreationTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationTour');
-        return { steps: characterCreationTour, mapping: charMapping };
+        return { steps: normalizeSteps(worldGenerationTour) };
+      case 'quickStartSelection':
+        const { quickStartTour } = await import('@/lib/tutorial/quickStartTour');
+        return { steps: normalizeSteps(quickStartTour) };
+      case 'characterCreationWizard':
+        const { characterCreationWizardTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationWizardTour');
+        return { steps: normalizeSteps(characterCreationWizardTour), mapping: charMapping };
       case 'firstPlay':
         const { firstPlayTour } = await import('@/lib/tutorial/firstPlayTour');
-        return { steps: firstPlayTour };
+        return { steps: normalizeSteps(firstPlayTour) };
       default:
         return { steps: [] };
     }
@@ -59,7 +72,7 @@ interface TutorialProviderProps {
 
 export function TutorialProvider({ children }: TutorialProviderProps) {
   const [steps, setSteps] = useState<Step[]>([]);
-  const [activeTour, setActiveTour] = useState<TutorialPhase | null>(null);
+  const [activeTour, setActiveTour] = useState<TutorialPhase | string | null>(null);
   const [run, setRun] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [pauseReason, setPauseReason] = useState<PauseReason>(null);
@@ -87,15 +100,17 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
-  const startTour = useCallback(async (tourId: TutorialPhase, initialStepIndex = 0) => {
+  const startTour = useCallback(async (tourId: TutorialPhase | string, initialStepIndex = 0) => {
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
     
     if (loadedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
-      const phaseData = tutorialProgress.phases[tourId];
-      const lastStep = (phaseData && 'lastStep' in phaseData) ? phaseData.lastStep : 0;
+      // Safe check for phase existence
+      const isPhase = tourId in tutorialProgress.phases;
+      const phaseData = isPhase ? tutorialProgress.phases[tourId as TutorialPhase] : undefined;
+      const lastStep = (phaseData && 'lastStep' in phaseData) ? (phaseData as { lastStep: number }).lastStep : 0;
 
-      if (tourId === 'worldCreation' && mapping && initialStepIndex === 0) {
+      if (mapping && initialStepIndex === 0) {
         const stepIndices = Object.entries(mapping)
           .filter((entry) => entry[1] === currentWizardStep)
           .map((entry) => parseInt(entry[0], 10));
@@ -103,7 +118,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
           ? Math.max(...stepIndices)
           : null;
 
-        if (maxIndexForWizardStep !== null && lastStep >= maxIndexForWizardStep) {
+        if (maxIndexForWizardStep !== null && lastStep > maxIndexForWizardStep) {
           return;
         }
       }
@@ -115,9 +130,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
       let nextStepIndex = initialStepIndex > 0 ? initialStepIndex : lastStep;
 
-      if (tourId === 'worldCreation' && mapping) {
+      if (mapping) {
         const mappedWizardStep = mapping[nextStepIndex];
-        if (mappedWizardStep !== currentWizardStep) {
+        // Only enforce wizard sync if the current tour step is actually mapped to a wizard step
+        if (mappedWizardStep !== undefined && mappedWizardStep !== currentWizardStep) {
           const mappedEntry = Object.entries(mapping)
             .find((entry) => entry[1] === currentWizardStep);
           if (mappedEntry) {
@@ -165,7 +181,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, type, index, action } = data;
-    
+
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setSteps([]);
       setRun(false);
@@ -174,22 +190,33 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       missingTargetRef.current = null;
       if (activeTour) {
         if (status === STATUS.FINISHED) {
-          if (activeTour === 'worldCreation' && stepMapping) {
+          if (activeTour === 'quickStartSelection') {
+            updateTutorialProgress('characterCreation', { quickStartCompleted: true });
+          } else if (activeTour === 'characterCreationWizard') {
+            completeTutorialPhase('characterCreation');
+          } else if (stepMapping) {
             const wizardStepValues = Object.values(stepMapping);
             const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
             const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
             const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
 
             if (isFinalWizardStep && isFinalTourStep) {
-              completeTutorialPhase(activeTour);
+              completeTutorialPhase(activeTour as TutorialPhase);
             } else {
-              updateTutorialProgress(activeTour, { lastStep: index });
+              updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
             }
           } else {
-            completeTutorialPhase(activeTour);
+            // Check if it's a valid phase before completing
+            if (activeTour in tutorialProgress.phases) {
+              completeTutorialPhase(activeTour as TutorialPhase);
+            }
           }
         } else {
-          updateTutorialProgress(activeTour, { skipped: true });
+          if (activeTour === 'quickStartSelection' || activeTour === 'characterCreationWizard') {
+            updateTutorialProgress('characterCreation', { skipped: true });
+          } else if (activeTour in tutorialProgress.phases) {
+            updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+          }
         }
       }
       setActiveTour(null);
@@ -200,22 +227,18 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
       if (activeTour) {
-        updateTutorialProgress(activeTour, { lastStep: index });
+        if (activeTour in tutorialProgress.phases) {
+          updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
+        }
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (activeTour !== 'worldCreation') return;
-      const stepData = steps[index]?.data as { skipIfMissing?: boolean } | undefined;
-      if (stepData?.skipIfMissing) {
-        const direction = action === ACTIONS.PREV ? -1 : 1;
-        const nextIndex = index + direction;
-        if (nextIndex >= 0 && nextIndex < steps.length) {
-          setStepIndex(nextIndex);
-        }
-        return;
-      }
+      if (!stepMapping) return;
+      
       const mappedWizardStep = stepMapping?.[index];
-      const isSameWizardStep = mappedWizardStep === currentWizardStep;
+      // If mappedWizardStep is undefined, it means this tour step isn't tied to a specific wizard step
+      // So we assume we are on the "correct" page and it's just a missing element (retry).
+      const isSameWizardStep = mappedWizardStep === undefined || mappedWizardStep === currentWizardStep;
       const target = steps[index]?.target;
 
       if (isSameWizardStep) {
@@ -233,22 +256,21 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
       setTimeout(() => {
         if (runRef.current && !isPausedRef.current) {
-          pauseTour('wizard-transition');
+          pauseTour('missing-target');
         }
       }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stepMapping, currentWizardStep, steps]);
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
   
   const lastWizardStepRef = useRef<number | null>(null);
 
   // Sync tour with wizard (only when the wizard actually changes steps)
   useEffect(() => {
-    if (!isPaused || pauseReason !== 'missing-target' || activeTour !== 'worldCreation') return;
+    if (!isPaused || pauseReason !== 'missing-target' || !stepMapping) return;
     const missingTarget = missingTargetRef.current;
     if (!missingTarget?.target) return;
 
     let retries = 0;
-    const maxRetries = 40; // 10 seconds
 
     const retryInterval = window.setInterval(() => {
       if (!isPausedRef.current || pauseReason !== 'missing-target') {
@@ -258,23 +280,31 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
       const element = document.querySelector(missingTarget.target as string);
       if (element) {
-        missingTargetRef.current = null;
-        resumeTour();
-        window.clearInterval(retryInterval);
-        return;
+        // Check if element is truly ready for Joyride (has dimensions and is visible)
+        const rect = element.getBoundingClientRect();
+        const isActuallyMounted = rect.width > 0 && rect.height > 0;
+        const style = window.getComputedStyle(element);
+        const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+
+        if (isActuallyMounted && isVisible) {
+          missingTargetRef.current = null;
+          resumeTour();
+          window.clearInterval(retryInterval);
+          return;
+        }
       }
 
       retries++;
-      if (retries >= maxRetries) {
+      if (retries >= MAX_TARGET_RETRIES) {
         logger.warn('Tutorial missing target timeout', { target: missingTarget.target });
         window.clearInterval(retryInterval);
       }
-    }, 250);
+    }, RETRY_INTERVAL_MS);
 
     return () => {
       window.clearInterval(retryInterval);
     };
-  }, [isPaused, pauseReason, activeTour, resumeTour]);
+  }, [isPaused, pauseReason, activeTour, resumeTour, stepMapping]);
 
   useEffect(() => {
     if (!activeTour || !stepMapping) return;
@@ -344,16 +374,30 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      updateTutorialProgress(activeTour, { skipped: true });
+      if (activeTour === 'quickStartSelection' || activeTour === 'characterCreationWizard') {
+        updateTutorialProgress('characterCreation', { skipped: true });
+      } else if (activeTour in tutorialProgress.phases) {
+        updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+      }
     }
     setActiveTour(null);
-  }, [activeTour, updateTutorialProgress]);
+  }, [activeTour, updateTutorialProgress, tutorialProgress.phases]);
+
+  // Expose startTour for testing
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (process.env.NODE_ENV === 'development' || (window as any).__PLAYWRIGHT__) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).__TEST_START_TOUR__ = startTour;
+    }
+  }, [startTour]);
 
   return (
     <TutorialContext.Provider value={{
       startTour,
       stopTour,
       pauseTour,
+      resumeTour,
       nextStep,
       prevStep,
       skipTour,
@@ -365,29 +409,32 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }}>
       {children}
       <TutorialProgressWidget />
-      {steps.length > 0 && run && (
-        <Joyride
-          key={`${activeTour}-${isPaused}`}
-          steps={steps}
-          run={!isPaused}
-          stepIndex={stepIndex}
-          continuous={joyrideOptions.continuous}
-          scrollToFirstStep={joyrideOptions.scrollToFirstStep}
-          showProgress={joyrideOptions.showProgress}
-          showSkipButton={joyrideOptions.showSkipButton}
-          disableScrolling={joyrideOptions.disableScrolling}
-          styles={joyrideStyles}
-          callback={handleJoyrideCallback}
-          disableOverlayClose={true}
-          spotlightClicks={true}
-          scrollOffset={joyrideOptions.scrollOffset}
+      {steps.length > 0 && run && (() => {
+        const tourOptions = getTourOptions(activeTour || '');
+        return (
+          <Joyride
+            key={`${activeTour}-${isPaused}`}
+            steps={steps}
+            run={!isPaused}
+            stepIndex={stepIndex}
+            continuous={tourOptions.continuous}
+            scrollToFirstStep={tourOptions.scrollToFirstStep}
+            showProgress={tourOptions.showProgress}
+            showSkipButton={tourOptions.showSkipButton}
+            disableScrolling={tourOptions.disableScrolling}
+            styles={joyrideStyles}
+            callback={handleJoyrideCallback}
+            disableOverlayClose={true}
+            spotlightClicks={true}
+            scrollOffset={tourOptions.scrollOffset}
           locale={
-            activeTour === 'worldCreation'
-              ? { skip: 'Skip world creation tutorial', last: 'Finish tutorial' }
+            stepMapping
+              ? { skip: 'Skip tutorial', last: 'Finish tutorial' }
               : undefined
           }
         />
-      )}
+        );
+      })()}
     </TutorialContext.Provider>
   );
 }

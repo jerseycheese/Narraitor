@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { EntityID } from '@/types/common.types';
@@ -22,7 +22,6 @@ import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
 import { useTutorial } from '@/components/TutorialProvider';
-import { useSessionStore } from '@/state/sessionStore';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -38,9 +37,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const router = useRouter();
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
-  
-  const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
-  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
+
+  const {
+    setCurrentWizardStep,
+    pauseTour,
+    resumeTour,
+    currentTour,
+    isTourActive,
+  } = useTutorial();
+  const pausedForRecoveryRef = useRef(false);
 
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
@@ -51,6 +56,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       setShowRecoveryDialog(true);
     }
   }, [hasRecoveryData]);
+
+  React.useEffect(() => {
+    if (currentTour !== 'characterCreationWizard' || !isTourActive) {
+      return;
+    }
+
+    if (showRecoveryDialog && !pausedForRecoveryRef.current) {
+      pauseTour('end-of-page');
+      pausedForRecoveryRef.current = true;
+      return;
+    }
+
+    if (!showRecoveryDialog && pausedForRecoveryRef.current) {
+      resumeTour();
+      pausedForRecoveryRef.current = false;
+    }
+  }, [currentTour, isTourActive, pauseTour, resumeTour, showRecoveryDialog]);
 
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
@@ -120,16 +142,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   React.useEffect(() => {
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
-
-  // Auto-start tour if needed
-  React.useEffect(() => {
-    if (shouldShowTour && !isTourActive) {
-      const timer = setTimeout(() => {
-        startTour('characterCreation');
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldShowTour, isTourActive, startTour]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({

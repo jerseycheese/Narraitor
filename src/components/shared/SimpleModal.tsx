@@ -25,6 +25,8 @@ interface SimpleModalProps {
   className?: string;
   /** Optional classes for the scrolling content wrapper */
   contentClassName?: string;
+  /** Determines where scrolling happens */
+  scrollBehavior?: 'content' | 'overlay';
   /** Whether to show the close button */
   showCloseButton?: boolean;
   /** Whether to close on backdrop click */
@@ -41,6 +43,8 @@ interface SimpleModalProps {
   footer?: React.ReactNode;
   /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
+  /** Whether to keep the footer visible while overlay scrolling */
+  stickyFooter?: boolean;
   /** Contextual tone to align borders and accents with design tokens */
   tone?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
 }
@@ -117,6 +121,7 @@ export function SimpleModal({
   children,
   className,
   contentClassName,
+  scrollBehavior = 'overlay',
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeOnEscape = true,
@@ -125,6 +130,7 @@ export function SimpleModal({
   description,
   footer,
   footerClassName,
+  stickyFooter = false,
   tone = 'default',
 }: SimpleModalProps) {
   const toneStyles = TONE_STYLES[tone];
@@ -132,18 +138,22 @@ export function SimpleModal({
   const resolvedDescriptionId =
     ariaDescribedBy || (description ? `${fallbackDescriptionId}-description` : undefined);
   const hasHeaderContent = Boolean(title || showCloseButton || description);
+  const isOverlayScroll = scrollBehavior === 'overlay';
+  const shouldStickFooter = Boolean(footer) && stickyFooter && isOverlayScroll;
 
   return (
     <Dialog open={isOpen} onOpenChange={open => (open ? undefined : onClose())}>
       <DialogContent
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
+        overlayScroll={isOverlayScroll}
         className={cn(
-          '!flex !flex-col !gap-0 !p-0 overflow-hidden bg-background text-foreground shadow-xl focus:outline-none focus-visible:outline-none',
+          '!flex !flex-col !gap-0 !p-0 bg-background text-foreground shadow-xl focus:outline-none focus-visible:outline-none',
           'dark:bg-white dark:text-gray-900',
           toneStyles.frame,
-          'max-h-[90vh] w-full sm:rounded-xl',
+          'w-full sm:rounded-xl',
           SIZE_CLASSES[size],
+          !isOverlayScroll ? 'max-h-[100dvh] overflow-hidden' : undefined,
           className,
         )}
         onInteractOutside={event => {
@@ -204,16 +214,25 @@ export function SimpleModal({
         )}
 
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
-          <div className={cn('flex-1 overflow-y-auto px-6 py-6', contentClassName)}>
+          <div
+            data-scroll-container={isOverlayScroll ? undefined : 'content'}
+            className={cn(
+              'flex-1 px-6 py-6',
+              isOverlayScroll ? undefined : 'overflow-y-auto',
+              contentClassName,
+            )}
+          >
             {children}
           </div>
         ) : null}
 
         {footer && (
           <div
+            data-sticky-footer={shouldStickFooter ? 'true' : undefined}
             className={cn(
               'border-t px-6 py-5',
               toneStyles.footerBorder,
+              shouldStickFooter ? 'sticky bottom-0 z-10 bg-background dark:bg-white' : undefined,
               footerClassName,
             )}
           >

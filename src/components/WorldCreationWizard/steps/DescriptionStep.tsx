@@ -79,7 +79,7 @@ export default function DescriptionStep({
     if (!hasAISuggestions) {
       return (
         <div
-          className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-foreground"
+          className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-text"
           data-testid="ai-suggestion-empty"
         >
           {canGenerateSuggestions ? (

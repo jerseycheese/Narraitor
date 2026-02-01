@@ -6,7 +6,7 @@ import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-type-selector"]',
-    content: 'Welcome to the World Creation Wizard! Choose a path: start from scratch on the left, or use a template on the right.',
+    content: 'Welcome to the World Creation Wizard! You can choose a path: start from scratch on the left, or use a template on the right.',
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
@@ -14,21 +14,21 @@ export const worldCreationTour: Step[] = [
   },
   {
     target: '[data-tutorial="create-own-world-btn"]',
-    content: 'Start from scratch with Create My Own World and define everything yourself.',
+    content: 'This option lets you start from scratch with Create My Own World and define everything yourself.',
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="template-list"]',
-    content: 'Use a template to jump-start your world with a curated setup.',
+    content: 'You can use a template to jump-start your world with a curated setup.',
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="generate-tab"]',
-    content: 'Switch to Generate to create a new template you can customize.',
+    content: 'The Generate tab lets you create a new template you can customize.',
     placement: 'top',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
@@ -37,7 +37,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-name"]',
     content: TutorialContent({
-      children: 'Give your world a name so it feels distinct.',
+      children: "Here's where you'll name your world to make it feel distinct.",
       example: '"The Shattered Realms" to evoke a fractured fantasy kingdom',
     }),
     placement: 'right',
@@ -47,7 +47,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="genre-picker"]',
     content: TutorialContent({
-      children: 'Select a genre to define the tone and available options.',
+      children: "Here you'll select a genre to define the tone and available options.",
       example: 'Cyberpunk for neon-lit dystopias with hackers and megacorps',
     }),
     placement: 'top',
@@ -56,7 +56,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-type"]',
     content: TutorialContent({
-      children: 'Choose whether your world is original, inspired by, or set within an existing setting.',
+      children: 'This is where you choose whether your world is original, inspired by, or set within an existing setting.',
       example: 'Inspired By to create your own spin on a favorite universe',
     }),
     placement: 'top',
@@ -65,7 +65,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-reference"]',
     content: TutorialContent({
-      children: 'Enter the setting your world should follow.',
+      children: "Here you'll enter the setting your world should follow.",
       example: '"Star Wars during the Old Republic era" for that specific time period',
     }),
     placement: 'top',
@@ -75,7 +75,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="tone-content-rating"]',
     content: TutorialContent({
-      children: 'Set the content rating to match your audience.',
+      children: "This is where you'll set the content rating to match your audience.",
       example: 'PG-13 for moderate themes and action without explicit content',
     }),
     placement: 'top',
@@ -86,7 +86,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="tone-narrative-style"]',
     content: TutorialContent({
-      children: 'Pick the narrative style that fits your world.',
+      children: "Here you can pick the narrative style that fits your world.",
       example: 'Epic for grand-scale stories with heroic themes',
     }),
     placement: 'top',
@@ -96,7 +96,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="tone-language-complexity"]',
     content: TutorialContent({
-      children: 'Adjust language complexity to match your reading preference.',
+      children: 'This setting adjusts language complexity to match your reading preference.',
       example: 'Literary for sophisticated prose with artistic expression',
     }),
     placement: 'top',
@@ -106,7 +106,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="tone-custom-instructions"]',
     content: TutorialContent({
-      children: 'Add extra guidance for how stories should be told.',
+      children: 'You can add extra guidance for how stories should be told.',
       example: '"Emphasize moral dilemmas" to make choices feel meaningful',
     }),
     placement: 'top',
@@ -118,7 +118,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-description"]',
     content: TutorialContent({
-      children: 'Describe your world in detail. This will be used to generate rich lore, locations, and history.',
+      children: "Here's where you'll describe your world in detail. This will be used to generate rich lore, locations, and history.",
       example: '"A war-torn kingdom where magic is fading" sets up conflict and stakes',
     }),
     placement: 'top',
@@ -128,7 +128,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="ai-suggestions-actions"]',
     content: TutorialContent({
-      children: 'Click Generate to get suggested attributes and skills based on your description.',
+      children: 'You can click Generate to get suggested attributes and skills based on your description.',
       example: 'A cyberpunk world might suggest "Hacking" and "Street Cred"',
     }),
     placement: 'top',
@@ -148,7 +148,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="attribute-editor"]',
     content: TutorialContent({
-      children: 'Review and customize the core attributes that define characters.',
+      children: "Here's where you'll review and customize the core attributes that define characters.",
       example: '"Willpower" to represent mental fortitude in a horror setting',
     }),
     placement: 'top',
@@ -158,7 +158,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="attribute-suggestions"]',
     content: TutorialContent({
-      children: 'Use the suggested attributes or customize them.',
+      children: 'You can use the suggested attributes or customize them.',
       example: 'Rename "Strength" to "Might" for a more fantasy feel',
     }),
     placement: 'top',
@@ -167,7 +167,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="attribute-custom"]',
     content: TutorialContent({
-      children: 'Add custom attributes unique to your setting.',
+      children: 'This section lets you add custom attributes unique to your setting.',
       example: '"Corruption" to track dark magic influence in your world',
     }),
     placement: 'top',
@@ -187,7 +187,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="skill-editor"]',
     content: TutorialContent({
-      children: 'Define the skills characters can learn.',
+      children: "Here's where you'll define the skills characters can learn.",
       example: '"Persuasion" for social encounters and negotiations',
     }),
     placement: 'top',
@@ -197,7 +197,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="skill-suggestions"]',
     content: TutorialContent({
-      children: 'Review the suggested skills and tweak them.',
+      children: 'You can review the suggested skills and tweak them.',
       example: 'Rename "Melee Combat" to "Blade Dancing" for a unique feel',
     }),
     placement: 'bottom',
@@ -207,7 +207,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="skill-custom"]',
     content: TutorialContent({
-      children: 'Create custom skills for your world.',
+      children: 'This section lets you create custom skills for your world.',
       example: '"Dragon Riding" to enable aerial adventures in your fantasy world',
     }),
     placement: 'top',
@@ -233,20 +233,20 @@ export const worldCreationTour: Step[] = [
   },
   {
     target: '[data-tutorial="finalize-image"]',
-    content: 'Generate a world image to visualize your setting based on your description and genre.',
+    content: 'You can generate a world image to visualize your setting based on your description and genre.',
     placement: 'top',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="finalize-attributes"]',
-    content: 'Double-check the attributes you\'ve chosen. You can still go back to make changes.',
+    content: "Here you can double-check the attributes you've chosen. You can still go back to make changes.",
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
   },
   {
     target: '[data-tutorial="finalize-skills"]',
-    content: 'Confirm the skills list before creating the world. You can still go back to make changes.',
+    content: "Here's where you can confirm the skills list before creating the world. You can still go back to make changes.",
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
@@ -254,34 +254,34 @@ export const worldCreationTour: Step[] = [
   },
   {
     target: '[data-tutorial="finalize-world"]',
-    content: 'Review your world details and create it! You\'re just one step away from your adventure.',
+    content: "Here's where you'll review your world details and create it! You're just one step away from your adventure.",
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
   },
   {
     target: '[data-tutorial="quickstart-archetypes"]',
-    content: 'Pick a pre-made character to jump straight into the story.',
+    content: 'You can pick a pre-made character to jump straight into the story.',
     placement: 'top',
     disableBeacon: true,
     hideBackButton: true,
   },
   {
     target: '[data-tutorial="quickstart-random"]',
-    content: 'Generate a fresh random character if you want a new option.',
+    content: 'This button generates a fresh random character if you want a new option.',
     placement: 'top',
     disableBeacon: true,
   },
   {
     target: '[data-tutorial="quickstart-custom"]',
-    content: 'Create a custom character with full control over details.',
+    content: 'This option lets you create a custom character with full control over details.',
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
   },
   {
     target: '[data-tutorial="quickstart-skip"]',
-    content: 'Skip this for now and jump into the game. You can create a character later.',
+    content: 'You can skip this for now and jump into the game. You can create a character later.',
     placement: 'top',
     disableBeacon: true,
     disableScrolling: true,
