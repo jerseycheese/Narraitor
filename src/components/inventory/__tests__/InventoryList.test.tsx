@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
 import type { InventoryStore } from '@/state/inventoryStore';
@@ -11,7 +12,28 @@ jest.mock('@/state/inventoryStore', () => ({
 
 const mockUseInventoryStore = useInventoryStore as jest.MockedFunction<typeof useInventoryStore>;
 
+interface MockDropDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  item: InventoryItem;
+}
+
+// Mock DropConfirmationDialog to avoid testing its internal logic here
+jest.mock('../DropConfirmationDialog', () => ({
+  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: MockDropDialogProps) => (
+    isOpen ? (
+      <div role="dialog" aria-label="Drop Item">
+        <p>Drop {item?.name}?</p>
+        <button onClick={onConfirm}>Confirm Drop</button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    ) : null
+  )
+}));
+
 const baseTimestamp = '2025-01-15T12:00:00Z';
+
 
 const createMockInventoryStore = (
   overrides: Partial<InventoryStore> = {}
@@ -220,5 +242,44 @@ describe('InventoryList', () => {
     rerender(<InventoryList characterId={characterId} />);
 
     expect(screen.getByText('Arcane Tome')).toBeInTheDocument();
+  });
+
+  test('opens confirmation dialog on drop click', async () => {
+    const user = userEvent.setup();
+    const mockRemoveItem = jest.fn();
+    const mockClearError = jest.fn();
+    
+    const mockItems = [
+      createItem({ id: 'item-1', name: 'Test Item', quantity: 1 })
+    ];
+    
+    const mockStore = createMockInventoryStore({
+        items: { 'item-1': mockItems[0] },
+        characterInventories: { [characterId]: ['item-1'] },
+        removeItem: mockRemoveItem,
+        clearError: mockClearError,
+        error: null,
+    });
+
+    mockUseInventoryStore.mockImplementation((selector) => 
+        selector ? selector(mockStore) : mockStore
+    );
+    // Mock getState needed for the hook
+    (mockUseInventoryStore as unknown as { getState: () => InventoryStore }).getState = () => mockStore;
+
+    render(<InventoryList characterId={characterId} />);
+
+    // Find drop button
+    const dropButton = screen.getByLabelText('Drop Test Item');
+    await user.click(dropButton);
+
+    // Dialog should be open
+    expect(screen.getByRole('dialog', { name: 'Drop Item' })).toBeInTheDocument();
+    
+    // Confirm
+    await user.click(screen.getByText('Confirm Drop'));
+    
+    // Should call removeItem
+    expect(mockRemoveItem).toHaveBeenCalledWith(characterId, 'item-1', 1);
   });
 });

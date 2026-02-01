@@ -16,6 +16,26 @@ import { mockZustandStore, createMockInventoryStore, createMockInventoryItem } f
 // Mock the inventory store
 jest.mock('@/state/inventoryStore');
 
+// Mock DropConfirmationDialog
+interface MockDropDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  item: InventoryItem;
+}
+
+jest.mock('./DropConfirmationDialog', () => ({
+  DropConfirmationDialog: ({ isOpen, onConfirm, onClose, item }: MockDropDialogProps) => (
+    isOpen ? (
+      <div role="dialog" aria-label="Drop Item">
+        <p>Drop {item?.name}?</p>
+        <button onClick={onConfirm}>Confirm Drop</button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    ) : null
+  )
+}));
+
 const mockInventoryItems: InventoryItem[] = [
   createMockInventoryItem({
     id: 'item-1' as EntityID,
@@ -184,9 +204,10 @@ describe('InventoryTable', () => {
     expect(useButtons).toHaveLength(3);
   });
 
-  it('calls remove handler when drop button clicked', async () => {
+  it('opens confirmation dialog when drop button clicked', async () => {
     const user = userEvent.setup();
     const mockRemoveItem = jest.fn();
+    const mockClearError = jest.fn();
 
     const mockState = {
       items: mockInventoryItems.reduce((acc, item) => {
@@ -198,6 +219,8 @@ describe('InventoryTable', () => {
       },
       getCharacterItems: jest.fn(() => mockInventoryItems),
       removeItem: mockRemoveItem,
+      clearError: mockClearError,
+      error: null,
     };
 
     mockZustandStore(
@@ -210,7 +233,14 @@ describe('InventoryTable', () => {
     const dropButtons = screen.getAllByLabelText(/drop/i);
     await user.click(dropButtons[0]);
 
-    expect(mockRemoveItem).toHaveBeenCalledWith('char-1', 'item-1');
+    // Expect dialog
+    expect(screen.getByRole('dialog', { name: 'Drop Item' })).toBeInTheDocument();
+    
+    // Confirm
+    await user.click(screen.getByText('Confirm Drop'));
+    
+    // Expect removeItem
+    expect(mockRemoveItem).toHaveBeenCalledWith('char-1', 'item-1', 5); // Quantity 5 for item-1
   });
 
   it('displays empty state when no inventory items', () => {

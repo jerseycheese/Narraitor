@@ -14,6 +14,8 @@ import { useSessionStore } from '@/state/sessionStore';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
+import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
+import { DropConfirmationDialog } from './DropConfirmationDialog';
 
 interface InventoryTableProps {
   characterId: EntityID;
@@ -38,7 +40,19 @@ export function InventoryTable({
   // Select items and character inventory to re-render on changes
   const items = useInventoryStore((state) => state.items);
   const characterInventories = useInventoryStore((state) => state.characterInventories);
-  const removeItem = useInventoryStore((state) => state.removeItem);
+  
+  const {
+    isDialogOpen,
+    itemToDrop,
+    dropQuantity,
+    quantityError,
+    storeError,
+    openDropDialog,
+    closeDropDialog,
+    setDropQuantity,
+    confirmDrop,
+  } = useItemDropConfirmation(characterId);
+  
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = React.useState<EntityID | null>(null);
 
@@ -172,7 +186,7 @@ export function InventoryTable({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => removeItem(characterId, row.original.id)}
+                onClick={() => openDropDialog(row.original)}
                 aria-label={`Drop ${row.original.name}`}
                 title="Drop item"
               >
@@ -183,7 +197,7 @@ export function InventoryTable({
         },
       },
     ],
-    [characterId, removeItem, handleUseItem, usingItemId]
+    [openDropDialog, handleUseItem, usingItemId]
   );
 
   // Handle empty state
@@ -196,18 +210,30 @@ export function InventoryTable({
   }
 
   return (
-    <DataTable
-      columns={columns}
-      data={filteredItems}
-      pagination={{
-        pageSize: 10,
-        showPagination: true,
-      }}
-      searchable={{
-        enabled: true,
-        placeholder: 'Search items...',
-      }}
-      ariaLabel={`Inventory table for character ${characterId}`}
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={filteredItems}
+        pagination={{
+          pageSize: 10,
+          showPagination: true,
+        }}
+        searchable={{
+          enabled: true,
+          placeholder: 'Search items...',
+        }}
+        ariaLabel={`Inventory table for character ${characterId}`}
+      />
+      <DropConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={closeDropDialog}
+        onConfirm={confirmDrop}
+        item={itemToDrop}
+        quantity={dropQuantity}
+        onQuantityChange={setDropQuantity}
+        quantityError={quantityError}
+        storeError={storeError}
+      />
+    </>
   );
 }

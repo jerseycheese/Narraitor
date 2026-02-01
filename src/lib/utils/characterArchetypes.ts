@@ -1,6 +1,6 @@
 // src/lib/utils/characterArchetypes.ts
 
-import { World, CharacterArchetype } from '@/types/world.types';
+import { World } from '@/types/world.types';
 import { GenreValue } from '@/lib/constants/genres';
 import { generateUniqueId } from './generateId';
 import { calculateCharacterLevel } from './characterLevel';
@@ -9,6 +9,7 @@ import {
   PHYSICAL_DESCRIPTION_TEMPLATES,
   ArchetypeTemplate as ImportedArchetypeTemplate
 } from '@/lib/constants/characterArchetypeTemplates';
+import type { CharacterArchetype } from '@/types/archetype.types';
 
 export type { CharacterArchetype };
 export type ArchetypeTemplate = ImportedArchetypeTemplate;

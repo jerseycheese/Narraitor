@@ -9,30 +9,9 @@ import {
 import type { SkillDifficulty } from './skill-difficulty.types';
 import type { ToneSettings } from './tone-settings.types';
 import type { GenreValue } from './genre.types';
+import type { CharacterArchetype } from '@/types/archetype.types';
 
-export interface CharacterArchetype {
-  id: string;
-  name: string;
-  description: string;
-  level: number;
-  attributes: Array<{
-    id: string;
-    name: string;
-    value: number;
-  }>;
-  skills: Array<{
-    id: string;
-    name: string;
-    level: number;
-  }>;
-  background: {
-    description: string;
-    personality: string;
-    motivation: string;
-    fears: string[];
-    physicalDescription?: string;
-  };
-}
+export type { CharacterArchetype };
 
 /**
  * Character template for quick character creation

@@ -16,6 +16,8 @@ import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import { InventoryViewToggle, type InventoryViewMode } from './InventoryViewToggle';
 import { InventoryTable } from './InventoryTable';
 import { Trash2 } from 'lucide-react';
+import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
+import { DropConfirmationDialog } from './DropConfirmationDialog';
 
 interface InventoryListProps {
   characterId: EntityID;
@@ -40,7 +42,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   // Select items and character inventory to re-render on changes
   const itemsObject = useInventoryStore((state) => state.items);
   const characterInventories = useInventoryStore((state) => state.characterInventories);
-  const removeItem = useInventoryStore((state) => state.removeItem);
+  
+  const {
+    isDialogOpen,
+    itemToDrop,
+    dropQuantity,
+    quantityError,
+    storeError,
+    openDropDialog,
+    closeDropDialog,
+    setDropQuantity,
+    confirmDrop,
+  } = useItemDropConfirmation(characterId);
 
   // Derive character items from selected state
   const items = React.useMemo(() => {
@@ -247,7 +260,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => removeItem(characterId, item.id)}
+                        onClick={() => openDropDialog(item)}
                         aria-label={`Drop ${item.name}`}
                         title="Drop item"
                       >
@@ -263,6 +276,17 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       })}
         </>
       )}
+
+      <DropConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={closeDropDialog}
+        onConfirm={confirmDrop}
+        item={itemToDrop}
+        quantity={dropQuantity}
+        onQuantityChange={setDropQuantity}
+        quantityError={quantityError}
+        storeError={storeError}
+      />
     </div>
   );
 };
