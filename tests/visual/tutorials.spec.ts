@@ -31,6 +31,18 @@ const setTutorialProgress = async (
   }, phases);
 };
 
+const waitForTestStartTour = async (page: Page): Promise<void> => {
+  await page.waitForFunction(
+    () => typeof (window as any).__TEST_START_TOUR__ === 'function',
+    { timeout: 15000 }
+  );
+};
+
+const startTour = async (page: Page, tourId: string): Promise<void> => {
+  await waitForTestStartTour(page);
+  await page.evaluate((id) => (window as any).__TEST_START_TOUR__(id), tourId);
+};
+
 test.describe('Tutorial visual coverage', () => {
   test('World generation tutorial overlay renders consistently', async ({ page }) => {
     test.setTimeout(60000);
@@ -88,5 +100,62 @@ test.describe('Tutorial visual coverage', () => {
     await expect(tooltip).toContainText('This option lets you start from scratch');
 
     await expect(page).toHaveScreenshot('tutorial-world-creation-step1.png', { fullPage: true });
+  });
+
+  test('QuickStart tutorial overlay renders consistently', async ({ page }) => {
+    test.setTimeout(60000);
+
+    await seedTestData(page);
+    await page.goto('/characters/create?worldId=world-cyberpunk-2077');
+    await waitForContentStable(page);
+    await waitForStoreReady(page);
+
+    await setTutorialProgress(page, {
+      intro: { completed: true, skipped: false },
+      worldCreation: { completed: true, skipped: false, lastStep: 999 },
+      worldGeneration: { completed: true, skipped: false, lastStep: 0 },
+      characterCreation: { completed: true, skipped: false, lastStep: 0, quickStartCompleted: false },
+      firstPlay: { completed: true, skipped: false },
+    });
+
+    await page.waitForSelector('[data-tutorial="quickstart-archetypes"]', { timeout: 15000 });
+    await startTour(page, 'quickStartSelection');
+
+    const tooltip = page.locator('.react-joyride__tooltip');
+    await expect(tooltip).toBeVisible({ timeout: 10000 });
+    await expect(tooltip).toContainText('pre-generated characters');
+
+    await expect(page).toHaveScreenshot('tutorial-quickstart-selection-step0.png', { fullPage: true });
+  });
+
+  test('Character creation wizard tutorial overlay renders consistently', async ({ page }) => {
+    test.setTimeout(90000);
+
+    await seedTestData(page);
+    await page.goto('/characters/create?worldId=world-cyberpunk-2077');
+    await waitForContentStable(page);
+    await waitForStoreReady(page);
+
+    await setTutorialProgress(page, {
+      intro: { completed: true, skipped: false },
+      worldCreation: { completed: true, skipped: false, lastStep: 999 },
+      worldGeneration: { completed: true, skipped: false, lastStep: 0 },
+      characterCreation: { completed: true, skipped: false, lastStep: 0, quickStartCompleted: true },
+      firstPlay: { completed: true, skipped: false },
+    });
+
+    const customizeButton = page.getByRole('button', { name: 'Create Custom Character' });
+    await expect(customizeButton).toBeVisible({ timeout: 15000 });
+    await customizeButton.click();
+    await waitForContentStable(page);
+
+    await page.waitForSelector('[data-tutorial="template-selector"]', { timeout: 15000 });
+    await startTour(page, 'characterCreationWizard');
+
+    const tooltip = page.locator('.react-joyride__tooltip');
+    await expect(tooltip).toBeVisible({ timeout: 10000 });
+    await expect(tooltip).toContainText('character template');
+
+    await expect(page).toHaveScreenshot('tutorial-character-creation-step0.png', { fullPage: true });
   });
 });
