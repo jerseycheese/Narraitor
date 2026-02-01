@@ -11,6 +11,8 @@ import type { ToneSettings } from './tone-settings.types';
 import type { GenreValue } from './genre.types';
 import type { CharacterArchetype } from '@/types/archetype.types';
 
+export type { CharacterArchetype };
+
 /**
  * Character template for quick character creation
  * Structurally identical to CharacterArchetype but stored per-world
