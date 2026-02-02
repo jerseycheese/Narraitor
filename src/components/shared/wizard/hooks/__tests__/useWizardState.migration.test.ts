@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react';
+import { createElement } from 'react';
 import { useWizardState } from '../useWizardState';
 
 // Mock localStorage
@@ -127,5 +128,42 @@ describe('useWizardState - localStorage migration', () => {
     // Should fall back to initial data when localStorage is corrupted
     expect(result.current.state.data).toEqual(initialData);
     expect(result.current.state.currentStep).toBe(0);
+  });
+
+  test('computes initial step validation on first render when validateStep is provided', () => {
+    localStorageMock.getItem.mockReturnValue(null);
+
+    const initialData: TestData = {
+      name: '',
+      genre: 'fantasy',
+      worldTypeData: {
+        worldType: 'original',
+        worldReference: '',
+        additionalDetails: ''
+      }
+    };
+
+    const validateStep = jest.fn(() => ({
+      valid: true,
+      errors: [],
+      touched: true,
+    }));
+
+    const WizardTest = () => {
+      const wizard = useWizardState({
+        steps: [{ id: 'test', label: 'Test' }],
+        initialData,
+        onComplete: () => {},
+        validateStep,
+        persistKey: 'test-wizard',
+      });
+
+      return createElement('button', { disabled: !wizard.stepValidation?.valid }, 'Next');
+    };
+
+    const { renderToString } = require('react-dom/server.node');
+    const html = renderToString(createElement(WizardTest));
+
+    expect(html).not.toContain('disabled');
   });
 });

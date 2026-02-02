@@ -63,23 +63,49 @@ export function useWizardState<T>(config: WizardConfig<T>) {
           // This ensures new fields in initialData are present even if not in saved state
           const mergedData = { ...initialData, ...parsed.data };
           // State restored from persistence with migration
-          return {
+          const initialState = {
             ...parsed,
             data: mergedData,
           };
+
+          if (validateStep) {
+            const validation = validateStep(initialState.currentStep, initialState.data);
+            return {
+              ...initialState,
+              validation: {
+                ...initialState.validation,
+                [initialState.currentStep]: { ...validation, touched: true },
+              },
+            };
+          }
+
+          return initialState;
         } catch {
           // Failed to parse saved state, will use initial state
         }
       }
     }
 
-    return {
+    const initialState = {
       currentStep: 0,
       data: initialData,
       errors: {},
       isProcessing: false,
       validation: {},
     };
+
+    if (validateStep) {
+      const validation = validateStep(initialState.currentStep, initialState.data);
+      return {
+        ...initialState,
+        validation: {
+          ...initialState.validation,
+          [initialState.currentStep]: { ...validation, touched: true },
+        },
+      };
+    }
+
+    return initialState;
   });
 
   // Persist state to localStorage
