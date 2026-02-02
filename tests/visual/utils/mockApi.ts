@@ -89,7 +89,7 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
         themes: ['resolve', 'tension'],
         includedEvents: 1,
         includedDecisions: 0,
-        lastEventTimestamp: new Date().toISOString(),
+        lastEventTimestamp: '2024-01-01T12:00:00.000Z',
         model: 'playwright-mock',
       }),
     });
