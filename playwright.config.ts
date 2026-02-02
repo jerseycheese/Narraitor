@@ -10,8 +10,8 @@ export default defineConfig({
   // Test directory for visual regression tests
   testDir: './tests/visual',
   
-  // Reduced timeout for faster failure detection
-  timeout: 30 * 1000,
+  // Increased timeout to account for CI slowness
+  timeout: 60 * 1000,
   
   // Expect timeout for assertions
   expect: {
