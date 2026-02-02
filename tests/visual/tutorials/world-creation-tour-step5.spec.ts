@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
+import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, zeroPad } from '../utils/tutorial-helpers';
 
 const steps = [23, 24, 25, 26, 27];
@@ -9,6 +10,7 @@ test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
   test.setTimeout(120000);
 
   await seedTestData(page);
+  await mockApiEndpoints(page);
   await page.goto('/worlds/create');
   await waitForContentStable(page);
   await waitForStoreReady(page);
