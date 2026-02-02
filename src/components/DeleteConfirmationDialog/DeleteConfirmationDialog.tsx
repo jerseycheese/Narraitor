@@ -30,6 +30,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
+      description={description}
       showCloseButton={false}
       size="lg"
       tone="destructive"
@@ -58,10 +59,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       )}
       footerClassName="bg-background"
     >
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">{description}</p>
-        <p className="text-base font-semibold text-foreground">{itemName}</p>
-      </div>
+      <p className="text-base font-semibold text-foreground">{itemName}</p>
     </SimpleModal>
   );
 };

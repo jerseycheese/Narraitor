@@ -135,10 +135,11 @@ export function RecoveryNotification({
   };
 
   return (
-    <SimpleModal 
-      isOpen={isVisible} 
+    <SimpleModal
+      isOpen={isVisible}
       onClose={onDismiss}
       title="Character Creation Progress Found"
+      description="Found saved character creation progress from a previous session."
       showCloseButton={true}
       size="md"
       ariaDescribedBy="recovery-notification-content"
@@ -165,7 +166,6 @@ export function RecoveryNotification({
       
       <div>
           <p className="text-sm text-muted-foreground mb-4">
-            Found saved character creation progress from a previous session.
             {hasCurrentData && (
               <span className="block mt-2 text-amber-500 font-medium inline-flex items-center gap-1">
                 <AlertTriangle className="w-4 h-4" aria-hidden="true" />
