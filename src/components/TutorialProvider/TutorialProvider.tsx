@@ -389,8 +389,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     if (process.env.NODE_ENV === 'development' || (window as any).__PLAYWRIGHT__) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).__TEST_START_TOUR__ = startTour;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).__TEST_STOP_TOUR__ = stopTour;
     }
-  }, [startTour]);
+  }, [startTour, stopTour]);
 
   return (
     <TutorialContext.Provider value={{

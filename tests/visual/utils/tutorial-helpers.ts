@@ -44,6 +44,14 @@ export const startTourAt = async (page: Page, tourId: string, stepIndex: number)
   );
 };
 
+export const stopTour = async (page: Page): Promise<void> => {
+  await page.evaluate(() => {
+    if (typeof (window as any).__TEST_STOP_TOUR__ === 'function') {
+      (window as any).__TEST_STOP_TOUR__();
+    }
+  });
+};
+
 export const waitForTooltip = async (page: Page): Promise<void> => {
   const tooltip = page.locator('.react-joyride__tooltip');
   await expect(tooltip).toBeVisible({ timeout: 10000 });
