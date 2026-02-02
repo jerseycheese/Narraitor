@@ -40,7 +40,24 @@ test('World creation tour step 4 snapshots (steps 19-22)', async ({ page }) => {
   await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 }).catch(() => {});
   await waitForContentStable(page);
 
-  // Now on step 3 (AttributeReviewStep). Click Next.
+  // Now on step 3 (AttributeReviewStep).
+  // Add a minimal custom attribute to satisfy requirement and advance
+  const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
+  if (await addCustomAttributeBtn.count() > 0) {
+    await addCustomAttributeBtn.click();
+    await page.waitForTimeout(300);
+    const attributeNameInput = page.getByRole('textbox', { name: 'Attribute Name *' });
+    if (await attributeNameInput.count() > 0) {
+      await attributeNameInput.fill('Test Attribute');
+      await page.waitForTimeout(150);
+      const createAttributeBtn = page.getByRole('button', { name: 'Create Attribute' });
+      if (await createAttributeBtn.count() > 0) {
+        await createAttributeBtn.click();
+        await page.waitForTimeout(300);
+      }
+    }
+  }
+  
   await page.getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 

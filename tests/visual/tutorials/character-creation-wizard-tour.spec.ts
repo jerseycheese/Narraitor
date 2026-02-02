@@ -45,14 +45,79 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({ page }) =>
       await waitForContentStable(page);
     } else if (stepIndex === 3) {
       // Step 2 -> Step 3 (Skills)
+      // Allocate required points so we can advance to the skills step.
+      await page.evaluate(() => {
+        const sliders = Array.from(
+          document.querySelectorAll('[data-testid^="allocation-slider-"] input[type="range"]')
+        ) as HTMLInputElement[];
+        if (!sliders.length) return;
+
+        const setValue = (input: HTMLInputElement, value: number) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          if (setter) {
+            setter.call(input, String(value));
+          } else {
+            input.value = String(value);
+          }
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        const totalPoints = (() => {
+          const text = document.querySelector('.component-attributes-step')?.textContent || '';
+          const match = text.match(/Total:\s*(\d+)/);
+          return match ? Number(match[1]) : 0;
+        })();
+
+        const mins = sliders.map((slider) => Number(slider.min));
+        const maxes = sliders.map((slider) => Number(slider.max));
+        const minSum = mins.reduce((sum, value) => sum + value, 0);
+        let remaining = Math.max(0, totalPoints - minSum);
+
+        sliders.forEach((slider, index) => {
+          const capacity = maxes[index] - mins[index];
+          const allocation = remaining > 0 ? Math.min(remaining, capacity) : 0;
+          setValue(slider, mins[index] + allocation);
+          remaining -= allocation;
+        });
+      });
+      await waitForContentStable(page);
       await wizardNext.click();
       await waitForContentStable(page);
     } else if (stepIndex === 4) {
       // Step 3 -> Step 4 (Background)
-      // Skill selection is required (at least 1)
-      const skillToggle = page.locator('button:has-text("Excluded"), button:has-text("Not Selected")').first();
-      await expect(skillToggle).toBeVisible({ timeout: 15000 });
-      await skillToggle.click();
+      // Skill selection is required (at least 2 and points allocated)
+      const skillToggles = page.locator('button:has-text("Excluded"), button:has-text("Not Selected")');
+      let togglesClicked = 0;
+      while (togglesClicked < 2) {
+        const availableToggle = skillToggles.first();
+        if ((await availableToggle.count()) === 0) break;
+        await availableToggle.scrollIntoViewIfNeeded();
+        await availableToggle.click({ timeout: 5000 });
+        togglesClicked += 1;
+        await waitForContentStable(page);
+      }
+      
+      // Increase each selected skill to its maximum level to satisfy the pool
+      const skillSliders = page.locator('[data-testid^="skill-level-slider"] input[type="range"]');
+      const sliderCount = await skillSliders.count();
+      for (let i = 0; i < sliderCount; i++) {
+        const slider = skillSliders.nth(i);
+        await slider.evaluate((element) => {
+          const input = element as HTMLInputElement;
+          const max = Number(input.max);
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          if (setter) {
+            setter.call(input, String(max));
+          } else {
+            input.value = String(max);
+          }
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
+      await waitForContentStable(page);
+
       await wizardNext.click();
       await waitForContentStable(page);
     } else if (stepIndex === 5) {

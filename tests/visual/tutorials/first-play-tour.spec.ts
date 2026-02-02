@@ -47,8 +47,7 @@ test('First Play tour snapshots (steps 0-6)', async ({ page }) => {
     await page.waitForTimeout(1000);
     
     await expect(page).toHaveScreenshot(`tutorial-first-play-step${zeroPad(stepIndex)}.png`, { 
-      animations: 'disabled',
-      threshold: 0.2
+      animations: 'disabled'
     });
   }
 });
