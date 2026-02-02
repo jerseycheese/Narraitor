@@ -89,7 +89,7 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
         themes: ['resolve', 'tension'],
         includedEvents: 1,
         includedDecisions: 0,
-        lastEventTimestamp: new Date().toISOString(),
+        lastEventTimestamp: '2024-01-01T12:00:00.000Z',
         model: 'playwright-mock',
       }),
     });
@@ -185,6 +185,29 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
       body: JSON.stringify({
         imageUrl:
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=',
+      }),
+    });
+  });
+
+  // Mock world analysis endpoint
+  await page.route('**/api/ai/analyze-world', async (route) => {
+    console.log('Intercepted world analysis API call');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        attributes: [
+          { name: 'Cybernetics', description: 'Integration with tech', minValue: 1, maxValue: 10, baseValue: 5 },
+          { name: 'Hacking', description: 'Digital intrusion skills', minValue: 1, maxValue: 10, baseValue: 5 },
+          { name: 'Reflexes', description: 'Combat reaction speed', minValue: 1, maxValue: 10, baseValue: 5 },
+          { name: 'Street Cred', description: 'Social standing in the underworld', minValue: 1, maxValue: 10, baseValue: 5 },
+        ],
+        skills: [
+          { name: 'Netrunning', description: 'Navigating cyberspace', difficulty: 'hard', linkedAttributeNames: ['Hacking'] },
+          { name: 'Pistols', description: 'Handgun combat', difficulty: 'medium', linkedAttributeNames: ['Reflexes'] },
+          { name: 'Stealth', description: 'Moving unseen', difficulty: 'medium', linkedAttributeNames: ['Reflexes'] },
+          { name: 'Negotiation', description: 'Social engineering', difficulty: 'medium', linkedAttributeNames: ['Street Cred'] },
+        ],
       }),
     });
   });
