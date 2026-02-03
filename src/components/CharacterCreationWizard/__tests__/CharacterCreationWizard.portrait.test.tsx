@@ -97,7 +97,6 @@ describe('PortraitStep Component', () => {
 
     expect(screen.getByText('Character Portrait')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /generate portrait/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /generate portrait/i })).toBeInTheDocument();
   });
 
   it('should handle portrait generation user interaction', async () => {
