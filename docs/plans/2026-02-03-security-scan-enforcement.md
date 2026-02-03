@@ -38,7 +38,7 @@ Expected: npm updates patch/minor dependencies without `--force`
 **Step 2: Verify audit is clean for HIGH+**
 
 Run: `npm audit --production --audit-level=high`
-Expected: `found 0 vulnerabilities`
+Expected: no HIGH or CRITICAL vulnerabilities (moderate/low may still be listed)
 
 **Step 3: Review dependency changes**
 
