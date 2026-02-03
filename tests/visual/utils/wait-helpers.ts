@@ -17,7 +17,7 @@ export async function waitForContentStable(page: Page): Promise<void> {
     await page.waitForLoadState('networkidle', { timeout: 8000 });
   } catch (error) {
     // If networkidle times out, continue - common with dynamic content
-    console.log('Network idle timeout, continuing...');
+    console.log(`Network idle wait failed: ${(error as Error).message}`);
   }
   
   // Wait for any loading indicators to disappear with reasonable timeouts
@@ -30,13 +30,16 @@ export async function waitForContentStable(page: Page): Promise<void> {
     'text=Creating archetypes...'
   ];
   
-  // Check all loading selectors concurrently
-  await Promise.allSettled(
-    loadingSelectors.map(selector => 
-      page.waitForSelector(selector, { state: 'detached', timeout: 5000 })
-        .catch(() => {}) // Ignore if not found
-    )
-  );
+  for (const selector of loadingSelectors) {
+    const locator = page.locator(selector);
+    const count = await locator.count();
+    if (count === 0) continue;
+    try {
+      await locator.first().waitFor({ state: 'detached', timeout: 5000 });
+    } catch (error) {
+      console.log(`Loading selector still present after 5s: ${selector} - ${(error as Error).message}`);
+    }
+  }
   
   // Wait for "Loading..." text to disappear with adequate timeout for seeding
   try {
@@ -46,11 +49,29 @@ export async function waitForContentStable(page: Page): Promise<void> {
       { timeout: 8000 }
     );
   } catch (error) {
-    // Loading text not found or already gone - continue
+    console.log(`Loading text wait failed: ${(error as Error).message}`);
   }
   
   // Final stabilization wait - enough time for data seeding to complete
   await page.waitForTimeout(500);
+}
+
+export async function waitForNavigationHeading(
+  page: Page,
+  expectedHeading: string,
+  { timeout = 5000, exact = false }: { timeout?: number; exact?: boolean } = {}
+): Promise<void> {
+  await page.waitForFunction(
+    ({ headingText, exact }) => {
+      const headings = Array.from(document.querySelectorAll('h1, h2, h3'));
+      return headings.some((heading) => {
+        const text = heading.textContent?.trim() ?? '';
+        return exact ? text === headingText : text.includes(headingText);
+      });
+    },
+    { headingText: expectedHeading, exact },
+    { timeout }
+  );
 }
 
 /**
@@ -62,8 +83,8 @@ export async function waitForImagesLoaded(page: Page, timeout: number = 5000): P
       () => Array.from(document.images).every((img) => img.complete),
       { timeout }
     );
-  } catch {
-    console.log('Image not loaded yet, proceeding with screenshot');
+  } catch (error) {
+    console.log(`Image loading wait failed: ${(error as Error).message}`);
   }
 }
 
