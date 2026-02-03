@@ -273,9 +273,9 @@ jobs:
         run: mkdir -p ci-security
 
       - name: Run npm audit (fails on high severity only)
-        # Non-blocking during initial rollout; flip to false once issues #787/#788 land.
+        # Now enforced after resolving vulnerabilities in issue #950
         run: npm audit --production --audit-level=high | tee ci-security/npm-audit.txt
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Generate npm audit JSON report
         run: npm audit --production --json > ci-security/npm-audit.json
