@@ -125,10 +125,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-jest-
 
-      - name: Run tests
-        run: npm run test
-      - name: Check code coverage
-        run: npm run test:coverage
+      - name: Run tests with coverage
+        run: npm run test:ci
 
   build:
     name: Build Check

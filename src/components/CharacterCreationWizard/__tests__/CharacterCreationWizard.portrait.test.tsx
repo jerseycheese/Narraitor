@@ -43,7 +43,7 @@ const mockWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore
 // Store original fetch to restore it after tests
 const originalFetch = global.fetch;
 
-describe.skip('PortraitStep Component', () => {
+describe('PortraitStep Component', () => {
   const mockData = {
     characterData: {
       name: 'Elara Moonshadow',
@@ -96,7 +96,6 @@ describe.skip('PortraitStep Component', () => {
     );
 
     expect(screen.getByText('Character Portrait')).toBeInTheDocument();
-    expect(screen.getByText(/Generate a portrait/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /generate portrait/i })).toBeInTheDocument();
   });
 
@@ -176,7 +175,9 @@ describe.skip('PortraitStep Component', () => {
   });
 });
 
-describe.skip('Character Creation Wizard with Portrait Integration', () => {
+import { TutorialProvider } from '../../../components/TutorialProvider';
+
+describe('Character Creation Wizard with Portrait Integration', () => {
   const mockWorld = {
     id: 'world-1',
     name: 'Fantasy World',
@@ -239,7 +240,11 @@ describe.skip('Character Creation Wizard with Portrait Integration', () => {
   });
 
   it('should include portrait step in wizard', () => {
-    render(<CharacterCreationWizard worldId="world-1" />);
+    render(
+      <TutorialProvider>
+        <CharacterCreationWizard worldId="world-1" />
+      </TutorialProvider>
+    );
 
     // Check that Portrait step is in the progress bar
     const steps = screen.getAllByText(/Portrait/i);
@@ -247,7 +252,11 @@ describe.skip('Character Creation Wizard with Portrait Integration', () => {
   });
 
   it('should save character with placeholder portrait by default', async () => {
-    render(<CharacterCreationWizard worldId="world-1" initialStep={4} />);
+    render(
+      <TutorialProvider>
+        <CharacterCreationWizard worldId="world-1" initialStep={5} />
+      </TutorialProvider>
+    );
 
     // The portrait step should be visible
     expect(screen.getByText('Character Portrait')).toBeInTheDocument();

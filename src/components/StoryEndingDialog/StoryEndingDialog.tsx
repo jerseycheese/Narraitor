@@ -62,6 +62,7 @@ export function StoryEndingDialog({
       isOpen={isOpen} 
       onClose={onClose}
       title={(title && safeTrim(title)) || "Story Ending"}
+      description={content}
       showCloseButton={false}
       size="xl"
       ariaDescribedBy="story-ending-content"
@@ -70,17 +71,6 @@ export function StoryEndingDialog({
         endingTypeClasses[endingType]
       )}
     >
-      <div
-        id="story-ending-content"
-        className="prose prose-gray dark:prose-invert mb-6"
-      >
-        {typeof content === 'string' ? (
-          <p>{content}</p>
-        ) : (
-          content
-        )}
-      </div>
-      
       <div className="mt-6 flex flex-col-reverse sm:flex-row gap-2">
         <Button
           ref={closeButtonRef}
