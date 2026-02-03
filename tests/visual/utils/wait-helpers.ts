@@ -30,13 +30,16 @@ export async function waitForContentStable(page: Page): Promise<void> {
     'text=Creating archetypes...'
   ];
   
-  // Check all loading selectors concurrently
-  await Promise.allSettled(
-    loadingSelectors.map(selector => 
-      page.waitForSelector(selector, { state: 'detached', timeout: 5000 })
-        .catch(() => {}) // Ignore if not found
-    )
-  );
+  for (const selector of loadingSelectors) {
+    const locator = page.locator(selector);
+    const count = await locator.count();
+    if (count === 0) continue;
+    try {
+      await locator.first().waitFor({ state: 'detached', timeout: 5000 });
+    } catch (error) {
+      console.log(`Loading selector still present after 5s: ${selector}`);
+    }
+  }
   
   // Wait for "Loading..." text to disappear with adequate timeout for seeding
   try {
@@ -51,6 +54,69 @@ export async function waitForContentStable(page: Page): Promise<void> {
   
   // Final stabilization wait - enough time for data seeding to complete
   await page.waitForTimeout(500);
+}
+
+export async function waitForComponentState(
+  page: Page,
+  selector: string,
+  predicate: (element: Element) => boolean,
+  { timeout = 10000 }: { timeout?: number } = {}
+): Promise<void> {
+  const predicateSource = predicate.toString();
+  await page.waitForFunction(
+    ({ selector, predicateSource }) => {
+      const element = document.querySelector(selector);
+      if (!element) return false;
+      const predicateFn = new Function('element', `return (${predicateSource})(element);`) as (element: Element) => boolean;
+      try {
+        return Boolean(predicateFn(element));
+      } catch {
+        return false;
+      }
+    },
+    { selector, predicateSource },
+    { timeout }
+  );
+}
+
+export async function waitForStorageChange(
+  page: Page,
+  storageKey: string,
+  predicate: (value: any) => boolean,
+  { timeout = 10000, storage = 'localStorage' }: { timeout?: number; storage?: 'localStorage' | 'sessionStorage' } = {}
+): Promise<void> {
+  const predicateSource = predicate.toString();
+  await page.waitForFunction(
+    ({ storageKey, storage, predicateSource }) => {
+      const storageArea = storage === 'sessionStorage' ? window.sessionStorage : window.localStorage;
+      const value = storageArea.getItem(storageKey);
+      if (!value) return false;
+      try {
+        const parsed = JSON.parse(value);
+        const predicateFn = new Function('value', `return (${predicateSource})(value);`) as (value: any) => boolean;
+        return Boolean(predicateFn(parsed));
+      } catch {
+        return false;
+      }
+    },
+    { storageKey, storage, predicateSource },
+    { timeout }
+  );
+}
+
+export async function waitForNavigationHeading(
+  page: Page,
+  expectedHeading: string,
+  { timeout = 5000 }: { timeout?: number } = {}
+): Promise<void> {
+  await page.waitForFunction(
+    (headingText) => {
+      const headings = Array.from(document.querySelectorAll('h1, h2, h3'));
+      return headings.some((heading) => heading.textContent?.includes(headingText));
+    },
+    expectedHeading,
+    { timeout }
+  );
 }
 
 /**
