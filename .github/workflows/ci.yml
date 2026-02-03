@@ -273,7 +273,7 @@ jobs:
         run: mkdir -p ci-security
 
       - name: Run npm audit (fails on high severity only)
-        # Now enforced after resolving vulnerabilities in issue #950
+        # Now enforced after resolving known vulnerabilities
         run: npm audit --production --audit-level=high | tee ci-security/npm-audit.txt
         continue-on-error: false
 
