@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import {
+  waitForContentStable,
+  hideDynamicContent,
+  waitForNavigationHeading,
+} from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
 /**
@@ -25,10 +29,18 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
   await test.step('QuickStart screenshot', async () => {
     // Allow archetype generation to complete - this needs extra time
     await waitForContentStable(page);
-    const loadingCount = await page.locator('text=Creating archetypes').count();
-    if (loadingCount > 0) {
-      await page.waitForTimeout(2000); // Give extra time for archetype generation
-    }
+    await page.waitForFunction(
+      () => {
+        const text = document.body.textContent ?? '';
+        if (!text.includes('Creating archetypes')) {
+          return true;
+        }
+        return Array.from(document.querySelectorAll('button')).some((button) =>
+          button.textContent?.includes('Create Custom Character')
+        );
+      },
+      { timeout: 10000 }
+    );
 
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-quickstart.png', { fullPage: true });
@@ -39,7 +51,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const customButton = page.locator('button:has-text("Create Custom Character")');
     if (await customButton.count() > 0) {
       await customButton.click();
-      await page.waitForTimeout(500); // Allow UI transition
+      await waitForNavigationHeading(page, 'Choose a Starting Template', { timeout: 5000, exact: true });
     }
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step0-template-selection.png', { fullPage: true });
@@ -50,7 +62,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const skipTemplateBtn = page.locator('button:has-text("Next")');
     if (await skipTemplateBtn.count() > 0) {
       await skipTemplateBtn.click();
-      await page.waitForTimeout(500); // Allow navigation
+      await waitForNavigationHeading(page, 'Basic Information', { timeout: 5000, exact: true });
     }
     await hideDynamicContent(page);
     await expect(page).toHaveScreenshot('character-creation-step1-basic-info.png', { fullPage: true });
@@ -61,12 +73,12 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     const nameInput = page.locator('input[placeholder*="Enter character name"]');
     if (await nameInput.count() > 0) {
       await nameInput.fill('Test Character');
-      await page.waitForTimeout(200); // Allow input to register
+      await expect(nameInput).toHaveValue('Test Character', { timeout: 2000 });
     }
     const nextBtn1 = page.locator('button:has-text("Next")');
     if (await nextBtn1.count() > 0) {
       await nextBtn1.click();
-      await page.waitForTimeout(800); // Allow navigation
+      await waitForNavigationHeading(page, 'Allocate Attribute Points', { timeout: 5000, exact: true });
     }
 
     await hideDynamicContent(page);
@@ -118,7 +130,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     if (await proceedToSkillsBtn.count() > 0) {
       await expect(proceedToSkillsBtn).toBeEnabled({ timeout: 10000 });
       await proceedToSkillsBtn.click();
-      await page.waitForTimeout(800);
+      await waitForNavigationHeading(page, 'Allocate Skill Points', { timeout: 10000, exact: true });
     }
   });
 
@@ -174,7 +186,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     if (await proceedToBackgroundBtn.count() > 0) {
       await expect(proceedToBackgroundBtn).toBeEnabled();
       await proceedToBackgroundBtn.click();
-      await page.waitForTimeout(500);
+      await waitForNavigationHeading(page, 'Character Background', { timeout: 5000, exact: true });
     }
   });
 
@@ -198,7 +210,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     if (await proceedToPortraitBtn.count() > 0) {
       await expect(proceedToPortraitBtn).toBeEnabled();
       await proceedToPortraitBtn.click();
-      await page.waitForTimeout(500);
+      await waitForNavigationHeading(page, 'Character Portrait', { timeout: 5000, exact: true });
     }
   });
 
