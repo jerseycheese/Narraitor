@@ -17,7 +17,7 @@ export async function waitForContentStable(page: Page): Promise<void> {
     await page.waitForLoadState('networkidle', { timeout: 8000 });
   } catch (error) {
     // If networkidle times out, continue - common with dynamic content
-    console.log('Network idle timeout, continuing...');
+    console.log(`Network idle wait failed: ${(error as Error).message}`);
   }
   
   // Wait for any loading indicators to disappear with reasonable timeouts
@@ -37,7 +37,7 @@ export async function waitForContentStable(page: Page): Promise<void> {
     try {
       await locator.first().waitFor({ state: 'detached', timeout: 5000 });
     } catch (error) {
-      console.log(`Loading selector still present after 5s: ${selector}`);
+      console.log(`Loading selector still present after 5s: ${selector} - ${(error as Error).message}`);
     }
   }
   
@@ -49,72 +49,27 @@ export async function waitForContentStable(page: Page): Promise<void> {
       { timeout: 8000 }
     );
   } catch (error) {
-    // Loading text not found or already gone - continue
+    console.log(`Loading text wait failed: ${(error as Error).message}`);
   }
   
   // Final stabilization wait - enough time for data seeding to complete
   await page.waitForTimeout(500);
 }
 
-export async function waitForComponentState(
-  page: Page,
-  selector: string,
-  predicate: (element: Element) => boolean,
-  { timeout = 10000 }: { timeout?: number } = {}
-): Promise<void> {
-  const predicateSource = predicate.toString();
-  await page.waitForFunction(
-    ({ selector, predicateSource }) => {
-      const element = document.querySelector(selector);
-      if (!element) return false;
-      const predicateFn = new Function('element', `return (${predicateSource})(element);`) as (element: Element) => boolean;
-      try {
-        return Boolean(predicateFn(element));
-      } catch {
-        return false;
-      }
-    },
-    { selector, predicateSource },
-    { timeout }
-  );
-}
-
-export async function waitForStorageChange(
-  page: Page,
-  storageKey: string,
-  predicate: (value: any) => boolean,
-  { timeout = 10000, storage = 'localStorage' }: { timeout?: number; storage?: 'localStorage' | 'sessionStorage' } = {}
-): Promise<void> {
-  const predicateSource = predicate.toString();
-  await page.waitForFunction(
-    ({ storageKey, storage, predicateSource }) => {
-      const storageArea = storage === 'sessionStorage' ? window.sessionStorage : window.localStorage;
-      const value = storageArea.getItem(storageKey);
-      if (!value) return false;
-      try {
-        const parsed = JSON.parse(value);
-        const predicateFn = new Function('value', `return (${predicateSource})(value);`) as (value: any) => boolean;
-        return Boolean(predicateFn(parsed));
-      } catch {
-        return false;
-      }
-    },
-    { storageKey, storage, predicateSource },
-    { timeout }
-  );
-}
-
 export async function waitForNavigationHeading(
   page: Page,
   expectedHeading: string,
-  { timeout = 5000 }: { timeout?: number } = {}
+  { timeout = 5000, exact = false }: { timeout?: number; exact?: boolean } = {}
 ): Promise<void> {
   await page.waitForFunction(
-    (headingText) => {
+    ({ headingText, exact }) => {
       const headings = Array.from(document.querySelectorAll('h1, h2, h3'));
-      return headings.some((heading) => heading.textContent?.includes(headingText));
+      return headings.some((heading) => {
+        const text = heading.textContent?.trim() ?? '';
+        return exact ? text === headingText : text.includes(headingText);
+      });
     },
-    expectedHeading,
+    { headingText: expectedHeading, exact },
     { timeout }
   );
 }
@@ -128,8 +83,8 @@ export async function waitForImagesLoaded(page: Page, timeout: number = 5000): P
       () => Array.from(document.images).every((img) => img.complete),
       { timeout }
     );
-  } catch {
-    console.log('Image not loaded yet, proceeding with screenshot');
+  } catch (error) {
+    console.log(`Image loading wait failed: ${(error as Error).message}`);
   }
 }
 

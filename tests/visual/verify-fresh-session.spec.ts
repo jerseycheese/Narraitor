@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { waitForComponentState } from './utils/wait-helpers';
 import { getTimestamp } from '@/lib/utils';
 
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
@@ -413,7 +412,11 @@ test.describe('Fresh GameSession skeleton → content', () => {
 
     // If still world-not-found, retry reseed + reload once more
     const worldNotFound = page.getByText('World Not Found');
-    if (await worldNotFound.isVisible().catch(() => false)) {
+    const worldNotFoundVisible = await worldNotFound.isVisible().catch((error) => {
+      console.log(`Error checking worldNotFound visibility: ${(error as Error).message}`);
+      return false;
+    });
+    if (worldNotFoundVisible) {
       await page.evaluate(
         ({ getTimestampSource }) => {
           const instantiateGetTimestamp = (source: string) =>
@@ -451,7 +454,11 @@ test.describe('Fresh GameSession skeleton → content', () => {
 
     // Click the in-page Start Session button (most reliable to start a session)
     const startSession = page.getByRole('button', { name: /start session/i });
-    if (await startSession.isVisible().catch(() => false)) {
+    const startSessionVisible = await startSession.isVisible().catch((error) => {
+      console.log(`Error checking start session visibility: ${(error as Error).message}`);
+      return false;
+    });
+    if (startSessionVisible) {
       await startSession.click();
     }
 
@@ -496,15 +503,12 @@ test.describe('Fresh GameSession skeleton → content', () => {
     // Choices panel should render (selector or skeleton fallback while choices load)
     const choiceSelector = page.locator('[data-testid="choice-selector"]');
     const choiceFallback = page.locator('#choices-container .player-choices-container');
-    await waitForComponentState(
-      page,
-      'body',
-      () => {
-        return Boolean(
+    await page.waitForFunction(
+      () =>
+        Boolean(
           document.querySelector('[data-testid="choice-selector"]') ||
             document.querySelector('#choices-container .player-choices-container')
-        );
-      },
+        ),
       { timeout: 10000 }
     );
     const hasChoices = await choiceSelector.isVisible();
