@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForComponentState } from './utils/wait-helpers';
 import { getTimestamp } from '@/lib/utils';
 
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
@@ -459,10 +460,11 @@ test.describe('Fresh GameSession skeleton → content', () => {
 
     // Skeleton should appear briefly
     const skeleton = page.locator('[data-testid="game-session-skeleton"]');
-    await skeleton
-      .first()
-      .waitFor({ state: 'visible', timeout: 5000 })
-      .catch(() => {});
+    try {
+      await skeleton.first().waitFor({ state: 'visible', timeout: 5000 });
+    } catch {
+      console.log('Skeleton did not appear - app initialized too quickly');
+    }
 
     // Then the active session container should become visible (allow time for AI/fallback)
     await page
@@ -475,18 +477,45 @@ test.describe('Fresh GameSession skeleton → content', () => {
         throw e;
       });
 
+    try {
+      await page.waitForFunction(
+        () => {
+          const narrativeStore = (window as any).useNarrativeStore?.getState?.();
+          if (!narrativeStore) return false;
+          const segments = narrativeStore.segments || {};
+          return Object.keys(segments).length > 0;
+        },
+        { timeout: 20000 }
+      );
+    } catch (e) {
+      console.log('--- Debug logs ---');
+      for (const l of logs) console.log(l);
+      throw e;
+    }
+
     // Choices panel should render (selector or skeleton fallback while choices load)
     const choiceSelector = page.locator('[data-testid="choice-selector"]');
     const choiceFallback = page.locator('#choices-container .player-choices-container');
-    const hasChoices = await choiceSelector.isVisible().catch(() => false);
+    await waitForComponentState(
+      page,
+      'body',
+      () => {
+        return Boolean(
+          document.querySelector('[data-testid="choice-selector"]') ||
+            document.querySelector('#choices-container .player-choices-container')
+        );
+      },
+      { timeout: 10000 }
+    );
+    const hasChoices = await choiceSelector.isVisible();
     if (!hasChoices) {
       await expect(choiceFallback).toBeVisible({ timeout: 10000 });
     }
 
     // Optional: click the first visible choice to confirm interactivity
-    if (await choiceSelector.isVisible().catch(() => false)) {
+    if (await choiceSelector.isVisible()) {
       const firstChoice = page.locator('[data-testid^="choice-option-"]').first();
-      if (await firstChoice.isVisible().catch(() => false)) {
+      if (await firstChoice.isVisible()) {
         await firstChoice.click();
       }
     }
