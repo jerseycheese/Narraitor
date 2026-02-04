@@ -153,7 +153,13 @@ function determineLossSignificance(
   item: InventoryItem,
   lossMetadata: LostItemMetadata
 ): 'minor' | 'major' | 'critical' {
-  // Quest items lost = CRITICAL
+  // Quest deliveries = major (important story milestone)
+  // Check this BEFORE quest-items to ensure delivered quest items aren't "critical"
+  if (lossMetadata.lossReason === 'delivered') {
+    return 'major';
+  }
+
+  // Quest items lost (stolen, destroyed, etc) = CRITICAL
   if (item.categoryId === 'quest-items') {
     return 'critical';
   }
@@ -163,11 +169,6 @@ function determineLossSignificance(
     ['equipment', 'valuables'].includes(item.categoryId) &&
     ['stolen', 'destroyed', 'dropped'].includes(lossMetadata.lossReason || '')
   ) {
-    return 'major';
-  }
-
-  // Quest deliveries = major (important story milestone)
-  if (lossMetadata.lossReason === 'delivered') {
     return 'major';
   }
 

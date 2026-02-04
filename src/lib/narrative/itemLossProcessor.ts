@@ -76,9 +76,10 @@ export async function processLostItems(
           );
 
           // Create journal entry (non-blocking)
+          // We pass a modified metadata object with the actual quantity removed
           void createJournalEntryForLoss(
             item.matchedInventoryItem,
-            item,
+            { ...item, quantity: item.quantityToRemove },
             characterId,
             sessionId
           );
