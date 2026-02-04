@@ -2,7 +2,6 @@
 
 import { useInventoryStore } from '@/state/inventoryStore';
 import {
-  getTimestamp,
   normalizeText,
   NORM_NAME,
 } from '@/lib/utils';

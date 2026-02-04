@@ -230,7 +230,7 @@ describe('itemLossProcessor', () => {
         .mockImplementationOnce(() => {
           throw new Error('Store failure');
         })
-        .mockImplementationOnce((characterId, itemId, qty) => {
+        .mockImplementationOnce((_characterId, _itemId, _qty) => {
           // Success for the second item
         });
 

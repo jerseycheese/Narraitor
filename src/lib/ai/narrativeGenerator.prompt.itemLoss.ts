@@ -1,4 +1,3 @@
-import { safeTrim } from '@/lib/utils';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { NarrativeStaticContentCache } from './narrativeGenerator.prompt.types';
 

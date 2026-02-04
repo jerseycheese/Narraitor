@@ -1,6 +1,6 @@
 import { safeTrim } from '@/lib/utils';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
-import type { GeneratedCharacterMetadata, ItemLossReason, LostItemMetadata } from '@/types/narrative.types';
+import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
 import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
 
