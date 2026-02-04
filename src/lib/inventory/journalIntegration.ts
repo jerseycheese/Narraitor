@@ -3,6 +3,7 @@
 import type { InventoryItem, InventoryAcquisitionMethod } from '@/types/inventory.types';
 import type { JournalEntry } from '@/types/journal.types';
 import type { EntityID } from '@/types/common.types';
+import type { LostItemMetadata } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
 
 /**
@@ -110,8 +111,6 @@ export function createAcquisitionJournalEntry(
     updatedAt: getTimestamp(),
   };
 }
-
-import type { LostItemMetadata } from '@/types/narrative.types';
 
 /**
  * Creates a journal entry for item loss/usage.

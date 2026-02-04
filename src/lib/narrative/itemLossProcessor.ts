@@ -67,6 +67,10 @@ export async function processLostItems(
           continue;
         }
 
+        if (item.quantityToRemove <= 0) {
+          continue;
+        }
+
         try {
           // Execute removal
           inventoryStore.removeItem(

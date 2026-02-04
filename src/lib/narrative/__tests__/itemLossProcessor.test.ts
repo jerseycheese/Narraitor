@@ -201,7 +201,7 @@ describe('itemLossProcessor', () => {
       expect(mockRemoveItem).not.toHaveBeenCalled();
     });
 
-    it('handles zero quantity by defaulting to 1', async () => {
+    it('handles zero quantity as no-op', async () => {
       const lossMetadata: LostItemMetadata = {
         name: 'Health Potion',
         quantity: 0,
@@ -209,15 +209,8 @@ describe('itemLossProcessor', () => {
 
       await processLostItems([lossMetadata], 'character-123', 'session-456');
 
-      // prepareItemForLoss sets quantityToRemove = requestedQuantity (0)
-      // but if matchedItem exists, and 0 > matchedItem.quantity (false), it stays 0.
-      // Wait, if quantity is 0, it removes 0? 
-      // Actually LostItemMetadata quantity? defaults to 1 in type definition comment.
-      // In code: const requestedQuantity = item.quantity ?? 1;
-      
-      expect(mockRemoveItem).toHaveBeenCalledWith('character-123', 'item-1', 0);
-      // Wait, if it's 0, maybe it shouldn't call removeItem? 
-      // Actually inventoryStore.removeItem with 0 probably does nothing.
+      // Zero quantity should result in no removal action
+      expect(mockRemoveItem).not.toHaveBeenCalled();
     });
 
     it("isolates errors so one failure doesn't block others", async () => {
