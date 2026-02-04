@@ -9,6 +9,7 @@ import {
   NarrativeGenerationResult,
   NarrativeSegment,
   GeneratedCharacterMetadata,
+  GenerationParameters,
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -200,6 +201,12 @@ export class NarrativeGenerator {
         );
 
         if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateSegment`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
           result = {
             ...result,
             metadata: {
@@ -280,7 +287,8 @@ export class NarrativeGenerator {
   async generateInitialScene(
     worldId: string,
     characterIds: string[],
-    sessionId?: string
+    sessionId?: string,
+    options?: { generationParameters?: GenerationParameters }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -426,6 +434,12 @@ export class NarrativeGenerator {
         );
 
         if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateInitialScene`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
           result = {
             ...result,
             metadata: {
@@ -453,7 +467,11 @@ export class NarrativeGenerator {
         }
       }
 
-      if (result.metadata.itemsLost && result.metadata.itemsLost.length > 0) {
+      if (
+        !options?.generationParameters?.disableItemLossProcessing &&
+        result.metadata.itemsLost &&
+        result.metadata.itemsLost.length > 0
+      ) {
         const characterId = characterIds[0];
         if (characterId && sessionId) {
           void processLostItems(
@@ -537,7 +555,8 @@ export class NarrativeGenerator {
     customAction?: {
       action: string;
       implicitSkills?: string[];
-    }
+    },
+    options?: { generationParameters?: GenerationParameters }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -621,6 +640,12 @@ export class NarrativeGenerator {
         );
 
         if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateSkillAcknowledgment`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
           result = {
             ...result,
             metadata: {
@@ -643,7 +668,11 @@ export class NarrativeGenerator {
         }
       }
 
-      if (result.metadata.itemsLost && result.metadata.itemsLost.length > 0) {
+      if (
+        !options?.generationParameters?.disableItemLossProcessing &&
+        result.metadata.itemsLost &&
+        result.metadata.itemsLost.length > 0
+      ) {
         const characterId = characterIds[0];
         const sessionId = narrativeContext.sessionId;
         if (characterId && sessionId) {
