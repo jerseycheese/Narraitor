@@ -71,6 +71,10 @@ export const formatNarrativeResponse = async (
       tags: extractedMetadata.tags || [getWorldGenre() || 'fantasy', 'narrative'],
       itemsAcquired:
         analyzedItems && analyzedItems.length > 0 ? analyzedItems : undefined,
+      itemsLost:
+        extractedMetadata.itemsLost && extractedMetadata.itemsLost.length > 0
+          ? extractedMetadata.itemsLost
+          : undefined,
       characters: extractedMetadata.characters,
       majorEvent: sanitizedMajorEvent,
     },

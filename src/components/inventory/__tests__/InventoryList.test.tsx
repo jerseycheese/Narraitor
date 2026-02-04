@@ -40,6 +40,13 @@ const createMockInventoryStore = (
 ): InventoryStore => {
   const items = overrides.items ?? {};
   const characterInventories = overrides.characterInventories ?? {};
+  const getCharacterItems =
+    overrides.getCharacterItems ??
+    jest.fn((id: string) =>
+      (characterInventories[id] ?? [])
+        .map((itemId) => items[itemId])
+        .filter((item): item is InventoryItem => Boolean(item))
+    );
 
   return {
     items,
@@ -66,7 +73,7 @@ const createMockInventoryStore = (
     addItem: jest.fn(),
     removeItem: jest.fn(),
     updateItemQuantity: jest.fn(),
-    getCharacterItems: jest.fn().mockReturnValue([]),
+    getCharacterItems,
     clearCharacterInventory: jest.fn(),
     useItem: jest.fn(),
     setGeneratingImage: jest.fn(),

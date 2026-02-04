@@ -811,6 +811,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       characters: metadata?.characters,
       speakerId: metadata?.speakerId,
       itemsAcquired: metadata?.itemsAcquired,
+      itemsLost: metadata?.itemsLost,
       endingId: metadata?.endingId,
       endingData: metadata?.endingData,
       tone: metadata?.tone,

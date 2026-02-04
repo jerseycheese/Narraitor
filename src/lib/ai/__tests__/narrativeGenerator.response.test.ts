@@ -1,3 +1,4 @@
+import { formatNarrativeResponse } from '../narrativeGenerator.response';
 import { parseNarrativeResponse } from '../narrativeGenerator.response.parse';
 import { normalizeNarrativeContent } from '../narrativeGenerator.response.normalize';
 import type { NarrativeExtractedMetadata } from '../narrativeGenerator.response.types';
@@ -29,5 +30,21 @@ describe('narrative response helpers', () => {
     );
 
     expect(normalized).toBe('Jordan nods.');
+  });
+
+  it('preserves itemsLost metadata when formatting response', async () => {
+    const response = {
+      content: `\n\n\`\`\`json\n{"content":"You drop the knife.","metadata":{"itemsLost":[{"name":"Rusted Knife","lossReason":"dropped","quantity":1}]}}\n\`\`\``,
+    };
+
+    const geminiClient = {
+      generateContent: jest.fn(),
+    };
+
+    const result = await formatNarrativeResponse(response, 'scene', geminiClient);
+
+    expect(result.metadata.itemsLost).toEqual([
+      { name: 'Rusted Knife', lossReason: 'dropped', quantity: 1 },
+    ]);
   });
 });

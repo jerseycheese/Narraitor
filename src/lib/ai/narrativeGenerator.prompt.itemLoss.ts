@@ -77,6 +77,7 @@ When your narrative describes the character using, losing, or giving away items,
 5. Each item needs: name (required), quantity (optional, default 1), lossReason (optional)
 6. For stackable items (like arrows), reducing quantity by 1 keeps the item with quantity-1
 7. Don't duplicate - same item lost once = one metadata entry
+8. Always include metadata.itemsLost in your JSON response (use [] if nothing was lost).
 
 **Examples**:
 
