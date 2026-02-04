@@ -9,6 +9,7 @@ import type { LostItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItem } from '@/types/inventory.types';
 import { createLossJournalEntry } from '@/lib/inventory/journalIntegration';
+import { logger } from '@/lib/utils/logger';
 
 type PreparedLossItem = LostItemMetadata & {
   normalizedName: string;
@@ -42,12 +43,14 @@ export async function processLostItems(
     return;
   }
 
+  logger.info(`Processing ${items.length} lost items for character ${characterId}`);
+
   const previous = processingQueue.get(characterId) ?? Promise.resolve();
 
   const tracked = previous
     .catch((err) => {
       // Prevent a failed prior job from blocking the queue
-      console.error('Previous item loss run failed', err);
+      logger.error('Previous item loss run failed', err);
     })
     .then(async () => {
       const inventoryStore = useInventoryStore.getState();
@@ -61,17 +64,20 @@ export async function processLostItems(
         const item = preparedItems[i];
 
         if (!item.matchedInventoryItem) {
-          console.warn(
-            `Could not find item "${item.name}" in inventory for removal. Skipping.`
+          logger.warn(
+            `Could not find item "${item.name}" in inventory for removal. Skipping.`,
+            { characterId, inventoryCount: characterItems.length }
           );
           continue;
         }
 
         if (item.quantityToRemove <= 0) {
+          logger.info(`Skipping removal of "${item.name}" as quantity is 0`);
           continue;
         }
 
         try {
+          logger.info(`Removing ${item.quantityToRemove}x "${item.matchedInventoryItem.name}" from inventory`);
           // Execute removal
           inventoryStore.removeItem(
             characterId,
@@ -89,7 +95,7 @@ export async function processLostItems(
           );
 
           if (item.adjustedQuantity) {
-            console.warn(
+            logger.warn(
               `Insufficient quantity for "${item.name}": requested ${item.quantity}, had ${item.matchedInventoryItem.quantity}. Removed all available.`
             );
           }
@@ -98,12 +104,12 @@ export async function processLostItems(
           await delayBetweenItems(i, preparedItems.length);
         } catch (err) {
           // Log error but continue processing remaining items
-          console.error(`Failed to remove item "${item.name}" from inventory:`, err);
+          logger.error(`Failed to remove item "${item.name}" from inventory:`, err);
         }
       }
     })
     .catch((err) => {
-      console.error('processLostItems encountered an unexpected error', err);
+      logger.error('processLostItems encountered an unexpected error', err);
     })
     .finally(() => {
       if (processingQueue.get(characterId) === tracked) {
@@ -217,7 +223,11 @@ async function createJournalEntryForLoss(
 
     journalStore.addEntry(sessionId, journalEntry);
   } catch (error) {
-    console.warn('Failed to create journal entry for item loss:', error);
+    logger.error('Failed to create journal entry for item loss:', {
+      error,
+      itemName: item.name,
+      characterId,
+    });
   }
 }
 

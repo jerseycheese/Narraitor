@@ -7,10 +7,24 @@ import type { LostItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 import type { InventoryItem } from '@/types/inventory.types';
 import { createLossJournalEntry } from '@/lib/inventory/journalIntegration';
+import { logger } from '@/lib/utils/logger';
 
 // Mock the dependencies
 jest.mock('@/state/inventoryStore');
 jest.mock('@/lib/inventory/checkItemSimilarityClient');
+jest.mock('@/lib/utils/logger', () => {
+  const mockLogger = {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  };
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => mockLogger),
+    logger: mockLogger,
+  };
+});
 jest.mock('@/state/journalStore', () => ({
   useJournalStore: {
     getState: jest.fn(() => ({
@@ -39,12 +53,10 @@ describe('itemLossProcessor', () => {
   const mockCheckSimilarity = checkItemSimilarityClient as jest.MockedFunction<
     typeof checkItemSimilarityClient
   >;
-  let warnSpy: jest.SpyInstance;
   let characterItems: InventoryItem[];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     
     // Initial inventory
     characterItems = [
@@ -81,7 +93,7 @@ describe('itemLossProcessor', () => {
       return { similar: false, confidence: 0.1, rationale: 'No match' };
     });
 
-    mockRemoveItem = jest.fn((characterId: string, itemId: string, quantity?: number) => {
+    mockRemoveItem = jest.fn((_characterId: string, itemId: string, quantity?: number) => {
       const target = characterItems.find((item) => item.id === itemId);
       if (target) {
         const removeQty = quantity ?? target.quantity;
@@ -101,10 +113,6 @@ describe('itemLossProcessor', () => {
         getCharacterItems: mockGetCharacterItems,
       })
     );
-  });
-
-  afterEach(() => {
-    warnSpy?.mockRestore();
   });
 
   describe('processLostItems', () => {
@@ -157,7 +165,10 @@ describe('itemLossProcessor', () => {
 
       await processLostItems(items, 'character-123', 'session-456');
 
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Could not find item "Non-existent Item"'));
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Could not find item "Non-existent Item"'),
+        expect.any(Object)
+      );
       expect(mockRemoveItem).toHaveBeenCalledTimes(1);
       expect(mockRemoveItem).toHaveBeenCalledWith('character-123', 'item-1', 1);
     });
@@ -171,7 +182,9 @@ describe('itemLossProcessor', () => {
       await processLostItems([lossMetadata], 'character-123', 'session-456');
 
       expect(mockRemoveItem).toHaveBeenCalledWith('character-123', 'item-1', 3);
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Insufficient quantity for "Health Potion"'));
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Insufficient quantity for "Health Potion"')
+      );
     });
 
     it('uses semantic matching to find items', async () => {

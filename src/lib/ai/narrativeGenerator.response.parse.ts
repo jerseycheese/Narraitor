@@ -90,8 +90,8 @@ export const parseNarrativeResponse = (
                   };
                 })
               : undefined,
-            itemsLost: Array.isArray(parsed?.metadata?.itemsLost)
-              ? parsed?.metadata?.itemsLost
+            itemsLost: Array.isArray(parsed?.metadata?.itemsLost || parsed?.itemsLost)
+              ? (parsed?.metadata?.itemsLost || parsed?.itemsLost)
                   .map((item: unknown) => {
                     const rawItem = item as {
                       name: string;

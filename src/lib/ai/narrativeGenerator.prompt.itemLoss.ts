@@ -42,17 +42,19 @@ When your narrative describes the character using, losing, or giving away items,
 - Items given as gifts
 - Items sacrificed or consumed in rituals
 
-**Metadata Structure**:
+**Metadata Structure (inside the "metadata" object)**:
 \`\`\`json
 {
-  "itemsLost": [
-    {
-      "name": "Health Potion",
-      "quantity": 1,
-      "lossReason": "consumed",
-      "lossContext": "Drank to recover from wounds"
-    }
-  ]
+  "metadata": {
+    "itemsLost": [
+      {
+        "name": "Health Potion",
+        "quantity": 1,
+        "lossReason": "consumed",
+        "lossContext": "Drank to recover from wounds"
+      }
+    ]
+  }
 }
 \`\`\`
 
@@ -68,7 +70,7 @@ When your narrative describes the character using, losing, or giving away items,
 - unknown: When reason unclear
 
 **Critical Rules**:
-1. Only emit for items the character CURRENTLY HAS (see inventory above)
+1. Emit itemsLost metadata whenever the narrative describes the character losing, using, or discarding an item.
 2. Use the item name from the inventory list that best matches the item in the narrative.
 3. Quantity cannot exceed current inventory quantity
 4. Don't emit for items merely mentioned - only actual usage/loss
