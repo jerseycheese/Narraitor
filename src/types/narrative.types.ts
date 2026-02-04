@@ -148,6 +148,28 @@ export interface AcquiredItemMetadata {
   refinesPrevious?: boolean;
 }
 
+/**
+ * Represents an item lost or consumed during narrative generation
+ */
+export interface LostItemMetadata {
+  name: string; // Item name for semantic matching
+  itemId?: EntityID; // Optional exact ID (takes precedence)
+  quantity?: number; // Defaults to 1
+  lossReason?: ItemLossReason; // How/why lost
+  lossContext?: string; // Narrative context
+}
+
+export type ItemLossReason =
+  | 'consumed' // Used up (consumables, food, medicine)
+  | 'delivered' // Quest completion/delivery to NPC
+  | 'stolen' // Taken by NPC/enemy
+  | 'dropped' // Abandoned/left behind
+  | 'destroyed' // Broken/ruined/damaged beyond use
+  | 'sold' // Traded to merchant
+  | 'gifted' // Given to NPC as present
+  | 'sacrificed' // Ritual/special use
+  | 'unknown'; // Fallback when AI doesn't specify
+
 export interface GeneratedCharacterMetadata {
   id: EntityID;
   name: string;
@@ -231,6 +253,8 @@ export interface NarrativeMetadata {
   tone?: EndingTone;
   // Item acquisition metadata
   itemsAcquired?: AcquiredItemMetadata[];
+  // Item loss metadata
+  itemsLost?: LostItemMetadata[];
   // Major event tracking
   majorEvent?: string;
   // Decision consequence tracking (Issue #971)
@@ -301,6 +325,12 @@ export interface GenerationParameters {
    * existing items (e.g., item usage) where no new pickups should be recorded.
    */
   disableItemAcquisitionProcessing?: boolean;
+  /**
+   * When true, skips the post-processing step that turns AI metadata.itemsLost
+   * into actual inventory removals. Useful when generating narrative that mentions
+   * items but shouldn't trigger removal.
+   */
+  disableItemLossProcessing?: boolean;
 }
 
 /**
@@ -331,6 +361,8 @@ export interface NarrativeGenerationResult {
     };
     // Item acquisition metadata
     itemsAcquired?: AcquiredItemMetadata[];
+    // Item loss metadata
+    itemsLost?: LostItemMetadata[];
     // Major event tracking
     majorEvent?: string;
     // Debug information (dev mode only)

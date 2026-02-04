@@ -1,8 +1,8 @@
 import { safeTrim } from '@/lib/utils';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
-import type { GeneratedCharacterMetadata } from '@/types/narrative.types';
+import type { GeneratedCharacterMetadata, ItemLossReason, LostItemMetadata } from '@/types/narrative.types';
 import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
-import { validateMood } from './narrativeGenerator.response.helpers';
+import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
 
 export const parseNarrativeResponse = (
   response: { content?: string },
@@ -89,6 +89,26 @@ export const parseNarrativeResponse = (
                       rawItem.acquisitionMethod as InventoryAcquisitionMethod,
                   };
                 })
+              : undefined,
+            itemsLost: Array.isArray(parsed?.metadata?.itemsLost)
+              ? parsed?.metadata?.itemsLost
+                  .map((item: unknown) => {
+                    const rawItem = item as {
+                      name: string;
+                      itemId?: string;
+                      quantity?: number;
+                      lossReason?: string;
+                      lossContext?: string;
+                    };
+                    return {
+                      name: rawItem.name,
+                      itemId: rawItem.itemId,
+                      quantity: rawItem.quantity,
+                      lossReason: validateLossReason(rawItem.lossReason),
+                      lossContext: rawItem.lossContext,
+                    } as LostItemMetadata;
+                  })
+                  .filter((item: LostItemMetadata) => Boolean(item.name))
               : undefined,
             characters: Array.isArray(parsed?.metadata?.characters)
               ? parsed.metadata.characters

@@ -13,3 +13,6 @@ export { enhancePromptWithInventory } from './narrativeGenerator.prompt.inventor
 export {
   enhancePromptWithItemAcquisitionInstructions,
 } from './narrativeGenerator.prompt.itemAcquisition';
+export {
+  enhancePromptWithItemLossInstructions,
+} from './narrativeGenerator.prompt.itemLoss';

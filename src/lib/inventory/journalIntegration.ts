@@ -110,3 +110,124 @@ export function createAcquisitionJournalEntry(
     updatedAt: getTimestamp(),
   };
 }
+
+import type { LostItemMetadata } from '@/types/narrative.types';
+
+/**
+ * Creates a journal entry for item loss/usage.
+ * Uses INVERSE significance from acquisition (losing quest items = critical, not major).
+ */
+export function createLossJournalEntry(
+  item: InventoryItem,
+  lossMetadata: LostItemMetadata,
+  worldId: EntityID,
+  characterId: EntityID
+): Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> {
+  const significance = determineLossSignificance(item, lossMetadata);
+  const content = formatLossContext(item, lossMetadata);
+
+  return {
+    worldId,
+    characterId,
+    type: 'item_usage',
+    title: formatLossTitle(item, lossMetadata),
+    content,
+    significance,
+    isRead: false,
+    relatedEntities: [
+      {
+        type: 'item',
+        id: item.id,
+        name: item.name,
+      },
+    ],
+    metadata: {
+      tags: [item.categoryId, lossMetadata.lossReason || 'unknown'],
+      automaticEntry: true,
+    },
+    updatedAt: getTimestamp(),
+  };
+}
+
+function determineLossSignificance(
+  item: InventoryItem,
+  lossMetadata: LostItemMetadata
+): 'minor' | 'major' | 'critical' {
+  // Quest items lost = CRITICAL
+  if (item.categoryId === 'quest-items') {
+    return 'critical';
+  }
+
+  // Equipment/valuables stolen/destroyed = major
+  if (
+    ['equipment', 'valuables'].includes(item.categoryId) &&
+    ['stolen', 'destroyed', 'dropped'].includes(lossMetadata.lossReason || '')
+  ) {
+    return 'major';
+  }
+
+  // Quest deliveries = major (important story milestone)
+  if (lossMetadata.lossReason === 'delivered') {
+    return 'major';
+  }
+
+  // Consumables used normally = minor
+  return 'minor';
+}
+
+function formatLossTitle(
+  item: InventoryItem,
+  lossMetadata: LostItemMetadata
+): string {
+  const reason = lossMetadata.lossReason;
+
+  switch (reason) {
+    case 'consumed':
+      return `Used: ${item.name}`;
+    case 'delivered':
+      return `Delivered: ${item.name}`;
+    case 'stolen':
+      return `Stolen: ${item.name}`;
+    case 'destroyed':
+      return `Destroyed: ${item.name}`;
+    case 'dropped':
+      return `Abandoned: ${item.name}`;
+    case 'sold':
+      return `Sold: ${item.name}`;
+    case 'gifted':
+      return `Gifted: ${item.name}`;
+    case 'sacrificed':
+      return `Sacrificed: ${item.name}`;
+    default:
+      return `Lost: ${item.name}`;
+  }
+}
+
+function formatLossContext(
+  item: InventoryItem,
+  lossMetadata: LostItemMetadata
+): string {
+  const parts: string[] = [];
+
+  // Quantity
+  if (lossMetadata.quantity && lossMetadata.quantity > 1) {
+    parts.push(`Lost ${lossMetadata.quantity}x ${item.name}`);
+  } else {
+    parts.push(`Lost ${item.name}`);
+  }
+
+  // Category
+  parts.push(`Category: ${item.categoryId}`);
+
+  // Reason
+  if (lossMetadata.lossReason) {
+    parts.push(`Reason: ${lossMetadata.lossReason}`);
+  }
+
+  // Narrative context
+  if (lossMetadata.lossContext) {
+    parts.push(lossMetadata.lossContext);
+  }
+
+  return parts.join(' • ');
+}

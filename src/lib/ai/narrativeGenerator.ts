@@ -20,8 +20,10 @@ import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
+import { processLostItems } from '@/lib/narrative/itemLossProcessor';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { logger } from '@/lib/utils/logger';
+import { useInventoryStore } from '@/state/inventoryStore';
 import {
   buildPromptDebugInfo,
   isDebugInfoEnabled,
@@ -36,6 +38,7 @@ import {
   convertToPersonalizationCharacter,
   enhancePromptWithInventory,
   enhancePromptWithItemAcquisitionInstructions,
+  enhancePromptWithItemLossInstructions,
   enhancePromptWithGoalContext,
   enhancePromptWithLore,
   enhancePromptWithPersonalization,
@@ -115,10 +118,23 @@ export class NarrativeGenerator {
         request.characterIds || [],
         budget
       );
-      const fullyEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
+
+      // Fetch character inventory for loss context
+      const characterIdForLoss = request.characterIds?.[0];
+      const characterInventory = characterIdForLoss
+        ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
+        : [];
+
+      const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
         this.staticContentCache,
         budget
+      );
+
+      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
+        acquisitionEnhancedPrompt,
+        this.staticContentCache,
+        characterInventory
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
@@ -215,6 +231,22 @@ export class NarrativeGenerator {
         }
       }
 
+      // Process item losses (parallel to acquisition processing)
+      if (
+        !request.generationParameters?.disableItemLossProcessing &&
+        result.metadata.itemsLost &&
+        result.metadata.itemsLost.length > 0
+      ) {
+        const characterId = request.characterIds?.[0];
+        if (characterId && request.sessionId) {
+          void processLostItems(
+            result.metadata.itemsLost,
+            characterId,
+            request.sessionId
+          );
+        }
+      }
+
       this.syncNpcMetadata(request.worldId, result.metadata.characters);
 
       return result;
@@ -286,10 +318,23 @@ export class NarrativeGenerator {
         characterIds,
         budget
       );
-      const fullyEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
+
+      // Fetch character inventory for loss context
+      const characterIdForLoss = characterIds[0];
+      const characterInventory = characterIdForLoss
+        ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
+        : [];
+
+      const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
         this.staticContentCache,
         budget
+      );
+
+      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
+        acquisitionEnhancedPrompt,
+        this.staticContentCache,
+        characterInventory
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
@@ -361,6 +406,17 @@ export class NarrativeGenerator {
         if (characterId && sessionId) {
           void processAcquiredItems(
             result.metadata.itemsAcquired,
+            characterId,
+            sessionId
+          );
+        }
+      }
+
+      if (result.metadata.itemsLost && result.metadata.itemsLost.length > 0) {
+        const characterId = characterIds[0];
+        if (characterId && sessionId) {
+          void processLostItems(
+            result.metadata.itemsLost,
             characterId,
             sessionId
           );
@@ -481,10 +537,23 @@ export class NarrativeGenerator {
         characterIds,
         budget
       );
-      const fullyEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
+
+      // Fetch character inventory for loss context
+      const characterIdForLoss = characterIds[0];
+      const characterInventory = characterIdForLoss
+        ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
+        : [];
+
+      const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
         this.staticContentCache,
         budget
+      );
+
+      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
+        acquisitionEnhancedPrompt,
+        this.staticContentCache,
+        characterInventory
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
@@ -503,6 +572,18 @@ export class NarrativeGenerator {
         if (characterId && sessionId) {
           void processAcquiredItems(
             result.metadata.itemsAcquired,
+            characterId,
+            sessionId
+          );
+        }
+      }
+
+      if (result.metadata.itemsLost && result.metadata.itemsLost.length > 0) {
+        const characterId = characterIds[0];
+        const sessionId = narrativeContext.sessionId;
+        if (characterId && sessionId) {
+          void processLostItems(
+            result.metadata.itemsLost,
             characterId,
             sessionId
           );

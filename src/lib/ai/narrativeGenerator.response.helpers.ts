@@ -1,5 +1,6 @@
 import { useWorldStore } from '@/state/worldStore';
 import { safeTrim } from '@/lib/utils';
+import type { ItemLossReason } from '@/types/narrative.types';
 
 export const normalizeId = (id?: string | null): string | undefined => {
   if (!id || typeof id !== 'string') {
@@ -76,6 +77,26 @@ export const validateMood = (
         | 'relaxed'
         | 'action'
         | 'emotional')
+    : undefined;
+};
+
+export const validateLossReason = (
+  reason?: string
+): ItemLossReason | undefined => {
+  const validReasons: ItemLossReason[] = [
+    'consumed',
+    'delivered',
+    'stolen',
+    'dropped',
+    'destroyed',
+    'sold',
+    'gifted',
+    'sacrificed',
+    'unknown',
+  ];
+
+  return validReasons.includes(reason as ItemLossReason)
+    ? (reason as ItemLossReason)
     : undefined;
 };
 
