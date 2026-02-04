@@ -69,14 +69,18 @@ When your narrative describes the character using, losing, or giving away items,
 
 **Critical Rules**:
 1. Only emit for items the character CURRENTLY HAS (see inventory above)
-2. Match item names EXACTLY as shown in inventory
+2. Use the item name from the inventory list that best matches the item in the narrative.
 3. Quantity cannot exceed current inventory quantity
 4. Don't emit for items merely mentioned - only actual usage/loss
 5. Each item needs: name (required), quantity (optional, default 1), lossReason (optional)
-6. For stackable items losing multiple: use single entry with quantity, not multiple entries
+6. For stackable items (like arrows), reducing quantity by 1 keeps the item with quantity-1
 7. Don't duplicate - same item lost once = one metadata entry
 
 **Examples**:
+
+*Inventory: - Rusty Iron Sword (1x) [equipment]*
+*Narrative: "You throw your sword into the abyss."*
+→ itemsLost: [{ "name": "Rusty Iron Sword", "lossReason": "dropped" }]
 
 *Narrative: "You drink the health potion, feeling warmth spread through your body."*
 → itemsLost: [{ "name": "Health Potion", "quantity": 1, "lossReason": "consumed" }]
