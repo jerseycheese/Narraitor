@@ -27,16 +27,6 @@ import {
 
 type SessionStatusLookup = (sessionId: EntityID) => SessionLifecycleStatus | undefined;
 
-// Re-export moved functions for backward compatibility
-export { recordMajorEvent, recordStoryCheckpoint } from './events';
-export {
-  updateNPCRelationship,
-  updateCharacterRelationship,
-  updatePlayerCharacterThread,
-  removePlayerCharacterThreads,
-  removeCharacterRelationshipEdges,
-} from './relationships';
-
 // === Public API ===
 
 export const detectConflict = (currentVersion: number, incomingVersion: number): boolean =>
