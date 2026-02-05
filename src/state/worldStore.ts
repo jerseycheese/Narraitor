@@ -9,7 +9,7 @@ import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/l
 import { CrudStore } from './createCrudStore';
 import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
-import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
+import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world';
 import Logger from '@/lib/utils/logger';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 

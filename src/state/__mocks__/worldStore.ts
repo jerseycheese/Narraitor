@@ -5,7 +5,7 @@ import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.
 import { formatForDebug, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '@/types/world-state.types';
-import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world/worldStateManager';
+import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world';
 
 interface MockWorldState {
   worlds: Record<string, World>;

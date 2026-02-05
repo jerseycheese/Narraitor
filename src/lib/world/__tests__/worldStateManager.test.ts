@@ -6,7 +6,7 @@ import {
   detectConflict,
   mergeState,
   applyWorldStateUpdate,
-} from '../worldStateManager';
+} from '../index';
 import { createEmptyWorldState } from '@/types/world-state.types';
 
 describe('worldStateManager', () => {
