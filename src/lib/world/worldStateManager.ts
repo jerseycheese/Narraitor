@@ -5,8 +5,8 @@ import {
   WorldState,
   WorldStateUpdate,
   NPCRelationshipState,
-  SessionLifecycleStatus,
 } from '@/types/world-state.types';
+import { SessionLifecycleStatus } from '@/types/session.types';
 import {
   ensureState,
   mergeRelationships,
