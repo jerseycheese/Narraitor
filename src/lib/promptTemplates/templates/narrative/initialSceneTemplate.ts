@@ -105,6 +105,7 @@ Response Format (CRITICAL - must be valid JSON):
     "mood": "mysterious",
     "location": "Starting location",
     "tags": ["opening", "introduction"],
+    "itemsLost": [],
     "majorEvent": "Review the content field above. If it contains a CONSEQUENTIAL story beat (critical decision, major revelation, relationship shift, goal progress, or story-changing event), summarize THAT SPECIFIC MOMENT in one short clause (max 18 words). Otherwise null. This must describe what ACTUALLY HAPPENED in your narrative, not a generic description."
   }
 }

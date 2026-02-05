@@ -139,7 +139,8 @@ Response Format:
     ],
     "mood": "appropriate mood based on success/failure",
     "location": "${narrativeContext?.currentLocation || 'current location'}",
-    "tags": ["skill-acknowledgment", "${skillUsed?.success ? 'skill-success' : 'skill-failure'}", "${skillUsed?.skillId || 'custom-action'}"]
+    "tags": ["skill-acknowledgment", "${skillUsed?.success ? 'skill-success' : 'skill-failure'}", "${skillUsed?.skillId || 'custom-action'}"],
+    "itemsLost": []
   }
 }`;
 };
