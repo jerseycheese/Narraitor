@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narraitor Design System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital,wght@0,400;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=Montserrat:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+    :root {
+      /* Colors */
+      --color-canvas: #fdfbf7; /* Warm Paper */
+      --color-surface: #ffffff;
+      --color-surface-hover: #f4f4f5;
+      --color-border: #e4e4e7;
+      --color-border-strong: #d4d4d8;
+      --color-text-primary: #111111; /* High-contrast Charcoal */
+      --color-text-secondary: #3f3f46;
+      --color-text-muted: #71717a;
+      
+      /* Mechanical Accent - Archival Ink Blue */
+      --color-accent: #312e81; /* Indigo-900 */
+      --color-accent-hover: #1e1b4b; /* Indigo-950 */
+      
+      /* Semantic Markup - Pen & Ink style */
+      --color-success: #065f46; /* Emerald-800 */
+      --color-error: #9f1239;   /* Rose-800 */
+      --color-warning: #92400e; /* Amber-800 */
+      --color-info: #075985;    /* Sky-800 */
+
+      /* Typography */
+      --font-narrative: 'Lora', serif;
+      --font-system: 'IBM Plex Mono', monospace;
+      --font-interface: 'IBM Plex Sans', sans-serif;
+
+      /* Spacing */
+      --spacing-unit: 24px;
+    }
+
+    [data-theme="dark"] {
+      --color-canvas: #09090b;
+      --color-surface: #18181b;
+      --color-surface-hover: #27272a;
+      --color-border: #3f3f46;
+      --color-border-strong: #52525b;
+      --color-text-primary: #fafafa;
+      --color-text-secondary: #d4d4d8;
+      --color-text-muted: #71717a;
+      
+      /* Dark mode ink - slightly more vibrant for visibility */
+      --color-accent: #818cf8;  /* Indigo-400 */
+      --color-accent-hover: #a5b4fc;
+      --color-success: #34d399; /* Emerald-400 */
+      --color-error: #fb7185;   /* Rose-400 */
+      --color-warning: #fbbf24; /* Amber-400 */
+      --color-info: #38bdf8;    /* Sky-400 */
+    }
+
+    body {
+      font-family: var(--font-interface);
+      background: var(--color-canvas);
+      color: var(--color-text-primary);
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      /* Mechanical drafting grid - graph paper style */
+      background:
+        linear-gradient(-90deg, rgba(0,0,0,.02) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.02) 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(0,0,0,.015) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.015) 1px, transparent 1px),
+        linear-gradient(transparent 3px, var(--color-canvas) 3px, var(--color-canvas) 69px, transparent 69px),
+        linear-gradient(-90deg, rgba(0,0,0,.04) 1px, transparent 1px),
+        linear-gradient(-90deg, transparent 3px, var(--color-canvas) 3px, var(--color-canvas) 69px, transparent 69px),
+        linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+        var(--color-canvas);
+      background-size:
+        6px 6px,
+        6px 6px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px;
+    }
+
+    [data-theme="dark"] body::before {
+      background:
+        linear-gradient(-90deg, rgba(255,255,255,.015) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(255,255,255,.01) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.01) 1px, transparent 1px),
+        linear-gradient(transparent 3px, var(--color-canvas) 3px, var(--color-canvas) 69px, transparent 69px),
+        linear-gradient(-90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(-90deg, transparent 3px, var(--color-canvas) 3px, var(--color-canvas) 69px, transparent 69px),
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        var(--color-canvas);
+      background-size:
+        6px 6px,
+        6px 6px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px,
+        72px 72px;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .font-narrative { font-family: var(--font-narrative); }
+    .font-system { font-family: var(--font-system); }
+    .font-interface { font-family: var(--font-interface); }
+    .text-narrative {
+      font-family: var(--font-narrative);
+      font-size: 1.125rem;
+      line-height: 1.75;
+      color: var(--color-text-primary);
+    }
+    .text-technical {
+      font-family: var(--font-system);
+      font-size: 0.875rem;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .text-ui {
+      font-family: var(--font-interface);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--color-text-primary);
+    }
+
+    .swatch {
+      height: 60px;
+      border-radius: 4px;
+      border: 1px solid var(--color-border);
+    }
+
+    .section {
+      border-bottom: 1px solid var(--color-border);
+      padding: 48px 0;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    code {
+      background: var(--color-surface-hover);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: var(--font-system);
+      font-size: 0.875rem;
+    }
+
+    body a {
+      color: var(--color-accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: all 0.15s;
+    }
+
+    body a:hover {
+      color: var(--color-accent-hover);
+    }
+
+    /* Sticky Navigation */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-canvas);
+      border-bottom: 1px solid var(--color-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    [data-theme="dark"] .sticky-nav {
+      background: rgba(9, 9, 11, 0.95);
+    }
+
+    .nav-burger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-burger:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-border-strong);
+    }
+
+    .nav-burger svg {
+      width: 20px;
+      height: 20px;
+      color: var(--color-text-primary);
+    }
+
+    .nav-link {
+      display: block;
+      padding: 8px 12px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      color: var(--color-text-secondary) !important;
+      text-decoration: none !important;
+      font-size: 11px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .nav-link:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-accent);
+      color: var(--color-accent) !important;
+    }
+
+    .text-muted { color: var(--color-text-muted); }
+
+    .category-header {
+      padding: 12px 0;
+      border-bottom: 2px solid var(--color-text-primary);
+      margin-top: 64px;
+      margin-bottom: 32px;
+      font-family: var(--font-system);
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--color-canvas);
+      border-bottom: 1px solid var(--color-border);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .nav-dropdown {
+      background: rgba(9, 9, 11, 0.98);
+    }
+
+    .nav-dropdown.open {
+      max-height: 600px;
+    }
+
+    /* Skip Link */
+    body .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--color-accent);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-size: 14px;
+      z-index: 1000;
+      border-radius: 0 0 4px 0;
+      font-family: var(--font-interface);
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div class="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
+        <div>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2" style="color: var(--color-text-primary);">Narraitor Design System</h1>
+          <p class="text-sm sm:text-base md:text-lg" style="color: var(--color-text-muted);">The "Mechanical Manuscript" — A Paper & Ink aesthetic for AI storytelling</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Navigation -->
+    <nav class="sticky-nav" aria-label="Design system navigation">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+        <button
+          id="nav-toggle"
+          class="nav-burger font-system text-xs"
+          onclick="toggleNav()"
+          aria-label="Navigation menu"
+          aria-expanded="false"
+          aria-controls="nav-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <span class="hidden sm:inline">NAVIGATION</span>
+        </button>
+
+        <button onclick="toggleTheme()" class="nav-burger font-system text-xs flex items-center gap-2" aria-label="Toggle dark mode">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+          <span class="hidden sm:inline">THEME</span>
+        </button>
+      </div>
+
+      <div id="nav-dropdown" class="nav-dropdown" aria-hidden="true">
+        <div class="max-w-6xl mx-auto px-8 py-8">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-system">
+            
+            <!-- Group 1: System -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">SYSTEM</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#philosophy" class="nav-link" onclick="closeNav()">PHILOSOPHY</a>
+                <a href="#variables" class="nav-link" onclick="closeNav()">VARIABLES</a>
+                <a href="#tokens" class="nav-link" onclick="closeNav()">TOKENS</a>
+                <a href="#grid" class="nav-link" onclick="closeNav()">GRID & BREAKPOINTS</a>
+              </div>
+            </div>
+
+            <!-- Group 2: Foundations -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">FOUNDATIONS</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#colors" class="nav-link" onclick="closeNav()">COLORS</a>
+                <a href="#typography" class="nav-link" onclick="closeNav()">TYPOGRAPHY</a>
+                <a href="#spacing" class="nav-link" onclick="closeNav()">SPACING</a>
+                <a href="#icons" class="nav-link" onclick="closeNav()">ICONOGRAPHY</a>
+                <a href="#elevation" class="nav-link" onclick="closeNav()">ELEVATION & RADIUS</a>
+              </div>
+            </div>
+
+            <!-- Group 3: Components -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">COMPONENTS</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#components" class="nav-link" onclick="closeNav()">CORE UI</a>
+                <a href="#examples" class="nav-link" onclick="closeNav()">EXAMPLES</a>
+                <a href="#mechanics" class="nav-link" onclick="closeNav()">GAME MECHANICS</a>
+                <a href="#states" class="nav-link" onclick="closeNav()">INTERACTIVE STATES</a>
+              </div>
+            </div>
+
+            <!-- Group 4: Experience -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">EXPERIENCE</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#layout" class="nav-link" onclick="closeNav()">LAYOUT ARCHETYPES</a>
+                <a href="#a11y" class="nav-link" onclick="closeNav()">ACCESSIBILITY</a>
+                <a href="#motion" class="nav-link" onclick="closeNav()">MOTION</a>
+                <a href="#content" class="nav-link" onclick="closeNav()">CONTENT & VOICE</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main id="main-content" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+      <div class="category-header">01. System</div>
+
+      <!-- Philosophy -->
+      <section class="section py-8 md:py-12" id="philosophy">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-4 md:mb-6">Design Philosophy</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div>
+            <h3 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">THE CONCEPT</h3>
+            <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">A fusion of long-form digital journalism and architectural drafting. The app is the "Drafting Table," and the story is the "Manuscript."</p>
+          </div>
+          <div>
+            <h3 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">THE GOAL</h3>
+            <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">A "blank canvas" that feels premium and intentional. It doesn't compete with the AI's genre; it frames it.</p>
+          </div>
+          <div>
+            <h3 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">NEUTRALITY</h3>
+            <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">Use a "Paper & Ink" palette with a single functional accent color for interactions.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CSS Variables -->
+      <section class="section" id="variables">
+        <h2 class="text-2xl font-semibold mb-6">CSS Variables</h2>
+        <div class="p-6 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">:root {
+  /* Colors */
+  --color-canvas: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-text-primary: #18181b;
+  --color-text-secondary: #3f3f46;
+  --color-text-muted: #71717a;
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+
+  /* Typography */
+  --font-narrative: 'Lora', serif;
+  --font-system: 'IBM Plex Mono', monospace;
+  --font-interface: 'IBM Plex Sans', sans-serif;
+
+  /* Spacing */
+  --spacing-unit: 24px;
+}
+
+[data-theme="dark"] {
+  --color-canvas: #09090b;
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+  --color-border: #3f3f46;
+  --color-border-strong: #52525b;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #d4d4d8;
+  --color-text-muted: #71717a;
+}</pre>
+        </div>
+      </section>
+
+      <div class="category-header">02. Foundations</div>
+
+      <!-- Colors -->
+      <section class="section py-8 md:py-12" id="colors">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Color Palette</h2>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Base Colors</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div>
+              <div class="swatch" style="background: #fafafa;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-50</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#fafafa</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Canvas (light)</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #ffffff; border: 1px solid #e4e4e7;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">white</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#ffffff</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Surfaces</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #f4f4f5;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-100</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#f4f4f5</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Hover states</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #e4e4e7;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-200</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#e4e4e7</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Borders</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #d4d4d8;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-300</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#d4d4d8</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Input borders</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-2">Full Zinc Neutral Scale (Reference)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Complete neutral ramp used for surfaces, typography, borders, and dark mode tokens.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #fafafa; border: 1px solid #e4e4e7;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-50</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#fafafa</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #f4f4f5;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-100</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#f4f4f5</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #e4e4e7;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-200</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#e4e4e7</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #d4d4d8;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-300</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#d4d4d8</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #a1a1aa;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-400</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#a1a1aa</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #71717a;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-500</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#71717a</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #52525b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-600</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#52525b</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #3f3f46;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-700</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#3f3f46</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #27272a;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-800</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#27272a</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #18181b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-900</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#18181b</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #09090b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-950</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#09090b</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Text Colors</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div>
+              <div class="swatch" style="background: #18181b;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-900</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#18181b</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Primary text</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #3f3f46;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-700</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#3f3f46</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Secondary text</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: #71717a;"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">zinc-500</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">#71717a</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Muted text</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-base sm:text-lg font-medium mb-4">Accent Color (Archival Ink)</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div>
+              <div class="swatch" style="background: var(--color-accent);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">indigo-900</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">var(--color-accent)</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Primary Actions</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: var(--color-accent-hover);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">indigo-950</div>
+                <div class="font-system text-xs" style="color: var(--color-text-muted);">var(--color-accent-hover)</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Hover/Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h3 class="text-base sm:text-lg font-medium mb-2">Contrast Pairing Matrix</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Ratios below use WCAG contrast math and represent the core text/UI pairings used in this prototype. Re-check these exact pairs in WebAIM before production migration.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Primary on Canvas <span class="font-system">18.27:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Secondary on Canvas <span class="font-system">10.10:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Muted on Canvas <span class="font-system">4.68:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Accent on Canvas <span class="font-system">11.05:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">White on Accent Button <span class="font-system">11.42:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Success on Canvas <span class="font-system">7.43:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Error on Canvas <span class="font-system">7.76:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Warning on Canvas <span class="font-system">6.86:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Info on Canvas <span class="font-system">7.32:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Text Primary on Dark Canvas <span class="font-system">19.06:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Text Secondary on Dark Canvas <span class="font-system">13.46:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Canvas Text on Dark Accent <span class="font-system">6.67:1</span> (AA pass)</div>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Semantic Markup (Pen & Ink)</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div>
+              <div class="swatch" style="background: var(--color-success);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">emerald-800</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Success / Growth</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: var(--color-error);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rose-800</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Error / Destruction</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: var(--color-warning);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">amber-800</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Warning / Caution</div>
+              </div>
+            </div>
+            <div>
+              <div class="swatch" style="background: var(--color-info);"></div>
+              <div class="mt-2">
+                <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">sky-800</div>
+                <div class="text-xs mt-1" style="color: var(--color-text-muted);">Info / Reference</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Typography -->
+      <section class="section py-8 md:py-12" id="typography">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Typography</h2>
+
+        <div class="space-y-8">
+          <!-- Narrative Font -->
+          <div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-baseline justify-between mb-4 gap-2">
+              <h3 class="text-base sm:text-lg font-medium">The Story (Serif)</h3>
+              <code>font-family: 'Lora', serif</code>
+            </div>
+            <div class="space-y-4">
+              <div class="font-narrative text-2xl sm:text-3xl md:text-4xl" style="color: var(--color-text-primary);">The old library stretched before you</div>
+              <div class="font-narrative text-xl sm:text-2xl" style="color: var(--color-text-primary);">Used for all AI-generated narration</div>
+              <div class="font-narrative text-base sm:text-lg leading-relaxed" style="color: var(--color-text-secondary);">
+                Dust motes danced in the pale light filtering through stained glass windows, each particle a tiny universe suspended in time. Your footsteps echoed on worn marble floors.
+              </div>
+            </div>
+          </div>
+
+          <!-- System Font -->
+          <div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-baseline justify-between mb-4 gap-2">
+              <h3 class="text-base sm:text-lg font-medium">The System (Monospace)</h3>
+              <code>font-family: 'IBM Plex Mono', monospace</code>
+            </div>
+            <div class="space-y-3">
+              <div class="font-system text-lg sm:text-xl" style="color: var(--color-text-primary);">HEALTH: 42/50</div>
+              <div class="font-system text-sm sm:text-base" style="color: var(--color-text-primary);">> EXAMINE_BOOK</div>
+              <div class="font-system text-xs sm:text-sm" style="color: var(--color-text-muted);">TURN 14 • LAST_SAVE: 2m ago</div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-muted);">Used for UI labels, dice results, and suggested actions</div>
+            </div>
+          </div>
+
+          <!-- Interface Font -->
+          <div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-baseline justify-between mb-4 gap-2">
+              <h3 class="text-base sm:text-lg font-medium">The Interface (Sans-Serif)</h3>
+              <code>font-family: 'IBM Plex Sans', sans-serif</code>
+            </div>
+            <div class="space-y-3">
+              <div class="font-interface text-lg sm:text-xl font-semibold" style="color: var(--color-text-primary);">Character Creation</div>
+              <div class="font-interface text-sm sm:text-base" style="color: var(--color-text-primary);">Continue to Attributes</div>
+              <div class="font-interface text-xs sm:text-sm" style="color: var(--color-text-secondary);">Let's start with the fundamentals of your character.</div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-muted);">Used for buttons and high-level navigation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 sm:p-6 rounded" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-xs sm:text-sm mb-3" style="color: var(--color-text-muted);">SCALE & LINE HEIGHT</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">Body Text</div>
+              <div style="color: var(--color-text-secondary);">18px / 1.6 line-height (Narrative)</div>
+            </div>
+            <div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">System Labels</div>
+              <div style="color: var(--color-text-secondary);">12-14px / 1.4 line-height</div>
+            </div>
+            <div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">Headings</div>
+              <div style="color: var(--color-text-secondary);">1.1-1.2 line-height</div>
+            </div>
+            <div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">Max Line Width</div>
+              <div style="color: var(--color-text-secondary);">768px (max-w-3xl)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heading Hierarchy -->
+        <div class="mt-12">
+          <h3 class="text-lg font-medium mb-6">Heading Hierarchy</h3>
+          <div class="space-y-6">
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h1</div>
+              <div class="flex-1">
+                <h1 class="font-interface text-4xl font-semibold" style="color: var(--color-text-primary); line-height: 1.1;">
+                  Page Title / Hero Heading
+                </h1>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  36px / 2.25rem • font-semibold • line-height: 1.1 • Interface font
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h2</div>
+              <div class="flex-1">
+                <h2 class="font-interface text-3xl font-semibold" style="color: var(--color-text-primary); line-height: 1.1;">
+                  Section Heading
+                </h2>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  30px / 1.875rem • font-semibold • line-height: 1.1 • Interface font
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h3</div>
+              <div class="flex-1">
+                <h3 class="font-interface text-2xl font-semibold" style="color: var(--color-text-primary); line-height: 1.2;">
+                  Subsection Heading
+                </h3>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  24px / 1.5rem • font-semibold • line-height: 1.2 • Interface font
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h4</div>
+              <div class="flex-1">
+                <h4 class="font-interface text-xl font-semibold" style="color: var(--color-text-primary); line-height: 1.2;">
+                  Component Heading
+                </h4>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  20px / 1.25rem • font-semibold • line-height: 1.2 • Interface font
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h5</div>
+              <div class="flex-1">
+                <h5 class="font-interface text-lg font-medium" style="color: var(--color-text-primary); line-height: 1.2;">
+                  Small Heading
+                </h5>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  18px / 1.125rem • font-medium • line-height: 1.2 • Interface font
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-6">
+              <div class="w-24 font-system text-xs" style="color: var(--color-text-muted);">h6</div>
+              <div class="flex-1">
+                <h6 class="font-interface text-base font-medium" style="color: var(--color-text-primary); line-height: 1.2;">
+                  Smallest Heading
+                </h6>
+                <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                  16px / 1rem • font-medium • line-height: 1.2 • Interface font
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Common Text Elements -->
+        <div class="mt-12">
+          <h3 class="text-lg font-medium mb-6">Common Text Elements</h3>
+
+          <div class="space-y-6">
+
+            <!-- Paragraph -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">PARAGRAPH (NARRATIVE)</div>
+              <p class="font-narrative text-lg leading-relaxed" style="color: var(--color-text-primary);">
+                The chamber opened before you, its vaulted ceiling disappearing into shadow. Ancient mechanisms lined the walls—gears frozen mid-turn, their purpose lost to time. In the center, upon a raised dais, sat a single leather-bound tome.
+              </p>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                18px • Narrative font (Serif) • 1.75 line-height • For AI-generated story content
+              </div>
+            </div>
+
+            <!-- Body Text -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">BODY TEXT (INTERFACE)</div>
+              <p class="font-interface text-base leading-normal" style="color: var(--color-text-secondary);">
+                This is standard interface body text used for descriptions, instructions, and utility content throughout the application. It uses the Interface font family for clarity and readability.
+              </p>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                16px • Interface font (Sans) • 1.5 line-height • For UI descriptions and instructions
+              </div>
+            </div>
+
+            <!-- System Labels -->
+            <div>
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">SYSTEM LABELS</div>
+              <div class="space-y-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">HEALTH: 42/50</div>
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">TURN_14</div>
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">STATUS: ACTIVE</div>
+              </div>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                14px • System font (Mono) • ALL_CAPS with underscores • Technical data labels
+              </div>
+            </div>
+
+            <!-- Lists -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">LISTS</div>
+              <ul class="font-narrative text-lg leading-relaxed space-y-1" style="color: var(--color-text-primary); list-style: disc; padding-left: 1.5rem;">
+                <li>Leather satchel (2.5kg)</li>
+                <li>Waterskin (0.8kg)</li>
+                <li>Travel rations (1.0kg)</li>
+              </ul>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                Use Narrative font for story lists, Interface font for UI lists
+              </div>
+            </div>
+
+            <!-- Code/Technical -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">INLINE CODE</div>
+              <p class="font-interface text-sm" style="color: var(--color-text-secondary);">
+                Use <code>max-w-3xl</code> for narrative columns and <code>var(--color-accent)</code> for accent colors.
+              </p>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                14px • System font (Mono) • Subtle background • For technical references
+              </div>
+            </div>
+
+            <!-- Small Text -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SMALL TEXT / CAPTIONS</div>
+              <p class="font-interface text-xs" style="color: var(--color-text-muted);">
+                Last saved 2 minutes ago • 1,247 words • Chapter III
+              </p>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                12px • Interface or System font • Muted color • For metadata and timestamps
+              </div>
+            </div>
+
+            <!-- Links -->
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">LINKS</div>
+              <p class="font-interface text-base" style="color: var(--color-text-secondary);">
+                Return to <a href="#">Character Library</a> or
+                <a href="#">start a new game</a>.
+              </p>
+              <div class="text-xs mt-2" style="color: var(--color-text-muted);">
+                Accent color • Underline by default • Maintains font size of surrounding text
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mt-12">
+          <h3 class="text-lg font-medium mb-4">Semantic Text Tokens</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Role-based typography utilities map semantic intent to font and rhythm: <code>text-narrative</code>, <code>text-technical</code>, and <code>text-ui</code>.</p>
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-narrative</div>
+              <p class="text-narrative max-w-3xl">The manuscript breathed as you opened it, each line settling into place like ink finding paper.</p>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-technical</div>
+              <p class="text-technical">Turn: 14 • Hp: 42/50 • Save Slot: Auto-3</p>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-ui</div>
+              <p class="text-ui">Continue to Character Attributes</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Spacing -->
+      <section class="section" id="spacing">
+        <h2 class="text-2xl font-semibold mb-6">Spacing Scale</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Grid-based spacing system using 24px base unit for alignment and rhythm.</p>
+
+        <div class="grid grid-cols-4 gap-6">
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">4px</div>
+            <div style="width: 4px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Micro spacing</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">8px</div>
+            <div style="width: 8px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Tight spacing</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">16px</div>
+            <div style="width: 16px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Standard spacing</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">24px</div>
+            <div style="width: 24px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Grid unit</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">32px</div>
+            <div style="width: 32px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Large spacing</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">48px</div>
+            <div style="width: 48px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Section spacing</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">64px</div>
+            <div style="width: 64px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Major sections</div>
+          </div>
+          <div>
+            <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">96px</div>
+            <div style="width: 96px; height: 24px; background: var(--color-accent);"></div>
+            <div class="text-xs mt-1" style="color: var(--color-text-muted);">Hero spacing</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grid System -->
+      <section class="section py-8 md:py-12" id="grid">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Grid System & Breakpoints</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Responsive layout structure based on 12-column grid with standardized breakpoints.</p>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Breakpoints</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div>
+                <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">sm</div>
+                <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">Small devices</div>
+              </div>
+              <code class="font-system text-xs sm:text-sm">640px</code>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div>
+                <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">md</div>
+                <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">Tablets</div>
+              </div>
+              <code class="font-system text-xs sm:text-sm">768px</code>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div>
+                <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">lg</div>
+                <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">Laptops</div>
+              </div>
+              <code class="font-system text-xs sm:text-sm">1024px</code>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div>
+                <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">xl</div>
+                <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">Desktops</div>
+              </div>
+              <code class="font-system text-xs sm:text-sm">1280px</code>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div>
+                <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">2xl</div>
+                <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">Large screens</div>
+              </div>
+              <code class="font-system text-xs sm:text-sm">1536px</code>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-base sm:text-lg font-medium mb-4">Container Widths</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MANUSCRIPT (Narrative)</div>
+              <div class="space-y-2 text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                <div class="flex justify-between">
+                  <span>Optimal reading width</span>
+                  <code>768px (max-w-3xl)</code>
+                </div>
+                <div class="flex justify-between">
+                  <span>Characters per line</span>
+                  <code>45-90</code>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSHOP (Utility)</div>
+              <div class="space-y-2 text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                <div class="flex justify-between">
+                  <span>Content width</span>
+                  <code>1024px (max-w-5xl)</code>
+                </div>
+                <div class="flex justify-between">
+                  <span>Full width</span>
+                  <code>1280px (max-w-7xl)</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Responsive Design -->
+      <section class="section py-8 md:py-12" id="responsive">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Responsive Design</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Mobile-first approach with graceful scaling across all devices.</p>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Breakpoint Strategy</h3>
+          <div class="space-y-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">BASE (Mobile First)</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">0px - 639px</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-accent);">DEFAULT</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Single column layouts, stacked navigation, full-width components. Touch-optimized with 44px minimum tap targets.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">sm</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">640px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LARGE PHONES</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Slightly wider content, may introduce 2-column layouts for cards. Navigation remains mobile-optimized.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">md</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">768px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">TABLETS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Transition point: sidebar navigation appears, 2-3 column grids, narrative text stays at optimal reading width.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">lg</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">1024px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LAPTOPS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Full desktop layout: HUD panels appear, Workshop sidebar visible, multi-column data tables.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">xl / 2xl</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">1280px+ / 1536px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LARGE DISPLAYS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Max content width maintained (1280px), increased margins. Narrative column stays at optimal 768px.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Layout Adaptation Patterns</h3>
+
+          <div class="space-y-6">
+
+            <!-- Manuscript Mobile -->
+            <div>
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">THE MANUSCRIPT (MOBILE)</div>
+              <div class="p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <div class="space-y-4">
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">HUD (Collapsible)</div>
+                  </div>
+                  <div class="p-6 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">NARRATIVE (Full Width)</div>
+                    <div style="height: 60px; background: linear-gradient(to bottom, rgba(120,120,120,0.1), transparent);"></div>
+                  </div>
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">INPUT (Fixed Bottom)</div>
+                  </div>
+                </div>
+              </div>
+              <ul class="text-xs mt-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>HUD collapses to expandable drawer</li>
+                <li>Narrative uses full width (16px padding)</li>
+                <li>Suggested actions stack vertically</li>
+                <li>Input remains fixed at bottom</li>
+              </ul>
+            </div>
+
+            <!-- Workshop Mobile -->
+            <div>
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">THE WORKSHOP (MOBILE)</div>
+              <div class="p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <div class="space-y-4">
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">TOP NAV + PROGRESS</div>
+                  </div>
+                  <div class="p-6 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE (Full Width)</div>
+                    <div style="height: 100px; background: linear-gradient(to bottom, rgba(120,120,120,0.1), transparent);"></div>
+                  </div>
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">ACTION BUTTONS</div>
+                  </div>
+                </div>
+              </div>
+              <ul class="text-xs mt-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Sidebar becomes top navigation tabs</li>
+                <li>Progress bar moves to top</li>
+                <li>Forms stack into single column</li>
+                <li>Action buttons fixed at bottom or sticky</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Touch Optimization</h3>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">MINIMUM SIZES</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Tap targets: <code>44px × 44px</code></li>
+                <li>Button height: <code>48px</code></li>
+                <li>Input height: <code>48px</code></li>
+                <li>List items: <code>56px</code></li>
+                <li>Icon buttons: <code>44px</code></li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">SPACING</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Between targets: <code>8px min</code></li>
+                <li>Edge padding: <code>16px</code></li>
+                <li>Section gaps: <code>24px</code></li>
+                <li>Safe area insets: Respected</li>
+                <li>Thumb zones: Considered</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Typography Scaling</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">FLUID TYPE SCALE</div>
+            <div class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
+              <div class="flex justify-between">
+                <span>Narrative text (mobile)</span>
+                <code>16px → 18px (tablet+)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Body text (mobile)</span>
+                <code>14px → 16px (tablet+)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>h1 (mobile)</span>
+                <code>28px → 36px (desktop)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>h2 (mobile)</span>
+                <code>24px → 30px (desktop)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>System labels</span>
+                <code>12px (all screens)</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Content Width Constraints</h3>
+          <div class="space-y-3">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">Narrative Column</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Optimal reading width</div>
+                </div>
+                <code class="text-xs">max-w-3xl (768px)</code>
+              </div>
+              <div class="text-xs mt-2" style="color: var(--color-text-secondary);">
+                Never exceeds 768px even on large displays. Centers with auto margins on desktop.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">Workshop Content</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Utility pages</div>
+                </div>
+                <code class="text-xs">max-w-5xl (1024px)</code>
+              </div>
+              <div class="text-xs mt-2" style="color: var(--color-text-secondary);">
+                Allows wider layouts for forms and data. Full width on mobile with 16px padding.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium mb-4">Mobile-Specific Patterns</h3>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">NAVIGATION</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Bottom tab bars preferred</li>
+                <li>Hamburger menu for overflow</li>
+                <li>Swipe gestures for navigation</li>
+                <li>Back button in top-left</li>
+                <li>Breadcrumbs hidden on mobile</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">INTERACTIONS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Pull-to-refresh support</li>
+                <li>Long-press for context menus</li>
+                <li>Swipe actions on list items</li>
+                <li>Modal sheets vs. full modals</li>
+                <li>Toast notifications at top</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FORMS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>One input per row</li>
+                <li>Large touch targets</li>
+                <li>Native keyboard types</li>
+                <li>Inline validation</li>
+                <li>Fixed submit buttons</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CARDS & LISTS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Horizontal scroll for cards</li>
+                <li>Infinite scroll for lists</li>
+                <li>Skeleton loaders</li>
+                <li>Optimistic UI updates</li>
+                <li>Swipe for actions</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">IMPLEMENTATION</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Use Tailwind responsive prefixes: <code>md:flex</code>, <code>lg:grid-cols-3</code></li>
+            <li>Test on real devices, not just browser DevTools</li>
+            <li>Consider touch vs. mouse hover states</li>
+            <li>Use <code>env(safe-area-inset-*)</code> for notched devices</li>
+            <li>Lazy load below-the-fold content on mobile</li>
+            <li>Optimize images with responsive srcset</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Iconography -->
+      <section class="section" id="icons">
+        <h2 class="text-2xl font-semibold mb-6">Iconography</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Using Lucide icons with consistent sizing and stroke weight.</p>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Icon Sizes</h3>
+          <div class="grid grid-cols-4 gap-4">
+            <div class="p-4 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 8px; color: var(--color-text-primary);">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">16px</div>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Inline text</div>
+            </div>
+            <div class="p-4 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 8px; color: var(--color-text-primary);">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">20px</div>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Standard</div>
+            </div>
+            <div class="p-4 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 8px; color: var(--color-text-primary);">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">24px</div>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Buttons</div>
+            </div>
+            <div class="p-4 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 8px; color: var(--color-text-primary);">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">32px</div>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Hero/empty states</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">GUIDELINES</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Stroke weight: <code>1.5px</code> (consistent with Lucide standard)</li>
+            <li>Use icons to support text, not replace it</li>
+            <li>Always include <code>aria-label</code> for icon-only buttons</li>
+            <li>Icons inherit text color by default</li>
+            <li>Use <code>aria-hidden="true"</code> for decorative icons</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Elevation -->
+      <section class="section" id="elevation">
+        <h2 class="text-2xl font-semibold mb-6">Elevation & Shadows</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the "drafting table" aesthetic.</p>
+
+        <div class="grid grid-cols-3 gap-6">
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-sm</div>
+              <code class="text-xs">0 1px 2px rgba(0,0,0,0.05)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Subtle depth for cards</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-md</div>
+              <code class="text-xs">0 4px 6px rgba(0,0,0,0.1)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dropdowns, tooltips</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-lg</div>
+              <code class="text-xs">0 10px 15px rgba(0,0,0,0.1)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Modals, floating panels</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">USAGE NOTE</h4>
+          <p class="text-sm" style="color: var(--color-text-secondary);">
+            Prefer <code>backdrop-blur</code> and borders over shadows for the HUD panels to maintain the "technical blueprint" aesthetic. Use shadows only for floating elements that need clear separation.
+          </p>
+        </div>
+      </section>
+
+      <!-- Border Radius -->
+      <section class="section" id="radius">
+        <h2 class="text-2xl font-semibold mb-6">Border Radius</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal rounding to maintain crisp, technical aesthetic.</p>
+
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 0;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">none</div>
+              <code class="text-xs">0px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dot grid, technical elements</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 2px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-sm</div>
+              <code class="text-xs">2px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Default for most UI</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 4px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded</div>
+              <code class="text-xs">4px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Buttons, inputs</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 8px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-lg</div>
+              <code class="text-xs">8px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Cards, modals</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">DEFAULT</h4>
+          <p class="text-sm" style="color: var(--color-text-secondary);">
+            Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains the technical, precise aesthetic while avoiding harsh 90° corners.
+          </p>
+        </div>
+      </section>
+
+      <div class="category-header">03. Components</div>
+
+      <!-- Components -->
+      <section class="section" id="components">
+        <h2 class="text-2xl font-semibold mb-6">Components</h2>
+
+        <!-- Buttons -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Buttons</h3>
+          <div class="flex flex-wrap gap-4 items-center">
+            <button class="px-6 py-3 rounded-sm font-interface text-sm font-medium" style="background: var(--color-accent); color: white;">
+              Primary Action
+            </button>
+            <button class="px-6 py-3 rounded-sm font-interface text-sm font-medium" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+              Secondary Action
+            </button>
+            <button class="px-4 py-2 rounded-sm font-system text-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+              > SUGGESTED_ACTION
+            </button>
+            <button class="px-4 py-2 rounded-sm font-interface text-sm" style="color: var(--color-text-muted);">
+              Text Button
+            </button>
+          </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Form Inputs</h3>
+          <div class="space-y-4 max-w-md">
+            <input
+              type="text"
+              placeholder="Enter text..."
+              class="w-full px-4 py-3 rounded-sm font-interface text-sm"
+              style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);"
+            />
+            <textarea
+              placeholder="Longer text input..."
+              rows="3"
+              class="w-full px-4 py-3 rounded-sm font-interface text-sm resize-none"
+              style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);"
+            ></textarea>
+            <select class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+              <option>Select an option...</option>
+              <option>Option 1</option>
+              <option>Option 2</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Cards & Panels</h3>
+          <div class="grid grid-cols-2 gap-4 max-w-2xl">
+            <div class="p-6 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STANDARD CARD</div>
+              <p class="text-sm" style="color: var(--color-text-secondary);">Basic card with border and padding</p>
+            </div>
+            <div class="p-6 rounded-sm backdrop-blur-md" style="background: rgba(255, 255, 255, 0.8); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">HUD PANEL</div>
+              <p class="text-sm" style="color: var(--color-text-secondary);">Translucent with backdrop blur</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Display -->
+        <div>
+          <h3 class="text-lg font-medium mb-4">Data Display</h3>
+          <div class="border rounded-sm overflow-hidden max-w-2xl" style="border-color: var(--color-border);">
+            <table class="w-full">
+              <thead style="background: var(--color-surface-hover);">
+                <tr class="font-system text-xs" style="color: var(--color-text-muted);">
+                  <th class="text-left px-4 py-2">ITEM</th>
+                  <th class="text-left px-4 py-2">VALUE</th>
+                  <th class="text-left px-4 py-2">STATUS</th>
+                </tr>
+              </thead>
+              <tbody class="font-system text-sm" style="color: var(--color-text-primary);">
+                <tr style="border-top: 1px solid var(--color-border);">
+                  <td class="px-4 py-3">Health Potion</td>
+                  <td class="px-4 py-3">25g</td>
+                  <td class="px-4 py-3" style="color: var(--color-accent);">Available</td>
+                </tr>
+                <tr style="border-top: 1px solid var(--color-border);">
+                  <td class="px-4 py-3">Ancient Scroll</td>
+                  <td class="px-4 py-3">150g</td>
+                  <td class="px-4 py-3" style="color: var(--color-text-muted);">Equipped</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div class="category-header">04. Experience</div>
+
+      <!-- Layout Patterns -->
+      <section class="section py-8 md:py-12" id="layout">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Layout Patterns</h2>
+
+        <div class="space-y-8">
+          <!-- The Manuscript -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Manuscript" (Game Session)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Single-column, center-focused layout for immersive reading</p>
+            <div class="p-4 sm:p-8 rounded-sm relative overflow-hidden" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); min-height: 300px;">
+              <!-- HUD -->
+              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: rgba(255, 255, 255, 0.8); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">HUD (Floating)</div>
+              </div>
+              <!-- Content -->
+              <div class="max-w-3xl mx-auto pt-12 sm:pt-12">
+                <div class="font-narrative text-base sm:text-lg mb-4" style="color: var(--color-text-primary);">
+                  Narrative Column (max-w-3xl)
+                </div>
+                <div class="h-20" style="background: var(--color-surface); border: 1px solid var(--color-border);"></div>
+              </div>
+              <!-- Input -->
+              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">Input Zone (Docked Bottom)</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">Narrative Reading Surface Validation</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Tested at realistic lengths: short paragraph, full-page segment, and multi-paragraph scene progression.</p>
+            <div class="p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="max-w-3xl mx-auto space-y-8">
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SHORT PARAGRAPH</div>
+                  <p class="text-narrative">The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.</p>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FULL-PAGE SEGMENT</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.</p>
+                    <p class="text-narrative">A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: "Records of Irrecoverable Histories." Beneath the desk, a low drawer pulsed with a soft blue glow that brightened when you moved closer.</p>
+                    <p class="text-narrative">When you pulled it open, you found a catalog of names scratched into thin brass sheets. Some had been crossed out with decisive strokes; others had notes beside them in hurried script: "relocated," "sealed," "missing witness." At the bottom of the stack sat a single page of vellum, untouched by dust, bearing your own name in fresh black ink.</p>
+                  </div>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MULTI-PARAGRAPH SCENE FLOW</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You turned the page and the room answered. The rails overhead began to move in sequence, carrying lanterns into a slow orbit around the desk.</p>
+                    <p class="text-narrative">Each pass of light revealed another detail: a hidden map etched into the floorboards, a keyhole set into the spine of a bound atlas, and a thread of red string leading from your chair to the locked west door.</p>
+                    <p class="text-narrative">When the orbit stopped, the lantern nearest you dipped on its own and projected a final line onto the wall: "Begin where your story was first rewritten."</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Workshop -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Workshop" (Library/Wizards)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Multi-column layout for utility and data management</p>
+            <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
+              <div class="flex flex-col sm:flex-row" style="min-height: 250px;">
+                <div class="w-full sm:w-48 p-4" style="background: var(--color-surface-hover); border-bottom: 1px solid var(--color-border); sm:border-bottom-0 sm:border-right: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SIDEBAR</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Blueprint navigation</div>
+                </div>
+                <div class="flex-1 p-4 sm:p-6" style="background: var(--color-surface);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Forms and data entry</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Component Examples from App -->
+      <section class="section py-8 md:py-12" id="examples">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Component Examples from App</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Real components from the Narraitor application showing the design system in practice.</p>
+
+        <!-- Badges -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Badges</h3>
+          <div class="space-y-4">
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">GENRE & TYPE BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">
+                  Fantasy
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">
+                  Sci-Fi
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Original World
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Set In: Middle Earth
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">STATUS BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Available
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Warning
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  Unavailable
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">COUNTER BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Characters <span class="ml-1 font-bold">4</span>
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Sessions <span class="ml-1 font-bold">12</span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Alerts/Notifications -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Alerts & Notifications</h3>
+          <div class="space-y-4 max-w-2xl">
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-success); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-success);">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="8 12 12 16 16 10"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-success);">Success</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  Your character has been saved successfully. You can now start a new game session.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-warning); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-warning);">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-warning);">Warning</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  This action cannot be undone. Make sure you have a backup before proceeding.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-error); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-error);">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-error);">Error</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  Failed to load world data. Please check your connection and try again.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-info); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-info);">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-info);">Info</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  AI generation may take a few moments. Your progress is automatically saved.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- World/Character Cards -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Content Cards</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+
+            <!-- World Card Example -->
+            <div class="rounded-sm overflow-hidden" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <!-- Card Image -->
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 120px; sm:height: 160px; position: relative;">
+                <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); padding: 4px 8px; border-radius: 4px;">
+                  <div class="font-system text-[10px] sm:text-xs" style="color: white;">ACTIVE</div>
+                </div>
+              </div>
+
+              <!-- Card Content -->
+              <div class="p-4">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 class="font-interface text-base sm:text-lg font-semibold mb-1" style="color: var(--color-text-primary);">The Mechanical Archive</h3>
+                    <p class="text-xs sm:text-sm" style="color: var(--color-text-muted);">Created Jan 28, 2026</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">Steampunk</span>
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    Characters <span class="ml-1 font-bold">3</span>
+                  </span>
+                </div>
+
+                <p class="text-xs sm:text-sm mb-4 leading-relaxed font-narrative" style="color: var(--color-text-secondary);">
+                  A world of clockwork mechanisms and steam-powered wonders, where ancient knowledge is locked in mechanical vaults.
+                </p>
+
+                <div class="flex gap-2">
+                  <button class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm text-xs sm:text-sm font-interface font-medium" style="background: var(--color-accent); color: white;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="inline mr-1" style="margin-bottom: 2px;">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Play
+                  </button>
+                  <button class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm text-xs sm:text-sm font-interface" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Continue Card -->
+            <div class="rounded-sm p-4 sm:p-6" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">CONTINUE_SESSION</div>
+                  <h3 class="font-interface text-lg sm:text-xl font-semibold" style="color: var(--color-text-primary);">The Archive's Secret</h3>
+                </div>
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                  In Progress
+                </span>
+              </div>
+
+              <p class="text-xs sm:text-sm mb-4 font-narrative leading-relaxed" style="color: var(--color-text-secondary);">
+                "The chamber opened before you, its vaulted ceiling disappearing into shadow..."
+              </p>
+
+              <div class="flex items-center gap-3 sm:gap-4 mb-4 text-[10px] sm:text-xs font-system" style="color: var(--color-text-muted);">
+                <span>TURN: 14</span>
+                <span>•</span>
+                <span>LAST_PLAYED: 2h ago</span>
+              </div>
+
+              <button class="w-full px-4 py-2.5 sm:py-3 rounded-sm text-xs sm:text-sm font-interface font-medium" style="background: var(--color-accent); color: white;">
+                Resume Session
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Game Mechanics -->
+        <div class="mb-12" id="mechanics">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Game Mechanics</h3>
+          <div class="space-y-4 max-w-2xl">
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">CHOICE OUTCOME CALLOUT</div>
+              <div class="relative w-full rounded-sm p-3 sm:p-4 border-l-4" style="border-left-color: var(--color-accent); background: linear-gradient(90deg, rgba(249, 115, 22, 0.05), transparent);">
+                <div class="font-system text-xs sm:text-sm font-medium mb-1" style="color: var(--color-accent);">PERCEPTION CHECK: SUCCESS (14 vs DC 12)</div>
+                <div class="font-narrative text-base sm:text-lg italic leading-relaxed" style="color: var(--color-text-secondary);">
+                  You notice a subtle discoloration on the stone wall, revealing the outline of a hidden mechanism.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading States -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Loading States</h3>
+          <div class="space-y-4 max-w-2xl">
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">SKELETON LOADER (NARRATIVE)</div>
+              <div class="space-y-3">
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; width: 85%; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; width: 92%; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">SPINNER (BUTTON)</div>
+              <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.7;">
+                <svg class="animate-spin h-3 w-3 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <style>
+          @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.15; }
+          }
+        </style>
+      </section>
+
+      <!-- Interactive States -->
+      <section class="section py-8 md:py-12" id="states">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Interactive States</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Consistent visual feedback across all interactive elements.</p>
+
+        <div class="space-y-8">
+          <!-- Button States -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-4">Button States</h3>
+            <div class="space-y-4">
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-full sm:w-32 font-system text-xs" style="color: var(--color-text-muted);">DEFAULT</div>
+                <div class="flex flex-wrap gap-4">
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-accent); color: white;">
+                    Primary Button
+                  </button>
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    Secondary Button
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-full sm:w-32 font-system text-xs" style="color: var(--color-text-muted);">HOVER</div>
+                <div class="flex flex-wrap gap-4">
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-accent-hover); color: white;">
+                    Primary Button
+                  </button>
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-primary);">
+                    Secondary Button
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-full sm:w-32 font-system text-xs" style="color: var(--color-text-muted);">ACTIVE</div>
+                <div class="flex flex-wrap gap-4">
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: #312e81; color: white; transform: scale(0.98);">
+                    Primary Button
+                  </button>
+                  <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-surface); border: 2px solid var(--color-border-strong); color: var(--color-text-primary); transform: scale(0.98);">
+                    Secondary Button
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-full sm:w-32 font-system text-xs" style="color: var(--color-text-muted);">DISABLED</div>
+                <div class="flex flex-wrap gap-4">
+                  <button disabled class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: #a1a1aa; color: #d4d4d8; cursor: not-allowed;">
+                    Primary Button
+                  </button>
+                  <button disabled class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium" style="background: var(--color-surface); border: 1px solid #e4e4e7; color: #a1a1aa; cursor: not-allowed;">
+                    Secondary Button
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-full sm:w-32 font-system text-xs" style="color: var(--color-text-muted);">LOADING</div>
+                <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.7; cursor: wait;">
+                  <svg class="animate-spin h-3 w-3 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Loading...
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Input States -->
+          <div>
+            <h3 class="text-lg font-medium mb-4">Input States</h3>
+            <div class="space-y-4 max-w-md">
+
+              <div>
+                <label class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">DEFAULT</label>
+                <input type="text" placeholder="Enter text..." class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" />
+              </div>
+
+              <div>
+                <label class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">FOCUS</label>
+                <input type="text" value="Focused input" class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface); border: 1px solid var(--color-accent); outline: 2px solid var(--color-accent); outline-offset: 0; color: var(--color-text-primary);" />
+              </div>
+
+              <div>
+                <label class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">ERROR</label>
+                <input type="text" value="Invalid input" class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface); border: 1px solid #ef4444; color: var(--color-text-primary);" />
+                <p class="text-xs mt-1" style="color: #ef4444;">This field is required</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">SUCCESS</label>
+                <input type="text" value="Valid input" class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface); border: 1px solid #22c55e; color: var(--color-text-primary);" />
+                <p class="text-xs mt-1" style="color: #22c55e;">✓ Looks good!</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">DISABLED</label>
+                <input type="text" value="Disabled input" disabled class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: #a1a1aa; cursor: not-allowed;" />
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Link States -->
+          <div>
+            <h3 class="text-lg font-medium mb-4">Link & Text States</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-4">
+                <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">DEFAULT</div>
+                <a href="#" class="font-interface text-sm">
+                  Text link
+                </a>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">HOVER</div>
+                <a href="#" class="font-interface text-sm" style="color: var(--color-accent-hover);">
+                  Text link
+                </a>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">VISITED</div>
+                <a href="#" class="font-interface text-sm" style="color: #a855f7;">
+                  Text link
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-8 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">IMPLEMENTATION NOTES</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>All state transitions should use <code>transition-all duration-150</code></li>
+            <li>Active state includes subtle scale: <code>transform: scale(0.98)</code></li>
+            <li>Loading states reduce opacity to 0.7 and show spinner</li>
+            <li>Error/success states must meet 4.5:1 contrast ratio</li>
+            <li>Never rely on color alone—use icons or text labels</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Accessibility -->
+      <section class="section" id="a11y">
+        <h2 class="text-2xl font-semibold mb-6">Accessibility (WCAG 2.1 AA)</h2>
+        <p class="mb-8" style="color: var(--color-text-secondary);">All components and patterns must meet WCAG 2.1 Level AA standards minimum.</p>
+
+        <!-- Color Contrast -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Color Contrast Requirements</h3>
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">STANDARD TEXT (< 18px)</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">4.5:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Light mode: text-primary on canvas = 18.27:1 ✓</li>
+                  <li>Dark mode: text-primary on dark-canvas = 19.06:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">LARGE TEXT (≥ 18px or bold ≥ 14px)</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">3:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Narrative text (18px) meets enhanced 4.5:1 standard ✓</li>
+                  <li>System labels (14px mono, muted) on canvas = 4.68:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">UI COMPONENTS & GRAPHICS</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">3:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Primary accent indicators on canvas = 11.05:1 ✓</li>
+                  <li>Button text (white on accent) = 11.42:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Focus States -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Focus Indicators</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">All interactive elements must have visible focus indicators with 3:1 contrast.</p>
+
+          <div class="space-y-3">
+            <button class="px-6 py-3 rounded-sm font-interface text-sm font-medium" style="background: var(--color-accent); color: white; outline: 2px solid transparent; outline-offset: 2px;" onfocus="this.style.outline='2px solid var(--color-accent)'; this.style.outlineOffset='2px';" onblur="this.style.outline='2px solid transparent';">
+              Primary Button (focus me)
+            </button>
+            <div class="text-xs font-system" style="color: var(--color-text-muted);">
+              outline: 2px solid var(--color-accent); outline-offset: 2px;
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">FOCUS STANDARDS</h4>
+            <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+              <li>Minimum 2px outline or border</li>
+              <li>2px offset for better visibility</li>
+              <li>Never remove focus styles (no <code>outline: none</code>)</li>
+              <li>Focus order follows logical reading flow</li>
+              <li>Skip links for keyboard navigation</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Touch Targets -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Touch Target Sizes</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
+              <div class="flex justify-between">
+                <span>Minimum touch target</span>
+                <code class="font-system">44px × 44px</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Primary buttons</span>
+                <code class="font-system">48px height minimum</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Icon buttons</span>
+                <code class="font-system">44px × 44px (include padding)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Spacing between targets</span>
+                <code class="font-system">8px minimum</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyboard Navigation -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Keyboard Navigation</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">REQUIRED SUPPORT</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Tab / Shift+Tab navigation</li>
+                <li>Enter / Space activation</li>
+                <li>Escape to close modals</li>
+                <li>Arrow keys for lists/menus</li>
+                <li>Home / End navigation</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FOCUS MANAGEMENT</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Trap focus in modals</li>
+                <li>Return focus on close</li>
+                <li>Skip navigation links</li>
+                <li>Logical tab order</li>
+                <li>No keyboard traps</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen Reader Support -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Screen Reader Support</h3>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SEMANTIC HTML</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Use semantic elements (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;section&gt;</code>)</li>
+                <li>Proper heading hierarchy (h1 → h6, no skipping)</li>
+                <li>Lists for related items (<code>&lt;ul&gt;</code>, <code>&lt;ol&gt;</code>)</li>
+                <li>Buttons for actions, links for navigation</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">ARIA PATTERNS</div>
+              <div class="text-sm space-y-2" style="color: var(--color-text-secondary);">
+                <div><code>aria-label</code> for icon-only buttons</div>
+                <div><code>aria-expanded</code> for collapsible sections</div>
+                <div><code>aria-live="polite"</code> for streaming text updates</div>
+                <div><code>aria-describedby</code> for form field hints</div>
+                <div><code>role="status"</code> for loading indicators</div>
+                <div><code>aria-hidden="true"</code> for decorative elements</div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SPECIAL CONSIDERATIONS FOR AI STREAMING</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Use <code>aria-live="polite"</code> on narrative container</li>
+                <li>Don't announce every token (causes speech overload)</li>
+                <li>Provide "Stop Reading" control for screen readers</li>
+                <li>Include skip link to bypass generated content</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motion & Animation -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Motion & Animation</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">RESPECT USER PREFERENCES</div>
+            <div class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Always respect <code>prefers-reduced-motion</code> media query. Disable or reduce animations when requested.
+            </div>
+            <pre class="font-system text-xs p-3 rounded" style="background: var(--color-surface-hover); color: var(--color-text-primary); white-space: pre; margin: 0;">@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}</pre>
+          </div>
+        </div>
+
+        <!-- Testing Checklist -->
+        <div>
+          <h3 class="text-lg font-medium mb-4">Accessibility Testing Checklist</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">AUTOMATED TESTING</div>
+              <ul class="text-sm space-y-1" style="color: var(--color-text-secondary); list-style: none; padding: 0;">
+                <li>☑ axe DevTools browser extension</li>
+                <li>☑ Lighthouse accessibility audit</li>
+                <li>☑ WAVE evaluation tool</li>
+                <li>☑ Color contrast analyzers</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">MANUAL TESTING</div>
+              <ul class="text-sm space-y-1" style="color: var(--color-text-secondary); list-style: none; padding: 0;">
+                <li>☑ Keyboard-only navigation</li>
+                <li>☑ Screen reader testing (NVDA, JAWS, VoiceOver)</li>
+                <li>☑ Zoom to 200% (text reflow)</li>
+                <li>☑ High contrast mode</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Motion & Animation -->
+      <section class="section" id="motion">
+        <h2 class="text-2xl font-semibold mb-6">Motion & Animation</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Subtle, purposeful motion that enhances usability without distraction.</p>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Duration Scale</h3>
+          <div class="grid grid-cols-4 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-sm font-medium mb-2" style="color: var(--color-text-primary);">75ms</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">Micro-interactions (hover, focus)</div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-sm font-medium mb-2" style="color: var(--color-text-primary);">150ms</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">Default transitions</div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-sm font-medium mb-2" style="color: var(--color-text-primary);">300ms</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">Panel slides, dropdowns</div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-sm font-medium mb-2" style="color: var(--color-text-primary);">500ms</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">Page transitions, modals</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Easing Functions</h3>
+          <div class="space-y-3">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">ease-out</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Elements entering the screen</div>
+                </div>
+                <code class="text-xs">cubic-bezier(0, 0, 0.2, 1)</code>
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">ease-in</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Elements leaving the screen</div>
+                </div>
+                <code class="text-xs">cubic-bezier(0.4, 0, 1, 1)</code>
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">ease-in-out</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Elements staying on screen (default)</div>
+                </div>
+                <code class="text-xs">cubic-bezier(0.4, 0, 0.2, 1)</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Animation Patterns</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STREAMING TEXT</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                Fade-in with subtle translateY<br>
+                <code>opacity: 0 → 1; transform: translateY(4px) → 0</code><br>
+                Duration: 300ms, ease-out
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SKELETON LOADING</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                Subtle pulse animation<br>
+                <code>opacity: 0.3 ↔ 0.15</code><br>
+                Duration: 1.5s, ease-in-out, infinite
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MODAL ENTRANCE</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                Scale + fade backdrop<br>
+                <code>scale: 0.95 → 1; opacity: 0 → 1</code><br>
+                Duration: 200ms, ease-out
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TOAST NOTIFICATIONS</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                Slide from edge<br>
+                <code>translateX: 100% → 0</code><br>
+                Duration: 300ms, ease-out
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">PRINCIPLES</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Animations should feel instant (&lt; 300ms for most interactions)</li>
+            <li>Always respect <code>prefers-reduced-motion</code></li>
+            <li>Avoid animating layout properties (use transform/opacity)</li>
+            <li>Never animate during text streaming (causes jank)</li>
+            <li>Use animation to provide feedback, not decoration</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Content Guidelines -->
+      <section class="section" id="content">
+        <h2 class="text-2xl font-semibold mb-6">Content & Voice</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Writing guidelines for UI text, labels, and microcopy.</p>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Voice & Tone</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">NARRATIVE VOICE</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <strong>Immersive, Evocative, Story-Driven</strong><br><br>
+                The AI-generated narrative sets the genre and tone. Our UI should not compete with it—it provides a neutral, elegant frame.
+              </div>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">SYSTEM VOICE</div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <strong>Precise, Technical, Unobtrusive</strong><br><br>
+                System messages use monospace typography and technical language—think drafting annotations rather than conversational UI.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Writing Patterns</h3>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">BUTTON LABELS</div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div style="color: #22c55e;">✓ Do</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"Continue to Attributes"</li>
+                    <li>"Save Character"</li>
+                    <li>"Start New Game"</li>
+                  </ul>
+                </div>
+                <div>
+                  <div style="color: #ef4444;">✗ Don't</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"Click here to continue"</li>
+                    <li>"Save"</li>
+                    <li>"OK"</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SYSTEM LABELS</div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div style="color: #22c55e;">✓ Do</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"HEALTH: 42/50"</li>
+                    <li>"TURN 14"</li>
+                    <li>"LAST_SAVE: 2m ago"</li>
+                  </ul>
+                </div>
+                <div>
+                  <div style="color: #ef4444;">✗ Don't</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"Your health is 42 out of 50"</li>
+                    <li>"Turn fourteen"</li>
+                    <li>"Saved 2 minutes ago"</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">ERROR MESSAGES</div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div style="color: #22c55e;">✓ Do</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"Character name required"</li>
+                    <li>"Connection lost. Reconnecting..."</li>
+                    <li>"Could not load world. Try again."</li>
+                  </ul>
+                </div>
+                <div>
+                  <div style="color: #ef4444;">✗ Don't</div>
+                  <ul class="list-disc pl-5" style="color: var(--color-text-secondary);">
+                    <li>"Oops! Something went wrong"</li>
+                    <li>"Error code: CHAR_NAME_NULL"</li>
+                    <li>"Please enter a name"</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">GUIDELINES</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Use sentence case for all UI text (not Title Case)</li>
+            <li>System labels use ALL_CAPS with underscores for technical feel</li>
+            <li>Be direct—avoid "please" and unnecessary politeness</li>
+            <li>Use active voice ("Save character" not "Character will be saved")</li>
+            <li>Front-load important information in longer messages</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Design Tokens -->
+      <section class="section" id="tokens">
+        <h2 class="text-2xl font-semibold mb-6">Design Tokens</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Exportable design values for implementation in code.</p>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Token Structure</h3>
+          <div class="p-6 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">{
+  "color": {
+    "canvas": {
+      "light": "#fafafa",
+      "dark": "#09090b"
+    },
+    "surface": {
+      "light": "#ffffff",
+      "dark": "#18181b"
+    },
+    "text": {
+      "primary": {
+        "light": "#18181b",
+        "dark": "#fafafa"
+      },
+      "secondary": {
+        "light": "#3f3f46",
+        "dark": "#d4d4d8"
+      },
+      "muted": {
+        "light": "#71717a",
+        "dark": "#71717a"
+      }
+    },
+    "accent": {
+      "primary": "#f97316",
+      "hover": "#ea580c"
+    }
+  },
+  "typography": {
+    "font": {
+      "narrative": "'EB Garamond', serif",
+      "system": "'JetBrains Mono', monospace",
+      "interface": "'Inter', sans-serif"
+    },
+    "size": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "lineHeight": {
+      "tight": "1.1",
+      "base": "1.5",
+      "relaxed": "1.75"
+    }
+  },
+  "spacing": {
+    "unit": "24px",
+    "scale": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "2xl": "48px",
+      "3xl": "64px",
+      "4xl": "96px"
+    }
+  },
+  "borderRadius": {
+    "none": "0px",
+    "sm": "2px",
+    "default": "4px",
+    "lg": "8px"
+  },
+  "shadow": {
+    "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+  }
+}</pre>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium mb-4">Usage in Code</h3>
+          <div class="space-y-4">
+
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TAILWIND CONFIG</div>
+              <div class="p-4 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: 'var(--color-canvas)',
+        surface: 'var(--color-surface)',
+        accent: 'var(--color-accent)',
+      },
+      fontFamily: {
+        narrative: 'var(--font-narrative)',
+        system: 'var(--font-system)',
+        interface: 'var(--font-interface)',
+      },
+      spacing: {
+        unit: 'var(--spacing-unit)',
+      },
+    },
+  },
+}</pre>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">REACT COMPONENT</div>
+              <div class="p-4 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">export function NarrativeText({ children }: Props) {
+  return (
+    &lt;p className="text-narrative max-w-3xl"&gt;
+      {children}
+    &lt;/p&gt;
+  )
+}
+
+export function SessionMeta() {
+  return &lt;span className="text-technical"&gt;Turn: 14&lt;/span&gt;
+}
+
+export function PrimaryAction() {
+  return &lt;button className="text-ui"&gt;Continue&lt;/button&gt;
+}</pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+
+    </main>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+    }
+
+    function toggleNav() {
+      const button = document.getElementById('nav-toggle');
+      const dropdown = document.getElementById('nav-dropdown');
+      const isOpen = dropdown.classList.contains('open');
+
+      if (isOpen) {
+        closeNav();
+      } else {
+        // Open menu
+        dropdown.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+        dropdown.setAttribute('aria-hidden', 'false');
+
+        // Move focus to first link
+        setTimeout(() => {
+          const firstLink = dropdown.querySelector('a');
+          if (firstLink) firstLink.focus();
+        }, 100);
+      }
+    }
+
+    function closeNav() {
+      const button = document.getElementById('nav-toggle');
+      const dropdown = document.getElementById('nav-dropdown');
+
+      if (!dropdown.classList.contains('open')) {
+        return;
+      }
+
+      dropdown.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+      dropdown.setAttribute('aria-hidden', 'true');
+
+      // Return focus to button
+      button.focus();
+    }
+
+    // Close nav when clicking outside
+    document.addEventListener('click', function(event) {
+      const nav = document.querySelector('.sticky-nav');
+      const dropdown = document.getElementById('nav-dropdown');
+      if (!nav.contains(event.target) && dropdown.classList.contains('open')) {
+        closeNav();
+      }
+    });
+
+    // Close nav on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeNav();
+      }
+    });
+  </script>
+
+</body>
+</html>
