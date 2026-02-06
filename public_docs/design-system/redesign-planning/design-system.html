@@ -149,15 +149,15 @@
       font-size: 0.875rem;
     }
 
-    a {
-      color: var(--color-accent) !important;
-      text-decoration: underline !important;
+    body a {
+      color: var(--color-accent);
+      text-decoration: underline;
       text-underline-offset: 2px;
       transition: all 0.15s;
     }
 
-    a:hover {
-      color: var(--color-accent-hover) !important;
+    body a:hover {
+      color: var(--color-accent-hover);
     }
 
     /* Sticky Navigation */
@@ -226,24 +226,24 @@
       padding: 16px;
     }
 
-    .nav-grid a {
+    body .nav-grid a {
       display: block;
       padding: 12px 16px;
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: 4px;
-      color: var(--color-text-secondary) !important;
-      text-decoration: none !important;
+      color: var(--color-text-secondary);
+      text-decoration: none;
       font-size: 12px;
       transition: all 0.15s;
       text-align: center;
     }
 
-    .nav-grid a:hover {
+    body .nav-grid a:hover {
       background: var(--color-surface-hover);
       border-color: var(--color-accent);
-      color: var(--color-accent) !important;
-      text-decoration: none !important;
+      color: var(--color-accent);
+      text-decoration: none;
     }
 
     @media (max-width: 768px) {
@@ -276,14 +276,14 @@
     }
 
     /* Skip Link */
-    .skip-link {
+    body .skip-link {
       position: absolute;
       top: -40px;
       left: 0;
       background: var(--color-accent);
-      color: white !important;
+      color: white;
       padding: 8px 16px;
-      text-decoration: none !important;
+      text-decoration: none;
       font-size: 14px;
       z-index: 1000;
       border-radius: 0 0 4px 0;
