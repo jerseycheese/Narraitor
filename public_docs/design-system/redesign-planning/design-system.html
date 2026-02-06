@@ -1733,7 +1733,7 @@
         </div>
 
         <!-- Game Mechanics -->
-        <div class="mb-12">
+        <div class="mb-12" id="mechanics">
           <h3 class="text-base sm:text-lg font-medium mb-4">Game Mechanics</h3>
           <div class="space-y-4 max-w-2xl">
             <div>
@@ -2534,6 +2534,10 @@
     function closeNav() {
       const button = document.getElementById('nav-toggle');
       const dropdown = document.getElementById('nav-dropdown');
+
+      if (!dropdown.classList.contains('open')) {
+        return;
+      }
 
       dropdown.classList.remove('open');
       button.setAttribute('aria-expanded', 'false');
