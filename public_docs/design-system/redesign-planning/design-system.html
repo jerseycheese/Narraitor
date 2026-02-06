@@ -2936,6 +2936,10 @@ export function PrimaryAction() {
         // Return a promise that resolves when streaming is fully complete
         return new Promise(async (resolve) => {
           if (shouldReset) this.reset();
+          
+          // Re-evaluate anchoring at start of new stream
+          this.shouldAnchor = isNearBottom(this.container);
+          
           this.tokens = tokenizeForStreaming(text);
           this.remainingTokens = [...this.tokens];
           this.isStreaming = true;
