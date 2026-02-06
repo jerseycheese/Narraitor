@@ -149,6 +149,17 @@
       font-size: 0.875rem;
     }
 
+    a {
+      color: var(--color-accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: all 0.15s;
+    }
+
+    a:hover {
+      color: var(--color-accent-hover);
+    }
+
     /* Sticky Navigation */
     .sticky-nav {
       position: sticky;
@@ -878,11 +889,11 @@
             <div>
               <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">LINKS</div>
               <p class="font-interface text-base" style="color: var(--color-text-secondary);">
-                Return to <a href="#" style="color: var(--color-accent); text-decoration: underline;">Character Library</a> or
-                <a href="#" style="color: var(--color-accent); text-decoration: underline;">start a new game</a>.
+                Return to <a href="#">Character Library</a> or
+                <a href="#">start a new game</a>.
               </p>
               <div class="text-xs mt-2" style="color: var(--color-text-muted);">
-                Accent color • Underline on hover • Maintains font size of surrounding text
+                Accent color • Underline by default • Maintains font size of surrounding text
               </div>
             </div>
 
@@ -1964,19 +1975,19 @@
             <div class="space-y-3">
               <div class="flex items-center gap-4">
                 <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">DEFAULT</div>
-                <a href="#" class="font-interface text-sm" style="color: var(--color-accent); text-decoration: underline; text-decoration-color: transparent;">
+                <a href="#" class="font-interface text-sm">
                   Text link
                 </a>
               </div>
               <div class="flex items-center gap-4">
                 <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">HOVER</div>
-                <a href="#" class="font-interface text-sm" style="color: var(--color-accent-hover); text-decoration: underline;">
+                <a href="#" class="font-interface text-sm" style="color: var(--color-accent-hover);">
                   Text link
                 </a>
               </div>
               <div class="flex items-center gap-4">
                 <div class="w-32 font-system text-xs" style="color: var(--color-text-muted);">VISITED</div>
-                <a href="#" class="font-interface text-sm" style="color: #a855f7; text-decoration: underline; text-decoration-color: transparent;">
+                <a href="#" class="font-interface text-sm" style="color: #a855f7;">
                   Text link
                 </a>
               </div>
