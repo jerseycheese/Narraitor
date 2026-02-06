@@ -198,6 +198,39 @@
       color: var(--color-text-primary);
     }
 
+    .nav-link {
+      display: block;
+      padding: 8px 12px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      color: var(--color-text-secondary) !important;
+      text-decoration: none !important;
+      font-size: 11px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .nav-link:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-accent);
+      color: var(--color-accent) !important;
+    }
+
+    .text-muted { color: var(--color-text-muted); }
+
+    .category-header {
+      padding: 12px 0;
+      border-bottom: 2px solid var(--color-text-primary);
+      margin-top: 64px;
+      margin-bottom: 32px;
+      font-family: var(--font-system);
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+    }
+
     .nav-dropdown {
       position: absolute;
       top: 100%;
@@ -217,62 +250,6 @@
 
     .nav-dropdown.open {
       max-height: 600px;
-    }
-
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 8px;
-      padding: 16px;
-    }
-
-    body .nav-grid a {
-      display: block;
-      padding: 12px 16px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      color: var(--color-text-secondary);
-      text-decoration: none;
-      font-size: 12px;
-      transition: all 0.15s;
-      text-align: center;
-    }
-
-    body .nav-grid a:hover {
-      background: var(--color-surface-hover);
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-      text-decoration: none;
-    }
-
-    @media (max-width: 768px) {
-      .nav-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 6px;
-        padding: 12px;
-      }
-
-      .nav-grid a {
-        padding: 10px 12px;
-        font-size: 11px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .nav-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-
-      .nav-grid a {
-        padding: 12px 8px;
-        font-size: 10px;
-      }
-
-      .nav-burger span {
-        display: none;
-      }
     }
 
     /* Skip Link */
@@ -338,32 +315,62 @@
       </div>
 
       <div id="nav-dropdown" class="nav-dropdown" aria-hidden="true">
-        <div class="max-w-6xl mx-auto">
-          <div class="nav-grid font-system">
-            <a href="#philosophy" onclick="closeNav()">PHILOSOPHY</a>
-            <a href="#variables" onclick="closeNav()">VARIABLES</a>
-            <a href="#colors" onclick="closeNav()">COLORS</a>
-            <a href="#typography" onclick="closeNav()">TYPOGRAPHY</a>
-            <a href="#spacing" onclick="closeNav()">SPACING</a>
-            <a href="#grid" onclick="closeNav()">GRID</a>
-            <a href="#responsive" onclick="closeNav()">RESPONSIVE</a>
-            <a href="#icons" onclick="closeNav()">ICONS</a>
-            <a href="#elevation" onclick="closeNav()">ELEVATION</a>
-            <a href="#radius" onclick="closeNav()">RADIUS</a>
-            <a href="#components" onclick="closeNav()">COMPONENTS</a>
-            <a href="#examples" onclick="closeNav()">EXAMPLES</a>
-            <a href="#states" onclick="closeNav()">STATES</a>
-            <a href="#layout" onclick="closeNav()">LAYOUT</a>
-            <a href="#a11y" onclick="closeNav()">A11Y</a>
-            <a href="#motion" onclick="closeNav()">MOTION</a>
-            <a href="#content" onclick="closeNav()">CONTENT</a>
-            <a href="#tokens" onclick="closeNav()">TOKENS</a>
+        <div class="max-w-6xl mx-auto px-8 py-8">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-system">
+            
+            <!-- Group 1: System -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">SYSTEM</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#philosophy" class="nav-link" onclick="closeNav()">PHILOSOPHY</a>
+                <a href="#variables" class="nav-link" onclick="closeNav()">VARIABLES</a>
+                <a href="#tokens" class="nav-link" onclick="closeNav()">TOKENS</a>
+                <a href="#grid" class="nav-link" onclick="closeNav()">GRID & BREAKPOINTS</a>
+              </div>
+            </div>
+
+            <!-- Group 2: Foundations -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">FOUNDATIONS</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#colors" class="nav-link" onclick="closeNav()">COLORS</a>
+                <a href="#typography" class="nav-link" onclick="closeNav()">TYPOGRAPHY</a>
+                <a href="#spacing" class="nav-link" onclick="closeNav()">SPACING</a>
+                <a href="#icons" class="nav-link" onclick="closeNav()">ICONOGRAPHY</a>
+                <a href="#elevation" class="nav-link" onclick="closeNav()">ELEVATION & RADIUS</a>
+              </div>
+            </div>
+
+            <!-- Group 3: Components -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">COMPONENTS</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#components" class="nav-link" onclick="closeNav()">CORE UI</a>
+                <a href="#examples" class="nav-link" onclick="closeNav()">EXAMPLES</a>
+                <a href="#mechanics" class="nav-link" onclick="closeNav()">GAME MECHANICS</a>
+                <a href="#states" class="nav-link" onclick="closeNav()">INTERACTIVE STATES</a>
+              </div>
+            </div>
+
+            <!-- Group 4: Experience -->
+            <div>
+              <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">EXPERIENCE</h4>
+              <div class="flex flex-col gap-2">
+                <a href="#layout" class="nav-link" onclick="closeNav()">LAYOUT ARCHETYPES</a>
+                <a href="#a11y" class="nav-link" onclick="closeNav()">ACCESSIBILITY</a>
+                <a href="#motion" class="nav-link" onclick="closeNav()">MOTION</a>
+                <a href="#content" class="nav-link" onclick="closeNav()">CONTENT & VOICE</a>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </nav>
 
     <main id="main-content" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+      <div class="category-header">01. System</div>
 
       <!-- Philosophy -->
       <section class="section py-8 md:py-12" id="philosophy">
@@ -422,6 +429,8 @@
 }</pre>
         </div>
       </section>
+
+      <div class="category-header">02. Foundations</div>
 
       <!-- Colors -->
       <section class="section py-8 md:py-12" id="colors">
@@ -1367,6 +1376,8 @@
         </div>
       </section>
 
+      <div class="category-header">03. Components</div>
+
       <!-- Components -->
       <section class="section" id="components">
         <h2 class="text-2xl font-semibold mb-6">Components</h2>
@@ -1457,6 +1468,8 @@
           </div>
         </div>
       </section>
+
+      <div class="category-header">04. Experience</div>
 
       <!-- Layout Patterns -->
       <section class="section py-8 md:py-12" id="layout">
