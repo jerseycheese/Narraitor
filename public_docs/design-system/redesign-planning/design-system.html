@@ -125,6 +125,26 @@
     .font-narrative { font-family: var(--font-narrative); }
     .font-system { font-family: var(--font-system); }
     .font-interface { font-family: var(--font-interface); }
+    .text-narrative {
+      font-family: var(--font-narrative);
+      font-size: 1.125rem;
+      line-height: 1.75;
+      color: var(--color-text-primary);
+    }
+    .text-technical {
+      font-family: var(--font-system);
+      font-size: 0.875rem;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .text-ui {
+      font-family: var(--font-interface);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--color-text-primary);
+    }
 
     .swatch {
       height: 60px;
@@ -483,6 +503,68 @@
         </div>
 
         <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-2">Full Zinc Neutral Scale (Reference)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Complete neutral ramp used for surfaces, typography, borders, and dark mode tokens.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #fafafa; border: 1px solid #e4e4e7;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-50</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#fafafa</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #f4f4f5;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-100</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#f4f4f5</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #e4e4e7;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-200</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#e4e4e7</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #d4d4d8;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-300</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#d4d4d8</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #a1a1aa;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-400</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#a1a1aa</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #71717a;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-500</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#71717a</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #52525b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-600</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#52525b</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #3f3f46;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-700</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#3f3f46</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #27272a;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-800</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#27272a</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #18181b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-900</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#18181b</div>
+            </div>
+            <div class="p-2 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="h-8 rounded-sm" style="background: #09090b;"></div>
+              <div class="font-system text-xs mt-2" style="color: var(--color-text-primary);">zinc-950</div>
+              <div class="font-system text-xs" style="color: var(--color-text-muted);">#09090b</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
           <h3 class="text-base sm:text-lg font-medium mb-4">Text Colors</h3>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             <div>
@@ -531,6 +613,25 @@
                 <div class="text-xs mt-1" style="color: var(--color-text-muted);">Hover/Active</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h3 class="text-base sm:text-lg font-medium mb-2">Contrast Pairing Matrix</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Ratios below use WCAG contrast math and represent the core text/UI pairings used in this prototype. Re-check these exact pairs in WebAIM before production migration.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Primary on Canvas <span class="font-system">18.27:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Secondary on Canvas <span class="font-system">10.10:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Text Muted on Canvas <span class="font-system">4.68:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Accent on Canvas <span class="font-system">11.05:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">White on Accent Button <span class="font-system">11.42:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Success on Canvas <span class="font-system">7.43:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Error on Canvas <span class="font-system">7.76:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Warning on Canvas <span class="font-system">6.86:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Info on Canvas <span class="font-system">7.32:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Text Primary on Dark Canvas <span class="font-system">19.06:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Text Secondary on Dark Canvas <span class="font-system">13.46:1</span> (AA pass)</div>
+            <div class="p-3 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">Dark Canvas Text on Dark Accent <span class="font-system">6.67:1</span> (AA pass)</div>
           </div>
         </div>
 
@@ -808,6 +909,25 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <div class="mt-12">
+          <h3 class="text-lg font-medium mb-4">Semantic Text Tokens</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Role-based typography utilities map semantic intent to font and rhythm: <code>text-narrative</code>, <code>text-technical</code>, and <code>text-ui</code>.</p>
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-narrative</div>
+              <p class="text-narrative max-w-3xl">The manuscript breathed as you opened it, each line settling into place like ink finding paper.</p>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-technical</div>
+              <p class="text-technical">Turn: 14 • Hp: 42/50 • Save Slot: Auto-3</p>
+            </div>
+            <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">text-ui</div>
+              <p class="text-ui">Continue to Character Attributes</p>
+            </div>
           </div>
         </div>
       </section>
@@ -1499,6 +1619,37 @@
             </div>
           </div>
 
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">Narrative Reading Surface Validation</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Tested at realistic lengths: short paragraph, full-page segment, and multi-paragraph scene progression.</p>
+            <div class="p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="max-w-3xl mx-auto space-y-8">
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SHORT PARAGRAPH</div>
+                  <p class="text-narrative">The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.</p>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FULL-PAGE SEGMENT</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.</p>
+                    <p class="text-narrative">A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: "Records of Irrecoverable Histories." Beneath the desk, a low drawer pulsed with a soft blue glow that brightened when you moved closer.</p>
+                    <p class="text-narrative">When you pulled it open, you found a catalog of names scratched into thin brass sheets. Some had been crossed out with decisive strokes; others had notes beside them in hurried script: "relocated," "sealed," "missing witness." At the bottom of the stack sat a single page of vellum, untouched by dust, bearing your own name in fresh black ink.</p>
+                  </div>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MULTI-PARAGRAPH SCENE FLOW</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You turned the page and the room answered. The rails overhead began to move in sequence, carrying lanterns into a slow orbit around the desk.</p>
+                    <p class="text-narrative">Each pass of light revealed another detail: a hidden map etched into the floorboards, a keyhole set into the spine of a bound atlas, and a thread of red string leading from your chair to the locked west door.</p>
+                    <p class="text-narrative">When the orbit stopped, the lantern nearest you dipped on its own and projected a final line onto the wall: "Begin where your story was first rewritten."</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
           <!-- The Workshop -->
           <div>
             <h3 class="text-base sm:text-lg font-medium mb-3">The "Workshop" (Library/Wizards)</h3>
@@ -1947,8 +2098,8 @@
               </div>
               <div class="text-sm" style="color: var(--color-text-secondary);">
                 <ul class="list-disc pl-5 space-y-1">
-                  <li>Light mode: zinc-900 on zinc-50 = 16.1:1 ✓</li>
-                  <li>Dark mode: zinc-50 on zinc-950 = 18.8:1 ✓</li>
+                  <li>Light mode: text-primary on canvas = 18.27:1 ✓</li>
+                  <li>Dark mode: text-primary on dark-canvas = 19.06:1 ✓</li>
                 </ul>
               </div>
             </div>
@@ -1961,7 +2112,7 @@
               <div class="text-sm" style="color: var(--color-text-secondary);">
                 <ul class="list-disc pl-5 space-y-1">
                   <li>Narrative text (18px) meets enhanced 4.5:1 standard ✓</li>
-                  <li>System labels (14px mono) use zinc-700/zinc-300 = 5.2:1 ✓</li>
+                  <li>System labels (14px mono, muted) on canvas = 4.68:1 ✓</li>
                 </ul>
               </div>
             </div>
@@ -1973,8 +2124,8 @@
               </div>
               <div class="text-sm" style="color: var(--color-text-secondary);">
                 <ul class="list-disc pl-5 space-y-1">
-                  <li>Borders (zinc-200/zinc-700) meet 3:1 against backgrounds ✓</li>
-                  <li>Focus indicators use orange-500 with 2px outline = 4.8:1 ✓</li>
+                  <li>Primary accent indicators on canvas = 11.05:1 ✓</li>
+                  <li>Button text (white on accent) = 11.42:1 ✓</li>
                 </ul>
               </div>
             </div>
@@ -2484,11 +2635,18 @@
               <div class="p-4 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
                 <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">export function NarrativeText({ children }: Props) {
   return (
-    &lt;p className="font-narrative text-lg leading-relaxed
-                  text-text-primary max-w-3xl"&gt;
+    &lt;p className="text-narrative max-w-3xl"&gt;
       {children}
     &lt;/p&gt;
   )
+}
+
+export function SessionMeta() {
+  return &lt;span className="text-technical"&gt;Turn: 14&lt;/span&gt;
+}
+
+export function PrimaryAction() {
+  return &lt;button className="text-ui"&gt;Continue&lt;/button&gt;
 }</pre>
               </div>
             </div>
