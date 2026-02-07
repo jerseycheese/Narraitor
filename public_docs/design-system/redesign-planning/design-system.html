@@ -185,9 +185,15 @@
     }
 
     .manuscript-viewport-layer {
-      position: sticky;
-      top: 0;
-      z-index: 140;
+      position: fixed;
+      inset: 0;
+      z-index: 160;
+    }
+
+    .manuscript-overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: var(--color-scrim);
     }
 
     .manuscript-viewport-shell {
@@ -1779,11 +1785,23 @@
 
           <article class="space-y-4">
             <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
-            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. This preview is rendered as a full-viewport layer and intentionally stacks over the document underneath so it feels like the live app shell.</p>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. Use the launch button to open the manuscript as a true viewport overlay on top of the design system page.</p>
 
-            <div class="full-viewport-breakout manuscript-viewport-layer">
+            <div>
+              <button id="launch-manuscript-overlay" type="button" aria-controls="manuscript-viewport-layer" aria-expanded="false" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">
+                Launch Manuscript Overlay
+              </button>
+            </div>
+
+            <div id="manuscript-viewport-layer" class="full-viewport-breakout manuscript-viewport-layer hidden" aria-hidden="true">
+              <div class="manuscript-overlay-backdrop" data-manuscript-overlay-backdrop></div>
               <div class="manuscript-viewport-shell">
                 <div class="manuscript-viewport-inner">
+                  <div class="absolute top-3 left-1/2 -translate-x-1/2 z-30">
+                    <button id="close-manuscript-overlay" type="button" class="px-3 py-1.5 rounded-sm font-system text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                      Close Overlay (Esc)
+                    </button>
+                  </div>
 
                   <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
                     <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
@@ -2002,7 +2020,7 @@
           </div>
         </div>
 
-        <div id="manuscript-drawer-overlay" class="fixed inset-0 hidden z-[120]" aria-hidden="true">
+        <div id="manuscript-drawer-overlay" class="fixed inset-0 hidden z-[220]" aria-hidden="true">
           <div class="absolute inset-0" data-drawer-backdrop style="background: var(--color-scrim);"></div>
           <aside id="manuscript-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="manuscript-drawer-title" tabindex="-1" class="absolute right-0 top-0 h-full w-full max-w-md p-4 sm:p-6" style="background: var(--color-surface); border-left: 1px solid var(--color-border); box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);">
             <div class="flex items-start justify-between gap-4 mb-4">
@@ -3013,6 +3031,7 @@ export function PrimaryAction() {
 
   <script>
     let activeDrawerTrigger = null;
+    let manuscriptOverlayLauncher = null;
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -3056,6 +3075,60 @@ export function PrimaryAction() {
 
       // Return focus to button
       button.focus();
+    }
+
+    function openManuscriptOverlay() {
+      const overlay = document.getElementById('manuscript-viewport-layer');
+      const closeButton = document.getElementById('close-manuscript-overlay');
+
+      if (!overlay || !closeButton) {
+        return;
+      }
+
+      overlay.classList.remove('hidden');
+      overlay.setAttribute('aria-hidden', 'false');
+
+      if (manuscriptOverlayLauncher) {
+        manuscriptOverlayLauncher.setAttribute('aria-expanded', 'true');
+      }
+
+      document.body.style.overflow = 'hidden';
+      closeButton.focus();
+    }
+
+    function closeManuscriptOverlay() {
+      const overlay = document.getElementById('manuscript-viewport-layer');
+
+      if (!overlay || overlay.classList.contains('hidden')) {
+        return;
+      }
+
+      closeManuscriptDrawer();
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      if (manuscriptOverlayLauncher) {
+        manuscriptOverlayLauncher.setAttribute('aria-expanded', 'false');
+        manuscriptOverlayLauncher.focus();
+      }
+    }
+
+    function initManuscriptOverlayController() {
+      const launchButton = document.getElementById('launch-manuscript-overlay');
+      const overlay = document.getElementById('manuscript-viewport-layer');
+      const closeButton = document.getElementById('close-manuscript-overlay');
+      const backdrop = overlay ? overlay.querySelector('[data-manuscript-overlay-backdrop]') : null;
+
+      if (!launchButton || !overlay || !closeButton || !backdrop) {
+        return;
+      }
+
+      manuscriptOverlayLauncher = launchButton;
+
+      launchButton.addEventListener('click', openManuscriptOverlay);
+      closeButton.addEventListener('click', closeManuscriptOverlay);
+      backdrop.addEventListener('click', closeManuscriptOverlay);
     }
 
     function initManuscriptInputController() {
@@ -3220,6 +3293,7 @@ export function PrimaryAction() {
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      initManuscriptOverlayController();
       initManuscriptInputController();
       initHudControllers();
       initDrawerControllers();
@@ -3238,6 +3312,7 @@ export function PrimaryAction() {
     // Close nav on escape key
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
+        closeManuscriptOverlay();
         closeNav();
         closeManuscriptDrawer();
       }
