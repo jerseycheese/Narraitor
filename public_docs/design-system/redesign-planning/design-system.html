@@ -291,6 +291,15 @@
       top: 0;
     }
 
+    /* Streaming Stability Prototype Utilities */
+    .streaming-skeleton {
+      min-height: 96px;
+    }
+
+    .choice-reserved-space {
+      min-height: 64px;
+    }
+
   </style>
 </head>
 <body>
@@ -377,6 +386,7 @@
               <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">EXPERIENCE</h4>
               <div class="flex flex-col gap-2">
                 <a href="#layout" class="nav-link" onclick="closeNav()">LAYOUT ARCHETYPES</a>
+                <a href="#streaming-stability" class="nav-link" onclick="closeNav()">STREAMING STABILITY</a>
                 <a href="#a11y" class="nav-link" onclick="closeNav()">ACCESSIBILITY</a>
                 <a href="#motion" class="nav-link" onclick="closeNav()">MOTION</a>
                 <a href="#content" class="nav-link" onclick="closeNav()">CONTENT & VOICE</a>
@@ -1666,6 +1676,159 @@
                 </div>
               </div>
             </div>
+        </div>
+      </section>
+
+      <!-- Streaming Stability Prototype -->
+      <section class="section py-8 md:py-12" id="streaming-stability">
+        <div class="category-header">05. Experience: Stability</div>
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Streaming Stability Prototype</h2>
+        <p class="mb-8 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+          Validating buffered rendering, scroll anchoring, and layout stability for AI-generated content.
+          Target: Cumulative Layout Shift (CLS) < 0.10.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <!-- Single Stream Prototype -->
+          <div class="flex flex-col h-full">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Single Segment Streaming</h3>
+            <div class="p-6 rounded-sm flex-1 flex flex-col" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div id="single-stream-container" class="font-narrative text-base sm:text-lg mb-6 overflow-y-auto max-h-[400px] streaming-skeleton" style="color: var(--color-text-primary);">
+                <!-- Text appends here -->
+              </div>
+              <div id="single-stream-choices" class="choice-reserved-space mt-auto pt-4 border-t border-border flex gap-4 hidden">
+                <button class="px-4 py-2 text-sm font-medium rounded-sm" style="background: var(--color-accent); color: white;">Option A</button>
+                <button class="px-4 py-2 text-sm font-medium rounded-sm border border-border" style="background: var(--color-surface); color: var(--color-text-primary);">Option B</button>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-4 items-center">
+              <button id="start-single-stream" class="px-4 py-2 text-xs font-semibold rounded-sm tracking-wide" style="background: var(--color-accent); color: white;">START STREAM</button>
+              <button id="reset-single-stream" class="px-4 py-2 text-xs font-semibold rounded-sm border border-border tracking-wide" style="background: var(--color-surface); color: var(--color-text-primary);">RESET</button>
+              <div class="ml-auto text-[10px] font-system text-muted uppercase">Single Segment</div>
+            </div>
+          </div>
+
+          <!-- History Stream Prototype -->
+          <div class="flex flex-col h-full">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Multi-Segment Narrative History</h3>
+            <div class="p-6 rounded-sm flex-1 flex flex-col" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div id="history-stream-container" class="font-narrative text-base sm:text-lg mb-6 overflow-y-auto max-h-[400px] scroll-smooth" style="color: var(--color-text-primary);">
+                <!-- Segments append here -->
+              </div>
+              <div id="history-stream-choices" class="choice-reserved-space mt-auto pt-4 border-t border-border flex gap-4 hidden">
+                <button class="px-4 py-2 text-sm font-medium rounded-sm" style="background: var(--color-accent); color: white;">Next Path</button>
+                <button class="px-4 py-2 text-sm font-medium rounded-sm border border-border" style="background: var(--color-surface); color: var(--color-text-primary);">Alternative</button>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-4 items-center">
+              <button id="start-history-stream" class="px-4 py-2 text-xs font-semibold rounded-sm tracking-wide" style="background: var(--color-accent); color: white;">START HISTORY</button>
+              <button id="reset-history-stream" class="px-4 py-2 text-xs font-semibold rounded-sm border border-border tracking-wide" style="background: var(--color-surface); color: var(--color-text-primary);">RESET</button>
+              <button id="simulate-scrolled-up" class="px-4 py-2 text-xs font-semibold rounded-sm border border-border tracking-wide" style="background: var(--color-surface); color: var(--color-text-primary);">SIMULATE SCROLLED UP</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics and Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 rounded-sm mb-12" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+          <div class="md:col-span-2">
+            <h4 class="text-sm font-system font-bold mb-4 uppercase tracking-widest" style="color: var(--color-text-muted);">Validation Controls</h4>
+            <div class="flex flex-wrap gap-8">
+              <div>
+                <label class="block text-[10px] font-system text-muted uppercase mb-2">Flush Interval (ms)</label>
+                <select id="flush-interval" class="bg-transparent border border-border rounded-sm px-3 py-1 text-sm font-system">
+                  <option value="50">50ms (Rapid)</option>
+                  <option value="75" selected>75ms (Balanced)</option>
+                  <option value="100">100ms (Conservative)</option>
+                  <option value="0">Per-Token (Stress)</option>
+                </select>
+              </div>
+              <div class="max-w-xs">
+                <p class="text-[10px] leading-relaxed" style="color: var(--color-text-muted);">
+                  Lower intervals increase main-thread thrash and risk higher CLS. 75ms is the recommended baseline for high-stability streaming.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-8">
+            <h4 class="text-sm font-system font-bold mb-4 uppercase tracking-widest" style="color: var(--color-text-muted);">Stability Metrics</h4>
+            <div class="space-y-4">
+              <div>
+                <div class="text-[10px] font-system text-muted uppercase mb-1">Cumulative Layout Shift</div>
+                <div id="cls-current-value" class="text-2xl font-system font-bold">0.0000</div>
+              </div>
+              <div id="cls-status" class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-system font-bold uppercase tracking-wider" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                PASS: < 0.10
+              </div>
+              <button id="reset-metrics" class="block text-[10px] font-system text-accent underline uppercase">Reset Counter</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Done Criteria & Safari Notes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold">Validation Checklist</h4>
+            <ul class="space-y-2 text-sm" style="color: var(--color-text-secondary);">
+              <li class="flex items-start"><span class="mr-2">□</span> <span>Single-segment CLS remains < 0.10</span></li>
+              <li class="flex items-start"><span class="mr-2">□</span> <span>Multi-segment history remains < 0.10</span></li>
+              <li class="flex items-start"><span class="mr-2">□</span> <span>Scroll anchoring honors manual scroll-up</span></li>
+              <li class="flex items-start"><span class="mr-2">□</span> <span>No visible "jumping" during choice reveal</span></li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-sm" style="background: rgba(7, 89, 133, 0.05); border: 1px solid rgba(7, 89, 133, 0.2);">
+            <h4 class="text-sm font-semibold mb-2" style="color: var(--color-info);">Safari Compatibility Note</h4>
+            <p class="text-xs leading-relaxed" style="color: var(--color-info);">
+              Safari does not natively support <code>overflow-anchor</code>. This prototype validates that <code>ResizeObserver</code> based anchoring provides an equivalent stable experience for iOS and macOS users without layout thrashing.
+            </p>
+          </div>
+        </div>
+
+        <!-- Manual Measurement Guide -->
+        <div class="mt-12 p-6 rounded-sm border border-border bg-canvas">
+          <h4 class="text-sm font-bold uppercase tracking-widest mb-4">Manual Validation Guide</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs leading-relaxed">
+            <div>
+              <h5 class="font-bold mb-2 uppercase text-[10px] text-muted">DevTools Benchmark</h5>
+              <ol class="list-decimal pl-4 space-y-2">
+                <li>Open Chrome DevTools -> Performance tab.</li>
+                <li>Click <strong>Record</strong>.</li>
+                <li>Run <strong>Single Segment Stream</strong> and <strong>Multi-Segment History</strong>.</li>
+                <li>Stop recording and check the <strong>Experience</strong> row for Layout Shifts.</li>
+                <li>Verify final CLS in the summary matches the in-page counter below 0.10.</li>
+              </ol>
+            </div>
+            <div>
+              <h5 class="font-bold mb-2 uppercase text-[10px] text-muted">UX Stability Check</h5>
+              <ol class="list-decimal pl-4 space-y-2">
+                <li>Start a stream, then manually scroll up before it finishes.</li>
+                <li>Confirm the viewport <strong>stops following</strong> new text (anchoring disabled).</li>
+                <li>Scroll back to the bottom; confirm anchoring <strong>re-engages</strong>.</li>
+                <li>Watch the choice reveal; confirm no other elements on the page move.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Handoff Notes -->
+        <div class="mt-8 p-6 rounded-sm border-l-4 border-accent bg-surface-hover">
+          <h4 class="text-sm font-bold uppercase tracking-widest mb-4">Migration Handoff (#1033)</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs leading-relaxed">
+            <div>
+              <p class="font-bold mb-2">Validated Defaults</p>
+              <ul class="space-y-1">
+                <li><strong>Buffer Interval:</strong> 75ms (Optimal balance of perceived speed vs stability)</li>
+                <li><strong>Method:</strong> <code>insertAdjacentText</code> (Minimizes DOM thrash)</li>
+                <li><strong>Anchoring:</strong> <code>ResizeObserver</code> + Pin State (Safari compatible)</li>
+              </ul>
+            </div>
+            <div>
+              <p class="font-bold mb-2">Production Implementation Notes</p>
+              <ul class="space-y-1">
+                <li>Replace <code>scroll-snap</code> with standard overflow if snap causes jumping during stream.</li>
+                <li>Ensure choices container uses <code>min-height</code> or <code>grid-template-rows</code> to reserve space.</li>
+                <li>Use <code>PerformanceObserver</code> in dev/preview builds to monitor regressions.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -2719,6 +2882,277 @@ export function PrimaryAction() {
       if (event.key === 'Escape') {
         closeNav();
       }
+    });
+
+    // --- Streaming Stability Prototype Logic ---
+
+    const NARRATIVE_FIXTURE = "The machine hummed with a low, rhythmic vibration that seemed to bypass the ears and resonate directly in the marrow of your bones. Across the brass console, dozens of tiny needles danced over paper scrolls, recording data from a reality you weren't entirely sure still existed. You reached out, your fingers hovering inches above the primary lever—a cold, salt-crusted iron bar that looked like it had been pulled from a shipwreck. If you pulled it, the sequence would begin. The atmospheric stabilizers would vent, the chronal anchors would drop, and the world outside these reinforced walls would either snap back into focus or dissolve into the static of an unwritten future.";
+
+    const HISTORY_FIXTURES = [
+      "The heavy air of the archive smelled of ozone and ancient parchment. You moved through the rows of shelving, your lantern casting long, flickering shadows that seemed to whisper of secrets long buried.",
+      "At the end of the hall, a single pedestal stood bathed in a shaft of pale moonlight. Resting upon it was the artifact you had sought for years—a simple brass compass, its needle spinning wildly as if lost in a storm of possibilities.",
+      "As your hand closed around the cool metal, the floor beneath you groaned. The mechanism was ancient, but it was still alive, and you had just triggered the first stage of its awakening."
+    ];
+
+    function tokenizeForStreaming(text) {
+      return text.split(/(\s+)/).filter(Boolean);
+    }
+
+    function isNearBottom(el, threshold = 24) {
+      return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
+    }
+
+    class StreamingRenderer {
+      constructor(containerId, choicesId, options = {}) {
+        this.containerId = containerId;
+        this.container = document.getElementById(containerId);
+        this.choices = document.getElementById(choicesId);
+        this.onComplete = options.onComplete || (() => {});
+        this.tokens = [];
+        this.remainingTokens = [];
+        this.queue = [];
+        this.intervalId = null;
+        this.isStreaming = false;
+        this.isFeederActive = false;
+        this.shouldAnchor = true;
+        this.currentWrapper = null;
+        this.resolveCompletion = null;
+        this.cancelRequested = false;
+
+        // Initialize ResizeObserver for scroll anchoring
+        this.observer = new ResizeObserver(() => {
+          if (this.isStreaming && this.shouldAnchor) {
+            this.container.scrollTop = this.container.scrollHeight;
+          }
+        });
+        this.observer.observe(this.container);
+
+        // Track manual scroll to disable/enable anchoring
+        this.container.addEventListener('scroll', () => {
+          if (this.isStreaming) {
+            this.shouldAnchor = isNearBottom(this.container);
+          }
+        });
+      }
+
+      async start(text, shouldReset = true) {
+        if (this.isStreaming) {
+          return Promise.resolve();
+        }
+
+        // Return a promise that resolves when streaming is fully complete
+        return new Promise(async (resolve) => {
+          if (shouldReset) this.reset();
+
+          this.cancelRequested = false;
+          
+          // Re-evaluate anchoring at start of new stream
+          this.shouldAnchor = isNearBottom(this.container);
+          
+          this.tokens = tokenizeForStreaming(text);
+          this.remainingTokens = [...this.tokens];
+          this.isStreaming = true;
+          this.resolveCompletion = resolve;
+          
+          // Brief skeleton phase
+          this.container.classList.add('streaming-skeleton');
+          await new Promise(r => setTimeout(r, 400));
+          this.container.classList.remove('streaming-skeleton');
+          
+          if (shouldReset) {
+            this.container.innerHTML = '';
+          }
+
+          // Always ensure content is in a wrapper div for layout stability
+          this.currentWrapper = document.createElement('div');
+          this.currentWrapper.className = 'mb-6 last:mb-0';
+          this.container.appendChild(this.currentWrapper);
+          
+          const flushLoop = () => {
+            if (!this.isStreaming || this.cancelRequested) {
+              return;
+            }
+
+            if (this.queue.length > 0) {
+              const chunk = this.queue.join('');
+              this.currentWrapper.insertAdjacentText('beforeend', chunk);
+              this.queue = [];
+            }
+            
+            if (this.remainingTokens.length === 0 && this.queue.length === 0 && !this.isFeederActive) {
+              this.stop();
+            }
+          };
+
+          const interval = this.getFlushInterval();
+          if (interval === 0) {
+            // Special case: per-token stress test
+            this.isFeederActive = true;
+            while (this.remainingTokens.length > 0 && !this.cancelRequested) {
+              const token = this.remainingTokens.shift();
+              this.currentWrapper.insertAdjacentText('beforeend', token);
+              await new Promise(r => setTimeout(r, 20));
+            }
+            this.isFeederActive = false;
+            if (!this.cancelRequested && this.isStreaming) {
+              this.stop();
+            }
+          } else {
+            this.intervalId = setInterval(flushLoop, interval);
+            this.isFeederActive = true;
+            while (this.remainingTokens.length > 0 && !this.cancelRequested) {
+              const token = this.remainingTokens.shift();
+              this.queue.push(token);
+              await new Promise(r => setTimeout(r, Math.random() * 30 + 10));
+            }
+            this.isFeederActive = false;
+            if (this.cancelRequested) {
+              this.queue = [];
+            }
+            // The flushLoop will catch the remaining queue and call stop()
+          }
+        });
+      }
+
+      getFlushInterval() {
+        const select = document.getElementById('flush-interval');
+        return select ? parseInt(select.value) : 75;
+      }
+
+      stop() {
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+
+        if (!this.isStreaming && !this.resolveCompletion) {
+          return;
+        }
+
+        this.isStreaming = false;
+        this.isFeederActive = false;
+        this.cancelRequested = false;
+        if (this.choices) {
+          this.choices.classList.remove('hidden');
+        }
+        this.onComplete();
+        if (this.resolveCompletion) {
+          this.resolveCompletion();
+          this.resolveCompletion = null;
+        }
+      }
+
+      reset() {
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+
+        this.cancelRequested = true;
+        this.isStreaming = false;
+        this.isFeederActive = false;
+        this.container.innerHTML = '';
+        this.container.classList.add('streaming-skeleton');
+        if (this.choices) {
+          this.choices.classList.add('hidden');
+        }
+        this.queue = [];
+        this.tokens = [];
+        this.remainingTokens = [];
+        this.currentWrapper = null;
+        if (this.resolveCompletion) {
+          this.resolveCompletion();
+          this.resolveCompletion = null;
+        }
+      }
+    }
+
+    const singleRenderer = new StreamingRenderer('single-stream-container', 'single-stream-choices');
+
+    document.getElementById('start-single-stream').addEventListener('click', () => {
+      singleRenderer.start(NARRATIVE_FIXTURE);
+    });
+
+    document.getElementById('reset-single-stream').addEventListener('click', () => {
+      singleRenderer.reset();
+    });
+
+    document.getElementById('simulate-scrolled-up').addEventListener('click', () => {
+      const container = document.getElementById('history-stream-container');
+      container.scrollTop = 0;
+    });
+
+    const historyRenderer = new StreamingRenderer('history-stream-container', 'history-stream-choices');
+
+    document.getElementById('start-history-stream').addEventListener('click', async () => {
+      historyRenderer.reset();
+      
+      for (let i = 0; i < HISTORY_FIXTURES.length; i++) {
+        const isLast = i === HISTORY_FIXTURES.length - 1;
+        const segmentText = HISTORY_FIXTURES[i];
+        
+        // We no longer need to create a manual segmentEl because start() 
+        // creates a currentWrapper for us inside the container.
+        // If it's the last one, it will reveal choices upon completion
+        const originalChoices = historyRenderer.choices;
+        if (!isLast) historyRenderer.choices = null; 
+        
+        await historyRenderer.start(segmentText, false);
+        
+        // Restore renderer state for next segment
+        historyRenderer.choices = originalChoices;
+        
+        if (!isLast) {
+          // Pause between segments
+          await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+    });
+
+    document.getElementById('reset-history-stream').addEventListener('click', () => {
+      historyRenderer.reset();
+    });
+
+    // --- CLS Instrumentation ---
+
+    let clsValue = 0;
+    const clsDisplay = document.getElementById('cls-current-value');
+    const clsStatus = document.getElementById('cls-status');
+
+    function renderCls() {
+      if (clsDisplay) {
+        clsDisplay.textContent = clsValue.toFixed(4);
+      }
+      if (clsStatus) {
+        if (clsValue < 0.10) {
+          clsStatus.style.background = 'rgba(34, 197, 94, 0.1)';
+          clsStatus.style.color = '#22c55e';
+          clsStatus.textContent = 'PASS: < 0.10';
+        } else {
+          clsStatus.style.background = 'rgba(159, 18, 57, 0.1)';
+          clsStatus.style.color = '#9f1239';
+          clsStatus.textContent = 'FAIL: > 0.10';
+        }
+      }
+    }
+
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!entry.hadRecentInput) {
+            clsValue += entry.value;
+          }
+        }
+        renderCls();
+      });
+      observer.observe({ type: 'layout-shift', buffered: true });
+    } catch (e) {
+      console.warn('Layout Shift PerformanceObserver not supported');
+    }
+
+    document.getElementById('reset-metrics').addEventListener('click', () => {
+      clsValue = 0;
+      renderCls();
     });
   </script>
 
