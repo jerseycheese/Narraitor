@@ -1856,7 +1856,7 @@
                       </div>
                     </div>
 
-                    <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,220px] gap-4 items-start">
+                    <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-4 items-start">
                       <div class="min-h-[150px] rounded-sm p-4" style="background: var(--color-surface); border: 1px solid var(--color-border);">
                         <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
                         <fieldset class="space-y-2" aria-label="Suggested actions">
@@ -1877,12 +1877,35 @@
 
                       <aside class="rounded-sm p-4 min-h-[150px]" style="background: var(--color-surface); border: 1px solid var(--color-border);">
                         <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
-                        <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal side annotations.</p>
-                        <div data-marginalia-note="ledger-mark" hidden class="text-sm" style="color: var(--color-text-secondary);">
-                          <strong style="color: var(--color-text-primary);">Aster-9:</strong> Former archivist clearance sigil tied to restricted witness ledgers.
-                        </div>
-                        <div data-marginalia-note="vault-window" hidden class="text-sm" style="color: var(--color-text-secondary);">
-                          <strong style="color: var(--color-text-primary);">Pressure equalization:</strong> 90-second interval where vault locks can be bypassed without triggering alarms.
+                        <p class="text-xs mb-2" style="color: var(--color-text-muted);">Mocked from existing models: <code>LoreFact</code> + <code>JournalEntry</code>.</p>
+                        <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal the linked lore and journal records.</p>
+                        <div id="marginalia-view" hidden class="space-y-3">
+                          <div>
+                            <h5 id="marginalia-title" class="text-sm font-semibold" style="color: var(--color-text-primary);">-</h5>
+                            <p id="marginalia-description" class="text-xs mt-1" style="color: var(--color-text-secondary);">-</p>
+                          </div>
+
+                          <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                            <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">LORE FACT (MOCK)</div>
+                            <div class="text-xs" style="color: var(--color-text-secondary);">
+                              <div><strong style="color: var(--color-text-primary);">ID:</strong> <span id="marginalia-lore-id">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Category:</strong> <span id="marginalia-lore-category">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Visibility:</strong> <span id="marginalia-lore-visibility">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Value:</strong> <span id="marginalia-lore-value">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Tags:</strong> <span id="marginalia-lore-tags">-</span></div>
+                            </div>
+                          </div>
+
+                          <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                            <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">JOURNAL ENTRY (MOCK)</div>
+                            <div class="text-xs" style="color: var(--color-text-secondary);">
+                              <div><strong style="color: var(--color-text-primary);">ID:</strong> <span id="marginalia-journal-id">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Type:</strong> <span id="marginalia-journal-type">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Significance:</strong> <span id="marginalia-journal-significance">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Summary:</strong> <span id="marginalia-journal-content">-</span></div>
+                              <div><strong style="color: var(--color-text-primary);">Related:</strong> <span id="marginalia-journal-related">-</span></div>
+                            </div>
+                          </div>
                         </div>
                       </aside>
                     </div>
@@ -3274,20 +3297,108 @@ export function PrimaryAction() {
 
     function initMarginaliaController() {
       const noteButtons = document.querySelectorAll('[data-marginalia-target]');
-      const notes = document.querySelectorAll('[data-marginalia-note]');
       const emptyState = document.getElementById('marginalia-empty');
+      const view = document.getElementById('marginalia-view');
 
-      if (noteButtons.length === 0 || notes.length === 0 || !emptyState) {
+      const title = document.getElementById('marginalia-title');
+      const description = document.getElementById('marginalia-description');
+
+      const loreId = document.getElementById('marginalia-lore-id');
+      const loreCategory = document.getElementById('marginalia-lore-category');
+      const loreVisibility = document.getElementById('marginalia-lore-visibility');
+      const loreValue = document.getElementById('marginalia-lore-value');
+      const loreTags = document.getElementById('marginalia-lore-tags');
+
+      const journalId = document.getElementById('marginalia-journal-id');
+      const journalType = document.getElementById('marginalia-journal-type');
+      const journalSignificance = document.getElementById('marginalia-journal-significance');
+      const journalContent = document.getElementById('marginalia-journal-content');
+      const journalRelated = document.getElementById('marginalia-journal-related');
+
+      const marginaliaMockData = {
+        'ledger-mark': {
+          title: 'Aster-9 clearance mark',
+          description: 'Former archivist sigil tied to restricted witness ledgers.',
+          loreFact: {
+            id: 'lore_fact_aster9',
+            category: 'rules',
+            visibility: 'world-shared',
+            value: 'Aster-9 is a restricted archive clearance marker.',
+            tags: ['archives', 'clearance', 'security'],
+          },
+          journalEntry: {
+            id: 'journal_021',
+            type: 'discovery',
+            significance: 'major',
+            content: 'Discovered Aster-9 marker on hidden compartment key.',
+            related: 'location:Lower Archive, item:Archive Key',
+          },
+        },
+        'vault-window': {
+          title: 'Pressure equalization window',
+          description: '90-second bypass interval for the western vault lock.',
+          loreFact: {
+            id: 'lore_fact_vault_window',
+            category: 'events',
+            visibility: 'session-private',
+            value: 'Western vault lock weakens during pressure equalization.',
+            tags: ['vault', 'timing', 'security-cycle'],
+          },
+          journalEntry: {
+            id: 'journal_022',
+            type: 'decision',
+            significance: 'critical',
+            content: 'Marked the pressure cycle as the safest breach window.',
+            related: 'event:Vault Cycle, location:West Vault',
+          },
+        },
+      };
+
+      if (
+        noteButtons.length === 0 ||
+        !emptyState ||
+        !view ||
+        !title ||
+        !description ||
+        !loreId ||
+        !loreCategory ||
+        !loreVisibility ||
+        !loreValue ||
+        !loreTags ||
+        !journalId ||
+        !journalType ||
+        !journalSignificance ||
+        !journalContent ||
+        !journalRelated
+      ) {
         return;
       }
 
       noteButtons.forEach((button) => {
         button.addEventListener('click', () => {
           const target = button.getAttribute('data-marginalia-target');
-          notes.forEach((note) => {
-            note.hidden = note.getAttribute('data-marginalia-note') !== target;
-          });
+          const record = target ? marginaliaMockData[target] : null;
+          if (!record) {
+            return;
+          }
+
+          title.textContent = record.title;
+          description.textContent = record.description;
+
+          loreId.textContent = record.loreFact.id;
+          loreCategory.textContent = record.loreFact.category;
+          loreVisibility.textContent = record.loreFact.visibility;
+          loreValue.textContent = record.loreFact.value;
+          loreTags.textContent = record.loreFact.tags.join(', ');
+
+          journalId.textContent = record.journalEntry.id;
+          journalType.textContent = record.journalEntry.type;
+          journalSignificance.textContent = record.journalEntry.significance;
+          journalContent.textContent = record.journalEntry.content;
+          journalRelated.textContent = record.journalEntry.related;
+
           emptyState.hidden = true;
+          view.hidden = false;
         });
       });
     }
