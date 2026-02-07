@@ -177,6 +177,30 @@
       border-bottom: none;
     }
 
+    .full-viewport-breakout {
+      width: 100vw;
+      max-width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+    }
+
+    .manuscript-viewport-shell {
+      min-height: clamp(680px, calc(100vh - 128px), 920px);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manuscript-viewport-inner {
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding-left: clamp(0.75rem, 2vw, 1.5rem);
+      padding-right: clamp(0.75rem, 2vw, 1.5rem);
+      min-height: inherit;
+    }
+
     code {
       background: var(--color-surface-hover);
       padding: 2px 6px;
@@ -1746,110 +1770,114 @@
             </p>
           </div>
 
-          <article class="p-4 sm:p-6 rounded-sm relative overflow-hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); min-height: 820px;">
+          <article class="space-y-4">
             <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
-            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. HUD and drawers are overlays so content density stays stable under interaction.</p>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. This preview now breaks out to a full-viewport composition so it reads like the real app shell instead of a constrained documentation card.</p>
 
-            <div class="relative rounded-sm overflow-hidden" style="background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end)); border: 1px solid var(--color-border); min-height: 700px;">
+            <div class="full-viewport-breakout">
+              <div class="manuscript-viewport-shell">
+                <div class="manuscript-viewport-inner">
 
-              <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
-                <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                  Character HUD (Collapsed)
-                </button>
-                <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                  <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">VITALS</h4>
-                  <dl class="space-y-1 text-sm">
-                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">32 / 40</dd></div>
-                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Focus</dt><dd style="color: var(--color-text-primary);">11 / 12</dd></div>
-                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Light</dt><dd style="color: var(--color-text-primary);">Lantern x1</dd></div>
-                  </dl>
-                </div>
-              </div>
-
-              <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                  Session HUD (Collapsed)
-                </button>
-                <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                  <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
-                  <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
-                    <li>Turn: 14</li>
-                    <li>Region: Lower Archive</li>
-                    <li>Last check: Perception success</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-44">
-                <div class="mb-4 flex flex-wrap gap-2">
-                  <button type="button" data-drawer-trigger data-drawer-panel="character" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
-                  <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
-                  <button type="button" data-drawer-trigger data-drawer-panel="journal" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal</button>
-                </div>
-
-                <div style="max-height: 360px; overflow-y: auto; padding-right: 8px;">
-                  <div class="space-y-5">
-                    <p class="text-narrative">The lantern hissed as you descended the brass stairwell, each step ringing through the archive like a tuning fork. Dust drifted in geometric lines across the beam, and the smell of warm oil gave way to a colder scent of wet stone.</p>
-                    <p class="text-narrative">At the landing, the corridor split into three galleries. The left wall carried etched donor names, some scratched away and replaced with hurried corrections. You paused at the newest inscription and traced the final line with your thumb. The ink was still tacky.</p>
-                    <div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
-                      <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: PERCEPTION SUCCESS (14 vs DC 12)</div>
-                      <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You detect a hidden service hatch behind the donor plaques, aligned with fresh hinge scratches and soot-free brass.</p>
+                  <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
+                    <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                      Character HUD (Collapsed)
+                    </button>
+                    <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">VITALS</h4>
+                      <dl class="space-y-1 text-sm">
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">32 / 40</dd></div>
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Focus</dt><dd style="color: var(--color-text-primary);">11 / 12</dd></div>
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Light</dt><dd style="color: var(--color-text-primary);">Lantern x1</dd></div>
+                      </dl>
                     </div>
-                    <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark
-                      <button type="button" data-marginalia-target="ledger-mark" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">Aster-9</button>.
-                    </p>
-                    <p class="text-narrative">A page pinned beneath the key listed access windows for the western vault. One entry was circled twice and annotated in hurried hand:
-                      <button type="button" data-marginalia-target="vault-window" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">"Open only during pressure equalization."</button>
-                    </p>
-                    <p class="text-narrative">The corridor lights dimmed to amber. Somewhere below, the vault gears engaged and the floor beneath your boots trembled in a slow, deliberate rhythm.</p>
-                  </div>
-                </div>
-
-                <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,220px] gap-4 items-start">
-                  <div class="min-h-[150px] rounded-sm p-4" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                    <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
-                    <fieldset class="space-y-2" aria-label="Suggested actions">
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" checked class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Inspect the service hatch mechanism before entering.</span>
-                      </label>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Take the key and follow the red string toward the west vault.</span>
-                      </label>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Record the inscription changes in your journal before moving.</span>
-                      </label>
-                    </fieldset>
                   </div>
 
-                  <aside class="rounded-sm p-4 min-h-[150px]" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                    <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
-                    <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal side annotations.</p>
-                    <div data-marginalia-note="ledger-mark" hidden class="text-sm" style="color: var(--color-text-secondary);">
-                      <strong style="color: var(--color-text-primary);">Aster-9:</strong> Former archivist clearance sigil tied to restricted witness ledgers.
+                  <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                    <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                      Session HUD (Collapsed)
+                    </button>
+                    <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
+                      <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
+                        <li>Turn: 14</li>
+                        <li>Region: Lower Archive</li>
+                        <li>Last check: Perception success</li>
+                      </ul>
                     </div>
-                    <div data-marginalia-note="vault-window" hidden class="text-sm" style="color: var(--color-text-secondary);">
-                      <strong style="color: var(--color-text-primary);">Pressure equalization:</strong> 90-second interval where vault locks can be bypassed without triggering alarms.
-                    </div>
-                  </aside>
-                </div>
-              </div>
+                  </div>
 
-              <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                  <label class="flex items-center gap-2 text-xs font-system cursor-pointer" style="color: var(--color-text-muted);">
-                    <input id="manuscript-stream-toggle" type="checkbox">
-                    STREAMING RESPONSE ACTIVE
-                  </label>
-                  <div id="manuscript-stream-status" role="status" aria-live="polite" class="text-xs font-system" style="color: var(--color-text-secondary);">Status: Ready for input</div>
-                </div>
-                <label for="manuscript-input" class="sr-only">Narrative input</label>
-                <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Describe your next action..."></textarea>
-                <div class="mt-2 flex items-center justify-between gap-3">
-                  <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
-                  <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Turn</button>
+                  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-44">
+                    <div class="mb-4 flex flex-wrap gap-2">
+                      <button type="button" data-drawer-trigger data-drawer-panel="character" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
+                      <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
+                      <button type="button" data-drawer-trigger data-drawer-panel="journal" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal</button>
+                    </div>
+
+                    <div style="max-height: clamp(280px, 42vh, 540px); overflow-y: auto; padding-right: 8px;">
+                      <div class="space-y-5">
+                        <p class="text-narrative">The lantern hissed as you descended the brass stairwell, each step ringing through the archive like a tuning fork. Dust drifted in geometric lines across the beam, and the smell of warm oil gave way to a colder scent of wet stone.</p>
+                        <p class="text-narrative">At the landing, the corridor split into three galleries. The left wall carried etched donor names, some scratched away and replaced with hurried corrections. You paused at the newest inscription and traced the final line with your thumb. The ink was still tacky.</p>
+                        <div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
+                          <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: PERCEPTION SUCCESS (14 vs DC 12)</div>
+                          <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You detect a hidden service hatch behind the donor plaques, aligned with fresh hinge scratches and soot-free brass.</p>
+                        </div>
+                        <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark
+                          <button type="button" data-marginalia-target="ledger-mark" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">Aster-9</button>.
+                        </p>
+                        <p class="text-narrative">A page pinned beneath the key listed access windows for the western vault. One entry was circled twice and annotated in hurried hand:
+                          <button type="button" data-marginalia-target="vault-window" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">"Open only during pressure equalization."</button>
+                        </p>
+                        <p class="text-narrative">The corridor lights dimmed to amber. Somewhere below, the vault gears engaged and the floor beneath your boots trembled in a slow, deliberate rhythm.</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,220px] gap-4 items-start">
+                      <div class="min-h-[150px] rounded-sm p-4" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
+                        <fieldset class="space-y-2" aria-label="Suggested actions">
+                          <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="manuscript-choice" checked class="mt-1">
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Inspect the service hatch mechanism before entering.</span>
+                          </label>
+                          <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="manuscript-choice" class="mt-1">
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Take the key and follow the red string toward the west vault.</span>
+                          </label>
+                          <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="manuscript-choice" class="mt-1">
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Record the inscription changes in your journal before moving.</span>
+                          </label>
+                        </fieldset>
+                      </div>
+
+                      <aside class="rounded-sm p-4 min-h-[150px]" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
+                        <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal side annotations.</p>
+                        <div data-marginalia-note="ledger-mark" hidden class="text-sm" style="color: var(--color-text-secondary);">
+                          <strong style="color: var(--color-text-primary);">Aster-9:</strong> Former archivist clearance sigil tied to restricted witness ledgers.
+                        </div>
+                        <div data-marginalia-note="vault-window" hidden class="text-sm" style="color: var(--color-text-secondary);">
+                          <strong style="color: var(--color-text-primary);">Pressure equalization:</strong> 90-second interval where vault locks can be bypassed without triggering alarms.
+                        </div>
+                      </aside>
+                    </div>
+                  </div>
+
+                  <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                      <label class="flex items-center gap-2 text-xs font-system cursor-pointer" style="color: var(--color-text-muted);">
+                        <input id="manuscript-stream-toggle" type="checkbox">
+                        STREAMING RESPONSE ACTIVE
+                      </label>
+                      <div id="manuscript-stream-status" role="status" aria-live="polite" class="text-xs font-system" style="color: var(--color-text-secondary);">Status: Ready for input</div>
+                    </div>
+                    <label for="manuscript-input" class="sr-only">Narrative input</label>
+                    <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Describe your next action..."></textarea>
+                    <div class="mt-2 flex items-center justify-between gap-3">
+                      <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
+                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Turn</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
