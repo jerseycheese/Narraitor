@@ -1808,11 +1808,11 @@
                       Character HUD (Collapsed)
                     </button>
                     <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">VITALS</h4>
+                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CHARACTER SNAPSHOT</h4>
                       <dl class="space-y-1 text-sm">
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">32 / 40</dd></div>
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Focus</dt><dd style="color: var(--color-text-primary);">11 / 12</dd></div>
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Light</dt><dd style="color: var(--color-text-primary);">Lantern x1</dd></div>
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">85 / 100</dd></div>
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Tech Level</dt><dd style="color: var(--color-text-primary);">8</dd></div>
+                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Street Cred</dt><dd style="color: var(--color-text-primary);">6</dd></div>
                       </dl>
                     </div>
                   </div>
@@ -1824,9 +1824,10 @@
                     <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
                       <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
                       <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
-                        <li>Turn: 14</li>
-                        <li>Region: Lower Archive</li>
-                        <li>Last check: Perception success</li>
+                        <li>Turn: 3</li>
+                        <li>Session: The Data Heist</li>
+                        <li>Location: Arasaka building interior</li>
+                        <li>Last outcome: decision-cyberpunk-route (success)</li>
                       </ul>
                     </div>
                   </div>
@@ -1840,17 +1841,14 @@
 
                     <div style="max-height: clamp(280px, 42vh, 540px); overflow-y: auto; padding-right: 8px;">
                       <div class="space-y-5">
-                        <p class="text-narrative">The lantern hissed as you descended the brass stairwell, each step ringing through the archive like a tuning fork. Dust drifted in geometric lines across the beam, and the smell of warm oil gave way to a colder scent of wet stone.</p>
-                        <p class="text-narrative">At the landing, the corridor split into three galleries. The left wall carried etched donor names, some scratched away and replaced with hurried corrections. You paused at the newest inscription and traced the final line with your thumb. The ink was still tacky.</p>
+                        <p class="text-narrative">Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.</p>
+                        <p class="text-narrative">"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.</p>
                         <div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
-                          <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: PERCEPTION SUCCESS (14 vs DC 12)</div>
-                          <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You detect a hidden service hatch behind the donor plaques, aligned with fresh hinge scratches and soot-free brass.</p>
+                          <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: DECISION SUCCESS (decision-cyberpunk-route)</div>
+                          <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You choose to crawl through the ventilation system - stealthy but difficult.</p>
                         </div>
-                        <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark Aster-9.</p>
-                        <p class="text-narrative">A page pinned beneath the key listed access windows for the western vault. One entry was circled twice and annotated in hurried hand:
-                          "Open only during pressure equalization."
-                        </p>
-                        <p class="text-narrative">The corridor lights dimmed to amber. Somewhere below, the vault gears engaged and the floor beneath your boots trembled in a slow, deliberate rhythm.</p>
+                        <p class="text-narrative">You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.</p>
+                        <p class="text-narrative">Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.</p>
                       </div>
                     </div>
 
@@ -1859,16 +1857,16 @@
                         <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
                         <fieldset class="space-y-2" aria-label="Suggested actions">
                           <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="manuscript-choice" class="mt-1">
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Take the maintenance elevator - quieter but slower.</span>
+                          </label>
+                          <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="manuscript-choice" class="mt-1">
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Use the emergency stairs - faster but riskier.</span>
+                          </label>
+                          <label class="flex items-start gap-2 cursor-pointer">
                             <input type="radio" name="manuscript-choice" checked class="mt-1">
-                            <span class="text-sm" style="color: var(--color-text-secondary);">Inspect the service hatch mechanism before entering.</span>
-                          </label>
-                          <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="radio" name="manuscript-choice" class="mt-1">
-                            <span class="text-sm" style="color: var(--color-text-secondary);">Take the key and follow the red string toward the west vault.</span>
-                          </label>
-                          <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="radio" name="manuscript-choice" class="mt-1">
-                            <span class="text-sm" style="color: var(--color-text-secondary);">Record the inscription changes in your journal before moving.</span>
+                            <span class="text-sm" style="color: var(--color-text-secondary);">Crawl through the ventilation system - stealthy but difficult.</span>
                           </label>
                         </fieldset>
                       </div>
@@ -2019,9 +2017,9 @@
               <button id="manuscript-drawer-close" type="button" class="px-2 py-1 rounded-sm text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Close (Esc)</button>
             </div>
             <div id="manuscript-drawer-content" class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
-              <p><strong style="color: var(--color-text-primary);">Profile:</strong> Veyra Holt, former cartographer turned archive broker.</p>
-              <p><strong style="color: var(--color-text-primary);">Current objective:</strong> Reach western vault before pressure cycle resets.</p>
-              <p><strong style="color: var(--color-text-primary);">Quick actions:</strong> Equip lantern filter, spend focus point, annotate clue.</p>
+              <p><strong style="color: var(--color-text-primary);">Profile:</strong> Nova "Ghost" Chen, elite corporate hacker turned underground resistance fighter.</p>
+              <p><strong style="color: var(--color-text-primary);">Current objective:</strong> Infiltrating Arasaka building to steal critical data.</p>
+              <p><strong style="color: var(--color-text-primary);">Location:</strong> Neo-Tokyo Underground.</p>
             </div>
           </aside>
         </div>
@@ -3218,17 +3216,17 @@ export function PrimaryAction() {
         character: {
           title: 'Character Details',
           subtitle: 'Overlay panel opens without shifting manuscript text.',
-          body: '<p><strong style="color: var(--color-text-primary);">Profile:</strong> Veyra Holt, former cartographer turned archive broker.</p><p><strong style="color: var(--color-text-primary);">Current objective:</strong> Reach western vault before pressure cycle resets.</p><p><strong style="color: var(--color-text-primary);">Quick actions:</strong> Equip lantern filter, spend focus point, annotate clue.</p>',
+          body: '<p><strong style="color: var(--color-text-primary);">Profile:</strong> Nova "Ghost" Chen, elite corporate hacker turned underground resistance fighter.</p><p><strong style="color: var(--color-text-primary);">Current objective:</strong> Infiltrating Arasaka building to steal critical data.</p><p><strong style="color: var(--color-text-primary);">Location:</strong> Neo-Tokyo Underground.</p>',
         },
         inventory: {
           title: 'Inventory',
-          subtitle: 'Tools and consumables available for this turn.',
-          body: '<p><strong style="color: var(--color-text-primary);">Lantern oil:</strong> 2 vials</p><p><strong style="color: var(--color-text-primary);">Lock picks:</strong> 3 (one worn)</p><p><strong style="color: var(--color-text-primary);">Archive key:</strong> Tagged Aster-9, warm to touch.</p>',
+          subtitle: 'Seeded inventory records from game-session visual fixtures.',
+          body: '<p><strong style="color: var(--color-text-primary);">Ghostlink Cyberdeck:</strong> Signature deck tuned to slip past Arasaka intrusion countermeasures.</p><p><strong style="color: var(--color-text-primary);">NeuroBoost Stims:</strong> Fast-acting injectors that keep reflexes sharp during breach attempts (x3).</p><p><strong style="color: var(--color-text-primary);">Black ICE Shard:</strong> Prototype defensive program that can be slotted into the deck on demand.</p>',
         },
         journal: {
           title: 'Journal',
-          subtitle: 'Session notes and clue tracking.',
-          body: '<p><strong style="color: var(--color-text-primary);">Recent entry:</strong> "Vault schedule altered after midnight watch."</p><p><strong style="color: var(--color-text-primary);">Pinned clue:</strong> Pressure equalization lasts 90 seconds.</p><p><strong style="color: var(--color-text-primary);">Open thread:</strong> Identify who rewrote the donor ledger.</p>',
+          subtitle: 'Entries sourced from existing journal fixture records.',
+          body: '<p><strong style="color: var(--color-text-primary);">Decision:</strong> Chose the ventilation route to avoid the main lobby scanners.</p><p><strong style="color: var(--color-text-primary);">Discovery:</strong> Found a hidden relay broadcasting Arasaka executive calls.</p><p><strong style="color: var(--color-text-primary);">World Event:</strong> Security drones sweep the corridor as alarms spike.</p>',
         },
       };
 
