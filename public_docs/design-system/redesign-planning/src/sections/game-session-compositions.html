@@ -32,7 +32,7 @@
                           Session HUD
                         </button>
                         <button id="manuscript-panels-toggle" type="button" aria-expanded="false" aria-controls="manuscript-panels-menu" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                          Panels
+                          Tools
                         </button>
                       </div>
                       <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-64 max-h-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
@@ -48,7 +48,7 @@
                         </ul>
                       </div>
                       <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">PANEL SHORTCUTS</h4>
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TOOLS</h4>
                         <div class="space-y-2">
                           <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character HUD</button>
                           <button type="button" data-manuscript-control="toggle-session-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session HUD</button>
@@ -58,6 +58,9 @@
                           <button type="button" data-drawer-trigger data-drawer-panel="choice-history" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Choice History</button>
                           <button type="button" data-drawer-trigger data-drawer-panel="journal" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal Snapshot</button>
                           <button id="manuscript-open-journal-route" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Open Journal Route</button>
+                          <div class="my-1 border-t" style="border-color: var(--color-border);"></div>
+                          <button id="manuscript-simulate-turn" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
+                          <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
                         </div>
                       </div>
                     </div>
@@ -91,6 +94,7 @@
                   </main>
 
                   <div id="manuscript-action-rail" class="rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
                     <div id="manuscript-ending-suggestion" hidden class="mb-3 rounded-sm p-3" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35);">
                       <p class="font-interface text-sm font-semibold mb-1" style="color: var(--color-text-primary);">Your story could end here.</p>
                       <p class="text-xs sm:text-sm mb-3" style="color: var(--color-text-secondary);">You recovered the Arasaka relay key, but alarms are escalating and extraction windows are closing.</p>
@@ -108,21 +112,13 @@
                       </button>
                     </div>
                     <div id="manuscript-suggested-actions-region" class="mb-2">
-                      <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
                       <div id="manuscript-choice-actions" class="grid gap-1.5 lg:grid-cols-3"></div>
                     </div>
                     <label for="manuscript-input" class="sr-only">Narrative input</label>
                     <div class="manuscript-input-row">
                       <input id="manuscript-input" type="text" maxlength="400" class="w-full rounded-sm p-2 text-sm font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action...">
                       <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send</button>
-                    </div>
-                    <div class="manuscript-meta-row mt-2 hidden lg:flex flex-wrap items-center justify-between gap-3">
-                      <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
-                      <div class="manuscript-secondary-controls flex flex-wrap items-center gap-2">
-                        <button id="manuscript-simulate-turn" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
-                        <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
-                        <button id="manuscript-end-story" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">End Story</button>
-                      </div>
+                      <button id="manuscript-end-story" type="button" class="hidden lg:inline-flex items-center px-3 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 whitespace-nowrap" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">End Story</button>
                     </div>
                   </div>
                 </div>
@@ -147,7 +143,7 @@
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Docked input is functional and anchored" class="mt-1 h-4 w-4 rounded-sm">
-                <span>Docked input is functional, character-counted, and anchored during narrative scroll.</span>
+                <span>Docked input is functional and anchored during narrative scroll.</span>
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="HUD collapse and expansion validated" class="mt-1 h-4 w-4 rounded-sm">

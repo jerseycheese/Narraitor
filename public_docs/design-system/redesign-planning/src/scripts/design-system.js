@@ -1,6 +1,9 @@
     let activeDrawerTrigger = null;
     let activeEndStoryTrigger = null;
     let manuscriptOverlayLauncher = null;
+    let manuscriptScrollLockY = 0;
+    let manuscriptBodyLockStyles = null;
+    let manuscriptHtmlOverflow = '';
     const manuscriptHudPairs = [
       {
         buttonId: 'manuscript-hud-left-toggle',
@@ -25,6 +28,10 @@
         description: 'Elite corporate hacker turned underground resistance fighter',
         backgroundHistory: 'Former Arasaka security specialist who discovered dark corporate secrets',
         location: 'Neo-Tokyo Underground',
+        portrait: {
+          type: 'ai-generated',
+          url: '/visual-assets/portrait-cyberpunk.png',
+        },
         attributes: [
           { id: 'char-attr-tech-level', name: 'Tech Level', baseValue: 8, modifiedValue: 8 },
           { id: 'char-attr-street-cred', name: 'Street Cred', baseValue: 6, modifiedValue: 6 },
@@ -34,6 +41,13 @@
           { id: 'char-skill-streetwise', worldSkillId: 'skill-world-cyberpunk-2077-2', name: 'Streetwise', level: 8 },
         ],
       },
+      npcs: [
+        {
+          id: 'npc-fixer',
+          name: 'Wireline Fixer',
+          avatarUrl: '',
+        },
+      ],
       inventoryItems: [
         {
           id: 'inventory-ghostlink-cyberdeck',
@@ -194,6 +208,26 @@
         .replace(/\*(.*?)\*/g, '$1');
     }
 
+    function resolveAssetUrl(url) {
+      const value = String(url || '').trim();
+      if (!value) {
+        return '';
+      }
+
+      if (/^(https?:|data:)/i.test(value)) {
+        return value;
+      }
+
+      if (value.startsWith('/')) {
+        if (window.location.protocol === 'file:') {
+          return `../../../public${value}`;
+        }
+        return value;
+      }
+
+      return value;
+    }
+
     function normalizeIdentifier(value) {
       return String(value || '').trim().toLowerCase();
     }
@@ -234,6 +268,11 @@
     function resolveCharacterName(characterId) {
       if (characterId === manuscriptSourceRecords.character.id) {
         return manuscriptSourceRecords.character.name;
+      }
+
+      const matchingNpc = (manuscriptSourceRecords.npcs || []).find((npc) => npc.id === characterId);
+      if (matchingNpc && matchingNpc.name) {
+        return matchingNpc.name;
       }
 
       return deriveFallbackCharacterName(characterId);
@@ -413,6 +452,7 @@
       const sessionNarrativeCount = document.getElementById('manuscript-session-narrative-count');
 
       if (characterStatsContainer) {
+        const characterPortraitUrl = resolveAssetUrl(manuscriptSourceRecords.character.portrait?.url || '');
         const rowsFor = (items, valueKey) => items.map(
           (item) => `<div class="flex justify-between">
             <dt style="color: var(--color-text-secondary);">${escapeHtml(item.name)}</dt>
@@ -434,8 +474,15 @@
               <dl class="space-y-1 text-sm">${rowsFor(skills, 'level')}</dl>
             </section>`
           : '';
+        const portraitSection = characterPortraitUrl
+          ? `<section class="mb-3">
+              <img src="${escapeHtml(characterPortraitUrl)}" alt="${escapeHtml(manuscriptSourceRecords.character.name)} portrait" class="h-20 w-20 rounded-sm object-cover mb-2" style="border: 1px solid var(--color-border);" />
+              <p class="text-sm" style="color: var(--color-text-primary);">${escapeHtml(manuscriptSourceRecords.character.name)}</p>
+            </section>`
+          : '';
 
         characterStatsContainer.innerHTML = `
+          ${portraitSection}
           <section>
             <dl class="space-y-1 text-sm">
               <div class="flex justify-between">
@@ -478,7 +525,7 @@
         manuscriptOverlayLauncher.setAttribute('aria-expanded', 'true');
       }
 
-      document.body.style.overflow = 'hidden';
+      lockManuscriptScroll();
       closeButton.focus();
     }
 
@@ -495,12 +542,66 @@
       closeManuscriptDrawer();
       overlay.classList.add('hidden');
       overlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      unlockManuscriptScroll();
 
       if (manuscriptOverlayLauncher) {
         manuscriptOverlayLauncher.setAttribute('aria-expanded', 'false');
         manuscriptOverlayLauncher.focus();
       }
+    }
+
+    function lockManuscriptScroll() {
+      const html = document.documentElement;
+      const body = document.body;
+      if (body.classList.contains('manuscript-overlay-open')) {
+        return;
+      }
+
+      manuscriptScrollLockY = window.scrollY || window.pageYOffset || 0;
+      manuscriptBodyLockStyles = {
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        right: body.style.right,
+        width: body.style.width,
+        overflow: body.style.overflow,
+      };
+      manuscriptHtmlOverflow = html.style.overflow;
+
+      html.classList.add('manuscript-overlay-open');
+      body.classList.add('manuscript-overlay-open');
+
+      body.style.position = 'fixed';
+      body.style.top = `-${manuscriptScrollLockY}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+      body.style.overflow = 'hidden';
+      html.style.overflow = 'hidden';
+    }
+
+    function unlockManuscriptScroll() {
+      const html = document.documentElement;
+      const body = document.body;
+      if (!body.classList.contains('manuscript-overlay-open')) {
+        return;
+      }
+
+      body.classList.remove('manuscript-overlay-open');
+      html.classList.remove('manuscript-overlay-open');
+
+      body.style.position = manuscriptBodyLockStyles?.position || '';
+      body.style.top = manuscriptBodyLockStyles?.top || '';
+      body.style.left = manuscriptBodyLockStyles?.left || '';
+      body.style.right = manuscriptBodyLockStyles?.right || '';
+      body.style.width = manuscriptBodyLockStyles?.width || '';
+      body.style.overflow = manuscriptBodyLockStyles?.overflow || '';
+      html.style.overflow = manuscriptHtmlOverflow || '';
+
+      window.scrollTo(0, manuscriptScrollLockY);
+      manuscriptBodyLockStyles = null;
+      manuscriptHtmlOverflow = '';
+      manuscriptScrollLockY = 0;
     }
 
     function initManuscriptOverlayController() {
@@ -543,7 +644,7 @@
       const manuscriptControlButtons = document.querySelectorAll('[data-manuscript-control]');
       const mobileMediaQuery = window.matchMedia('(max-width: 1023px)');
 
-      if (!input || !sendButton || !charCount) {
+      if (!input || !sendButton) {
         return;
       }
 
@@ -569,6 +670,10 @@
       })();
 
       const updateCount = () => {
+        if (!(charCount instanceof HTMLElement)) {
+          return;
+        }
+
         const count = input.value.length;
         charCount.textContent = `${count}/400`;
       };

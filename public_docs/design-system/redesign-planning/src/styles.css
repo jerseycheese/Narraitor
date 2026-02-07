@@ -72,6 +72,12 @@
       position: relative;
     }
 
+    html.manuscript-overlay-open,
+    body.manuscript-overlay-open {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
     body::before {
       content: '';
       position: fixed;
@@ -180,6 +186,12 @@
       position: fixed;
       inset: 0;
       z-index: 160;
+      overscroll-behavior: none;
+    }
+
+    /* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
+    #manuscript-viewport-layer {
+      margin: 0;
     }
 
     .manuscript-overlay-backdrop {
@@ -198,6 +210,7 @@
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
+      overscroll-behavior: none;
     }
 
     .manuscript-viewport-inner {
@@ -245,6 +258,8 @@
       padding-right: 6px;
       position: relative;
       z-index: 1;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     .manuscript-main-stage {
@@ -297,6 +312,10 @@
 
     .manuscript-input-row #manuscript-send {
       white-space: nowrap;
+    }
+
+    #manuscript-action-rail {
+      touch-action: manipulation;
     }
 
     .manuscript-mobile-rail-top-controls {
@@ -401,14 +420,6 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 0.5rem;
-      }
-
-      .manuscript-secondary-controls {
-        display: none !important;
-      }
-
-      .manuscript-meta-row {
-        display: none !important;
       }
 
       #manuscript-choice-actions {

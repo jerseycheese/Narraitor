@@ -80,6 +80,12 @@
       position: relative;
     }
 
+    html.manuscript-overlay-open,
+    body.manuscript-overlay-open {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
     body::before {
       content: '';
       position: fixed;
@@ -188,6 +194,12 @@
       position: fixed;
       inset: 0;
       z-index: 160;
+      overscroll-behavior: none;
+    }
+
+    /* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
+    #manuscript-viewport-layer {
+      margin: 0;
     }
 
     .manuscript-overlay-backdrop {
@@ -206,6 +218,7 @@
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
+      overscroll-behavior: none;
     }
 
     .manuscript-viewport-inner {
@@ -253,6 +266,8 @@
       padding-right: 6px;
       position: relative;
       z-index: 1;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     .manuscript-main-stage {
@@ -305,6 +320,10 @@
 
     .manuscript-input-row #manuscript-send {
       white-space: nowrap;
+    }
+
+    #manuscript-action-rail {
+      touch-action: manipulation;
     }
 
     .manuscript-mobile-rail-top-controls {
@@ -409,14 +428,6 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 0.5rem;
-      }
-
-      .manuscript-secondary-controls {
-        display: none !important;
-      }
-
-      .manuscript-meta-row {
-        display: none !important;
       }
 
       #manuscript-choice-actions {
@@ -1995,7 +2006,7 @@
                           Session HUD
                         </button>
                         <button id="manuscript-panels-toggle" type="button" aria-expanded="false" aria-controls="manuscript-panels-menu" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                          Panels
+                          Tools
                         </button>
                       </div>
                       <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-64 max-h-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
@@ -2011,7 +2022,7 @@
                         </ul>
                       </div>
                       <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">PANEL SHORTCUTS</h4>
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TOOLS</h4>
                         <div class="space-y-2">
                           <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character HUD</button>
                           <button type="button" data-manuscript-control="toggle-session-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session HUD</button>
@@ -2021,6 +2032,9 @@
                           <button type="button" data-drawer-trigger data-drawer-panel="choice-history" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Choice History</button>
                           <button type="button" data-drawer-trigger data-drawer-panel="journal" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal Snapshot</button>
                           <button id="manuscript-open-journal-route" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Open Journal Route</button>
+                          <div class="my-1 border-t" style="border-color: var(--color-border);"></div>
+                          <button id="manuscript-simulate-turn" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
+                          <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
                         </div>
                       </div>
                     </div>
@@ -2054,6 +2068,7 @@
                   </main>
 
                   <div id="manuscript-action-rail" class="rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
                     <div id="manuscript-ending-suggestion" hidden class="mb-3 rounded-sm p-3" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35);">
                       <p class="font-interface text-sm font-semibold mb-1" style="color: var(--color-text-primary);">Your story could end here.</p>
                       <p class="text-xs sm:text-sm mb-3" style="color: var(--color-text-secondary);">You recovered the Arasaka relay key, but alarms are escalating and extraction windows are closing.</p>
@@ -2071,21 +2086,13 @@
                       </button>
                     </div>
                     <div id="manuscript-suggested-actions-region" class="mb-2">
-                      <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
                       <div id="manuscript-choice-actions" class="grid gap-1.5 lg:grid-cols-3"></div>
                     </div>
                     <label for="manuscript-input" class="sr-only">Narrative input</label>
                     <div class="manuscript-input-row">
                       <input id="manuscript-input" type="text" maxlength="400" class="w-full rounded-sm p-2 text-sm font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action...">
                       <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send</button>
-                    </div>
-                    <div class="manuscript-meta-row mt-2 hidden lg:flex flex-wrap items-center justify-between gap-3">
-                      <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
-                      <div class="manuscript-secondary-controls flex flex-wrap items-center gap-2">
-                        <button id="manuscript-simulate-turn" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
-                        <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
-                        <button id="manuscript-end-story" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">End Story</button>
-                      </div>
+                      <button id="manuscript-end-story" type="button" class="hidden lg:inline-flex items-center px-3 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 whitespace-nowrap" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">End Story</button>
                     </div>
                   </div>
                 </div>
@@ -2110,7 +2117,7 @@
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Docked input is functional and anchored" class="mt-1 h-4 w-4 rounded-sm">
-                <span>Docked input is functional, character-counted, and anchored during narrative scroll.</span>
+                <span>Docked input is functional and anchored during narrative scroll.</span>
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="HUD collapse and expansion validated" class="mt-1 h-4 w-4 rounded-sm">
@@ -3378,6 +3385,9 @@ export function PrimaryAction() {
     let activeDrawerTrigger = null;
     let activeEndStoryTrigger = null;
     let manuscriptOverlayLauncher = null;
+    let manuscriptScrollLockY = 0;
+    let manuscriptBodyLockStyles = null;
+    let manuscriptHtmlOverflow = '';
     const manuscriptHudPairs = [
       {
         buttonId: 'manuscript-hud-left-toggle',
@@ -3402,6 +3412,10 @@ export function PrimaryAction() {
         description: 'Elite corporate hacker turned underground resistance fighter',
         backgroundHistory: 'Former Arasaka security specialist who discovered dark corporate secrets',
         location: 'Neo-Tokyo Underground',
+        portrait: {
+          type: 'ai-generated',
+          url: '/visual-assets/portrait-cyberpunk.png',
+        },
         attributes: [
           { id: 'char-attr-tech-level', name: 'Tech Level', baseValue: 8, modifiedValue: 8 },
           { id: 'char-attr-street-cred', name: 'Street Cred', baseValue: 6, modifiedValue: 6 },
@@ -3411,6 +3425,13 @@ export function PrimaryAction() {
           { id: 'char-skill-streetwise', worldSkillId: 'skill-world-cyberpunk-2077-2', name: 'Streetwise', level: 8 },
         ],
       },
+      npcs: [
+        {
+          id: 'npc-fixer',
+          name: 'Wireline Fixer',
+          avatarUrl: '',
+        },
+      ],
       inventoryItems: [
         {
           id: 'inventory-ghostlink-cyberdeck',
@@ -3571,6 +3592,26 @@ export function PrimaryAction() {
         .replace(/\*(.*?)\*/g, '$1');
     }
 
+    function resolveAssetUrl(url) {
+      const value = String(url || '').trim();
+      if (!value) {
+        return '';
+      }
+
+      if (/^(https?:|data:)/i.test(value)) {
+        return value;
+      }
+
+      if (value.startsWith('/')) {
+        if (window.location.protocol === 'file:') {
+          return `../../../public${value}`;
+        }
+        return value;
+      }
+
+      return value;
+    }
+
     function normalizeIdentifier(value) {
       return String(value || '').trim().toLowerCase();
     }
@@ -3611,6 +3652,11 @@ export function PrimaryAction() {
     function resolveCharacterName(characterId) {
       if (characterId === manuscriptSourceRecords.character.id) {
         return manuscriptSourceRecords.character.name;
+      }
+
+      const matchingNpc = (manuscriptSourceRecords.npcs || []).find((npc) => npc.id === characterId);
+      if (matchingNpc && matchingNpc.name) {
+        return matchingNpc.name;
       }
 
       return deriveFallbackCharacterName(characterId);
@@ -3790,6 +3836,7 @@ export function PrimaryAction() {
       const sessionNarrativeCount = document.getElementById('manuscript-session-narrative-count');
 
       if (characterStatsContainer) {
+        const characterPortraitUrl = resolveAssetUrl(manuscriptSourceRecords.character.portrait?.url || '');
         const rowsFor = (items, valueKey) => items.map(
           (item) => `<div class="flex justify-between">
             <dt style="color: var(--color-text-secondary);">${escapeHtml(item.name)}</dt>
@@ -3811,8 +3858,15 @@ export function PrimaryAction() {
               <dl class="space-y-1 text-sm">${rowsFor(skills, 'level')}</dl>
             </section>`
           : '';
+        const portraitSection = characterPortraitUrl
+          ? `<section class="mb-3">
+              <img src="${escapeHtml(characterPortraitUrl)}" alt="${escapeHtml(manuscriptSourceRecords.character.name)} portrait" class="h-20 w-20 rounded-sm object-cover mb-2" style="border: 1px solid var(--color-border);" />
+              <p class="text-sm" style="color: var(--color-text-primary);">${escapeHtml(manuscriptSourceRecords.character.name)}</p>
+            </section>`
+          : '';
 
         characterStatsContainer.innerHTML = `
+          ${portraitSection}
           <section>
             <dl class="space-y-1 text-sm">
               <div class="flex justify-between">
@@ -3855,7 +3909,7 @@ export function PrimaryAction() {
         manuscriptOverlayLauncher.setAttribute('aria-expanded', 'true');
       }
 
-      document.body.style.overflow = 'hidden';
+      lockManuscriptScroll();
       closeButton.focus();
     }
 
@@ -3872,12 +3926,66 @@ export function PrimaryAction() {
       closeManuscriptDrawer();
       overlay.classList.add('hidden');
       overlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      unlockManuscriptScroll();
 
       if (manuscriptOverlayLauncher) {
         manuscriptOverlayLauncher.setAttribute('aria-expanded', 'false');
         manuscriptOverlayLauncher.focus();
       }
+    }
+
+    function lockManuscriptScroll() {
+      const html = document.documentElement;
+      const body = document.body;
+      if (body.classList.contains('manuscript-overlay-open')) {
+        return;
+      }
+
+      manuscriptScrollLockY = window.scrollY || window.pageYOffset || 0;
+      manuscriptBodyLockStyles = {
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        right: body.style.right,
+        width: body.style.width,
+        overflow: body.style.overflow,
+      };
+      manuscriptHtmlOverflow = html.style.overflow;
+
+      html.classList.add('manuscript-overlay-open');
+      body.classList.add('manuscript-overlay-open');
+
+      body.style.position = 'fixed';
+      body.style.top = `-${manuscriptScrollLockY}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+      body.style.overflow = 'hidden';
+      html.style.overflow = 'hidden';
+    }
+
+    function unlockManuscriptScroll() {
+      const html = document.documentElement;
+      const body = document.body;
+      if (!body.classList.contains('manuscript-overlay-open')) {
+        return;
+      }
+
+      body.classList.remove('manuscript-overlay-open');
+      html.classList.remove('manuscript-overlay-open');
+
+      body.style.position = manuscriptBodyLockStyles?.position || '';
+      body.style.top = manuscriptBodyLockStyles?.top || '';
+      body.style.left = manuscriptBodyLockStyles?.left || '';
+      body.style.right = manuscriptBodyLockStyles?.right || '';
+      body.style.width = manuscriptBodyLockStyles?.width || '';
+      body.style.overflow = manuscriptBodyLockStyles?.overflow || '';
+      html.style.overflow = manuscriptHtmlOverflow || '';
+
+      window.scrollTo(0, manuscriptScrollLockY);
+      manuscriptBodyLockStyles = null;
+      manuscriptHtmlOverflow = '';
+      manuscriptScrollLockY = 0;
     }
 
     function initManuscriptOverlayController() {
@@ -3920,7 +4028,7 @@ export function PrimaryAction() {
       const manuscriptControlButtons = document.querySelectorAll('[data-manuscript-control]');
       const mobileMediaQuery = window.matchMedia('(max-width: 1023px)');
 
-      if (!input || !sendButton || !charCount) {
+      if (!input || !sendButton) {
         return;
       }
 
@@ -3946,6 +4054,10 @@ export function PrimaryAction() {
       })();
 
       const updateCount = () => {
+        if (!(charCount instanceof HTMLElement)) {
+          return;
+        }
+
         const count = input.value.length;
         charCount.textContent = `${count}/400`;
       };
