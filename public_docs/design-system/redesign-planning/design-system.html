@@ -184,8 +184,15 @@
       margin-right: calc(50% - 50vw);
     }
 
+    .manuscript-viewport-layer {
+      position: sticky;
+      top: 0;
+      z-index: 140;
+    }
+
     .manuscript-viewport-shell {
-      min-height: clamp(680px, calc(100vh - 128px), 920px);
+      min-height: 100vh;
+      min-height: 100dvh;
       border-top: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-border);
       background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
@@ -1772,9 +1779,9 @@
 
           <article class="space-y-4">
             <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
-            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. This preview now breaks out to a full-viewport composition so it reads like the real app shell instead of a constrained documentation card.</p>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. This preview is rendered as a full-viewport layer and intentionally stacks over the document underneath so it feels like the live app shell.</p>
 
-            <div class="full-viewport-breakout">
+            <div class="full-viewport-breakout manuscript-viewport-layer">
               <div class="manuscript-viewport-shell">
                 <div class="manuscript-viewport-inner">
 
