@@ -2913,8 +2913,11 @@ export function PrimaryAction() {
         this.queue = [];
         this.intervalId = null;
         this.isStreaming = false;
+        this.isFeederActive = false;
         this.shouldAnchor = true;
         this.currentWrapper = null;
+        this.resolveCompletion = null;
+        this.cancelRequested = false;
 
         // Initialize ResizeObserver for scroll anchoring
         this.observer = new ResizeObserver(() => {
@@ -2933,9 +2936,15 @@ export function PrimaryAction() {
       }
 
       async start(text, shouldReset = true) {
+        if (this.isStreaming) {
+          return Promise.resolve();
+        }
+
         // Return a promise that resolves when streaming is fully complete
         return new Promise(async (resolve) => {
           if (shouldReset) this.reset();
+
+          this.cancelRequested = false;
           
           // Re-evaluate anchoring at start of new stream
           this.shouldAnchor = isNearBottom(this.container);
@@ -2960,6 +2969,10 @@ export function PrimaryAction() {
           this.container.appendChild(this.currentWrapper);
           
           const flushLoop = () => {
+            if (!this.isStreaming || this.cancelRequested) {
+              return;
+            }
+
             if (this.queue.length > 0) {
               const chunk = this.queue.join('');
               this.currentWrapper.insertAdjacentText('beforeend', chunk);
@@ -2975,22 +2988,27 @@ export function PrimaryAction() {
           if (interval === 0) {
             // Special case: per-token stress test
             this.isFeederActive = true;
-            while (this.remainingTokens.length > 0) {
+            while (this.remainingTokens.length > 0 && !this.cancelRequested) {
               const token = this.remainingTokens.shift();
               this.currentWrapper.insertAdjacentText('beforeend', token);
               await new Promise(r => setTimeout(r, 20));
             }
             this.isFeederActive = false;
-            this.stop();
+            if (!this.cancelRequested && this.isStreaming) {
+              this.stop();
+            }
           } else {
             this.intervalId = setInterval(flushLoop, interval);
             this.isFeederActive = true;
-            while (this.remainingTokens.length > 0) {
+            while (this.remainingTokens.length > 0 && !this.cancelRequested) {
               const token = this.remainingTokens.shift();
               this.queue.push(token);
               await new Promise(r => setTimeout(r, Math.random() * 30 + 10));
             }
             this.isFeederActive = false;
+            if (this.cancelRequested) {
+              this.queue = [];
+            }
             // The flushLoop will catch the remaining queue and call stop()
           }
         });
@@ -3002,8 +3020,18 @@ export function PrimaryAction() {
       }
 
       stop() {
-        if (this.intervalId) clearInterval(this.intervalId);
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+
+        if (!this.isStreaming && !this.resolveCompletion) {
+          return;
+        }
+
         this.isStreaming = false;
+        this.isFeederActive = false;
+        this.cancelRequested = false;
         if (this.choices) {
           this.choices.classList.remove('hidden');
         }
@@ -3015,8 +3043,14 @@ export function PrimaryAction() {
       }
 
       reset() {
-        if (this.intervalId) clearInterval(this.intervalId);
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+
+        this.cancelRequested = true;
         this.isStreaming = false;
+        this.isFeederActive = false;
         this.container.innerHTML = '';
         this.container.classList.add('streaming-skeleton');
         if (this.choices) {
@@ -3026,6 +3060,10 @@ export function PrimaryAction() {
         this.tokens = [];
         this.remainingTokens = [];
         this.currentWrapper = null;
+        if (this.resolveCompletion) {
+          this.resolveCompletion();
+          this.resolveCompletion = null;
+        }
       }
     }
 
