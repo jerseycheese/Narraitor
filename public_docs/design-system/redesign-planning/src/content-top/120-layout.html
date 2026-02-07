@@ -1,0 +1,77 @@
+<section class="section py-8 md:py-12" id="layout">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Layout Patterns</h2>
+
+        <div class="space-y-8">
+          <!-- The Manuscript -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Manuscript" (Game Session)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Single-column, center-focused layout for immersive reading</p>
+            <div class="p-4 sm:p-8 rounded-sm relative overflow-hidden" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); min-height: 300px;">
+              <!-- HUD -->
+              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">HUD (Floating)</div>
+              </div>
+              <!-- Content -->
+              <div class="max-w-3xl mx-auto pt-12 sm:pt-12">
+                <div class="font-narrative text-base sm:text-lg mb-4" style="color: var(--color-text-primary);">
+                  Narrative Column (max-w-3xl)
+                </div>
+                <div class="h-20" style="background: var(--color-surface); border: 1px solid var(--color-border);"></div>
+              </div>
+              <!-- Input -->
+              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">Input Zone (Docked Bottom)</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">Narrative Reading Surface Validation</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Tested at realistic lengths: short paragraph, full-page segment, and multi-paragraph scene progression.</p>
+            <div class="p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="max-w-3xl mx-auto space-y-8">
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SHORT PARAGRAPH</div>
+                  <p class="text-narrative">The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.</p>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FULL-PAGE SEGMENT</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.</p>
+                    <p class="text-narrative">A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: "Records of Irrecoverable Histories." Beneath the desk, a low drawer pulsed with a soft blue glow that brightened when you moved closer.</p>
+                    <p class="text-narrative">When you pulled it open, you found a catalog of names scratched into thin brass sheets. Some had been crossed out with decisive strokes; others had notes beside them in hurried script: "relocated," "sealed," "missing witness." At the bottom of the stack sat a single page of vellum, untouched by dust, bearing your own name in fresh black ink.</p>
+                  </div>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MULTI-PARAGRAPH SCENE FLOW</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You turned the page and the room answered. The rails overhead began to move in sequence, carrying lanterns into a slow orbit around the desk.</p>
+                    <p class="text-narrative">Each pass of light revealed another detail: a hidden map etched into the floorboards, a keyhole set into the spine of a bound atlas, and a thread of red string leading from your chair to the locked west door.</p>
+                    <p class="text-narrative">When the orbit stopped, the lantern nearest you dipped on its own and projected a final line onto the wall: "Begin where your story was first rewritten."</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Workshop -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Workshop" (Library/Wizards)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Multi-column layout for utility and data management</p>
+            <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
+              <div class="flex flex-col sm:flex-row" style="min-height: 250px;">
+                <div class="w-full sm:w-48 p-4" style="background: var(--color-surface-hover); border-bottom: 1px solid var(--color-border); sm:border-bottom-0 sm:border-right: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SIDEBAR</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Blueprint navigation</div>
+                </div>
+                <div class="flex-1 p-4 sm:p-6" style="background: var(--color-surface);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Forms and data entry</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>

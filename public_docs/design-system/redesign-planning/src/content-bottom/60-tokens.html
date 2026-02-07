@@ -1,0 +1,139 @@
+<section class="section" id="tokens">
+        <h2 class="text-2xl font-semibold mb-6">Design Tokens</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Exportable design values for implementation in code.</p>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Token Structure</h3>
+          <div class="p-6 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">{
+  "color": {
+    "canvas": {
+      "light": "#fafafa",
+      "dark": "#09090b"
+    },
+    "surface": {
+      "light": "#ffffff",
+      "dark": "#18181b"
+    },
+    "text": {
+      "primary": {
+        "light": "#18181b",
+        "dark": "#fafafa"
+      },
+      "secondary": {
+        "light": "#3f3f46",
+        "dark": "#d4d4d8"
+      },
+      "muted": {
+        "light": "#71717a",
+        "dark": "#71717a"
+      }
+    },
+    "accent": {
+      "primary": "#f97316",
+      "hover": "#ea580c"
+    }
+  },
+  "typography": {
+    "font": {
+      "narrative": "'EB Garamond', serif",
+      "system": "'JetBrains Mono', monospace",
+      "interface": "'Inter', sans-serif"
+    },
+    "size": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "lineHeight": {
+      "tight": "1.1",
+      "base": "1.5",
+      "relaxed": "1.75"
+    }
+  },
+  "spacing": {
+    "unit": "24px",
+    "scale": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "2xl": "48px",
+      "3xl": "64px",
+      "4xl": "96px"
+    }
+  },
+  "borderRadius": {
+    "none": "0px",
+    "sm": "2px",
+    "default": "4px",
+    "lg": "8px"
+  },
+  "shadow": {
+    "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+  }
+}</pre>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium mb-4">Usage in Code</h3>
+          <div class="space-y-4">
+
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TAILWIND CONFIG</div>
+              <div class="p-4 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: 'var(--color-canvas)',
+        surface: 'var(--color-surface)',
+        accent: 'var(--color-accent)',
+      },
+      fontFamily: {
+        narrative: 'var(--font-narrative)',
+        system: 'var(--font-system)',
+        interface: 'var(--font-interface)',
+      },
+      spacing: {
+        unit: 'var(--spacing-unit)',
+      },
+    },
+  },
+}</pre>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">REACT COMPONENT</div>
+              <div class="p-4 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">export function NarrativeText({ children }: Props) {
+  return (
+    &lt;p className="text-narrative max-w-3xl"&gt;
+      {children}
+    &lt;/p&gt;
+  )
+}
+
+export function SessionMeta() {
+  return &lt;span className="text-technical"&gt;Turn: 14&lt;/span&gt;
+}
+
+export function PrimaryAction() {
+  return &lt;button className="text-ui"&gt;Continue&lt;/button&gt;
+}</pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>

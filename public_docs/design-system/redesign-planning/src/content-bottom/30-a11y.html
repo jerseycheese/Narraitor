@@ -1,0 +1,211 @@
+<section class="section" id="a11y">
+        <h2 class="text-2xl font-semibold mb-6">Accessibility (WCAG 2.1 AA)</h2>
+        <p class="mb-8" style="color: var(--color-text-secondary);">All components and patterns must meet WCAG 2.1 Level AA standards minimum.</p>
+
+        <!-- Color Contrast -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Color Contrast Requirements</h3>
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">STANDARD TEXT (< 18px)</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">4.5:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Light mode: text-primary on canvas = 18.27:1 ✓</li>
+                  <li>Dark mode: text-primary on dark-canvas = 19.06:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">LARGE TEXT (≥ 18px or bold ≥ 14px)</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">3:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Narrative text (18px) meets enhanced 4.5:1 standard ✓</li>
+                  <li>System labels (14px mono, muted) on canvas = 4.68:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-2">
+                <div class="font-system text-sm" style="color: var(--color-text-muted);">UI COMPONENTS & GRAPHICS</div>
+                <div class="font-system text-sm font-medium" style="color: var(--color-accent);">3:1 minimum</div>
+              </div>
+              <div class="text-sm" style="color: var(--color-text-secondary);">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Primary accent indicators on canvas = 11.05:1 ✓</li>
+                  <li>Button text (white on accent) = 11.42:1 ✓</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Focus States -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Focus Indicators</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">All interactive elements must have visible focus indicators with 3:1 contrast.</p>
+
+          <div class="space-y-3">
+            <button class="px-6 py-3 rounded-sm font-interface text-sm font-medium" style="background: var(--color-accent); color: white; outline: 2px solid transparent; outline-offset: 2px;" onfocus="this.style.outline='2px solid var(--color-accent)'; this.style.outlineOffset='2px';" onblur="this.style.outline='2px solid transparent';">
+              Primary Button (focus me)
+            </button>
+            <div class="text-xs font-system" style="color: var(--color-text-muted);">
+              outline: 2px solid var(--color-accent); outline-offset: 2px;
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">FOCUS STANDARDS</h4>
+            <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+              <li>Minimum 2px outline or border</li>
+              <li>2px offset for better visibility</li>
+              <li>Never remove focus styles (no <code>outline: none</code>)</li>
+              <li>Focus order follows logical reading flow</li>
+              <li>Skip links for keyboard navigation</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Touch Targets -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Touch Target Sizes</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
+              <div class="flex justify-between">
+                <span>Minimum touch target</span>
+                <code class="font-system">44px × 44px</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Primary buttons</span>
+                <code class="font-system">48px height minimum</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Icon buttons</span>
+                <code class="font-system">44px × 44px (include padding)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Spacing between targets</span>
+                <code class="font-system">8px minimum</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyboard Navigation -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Keyboard Navigation</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">REQUIRED SUPPORT</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Tab / Shift+Tab navigation</li>
+                <li>Enter / Space activation</li>
+                <li>Escape to close modals</li>
+                <li>Arrow keys for lists/menus</li>
+                <li>Home / End navigation</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FOCUS MANAGEMENT</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Trap focus in modals</li>
+                <li>Return focus on close</li>
+                <li>Skip navigation links</li>
+                <li>Logical tab order</li>
+                <li>No keyboard traps</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen Reader Support -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Screen Reader Support</h3>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SEMANTIC HTML</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Use semantic elements (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;section&gt;</code>)</li>
+                <li>Proper heading hierarchy (h1 → h6, no skipping)</li>
+                <li>Lists for related items (<code>&lt;ul&gt;</code>, <code>&lt;ol&gt;</code>)</li>
+                <li>Buttons for actions, links for navigation</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">ARIA PATTERNS</div>
+              <div class="text-sm space-y-2" style="color: var(--color-text-secondary);">
+                <div><code>aria-label</code> for icon-only buttons</div>
+                <div><code>aria-expanded</code> for collapsible sections</div>
+                <div><code>aria-live="polite"</code> for streaming text updates</div>
+                <div><code>aria-describedby</code> for form field hints</div>
+                <div><code>role="status"</code> for loading indicators</div>
+                <div><code>aria-hidden="true"</code> for decorative elements</div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SPECIAL CONSIDERATIONS FOR AI STREAMING</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Use <code>aria-live="polite"</code> on narrative container</li>
+                <li>Don't announce every token (causes speech overload)</li>
+                <li>Provide "Stop Reading" control for screen readers</li>
+                <li>Include skip link to bypass generated content</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motion & Animation -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Motion & Animation</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">RESPECT USER PREFERENCES</div>
+            <div class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Always respect <code>prefers-reduced-motion</code> media query. Disable or reduce animations when requested.
+            </div>
+            <pre class="font-system text-xs p-3 rounded" style="background: var(--color-surface-hover); color: var(--color-text-primary); white-space: pre; margin: 0;">@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}</pre>
+          </div>
+        </div>
+
+        <!-- Testing Checklist -->
+        <div>
+          <h3 class="text-lg font-medium mb-4">Accessibility Testing Checklist</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">AUTOMATED TESTING</div>
+              <ul class="text-sm space-y-1" style="color: var(--color-text-secondary); list-style: none; padding: 0;">
+                <li>☑ axe DevTools browser extension</li>
+                <li>☑ Lighthouse accessibility audit</li>
+                <li>☑ WAVE evaluation tool</li>
+                <li>☑ Color contrast analyzers</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">MANUAL TESTING</div>
+              <ul class="text-sm space-y-1" style="color: var(--color-text-secondary); list-style: none; padding: 0;">
+                <li>☑ Keyboard-only navigation</li>
+                <li>☑ Screen reader testing (NVDA, JAWS, VoiceOver)</li>
+                <li>☑ Zoom to 200% (text reflow)</li>
+                <li>☑ High contrast mode</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>

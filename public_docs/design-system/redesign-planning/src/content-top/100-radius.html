@@ -1,0 +1,49 @@
+<section class="section" id="radius">
+        <h2 class="text-2xl font-semibold mb-6">Border Radius</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal rounding to maintain crisp, technical aesthetic.</p>
+
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 0;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">none</div>
+              <code class="text-xs">0px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dot grid, technical elements</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 2px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-sm</div>
+              <code class="text-xs">2px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Default for most UI</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 4px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded</div>
+              <code class="text-xs">4px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Buttons, inputs</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 8px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-lg</div>
+              <code class="text-xs">8px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Cards, modals</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">DEFAULT</h4>
+          <p class="text-sm" style="color: var(--color-text-secondary);">
+            Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains the technical, precise aesthetic while avoiding harsh 90° corners.
+          </p>
+        </div>
+      </section>

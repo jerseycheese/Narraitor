@@ -1,0 +1,40 @@
+<section class="section" id="elevation">
+        <h2 class="text-2xl font-semibold mb-6">Elevation & Shadows</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the "drafting table" aesthetic.</p>
+
+        <div class="grid grid-cols-3 gap-6">
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-sm</div>
+              <code class="text-xs">0 1px 2px rgba(0,0,0,0.05)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Subtle depth for cards</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-md</div>
+              <code class="text-xs">0 4px 6px rgba(0,0,0,0.1)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dropdowns, tooltips</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="p-8 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);"></div>
+            <div class="mt-3">
+              <div class="font-system text-xs font-medium mb-1" style="color: var(--color-text-primary);">shadow-lg</div>
+              <code class="text-xs">0 10px 15px rgba(0,0,0,0.1)</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Modals, floating panels</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">USAGE NOTE</h4>
+          <p class="text-sm" style="color: var(--color-text-secondary);">
+            Prefer <code>backdrop-blur</code> and borders over shadows for the HUD panels to maintain the "technical blueprint" aesthetic. Use shadows only for floating elements that need clear separation.
+          </p>
+        </div>
+      </section>

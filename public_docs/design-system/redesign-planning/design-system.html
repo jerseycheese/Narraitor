@@ -197,21 +197,237 @@
     }
 
     .manuscript-viewport-shell {
-      min-height: 100vh;
-      min-height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
       border-top: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-border);
       background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
       position: relative;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
     .manuscript-viewport-inner {
       width: min(100%, 1480px);
       margin: 0 auto;
+      height: 100%;
       padding-left: clamp(0.75rem, 2vw, 1.5rem);
       padding-right: clamp(0.75rem, 2vw, 1.5rem);
-      min-height: inherit;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(0.5rem, 1.5vh, 1rem);
+      padding-top: clamp(0.5rem, 1.5vh, 1rem);
+      padding-bottom: clamp(0.5rem, 1.5vh, 1rem);
+      position: relative;
+      z-index: 1;
+      box-sizing: border-box;
+    }
+
+    .manuscript-overlay-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'left right';
+      align-items: start;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 30;
+    }
+
+    .manuscript-overlay-header-left {
+      grid-area: left;
+      justify-self: start;
+      position: relative;
+    }
+
+    .manuscript-overlay-header-right {
+      grid-area: right;
+      justify-self: end;
+      position: relative;
+    }
+
+    .manuscript-overlay-main {
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .manuscript-main-stage {
+      display: grid;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .manuscript-characters-mobile-bar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--color-manuscript-gradient-end);
+      border: 1px solid var(--color-border);
+      border-radius: 3px;
+      padding: 0.375rem 0.5rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2.25rem;
+    }
+
+    .manuscript-characters-mobile-label {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .manuscript-characters-mobile-list {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .manuscript-characters-mobile-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .manuscript-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .manuscript-input-row #manuscript-send {
+      white-space: nowrap;
+    }
+
+    .manuscript-mobile-rail-top-controls {
+      display: none;
+    }
+
+    .manuscript-characters-rail {
+      display: none;
+      background: var(--color-overlay-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 3px;
+      padding: 0.75rem;
+    }
+
+    .manuscript-rail-spacer {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .manuscript-characters-mobile-bar {
+        display: none;
+      }
+
+      .manuscript-main-stage {
+        grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr) minmax(10rem, 12rem);
+      }
+
+      .manuscript-characters-rail {
+        display: block;
+        position: sticky;
+        top: 0.25rem;
+      }
+
+      .manuscript-main-content {
+        grid-column: 2;
+      }
+
+      .manuscript-rail-spacer {
+        display: block;
+        grid-column: 3;
+      }
+    }
+
+    .manuscript-suggested-action {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+    }
+
+    .manuscript-suggested-action:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-border-strong);
+      color: var(--color-text-primary);
+    }
+
+    .manuscript-suggested-action.is-selected,
+    .manuscript-suggested-action[aria-pressed='true'] {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    .manuscript-suggested-action.is-selected:hover,
+    .manuscript-suggested-action[aria-pressed='true']:hover {
+      background: var(--color-accent-hover);
+      border-color: var(--color-accent-hover);
+      color: #fff;
+    }
+
+    .manuscript-hud-panel {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      z-index: 40;
+    }
+
+    .manuscript-hud-panel-left {
+      left: 0;
+    }
+
+    .manuscript-hud-panel-right {
+      right: 0;
+    }
+
+    @media (max-width: 1023px) {
+      .manuscript-overlay-header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: 'left right';
+        align-items: center;
+      }
+
+      #manuscript-hud-left-toggle,
+      #manuscript-hud-right-toggle {
+        display: none;
+      }
+
+      #manuscript-action-rail {
+        padding: 0.625rem;
+      }
+
+      .manuscript-mobile-rail-top-controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.5rem;
+      }
+
+      .manuscript-secondary-controls {
+        display: none !important;
+      }
+
+      .manuscript-meta-row {
+        display: none !important;
+      }
+
+      #manuscript-choice-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #manuscript-suggested-actions-region {
+        display: block !important;
+      }
     }
 
     code {
@@ -447,7 +663,8 @@
       <div class="category-header">01. System</div>
 
       <!-- Philosophy -->
-      <section class="section py-8 md:py-12" id="philosophy">
+      
+<section class="section py-8 md:py-12" id="philosophy">
         <h2 class="text-xl sm:text-2xl font-semibold mb-4 md:mb-6">Design Philosophy</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           <div>
@@ -464,9 +681,271 @@
           </div>
         </div>
       </section>
+<section class="section" id="radius">
+        <h2 class="text-2xl font-semibold mb-6">Border Radius</h2>
+        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal rounding to maintain crisp, technical aesthetic.</p>
 
-      <!-- CSS Variables -->
-      <section class="section" id="variables">
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 0;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">none</div>
+              <code class="text-xs">0px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dot grid, technical elements</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 2px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-sm</div>
+              <code class="text-xs">2px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Default for most UI</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 4px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded</div>
+              <code class="text-xs">4px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Buttons, inputs</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 8px;"></div>
+            <div class="mt-3 text-center">
+              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-lg</div>
+              <code class="text-xs">8px</code>
+              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Cards, modals</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">DEFAULT</h4>
+          <p class="text-sm" style="color: var(--color-text-secondary);">
+            Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains the technical, precise aesthetic while avoiding harsh 90° corners.
+          </p>
+        </div>
+      </section>
+<section class="section" id="components">
+        <h2 class="text-2xl font-semibold mb-6">Components</h2>
+
+        <!-- Buttons -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Buttons (State Matrix)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Primary and secondary variants are shown together for default, hover, active, disabled, and loading states.</p>
+          <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
+            <div class="grid grid-cols-1 md:grid-cols-[140px,1fr]">
+              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">State</div>
+              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">Variants</div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DEFAULT</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">HOVER</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white;">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-primary);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">ACTIVE</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white; transform: scale(0.98);">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 2px solid var(--color-border-strong); color: var(--color-text-primary); transform: scale(0.98);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DISABLED</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-border-strong); color: var(--color-text-muted); cursor: not-allowed;">Primary Action</button>
+                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted);">LOADING</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.8;" aria-live="polite">
+                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
+                  </svg>
+                  Loading...
+                </button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-secondary); opacity: 0.8;">
+                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
+                  </svg>
+                  Saving...
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Form Inputs (Validation States)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Validation states pair visual styling with explicit helper text labels so status is never color-only.</p>
+          <div class="space-y-4 max-w-md">
+            <div>
+              <label for="component-input-default" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Default</label>
+              <input id="component-input-default" type="text" placeholder="Character name" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" />
+            </div>
+
+            <div>
+              <label for="component-input-focus" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Focus</label>
+              <input id="component-input-focus" type="text" value="Focused narrative prompt" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-accent); outline: 2px solid var(--color-accent); color: var(--color-text-primary);" />
+            </div>
+
+            <div>
+              <label for="component-input-error" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Error</label>
+              <input id="component-input-error" type="text" value="Scene title already used" aria-describedby="component-input-error-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-error); color: var(--color-text-primary);" />
+              <p id="component-input-error-help" class="text-xs mt-1" style="color: var(--color-error);">Error: choose a unique title to continue.</p>
+            </div>
+
+            <div>
+              <label for="component-input-success" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Success</label>
+              <input id="component-input-success" type="text" value="Ravenhold Ledger" aria-describedby="component-input-success-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-success); color: var(--color-text-primary);" />
+              <p id="component-input-success-help" class="text-xs mt-1" style="color: var(--color-success);">Success: title accepted and ready to save.</p>
+            </div>
+
+            <div>
+              <label for="component-input-disabled" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Disabled</label>
+              <input id="component-input-disabled" type="text" value="Locked while streaming" disabled class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Core Utility Cluster (Badges, Alerts, Cards, Drawer Trigger)</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">BADGES</h4>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(49, 46, 129, 0.15); color: var(--color-accent);">Fantasy</span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session 04</span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(6, 95, 70, 0.12); color: var(--color-success);">Stable</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">ALERTS</h4>
+              <div class="space-y-2 text-sm">
+                <div class="rounded-sm px-3 py-2" style="background: rgba(6, 95, 70, 0.08); border: 1px solid rgba(6, 95, 70, 0.35); color: var(--color-success);">Success: choices updated.</div>
+                <div class="rounded-sm px-3 py-2" style="background: rgba(146, 64, 14, 0.08); border: 1px solid rgba(146, 64, 14, 0.35); color: var(--color-warning);">Warning: low torchlight may affect stealth.</div>
+                <div class="rounded-sm px-3 py-2" style="background: rgba(159, 18, 57, 0.08); border: 1px solid rgba(159, 18, 57, 0.35); color: var(--color-error);">Error: outcome save failed.</div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STANDARD CARD</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Basic manuscript metadata card.</p>
+                </div>
+                <div class="p-4 rounded-sm backdrop-blur-md" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">HUD CARD</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Floating overlay-compatible card panel.</p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                  <h4 class="font-system text-xs" style="color: var(--color-text-muted);">DRAWER TRIGGER + STATIC PREVIEW</h4>
+                  <button id="component-drawer-trigger" type="button" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Open Character Drawer</button>
+                </div>
+                <div class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px dashed var(--color-border-strong);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STATIC DRAWER PREVIEW</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Overlay panel includes profile summary, inventory quick stats, and journal links. In the composition prototype, this opens as an absolute/fixed layer without shifting narrative content.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+<section class="section py-8 md:py-12" id="layout">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Layout Patterns</h2>
+
+        <div class="space-y-8">
+          <!-- The Manuscript -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Manuscript" (Game Session)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Single-column, center-focused layout for immersive reading</p>
+            <div class="p-4 sm:p-8 rounded-sm relative overflow-hidden" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); min-height: 300px;">
+              <!-- HUD -->
+              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">HUD (Floating)</div>
+              </div>
+              <!-- Content -->
+              <div class="max-w-3xl mx-auto pt-12 sm:pt-12">
+                <div class="font-narrative text-base sm:text-lg mb-4" style="color: var(--color-text-primary);">
+                  Narrative Column (max-w-3xl)
+                </div>
+                <div class="h-20" style="background: var(--color-surface); border: 1px solid var(--color-border);"></div>
+              </div>
+              <!-- Input -->
+              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                <div class="font-system" style="color: var(--color-text-muted);">Input Zone (Docked Bottom)</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">Narrative Reading Surface Validation</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Tested at realistic lengths: short paragraph, full-page segment, and multi-paragraph scene progression.</p>
+            <div class="p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="max-w-3xl mx-auto space-y-8">
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SHORT PARAGRAPH</div>
+                  <p class="text-narrative">The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.</p>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FULL-PAGE SEGMENT</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.</p>
+                    <p class="text-narrative">A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: "Records of Irrecoverable Histories." Beneath the desk, a low drawer pulsed with a soft blue glow that brightened when you moved closer.</p>
+                    <p class="text-narrative">When you pulled it open, you found a catalog of names scratched into thin brass sheets. Some had been crossed out with decisive strokes; others had notes beside them in hurried script: "relocated," "sealed," "missing witness." At the bottom of the stack sat a single page of vellum, untouched by dust, bearing your own name in fresh black ink.</p>
+                  </div>
+                </article>
+
+                <article>
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MULTI-PARAGRAPH SCENE FLOW</div>
+                  <div class="space-y-4">
+                    <p class="text-narrative">You turned the page and the room answered. The rails overhead began to move in sequence, carrying lanterns into a slow orbit around the desk.</p>
+                    <p class="text-narrative">Each pass of light revealed another detail: a hidden map etched into the floorboards, a keyhole set into the spine of a bound atlas, and a thread of red string leading from your chair to the locked west door.</p>
+                    <p class="text-narrative">When the orbit stopped, the lantern nearest you dipped on its own and projected a final line onto the wall: "Begin where your story was first rewritten."</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Workshop -->
+          <div>
+            <h3 class="text-base sm:text-lg font-medium mb-3">The "Workshop" (Library/Wizards)</h3>
+            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Multi-column layout for utility and data management</p>
+            <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
+              <div class="flex flex-col sm:flex-row" style="min-height: 250px;">
+                <div class="w-full sm:w-48 p-4" style="background: var(--color-surface-hover); border-bottom: 1px solid var(--color-border); sm:border-bottom-0 sm:border-right: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SIDEBAR</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Blueprint navigation</div>
+                </div>
+                <div class="flex-1 p-4 sm:p-6" style="background: var(--color-surface);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE</div>
+                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Forms and data entry</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+<section class="section" id="variables">
         <h2 class="text-2xl font-semibold mb-6">CSS Variables</h2>
         <div class="p-6 rounded-sm overflow-x-auto" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
           <pre class="font-system text-xs" style="color: var(--color-text-primary); white-space: pre; margin: 0;">:root {
@@ -503,11 +982,7 @@
 }</pre>
         </div>
       </section>
-
-      <div class="category-header">02. Foundations</div>
-
-      <!-- Colors -->
-      <section class="section py-8 md:py-12" id="colors">
+<section class="section py-8 md:py-12" id="colors">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Color Palette</h2>
 
         <div class="mb-8">
@@ -723,9 +1198,7 @@
           </div>
         </div>
       </section>
-
-      <!-- Typography -->
-      <section class="section py-8 md:py-12" id="typography">
+<section class="section py-8 md:py-12" id="typography">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Typography</h2>
 
         <div class="space-y-8">
@@ -985,9 +1458,7 @@
           </div>
         </div>
       </section>
-
-      <!-- Spacing -->
-      <section class="section" id="spacing">
+<section class="section" id="spacing">
         <h2 class="text-2xl font-semibold mb-6">Spacing Scale</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Grid-based spacing system using 24px base unit for alignment and rhythm.</p>
 
@@ -1034,9 +1505,7 @@
           </div>
         </div>
       </section>
-
-      <!-- Grid System -->
-      <section class="section py-8 md:py-12" id="grid">
+<section class="section py-8 md:py-12" id="grid">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Grid System & Breakpoints</h2>
         <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Responsive layout structure based on 12-column grid with standardized breakpoints.</p>
 
@@ -1113,9 +1582,7 @@
           </div>
         </div>
       </section>
-
-      <!-- Responsive Design -->
-      <section class="section py-8 md:py-12" id="responsive">
+<section class="section py-8 md:py-12" id="responsive">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Responsive Design</h2>
         <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Mobile-first approach with graceful scaling across all devices.</p>
 
@@ -1401,9 +1868,7 @@
           </ul>
         </div>
       </section>
-
-      <!-- Iconography -->
-      <section class="section" id="icons">
+<section class="section" id="icons">
         <h2 class="text-2xl font-semibold mb-6">Iconography</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Using Lucide icons with consistent sizing and stroke weight.</p>
 
@@ -1456,9 +1921,7 @@
           </ul>
         </div>
       </section>
-
-      <!-- Elevation -->
-      <section class="section" id="elevation">
+<section class="section" id="elevation">
         <h2 class="text-2xl font-semibold mb-6">Elevation & Shadows</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the "drafting table" aesthetic.</p>
 
@@ -1498,282 +1961,7 @@
           </p>
         </div>
       </section>
-
-      <!-- Border Radius -->
-      <section class="section" id="radius">
-        <h2 class="text-2xl font-semibold mb-6">Border Radius</h2>
-        <p class="mb-6" style="color: var(--color-text-secondary);">Minimal rounding to maintain crisp, technical aesthetic.</p>
-
-        <div class="grid grid-cols-4 gap-4">
-          <div>
-            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 0;"></div>
-            <div class="mt-3 text-center">
-              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">none</div>
-              <code class="text-xs">0px</code>
-              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Dot grid, technical elements</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 2px;"></div>
-            <div class="mt-3 text-center">
-              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-sm</div>
-              <code class="text-xs">2px</code>
-              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Default for most UI</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 4px;"></div>
-            <div class="mt-3 text-center">
-              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded</div>
-              <code class="text-xs">4px</code>
-              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Buttons, inputs</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="w-20 h-20 mx-auto" style="background: var(--color-accent); border-radius: 8px;"></div>
-            <div class="mt-3 text-center">
-              <div class="font-system text-xs font-medium" style="color: var(--color-text-primary);">rounded-lg</div>
-              <code class="text-xs">8px</code>
-              <div class="text-xs mt-1" style="color: var(--color-text-muted);">Cards, modals</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-6 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-          <h4 class="font-system text-sm mb-2" style="color: var(--color-text-muted);">DEFAULT</h4>
-          <p class="text-sm" style="color: var(--color-text-secondary);">
-            Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains the technical, precise aesthetic while avoiding harsh 90° corners.
-          </p>
-        </div>
-      </section>
-
-      <div class="category-header">03. Components</div>
-
-      <!-- Components -->
-      <section class="section" id="components">
-        <h2 class="text-2xl font-semibold mb-6">Components</h2>
-
-        <!-- Buttons -->
-        <div class="mb-12">
-          <h3 class="text-lg font-medium mb-4">Buttons (State Matrix)</h3>
-          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Primary and secondary variants are shown together for default, hover, active, disabled, and loading states.</p>
-          <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-            <div class="grid grid-cols-1 md:grid-cols-[140px,1fr]">
-              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">State</div>
-              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">Variants</div>
-
-              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DEFAULT</div>
-              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Primary Action</button>
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Secondary Action</button>
-              </div>
-
-              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">HOVER</div>
-              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white;">Primary Action</button>
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-primary);">Secondary Action</button>
-              </div>
-
-              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">ACTIVE</div>
-              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white; transform: scale(0.98);">Primary Action</button>
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 2px solid var(--color-border-strong); color: var(--color-text-primary); transform: scale(0.98);">Secondary Action</button>
-              </div>
-
-              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DISABLED</div>
-              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
-                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-border-strong); color: var(--color-text-muted); cursor: not-allowed;">Primary Action</button>
-                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;">Secondary Action</button>
-              </div>
-
-              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted);">LOADING</div>
-              <div class="px-4 py-4 flex flex-wrap gap-3">
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.8;" aria-live="polite">
-                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
-                  </svg>
-                  Loading...
-                </button>
-                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-secondary); opacity: 0.8;">
-                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
-                  </svg>
-                  Saving...
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Inputs -->
-        <div class="mb-12">
-          <h3 class="text-lg font-medium mb-4">Form Inputs (Validation States)</h3>
-          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Validation states pair visual styling with explicit helper text labels so status is never color-only.</p>
-          <div class="space-y-4 max-w-md">
-            <div>
-              <label for="component-input-default" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Default</label>
-              <input id="component-input-default" type="text" placeholder="Character name" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" />
-            </div>
-
-            <div>
-              <label for="component-input-focus" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Focus</label>
-              <input id="component-input-focus" type="text" value="Focused narrative prompt" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-accent); outline: 2px solid var(--color-accent); color: var(--color-text-primary);" />
-            </div>
-
-            <div>
-              <label for="component-input-error" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Error</label>
-              <input id="component-input-error" type="text" value="Scene title already used" aria-describedby="component-input-error-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-error); color: var(--color-text-primary);" />
-              <p id="component-input-error-help" class="text-xs mt-1" style="color: var(--color-error);">Error: choose a unique title to continue.</p>
-            </div>
-
-            <div>
-              <label for="component-input-success" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Success</label>
-              <input id="component-input-success" type="text" value="Ravenhold Ledger" aria-describedby="component-input-success-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-success); color: var(--color-text-primary);" />
-              <p id="component-input-success-help" class="text-xs mt-1" style="color: var(--color-success);">Success: title accepted and ready to save.</p>
-            </div>
-
-            <div>
-              <label for="component-input-disabled" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Disabled</label>
-              <input id="component-input-disabled" type="text" value="Locked while streaming" disabled class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;" />
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-12">
-          <h3 class="text-lg font-medium mb-4">Core Utility Cluster (Badges, Alerts, Cards, Drawer Trigger)</h3>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">BADGES</h4>
-              <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(49, 46, 129, 0.15); color: var(--color-accent);">Fantasy</span>
-                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session 04</span>
-                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(6, 95, 70, 0.12); color: var(--color-success);">Stable</span>
-              </div>
-            </div>
-
-            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">ALERTS</h4>
-              <div class="space-y-2 text-sm">
-                <div class="rounded-sm px-3 py-2" style="background: rgba(6, 95, 70, 0.08); border: 1px solid rgba(6, 95, 70, 0.35); color: var(--color-success);">Success: choices updated.</div>
-                <div class="rounded-sm px-3 py-2" style="background: rgba(146, 64, 14, 0.08); border: 1px solid rgba(146, 64, 14, 0.35); color: var(--color-warning);">Warning: low torchlight may affect stealth.</div>
-                <div class="rounded-sm px-3 py-2" style="background: rgba(159, 18, 57, 0.08); border: 1px solid rgba(159, 18, 57, 0.35); color: var(--color-error);">Error: outcome save failed.</div>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STANDARD CARD</div>
-                  <p class="text-sm" style="color: var(--color-text-secondary);">Basic manuscript metadata card.</p>
-                </div>
-                <div class="p-4 rounded-sm backdrop-blur-md" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">HUD CARD</div>
-                  <p class="text-sm" style="color: var(--color-text-secondary);">Floating overlay-compatible card panel.</p>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                <div class="flex items-center justify-between gap-3 mb-3">
-                  <h4 class="font-system text-xs" style="color: var(--color-text-muted);">DRAWER TRIGGER + STATIC PREVIEW</h4>
-                  <button id="component-drawer-trigger" type="button" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Open Character Drawer</button>
-                </div>
-                <div class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px dashed var(--color-border-strong);">
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STATIC DRAWER PREVIEW</div>
-                  <p class="text-sm" style="color: var(--color-text-secondary);">Overlay panel includes profile summary, inventory quick stats, and journal links. In the composition prototype, this opens as an absolute/fixed layer without shifting narrative content.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="category-header">04. Experience</div>
-
-      <!-- Layout Patterns -->
-      <section class="section py-8 md:py-12" id="layout">
-        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Layout Patterns</h2>
-
-        <div class="space-y-8">
-          <!-- The Manuscript -->
-          <div>
-            <h3 class="text-base sm:text-lg font-medium mb-3">The "Manuscript" (Game Session)</h3>
-            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Single-column, center-focused layout for immersive reading</p>
-            <div class="p-4 sm:p-8 rounded-sm relative overflow-hidden" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); min-height: 300px;">
-              <!-- HUD -->
-              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
-                <div class="font-system" style="color: var(--color-text-muted);">HUD (Floating)</div>
-              </div>
-              <!-- Content -->
-              <div class="max-w-3xl mx-auto pt-12 sm:pt-12">
-                <div class="font-narrative text-base sm:text-lg mb-4" style="color: var(--color-text-primary);">
-                  Narrative Column (max-w-3xl)
-                </div>
-                <div class="h-20" style="background: var(--color-surface); border: 1px solid var(--color-border);"></div>
-              </div>
-              <!-- Input -->
-              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
-                <div class="font-system" style="color: var(--color-text-muted);">Input Zone (Docked Bottom)</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-base sm:text-lg font-medium mb-3">Narrative Reading Surface Validation</h3>
-            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Tested at realistic lengths: short paragraph, full-page segment, and multi-paragraph scene progression.</p>
-            <div class="p-4 sm:p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-              <div class="max-w-3xl mx-auto space-y-8">
-                <article>
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SHORT PARAGRAPH</div>
-                  <p class="text-narrative">The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.</p>
-                </article>
-
-                <article>
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FULL-PAGE SEGMENT</div>
-                  <div class="space-y-4">
-                    <p class="text-narrative">You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.</p>
-                    <p class="text-narrative">A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: "Records of Irrecoverable Histories." Beneath the desk, a low drawer pulsed with a soft blue glow that brightened when you moved closer.</p>
-                    <p class="text-narrative">When you pulled it open, you found a catalog of names scratched into thin brass sheets. Some had been crossed out with decisive strokes; others had notes beside them in hurried script: "relocated," "sealed," "missing witness." At the bottom of the stack sat a single page of vellum, untouched by dust, bearing your own name in fresh black ink.</p>
-                  </div>
-                </article>
-
-                <article>
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MULTI-PARAGRAPH SCENE FLOW</div>
-                  <div class="space-y-4">
-                    <p class="text-narrative">You turned the page and the room answered. The rails overhead began to move in sequence, carrying lanterns into a slow orbit around the desk.</p>
-                    <p class="text-narrative">Each pass of light revealed another detail: a hidden map etched into the floorboards, a keyhole set into the spine of a bound atlas, and a thread of red string leading from your chair to the locked west door.</p>
-                    <p class="text-narrative">When the orbit stopped, the lantern nearest you dipped on its own and projected a final line onto the wall: "Begin where your story was first rewritten."</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-
-          <!-- The Workshop -->
-          <div>
-            <h3 class="text-base sm:text-lg font-medium mb-3">The "Workshop" (Library/Wizards)</h3>
-            <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Multi-column layout for utility and data management</p>
-            <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-              <div class="flex flex-col sm:flex-row" style="min-height: 250px;">
-                <div class="w-full sm:w-48 p-4" style="background: var(--color-surface-hover); border-bottom: 1px solid var(--color-border); sm:border-bottom-0 sm:border-right: 1px solid var(--color-border);">
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SIDEBAR</div>
-                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Blueprint navigation</div>
-                </div>
-                <div class="flex-1 p-4 sm:p-6" style="background: var(--color-surface);">
-                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE</div>
-                  <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">Forms and data entry</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section py-8 md:py-12" id="game-session-compositions">
+<section class="section py-8 md:py-12" id="game-session-compositions">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Game Session Compositions (#1031)</h2>
         <div class="space-y-8">
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
@@ -1797,74 +1985,107 @@
               <div class="manuscript-overlay-backdrop" data-manuscript-overlay-backdrop></div>
               <div class="manuscript-viewport-shell">
                 <div class="manuscript-viewport-inner">
-                  <div class="absolute top-3 left-1/2 -translate-x-1/2 z-30">
-                    <button id="close-manuscript-overlay" type="button" class="px-3 py-1.5 rounded-sm font-system text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                      Close Overlay (Esc)
-                    </button>
-                  </div>
-
-                  <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
-                    <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                      Character HUD (Collapsed)
-                    </button>
-                    <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CHARACTER SNAPSHOT</h4>
-                      <dl class="space-y-1 text-sm">
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Level</dt><dd style="color: var(--color-text-primary);">3</dd></div>
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Hacking</dt><dd style="color: var(--color-text-primary);">12</dd></div>
-                        <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Streetwise</dt><dd style="color: var(--color-text-primary);">8</dd></div>
-                      </dl>
-                    </div>
-                  </div>
-
-                  <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                    <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                      Session HUD (Collapsed)
-                    </button>
-                    <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                      <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
-                      <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
-                        <li>Turn: 3</li>
-                        <li>Session: The Data Heist</li>
-                        <li>Location: Arasaka building interior</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-44">
-                    <div class="mb-4 flex flex-wrap gap-2">
-                      <button type="button" data-drawer-trigger data-drawer-panel="character" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
-                      <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
-                      <button type="button" data-drawer-trigger data-drawer-panel="journal" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal</button>
-                    </div>
-
-                    <div style="max-height: clamp(280px, 42vh, 540px); overflow-y: auto; padding-right: 8px;">
-                      <div class="space-y-5">
-                        <p class="text-narrative">Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.</p>
-                        <p class="text-narrative">"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.</p>
-                        <div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
-                          <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: DECISION SUCCESS (decision-cyberpunk-route)</div>
-                          <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You choose to crawl through the ventilation system - stealthy but difficult.</p>
+                  <header class="manuscript-overlay-header">
+                    <div class="manuscript-overlay-header-left">
+                      <div class="manuscript-header-controls flex items-center gap-2">
+                        <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                          Character HUD
+                        </button>
+                        <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                          Session HUD
+                        </button>
+                        <button id="manuscript-panels-toggle" type="button" aria-expanded="false" aria-controls="manuscript-panels-menu" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                          Panels
+                        </button>
+                      </div>
+                      <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-64 max-h-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CHARACTER SNAPSHOT</h4>
+                        <div id="manuscript-character-hud-stats" class="space-y-3 text-sm"></div>
+                      </div>
+                      <div id="manuscript-hud-right-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
+                        <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
+                          <li>Session ID: <span id="manuscript-session-id"></span></li>
+                          <li>Status: <span id="manuscript-session-status"></span></li>
+                          <li>Narrative Entries: <span id="manuscript-session-narrative-count"></span></li>
+                        </ul>
+                      </div>
+                      <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">PANEL SHORTCUTS</h4>
+                        <div class="space-y-2">
+                          <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character HUD</button>
+                          <button type="button" data-manuscript-control="toggle-session-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session HUD</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="character" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="story-summary" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Story So Far</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="choice-history" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Choice History</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="journal" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal Snapshot</button>
+                          <button id="manuscript-open-journal-route" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Open Journal Route</button>
                         </div>
-                        <p class="text-narrative">You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.</p>
-                        <p class="text-narrative">Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.</p>
                       </div>
                     </div>
 
-                  </div>
+                    <div class="manuscript-overlay-header-right">
+                      <button id="close-manuscript-overlay" type="button" class="px-3 py-1.5 rounded-sm font-system text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                        Close
+                      </button>
+                    </div>
+                  </header>
 
-                  <div id="manuscript-action-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
-                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">ACTION RAIL (SUGGESTED + CUSTOM)</div>
-                    <div class="flex flex-wrap gap-2 mb-3">
-                      <button type="button" data-suggested-action="Take the maintenance elevator - quieter but slower." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Take the maintenance elevator</button>
-                      <button type="button" data-suggested-action="Use the emergency stairs - faster but riskier." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Use the emergency stairs</button>
-                      <button type="button" data-suggested-action="Crawl through the ventilation system - stealthy but difficult." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Crawl through ventilation</button>
+                  <main class="manuscript-overlay-main">
+                    <div class="pb-4">
+                      <div id="manuscript-characters-present-mobile-bar" class="manuscript-characters-mobile-bar">
+                        <p class="manuscript-characters-mobile-label font-system text-[11px] uppercase tracking-wide" style="color: var(--color-text-muted);">Characters Present</p>
+                        <div id="manuscript-characters-present-mobile-list" class="manuscript-characters-mobile-list"></div>
+                      </div>
+                      <div class="manuscript-main-stage">
+                        <aside id="manuscript-characters-present-rail" class="manuscript-characters-rail">
+                          <p class="font-system text-[11px] uppercase tracking-wide mb-2" style="color: var(--color-text-muted);">Characters Present</p>
+                          <div id="manuscript-characters-present-list" class="flex flex-wrap gap-1"></div>
+                        </aside>
+                        <div class="manuscript-main-content">
+                          <div class="max-w-3xl mx-auto">
+                            <div id="manuscript-narrative-stream" class="space-y-5"></div>
+                          </div>
+                        </div>
+                        <div class="manuscript-rail-spacer" aria-hidden="true"></div>
+                      </div>
+                    </div>
+                  </main>
+
+                  <div id="manuscript-action-rail" class="rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <div id="manuscript-ending-suggestion" hidden class="mb-3 rounded-sm p-3" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35);">
+                      <p class="font-interface text-sm font-semibold mb-1" style="color: var(--color-text-primary);">Your story could end here.</p>
+                      <p class="text-xs sm:text-sm mb-3" style="color: var(--color-text-secondary);">You recovered the Arasaka relay key, but alarms are escalating and extraction windows are closing.</p>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <button id="manuscript-ending-accept" type="button" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">View Ending</button>
+                        <button id="manuscript-ending-dismiss" type="button" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Continue Playing</button>
+                      </div>
+                    </div>
+                    <div class="manuscript-mobile-rail-top-controls mb-2">
+                      <button id="manuscript-toggle-suggested-actions" type="button" aria-expanded="false" aria-controls="manuscript-suggested-actions-region" class="w-full px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                        Suggested Actions
+                      </button>
+                      <button type="button" data-manuscript-control="end-story" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 whitespace-nowrap" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">
+                        End Story
+                      </button>
+                    </div>
+                    <div id="manuscript-suggested-actions-region" class="mb-2">
+                      <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
+                      <div id="manuscript-choice-actions" class="grid gap-1.5 lg:grid-cols-3"></div>
                     </div>
                     <label for="manuscript-input" class="sr-only">Narrative input</label>
-                    <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action..."></textarea>
-                    <div class="mt-2 flex items-center justify-between gap-3">
+                    <div class="manuscript-input-row">
+                      <input id="manuscript-input" type="text" maxlength="400" class="w-full rounded-sm p-2 text-sm font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action...">
+                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send</button>
+                    </div>
+                    <div class="manuscript-meta-row mt-2 hidden lg:flex flex-wrap items-center justify-between gap-3">
                       <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
-                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Turn</button>
+                      <div class="manuscript-secondary-controls flex flex-wrap items-center gap-2">
+                        <button id="manuscript-simulate-turn" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
+                        <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
+                        <button id="manuscript-end-story" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">End Story</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1900,6 +2121,14 @@
                 <span>Drawer interactions open as overlays without shifting narrative content.</span>
               </li>
               <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Production component mapping prototype complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Production game-session component mapping is documented (keep/move/remove/defer) with explicit issue ownership across <code>#1034</code>, <code>#1035</code>, and deferred <code>#1043</code>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Session controls prototype complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Mapped session controls are prototyped in manuscript context: autosave indicator placement, ending suggestion banner placement, and end-story confirmation flow.</span>
+              </li>
+              <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Accessibility checks complete" class="mt-1 h-4 w-4 rounded-sm">
                 <span>Focus, keyboard, and contrast validation checks are documented and pass.</span>
               </li>
@@ -1924,6 +2153,10 @@
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Drawer keyboard check" class="mt-1 h-4 w-4 rounded-sm">
                 <span>Drawer opens from trigger (Enter/Space), closes on Escape, and returns focus to invoking trigger.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="End story confirmation keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>End-story confirmation opens as a modal overlay, closes on Escape/cancel, and returns focus to the invoking control.</span>
               </li>
             </ul>
           </div>
@@ -1978,10 +2211,158 @@
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
             <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MIGRATION HANDOFF NOTES</h3>
             <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li><strong style="color: var(--color-text-primary);">#1031 prototype gate:</strong> review and accept the component mapping snapshot below before starting production migration tasks in <code>#1034</code> or <code>#1035</code>.</li>
               <li><strong style="color: var(--color-text-primary);">#1034 components/layout integration:</strong> migrate the single-column manuscript shell, docked input behavior, and HUD positioning/toggles.</li>
               <li><strong style="color: var(--color-text-primary);">#1035 progressive disclosure:</strong> migrate drawer overlay controller and focus-return behavior.</li>
               <li><strong style="color: var(--color-text-primary);">#1043 follow-up (deferred):</strong> add production narrative annotation linking for inline term-to-context interactions.</li>
             </ul>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">PRODUCTION COMPONENT AUDIT SNAPSHOT (2026-02-07)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Current production composition is <code>GameSession -> ActiveGameSession -> NarrativeColumn + ChoicesColumn + Controls</code>. This table maps existing responsibilities into manuscript-era placement.
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">Production Surface</th>
+                    <th class="text-left py-2 pr-4">Manuscript Decision</th>
+                    <th class="text-left py-2">Issue Mapping</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSession</code> two-column shell</td>
+                    <td class="py-2 pr-4">Replace with full-viewport manuscript shell and fixed bottom action rail.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSessionNarrativeColumn</code> + <code>NarrativeHistory*</code></td>
+                    <td class="py-2 pr-4">Keep behavior, move to center single-column narrative stream.</td>
+                    <td class="py-2"><code>#1034</code> + <code>#1033</code> (streaming/scroll hardening)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSessionChoicesColumn</code> + <code>ChoiceSelector</code></td>
+                    <td class="py-2 pr-4">Remove right column; fold suggested actions + custom input into docked rail.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>CharacterSummary</code></td>
+                    <td class="py-2 pr-4">Move to collapsed HUD summary + expanded drawer details.</td>
+                    <td class="py-2"><code>#1034</code> (HUD) + <code>#1035</code> (drawer)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code>, <code>StorySummarySection</code>, <code>ChoiceHistorySection</code></td>
+                    <td class="py-2 pr-4">Move from in-flow collapsibles into progressive disclosure drawers.</td>
+                    <td class="py-2"><code>#1035</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>SaveIndicator</code></td>
+                    <td class="py-2 pr-4">Keep passive autosave status, remove manual <code>Save Now</code> action during migration, and place status in a low-noise rail/HUD area.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4"><code>EndingSuggestionBanner</code> + end-story confirmation modal</td>
+                    <td class="py-2 pr-4">Keep behavior, place banner in rail/HUD context without narrative reflow.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-4 space-y-2 text-sm" style="color: var(--color-text-secondary);">
+              <p><strong style="color: var(--color-text-primary);">Coverage check:</strong> No net-new issue required from this audit.</p>
+              <p><strong style="color: var(--color-text-primary);">Prototype gate:</strong> this mapping table is part of <code>#1031</code> completion and should be treated as migration input, not migration output.</p>
+              <p><strong style="color: var(--color-text-primary);">Follow-up note:</strong> tighten <code>#1034</code> acceptance criteria for end-story control placement, save status placement, ending-suggestion placement, and manual <code>Save Now</code> removal from app UI/code paths.</p>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MISSING-ELEMENTS MATRIX (2026-02-07)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Matrix for manuscript parity decisions in <code>#1031</code>. Each row references an existing app field/component surface and records whether it was added, deferred, or excluded for manuscript mode.
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">App Element</th>
+                    <th class="text-left py-2 pr-4">Exists in App</th>
+                    <th class="text-left py-2 pr-4">Added to Manuscript</th>
+                    <th class="text-left py-2 pr-4">Deferred</th>
+                    <th class="text-left py-2 pr-4">Not Appropriate</th>
+                    <th class="text-left py-2">Decision Note</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>DecisionOption.alignment</code> indicators (<code>ChoiceSelector</code>)</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred visual alignment labels to reduce manuscript rail density.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>DecisionOption.requirements[]</code> skill checks</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred for follow-up issue decision on whether manuscript rail should expose requirement checks.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>NarrativeSegment.metadata.characterIds</code> / <code>segment.characterIds</code></td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Rendered as sticky mobile bar under header and desktop rail adjacent to narrative stream.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>NarrativeSegment.metadata.location</code> inline narrative label</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2">Removed from narrative body; location context is already represented in Session HUD.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code> “Use” action button</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Drawer items now expose a Use button that feeds action text back into manuscript input.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code> drop flow (<code>DropConfirmationDialog</code>)</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred to <code>#1035</code> while manuscript mode remains non-destructive in this prototype slice.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>SaveIndicator</code> manual <code>Save Now</code> action</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2">Excluded from manuscript interaction rail per #1031 decision to keep passive autosave only.</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4"><code>SaveIndicator</code> passive status text</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred pending final manuscript HUD density decision in <code>#1034</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -1990,22 +2371,31 @@
           <aside id="manuscript-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="manuscript-drawer-title" tabindex="-1" class="absolute right-0 top-0 h-full w-full max-w-md p-4 sm:p-6" style="background: var(--color-surface); border-left: 1px solid var(--color-border); box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);">
             <div class="flex items-start justify-between gap-4 mb-4">
               <div>
-                <h3 id="manuscript-drawer-title" class="text-lg font-semibold">Character Details</h3>
-                <p id="manuscript-drawer-subtitle" class="text-sm" style="color: var(--color-text-secondary);">Overlay panel opens without shifting manuscript text.</p>
+                <h3 id="manuscript-drawer-title" class="text-lg font-semibold"></h3>
+                <p id="manuscript-drawer-subtitle" class="text-sm" style="color: var(--color-text-secondary);"></p>
               </div>
               <button id="manuscript-drawer-close" type="button" class="px-2 py-1 rounded-sm text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Close (Esc)</button>
             </div>
-            <div id="manuscript-drawer-content" class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
-              <p><strong style="color: var(--color-text-primary);">Profile:</strong> Nova "Ghost" Chen, elite corporate hacker turned underground resistance fighter.</p>
-              <p><strong style="color: var(--color-text-primary);">Current objective:</strong> Infiltrating Arasaka building to steal critical data.</p>
-              <p><strong style="color: var(--color-text-primary);">Location:</strong> Neo-Tokyo Underground.</p>
-            </div>
+            <div id="manuscript-drawer-content" class="space-y-3 text-sm" style="color: var(--color-text-secondary);"></div>
           </aside>
+        </div>
+
+        <div id="manuscript-end-story-modal" class="fixed inset-0 hidden z-[230]" aria-hidden="true">
+          <div class="absolute inset-0" data-end-story-backdrop style="background: var(--color-scrim);"></div>
+          <div id="manuscript-end-story-dialog" role="dialog" aria-modal="true" aria-labelledby="manuscript-end-story-title" aria-describedby="manuscript-end-story-body" tabindex="-1" class="absolute left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-sm p-4 sm:p-5" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+            <h3 id="manuscript-end-story-title" class="text-lg font-semibold mb-2">End Story</h3>
+            <p id="manuscript-end-story-body" class="text-sm mb-4" style="color: var(--color-text-secondary);">Confirm ending generation for the current session state. This mirrors the production confirmation dialog placement in manuscript mode.</p>
+            <div class="flex flex-wrap items-center justify-end gap-2">
+              <button id="manuscript-end-story-cancel" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Cancel</button>
+              <button id="manuscript-end-story-confirm" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(180, 83, 9, 0.14); border: 1px solid rgba(180, 83, 9, 0.5); color: rgb(146, 64, 14);">Confirm End Story</button>
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- Component Examples from App -->
-      <section class="section py-8 md:py-12" id="examples">
+      
+<section class="section py-8 md:py-12" id="examples">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Component Examples from App</h2>
         <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Real components from the Narraitor application showing the design system in practice.</p>
 
@@ -2268,9 +2658,7 @@
           }
         </style>
       </section>
-
-      <!-- Interactive States -->
-      <section class="section py-8 md:py-12" id="states">
+<section class="section py-8 md:py-12" id="states">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Interactive States</h2>
         <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Consistent visual feedback across all interactive elements.</p>
 
@@ -2415,9 +2803,7 @@
           </ul>
         </div>
       </section>
-
-      <!-- Accessibility -->
-      <section class="section" id="a11y">
+<section class="section" id="a11y">
         <h2 class="text-2xl font-semibold mb-6">Accessibility (WCAG 2.1 AA)</h2>
         <p class="mb-8" style="color: var(--color-text-secondary);">All components and patterns must meet WCAG 2.1 Level AA standards minimum.</p>
 
@@ -2628,9 +3014,7 @@
           </div>
         </div>
       </section>
-
-      <!-- Motion & Animation -->
-      <section class="section" id="motion">
+<section class="section" id="motion">
         <h2 class="text-2xl font-semibold mb-6">Motion & Animation</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Subtle, purposeful motion that enhances usability without distraction.</p>
 
@@ -2738,9 +3122,7 @@
           </ul>
         </div>
       </section>
-
-      <!-- Content Guidelines -->
-      <section class="section" id="content">
+<section class="section" id="content">
         <h2 class="text-2xl font-semibold mb-6">Content & Voice</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Writing guidelines for UI text, labels, and microcopy.</p>
 
@@ -2847,9 +3229,7 @@
           </ul>
         </div>
       </section>
-
-      <!-- Design Tokens -->
-      <section class="section" id="tokens">
+<section class="section" id="tokens">
         <h2 class="text-2xl font-semibold mb-6">Design Tokens</h2>
         <p class="mb-6" style="color: var(--color-text-secondary);">Exportable design values for implementation in code.</p>
 
@@ -2991,12 +3371,338 @@ export function PrimaryAction() {
 
 
 
+
     </main>
   </div>
-
   <script>
     let activeDrawerTrigger = null;
+    let activeEndStoryTrigger = null;
     let manuscriptOverlayLauncher = null;
+    const manuscriptHudPairs = [
+      {
+        buttonId: 'manuscript-hud-left-toggle',
+        panelId: 'manuscript-hud-left-panel',
+      },
+      {
+        buttonId: 'manuscript-hud-right-toggle',
+        panelId: 'manuscript-hud-right-panel',
+      },
+    ];
+    const manuscriptSourceRecords = {
+      session: {
+        id: 'session-cyberpunk-ghost',
+        worldId: 'world-cyberpunk-2077',
+        characterId: 'char-cyberpunk-hacker',
+        status: 'active',
+      },
+      character: {
+        id: 'char-cyberpunk-hacker',
+        name: 'Nova "Ghost" Chen',
+        level: 3,
+        description: 'Elite corporate hacker turned underground resistance fighter',
+        backgroundHistory: 'Former Arasaka security specialist who discovered dark corporate secrets',
+        location: 'Neo-Tokyo Underground',
+        attributes: [
+          { id: 'char-attr-tech-level', name: 'Tech Level', baseValue: 8, modifiedValue: 8 },
+          { id: 'char-attr-street-cred', name: 'Street Cred', baseValue: 6, modifiedValue: 6 },
+        ],
+        skills: [
+          { id: 'char-skill-hacking', worldSkillId: 'skill-world-cyberpunk-2077-1', name: 'Hacking', level: 12 },
+          { id: 'char-skill-streetwise', worldSkillId: 'skill-world-cyberpunk-2077-2', name: 'Streetwise', level: 8 },
+        ],
+      },
+      inventoryItems: [
+        {
+          id: 'inventory-ghostlink-cyberdeck',
+          characterId: 'char-cyberpunk-hacker',
+          name: 'Ghostlink Cyberdeck',
+          description: 'Signature deck tuned to slip past Arasaka intrusion countermeasures.',
+          quantity: 1,
+          imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=cyberdeck&backgroundColor=1e293b&scale=80',
+        },
+        {
+          id: 'inventory-neuro-stims',
+          characterId: 'char-cyberpunk-hacker',
+          name: 'NeuroBoost Stims',
+          description: 'Fast-acting injectors that keep reflexes sharp during breach attempts.',
+          quantity: 3,
+          imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=neurostim&backgroundColor=3b82f6&scale=80',
+        },
+        {
+          id: 'inventory-black-ice-shard',
+          characterId: 'char-cyberpunk-hacker',
+          name: 'Black ICE Shard',
+          description: 'Prototype defensive program that can be slotted into the deck on demand.',
+          quantity: 1,
+          imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=blackice&backgroundColor=7c3aed&scale=80',
+        },
+      ],
+      narrativeSegments: [
+        {
+          id: 'segment-cyberpunk-1',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'scene',
+          characterIds: ['char-cyberpunk-hacker'],
+          content: 'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The *Arasaka building* looms ahead, its security algorithms pulsing like a **digital heartbeat**.',
+          metadata: {
+            location: 'Starting Location',
+            characterIds: ['char-cyberpunk-hacker'],
+          },
+        },
+        {
+          id: 'segment-cyberpunk-2',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'dialogue',
+          characterIds: ['char-cyberpunk-hacker'],
+          content: '"Nice deck," a voice says from the shadows. "*Arasaka custom job, looks like.*" The fixer steps into the dim light, **chrome eyes gleaming**.',
+          metadata: {
+            location: 'Neo-Tokyo alley',
+            characterIds: ['char-cyberpunk-hacker', 'npc-fixer'],
+          },
+        },
+        {
+          id: 'segment-cyberpunk-3',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'action',
+          characterIds: ['char-cyberpunk-hacker'],
+          content: 'You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
+          metadata: {
+            location: 'Arasaka building interior',
+            characterIds: ['char-cyberpunk-hacker'],
+            causedByDecisionId: 'decision-cyberpunk-route',
+            causedByDecisionText: 'You choose to crawl through the ventilation system - stealthy but difficult',
+            decisionOutcome: 'success',
+          },
+        },
+        {
+          id: 'segment-cyberpunk-4',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'transition',
+          characterIds: ['char-cyberpunk-hacker'],
+          content: 'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
+          metadata: {
+            location: 'Arasaka building',
+            characterIds: ['char-cyberpunk-hacker'],
+          },
+        },
+      ],
+      decisions: [
+        {
+          id: 'decision-cyberpunk-route',
+          prompt: 'How do you want to reach the 47th floor?',
+          decisionWeight: 'major',
+          selectedOptionId: 'option-ventilation',
+          selectedAt: '2024-01-01T02:02:00.000Z',
+          characterId: 'char-cyberpunk-hacker',
+          contextSummary: 'Infiltrating Arasaka building to steal critical data',
+          narrativeSegmentId: 'segment-cyberpunk-2',
+          options: [
+            {
+              id: 'option-elevator',
+              text: 'Take the maintenance elevator - quieter but slower',
+              alignment: 'neutral',
+              hint: 'Lower risk of detection but takes more time',
+              requirements: [{ type: 'skill', targetId: 'skill-hacking', operator: 'gte', value: 10 }],
+            },
+            {
+              id: 'option-stairs',
+              text: 'Use the emergency stairs - faster but riskier',
+              alignment: 'chaotic',
+              hint: 'Quick route but higher chance of encountering security',
+              requirements: [{ type: 'skill', targetId: 'skill-streetwise', operator: 'gte', value: 8 }],
+            },
+            {
+              id: 'option-ventilation',
+              text: 'Crawl through the ventilation system - stealthy but difficult',
+              alignment: 'lawful',
+              hint: 'Requires high tech skill but nearly undetectable',
+              requirements: [
+                { type: 'skill', targetId: 'skill-hacking', operator: 'gte', value: 14 },
+                { type: 'skill', targetId: 'skill-streetwise', operator: 'gte', value: 10 },
+              ],
+            },
+          ],
+        },
+      ],
+      journalEntries: [
+        {
+          id: 'entry-cyberpunk-decision',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'decision',
+          title: 'Decision',
+          content: 'Chose the ventilation route to avoid the main lobby scanners.',
+          detailedContent: 'Nova reroutes power to the ventilation shafts, trusting stealth over speed. The detour buys time and keeps Arasaka\'s lobby scanners blind.',
+        },
+        {
+          id: 'entry-cyberpunk-discovery',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'discovery',
+          title: 'Discovery',
+          content: 'Found a hidden relay broadcasting Arasaka executive calls.',
+          detailedContent: 'A concealed relay node pulses beneath the floor panel, routing encrypted executive calls. The signal pattern suggests a private line to the board.',
+        },
+        {
+          id: 'entry-cyberpunk-world-event',
+          sessionId: 'session-cyberpunk-ghost',
+          type: 'world_event',
+          title: 'World Event',
+          content: 'Security drones sweep the corridor as alarms spike.',
+          detailedContent: 'Alarms crackle to life as a wave of security drones sweeps the executive corridor. The neon haze outside flickers with emergency broadcasts.',
+        },
+      ],
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatEntryType(type) {
+      return String(type).replace(/_/g, ' ').toUpperCase();
+    }
+
+    function stripMarkdownFormatting(content) {
+      return String(content || '')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1');
+    }
+
+    function normalizeIdentifier(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function deriveFallbackCharacterName(characterId) {
+      const cleaned = String(characterId || '')
+        .replace(/^npc[-_]?/i, '')
+        .replace(/[-_]/g, ' ')
+        .trim();
+
+      if (!cleaned) {
+        return 'Unknown NPC';
+      }
+
+      return `NPC ${cleaned}`;
+    }
+
+    function getSegmentCharacterIds(segment) {
+      const uniqueIds = new Map();
+      const addId = (value) => {
+        const trimmed = String(value || '').trim();
+        if (!trimmed) {
+          return;
+        }
+
+        const normalized = normalizeIdentifier(trimmed);
+        if (!uniqueIds.has(normalized)) {
+          uniqueIds.set(normalized, trimmed);
+        }
+      };
+
+      (segment.characterIds || []).forEach(addId);
+      ((segment.metadata && segment.metadata.characterIds) || []).forEach(addId);
+
+      return Array.from(uniqueIds.values());
+    }
+
+    function resolveCharacterName(characterId) {
+      if (characterId === manuscriptSourceRecords.character.id) {
+        return manuscriptSourceRecords.character.name;
+      }
+
+      return deriveFallbackCharacterName(characterId);
+    }
+
+    function renderManuscriptNarrativeFromSourceRecords() {
+      const narrativeStream = document.getElementById('manuscript-narrative-stream');
+      const charactersPresentList = document.getElementById('manuscript-characters-present-list');
+      const charactersPresentMobileList = document.getElementById('manuscript-characters-present-mobile-list');
+      if (!narrativeStream || !charactersPresentList || !charactersPresentMobileList) {
+        return;
+      }
+
+      const sessionNarrativeSegments = manuscriptSourceRecords.narrativeSegments.filter(
+        (segment) => segment.sessionId === manuscriptSourceRecords.session.id,
+      );
+
+      if (sessionNarrativeSegments.length === 0) {
+        narrativeStream.innerHTML = '<p style="color: var(--color-text-secondary);">No narrative segments found for this session.</p>';
+        charactersPresentList.innerHTML = '<p class="text-xs" style="color: var(--color-text-secondary);">No participants recorded.</p>';
+        charactersPresentMobileList.innerHTML = '<p class="text-xs" style="color: var(--color-text-secondary);">No participants recorded.</p>';
+        return;
+      }
+
+      const activeSegmentForParticipants = (() => {
+        for (let index = sessionNarrativeSegments.length - 1; index >= 0; index -= 1) {
+          const segment = sessionNarrativeSegments[index];
+          if (getSegmentCharacterIds(segment).length > 0) {
+            return segment;
+          }
+        }
+        return sessionNarrativeSegments[sessionNarrativeSegments.length - 1];
+      })();
+      const activeSegmentCharacterIds = activeSegmentForParticipants
+        ? getSegmentCharacterIds(activeSegmentForParticipants)
+        : [];
+
+      const participantMarkup = activeSegmentCharacterIds.length > 0
+        ? activeSegmentCharacterIds.map((characterId) => `<span class="inline-flex items-center rounded-sm px-2 py-1 text-xs font-interface" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(resolveCharacterName(characterId))}</span>`).join('')
+        : '<p class="text-xs" style="color: var(--color-text-secondary);">No participants recorded.</p>';
+
+      charactersPresentList.innerHTML = participantMarkup;
+      charactersPresentMobileList.innerHTML = participantMarkup;
+
+      narrativeStream.innerHTML = sessionNarrativeSegments.map((segment) => {
+        const metadata = segment.metadata || {};
+        const hasDecisionOutcome = Boolean(metadata.causedByDecisionId && metadata.causedByDecisionText);
+        const outcomeLabel = metadata.decisionOutcome
+          ? `OUTCOME: ${formatEntryType(String(metadata.decisionOutcome).replace(/-/g, '_'))}`
+          : 'OUTCOME: DECISION';
+
+        const outcomeMarkup = hasDecisionOutcome
+          ? `<div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
+              <div class="font-system text-xs mb-1" style="color: var(--color-accent);">${escapeHtml(outcomeLabel)}</div>
+              <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">${escapeHtml(metadata.causedByDecisionText)}</p>
+            </div>`
+          : '';
+
+        return `<article class="space-y-3">
+          ${outcomeMarkup}
+          <p class="text-narrative">${escapeHtml(stripMarkdownFormatting(segment.content))}</p>
+        </article>`;
+      }).join('');
+    }
+
+    function renderManuscriptChoiceActionsFromSourceRecords() {
+      const decisionPrompt = document.getElementById('manuscript-decision-prompt');
+      const choiceActions = document.getElementById('manuscript-choice-actions');
+      const primaryDecision = manuscriptSourceRecords.decisions[0];
+
+      if (!decisionPrompt || !choiceActions) {
+        return;
+      }
+
+      if (!primaryDecision) {
+        decisionPrompt.textContent = 'No decision records found.';
+        choiceActions.innerHTML = '';
+        return;
+      }
+
+      decisionPrompt.textContent = primaryDecision.prompt;
+
+      choiceActions.innerHTML = primaryDecision.options.map((option) => {
+        return `<button
+            type="button"
+            data-suggested-action="${escapeHtml(option.text)}"
+            class="manuscript-suggested-action w-full min-w-0 text-left px-2.5 py-1.5 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            ${escapeHtml(option.text)}
+          </button>`;
+      }).join('');
+    }
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -3042,6 +3748,98 @@ export function PrimaryAction() {
       button.focus();
     }
 
+    function closeManuscriptPanelsMenu() {
+      const menu = document.getElementById('manuscript-panels-menu');
+      const headerToggle = document.getElementById('manuscript-panels-toggle');
+      const railToggle = document.getElementById('manuscript-panels-toggle-rail');
+
+      if (!menu || menu.hidden) {
+        return;
+      }
+
+      menu.hidden = true;
+      if (headerToggle) {
+        headerToggle.setAttribute('aria-expanded', 'false');
+      }
+      if (railToggle) {
+        railToggle.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function closeManuscriptHudPanels(excludeButtonId = null) {
+      manuscriptHudPairs.forEach(({ buttonId, panelId }) => {
+        if (excludeButtonId && excludeButtonId === buttonId) {
+          return;
+        }
+
+        const button = document.getElementById(buttonId);
+        const panel = document.getElementById(panelId);
+        if (!button || !panel) {
+          return;
+        }
+
+        button.setAttribute('aria-expanded', 'false');
+        panel.hidden = true;
+      });
+    }
+
+    function renderManuscriptHudFromSourceRecords() {
+      const characterStatsContainer = document.getElementById('manuscript-character-hud-stats');
+      const sessionId = document.getElementById('manuscript-session-id');
+      const sessionStatus = document.getElementById('manuscript-session-status');
+      const sessionNarrativeCount = document.getElementById('manuscript-session-narrative-count');
+
+      if (characterStatsContainer) {
+        const rowsFor = (items, valueKey) => items.map(
+          (item) => `<div class="flex justify-between">
+            <dt style="color: var(--color-text-secondary);">${escapeHtml(item.name)}</dt>
+            <dd style="color: var(--color-text-primary);">${escapeHtml(item[valueKey])}</dd>
+          </div>`,
+        ).join('');
+
+        const attributes = manuscriptSourceRecords.character.attributes || [];
+        const skills = manuscriptSourceRecords.character.skills || [];
+        const attributeSection = attributes.length > 0
+          ? `<section>
+              <h5 class="font-system text-[11px] mb-1" style="color: var(--color-text-muted);">ATTRIBUTES</h5>
+              <dl class="space-y-1 text-sm">${rowsFor(attributes, 'modifiedValue')}</dl>
+            </section>`
+          : '';
+        const skillSection = skills.length > 0
+          ? `<section>
+              <h5 class="font-system text-[11px] mb-1" style="color: var(--color-text-muted);">SKILLS</h5>
+              <dl class="space-y-1 text-sm">${rowsFor(skills, 'level')}</dl>
+            </section>`
+          : '';
+
+        characterStatsContainer.innerHTML = `
+          <section>
+            <dl class="space-y-1 text-sm">
+              <div class="flex justify-between">
+                <dt style="color: var(--color-text-secondary);">Level</dt>
+                <dd style="color: var(--color-text-primary);">${escapeHtml(manuscriptSourceRecords.character.level)}</dd>
+              </div>
+            </dl>
+          </section>
+          ${attributeSection}
+          ${skillSection}
+        `;
+      }
+
+      if (sessionId) {
+        sessionId.textContent = manuscriptSourceRecords.session.id;
+      }
+      if (sessionStatus) {
+        sessionStatus.textContent = manuscriptSourceRecords.session.status;
+      }
+      if (sessionNarrativeCount) {
+        const sessionNarrativeSegments = manuscriptSourceRecords.narrativeSegments.filter(
+          (segment) => segment.sessionId === manuscriptSourceRecords.session.id,
+        );
+        sessionNarrativeCount.textContent = String(sessionNarrativeSegments.length);
+      }
+    }
+
     function openManuscriptOverlay() {
       const overlay = document.getElementById('manuscript-viewport-layer');
       const closeButton = document.getElementById('close-manuscript-overlay');
@@ -3068,6 +3866,9 @@ export function PrimaryAction() {
         return;
       }
 
+      closeManuscriptEndStoryModal();
+      closeManuscriptPanelsMenu();
+      closeManuscriptHudPanels();
       closeManuscriptDrawer();
       overlay.classList.add('hidden');
       overlay.setAttribute('aria-hidden', 'true');
@@ -3099,16 +3900,201 @@ export function PrimaryAction() {
     function initManuscriptInputController() {
       const input = document.getElementById('manuscript-input');
       const sendButton = document.getElementById('manuscript-send');
+      const simulateTurnButton = document.getElementById('manuscript-simulate-turn');
       const charCount = document.getElementById('manuscript-char-count');
+      const toggleSuggestedActionsButton = document.getElementById('manuscript-toggle-suggested-actions');
+      const suggestedActionsRegion = document.getElementById('manuscript-suggested-actions-region');
+      const toggleEndingSuggestionButton = document.getElementById('manuscript-toggle-ending-suggestion');
+      const endingSuggestion = document.getElementById('manuscript-ending-suggestion');
+      const endingAcceptButton = document.getElementById('manuscript-ending-accept');
+      const endingDismissButton = document.getElementById('manuscript-ending-dismiss');
+      const endStoryButton = document.getElementById('manuscript-end-story');
+      const endStoryModal = document.getElementById('manuscript-end-story-modal');
+      const endStoryDialog = document.getElementById('manuscript-end-story-dialog');
+      const endStoryCancel = document.getElementById('manuscript-end-story-cancel');
+      const endStoryConfirm = document.getElementById('manuscript-end-story-confirm');
+      const endStoryBackdrop = endStoryModal ? endStoryModal.querySelector('[data-end-story-backdrop]') : null;
+      const narrativeStream = document.getElementById('manuscript-narrative-stream');
+      const narrativeScrollContainer = document.querySelector('.manuscript-overlay-main');
       const suggestedActionButtons = document.querySelectorAll('[data-suggested-action]');
+      const manuscriptControlButtons = document.querySelectorAll('[data-manuscript-control]');
+      const mobileMediaQuery = window.matchMedia('(max-width: 1023px)');
 
       if (!input || !sendButton || !charCount) {
         return;
       }
 
+      let activeSuggestedActionButton = null;
+      let simulatedTurnIndex = 0;
+      const simulatedTurns = (() => {
+        const primaryDecision = manuscriptSourceRecords.decisions[0];
+        const journalTurns = manuscriptSourceRecords.journalEntries.filter(
+          (entry) => entry.sessionId === manuscriptSourceRecords.session.id
+            && ['decision', 'discovery', 'world_event'].includes(entry.type),
+        );
+
+        if (!primaryDecision || journalTurns.length === 0) {
+          return [];
+        }
+
+        return journalTurns.map((entry, index) => ({
+          actionLabel: primaryDecision.options[index % primaryDecision.options.length].text,
+          outcomeLabel: `OUTCOME: ${formatEntryType(entry.type)}`,
+          outcomeText: entry.content,
+          narrativeText: entry.detailedContent || entry.content,
+        }));
+      })();
+
       const updateCount = () => {
         const count = input.value.length;
         charCount.textContent = `${count}/400`;
+      };
+
+      const setSuggestedActionsVisible = (isVisible) => {
+        if (!(suggestedActionsRegion instanceof HTMLElement) || !(toggleSuggestedActionsButton instanceof HTMLElement)) {
+          return;
+        }
+
+        suggestedActionsRegion.hidden = !isVisible;
+        toggleSuggestedActionsButton.setAttribute('aria-expanded', String(isVisible));
+        toggleSuggestedActionsButton.textContent = isVisible
+          ? 'Hide Suggested Actions'
+          : `Suggested Actions (${suggestedActionButtons.length})`;
+      };
+
+      const syncSuggestedActionsForViewport = () => {
+        if (!(suggestedActionsRegion instanceof HTMLElement)) {
+          return;
+        }
+
+        if (mobileMediaQuery.matches) {
+          setSuggestedActionsVisible(false);
+          return;
+        }
+
+        suggestedActionsRegion.hidden = false;
+        if (toggleSuggestedActionsButton instanceof HTMLElement) {
+          toggleSuggestedActionsButton.setAttribute('aria-expanded', 'true');
+        }
+      };
+
+      const setEndingSuggestionVisible = (isVisible) => {
+        if (!(endingSuggestion instanceof HTMLElement) || !(toggleEndingSuggestionButton instanceof HTMLElement)) {
+          return;
+        }
+
+        endingSuggestion.hidden = !isVisible;
+        toggleEndingSuggestionButton.setAttribute('aria-expanded', String(isVisible));
+        toggleEndingSuggestionButton.textContent = isVisible ? 'Hide Ending Suggestion' : 'Show Ending Suggestion';
+      };
+
+      const openManuscriptEndStoryModal = (trigger) => {
+        if (!(endStoryModal instanceof HTMLElement) || !(endStoryDialog instanceof HTMLElement)) {
+          return;
+        }
+
+        endStoryModal.classList.remove('hidden');
+        endStoryModal.setAttribute('aria-hidden', 'false');
+        activeEndStoryTrigger = trigger || null;
+        endStoryDialog.focus();
+      };
+
+      const setSuggestedButtonSelectedState = (button, isSelected) => {
+        if (!(button instanceof HTMLElement)) {
+          return;
+        }
+
+        button.classList.toggle('is-selected', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+      };
+
+      const setActiveSuggestedActionButton = (nextButton) => {
+        suggestedActionButtons.forEach((button) => {
+          setSuggestedButtonSelectedState(button, button === nextButton);
+        });
+
+        activeSuggestedActionButton = nextButton;
+      };
+
+      const getNextSimulatedTurn = () => {
+        if (simulatedTurns.length === 0) {
+          return null;
+        }
+
+        const turn = simulatedTurns[simulatedTurnIndex % simulatedTurns.length];
+        simulatedTurnIndex += 1;
+        return turn;
+      };
+
+      const scrollNarrativeToBottom = () => {
+        if (!(narrativeScrollContainer instanceof HTMLElement)) {
+          return;
+        }
+
+        narrativeScrollContainer.scrollTop = narrativeScrollContainer.scrollHeight;
+      };
+
+      const appendNarrativeTurn = (actionText, simulatedTurn) => {
+        if (!(narrativeStream instanceof HTMLElement)) {
+          return;
+        }
+
+        const outcomeCard = document.createElement('div');
+        outcomeCard.className = 'rounded-sm p-4 border-l-4';
+        outcomeCard.style.borderLeftColor = 'var(--color-accent)';
+        outcomeCard.style.background = 'rgba(49, 46, 129, 0.08)';
+
+        const outcomeLabel = document.createElement('div');
+        outcomeLabel.className = 'font-system text-xs mb-1';
+        outcomeLabel.style.color = 'var(--color-accent)';
+        outcomeLabel.textContent = simulatedTurn.outcomeLabel;
+
+        const outcomeText = document.createElement('p');
+        outcomeText.className = 'text-sm sm:text-base font-narrative italic';
+        outcomeText.style.color = 'var(--color-text-secondary)';
+        outcomeText.textContent = simulatedTurn.outcomeText;
+
+        const actionEcho = document.createElement('p');
+        actionEcho.className = 'text-sm font-interface mt-2';
+        actionEcho.style.color = 'var(--color-text-muted)';
+        actionEcho.textContent = `Action submitted: ${actionText}`;
+
+        outcomeCard.appendChild(outcomeLabel);
+        outcomeCard.appendChild(outcomeText);
+        outcomeCard.appendChild(actionEcho);
+
+        const narrativeParagraph = document.createElement('p');
+        narrativeParagraph.className = 'text-narrative';
+        narrativeParagraph.textContent = simulatedTurn.narrativeText;
+
+        narrativeStream.appendChild(outcomeCard);
+        narrativeStream.appendChild(narrativeParagraph);
+        scrollNarrativeToBottom();
+      };
+
+      const submitAction = (actionText) => {
+        const trimmedAction = actionText.trim();
+        if (!trimmedAction) {
+          return;
+        }
+
+        const nextTurn = getNextSimulatedTurn();
+        if (!nextTurn) {
+          return;
+        }
+
+        appendNarrativeTurn(trimmedAction, nextTurn);
+        input.value = '';
+        setActiveSuggestedActionButton(null);
+        updateCount();
+      };
+
+      const applyInventoryUseActionToInput = (actionText) => {
+        input.value = actionText;
+        setActiveSuggestedActionButton(null);
+        updateCount();
+        closeManuscriptDrawer();
+        input.focus();
       };
 
       suggestedActionButtons.forEach((button) => {
@@ -3118,33 +4104,219 @@ export function PrimaryAction() {
             return;
           }
 
+          if (activeSuggestedActionButton === button) {
+            input.value = '';
+            setActiveSuggestedActionButton(null);
+            updateCount();
+            input.focus();
+            return;
+          }
+
+          setActiveSuggestedActionButton(button);
           input.value = suggestedAction;
           updateCount();
+          if (mobileMediaQuery.matches) {
+            setSuggestedActionsVisible(false);
+          }
           input.focus();
         });
       });
 
-      input.addEventListener('input', updateCount);
+      if (toggleSuggestedActionsButton instanceof HTMLElement && suggestedActionsRegion instanceof HTMLElement) {
+        toggleSuggestedActionsButton.addEventListener('click', () => {
+          setSuggestedActionsVisible(suggestedActionsRegion.hidden);
+        });
+      }
+
+      if (typeof mobileMediaQuery.addEventListener === 'function') {
+        mobileMediaQuery.addEventListener('change', syncSuggestedActionsForViewport);
+      } else if (typeof mobileMediaQuery.addListener === 'function') {
+        mobileMediaQuery.addListener(syncSuggestedActionsForViewport);
+      }
+
+      const controlTargetsByKey = {
+        'end-story': 'manuscript-end-story',
+        'toggle-character-hud': 'manuscript-hud-left-toggle',
+        'toggle-session-hud': 'manuscript-hud-right-toggle',
+      };
+
+      manuscriptControlButtons.forEach((controlButton) => {
+        controlButton.addEventListener('click', () => {
+          const controlKey = controlButton.getAttribute('data-manuscript-control');
+          if (!controlKey) {
+            return;
+          }
+
+          const targetId = controlTargetsByKey[controlKey];
+          if (!targetId) {
+            return;
+          }
+
+          const targetButton = document.getElementById(targetId);
+          if (!(targetButton instanceof HTMLElement) || targetButton.hasAttribute('disabled')) {
+            return;
+          }
+
+          targetButton.click();
+        });
+      });
+
+      document.addEventListener('click', (event) => {
+        const target = event.target instanceof Element
+          ? event.target.closest('[data-manuscript-use-item]')
+          : null;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const actionText = target.getAttribute('data-manuscript-use-item');
+        if (!actionText || target.hasAttribute('disabled')) {
+          return;
+        }
+
+        applyInventoryUseActionToInput(actionText);
+      });
+
+      sendButton.addEventListener('click', () => {
+        submitAction(input.value);
+      });
+
+      if (simulateTurnButton) {
+        simulateTurnButton.addEventListener('click', () => {
+          const nextTurn = getNextSimulatedTurn();
+          if (!nextTurn) {
+            return;
+          }
+
+          appendNarrativeTurn(nextTurn.actionLabel, nextTurn);
+          input.value = '';
+          setActiveSuggestedActionButton(null);
+          updateCount();
+        });
+      }
+
+      if (toggleEndingSuggestionButton) {
+        toggleEndingSuggestionButton.addEventListener('click', () => {
+          setEndingSuggestionVisible(endingSuggestion ? endingSuggestion.hidden : false);
+        });
+      }
+
+      if (endingDismissButton) {
+        endingDismissButton.addEventListener('click', () => {
+          setEndingSuggestionVisible(false);
+        });
+      }
+
+      if (endingAcceptButton) {
+        endingAcceptButton.addEventListener('click', () => {
+          setEndingSuggestionVisible(false);
+        });
+      }
+
+      if (endStoryButton) {
+        endStoryButton.addEventListener('click', () => {
+          openManuscriptEndStoryModal(endStoryButton);
+        });
+      }
+
+      if (endStoryCancel) {
+        endStoryCancel.addEventListener('click', closeManuscriptEndStoryModal);
+      }
+
+      if (endStoryBackdrop) {
+        endStoryBackdrop.addEventListener('click', closeManuscriptEndStoryModal);
+      }
+
+      if (endStoryConfirm) {
+        endStoryConfirm.addEventListener('click', () => {
+          closeManuscriptEndStoryModal();
+          setEndingSuggestionVisible(false);
+        });
+      }
+
+      input.addEventListener('input', () => {
+        if (!(activeSuggestedActionButton instanceof HTMLElement)) {
+          updateCount();
+          return;
+        }
+
+        const selectedSuggestion = activeSuggestedActionButton.getAttribute('data-suggested-action');
+        if (input.value !== selectedSuggestion) {
+          setActiveSuggestedActionButton(null);
+        }
+
+        updateCount();
+      });
+
+      setActiveSuggestedActionButton(null);
+      syncSuggestedActionsForViewport();
+      setEndingSuggestionVisible(false);
       updateCount();
     }
 
-    function initHudControllers() {
-      const hudPairs = [
-        {
-          buttonId: 'manuscript-hud-left-toggle',
-          panelId: 'manuscript-hud-left-panel',
-          closedLabel: 'Character HUD (Collapsed)',
-          openLabel: 'Character HUD (Expanded)',
-        },
-        {
-          buttonId: 'manuscript-hud-right-toggle',
-          panelId: 'manuscript-hud-right-panel',
-          closedLabel: 'Session HUD (Collapsed)',
-          openLabel: 'Session HUD (Expanded)',
-        },
-      ];
+    function initPanelsController() {
+      const menu = document.getElementById('manuscript-panels-menu');
+      const headerToggle = document.getElementById('manuscript-panels-toggle');
+      const railToggle = document.getElementById('manuscript-panels-toggle-rail');
 
-      hudPairs.forEach(({ buttonId, panelId, closedLabel, openLabel }) => {
+      if (!menu || !headerToggle) {
+        return;
+      }
+
+      const setOpen = (isOpen) => {
+        menu.hidden = !isOpen;
+        headerToggle.setAttribute('aria-expanded', String(isOpen));
+        if (railToggle) {
+          railToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+      };
+
+      const handleToggle = () => {
+        const shouldOpen = menu.hidden;
+        if (shouldOpen) {
+          closeManuscriptHudPanels();
+        }
+        setOpen(shouldOpen);
+      };
+
+      headerToggle.addEventListener('click', handleToggle);
+      if (railToggle) {
+        railToggle.addEventListener('click', handleToggle);
+      }
+
+      menu.addEventListener('click', (event) => {
+        const target = event.target instanceof Element
+          ? event.target.closest('[data-drawer-trigger], #manuscript-open-journal-route, [data-manuscript-control]')
+          : null;
+        if (target) {
+          setOpen(false);
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        if (menu.hidden) {
+          return;
+        }
+
+        const target = event.target;
+        if (!(target instanceof Node)) {
+          return;
+        }
+
+        const clickedToggle = target === headerToggle || target === railToggle
+          || (target instanceof Element
+            && ((headerToggle.contains(target)) || (railToggle ? railToggle.contains(target) : false)));
+
+        if (clickedToggle || menu.contains(target)) {
+          return;
+        }
+
+        setOpen(false);
+      });
+    }
+
+    function initHudControllers() {
+      manuscriptHudPairs.forEach(({ buttonId, panelId }) => {
         const button = document.getElementById(buttonId);
         const panel = document.getElementById(panelId);
 
@@ -3155,8 +4327,11 @@ export function PrimaryAction() {
         button.addEventListener('click', () => {
           const isOpen = button.getAttribute('aria-expanded') === 'true';
           const nextState = !isOpen;
+          if (nextState) {
+            closeManuscriptPanelsMenu();
+            closeManuscriptHudPanels(buttonId);
+          }
           button.setAttribute('aria-expanded', String(nextState));
-          button.textContent = nextState ? openLabel : closedLabel;
           panel.hidden = !nextState;
         });
       });
@@ -3177,6 +4352,21 @@ export function PrimaryAction() {
       }
     }
 
+    function closeManuscriptEndStoryModal() {
+      const modal = document.getElementById('manuscript-end-story-modal');
+      if (!modal || modal.classList.contains('hidden')) {
+        return;
+      }
+
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+
+      if (activeEndStoryTrigger) {
+        activeEndStoryTrigger.focus();
+        activeEndStoryTrigger = null;
+      }
+    }
+
     function initDrawerControllers() {
       const overlay = document.getElementById('manuscript-drawer-overlay');
       const panel = document.getElementById('manuscript-drawer-panel');
@@ -3191,21 +4381,105 @@ export function PrimaryAction() {
         return;
       }
 
+      const sessionNarrativeSegments = manuscriptSourceRecords.narrativeSegments.filter(
+        (segment) => segment.sessionId === manuscriptSourceRecords.session.id,
+      );
+      const sessionJournalEntries = manuscriptSourceRecords.journalEntries.filter(
+        (entry) => entry.sessionId === manuscriptSourceRecords.session.id,
+      );
+      const sessionDecisions = manuscriptSourceRecords.decisions.filter(
+        (decision) => decision.narrativeSegmentId
+          && sessionNarrativeSegments.some((segment) => segment.id === decision.narrativeSegmentId),
+      );
+      const characterInventoryItems = manuscriptSourceRecords.inventoryItems.filter(
+        (item) => item.characterId === manuscriptSourceRecords.character.id,
+      );
+
+      const inventoryMarkup = characterInventoryItems.length > 0
+        ? characterInventoryItems.map((item) => {
+          const quantityLabel = item.quantity > 1
+            ? `<span class="ml-1 font-system text-xs" style="color: var(--color-text-muted);">x${item.quantity}</span>`
+            : '';
+          const isUsable = item.quantity > 0;
+          const useActionText = `Use ${item.name}`;
+          const imageMarkup = item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)} item image" class="h-12 w-12 rounded-sm object-cover" style="border: 1px solid var(--color-border);" />`
+            : '';
+
+          return `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <div class="flex items-start gap-3">
+              ${imageMarkup}
+              <div class="min-w-0">
+                <p class="text-sm"><strong style="color: var(--color-text-primary);">${escapeHtml(item.name)}</strong>${quantityLabel}</p>
+                <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);">${escapeHtml(item.description)}</p>
+                <div class="mt-2 flex items-center gap-2">
+                  <button type="button" data-manuscript-use-item="${escapeHtml(useActionText)}" ${isUsable ? '' : 'disabled'} class="px-2.5 py-1 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    ${isUsable ? 'Use' : 'Unavailable'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>`;
+        }).join('')
+        : '<p style="color: var(--color-text-secondary);">No inventory records found for this character.</p>';
+
+      const storySummaryMarkup = sessionNarrativeSegments.length > 0
+        ? sessionNarrativeSegments.map(
+          (segment) => `<p>${escapeHtml(segment.content)}</p>`,
+        ).join('')
+        : '<p style="color: var(--color-text-secondary);">No narrative segments found for this session.</p>';
+
+      const choiceHistoryMarkup = sessionDecisions.length > 0
+        ? sessionDecisions.map((decision) => {
+          const selectedOption = decision.options.find((option) => option.id === decision.selectedOptionId);
+          const outcomeSegment = sessionNarrativeSegments.find(
+            (segment) => segment.metadata && segment.metadata.causedByDecisionId === decision.id,
+          );
+          const outcomeText = outcomeSegment?.content || 'No outcome segment linked yet.';
+
+          return `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <p class="text-sm"><strong style="color: var(--color-text-primary);">Prompt:</strong> ${escapeHtml(decision.prompt)}</p>
+            <p class="text-sm mt-1"><strong style="color: var(--color-text-primary);">Selected:</strong> ${escapeHtml(selectedOption?.text || decision.selectedOptionId || 'Unknown option')}</p>
+            <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">Outcome:</strong> ${escapeHtml(outcomeText)}</p>
+          </article>`;
+        }).join('')
+        : '<p style="color: var(--color-text-secondary);">No recorded choices found for this session.</p>';
+
+      const journalSnapshotMarkup = sessionJournalEntries.length > 0
+        ? sessionJournalEntries.map((entry) => `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <p class="text-sm"><strong style="color: var(--color-text-primary);">${escapeHtml(entry.title)}</strong></p>
+            <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);">${escapeHtml(entry.content)}</p>
+          </article>`).join('')
+        : '<p style="color: var(--color-text-secondary);">No journal entries found for this session.</p>';
+
       const drawerContentByPanel = {
         character: {
           title: 'Character Details',
-          subtitle: 'Overlay panel opens without shifting manuscript text.',
-          body: '<p><strong style="color: var(--color-text-primary);">Profile:</strong> Nova "Ghost" Chen, elite corporate hacker turned underground resistance fighter.</p><p><strong style="color: var(--color-text-primary);">Current objective:</strong> Infiltrating Arasaka building to steal critical data.</p><p><strong style="color: var(--color-text-primary);">Location:</strong> Neo-Tokyo Underground.</p>',
+          subtitle: `Character ID: ${manuscriptSourceRecords.character.id}`,
+          body: `<p><strong style="color: var(--color-text-primary);">Name:</strong> ${escapeHtml(manuscriptSourceRecords.character.name)}</p>
+            <p><strong style="color: var(--color-text-primary);">Description:</strong> ${escapeHtml(manuscriptSourceRecords.character.description)}</p>
+            <p><strong style="color: var(--color-text-primary);">History:</strong> ${escapeHtml(manuscriptSourceRecords.character.backgroundHistory)}</p>
+            <p><strong style="color: var(--color-text-primary);">Location:</strong> ${escapeHtml(manuscriptSourceRecords.character.location)}</p>`,
         },
         inventory: {
           title: 'Inventory',
-          subtitle: 'Seeded inventory records from game-session visual fixtures.',
-          body: '<p><strong style="color: var(--color-text-primary);">Ghostlink Cyberdeck:</strong> Signature deck tuned to slip past Arasaka intrusion countermeasures.</p><p><strong style="color: var(--color-text-primary);">NeuroBoost Stims:</strong> Fast-acting injectors that keep reflexes sharp during breach attempts (x3).</p><p><strong style="color: var(--color-text-primary);">Black ICE Shard:</strong> Prototype defensive program that can be slotted into the deck on demand.</p>',
+          subtitle: `Character ID: ${manuscriptSourceRecords.character.id}`,
+          body: inventoryMarkup,
+        },
+        'story-summary': {
+          title: 'The Story So Far',
+          subtitle: `Session ID: ${manuscriptSourceRecords.session.id}`,
+          body: storySummaryMarkup,
+        },
+        'choice-history': {
+          title: 'Choice History',
+          subtitle: `Session ID: ${manuscriptSourceRecords.session.id}`,
+          body: choiceHistoryMarkup,
         },
         journal: {
-          title: 'Journal',
-          subtitle: 'Entries sourced from existing journal fixture records.',
-          body: '<p><strong style="color: var(--color-text-primary);">Decision:</strong> Chose the ventilation route to avoid the main lobby scanners.</p><p><strong style="color: var(--color-text-primary);">Discovery:</strong> Found a hidden relay broadcasting Arasaka executive calls.</p><p><strong style="color: var(--color-text-primary);">World Event:</strong> Security drones sweep the corridor as alarms spike.</p>',
+          title: 'Journal Snapshot',
+          subtitle: `Session ID: ${manuscriptSourceRecords.session.id}`,
+          body: journalSnapshotMarkup,
         },
       };
 
@@ -3216,7 +4490,9 @@ export function PrimaryAction() {
         content.innerHTML = drawerData.body;
         overlay.classList.remove('hidden');
         overlay.setAttribute('aria-hidden', 'false');
-        activeDrawerTrigger = trigger || null;
+        const headerPanelsToggle = document.getElementById('manuscript-panels-toggle');
+        const shouldReturnToPanelsToggle = trigger instanceof Element && trigger.closest('#manuscript-panels-menu');
+        activeDrawerTrigger = shouldReturnToPanelsToggle ? headerPanelsToggle : (trigger || null);
         panel.focus();
       };
       triggers.forEach((trigger) => {
@@ -3237,7 +4513,11 @@ export function PrimaryAction() {
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      renderManuscriptHudFromSourceRecords();
+      renderManuscriptNarrativeFromSourceRecords();
+      renderManuscriptChoiceActionsFromSourceRecords();
       initManuscriptOverlayController();
+      initPanelsController();
       initManuscriptInputController();
       initHudControllers();
       initDrawerControllers();
@@ -3258,8 +4538,10 @@ export function PrimaryAction() {
         closeManuscriptOverlay();
         closeNav();
         closeManuscriptDrawer();
+        closeManuscriptEndStoryModal();
       }
     });
+
   </script>
 
 </body>
