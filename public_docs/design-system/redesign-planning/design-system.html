@@ -1722,13 +1722,122 @@
 
       <section class="section py-8 md:py-12" id="game-session-compositions">
         <h2 class="text-xl sm:text-2xl font-semibold mb-6">Game Session Compositions (#1031)</h2>
-        <div class="space-y-6">
+        <div class="space-y-8">
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
             <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">SCOPE NOTE</h3>
             <p class="text-sm sm:text-base" style="color: var(--color-text-secondary);">
               This section validates issue <strong>#1031</strong> component and layout prototypes. It is the single migration handoff source for downstream implementation issues <strong>#1034</strong> (components/layout integration) and <strong>#1035</strong> (progressive disclosure drawers/marginalia).
             </p>
           </div>
+
+          <article class="p-4 sm:p-6 rounded-sm relative overflow-hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); min-height: 820px;">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. HUD and drawers are overlays so content density stays stable under interaction.</p>
+
+            <div class="relative rounded-sm overflow-hidden" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 244, 245, 0.92)); border: 1px solid var(--color-border); min-height: 700px;">
+
+              <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
+                <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                  Character HUD (Collapsed)
+                </button>
+                <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--color-border);">
+                  <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">VITALS</h4>
+                  <dl class="space-y-1 text-sm">
+                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">32 / 40</dd></div>
+                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Focus</dt><dd style="color: var(--color-text-primary);">11 / 12</dd></div>
+                    <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Light</dt><dd style="color: var(--color-text-primary);">Lantern x1</dd></div>
+                  </dl>
+                </div>
+              </div>
+
+              <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                  Session HUD (Collapsed)
+                </button>
+                <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--color-border);">
+                  <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
+                  <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
+                    <li>Turn: 14</li>
+                    <li>Region: Lower Archive</li>
+                    <li>Last check: Perception success</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-44">
+                <div class="mb-4 flex flex-wrap gap-2">
+                  <button type="button" data-drawer-trigger data-drawer-panel="character" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
+                  <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
+                  <button type="button" data-drawer-trigger data-drawer-panel="journal" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal</button>
+                </div>
+
+                <div style="max-height: 360px; overflow-y: auto; padding-right: 8px;">
+                  <div class="space-y-5">
+                    <p class="text-narrative">The lantern hissed as you descended the brass stairwell, each step ringing through the archive like a tuning fork. Dust drifted in geometric lines across the beam, and the smell of warm oil gave way to a colder scent of wet stone.</p>
+                    <p class="text-narrative">At the landing, the corridor split into three galleries. The left wall carried etched donor names, some scratched away and replaced with hurried corrections. You paused at the newest inscription and traced the final line with your thumb. The ink was still tacky.</p>
+                    <div class="rounded-sm p-4 border-l-4" style="border-left-color: var(--color-accent); background: rgba(49, 46, 129, 0.08);">
+                      <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: PERCEPTION SUCCESS (14 vs DC 12)</div>
+                      <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You detect a hidden service hatch behind the donor plaques, aligned with fresh hinge scratches and soot-free brass.</p>
+                    </div>
+                    <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark
+                      <button type="button" data-marginalia-target="ledger-mark" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">Aster-9</button>.
+                    </p>
+                    <p class="text-narrative">A page pinned beneath the key listed access windows for the western vault. One entry was circled twice and annotated in hurried hand:
+                      <button type="button" data-marginalia-target="vault-window" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">"Open only during pressure equalization."</button>
+                    </p>
+                    <p class="text-narrative">The corridor lights dimmed to amber. Somewhere below, the vault gears engaged and the floor beneath your boots trembled in a slow, deliberate rhythm.</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,220px] gap-4 items-start">
+                  <div class="min-h-[150px] rounded-sm p-4" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
+                    <fieldset class="space-y-2" aria-label="Suggested actions">
+                      <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="radio" name="manuscript-choice" checked class="mt-1">
+                        <span class="text-sm" style="color: var(--color-text-secondary);">Inspect the service hatch mechanism before entering.</span>
+                      </label>
+                      <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="radio" name="manuscript-choice" class="mt-1">
+                        <span class="text-sm" style="color: var(--color-text-secondary);">Take the key and follow the red string toward the west vault.</span>
+                      </label>
+                      <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="radio" name="manuscript-choice" class="mt-1">
+                        <span class="text-sm" style="color: var(--color-text-secondary);">Record the inscription changes in your journal before moving.</span>
+                      </label>
+                    </fieldset>
+                  </div>
+
+                  <aside class="rounded-sm p-4 min-h-[150px]" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
+                    <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal side annotations.</p>
+                    <div data-marginalia-note="ledger-mark" hidden class="text-sm" style="color: var(--color-text-secondary);">
+                      <strong style="color: var(--color-text-primary);">Aster-9:</strong> Former archivist clearance sigil tied to restricted witness ledgers.
+                    </div>
+                    <div data-marginalia-note="vault-window" hidden class="text-sm" style="color: var(--color-text-secondary);">
+                      <strong style="color: var(--color-text-primary);">Pressure equalization:</strong> 90-second interval where vault locks can be bypassed without triggering alarms.
+                    </div>
+                  </aside>
+                </div>
+              </div>
+
+              <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: rgba(255, 255, 255, 0.94); border: 1px solid var(--color-border); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                  <label class="flex items-center gap-2 text-xs font-system cursor-pointer" style="color: var(--color-text-muted);">
+                    <input id="manuscript-stream-toggle" type="checkbox">
+                    STREAMING RESPONSE ACTIVE
+                  </label>
+                  <div id="manuscript-stream-status" role="status" aria-live="polite" class="text-xs font-system" style="color: var(--color-text-secondary);">Status: Ready for input</div>
+                </div>
+                <label for="manuscript-input" class="sr-only">Narrative input</label>
+                <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Describe your next action..."></textarea>
+                <div class="mt-2 flex items-center justify-between gap-3">
+                  <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
+                  <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Turn</button>
+                </div>
+              </div>
+            </div>
+          </article>
 
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
             <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">#1031 DONE WHEN CHECKLIST</h3>
@@ -1763,6 +1872,101 @@
               </li>
             </ul>
           </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">KEYBOARD WALKTHROUGH CHECKLIST</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Choice selector keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Choice selector radios are reachable in order and announce labels correctly.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Docked input keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Docked textarea, stream toggle, and send button are keyboard reachable with visible focus ring.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="HUD keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>HUD toggles update <code>aria-expanded</code> and reveal/collapse corresponding panels.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Drawer keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Drawer opens from trigger (Enter/Space), closes on Escape, and returns focus to invoking trigger.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">FOCUS STYLE VERIFICATION</h3>
+            <div class="space-y-2 text-sm" style="color: var(--color-text-secondary);">
+              <p><strong style="color: var(--color-text-primary);">Choice selector cluster:</strong> radio inputs must show browser focus indicator plus label association.</p>
+              <p><strong style="color: var(--color-text-primary);">Docked input cluster:</strong> textarea and send button use a visible 2px outline with offset when focused.</p>
+              <p><strong style="color: var(--color-text-primary);">HUD controls:</strong> both top-corner toggles expose clear focus ring and state text.</p>
+              <p><strong style="color: var(--color-text-primary);">Drawer controls:</strong> trigger buttons and close button retain visible focus throughout open/close cycle.</p>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">CONTRAST VERIFICATION TABLE</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">Element Pair</th>
+                    <th class="text-left py-2 pr-4">Target</th>
+                    <th class="text-left py-2">Result (Manual)</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Narrative text <code>--color-text-primary</code> on manuscript surface</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (high contrast baseline pair)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Primary button text on <code>--color-accent</code></td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (validated in existing token set)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Helper/error text on neutral surfaces</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (semantic status colors)</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4">Muted technical labels on panel backgrounds</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (existing typography token validation)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MIGRATION HANDOFF NOTES</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li><strong style="color: var(--color-text-primary);">#1034 components/layout integration:</strong> migrate the single-column manuscript shell, docked input behavior, and HUD positioning/toggles.</li>
+              <li><strong style="color: var(--color-text-primary);">#1035 progressive disclosure:</strong> migrate drawer overlay controller, focus-return behavior, and marginalia annotation reveal pattern.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="manuscript-drawer-overlay" class="fixed inset-0 hidden z-[120]" aria-hidden="true">
+          <div class="absolute inset-0" data-drawer-backdrop style="background: rgba(17, 17, 17, 0.45);"></div>
+          <aside id="manuscript-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="manuscript-drawer-title" tabindex="-1" class="absolute right-0 top-0 h-full w-full max-w-md p-4 sm:p-6" style="background: var(--color-surface); border-left: 1px solid var(--color-border); box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 id="manuscript-drawer-title" class="text-lg font-semibold">Character Details</h3>
+                <p id="manuscript-drawer-subtitle" class="text-sm" style="color: var(--color-text-secondary);">Overlay panel opens without shifting manuscript text.</p>
+              </div>
+              <button id="manuscript-drawer-close" type="button" class="px-2 py-1 rounded-sm text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Close (Esc)</button>
+            </div>
+            <div id="manuscript-drawer-content" class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
+              <p><strong style="color: var(--color-text-primary);">Profile:</strong> Veyra Holt, former cartographer turned archive broker.</p>
+              <p><strong style="color: var(--color-text-primary);">Current objective:</strong> Reach western vault before pressure cycle resets.</p>
+              <p><strong style="color: var(--color-text-primary);">Quick actions:</strong> Equip lantern filter, spend focus point, annotate clue.</p>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -2757,6 +2961,8 @@ export function PrimaryAction() {
   </div>
 
   <script>
+    let activeDrawerTrigger = null;
+
     function toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute('data-theme');
@@ -2801,6 +3007,174 @@ export function PrimaryAction() {
       button.focus();
     }
 
+    function initManuscriptInputController() {
+      const input = document.getElementById('manuscript-input');
+      const sendButton = document.getElementById('manuscript-send');
+      const charCount = document.getElementById('manuscript-char-count');
+      const streamToggle = document.getElementById('manuscript-stream-toggle');
+      const streamStatus = document.getElementById('manuscript-stream-status');
+
+      if (!input || !sendButton || !charCount || !streamToggle || !streamStatus) {
+        return;
+      }
+
+      const updateCount = () => {
+        const count = input.value.length;
+        charCount.textContent = `${count}/400`;
+      };
+
+      const updateStreamingState = () => {
+        const isStreaming = streamToggle.checked;
+        input.disabled = isStreaming;
+        sendButton.disabled = isStreaming;
+        sendButton.style.opacity = isStreaming ? '0.6' : '1';
+        sendButton.style.cursor = isStreaming ? 'not-allowed' : 'pointer';
+        streamStatus.textContent = isStreaming ? 'Status: Streaming in progress, input temporarily locked' : 'Status: Ready for input';
+      };
+
+      input.addEventListener('input', updateCount);
+      streamToggle.addEventListener('change', updateStreamingState);
+
+      updateCount();
+      updateStreamingState();
+    }
+
+    function initHudControllers() {
+      const hudPairs = [
+        {
+          buttonId: 'manuscript-hud-left-toggle',
+          panelId: 'manuscript-hud-left-panel',
+          closedLabel: 'Character HUD (Collapsed)',
+          openLabel: 'Character HUD (Expanded)',
+        },
+        {
+          buttonId: 'manuscript-hud-right-toggle',
+          panelId: 'manuscript-hud-right-panel',
+          closedLabel: 'Session HUD (Collapsed)',
+          openLabel: 'Session HUD (Expanded)',
+        },
+      ];
+
+      hudPairs.forEach(({ buttonId, panelId, closedLabel, openLabel }) => {
+        const button = document.getElementById(buttonId);
+        const panel = document.getElementById(panelId);
+
+        if (!button || !panel) {
+          return;
+        }
+
+        button.addEventListener('click', () => {
+          const isOpen = button.getAttribute('aria-expanded') === 'true';
+          const nextState = !isOpen;
+          button.setAttribute('aria-expanded', String(nextState));
+          button.textContent = nextState ? openLabel : closedLabel;
+          panel.hidden = !nextState;
+        });
+      });
+    }
+
+    function closeManuscriptDrawer() {
+      const overlay = document.getElementById('manuscript-drawer-overlay');
+      if (!overlay || overlay.classList.contains('hidden')) {
+        return;
+      }
+
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+
+      if (activeDrawerTrigger) {
+        activeDrawerTrigger.focus();
+        activeDrawerTrigger = null;
+      }
+    }
+
+    function initDrawerControllers() {
+      const overlay = document.getElementById('manuscript-drawer-overlay');
+      const panel = document.getElementById('manuscript-drawer-panel');
+      const title = document.getElementById('manuscript-drawer-title');
+      const subtitle = document.getElementById('manuscript-drawer-subtitle');
+      const content = document.getElementById('manuscript-drawer-content');
+      const closeButton = document.getElementById('manuscript-drawer-close');
+      const backdrop = overlay ? overlay.querySelector('[data-drawer-backdrop]') : null;
+      const triggers = document.querySelectorAll('[data-drawer-trigger]');
+
+      if (!overlay || !panel || !title || !subtitle || !content || !closeButton || !backdrop || triggers.length === 0) {
+        return;
+      }
+
+      const drawerContentByPanel = {
+        character: {
+          title: 'Character Details',
+          subtitle: 'Overlay panel opens without shifting manuscript text.',
+          body: '<p><strong style="color: var(--color-text-primary);">Profile:</strong> Veyra Holt, former cartographer turned archive broker.</p><p><strong style="color: var(--color-text-primary);">Current objective:</strong> Reach western vault before pressure cycle resets.</p><p><strong style="color: var(--color-text-primary);">Quick actions:</strong> Equip lantern filter, spend focus point, annotate clue.</p>',
+        },
+        inventory: {
+          title: 'Inventory',
+          subtitle: 'Tools and consumables available for this turn.',
+          body: '<p><strong style="color: var(--color-text-primary);">Lantern oil:</strong> 2 vials</p><p><strong style="color: var(--color-text-primary);">Lock picks:</strong> 3 (one worn)</p><p><strong style="color: var(--color-text-primary);">Archive key:</strong> Tagged Aster-9, warm to touch.</p>',
+        },
+        journal: {
+          title: 'Journal',
+          subtitle: 'Session notes and clue tracking.',
+          body: '<p><strong style="color: var(--color-text-primary);">Recent entry:</strong> "Vault schedule altered after midnight watch."</p><p><strong style="color: var(--color-text-primary);">Pinned clue:</strong> Pressure equalization lasts 90 seconds.</p><p><strong style="color: var(--color-text-primary);">Open thread:</strong> Identify who rewrote the donor ledger.</p>',
+        },
+      };
+
+      const openDrawer = (panelKey, trigger) => {
+        const drawerData = drawerContentByPanel[panelKey] || drawerContentByPanel.character;
+        title.textContent = drawerData.title;
+        subtitle.textContent = drawerData.subtitle;
+        content.innerHTML = drawerData.body;
+        overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+        activeDrawerTrigger = trigger || null;
+        panel.focus();
+      };
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          openDrawer(trigger.getAttribute('data-drawer-panel'), trigger);
+        });
+
+        trigger.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openDrawer(trigger.getAttribute('data-drawer-panel'), trigger);
+          }
+        });
+      });
+
+      closeButton.addEventListener('click', closeManuscriptDrawer);
+      backdrop.addEventListener('click', closeManuscriptDrawer);
+    }
+
+    function initMarginaliaController() {
+      const noteButtons = document.querySelectorAll('[data-marginalia-target]');
+      const notes = document.querySelectorAll('[data-marginalia-note]');
+      const emptyState = document.getElementById('marginalia-empty');
+
+      if (noteButtons.length === 0 || notes.length === 0 || !emptyState) {
+        return;
+      }
+
+      noteButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.getAttribute('data-marginalia-target');
+          notes.forEach((note) => {
+            note.hidden = note.getAttribute('data-marginalia-note') !== target;
+          });
+          emptyState.hidden = true;
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initManuscriptInputController();
+      initHudControllers();
+      initDrawerControllers();
+      initMarginaliaController();
+    });
+
     // Close nav when clicking outside
     document.addEventListener('click', function(event) {
       const nav = document.querySelector('.sticky-nav');
@@ -2814,6 +3188,7 @@ export function PrimaryAction() {
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         closeNav();
+        closeManuscriptDrawer();
       }
     });
   </script>
