@@ -29,6 +29,14 @@
       --color-warning: #92400e; /* Amber-800 */
       --color-info: #075985;    /* Sky-800 */
 
+      /* Overlay surfaces and scrims */
+      --color-overlay-surface: rgba(255, 255, 255, 0.9);
+      --color-overlay-surface-strong: rgba(255, 255, 255, 0.95);
+      --color-manuscript-gradient-start: rgba(255, 255, 255, 0.92);
+      --color-manuscript-gradient-end: rgba(244, 244, 245, 0.92);
+      --color-scrim: rgba(17, 17, 17, 0.45);
+      --shadow-overlay: 0 6px 18px rgba(0, 0, 0, 0.08);
+
       /* Typography */
       --font-narrative: 'Lora', serif;
       --font-system: 'IBM Plex Mono', monospace;
@@ -55,6 +63,14 @@
       --color-error: #fb7185;   /* Rose-400 */
       --color-warning: #fbbf24; /* Amber-400 */
       --color-info: #38bdf8;    /* Sky-400 */
+
+      /* Overlay surfaces and scrims */
+      --color-overlay-surface: rgba(24, 24, 27, 0.9);
+      --color-overlay-surface-strong: rgba(24, 24, 27, 0.96);
+      --color-manuscript-gradient-start: rgba(39, 39, 42, 0.9);
+      --color-manuscript-gradient-end: rgba(24, 24, 27, 0.92);
+      --color-scrim: rgba(0, 0, 0, 0.65);
+      --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     body {
@@ -1618,7 +1634,7 @@
                   <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STANDARD CARD</div>
                   <p class="text-sm" style="color: var(--color-text-secondary);">Basic manuscript metadata card.</p>
                 </div>
-                <div class="p-4 rounded-sm backdrop-blur-md" style="background: rgba(255, 255, 255, 0.85); border: 1px solid var(--color-border);">
+                <div class="p-4 rounded-sm backdrop-blur-md" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
                   <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">HUD CARD</div>
                   <p class="text-sm" style="color: var(--color-text-secondary);">Floating overlay-compatible card panel.</p>
                 </div>
@@ -1652,7 +1668,7 @@
             <p class="text-xs sm:text-sm mb-4" style="color: var(--color-text-secondary);">Single-column, center-focused layout for immersive reading</p>
             <div class="p-4 sm:p-8 rounded-sm relative overflow-hidden" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); min-height: 300px;">
               <!-- HUD -->
-              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: rgba(255, 255, 255, 0.8); border: 1px solid var(--color-border);">
+              <div class="absolute top-2 left-2 sm:top-4 sm:left-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
                 <div class="font-system" style="color: var(--color-text-muted);">HUD (Floating)</div>
               </div>
               <!-- Content -->
@@ -1663,7 +1679,7 @@
                 <div class="h-20" style="background: var(--color-surface); border: 1px solid var(--color-border);"></div>
               </div>
               <!-- Input -->
-              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border);">
+              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 p-2 sm:p-3 rounded-sm backdrop-blur-md text-[10px] sm:text-xs" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
                 <div class="font-system" style="color: var(--color-text-muted);">Input Zone (Docked Bottom)</div>
               </div>
             </div>
@@ -1734,13 +1750,13 @@
             <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
             <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. HUD and drawers are overlays so content density stays stable under interaction.</p>
 
-            <div class="relative rounded-sm overflow-hidden" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 244, 245, 0.92)); border: 1px solid var(--color-border); min-height: 700px;">
+            <div class="relative rounded-sm overflow-hidden" style="background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end)); border: 1px solid var(--color-border); min-height: 700px;">
 
               <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
-                <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
                   Character HUD (Collapsed)
                 </button>
-                <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--color-border);">
+                <div id="manuscript-hud-left-panel" hidden class="mt-2 w-48 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
                   <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">VITALS</h4>
                   <dl class="space-y-1 text-sm">
                     <div class="flex justify-between"><dt style="color: var(--color-text-secondary);">Health</dt><dd style="color: var(--color-text-primary);">32 / 40</dd></div>
@@ -1751,10 +1767,10 @@
               </div>
 
               <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: rgba(255, 255, 255, 0.9); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
                   Session HUD (Collapsed)
                 </button>
-                <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--color-border);">
+                <div id="manuscript-hud-right-panel" hidden class="mt-2 w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
                   <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
                   <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
                     <li>Turn: 14</li>
@@ -1821,7 +1837,7 @@
                 </div>
               </div>
 
-              <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: rgba(255, 255, 255, 0.94); border: 1px solid var(--color-border); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);">
+              <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                   <label class="flex items-center gap-2 text-xs font-system cursor-pointer" style="color: var(--color-text-muted);">
                     <input id="manuscript-stream-toggle" type="checkbox">
@@ -1952,7 +1968,7 @@
         </div>
 
         <div id="manuscript-drawer-overlay" class="fixed inset-0 hidden z-[120]" aria-hidden="true">
-          <div class="absolute inset-0" data-drawer-backdrop style="background: rgba(17, 17, 17, 0.45);"></div>
+          <div class="absolute inset-0" data-drawer-backdrop style="background: var(--color-scrim);"></div>
           <aside id="manuscript-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="manuscript-drawer-title" tabindex="-1" class="absolute right-0 top-0 h-full w-full max-w-md p-4 sm:p-6" style="background: var(--color-surface); border-left: 1px solid var(--color-border); box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);">
             <div class="flex items-start justify-between gap-4 mb-4">
               <div>
