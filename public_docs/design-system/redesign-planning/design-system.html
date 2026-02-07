@@ -1855,13 +1855,13 @@
 
                   <div id="manuscript-choice-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                      <p class="text-xs" style="color: var(--color-text-muted);">Recommended: pick a suggested action first. Use custom action only if none fit.</p>
+                      <p class="text-xs" style="color: var(--color-text-muted);">Secondary path: use a suggested action when you want a quick option.</p>
                       <div class="inline-flex rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-                        <button id="manuscript-mode-choice" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Use Suggested</button>
-                        <button id="manuscript-mode-custom" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary); border-left: 1px solid var(--color-border);">Write Custom</button>
+                        <button id="manuscript-mode-custom" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary);">Write Custom (Primary)</button>
+                        <button id="manuscript-mode-choice" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white; border-left: 1px solid var(--color-border);">Use Suggested</button>
                       </div>
                     </div>
-                    <p id="manuscript-action-status" class="text-xs mb-3" style="color: var(--color-text-muted);">Active path: Suggested choices.</p>
+                    <p id="manuscript-action-status" class="text-xs mb-3" style="color: var(--color-text-muted);">Active path: Suggested choices (secondary).</p>
                     <fieldset class="space-y-2 max-h-28 overflow-y-auto pr-1" aria-label="Suggested actions">
                       <label class="flex items-start gap-2 cursor-pointer">
                         <input type="radio" name="manuscript-choice" class="mt-1">
@@ -1883,10 +1883,10 @@
 
                   <div id="manuscript-custom-input-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4 hidden" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                      <p class="text-xs" style="color: var(--color-text-muted);">Custom action mode: write your own turn text.</p>
+                      <p class="text-xs" style="color: var(--color-text-muted);">Primary path: write your own action text.</p>
                       <div class="inline-flex rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-                        <button id="manuscript-mode-choice-alt" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary);">Use Suggested</button>
-                        <button id="manuscript-mode-custom-alt" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white; border-left: 1px solid var(--color-border);">Write Custom</button>
+                        <button id="manuscript-mode-custom-alt" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Write Custom (Primary)</button>
+                        <button id="manuscript-mode-choice-alt" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary); border-left: 1px solid var(--color-border);">Use Suggested</button>
                       </div>
                     </div>
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
@@ -3223,7 +3223,7 @@ export function PrimaryAction() {
 
         actionStatus.textContent = isCustomMode
           ? 'Active path: Custom action.'
-          : 'Active path: Suggested choices.';
+          : 'Active path: Suggested choices (secondary).';
 
         updateStreamingState();
 
@@ -3258,7 +3258,7 @@ export function PrimaryAction() {
       streamToggle.addEventListener('change', updateStreamingState);
 
       updateCount();
-      setMode('choice');
+      setMode('custom');
     }
 
     function initHudControllers() {
