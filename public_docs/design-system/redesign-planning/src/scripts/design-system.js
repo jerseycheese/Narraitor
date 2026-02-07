@@ -990,6 +990,54 @@
       }
     }
 
+    function getFocusableElements(container) {
+      if (!(container instanceof HTMLElement)) {
+        return [];
+      }
+
+      const focusableSelector = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled]):not([type="hidden"])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])',
+      ].join(',');
+
+      return Array.from(container.querySelectorAll(focusableSelector))
+        .filter((node) => node instanceof HTMLElement && !node.hasAttribute('hidden') && node.getAttribute('aria-hidden') !== 'true');
+    }
+
+    function trapFocusInContainer(event, container) {
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(container);
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        container.focus();
+        return;
+      }
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey) {
+        if (activeElement === firstFocusable || !container.contains(activeElement)) {
+          event.preventDefault();
+          lastFocusable.focus();
+        }
+        return;
+      }
+
+      if (activeElement === lastFocusable || !container.contains(activeElement)) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    }
+
     function initDrawerControllers() {
       const overlay = document.getElementById('manuscript-drawer-overlay');
       const panel = document.getElementById('manuscript-drawer-panel');
@@ -1116,6 +1164,11 @@
         const headerPanelsToggle = document.getElementById('manuscript-panels-toggle');
         const shouldReturnToPanelsToggle = trigger instanceof Element && trigger.closest('#manuscript-panels-menu');
         activeDrawerTrigger = shouldReturnToPanelsToggle ? headerPanelsToggle : (trigger || null);
+        const focusableElements = getFocusableElements(panel);
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+          return;
+        }
         panel.focus();
       };
       triggers.forEach((trigger) => {
@@ -1133,6 +1186,9 @@
 
       closeButton.addEventListener('click', closeManuscriptDrawer);
       backdrop.addEventListener('click', closeManuscriptDrawer);
+      panel.addEventListener('keydown', (event) => {
+        trapFocusInContainer(event, panel);
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
