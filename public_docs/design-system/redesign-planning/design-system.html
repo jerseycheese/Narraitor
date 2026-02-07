@@ -214,6 +214,25 @@
       min-height: inherit;
     }
 
+    .marginalia-panel {
+      display: flex;
+      flex-direction: column;
+      max-height: clamp(220px, 34vh, 380px);
+      overflow: hidden;
+    }
+
+    .marginalia-header {
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 8px;
+    }
+
+    .marginalia-body {
+      overflow-y: auto;
+      padding-top: 8px;
+      padding-right: 4px;
+    }
+
     code {
       background: var(--color-surface-hover);
       padding: 2px 6px;
@@ -1875,35 +1894,42 @@
                         </fieldset>
                       </div>
 
-                      <aside class="rounded-sm p-4 min-h-[150px]" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
-                        <p class="text-xs mb-2" style="color: var(--color-text-muted);">Mocked from existing models: <code>LoreFact</code> + <code>JournalEntry</code>.</p>
-                        <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal the linked lore and journal records.</p>
-                        <div id="marginalia-view" hidden class="space-y-3">
-                          <div>
-                            <h5 id="marginalia-title" class="text-sm font-semibold" style="color: var(--color-text-primary);">-</h5>
-                            <p id="marginalia-description" class="text-xs mt-1" style="color: var(--color-text-secondary);">-</p>
-                          </div>
+                      <aside class="rounded-sm p-4 marginalia-panel" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                        <div class="marginalia-header">
+                          <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
+                          <p class="text-xs" style="color: var(--color-text-muted);">Quick context only. Open full records in drawer.</p>
+                        </div>
 
-                          <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-                            <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">LORE FACT (MOCK)</div>
-                            <div class="text-xs" style="color: var(--color-text-secondary);">
-                              <div><strong style="color: var(--color-text-primary);">ID:</strong> <span id="marginalia-lore-id">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Category:</strong> <span id="marginalia-lore-category">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Visibility:</strong> <span id="marginalia-lore-visibility">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Value:</strong> <span id="marginalia-lore-value">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Tags:</strong> <span id="marginalia-lore-tags">-</span></div>
+                        <div class="marginalia-body">
+                          <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal quick context.</p>
+                          <div id="marginalia-view" hidden class="space-y-3">
+                            <div>
+                              <h5 id="marginalia-title" class="text-sm font-semibold" style="color: var(--color-text-primary);">-</h5>
+                              <p id="marginalia-description" class="text-xs mt-1" style="color: var(--color-text-secondary);">-</p>
                             </div>
-                          </div>
 
-                          <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-                            <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">JOURNAL ENTRY (MOCK)</div>
-                            <div class="text-xs" style="color: var(--color-text-secondary);">
-                              <div><strong style="color: var(--color-text-primary);">ID:</strong> <span id="marginalia-journal-id">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Type:</strong> <span id="marginalia-journal-type">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Significance:</strong> <span id="marginalia-journal-significance">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Summary:</strong> <span id="marginalia-journal-content">-</span></div>
-                              <div><strong style="color: var(--color-text-primary);">Related:</strong> <span id="marginalia-journal-related">-</span></div>
+                            <div class="flex flex-wrap gap-2 text-[10px] font-system">
+                              <span id="marginalia-chip-lore" class="px-2 py-1 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">-</span>
+                              <span id="marginalia-chip-journal" class="px-2 py-1 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">-</span>
+                            </div>
+
+                            <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                              <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">LORE SNAPSHOT</div>
+                              <p id="marginalia-lore-preview" class="text-xs" style="color: var(--color-text-secondary);">-</p>
+                            </div>
+
+                            <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                              <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">JOURNAL SNAPSHOT</div>
+                              <p id="marginalia-journal-preview" class="text-xs" style="color: var(--color-text-secondary);">-</p>
+                            </div>
+
+                            <div class="flex gap-2">
+                              <button id="marginalia-open-lore" type="button" disabled class="px-2.5 py-1.5 rounded-sm text-xs font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white; opacity: 0.6;">
+                                View Full Lore
+                              </button>
+                              <button id="marginalia-open-journal" type="button" disabled class="px-2.5 py-1.5 rounded-sm text-xs font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary); opacity: 0.6;">
+                                View Full Journal
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -3055,6 +3081,8 @@ export function PrimaryAction() {
   <script>
     let activeDrawerTrigger = null;
     let manuscriptOverlayLauncher = null;
+    let activeMarginaliaRecord = null;
+    let openManuscriptDrawer = null;
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -3245,7 +3273,8 @@ export function PrimaryAction() {
       const backdrop = overlay ? overlay.querySelector('[data-drawer-backdrop]') : null;
       const triggers = document.querySelectorAll('[data-drawer-trigger]');
 
-      if (!overlay || !panel || !title || !subtitle || !content || !closeButton || !backdrop || triggers.length === 0) {
+      if (!overlay || !panel || !title || !subtitle || !content || !closeButton || !backdrop) {
+        openManuscriptDrawer = null;
         return;
       }
 
@@ -3267,8 +3296,8 @@ export function PrimaryAction() {
         },
       };
 
-      const openDrawer = (panelKey, trigger) => {
-        const drawerData = drawerContentByPanel[panelKey] || drawerContentByPanel.character;
+      const openDrawer = (panelKey, trigger, drawerOverride) => {
+        const drawerData = drawerOverride || drawerContentByPanel[panelKey] || drawerContentByPanel.character;
         title.textContent = drawerData.title;
         subtitle.textContent = drawerData.subtitle;
         content.innerHTML = drawerData.body;
@@ -3277,6 +3306,7 @@ export function PrimaryAction() {
         activeDrawerTrigger = trigger || null;
         panel.focus();
       };
+      openManuscriptDrawer = openDrawer;
 
       triggers.forEach((trigger) => {
         trigger.addEventListener('click', () => {
@@ -3302,18 +3332,12 @@ export function PrimaryAction() {
 
       const title = document.getElementById('marginalia-title');
       const description = document.getElementById('marginalia-description');
-
-      const loreId = document.getElementById('marginalia-lore-id');
-      const loreCategory = document.getElementById('marginalia-lore-category');
-      const loreVisibility = document.getElementById('marginalia-lore-visibility');
-      const loreValue = document.getElementById('marginalia-lore-value');
-      const loreTags = document.getElementById('marginalia-lore-tags');
-
-      const journalId = document.getElementById('marginalia-journal-id');
-      const journalType = document.getElementById('marginalia-journal-type');
-      const journalSignificance = document.getElementById('marginalia-journal-significance');
-      const journalContent = document.getElementById('marginalia-journal-content');
-      const journalRelated = document.getElementById('marginalia-journal-related');
+      const loreChip = document.getElementById('marginalia-chip-lore');
+      const journalChip = document.getElementById('marginalia-chip-journal');
+      const lorePreview = document.getElementById('marginalia-lore-preview');
+      const journalPreview = document.getElementById('marginalia-journal-preview');
+      const openLoreButton = document.getElementById('marginalia-open-lore');
+      const openJournalButton = document.getElementById('marginalia-open-journal');
 
       const marginaliaMockData = {
         'ledger-mark': {
@@ -3325,6 +3349,7 @@ export function PrimaryAction() {
             visibility: 'world-shared',
             value: 'Aster-9 is a restricted archive clearance marker.',
             tags: ['archives', 'clearance', 'security'],
+            metadataDescription: 'Marks archival vaults that require witness-ledger privileges.',
           },
           journalEntry: {
             id: 'journal_021',
@@ -3332,6 +3357,7 @@ export function PrimaryAction() {
             significance: 'major',
             content: 'Discovered Aster-9 marker on hidden compartment key.',
             related: 'location:Lower Archive, item:Archive Key',
+            metadataTags: ['investigation', 'archive-security'],
           },
         },
         'vault-window': {
@@ -3343,6 +3369,7 @@ export function PrimaryAction() {
             visibility: 'session-private',
             value: 'Western vault lock weakens during pressure equalization.',
             tags: ['vault', 'timing', 'security-cycle'],
+            metadataDescription: 'Critical timing mechanic discovered during current session.',
           },
           journalEntry: {
             id: 'journal_022',
@@ -3350,6 +3377,7 @@ export function PrimaryAction() {
             significance: 'critical',
             content: 'Marked the pressure cycle as the safest breach window.',
             related: 'event:Vault Cycle, location:West Vault',
+            metadataTags: ['heist-plan', 'time-sensitive'],
           },
         },
       };
@@ -3360,19 +3388,66 @@ export function PrimaryAction() {
         !view ||
         !title ||
         !description ||
-        !loreId ||
-        !loreCategory ||
-        !loreVisibility ||
-        !loreValue ||
-        !loreTags ||
-        !journalId ||
-        !journalType ||
-        !journalSignificance ||
-        !journalContent ||
-        !journalRelated
+        !loreChip ||
+        !journalChip ||
+        !lorePreview ||
+        !journalPreview ||
+        !openLoreButton ||
+        !openJournalButton
       ) {
         return;
       }
+
+      const buildLoreDrawerBody = (record) => {
+        return `
+          <div class="space-y-2 text-sm">
+            <div><strong style="color: var(--color-text-primary);">id:</strong> ${record.loreFact.id}</div>
+            <div><strong style="color: var(--color-text-primary);">category:</strong> ${record.loreFact.category}</div>
+            <div><strong style="color: var(--color-text-primary);">visibility:</strong> ${record.loreFact.visibility}</div>
+            <div><strong style="color: var(--color-text-primary);">value:</strong> ${record.loreFact.value}</div>
+            <div><strong style="color: var(--color-text-primary);">metadata.description:</strong> ${record.loreFact.metadataDescription}</div>
+            <div><strong style="color: var(--color-text-primary);">metadata.tags:</strong> ${record.loreFact.tags.join(', ')}</div>
+          </div>
+        `;
+      };
+
+      const buildJournalDrawerBody = (record) => {
+        return `
+          <div class="space-y-2 text-sm">
+            <div><strong style="color: var(--color-text-primary);">id:</strong> ${record.journalEntry.id}</div>
+            <div><strong style="color: var(--color-text-primary);">type:</strong> ${record.journalEntry.type}</div>
+            <div><strong style="color: var(--color-text-primary);">significance:</strong> ${record.journalEntry.significance}</div>
+            <div><strong style="color: var(--color-text-primary);">content:</strong> ${record.journalEntry.content}</div>
+            <div><strong style="color: var(--color-text-primary);">relatedEntities:</strong> ${record.journalEntry.related}</div>
+            <div><strong style="color: var(--color-text-primary);">metadata.tags:</strong> ${record.journalEntry.metadataTags.join(', ')}</div>
+          </div>
+        `;
+      };
+
+      const openFullLore = () => {
+        if (!activeMarginaliaRecord || !openManuscriptDrawer) {
+          return;
+        }
+        openManuscriptDrawer('marginalia-lore', openLoreButton, {
+          title: `Lore Fact: ${activeMarginaliaRecord.title}`,
+          subtitle: 'Full mocked LoreFact payload shown in drawer.',
+          body: buildLoreDrawerBody(activeMarginaliaRecord),
+        });
+      };
+
+      const openFullJournal = () => {
+        if (!activeMarginaliaRecord || !openManuscriptDrawer) {
+          return;
+        }
+        openManuscriptDrawer('marginalia-journal', openJournalButton, {
+          title: `Journal Entry: ${activeMarginaliaRecord.title}`,
+          subtitle: 'Full mocked JournalEntry payload shown in drawer.',
+          body: buildJournalDrawerBody(activeMarginaliaRecord),
+        });
+      };
+
+      openLoreButton.addEventListener('click', openFullLore);
+      openJournalButton.addEventListener('click', openFullJournal);
 
       noteButtons.forEach((button) => {
         button.addEventListener('click', () => {
@@ -3384,21 +3459,18 @@ export function PrimaryAction() {
 
           title.textContent = record.title;
           description.textContent = record.description;
-
-          loreId.textContent = record.loreFact.id;
-          loreCategory.textContent = record.loreFact.category;
-          loreVisibility.textContent = record.loreFact.visibility;
-          loreValue.textContent = record.loreFact.value;
-          loreTags.textContent = record.loreFact.tags.join(', ');
-
-          journalId.textContent = record.journalEntry.id;
-          journalType.textContent = record.journalEntry.type;
-          journalSignificance.textContent = record.journalEntry.significance;
-          journalContent.textContent = record.journalEntry.content;
-          journalRelated.textContent = record.journalEntry.related;
+          loreChip.textContent = `LoreFact · ${record.loreFact.category} · ${record.loreFact.visibility}`;
+          journalChip.textContent = `JournalEntry · ${record.journalEntry.type} · ${record.journalEntry.significance}`;
+          lorePreview.textContent = record.loreFact.value;
+          journalPreview.textContent = record.journalEntry.content;
+          activeMarginaliaRecord = record;
 
           emptyState.hidden = true;
           view.hidden = false;
+          openLoreButton.disabled = false;
+          openJournalButton.disabled = false;
+          openLoreButton.style.opacity = '1';
+          openJournalButton.style.opacity = '1';
         });
       });
     }
