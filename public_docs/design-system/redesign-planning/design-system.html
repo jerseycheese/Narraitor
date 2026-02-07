@@ -377,6 +377,7 @@
               <h4 class="text-[10px] text-muted mb-3 tracking-widest border-b border-border pb-1">EXPERIENCE</h4>
               <div class="flex flex-col gap-2">
                 <a href="#layout" class="nav-link" onclick="closeNav()">LAYOUT ARCHETYPES</a>
+                <a href="#game-session-compositions" class="nav-link" onclick="closeNav()">GAME SESSION COMPOSITIONS</a>
                 <a href="#a11y" class="nav-link" onclick="closeNav()">ACCESSIBILITY</a>
                 <a href="#motion" class="nav-link" onclick="closeNav()">MOTION</a>
                 <a href="#content" class="nav-link" onclick="closeNav()">CONTENT & VOICE</a>
@@ -1666,6 +1667,52 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section py-8 md:py-12" id="game-session-compositions">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Game Session Compositions (#1031)</h2>
+        <div class="space-y-6">
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">SCOPE NOTE</h3>
+            <p class="text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              This section validates issue <strong>#1031</strong> component and layout prototypes. It is the single migration handoff source for downstream implementation issues <strong>#1034</strong> (components/layout integration) and <strong>#1035</strong> (progressive disclosure drawers/marginalia).
+            </p>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">#1031 DONE WHEN CHECKLIST</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Core components complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Core components complete (buttons, inputs, badges, alerts, cards, drawer trigger).</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Manuscript layout validated" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Manuscript single-column layout validated with realistic narrative density.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Choice selector in single-column context" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Choice selector rendered inside the reading surface (not as a side column).</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Docked input is functional and anchored" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Docked input is functional, character-counted, and anchored during narrative scroll.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="HUD collapse and expansion validated" class="mt-1 h-4 w-4 rounded-sm">
+                <span>HUD collapsed and expanded states do not obstruct the primary reading surface.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Drawer behavior does not shift content" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Drawer interactions open as overlays without shifting narrative content.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Accessibility checks complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Focus, keyboard, and contrast validation checks are documented and pass.</span>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
