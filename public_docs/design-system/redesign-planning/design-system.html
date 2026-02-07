@@ -214,25 +214,6 @@
       min-height: inherit;
     }
 
-    .marginalia-panel {
-      display: flex;
-      flex-direction: column;
-      max-height: clamp(220px, 34vh, 380px);
-      overflow: hidden;
-    }
-
-    .marginalia-header {
-      flex-shrink: 0;
-      border-bottom: 1px solid var(--color-border);
-      padding-bottom: 8px;
-    }
-
-    .marginalia-body {
-      overflow-y: auto;
-      padding-top: 8px;
-      padding-right: 4px;
-    }
-
     code {
       background: var(--color-surface-hover);
       padding: 2px 6px;
@@ -1798,7 +1779,7 @@
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
             <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">SCOPE NOTE</h3>
             <p class="text-sm sm:text-base" style="color: var(--color-text-secondary);">
-              This section validates issue <strong>#1031</strong> component and layout prototypes. It is the single migration handoff source for downstream implementation issues <strong>#1034</strong> (components/layout integration) and <strong>#1035</strong> (progressive disclosure drawers/marginalia).
+              This section validates issue <strong>#1031</strong> component and layout prototypes. It is the single migration handoff source for downstream implementation issues <strong>#1034</strong> (components/layout integration) and <strong>#1035</strong> (progressive disclosure drawers).
             </p>
           </div>
 
@@ -1865,17 +1846,15 @@
                           <div class="font-system text-xs mb-1" style="color: var(--color-accent);">OUTCOME: PERCEPTION SUCCESS (14 vs DC 12)</div>
                           <p class="text-sm sm:text-base font-narrative italic" style="color: var(--color-text-secondary);">You detect a hidden service hatch behind the donor plaques, aligned with fresh hinge scratches and soot-free brass.</p>
                         </div>
-                        <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark
-                          <button type="button" data-marginalia-target="ledger-mark" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">Aster-9</button>.
-                        </p>
+                        <p class="text-narrative">When you pressed the seam, the panel withdrew with a pneumatic sigh. Inside sat a narrow compartment holding ledger slates, a coil of red string, and a key tagged with the mark Aster-9.</p>
                         <p class="text-narrative">A page pinned beneath the key listed access windows for the western vault. One entry was circled twice and annotated in hurried hand:
-                          <button type="button" data-marginalia-target="vault-window" class="underline decoration-dotted ml-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="color: var(--color-accent);">"Open only during pressure equalization."</button>
+                          "Open only during pressure equalization."
                         </p>
                         <p class="text-narrative">The corridor lights dimmed to amber. Somewhere below, the vault gears engaged and the floor beneath your boots trembled in a slow, deliberate rhythm.</p>
                       </div>
                     </div>
 
-                    <div class="mt-5 grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-4 items-start">
+                    <div class="mt-5">
                       <div class="min-h-[150px] rounded-sm p-4" style="background: var(--color-surface); border: 1px solid var(--color-border);">
                         <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">CHOICE SELECTOR (SINGLE-COLUMN CONTEXT)</h4>
                         <fieldset class="space-y-2" aria-label="Suggested actions">
@@ -1893,39 +1872,6 @@
                           </label>
                         </fieldset>
                       </div>
-
-                      <aside class="rounded-sm p-4 marginalia-panel" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                        <div class="marginalia-header">
-                          <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">MARGINALIA</h4>
-                          <p class="text-xs" style="color: var(--color-text-muted);">Quick context only, kept intentionally compact.</p>
-                        </div>
-
-                        <div class="marginalia-body">
-                          <p id="marginalia-empty" class="text-sm" style="color: var(--color-text-secondary);">Select an underlined term to reveal quick context.</p>
-                          <div id="marginalia-view" hidden class="space-y-3">
-                            <div>
-                              <h5 id="marginalia-title" class="text-sm font-semibold" style="color: var(--color-text-primary);">-</h5>
-                              <p id="marginalia-description" class="text-xs mt-1" style="color: var(--color-text-secondary);">-</p>
-                            </div>
-
-                            <div class="flex flex-wrap gap-2 text-[10px] font-system">
-                              <span id="marginalia-chip-lore" class="px-2 py-1 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">-</span>
-                              <span id="marginalia-chip-journal" class="px-2 py-1 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">-</span>
-                            </div>
-
-                            <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-                              <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">LORE SNAPSHOT</div>
-                              <p id="marginalia-lore-preview" class="text-xs" style="color: var(--color-text-secondary);">-</p>
-                            </div>
-
-                            <div class="rounded-sm p-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-                              <div class="font-system text-[10px] mb-1" style="color: var(--color-text-muted);">JOURNAL SNAPSHOT</div>
-                              <p id="marginalia-journal-preview" class="text-xs" style="color: var(--color-text-secondary);">-</p>
-                            </div>
-
-                          </div>
-                        </div>
-                      </aside>
                     </div>
                   </div>
 
@@ -2056,7 +2002,8 @@
             <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MIGRATION HANDOFF NOTES</h3>
             <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
               <li><strong style="color: var(--color-text-primary);">#1034 components/layout integration:</strong> migrate the single-column manuscript shell, docked input behavior, and HUD positioning/toggles.</li>
-              <li><strong style="color: var(--color-text-primary);">#1035 progressive disclosure:</strong> migrate drawer overlay controller, focus-return behavior, and marginalia annotation reveal pattern.</li>
+              <li><strong style="color: var(--color-text-primary);">#1035 progressive disclosure:</strong> migrate drawer overlay controller and focus-return behavior.</li>
+              <li><strong style="color: var(--color-text-primary);">#1043 follow-up (deferred):</strong> add production narrative annotation linking for inline term-to-context interactions.</li>
             </ul>
           </div>
         </div>
@@ -3312,98 +3259,11 @@ export function PrimaryAction() {
       backdrop.addEventListener('click', closeManuscriptDrawer);
     }
 
-    function initMarginaliaController() {
-      const noteButtons = document.querySelectorAll('[data-marginalia-target]');
-      const emptyState = document.getElementById('marginalia-empty');
-      const view = document.getElementById('marginalia-view');
-
-      const title = document.getElementById('marginalia-title');
-      const description = document.getElementById('marginalia-description');
-      const loreChip = document.getElementById('marginalia-chip-lore');
-      const journalChip = document.getElementById('marginalia-chip-journal');
-      const lorePreview = document.getElementById('marginalia-lore-preview');
-      const journalPreview = document.getElementById('marginalia-journal-preview');
-
-      const marginaliaMockData = {
-        'ledger-mark': {
-          title: 'Aster-9 clearance mark',
-          description: 'Former archivist sigil tied to restricted witness ledgers.',
-          loreFact: {
-            id: 'lore_fact_aster9',
-            category: 'rules',
-            visibility: 'world-shared',
-            value: 'Aster-9 is a restricted archive clearance marker.',
-            tags: ['archives', 'clearance', 'security'],
-          },
-          journalEntry: {
-            id: 'journal_021',
-            type: 'discovery',
-            significance: 'major',
-            content: 'Discovered Aster-9 marker on hidden compartment key.',
-            related: 'location:Lower Archive, item:Archive Key',
-          },
-        },
-        'vault-window': {
-          title: 'Pressure equalization window',
-          description: '90-second bypass interval for the western vault lock.',
-          loreFact: {
-            id: 'lore_fact_vault_window',
-            category: 'events',
-            visibility: 'session-private',
-            value: 'Western vault lock weakens during pressure equalization.',
-            tags: ['vault', 'timing', 'security-cycle'],
-          },
-          journalEntry: {
-            id: 'journal_022',
-            type: 'decision',
-            significance: 'critical',
-            content: 'Marked the pressure cycle as the safest breach window.',
-            related: 'event:Vault Cycle, location:West Vault',
-          },
-        },
-      };
-
-      if (
-        noteButtons.length === 0 ||
-        !emptyState ||
-        !view ||
-        !title ||
-        !description ||
-        !loreChip ||
-        !journalChip ||
-        !lorePreview ||
-        !journalPreview
-      ) {
-        return;
-      }
-
-      noteButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          const target = button.getAttribute('data-marginalia-target');
-          const record = target ? marginaliaMockData[target] : null;
-          if (!record) {
-            return;
-          }
-
-          title.textContent = record.title;
-          description.textContent = record.description;
-          loreChip.textContent = `LoreFact · ${record.loreFact.category} · ${record.loreFact.visibility}`;
-          journalChip.textContent = `JournalEntry · ${record.journalEntry.type} · ${record.journalEntry.significance}`;
-          lorePreview.textContent = record.loreFact.value;
-          journalPreview.textContent = record.journalEntry.content;
-
-          emptyState.hidden = true;
-          view.hidden = false;
-        });
-      });
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
       initManuscriptOverlayController();
       initManuscriptInputController();
       initHudControllers();
       initDrawerControllers();
-      initMarginaliaController();
     });
 
     // Close nav when clicking outside
