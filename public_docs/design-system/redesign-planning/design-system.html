@@ -1853,54 +1853,18 @@
 
                   </div>
 
-                  <div id="manuscript-choice-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                      <p class="text-xs" style="color: var(--color-text-muted);">Secondary path: use a suggested action when you want a quick option.</p>
-                      <div class="inline-flex rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-                        <button id="manuscript-mode-custom" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary);">Write Custom (Primary)</button>
-                        <button id="manuscript-mode-choice" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white; border-left: 1px solid var(--color-border);">Use Suggested</button>
-                      </div>
-                    </div>
-                    <p id="manuscript-action-status" class="text-xs mb-3" style="color: var(--color-text-muted);">Active path: Suggested choices (secondary).</p>
-                    <fieldset class="space-y-2 max-h-28 overflow-y-auto pr-1" aria-label="Suggested actions">
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Take the maintenance elevator - quieter but slower.</span>
-                      </label>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Use the emergency stairs - faster but riskier.</span>
-                      </label>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="radio" name="manuscript-choice" checked class="mt-1">
-                        <span class="text-sm" style="color: var(--color-text-secondary);">Crawl through the ventilation system - stealthy but difficult.</span>
-                      </label>
-                    </fieldset>
-                    <div class="mt-3 flex justify-end">
-                      <button id="manuscript-choice-send" type="button" class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Selected Choice</button>
-                    </div>
-                  </div>
-
-                  <div id="manuscript-custom-input-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4 hidden" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                      <p class="text-xs" style="color: var(--color-text-muted);">Primary path: write your own action text.</p>
-                      <div class="inline-flex rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
-                        <button id="manuscript-mode-custom-alt" type="button" aria-pressed="true" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Write Custom (Primary)</button>
-                        <button id="manuscript-mode-choice-alt" type="button" aria-pressed="false" class="px-3 py-1.5 text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); color: var(--color-text-secondary); border-left: 1px solid var(--color-border);">Use Suggested</button>
-                      </div>
-                    </div>
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                      <label class="flex items-center gap-2 text-xs font-system cursor-pointer" style="color: var(--color-text-muted);">
-                        <input id="manuscript-stream-toggle" type="checkbox">
-                        PROTOTYPE: SIMULATE AI RESPONSE LOCK
-                      </label>
-                      <div id="manuscript-stream-status" role="status" aria-live="polite" class="text-xs font-system" style="color: var(--color-text-secondary);">Status: Choose a suggested action or switch to custom.</div>
+                  <div id="manuscript-action-rail" class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SUGGESTED ACTIONS</div>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                      <button type="button" data-suggested-action="Take the maintenance elevator - quieter but slower." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Take the maintenance elevator</button>
+                      <button type="button" data-suggested-action="Use the emergency stairs - faster but riskier." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Use the emergency stairs</button>
+                      <button type="button" data-suggested-action="Crawl through the ventilation system - stealthy but difficult." class="px-3 py-1.5 rounded-sm text-xs font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Crawl through ventilation</button>
                     </div>
                     <label for="manuscript-input" class="sr-only">Narrative input</label>
-                    <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Describe your next action..."></textarea>
+                    <textarea id="manuscript-input" rows="2" maxlength="400" class="w-full rounded-sm px-3 py-2 text-sm font-interface resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action..."></textarea>
                     <div class="mt-2 flex items-center justify-between gap-3">
                       <span id="manuscript-char-count" class="font-system text-xs" style="color: var(--color-text-muted);">0/400</span>
-                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Custom Turn</button>
+                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send Turn</button>
                     </div>
                   </div>
                 </div>
@@ -1947,11 +1911,11 @@
             <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Choice selector keyboard check" class="mt-1 h-4 w-4 rounded-sm">
-                <span>Choice selector radios are reachable in order and announce labels correctly.</span>
+                <span>Suggested action buttons are reachable in order and visibly focused.</span>
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="Docked input keyboard check" class="mt-1 h-4 w-4 rounded-sm">
-                <span>Docked textarea, stream toggle, and send button are keyboard reachable with visible focus ring.</span>
+                <span>Docked textarea and send button are keyboard reachable with visible focus ring.</span>
               </li>
               <li class="flex items-start gap-2">
                 <input type="checkbox" disabled aria-label="HUD keyboard check" class="mt-1 h-4 w-4 rounded-sm">
@@ -1967,7 +1931,7 @@
           <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
             <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">FOCUS STYLE VERIFICATION</h3>
             <div class="space-y-2 text-sm" style="color: var(--color-text-secondary);">
-              <p><strong style="color: var(--color-text-primary);">Choice selector cluster:</strong> radio inputs must show browser focus indicator plus label association.</p>
+              <p><strong style="color: var(--color-text-primary);">Suggested action cluster:</strong> inline action buttons retain visible focus and clear pressed state.</p>
               <p><strong style="color: var(--color-text-primary);">Docked input cluster:</strong> textarea and send button use a visible 2px outline with offset when focused.</p>
               <p><strong style="color: var(--color-text-primary);">HUD controls:</strong> both top-corner toggles expose clear focus ring and state text.</p>
               <p><strong style="color: var(--color-text-primary);">Drawer controls:</strong> trigger buttons and close button retain visible focus throughout open/close cycle.</p>
@@ -3136,129 +3100,32 @@ export function PrimaryAction() {
       const input = document.getElementById('manuscript-input');
       const sendButton = document.getElementById('manuscript-send');
       const charCount = document.getElementById('manuscript-char-count');
-      const streamToggle = document.getElementById('manuscript-stream-toggle');
-      const streamStatus = document.getElementById('manuscript-stream-status');
-      const choiceRail = document.getElementById('manuscript-choice-rail');
-      const customRail = document.getElementById('manuscript-custom-input-rail');
-      const modeChoiceButton = document.getElementById('manuscript-mode-choice');
-      const modeCustomButton = document.getElementById('manuscript-mode-custom');
-      const modeChoiceAltButton = document.getElementById('manuscript-mode-choice-alt');
-      const modeCustomAltButton = document.getElementById('manuscript-mode-custom-alt');
-      const choiceSendButton = document.getElementById('manuscript-choice-send');
-      const actionStatus = document.getElementById('manuscript-action-status');
-      const choiceInputs = document.querySelectorAll('input[name="manuscript-choice"]');
+      const suggestedActionButtons = document.querySelectorAll('[data-suggested-action]');
 
-      if (
-        !input ||
-        !sendButton ||
-        !charCount ||
-        !streamToggle ||
-        !streamStatus ||
-        !choiceRail ||
-        !customRail ||
-        !modeChoiceButton ||
-        !modeCustomButton ||
-        !modeChoiceAltButton ||
-        !modeCustomAltButton ||
-        !choiceSendButton ||
-        !actionStatus
-      ) {
+      if (!input || !sendButton || !charCount) {
         return;
       }
-
-      let currentMode = 'choice';
 
       const updateCount = () => {
         const count = input.value.length;
         charCount.textContent = `${count}/400`;
       };
 
-      const updateModeButtons = (isCustomMode) => {
-        modeChoiceButton.setAttribute('aria-pressed', String(!isCustomMode));
-        modeCustomButton.setAttribute('aria-pressed', String(isCustomMode));
+      suggestedActionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const suggestedAction = button.getAttribute('data-suggested-action');
+          if (!suggestedAction) {
+            return;
+          }
 
-        modeChoiceButton.style.background = isCustomMode ? 'var(--color-surface)' : 'var(--color-accent)';
-        modeChoiceButton.style.color = isCustomMode ? 'var(--color-text-secondary)' : 'white';
-        modeCustomButton.style.background = isCustomMode ? 'var(--color-accent)' : 'var(--color-surface)';
-        modeCustomButton.style.color = isCustomMode ? 'white' : 'var(--color-text-secondary)';
-
-        modeChoiceAltButton.setAttribute('aria-pressed', String(!isCustomMode));
-        modeCustomAltButton.setAttribute('aria-pressed', String(isCustomMode));
-        modeChoiceAltButton.style.background = isCustomMode ? 'var(--color-surface)' : 'var(--color-accent)';
-        modeChoiceAltButton.style.color = isCustomMode ? 'var(--color-text-secondary)' : 'white';
-        modeCustomAltButton.style.background = isCustomMode ? 'var(--color-accent)' : 'var(--color-surface)';
-        modeCustomAltButton.style.color = isCustomMode ? 'white' : 'var(--color-text-secondary)';
-      };
-
-      const updateStreamingState = () => {
-        const isStreaming = streamToggle.checked;
-        const isCustomMode = currentMode === 'custom';
-
-        input.disabled = !isCustomMode || isStreaming;
-        sendButton.disabled = !isCustomMode || isStreaming;
-        sendButton.style.opacity = !isCustomMode || isStreaming ? '0.6' : '1';
-        sendButton.style.cursor = !isCustomMode || isStreaming ? 'not-allowed' : 'pointer';
-
-        if (!isCustomMode) {
-          streamStatus.textContent = 'Status: Choose a suggested action and send.';
-          return;
-        }
-
-        streamStatus.textContent = isStreaming
-          ? 'Status: Streaming in progress, custom input temporarily locked.'
-          : 'Status: Ready for custom input.';
-      };
-
-      const setMode = (nextMode, focusCustomInput = false) => {
-        currentMode = nextMode;
-        const isCustomMode = nextMode === 'custom';
-
-        if (!isCustomMode && streamToggle.checked) {
-          streamToggle.checked = false;
-        }
-
-        choiceRail.classList.toggle('hidden', isCustomMode);
-        customRail.classList.toggle('hidden', !isCustomMode);
-        updateModeButtons(isCustomMode);
-
-        actionStatus.textContent = isCustomMode
-          ? 'Active path: Custom action.'
-          : 'Active path: Suggested choices (secondary).';
-
-        updateStreamingState();
-
-        if (isCustomMode && focusCustomInput) {
+          input.value = suggestedAction;
+          updateCount();
           input.focus();
-        }
-      };
-
-      const getSelectedChoiceText = () => {
-        const selected = Array.from(choiceInputs).find((choiceInput) => choiceInput.checked);
-        if (!selected || !selected.parentElement) {
-          return '';
-        }
-
-        const choiceLabel = selected.parentElement.querySelector('span');
-        return choiceLabel ? choiceLabel.textContent.trim() : '';
-      };
-
-      modeChoiceButton.addEventListener('click', () => setMode('choice'));
-      modeCustomButton.addEventListener('click', () => setMode('custom', true));
-      modeChoiceAltButton.addEventListener('click', () => setMode('choice'));
-      modeCustomAltButton.addEventListener('click', () => setMode('custom', true));
-
-      choiceSendButton.addEventListener('click', () => {
-        const selectedChoiceText = getSelectedChoiceText();
-        actionStatus.textContent = selectedChoiceText
-          ? `Active path: Suggested choice sent - "${selectedChoiceText}".`
-          : 'Active path: Suggested choice sent.';
+        });
       });
 
       input.addEventListener('input', updateCount);
-      streamToggle.addEventListener('change', updateStreamingState);
-
       updateCount();
-      setMode('custom');
     }
 
     function initHudControllers() {
