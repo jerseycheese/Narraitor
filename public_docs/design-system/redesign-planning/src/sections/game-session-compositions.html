@@ -1,0 +1,416 @@
+<section class="section py-8 md:py-12" id="game-session-compositions">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Game Session Compositions (#1031)</h2>
+        <div class="space-y-8">
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">SCOPE NOTE</h3>
+            <p class="text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              This section validates issue <strong>#1031</strong> component and layout prototypes. It is the single migration handoff source for downstream implementation issues <strong>#1034</strong> (components/layout integration) and <strong>#1035</strong> (progressive disclosure drawers).
+            </p>
+          </div>
+
+          <article class="space-y-4">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Single-Column Manuscript Prototype (Validated)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Narrative text, choices, and drafting controls remain inside one center reading surface. Use the launch button to open the manuscript as a true viewport overlay on top of the design system page.</p>
+
+            <div>
+              <button id="launch-manuscript-overlay" type="button" aria-controls="manuscript-viewport-layer" aria-expanded="false" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">
+                Launch Manuscript Overlay
+              </button>
+            </div>
+
+            <div id="manuscript-viewport-layer" class="full-viewport-breakout manuscript-viewport-layer hidden" aria-hidden="true">
+              <div class="manuscript-overlay-backdrop" data-manuscript-overlay-backdrop></div>
+              <div class="manuscript-viewport-shell">
+                <div class="manuscript-viewport-inner">
+                  <header class="manuscript-overlay-header">
+                    <div class="manuscript-overlay-header-left">
+                      <div class="manuscript-header-controls flex items-center gap-2">
+                        <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                          Character
+                        </button>
+                        <button id="manuscript-panels-toggle" type="button" aria-expanded="false" aria-controls="manuscript-panels-menu" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                          Tools
+                        </button>
+                      </div>
+                      <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CHARACTER SNAPSHOT</h4>
+                        <div id="manuscript-character-hud-stats" class="space-y-3 text-sm"></div>
+                      </div>
+                      <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TOOLS</h4>
+                        <div class="space-y-2">
+                          <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="character" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="story-summary" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Story So Far</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="choice-history" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Choice History</button>
+                          <button type="button" data-drawer-trigger data-drawer-panel="journal" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Journal Snapshot</button>
+                          <button id="manuscript-open-journal-route" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Open Journal Route</button>
+                          <div class="my-1 border-t" style="border-color: var(--color-border);"></div>
+                          <button id="manuscript-simulate-turn" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
+                          <button id="manuscript-toggle-streaming" type="button" aria-pressed="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Toggle Streaming State</button>
+                          <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="manuscript-overlay-header-right">
+                      <button id="close-manuscript-overlay" type="button" class="px-3 py-1.5 rounded-sm font-system text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                        Close
+                      </button>
+                    </div>
+                  </header>
+
+                  <main class="manuscript-overlay-main">
+                    <div class="pb-4">
+                      <div id="manuscript-characters-present-mobile-bar" class="manuscript-characters-mobile-bar">
+                        <p class="manuscript-characters-mobile-label font-system text-[11px] uppercase tracking-wide" style="color: var(--color-text-muted);">Characters Present</p>
+                        <div id="manuscript-characters-present-mobile-list" class="manuscript-characters-mobile-list"></div>
+                      </div>
+                      <div class="manuscript-main-stage">
+                        <aside id="manuscript-characters-present-rail" class="manuscript-characters-rail">
+                          <p class="font-system text-[11px] uppercase tracking-wide mb-2" style="color: var(--color-text-muted);">Characters Present</p>
+                          <div id="manuscript-characters-present-list" class="flex flex-wrap gap-1"></div>
+                        </aside>
+                        <div class="manuscript-main-content">
+                          <div class="max-w-3xl mx-auto">
+                            <div id="manuscript-narrative-stream" class="space-y-5"></div>
+                          </div>
+                        </div>
+                        <div class="manuscript-rail-spacer" aria-hidden="true"></div>
+                      </div>
+                    </div>
+                  </main>
+
+                  <div id="manuscript-action-rail" class="rounded-sm p-3 sm:p-4" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+                    <p id="manuscript-decision-prompt" class="text-sm sm:text-base mb-1.5 font-medium" style="color: var(--color-text-primary);"></p>
+                    <div id="manuscript-ending-suggestion" hidden class="mb-3 rounded-sm p-3" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35);">
+                      <p class="font-interface text-sm font-semibold mb-1" style="color: var(--color-text-primary);">Your story could end here.</p>
+                      <p class="text-xs sm:text-sm mb-3" style="color: var(--color-text-secondary);">You recovered the Arasaka relay key, but alarms are escalating and extraction windows are closing.</p>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <button id="manuscript-ending-accept" type="button" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">View Ending</button>
+                        <button id="manuscript-ending-dismiss" type="button" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Continue Playing</button>
+                      </div>
+                    </div>
+                    <div class="manuscript-mobile-rail-top-controls mb-2">
+                      <button id="manuscript-toggle-suggested-actions" type="button" aria-expanded="false" aria-controls="manuscript-suggested-actions-region" class="w-full px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                        Suggested Actions
+                      </button>
+                      <button type="button" data-manuscript-control="end-story" class="px-3 py-1.5 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 whitespace-nowrap" style="background: var(--color-warning-soft); border: 1px solid var(--color-warning-border); color: var(--color-warning);">
+                        End Story
+                      </button>
+                    </div>
+                    <div id="manuscript-suggested-actions-region" class="mb-2">
+                      <div id="manuscript-choice-actions" class="grid gap-1.5 lg:grid-cols-3"></div>
+                    </div>
+                    <label for="manuscript-input" class="sr-only">Narrative input</label>
+                    <div class="manuscript-input-row">
+                      <input id="manuscript-input" type="text" maxlength="400" class="w-full rounded-sm p-2 text-sm font-interface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" placeholder="Or write your own action...">
+                      <button id="manuscript-send" type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Send</button>
+                      <button id="manuscript-end-story" type="button" class="hidden lg:inline-flex items-center px-3 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 whitespace-nowrap" style="background: var(--color-warning-soft); border: 1px solid var(--color-warning-border); color: var(--color-warning);">End Story</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">#1031 DONE WHEN CHECKLIST</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Core components complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Core components complete (buttons, inputs, badges, alerts, cards, drawer trigger).</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Manuscript layout validated" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Manuscript single-column layout validated with realistic narrative density.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Suggested actions in single-column context" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Suggested actions render in the docked rail (not as a side column), with custom input directly underneath.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Docked input is functional and anchored" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Docked input is functional and anchored during narrative scroll.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="HUD collapse and expansion validated" class="mt-1 h-4 w-4 rounded-sm">
+                <span>HUD collapsed and expanded states do not obstruct the primary reading surface.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Drawer behavior does not shift content" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Drawer interactions open as overlays without shifting narrative content.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Production component mapping prototype complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Production game-session component mapping is documented (keep/move/remove/defer) with explicit issue ownership across <code>#1034</code>, <code>#1035</code>, and deferred <code>#1043</code>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Session controls prototype complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Mapped session controls are prototyped in manuscript context: autosave indicator placement, ending suggestion banner placement, and end-story confirmation flow.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Accessibility checks complete" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Focus, keyboard, and contrast validation checks are documented and pass.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">KEYBOARD WALKTHROUGH CHECKLIST</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Suggested actions keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Suggested action buttons are reachable in order and visibly focused.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Docked input keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Docked textarea and send button are keyboard reachable with visible focus ring.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="HUD keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>HUD toggles update <code>aria-expanded</code> and reveal/collapse corresponding panels.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="Drawer keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>Drawer opens from trigger (Enter/Space), closes on Escape, and returns focus to invoking trigger.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <input type="checkbox" disabled aria-label="End story confirmation keyboard check" class="mt-1 h-4 w-4 rounded-sm">
+                <span>End-story confirmation opens as a modal overlay, closes on Escape/cancel, and returns focus to the invoking control.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">FOCUS STYLE VERIFICATION</h3>
+            <div class="space-y-2 text-sm" style="color: var(--color-text-secondary);">
+              <p><strong style="color: var(--color-text-primary);">Suggested action cluster:</strong> inline action buttons retain visible focus and clear pressed state.</p>
+              <p><strong style="color: var(--color-text-primary);">Docked input cluster:</strong> textarea and send button use a visible 2px outline with offset when focused.</p>
+              <p><strong style="color: var(--color-text-primary);">HUD controls:</strong> both top-corner toggles expose clear focus ring and state text.</p>
+              <p><strong style="color: var(--color-text-primary);">Drawer controls:</strong> trigger buttons and close button retain visible focus throughout open/close cycle.</p>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-3" style="color: var(--color-text-muted);">CONTRAST VERIFICATION TABLE</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">Element Pair</th>
+                    <th class="text-left py-2 pr-4">Target</th>
+                    <th class="text-left py-2">Result (Manual)</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Narrative text <code>--color-text-primary</code> on manuscript surface</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (high contrast baseline pair)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Primary button text on <code>--color-accent</code></td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (validated in existing token set)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4">Helper/error text on neutral surfaces</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (semantic status colors)</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4">Muted technical labels on panel backgrounds</td>
+                    <td class="py-2 pr-4">WCAG AA 4.5:1</td>
+                    <td class="py-2">Pass (existing typography token validation)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MIGRATION HANDOFF NOTES</h3>
+            <ul class="space-y-2 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+              <li><strong style="color: var(--color-text-primary);">#1031 prototype gate:</strong> review and accept the component mapping snapshot below before starting production migration tasks in <code>#1034</code> or <code>#1035</code>.</li>
+              <li><strong style="color: var(--color-text-primary);">#1034 components/layout integration:</strong> migrate the single-column manuscript shell, docked input behavior, and HUD positioning/toggles.</li>
+              <li><strong style="color: var(--color-text-primary);">#1035 progressive disclosure:</strong> migrate drawer overlay controller and focus-return behavior.</li>
+              <li><strong style="color: var(--color-text-primary);">#1043 follow-up (deferred):</strong> add production narrative annotation linking for inline term-to-context interactions.</li>
+            </ul>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">PRODUCTION COMPONENT AUDIT SNAPSHOT (2026-02-07)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Current production composition is <code>GameSession -> ActiveGameSession -> NarrativeColumn + ChoicesColumn + Controls</code>. This table maps existing responsibilities into manuscript-era placement.
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">Production Surface</th>
+                    <th class="text-left py-2 pr-4">Manuscript Decision</th>
+                    <th class="text-left py-2">Issue Mapping</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSession</code> two-column shell</td>
+                    <td class="py-2 pr-4">Replace with full-viewport manuscript shell and fixed bottom action rail.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSessionNarrativeColumn</code> + <code>NarrativeHistory*</code></td>
+                    <td class="py-2 pr-4">Keep behavior, move to center single-column narrative stream.</td>
+                    <td class="py-2"><code>#1034</code> + <code>#1033</code> (streaming/scroll hardening)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>ActiveGameSessionChoicesColumn</code> + <code>ChoiceSelector</code></td>
+                    <td class="py-2 pr-4">Remove right column; fold suggested actions + custom input into docked rail.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>CharacterSummary</code></td>
+                    <td class="py-2 pr-4">Move to collapsed HUD summary + expanded drawer details.</td>
+                    <td class="py-2"><code>#1034</code> (HUD) + <code>#1035</code> (drawer)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code>, <code>StorySummarySection</code>, <code>ChoiceHistorySection</code></td>
+                    <td class="py-2 pr-4">Move from in-flow collapsibles into progressive disclosure drawers.</td>
+                    <td class="py-2"><code>#1035</code></td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>SaveIndicator</code></td>
+                    <td class="py-2 pr-4">Keep passive autosave status, remove manual <code>Save Now</code> action during migration, and place status in a low-noise rail/HUD area.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4"><code>EndingSuggestionBanner</code> + end-story confirmation modal</td>
+                    <td class="py-2 pr-4">Keep behavior, place banner in rail/HUD context without narrative reflow.</td>
+                    <td class="py-2"><code>#1034</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-4 space-y-2 text-sm" style="color: var(--color-text-secondary);">
+              <p><strong style="color: var(--color-text-primary);">Coverage check:</strong> No net-new issue required from this audit.</p>
+              <p><strong style="color: var(--color-text-primary);">Prototype gate:</strong> this mapping table is part of <code>#1031</code> completion and should be treated as migration input, not migration output.</p>
+              <p><strong style="color: var(--color-text-primary);">Follow-up note:</strong> tighten <code>#1034</code> acceptance criteria for end-story control placement, save status placement, ending-suggestion placement, and manual <code>Save Now</code> removal from app UI/code paths.</p>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-system tracking-wide mb-2" style="color: var(--color-text-muted);">MISSING-ELEMENTS MATRIX (2026-02-07)</h3>
+            <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
+              Matrix for manuscript parity decisions in <code>#1031</code>. Each row references an existing app field/component surface and records whether it was added, deferred, or excluded for manuscript mode.
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">
+                    <th class="text-left py-2 pr-4">App Element</th>
+                    <th class="text-left py-2 pr-4">Exists in App</th>
+                    <th class="text-left py-2 pr-4">Added to Manuscript</th>
+                    <th class="text-left py-2 pr-4">Deferred</th>
+                    <th class="text-left py-2 pr-4">Not Appropriate</th>
+                    <th class="text-left py-2">Decision Note</th>
+                  </tr>
+                </thead>
+                <tbody style="color: var(--color-text-secondary);">
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>DecisionOption.alignment</code> indicators (<code>ChoiceSelector</code>)</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred visual alignment labels to reduce manuscript rail density.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>DecisionOption.requirements[]</code> skill checks</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred for follow-up issue decision on whether manuscript rail should expose requirement checks.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>NarrativeSegment.metadata.characterIds</code> / <code>segment.characterIds</code></td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Rendered as sticky mobile bar under header and desktop rail adjacent to narrative stream.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>NarrativeSegment.metadata.location</code> inline narrative label</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2">Removed from narrative body; location context available via Character Details drawer.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code> “Use” action button</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Drawer items now expose a Use button that feeds action text back into manuscript input.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>InventoryList</code> drop flow (<code>DropConfirmationDialog</code>)</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred to <code>#1035</code> while manuscript mode remains non-destructive in this prototype slice.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="py-2 pr-4"><code>SaveIndicator</code> manual <code>Save Now</code> action</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2">Excluded from manuscript interaction rail per #1031 decision to keep passive autosave only.</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4"><code>SaveIndicator</code> passive status text</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2 pr-4">Yes</td>
+                    <td class="py-2 pr-4">No</td>
+                    <td class="py-2">Deferred pending final manuscript HUD density decision in <code>#1034</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="manuscript-drawer-overlay" class="fixed inset-0 hidden z-[220]" aria-hidden="true">
+          <div class="absolute inset-0" data-drawer-backdrop style="background: var(--color-scrim);"></div>
+          <aside id="manuscript-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="manuscript-drawer-title" tabindex="-1" class="absolute right-0 top-0 h-full w-full max-w-md p-4 sm:p-6" style="background: var(--color-surface); border-left: 1px solid var(--color-border); box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 id="manuscript-drawer-title" class="text-lg font-semibold"></h3>
+                <p id="manuscript-drawer-subtitle" class="text-sm" style="color: var(--color-text-secondary);"></p>
+              </div>
+              <button id="manuscript-drawer-close" type="button" class="px-2 py-1 rounded-sm text-xs font-system focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Close</button>
+            </div>
+            <div id="manuscript-drawer-content" class="space-y-3 text-sm" style="color: var(--color-text-secondary);"></div>
+          </aside>
+        </div>
+
+        <div id="manuscript-end-story-modal" class="fixed inset-0 hidden z-[230]" aria-hidden="true">
+          <div class="absolute inset-0" data-end-story-backdrop style="background: var(--color-scrim);"></div>
+          <div id="manuscript-end-story-dialog" role="dialog" aria-modal="true" aria-labelledby="manuscript-end-story-title" aria-describedby="manuscript-end-story-body" tabindex="-1" class="absolute left-1/2 top-1/2 w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 rounded-sm p-4 sm:p-5" style="background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: var(--shadow-overlay);">
+            <h3 id="manuscript-end-story-title" class="text-lg font-semibold mb-2">End Story</h3>
+            <p id="manuscript-end-story-body" class="text-sm mb-4" style="color: var(--color-text-secondary);">Confirm ending generation for the current session state. This mirrors the production confirmation dialog placement in manuscript mode.</p>
+            <div class="flex flex-wrap items-center justify-end gap-2">
+              <button id="manuscript-end-story-cancel" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Cancel</button>
+              <button id="manuscript-end-story-confirm" type="button" class="px-3 py-2 rounded-sm font-interface text-xs sm:text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-warning-soft); border: 1px solid var(--color-warning-border); color: var(--color-warning);">Confirm End Story</button>
+            </div>
+          </div>
+        </div>
+      </section>

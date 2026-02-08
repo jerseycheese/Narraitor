@@ -1,0 +1,263 @@
+<section class="section py-8 md:py-12" id="examples">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Component Examples from App</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Real components from the Narraitor application showing the design system in practice.</p>
+
+        <!-- Badges -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Badges</h3>
+          <div class="space-y-4">
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">GENRE & TYPE BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">
+                  Fantasy
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">
+                  Sci-Fi
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Original World
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Set In: Middle Earth
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">STATUS BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Available
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Warning
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  Unavailable
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">COUNTER BADGES</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Characters <span class="ml-1 font-bold">4</span>
+                </span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                  Sessions <span class="ml-1 font-bold">12</span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Alerts/Notifications -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Alerts & Notifications</h3>
+          <div class="space-y-4 max-w-2xl">
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-success); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-success);">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="8 12 12 16 16 10"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-success);">Success</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  Your character has been saved successfully. You can now start a new game session.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-warning); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-warning);">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-warning);">Warning</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  This action cannot be undone. Make sure you have a backup before proceeding.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-error); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-error);">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-error);">Error</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  Failed to load world data. Please check your connection and try again.
+                </div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-lg border p-3 sm:p-4" style="background: var(--color-canvas); border-color: var(--color-info); border-left-width: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-3 sm:left-4 sm:top-4" style="color: var(--color-info);">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <div class="pl-8 sm:pl-7">
+                <h5 class="mb-1 text-sm sm:text-base font-medium leading-none tracking-tight" style="color: var(--color-info);">Info</h5>
+                <div class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                  AI generation may take a few moments. Your progress is automatically saved.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- World/Character Cards -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Content Cards</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+
+            <!-- World Card Example -->
+            <div class="rounded-sm overflow-hidden" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <!-- Card Image -->
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 120px; sm:height: 160px; position: relative;">
+                <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); padding: 4px 8px; border-radius: 4px;">
+                  <div class="font-system text-[10px] sm:text-xs" style="color: white;">ACTIVE</div>
+                </div>
+              </div>
+
+              <!-- Card Content -->
+              <div class="p-4">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 class="font-interface text-base sm:text-lg font-semibold mb-1" style="color: var(--color-text-primary);">The Mechanical Archive</h3>
+                    <p class="text-xs sm:text-sm" style="color: var(--color-text-muted);">Created Jan 28, 2026</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(249, 115, 22, 0.2); color: var(--color-accent);">Steampunk</span>
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    Characters <span class="ml-1 font-bold">3</span>
+                  </span>
+                </div>
+
+                <p class="text-xs sm:text-sm mb-4 leading-relaxed font-narrative" style="color: var(--color-text-secondary);">
+                  A world of clockwork mechanisms and steam-powered wonders, where ancient knowledge is locked in mechanical vaults.
+                </p>
+
+                <div class="flex gap-2">
+                  <button class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm text-xs sm:text-sm font-interface font-medium" style="background: var(--color-accent); color: white;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="inline mr-1" style="margin-bottom: 2px;">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Play
+                  </button>
+                  <button class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm text-xs sm:text-sm font-interface" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Continue Card -->
+            <div class="rounded-sm p-4 sm:p-6" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">CONTINUE_SESSION</div>
+                  <h3 class="font-interface text-lg sm:text-xl font-semibold" style="color: var(--color-text-primary);">The Archive's Secret</h3>
+                </div>
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                  In Progress
+                </span>
+              </div>
+
+              <p class="text-xs sm:text-sm mb-4 font-narrative leading-relaxed" style="color: var(--color-text-secondary);">
+                "The chamber opened before you, its vaulted ceiling disappearing into shadow..."
+              </p>
+
+              <div class="flex items-center gap-3 sm:gap-4 mb-4 text-[10px] sm:text-xs font-system" style="color: var(--color-text-muted);">
+                <span>TURN: 14</span>
+                <span>•</span>
+                <span>LAST_PLAYED: 2h ago</span>
+              </div>
+
+              <button class="w-full px-4 py-2.5 sm:py-3 rounded-sm text-xs sm:text-sm font-interface font-medium" style="background: var(--color-accent); color: white;">
+                Resume Session
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Game Mechanics -->
+        <div class="mb-12" id="mechanics">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Game Mechanics</h3>
+          <div class="space-y-4 max-w-2xl">
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">CHOICE OUTCOME CALLOUT</div>
+              <div class="relative w-full rounded-sm p-3 sm:p-4 border-l-4" style="border-left-color: var(--color-accent); background: linear-gradient(90deg, rgba(249, 115, 22, 0.05), transparent);">
+                <div class="font-system text-xs sm:text-sm font-medium mb-1" style="color: var(--color-accent);">PERCEPTION CHECK: SUCCESS (14 vs DC 12)</div>
+                <div class="font-narrative text-base sm:text-lg italic leading-relaxed" style="color: var(--color-text-secondary);">
+                  You notice a subtle discoloration on the stone wall, revealing the outline of a hidden mechanism.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading States -->
+        <div class="mb-12">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Loading States</h3>
+          <div class="space-y-4 max-w-2xl">
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">SKELETON LOADER (NARRATIVE)</div>
+              <div class="space-y-3">
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; width: 85%; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+                <div style="background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.05), rgba(120, 120, 120, 0.1)); height: 1.25rem; sm:height: 1.5rem; width: 92%; border-radius: 2px; animation: pulse 1.5s ease-in-out infinite;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="font-system text-[10px] sm:text-xs mb-2" style="color: var(--color-text-muted);">SPINNER (BUTTON)</div>
+              <button class="px-4 py-2 sm:px-6 sm:py-3 rounded-sm font-interface text-xs sm:text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.7;">
+                <svg class="animate-spin h-3 w-3 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <style>
+          @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.15; }
+          }
+        </style>
+      </section>
