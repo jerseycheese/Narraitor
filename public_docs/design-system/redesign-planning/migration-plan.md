@@ -139,6 +139,7 @@ Storybook is part of the migration safety net, not optional documentation.
 - Typography all over the place (mix of system fonts and custom choices)
 - No clear hierarchy
 - Tailwind utilities everywhere, hard to maintain
+- Markup bloat: components have deep div nesting and long className strings (80-150 chars) from stacking utilities
 
 **Accessibility gaps:**
 - Missing ARIA attributes
@@ -158,11 +159,12 @@ Storybook is part of the migration safety net, not optional documentation.
 These happen regardless of anything else:
 
 1. **Clean-slate cutover** - Remove legacy visual styling from target surfaces before applying redesign tokens/components
-2. **Streaming stability** - Fix CLS during AI text generation (buffered rendering, scroll anchoring)
-3. **Typography foundation** - Set up CSS variables and semantic tokens (enables everything else)
-4. **Keyboard navigation** - All interactive elements accessible via keyboard
-5. **Color contrast** - Meet WCAG AA minimums (4.5:1 text, 3:1 UI)
-6. **No regressions** - Existing functionality keeps working during migration
+2. **Minimal markup** - Each migrated component uses the least markup needed; no wrapper divs for single styling concerns, no long utility chains where a semantic class suffices
+3. **Streaming stability** - Fix CLS during AI text generation (buffered rendering, scroll anchoring)
+4. **Typography foundation** - Set up CSS variables and semantic tokens (enables everything else)
+5. **Keyboard navigation** - All interactive elements accessible via keyboard
+6. **Color contrast** - Meet WCAG AA minimums (4.5:1 text, 3:1 UI)
+7. **No regressions** - Existing functionality keeps working during migration
 
 Everything else is negotiable or deferrable.
 
@@ -308,6 +310,19 @@ Buffered rendering intercept likely at NarrativeHistoryManager or NarrativeHisto
 - Implement bottom-docked input
 - Add floating HUD
 - Test with real game sessions
+
+**Markup Simplification (Per Component)**
+
+When each component is touched during Phase 2, strip its markup back to the minimum needed. This is not a separate pass -- it happens naturally as part of migration.
+
+Simplification targets:
+- **Reduce wrapper divs**: Remove single-purpose spacing/padding wrappers when the parent or child can absorb the style
+- **Shorten className strings**: Replace long Tailwind utility chains with semantic design token classes or component-level styles. A 15-class string is a sign the component needs a design system abstraction.
+- **Flatten nesting**: If a component has 6+ levels of div nesting, restructure during migration
+- **Extract conditional styling**: Move complex ternary className logic into named variants or data-attribute-driven CSS
+- **Retire wizardStyles.ts pattern**: Replace centralized raw-Tailwind string objects with semantic token classes as wizard components are migrated
+
+Rule of thumb: After migration, a component's JSX should be readable without scrolling horizontally through className attributes.
 
 **Progressive Disclosure Migration - High Risk, Feature Flag**
 - Port marginalia system
@@ -529,6 +544,7 @@ Use this to track progress and know when each phase is done.
 - [ ] Tested with flags on/off
 - [ ] No content jumping in production
 - [ ] Keyboard navigation works on production game session
+- [ ] Migrated components use minimal markup (no unnecessary wrapper divs, no 10+ class utility chains)
 - [ ] Storybook stories updated for migrated components/layouts in same PR
 - [ ] `npm run build-storybook` passes after migration changes
 

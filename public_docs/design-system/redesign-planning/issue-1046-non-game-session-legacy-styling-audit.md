@@ -3,6 +3,7 @@
 - Part of #1020
 - Implements #1046
 - Feeds #1047
+- Companion: [issue-1037 game-session audit](./issue-1037-legacy-styling-audit.md)
 - Last updated: 2026-02-08
 
 ## Inventory baseline captures
@@ -52,6 +53,10 @@ src/components/CharacterCard/CharacterCard.tsx
 src/components/WorldCard/WorldCard.tsx
 src/components/WorldCreationWizard/steps/*
 src/components/CharacterCreationWizard/steps/*
+src/components/GameStartWizard/GameStartWizard.tsx
+src/components/GameStartWizard/steps/WorldSelectionStep.tsx
+src/components/GameStartWizard/steps/CharacterSelectionStep.tsx
+src/components/GameStartWizard/steps/GameReadyStep.tsx
 src/components/devtools/*
 ```
 
@@ -61,10 +66,11 @@ Pattern used for counts: `gray-*`, `text-link-*`, `bg-white`, `border-gray-*`, `
 
 | Scope | Legacy pattern hits |
 | --- | ---: |
-| `src/components/devtools` | 320 |
+| `src/components/devtools` | 283 |
 | `src/components/WorldCreationWizard` | 80 |
 | `src/components/Navigation` | 68 |
 | `src/components/CharacterCreationWizard` | 44 |
+| `src/components/GameStartWizard` | 34 |
 | `src/components/shared/wizard` | 30 |
 | `src/components/Journal` | 22 |
 | `src/app/characters` | 21 |
@@ -75,6 +81,8 @@ Pattern used for counts: `gray-*`, `text-link-*`, `bg-white`, `border-gray-*`, `
 | `src/app/settings` | 1 |
 | `src/components/shared/PageLayout.tsx` | 0 |
 | `src/components/shared/SectionWrapper.tsx` | 0 |
+
+Counts produced with: `grep -r '<pattern>' --include='*.tsx' --include='*.ts' <scope> | wc -l`
 
 ### `wizardStyles` consumer set (cross-domain coupling)
 
@@ -117,6 +125,10 @@ src/components/world/SmartTemplates/TemplatePreview.tsx
 | `src/components/devtools/EndingImageDebugSection/EndingImageDebugSection.tsx` | 50 |
 | `src/components/devtools/PortraitDebugSection/PromptBreakdown.tsx` | 38 |
 | `src/components/devtools/ErrorSection/ErrorSection.tsx` | 34 |
+| `src/components/GameStartWizard/steps/CharacterSelectionStep.tsx` | 10 |
+| `src/components/GameStartWizard/steps/GameReadyStep.tsx` | 9 |
+| `src/components/GameStartWizard/steps/WorldSelectionStep.tsx` | 6 |
+| `src/components/GameStartWizard/GameStartWizard.tsx` | 5 |
 | `src/components/CharacterCard/CharacterCard.tsx` | 9 |
 | `src/components/WorldCard/WorldCard.tsx` | 5 |
 | `src/components/shared/cards/CardActionGroup.tsx` | 8 |
@@ -210,13 +222,14 @@ Required surfaces in this artifact:
 
 - Game-session rendering surfaces and gameplay composition changes tracked in #1037/#1038/#1034.
 - Streaming behavior migration and scroll anchoring implementation tracked in #1033.
+- Dev harness routes (`src/app/dev/*`) -- developer-facing test and demo pages (~219 legacy pattern hits across 23 files); not user-facing production surfaces and will inherit design system changes through the components they exercise.
 - Production code changes for this audit issue; implementation belongs to #1038 and #1047.
 
 ## Adjacent risks
 
 - #1037 marked `.text-link-*` for removal in #1038, but #1046 inventory found active non-game-session callsites in 10 files; unsynchronized removal will regress navigation/workshop links.
 - `wizardStyles` is a high-coupling shared layer used across world + character workflows; local fixes can reintroduce legacy neutral colors if migration is not centralized.
-- Devtools components have heavy gray utility usage (`300` gray occurrences across `21` files), but global `.devtools-panel*` selectors appear orphaned and can drift from actual component styling.
+- Devtools components have heavy gray utility usage (`283` legacy pattern occurrences across `21` files), but global `.devtools-panel*` selectors appear orphaned and can drift from actual component styling.
 
 ## TS primitives layer findings
 
@@ -267,9 +280,10 @@ Coverage check categories mapped:
 | --- | ---: | --- | --- | --- | --- |
 | Navigation stack (`Navigation`, `MobileNavigationMenu`, `Breadcrumbs`, `RecentPagesDropdown`, `navigationDropdownStyles`) | 70 | `bg-gray-900`, `text-gray-*`, `text-link-nav*`, `bg-blue-*` action accents | Primary nav system still depends on global link utility family and gray palette classes. | Defer to migration issue. | #1047 |
 | Shared wizard style system (`wizardStyles.ts` + world/character wizard steps) | 113 | Centralized gray/blue utility chains, legacy card/button style tokens | High coupling layer can reintroduce legacy neutrals across workshop routes. | Defer to migration issue. | #1047 |
+| Game start wizard (`GameStartWizard`, step components) | 34 | `text-link-primary` + gray/blue utility chains in step selection UI | Pre-game wizard carries legacy link utilities and neutral styling across world/character selection steps. | Defer to migration issue. | #1047 |
 | Shared cards + card consumers (`ActiveStateCard`, `CardActionGroup`, `CharacterCard`, `WorldCard`) | 24 | Gray/blue defaults in shared action and card wrappers | Shared wrappers still carry legacy neutrals and button colors used across domains. | Defer to migration issue. | #1047 |
 | Journal surfaces (`JournalPage`, `JournalEntryList`, `JournalEntryDetail`) | 22 | System-event gray branch styles and mixed neutral conventions | Journal visual hierarchy is split across amber + legacy gray utility chains. | Defer to migration issue. | #1047 |
-| Devtools surfaces (`DevToolsPanel` + section components) | 320 | Dense gray utility chains across 21 files | Largest remaining non-game-session neutral debt; currently non-player-facing but cross-cutting. | Defer to migration issue. | #1047 |
+| Devtools surfaces (`DevToolsPanel` + section components) | 283 | Dense gray utility chains across 21 files | Largest remaining non-game-session neutral debt; currently non-player-facing but cross-cutting. | Defer to migration issue. | #1047 |
 | Shared layout wrappers (`PageLayout`, `SectionWrapper`) | 0 | Semantic tokenized layout wrappers | Baseline wrappers are already aligned and should stay stable. | Keep baseline. | #1047 |
 
 Required one-off pattern classifications:
@@ -307,6 +321,7 @@ Required one-off pattern classifications:
 | Devtools panel and core sections | `src/stories/03-organisms/devtools/panels/DevToolsPanel.stories.tsx`, `src/stories/03-organisms/devtools/panels/AITestingPanel.stories.tsx`, `src/stories/03-organisms/devtools/sections/ErrorSection.stories.tsx`, `src/stories/03-organisms/devtools/sections/StateSection.stories.tsx` | Update in #1047 | Add missing section stories for high-debt devtools modules. |
 | Shared layout wrappers | `src/stories/04-templates/layouts/PageLayout.stories.tsx`, `src/stories/04-templates/layouts/WorldListScreen.stories.tsx` | Keep baseline / update as needed | Route-shell migrations should keep these stories aligned with page composition. |
 | Quick start character surface | `src/stories/03-organisms/game-session/setup/QuickStartCharacters.stories.tsx` | Update in #1047 | Story currently lives under `game-session/setup`; keep linked to character-create migration scope. |
+| Game start wizard | `GameStartWizard.stories.helpers.tsx` (indirect) | Update in #1047 | Add dedicated story coverage when migration changes step styling. |
 | Character index/create route shells | No dedicated route stories | **Update in #1047 (gap)** | Add standalone route-shell story fixtures or equivalent template stories in #1047. |
 | `wizardStyles.ts` foundation contract | No direct story | **Update in #1047 (gap)** | Add direct wizard-style coverage or explicit visual test fixtures. |
 
