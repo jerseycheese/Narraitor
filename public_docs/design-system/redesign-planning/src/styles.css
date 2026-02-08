@@ -19,6 +19,8 @@
       --color-success: #065f46; /* Emerald-800 */
       --color-error: #9f1239;   /* Rose-800 */
       --color-warning: #92400e; /* Amber-800 */
+      --color-warning-soft: rgba(146, 64, 14, 0.14);
+      --color-warning-border: rgba(146, 64, 14, 0.5);
       --color-info: #075985;    /* Sky-800 */
 
       /* Overlay surfaces and scrims */
@@ -54,6 +56,8 @@
       --color-success: #34d399; /* Emerald-400 */
       --color-error: #fb7185;   /* Rose-400 */
       --color-warning: #fbbf24; /* Amber-400 */
+      --color-warning-soft: rgba(251, 191, 36, 0.14);
+      --color-warning-border: rgba(251, 191, 36, 0.5);
       --color-info: #38bdf8;    /* Sky-400 */
 
       /* Overlay surfaces and scrims */
