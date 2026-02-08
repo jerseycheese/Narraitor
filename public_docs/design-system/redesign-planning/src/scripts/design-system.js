@@ -1303,10 +1303,14 @@
       }
 
       menu.addEventListener('click', (event) => {
-        const target = event.target instanceof Element
-          ? event.target.closest('[data-drawer-trigger], #manuscript-open-journal-route, [data-manuscript-control]')
-          : null;
-        if (target) {
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) {
+          return;
+        }
+
+        const isDrawerTrigger = !!target.closest('[data-drawer-trigger]');
+        const shouldCloseMenu = !!target.closest('#manuscript-open-journal-route, [data-manuscript-control]');
+        if (!isDrawerTrigger && shouldCloseMenu) {
           setOpen(false);
         }
       });
@@ -1318,6 +1322,9 @@
 
         const target = event.target;
         if (!(target instanceof Node)) {
+          return;
+        }
+        if (isClickInsideOpenManuscriptDrawer(target)) {
           return;
         }
 
@@ -1363,6 +1370,9 @@
           if (!(target instanceof Node)) {
             return;
           }
+          if (isClickInsideOpenManuscriptDrawer(target)) {
+            return;
+          }
 
           if (button.contains(target) || panel.contains(target)) {
             return;
@@ -1403,6 +1413,19 @@
         activeEndStoryTrigger.focus();
         activeEndStoryTrigger = null;
       }
+    }
+
+    function isClickInsideOpenManuscriptDrawer(target) {
+      if (!(target instanceof Element)) {
+        return false;
+      }
+
+      const drawerOverlay = document.getElementById('manuscript-drawer-overlay');
+      if (!(drawerOverlay instanceof HTMLElement) || drawerOverlay.classList.contains('hidden')) {
+        return false;
+      }
+
+      return drawerOverlay.contains(target);
     }
 
     function getFocusableElements(container) {
@@ -1632,9 +1655,7 @@
         content.innerHTML = drawerData.body;
         overlay.classList.remove('hidden');
         overlay.setAttribute('aria-hidden', 'false');
-        const headerPanelsToggle = document.getElementById('manuscript-panels-toggle');
-        const shouldReturnToPanelsToggle = trigger instanceof Element && trigger.closest('#manuscript-panels-menu');
-        activeDrawerTrigger = shouldReturnToPanelsToggle ? headerPanelsToggle : (trigger || null);
+        activeDrawerTrigger = trigger || null;
         const focusableElements = getFocusableElements(panel);
         if (focusableElements.length > 0) {
           focusableElements[0].focus();
