@@ -26,32 +26,20 @@
                     <div class="manuscript-overlay-header-left">
                       <div class="manuscript-header-controls flex items-center gap-2">
                         <button id="manuscript-hud-left-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-left-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                          Character HUD
-                        </button>
-                        <button id="manuscript-hud-right-toggle" type="button" aria-expanded="false" aria-controls="manuscript-hud-right-panel" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
-                          Session HUD
+                          Character
                         </button>
                         <button id="manuscript-panels-toggle" type="button" aria-expanded="false" aria-controls="manuscript-panels-menu" class="px-2.5 py-1.5 rounded-sm font-system text-[11px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
                           Tools
                         </button>
                       </div>
-                      <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-64 max-h-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                      <div id="manuscript-hud-left-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
                         <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CHARACTER SNAPSHOT</h4>
                         <div id="manuscript-character-hud-stats" class="space-y-3 text-sm"></div>
                       </div>
-                      <div id="manuscript-hud-right-panel" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-56 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
-                        <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">SESSION DETAILS</h4>
-                        <ul class="space-y-1 text-sm" style="color: var(--color-text-secondary);">
-                          <li>Session ID: <span id="manuscript-session-id"></span></li>
-                          <li>Status: <span id="manuscript-session-status"></span></li>
-                          <li>Narrative Entries: <span id="manuscript-session-narrative-count"></span></li>
-                        </ul>
-                      </div>
-                      <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
+                      <div id="manuscript-panels-menu" hidden class="manuscript-hud-panel manuscript-hud-panel-left w-72 overflow-y-auto rounded-sm p-3" style="background: var(--color-overlay-surface-strong); border: 1px solid var(--color-border);">
                         <h4 class="font-system text-xs mb-2" style="color: var(--color-text-muted);">TOOLS</h4>
                         <div class="space-y-2">
-                          <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character HUD</button>
-                          <button type="button" data-manuscript-control="toggle-session-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session HUD</button>
+                          <button type="button" data-manuscript-control="toggle-character-hud" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Character</button>
                           <button type="button" data-drawer-trigger data-drawer-panel="character" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Character Details</button>
                           <button type="button" data-drawer-trigger data-drawer-panel="inventory" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Inventory</button>
                           <button type="button" data-drawer-trigger data-drawer-panel="story-summary" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Story So Far</button>
@@ -60,6 +48,7 @@
                           <button id="manuscript-open-journal-route" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">Open Journal Route</button>
                           <div class="my-1 border-t" style="border-color: var(--color-border);"></div>
                           <button id="manuscript-simulate-turn" type="button" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Simulate Next Turn</button>
+                          <button id="manuscript-toggle-streaming" type="button" aria-pressed="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Toggle Streaming State</button>
                           <button id="manuscript-toggle-ending-suggestion" type="button" aria-expanded="false" class="w-full text-left px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Show Ending Suggestion</button>
                         </div>
                       </div>
@@ -359,7 +348,7 @@
                     <td class="py-2 pr-4">No</td>
                     <td class="py-2 pr-4">No</td>
                     <td class="py-2 pr-4">Yes</td>
-                    <td class="py-2">Removed from narrative body; location context is already represented in Session HUD.</td>
+                    <td class="py-2">Removed from narrative body; location context available via Character Details drawer.</td>
                   </tr>
                   <tr style="border-bottom: 1px solid var(--color-border);">
                     <td class="py-2 pr-4"><code>InventoryList</code> “Use” action button</td>

@@ -328,6 +328,7 @@
       border: 1px solid var(--color-border);
       border-radius: 3px;
       padding: 0.75rem;
+      overflow-y: auto;
     }
 
     .manuscript-rail-spacer {
@@ -346,7 +347,7 @@
       .manuscript-characters-rail {
         display: block;
         position: sticky;
-        top: 0.25rem;
+        top: var(--manuscript-characters-rail-top, 0.25rem);
       }
 
       .manuscript-main-content {
@@ -396,10 +397,6 @@
       left: 0;
     }
 
-    .manuscript-hud-panel-right {
-      right: 0;
-    }
-
     @media (max-width: 1023px) {
       .manuscript-overlay-header {
         grid-template-columns: minmax(0, 1fr) auto;
@@ -407,8 +404,7 @@
         align-items: center;
       }
 
-      #manuscript-hud-left-toggle,
-      #manuscript-hud-right-toggle {
+      #manuscript-hud-left-toggle {
         display: none;
       }
 
@@ -561,4 +557,43 @@
 
     .skip-link:focus {
       top: 0;
+    }
+
+    /* Streaming state - disabled input during AI generation */
+    .manuscript-action-rail-streaming #manuscript-input,
+    .manuscript-action-rail-streaming #manuscript-send,
+    .manuscript-action-rail-streaming .manuscript-suggested-action {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .manuscript-action-rail-streaming #manuscript-input {
+      background: var(--color-surface-hover);
+    }
+
+    .manuscript-action-rail-streaming #manuscript-input::placeholder {
+      color: var(--color-accent);
+      opacity: 1;
+    }
+
+    /* Streaming text animation for narrative growth */
+    .manuscript-streaming-segment {
+      display: inline;
+    }
+
+    .manuscript-streaming-word {
+      opacity: 0;
+      animation: manuscript-word-appear 0.15s ease-out forwards;
+    }
+
+    @keyframes manuscript-word-appear {
+      from {
+        opacity: 0;
+        transform: translateY(2px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }

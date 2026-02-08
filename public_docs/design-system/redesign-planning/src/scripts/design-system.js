@@ -9,10 +9,6 @@
         buttonId: 'manuscript-hud-left-toggle',
         panelId: 'manuscript-hud-left-panel',
       },
-      {
-        buttonId: 'manuscript-hud-right-toggle',
-        panelId: 'manuscript-hud-right-panel',
-      },
     ];
     const manuscriptSourceRecords = {
       session: {
@@ -24,13 +20,15 @@
       character: {
         id: 'char-cyberpunk-hacker',
         name: 'Nova "Ghost" Chen',
+        worldId: 'world-cyberpunk-2077',
         level: 3,
+        isPlayer: true,
         description: 'Elite corporate hacker turned underground resistance fighter',
-        backgroundHistory: 'Former Arasaka security specialist who discovered dark corporate secrets',
-        location: 'Neo-Tokyo Underground',
         portrait: {
           type: 'ai-generated',
-          url: '/visual-assets/portrait-cyberpunk.png',
+          url: 'https://api.dicebear.com/7.x/personas/svg?seed=nova-ghost&backgroundColor=18181b',
+          generatedAt: '2024-01-01T01:00:00.000Z',
+          prompt: 'Cyberpunk hacker with tech augments',
         },
         attributes: [
           { id: 'char-attr-tech-level', name: 'Tech Level', baseValue: 8, modifiedValue: 8 },
@@ -40,12 +38,47 @@
           { id: 'char-skill-hacking', worldSkillId: 'skill-world-cyberpunk-2077-1', name: 'Hacking', level: 12 },
           { id: 'char-skill-streetwise', worldSkillId: 'skill-world-cyberpunk-2077-2', name: 'Streetwise', level: 8 },
         ],
+        derivedStats: [],
+        background: {
+          history: 'Former Arasaka security specialist who discovered dark corporate secrets',
+          personality: 'Cynical but loyal, values freedom over security',
+          goals: ['Expose corporate corruption', 'Protect the innocent'],
+          fears: ['Corporate retaliation', 'Loss of freedom'],
+          physicalDescription: 'Lean build with cybernetic eye implant and neural interface ports',
+          relationships: [],
+          isKnownFigure: false,
+        },
+        status: {
+          health: 85,
+          maxHealth: 100,
+          conditions: ['Cybernetic Enhancement'],
+          location: 'Neo-Tokyo Underground',
+        },
+        inventory: {
+          characterId: 'char-cyberpunk-hacker',
+          items: [],
+          capacity: 15,
+          categories: [],
+          itemOrder: [],
+        },
+        createdAt: '2024-01-01T01:00:00.000Z',
+        updatedAt: '2024-01-01T01:00:00.000Z',
       },
       npcs: [
         {
           id: 'npc-fixer',
           name: 'Wireline Fixer',
-          avatarUrl: '',
+          avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=fixer&backgroundColor=3f3f46',
+        },
+        {
+          id: 'npc-raven',
+          name: 'Raven',
+          avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=raven&backgroundColor=1e293b',
+        },
+        {
+          id: 'npc-kira',
+          name: 'Kira Tanaka',
+          avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=kira&backgroundColor=312e81',
         },
       ],
       inventoryItems: [
@@ -115,11 +148,11 @@
           id: 'segment-cyberpunk-4',
           sessionId: 'session-cyberpunk-ghost',
           type: 'transition',
-          characterIds: ['char-cyberpunk-hacker'],
+          characterIds: ['char-cyberpunk-hacker', 'npc-raven', 'npc-kira'],
           content: 'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
           metadata: {
             location: 'Arasaka building',
-            characterIds: ['char-cyberpunk-hacker'],
+            characterIds: ['char-cyberpunk-hacker', 'npc-raven', 'npc-kira'],
           },
         },
       ],
@@ -163,28 +196,107 @@
       ],
       journalEntries: [
         {
+          id: 'entry-cyberpunk-session-start',
+          sessionId: 'session-cyberpunk-ghost',
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
+          type: 'session_start',
+          title: 'Session Start',
+          content: 'Nova slips into the neon grid, preparing for the Arasaka breach.',
+          significance: 'minor',
+          isRead: true,
+          relatedEntities: [],
+          metadata: {
+            tags: ['session'],
+            automaticEntry: true,
+            sessionStartTime: '2024-01-01T02:00:00.000Z',
+            sessionContext: {
+              worldName: 'Neo-Tokyo',
+              characterName: 'Nova "Ghost" Chen',
+              sessionNumber: 1,
+            },
+          },
+          createdAt: '2024-01-01T02:00:30.000Z',
+          updatedAt: '2024-01-01T02:00:30.000Z',
+        },
+        {
           id: 'entry-cyberpunk-decision',
           sessionId: 'session-cyberpunk-ghost',
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
           type: 'decision',
           title: 'Decision',
           content: 'Chose the ventilation route to avoid the main lobby scanners.',
           detailedContent: 'Nova reroutes power to the ventilation shafts, trusting stealth over speed. The detour buys time and keeps Arasaka\'s lobby scanners blind.',
+          significance: 'major',
+          isRead: false,
+          relatedEntities: [
+            {
+              type: 'location',
+              id: 'location-arasaka-tower',
+              name: 'Arasaka Tower',
+            },
+          ],
+          metadata: {
+            tags: ['decision', 'stealth'],
+            automaticEntry: false,
+            decisionId: 'decision-cyberpunk-route',
+            decisionPrompt: 'How do you want to reach the 47th floor?',
+            choiceText: 'Crawl through the ventilation system - stealthy but difficult',
+          },
+          createdAt: '2024-01-01T02:02:10.000Z',
+          updatedAt: '2024-01-01T02:02:10.000Z',
         },
         {
           id: 'entry-cyberpunk-discovery',
           sessionId: 'session-cyberpunk-ghost',
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
           type: 'discovery',
           title: 'Discovery',
           content: 'Found a hidden relay broadcasting Arasaka executive calls.',
           detailedContent: 'A concealed relay node pulses beneath the floor panel, routing encrypted executive calls. The signal pattern suggests a private line to the board.',
+          significance: 'major',
+          isRead: false,
+          relatedEntities: [
+            {
+              type: 'item',
+              id: 'item-relay-node',
+              name: 'Signal Relay Node',
+            },
+          ],
+          metadata: {
+            tags: ['intel', 'arasaka'],
+            automaticEntry: false,
+          },
+          createdAt: '2024-01-01T02:03:20.000Z',
+          updatedAt: '2024-01-01T02:03:20.000Z',
         },
         {
           id: 'entry-cyberpunk-world-event',
           sessionId: 'session-cyberpunk-ghost',
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
           type: 'world_event',
           title: 'World Event',
           content: 'Security drones sweep the corridor as alarms spike.',
           detailedContent: 'Alarms crackle to life as a wave of security drones sweeps the executive corridor. The neon haze outside flickers with emergency broadcasts.',
+          significance: 'critical',
+          isRead: true,
+          relatedEntities: [
+            {
+              type: 'event',
+              id: 'event-alarm-surge',
+              name: 'Alarm Surge',
+            },
+          ],
+          metadata: {
+            tags: ['security', 'alarms'],
+            automaticEntry: true,
+            narrativeSegmentId: 'segment-cyberpunk-4',
+          },
+          createdAt: '2024-01-01T02:04:10.000Z',
+          updatedAt: '2024-01-01T02:04:10.000Z',
         },
       ],
     };
@@ -200,6 +312,27 @@
 
     function formatEntryType(type) {
       return String(type).replace(/_/g, ' ').toUpperCase();
+    }
+
+    function formatTimestamp(value) {
+      if (!value) {
+        return 'Unknown';
+      }
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
+
+      return date.toLocaleString();
+    }
+
+    function formatInlineLabel(value) {
+      if (!value) {
+        return 'Unknown';
+      }
+      const normalized = String(value).replace(/_/g, ' ').trim();
+      return normalized.charAt(0).toUpperCase() + normalized.slice(1);
     }
 
     function stripMarkdownFormatting(content) {
@@ -278,6 +411,19 @@
       return deriveFallbackCharacterName(characterId);
     }
 
+    function resolveCharacterAvatarUrl(characterId) {
+      if (characterId === manuscriptSourceRecords.character.id) {
+        return manuscriptSourceRecords.character.portrait?.url || '';
+      }
+
+      const matchingNpc = (manuscriptSourceRecords.npcs || []).find((npc) => npc.id === characterId);
+      if (matchingNpc && matchingNpc.avatarUrl) {
+        return matchingNpc.avatarUrl;
+      }
+
+      return '';
+    }
+
     function renderManuscriptNarrativeFromSourceRecords() {
       const narrativeStream = document.getElementById('manuscript-narrative-stream');
       const charactersPresentList = document.getElementById('manuscript-characters-present-list');
@@ -311,11 +457,18 @@
         : [];
 
       const participantMarkup = activeSegmentCharacterIds.length > 0
-        ? activeSegmentCharacterIds.map((characterId) => `<span class="inline-flex items-center rounded-sm px-2 py-1 text-xs font-interface" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(resolveCharacterName(characterId))}</span>`).join('')
+        ? activeSegmentCharacterIds.map((characterId) => {
+          const avatarUrl = resolveCharacterAvatarUrl(characterId);
+          const avatarMarkup = avatarUrl
+            ? `<img src="${escapeHtml(avatarUrl)}" alt="" class="w-5 h-5 rounded-full object-cover" style="border: 1px solid var(--color-border);" />`
+            : '';
+          return `<span class="inline-flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs font-interface" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${avatarMarkup}${escapeHtml(resolveCharacterName(characterId))}</span>`;
+        }).join('')
         : '<p class="text-xs" style="color: var(--color-text-secondary);">No participants recorded.</p>';
 
       charactersPresentList.innerHTML = participantMarkup;
       charactersPresentMobileList.innerHTML = participantMarkup;
+      syncManuscriptCharactersRailPosition();
 
       narrativeStream.innerHTML = sessionNarrativeSegments.map((segment) => {
         const metadata = segment.metadata || {};
@@ -445,11 +598,77 @@
       });
     }
 
+    function syncManuscriptCharactersRailPosition() {
+      const charactersRail = document.getElementById('manuscript-characters-present-rail');
+      const overlayHeader = document.querySelector('.manuscript-overlay-header');
+      const mainStage = document.querySelector('.manuscript-main-stage');
+      const actionRail = document.getElementById('manuscript-action-rail');
+      const overlay = document.getElementById('manuscript-viewport-layer');
+      const characterPanel = document.getElementById('manuscript-hud-left-panel');
+      const toolsPanel = document.getElementById('manuscript-panels-menu');
+      const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+
+      if (!(charactersRail instanceof HTMLElement)) {
+        return;
+      }
+
+      if (!desktopMediaQuery.matches) {
+        charactersRail.style.removeProperty('position');
+        charactersRail.style.removeProperty('top');
+        charactersRail.style.removeProperty('left');
+        charactersRail.style.removeProperty('width');
+        charactersRail.style.removeProperty('maxHeight');
+        charactersRail.style.removeProperty('z-index');
+        if (characterPanel) characterPanel.style.removeProperty('maxHeight');
+        if (toolsPanel) toolsPanel.style.removeProperty('maxHeight');
+        return;
+      }
+
+      if (
+        !(overlayHeader instanceof HTMLElement)
+        || !(mainStage instanceof HTMLElement)
+        || !(actionRail instanceof HTMLElement)
+        || !(overlay instanceof HTMLElement)
+        || overlay.classList.contains('hidden')
+      ) {
+        return;
+      }
+
+      const headerRect = overlayHeader.getBoundingClientRect();
+      const mainStageRect = mainStage.getBoundingClientRect();
+      const actionRailRect = actionRail.getBoundingClientRect();
+      const gapPx = 8;
+
+      // Calculate available space between header bottom and action rail top
+      const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
+      const halfSpace = Math.floor(availableSpace / 2);
+
+      // Set max-height for dropdown panels (top half)
+      if (characterPanel) {
+        characterPanel.style.maxHeight = `${halfSpace}px`;
+      }
+      if (toolsPanel) {
+        toolsPanel.style.maxHeight = `${halfSpace}px`;
+      }
+
+      // Set max-height for characters rail (bottom half)
+      charactersRail.style.maxHeight = `${halfSpace}px`;
+
+      // Always anchor characters rail to the bottom (above action rail)
+      const charactersRailRect = charactersRail.getBoundingClientRect();
+      const railHeight = Math.min(charactersRailRect.height, halfSpace);
+      const railTop = actionRailRect.top - railHeight - gapPx;
+      const railWidth = Math.max(0, Math.min(charactersRailRect.width, mainStageRect.width));
+
+      charactersRail.style.position = 'fixed';
+      charactersRail.style.top = `${railTop}px`;
+      charactersRail.style.left = `${mainStageRect.left}px`;
+      charactersRail.style.width = `${railWidth}px`;
+      charactersRail.style.zIndex = '20';
+    }
+
     function renderManuscriptHudFromSourceRecords() {
       const characterStatsContainer = document.getElementById('manuscript-character-hud-stats');
-      const sessionId = document.getElementById('manuscript-session-id');
-      const sessionStatus = document.getElementById('manuscript-session-status');
-      const sessionNarrativeCount = document.getElementById('manuscript-session-narrative-count');
 
       if (characterStatsContainer) {
         const characterPortraitUrl = resolveAssetUrl(manuscriptSourceRecords.character.portrait?.url || '');
@@ -495,19 +714,6 @@
           ${skillSection}
         `;
       }
-
-      if (sessionId) {
-        sessionId.textContent = manuscriptSourceRecords.session.id;
-      }
-      if (sessionStatus) {
-        sessionStatus.textContent = manuscriptSourceRecords.session.status;
-      }
-      if (sessionNarrativeCount) {
-        const sessionNarrativeSegments = manuscriptSourceRecords.narrativeSegments.filter(
-          (segment) => segment.sessionId === manuscriptSourceRecords.session.id,
-        );
-        sessionNarrativeCount.textContent = String(sessionNarrativeSegments.length);
-      }
     }
 
     function openManuscriptOverlay() {
@@ -526,6 +732,7 @@
       }
 
       lockManuscriptScroll();
+      requestAnimationFrame(syncManuscriptCharactersRailPosition);
       closeButton.focus();
     }
 
@@ -688,6 +895,7 @@
         toggleSuggestedActionsButton.textContent = isVisible
           ? 'Hide Suggested Actions'
           : `Suggested Actions (${suggestedActionButtons.length})`;
+        syncManuscriptCharactersRailPosition();
       };
 
       const syncSuggestedActionsForViewport = () => {
@@ -714,6 +922,7 @@
         endingSuggestion.hidden = !isVisible;
         toggleEndingSuggestionButton.setAttribute('aria-expanded', String(isVisible));
         toggleEndingSuggestionButton.textContent = isVisible ? 'Hide Ending Suggestion' : 'Show Ending Suggestion';
+        syncManuscriptCharactersRailPosition();
       };
 
       const openManuscriptEndStoryModal = (trigger) => {
@@ -865,7 +1074,6 @@
       const controlTargetsByKey = {
         'end-story': 'manuscript-end-story',
         'toggle-character-hud': 'manuscript-hud-left-toggle',
-        'toggle-session-hud': 'manuscript-hud-right-toggle',
       };
 
       manuscriptControlButtons.forEach((controlButton) => {
@@ -920,6 +1128,87 @@
           input.value = '';
           setActiveSuggestedActionButton(null);
           updateCount();
+        });
+      }
+
+      const toggleStreamingButton = document.getElementById('manuscript-toggle-streaming');
+      const actionRail = document.getElementById('manuscript-action-rail');
+      const defaultPlaceholder = 'Or write your own action...';
+      const streamingPlaceholder = 'Generating response...';
+
+      const streamingNarrativeFixture = 'The console flickered once, twice, then stabilized. A cascade of symbols scrolled across the display—ancient glyphs that predated even the earliest corporate archives. Your neural interface tingled as the data stream began to synchronize, pulling fragments of forgotten knowledge from the depths of the Arasaka mainframe.';
+
+      let streamingIntervalId = null;
+      let streamingTokens = [];
+      let streamingTokenIndex = 0;
+
+      const startStreamingDemo = () => {
+        if (!(narrativeStream instanceof HTMLElement)) {
+          return;
+        }
+
+        streamingTokens = streamingNarrativeFixture.split(/(\s+)/).filter(Boolean);
+        streamingTokenIndex = 0;
+
+        const streamingParagraph = document.createElement('p');
+        streamingParagraph.className = 'text-narrative manuscript-streaming-segment';
+        streamingParagraph.setAttribute('aria-live', 'polite');
+        narrativeStream.appendChild(streamingParagraph);
+
+        const appendNextToken = () => {
+          if (streamingTokenIndex >= streamingTokens.length) {
+            clearInterval(streamingIntervalId);
+            streamingIntervalId = null;
+            return;
+          }
+
+          const token = streamingTokens[streamingTokenIndex];
+          const isWhitespace = /^\s+$/.test(token);
+
+          if (isWhitespace) {
+            streamingParagraph.appendChild(document.createTextNode(token));
+          } else {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'manuscript-streaming-word';
+            wordSpan.textContent = token;
+            streamingParagraph.appendChild(wordSpan);
+          }
+
+          streamingTokenIndex += 1;
+
+          if (narrativeScrollContainer instanceof HTMLElement) {
+            narrativeScrollContainer.scrollTop = narrativeScrollContainer.scrollHeight;
+          }
+        };
+
+        streamingIntervalId = setInterval(appendNextToken, 50);
+      };
+
+      const stopStreamingDemo = () => {
+        if (streamingIntervalId) {
+          clearInterval(streamingIntervalId);
+          streamingIntervalId = null;
+        }
+      };
+
+      if (toggleStreamingButton && actionRail) {
+        toggleStreamingButton.addEventListener('click', () => {
+          const isStreaming = actionRail.classList.contains('manuscript-action-rail-streaming');
+          actionRail.classList.toggle('manuscript-action-rail-streaming', !isStreaming);
+          toggleStreamingButton.setAttribute('aria-pressed', String(!isStreaming));
+          toggleStreamingButton.textContent = isStreaming ? 'Toggle Streaming State' : 'Stop Streaming Demo';
+
+          if (!isStreaming) {
+            input.setAttribute('disabled', 'disabled');
+            input.placeholder = streamingPlaceholder;
+            sendButton.setAttribute('disabled', 'disabled');
+            startStreamingDemo();
+          } else {
+            input.removeAttribute('disabled');
+            input.placeholder = defaultPlaceholder;
+            sendButton.removeAttribute('disabled');
+            stopStreamingDemo();
+          }
         });
       }
 
@@ -997,6 +1286,7 @@
         if (railToggle) {
           railToggle.setAttribute('aria-expanded', String(isOpen));
         }
+        requestAnimationFrame(syncManuscriptCharactersRailPosition);
       };
 
       const handleToggle = () => {
@@ -1061,6 +1351,26 @@
           }
           button.setAttribute('aria-expanded', String(nextState));
           panel.hidden = !nextState;
+          requestAnimationFrame(syncManuscriptCharactersRailPosition);
+        });
+
+        document.addEventListener('click', (event) => {
+          if (panel.hidden) {
+            return;
+          }
+
+          const target = event.target;
+          if (!(target instanceof Node)) {
+            return;
+          }
+
+          if (button.contains(target) || panel.contains(target)) {
+            return;
+          }
+
+          button.setAttribute('aria-expanded', 'false');
+          panel.hidden = true;
+          requestAnimationFrame(syncManuscriptCharactersRailPosition);
         });
       });
     }
@@ -1205,27 +1515,71 @@
         ).join('')
         : '<p style="color: var(--color-text-secondary);">No narrative segments found for this session.</p>';
 
-      const choiceHistoryMarkup = sessionDecisions.length > 0
-        ? sessionDecisions.map((decision) => {
+      const impactfulDecisionWeights = new Set(['major', 'critical']);
+      const rankedDecisions = [...sessionDecisions].sort((left, right) => {
+        const leftTime = left.selectedAt ? new Date(left.selectedAt).getTime() : 0;
+        const rightTime = right.selectedAt ? new Date(right.selectedAt).getTime() : 0;
+        return rightTime - leftTime;
+      });
+      const impactfulDecisions = rankedDecisions.filter((decision) => impactfulDecisionWeights.has(decision.decisionWeight || ''));
+      const decisionsForHistory = (impactfulDecisions.length > 0 ? impactfulDecisions : rankedDecisions).slice(0, 3);
+
+      const choiceHistoryMarkup = decisionsForHistory.length > 0
+        ? decisionsForHistory.map((decision) => {
           const selectedOption = decision.options.find((option) => option.id === decision.selectedOptionId);
           const outcomeSegment = sessionNarrativeSegments.find(
             (segment) => segment.metadata && segment.metadata.causedByDecisionId === decision.id,
           );
-          const outcomeText = outcomeSegment?.content || 'No outcome segment linked yet.';
+          const outcomeText = stripMarkdownFormatting(outcomeSegment?.content || 'Impact is still unfolding.');
+          const outcomeType = outcomeSegment?.metadata?.decisionOutcome
+            ? formatInlineLabel(outcomeSegment.metadata.decisionOutcome)
+            : 'In progress';
 
-          return `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-            <p class="text-sm"><strong style="color: var(--color-text-primary);">Prompt:</strong> ${escapeHtml(decision.prompt)}</p>
-            <p class="text-sm mt-1"><strong style="color: var(--color-text-primary);">Selected:</strong> ${escapeHtml(selectedOption?.text || decision.selectedOptionId || 'Unknown option')}</p>
-            <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">Outcome:</strong> ${escapeHtml(outcomeText)}</p>
+          return `<article class="rounded-sm p-3 space-y-1.5" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <p class="text-sm font-semibold" style="color: var(--color-text-primary);">${escapeHtml(selectedOption?.text || decision.selectedOptionId || 'Unknown choice')}</p>
+              <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(outcomeType)}</span>
+            </div>
+            <p class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">${escapeHtml(outcomeText)}</p>
+            <div class="flex flex-wrap gap-3 text-[11px] font-system" style="color: var(--color-text-muted);">
+              <span>${escapeHtml(formatInlineLabel(decision.decisionWeight || 'major'))} decision</span>
+              <span>${escapeHtml(formatTimestamp(decision.selectedAt))}</span>
+            </div>
           </article>`;
         }).join('')
-        : '<p style="color: var(--color-text-secondary);">No recorded choices found for this session.</p>';
+        : '<p style="color: var(--color-text-secondary);">No impactful choices yet.</p>';
 
       const journalSnapshotMarkup = sessionJournalEntries.length > 0
-        ? sessionJournalEntries.map((entry) => `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
-            <p class="text-sm"><strong style="color: var(--color-text-primary);">${escapeHtml(entry.title)}</strong></p>
-            <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);">${escapeHtml(entry.content)}</p>
-          </article>`).join('')
+        ? [...sessionJournalEntries]
+          .sort((left, right) => {
+            const leftTime = left.createdAt ? new Date(left.createdAt).getTime() : 0;
+            const rightTime = right.createdAt ? new Date(right.createdAt).getTime() : 0;
+            return rightTime - leftTime;
+          })
+          .slice(0, 5)
+          .map((entry) => {
+            const significance = formatInlineLabel(entry.significance || 'minor');
+            const relatedNames = (entry.relatedEntities || []).map((entity) => entity.name).filter(Boolean);
+            const relatedLabel = relatedNames.length > 0 ? relatedNames.join(', ') : null;
+            const isUnread = entry.isRead === false;
+
+            return `<article class="rounded-sm p-3 space-y-1.5" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-semibold" style="color: var(--color-text-primary);">${escapeHtml(entry.title || formatInlineLabel(entry.type))}</p>
+                <div class="flex items-center gap-2">
+                  ${isUnread
+    ? '<span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35); color: var(--color-accent);">New</span>'
+    : ''}
+                  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(significance)}</span>
+                </div>
+              </div>
+              <p class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">${escapeHtml(entry.content)}</p>
+              <div class="flex flex-wrap gap-3 text-[11px] font-system" style="color: var(--color-text-muted);">
+                <span>${escapeHtml(formatTimestamp(entry.createdAt))}</span>
+                ${relatedLabel ? `<span>${escapeHtml(relatedLabel)}</span>` : ''}
+              </div>
+            </article>`;
+          }).join('')
         : '<p style="color: var(--color-text-secondary);">No journal entries found for this session.</p>';
 
       const drawerContentByPanel = {
@@ -1233,9 +1587,21 @@
           title: 'Character Details',
           subtitle: `Character ID: ${manuscriptSourceRecords.character.id}`,
           body: `<p><strong style="color: var(--color-text-primary);">Name:</strong> ${escapeHtml(manuscriptSourceRecords.character.name)}</p>
+            <p><strong style="color: var(--color-text-primary);">World ID:</strong> ${escapeHtml(manuscriptSourceRecords.character.worldId)}</p>
+            <p><strong style="color: var(--color-text-primary);">Level:</strong> ${escapeHtml(manuscriptSourceRecords.character.level)}</p>
+            <p><strong style="color: var(--color-text-primary);">Player Character:</strong> ${manuscriptSourceRecords.character.isPlayer ? 'Yes' : 'No'}</p>
             <p><strong style="color: var(--color-text-primary);">Description:</strong> ${escapeHtml(manuscriptSourceRecords.character.description)}</p>
-            <p><strong style="color: var(--color-text-primary);">History:</strong> ${escapeHtml(manuscriptSourceRecords.character.backgroundHistory)}</p>
-            <p><strong style="color: var(--color-text-primary);">Location:</strong> ${escapeHtml(manuscriptSourceRecords.character.location)}</p>`,
+            <p><strong style="color: var(--color-text-primary);">Background History:</strong> ${escapeHtml(manuscriptSourceRecords.character.background?.history || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Background Personality:</strong> ${escapeHtml(manuscriptSourceRecords.character.background?.personality || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Goals:</strong> ${escapeHtml((manuscriptSourceRecords.character.background?.goals || []).join(', ') || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Fears:</strong> ${escapeHtml((manuscriptSourceRecords.character.background?.fears || []).join(', ') || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Physical Description:</strong> ${escapeHtml(manuscriptSourceRecords.character.background?.physicalDescription || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Health:</strong> ${escapeHtml(manuscriptSourceRecords.character.status?.health || 'Unknown')} / ${escapeHtml(manuscriptSourceRecords.character.status?.maxHealth || 'Unknown')}</p>
+            <p><strong style="color: var(--color-text-primary);">Conditions:</strong> ${escapeHtml((manuscriptSourceRecords.character.status?.conditions || []).join(', ') || 'None')}</p>
+            <p><strong style="color: var(--color-text-primary);">Status Location:</strong> ${escapeHtml(manuscriptSourceRecords.character.status?.location || 'Unknown')}</p>
+            <p><strong style="color: var(--color-text-primary);">Inventory Capacity:</strong> ${escapeHtml(manuscriptSourceRecords.character.inventory?.capacity || 'Unknown')}</p>
+            <p><strong style="color: var(--color-text-primary);">Created:</strong> ${escapeHtml(formatTimestamp(manuscriptSourceRecords.character.createdAt))}</p>
+            <p><strong style="color: var(--color-text-primary);">Updated:</strong> ${escapeHtml(formatTimestamp(manuscriptSourceRecords.character.updatedAt))}</p>`,
         },
         inventory: {
           title: 'Inventory',
@@ -1249,7 +1615,7 @@
         },
         'choice-history': {
           title: 'Choice History',
-          subtitle: `Session ID: ${manuscriptSourceRecords.session.id}`,
+          subtitle: 'Last 3 impactful decisions',
           body: choiceHistoryMarkup,
         },
         journal: {
@@ -1305,6 +1671,7 @@
       initManuscriptInputController();
       initHudControllers();
       initDrawerControllers();
+      window.addEventListener('resize', syncManuscriptCharactersRailPosition);
     });
 
     // Close nav when clicking outside
@@ -1325,3 +1692,123 @@
         closeManuscriptEndStoryModal();
       }
     });
+
+    // --- Standalone Streaming Demo ---
+
+    const standaloneStreamFixture = 'The archive stretched before you, row upon row of crystalline data cores humming with the accumulated knowledge of a thousand generations. Your footsteps echoed against marble floors that had witnessed the rise and fall of empires. Somewhere in this labyrinth of light and shadow, the answer waited.';
+
+    const standaloneHistoryFixtures = [
+      'The heavy air of the archive smelled of ozone and ancient parchment. You moved through the rows of shelving, your lantern casting long, flickering shadows that seemed to whisper of secrets long buried.',
+      'At the end of the hall, a single pedestal stood bathed in a shaft of pale moonlight. Resting upon it was the artifact you had sought for years.',
+      'As your hand closed around the cool metal, the floor beneath you groaned. The mechanism was ancient, but it was still alive.',
+    ];
+
+    function initStandaloneStreamingDemo() {
+      const singleContainer = document.getElementById('standalone-stream-container');
+      const historyContainer = document.getElementById('standalone-history-container');
+      const startSingleBtn = document.getElementById('start-standalone-stream');
+      const resetSingleBtn = document.getElementById('reset-standalone-stream');
+      const startHistoryBtn = document.getElementById('start-standalone-history');
+      const resetHistoryBtn = document.getElementById('reset-standalone-history');
+
+      if (!singleContainer || !startSingleBtn) {
+        return;
+      }
+
+      let singleIntervalId = null;
+      let historyIntervalId = null;
+
+      const streamTextToContainer = (container, text, onComplete) => {
+        const tokens = text.split(/(\s+)/).filter(Boolean);
+        let tokenIndex = 0;
+
+        const paragraph = document.createElement('p');
+        paragraph.className = 'manuscript-streaming-segment';
+        container.appendChild(paragraph);
+
+        const appendNextToken = () => {
+          if (tokenIndex >= tokens.length) {
+            if (onComplete) onComplete();
+            return null;
+          }
+
+          const token = tokens[tokenIndex];
+          const isWhitespace = /^\s+$/.test(token);
+
+          if (isWhitespace) {
+            paragraph.appendChild(document.createTextNode(token));
+          } else {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'manuscript-streaming-word';
+            wordSpan.textContent = token;
+            paragraph.appendChild(wordSpan);
+          }
+
+          tokenIndex += 1;
+          container.scrollTop = container.scrollHeight;
+        };
+
+        return setInterval(appendNextToken, 50);
+      };
+
+      startSingleBtn.addEventListener('click', () => {
+        if (singleIntervalId) {
+          clearInterval(singleIntervalId);
+        }
+        singleContainer.innerHTML = '';
+        singleIntervalId = streamTextToContainer(singleContainer, standaloneStreamFixture, () => {
+          clearInterval(singleIntervalId);
+          singleIntervalId = null;
+        });
+      });
+
+      resetSingleBtn.addEventListener('click', () => {
+        if (singleIntervalId) {
+          clearInterval(singleIntervalId);
+          singleIntervalId = null;
+        }
+        singleContainer.innerHTML = '<p class="text-sm" style="color: var(--color-text-muted);">Click "Start Stream" to begin the demo.</p>';
+      });
+
+      if (historyContainer && startHistoryBtn && resetHistoryBtn) {
+        let historySegmentIndex = 0;
+
+        const streamNextHistorySegment = () => {
+          if (historySegmentIndex >= standaloneHistoryFixtures.length) {
+            return;
+          }
+
+          const text = standaloneHistoryFixtures[historySegmentIndex];
+          historySegmentIndex += 1;
+
+          historyIntervalId = streamTextToContainer(historyContainer, text, () => {
+            clearInterval(historyIntervalId);
+            historyIntervalId = null;
+
+            if (historySegmentIndex < standaloneHistoryFixtures.length) {
+              setTimeout(streamNextHistorySegment, 800);
+            }
+          });
+        };
+
+        startHistoryBtn.addEventListener('click', () => {
+          if (historyIntervalId) {
+            clearInterval(historyIntervalId);
+          }
+          historyContainer.innerHTML = '';
+          historySegmentIndex = 0;
+          streamNextHistorySegment();
+        });
+
+        resetHistoryBtn.addEventListener('click', () => {
+          if (historyIntervalId) {
+            clearInterval(historyIntervalId);
+            historyIntervalId = null;
+          }
+          historySegmentIndex = 0;
+          historyContainer.innerHTML = '<p class="text-sm" style="color: var(--color-text-muted);">Click "Start History" to stream multiple segments sequentially.</p>';
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initStandaloneStreamingDemo);
