@@ -17,6 +17,8 @@
 
 **Phase 1: Clean Slate (remove existing styling before migration)**
 - [#1037 - Audit legacy styling before clean-slate migration](https://github.com/jerseycheese/Narraitor/issues/1037)
+- [#1046 - Audit legacy styling beyond game-session surfaces](https://github.com/jerseycheese/Narraitor/issues/1046)
+- [#1045 - Define Storybook migration contract and coverage mapping](https://github.com/jerseycheese/Narraitor/issues/1045)
 - [#1038 - Remove legacy styling and establish clean slate](https://github.com/jerseycheese/Narraitor/issues/1038)
 - [#1039 - Set up feature flag infrastructure](https://github.com/jerseycheese/Narraitor/issues/1039)
 
@@ -25,6 +27,7 @@
 - [#1033 - Migrate streaming stability to app](https://github.com/jerseycheese/Narraitor/issues/1033)
 - [#1034 - Migrate components & layout to app](https://github.com/jerseycheese/Narraitor/issues/1034)
 - [#1035 - Migrate progressive disclosure to app](https://github.com/jerseycheese/Narraitor/issues/1035)
+- [#1047 - Roll out design system to non-game-session surfaces](https://github.com/jerseycheese/Narraitor/issues/1047)
 
 **Phase 3: Polish (deferred)**
 - [#1036 - Polish & optimization (only when pain appears)](https://github.com/jerseycheese/Narraitor/issues/1036)
@@ -102,7 +105,7 @@ This palette swap touches three surfaces:
 2. `src/app/globals.css` — CSS variables feeding shadcn/ui
 3. Component files using `gray-*` Tailwind classes directly
 
-The #1037 audit must map all gray references across these three layers so #1032 can execute a clean replacement.
+The #1037 and #1046 audits map gray references across these three layers so #1032 can execute a coordinated replacement for both game-session and non-game-session domains.
 
 ---
 
@@ -116,10 +119,12 @@ Storybook is part of the migration safety net, not optional documentation.
 
 **Storybook contract per migration issue:**
 - #1037 / #1038: add a mapping of audited surfaces to story files (keep/update/deprecate)
+- #1046: add non-game-session mapping and route-shell gap callouts
 - #1032: update token/foundation stories first (`00-foundation`)
 - #1033: update narrative/streaming stories
 - #1034: update game-session page and organism stories
 - #1035: update progressive disclosure and drawer interaction stories
+- #1047: update non-game-session stories (navigation, wizards, journal, shared wrappers) in the same PRs as implementation changes
 
 ---
 
@@ -245,6 +250,8 @@ The current design-system.html has generic components (buttons, inputs, cards) a
 - Identify conflicting style responsibilities and duplicate visual rules
 - Track this audit in [#1037](https://github.com/jerseycheese/Narraitor/issues/1037)
 - Use [`issue-1037-legacy-styling-audit.md`](./issue-1037-legacy-styling-audit.md) as the source-of-truth for #1038 removal scope and Storybook follow-up actions
+- Track non-game-session audit coverage in [#1046](https://github.com/jerseycheese/Narraitor/issues/1046)
+- Use [`issue-1046-non-game-session-legacy-styling-audit.md`](./issue-1046-non-game-session-legacy-styling-audit.md) as the source-of-truth for #1047 migration scope and #1038 shared-global removal readiness
 - Include a Storybook mapping table (`surface -> story file -> keep/update/deprecate`) so #1038 removals do not leave stale stories behind
 
 **Clean-Slate Cutover**
@@ -481,13 +488,16 @@ Use this to track progress and know when each phase is done.
 
 **Phase 1: Clean Slate (Remove Existing Styling Before Migration)**
 - [ ] Legacy style source audit complete for game session surfaces
+- [ ] Legacy style source audit complete for non-game-session surfaces (#1046)
 - [ ] Gray → zinc palette mapping documented across all three token layers
 - [ ] Legacy CSS classes flagged (`.btn`, `.btn-primary`, `.card`, `.text-link-*` in globals.css)
 - [ ] Existing scroll snap CSS on `.narrative-history-container` evaluated
 - [ ] TS design-tokens directory (`src/lib/design-tokens/`) included in audit scope
 - [ ] Storybook mapping table created for audited game-session surfaces (keep/update/deprecate)
+- [ ] Storybook mapping table created for audited non-game-session surfaces (keep/update/deprecate)
 - [ ] Feature flag infrastructure set up (#1039)
 - [ ] Keep/remove/defer map written and linked to #1037
+- [ ] Keep/remove/defer map written and linked to #1046
 - [ ] Legacy visual classes/styles removed or neutralized per plan
 - [ ] Game session still usable on neutral baseline
 - [ ] No unresolved styling conflicts blocking migration issues
@@ -612,6 +622,7 @@ Use this to track progress and know when each phase is done.
 - [ ] Build game-session-specific composition prototypes in design-system.html (narrative surface, choice selector, HUD, docked input)
 - [ ] Build streaming demo in design-system.html to test buffered rendering
 - [ ] Start Phase 1: Complete style inventory and removal map (#1037)
+- [ ] Complete non-game-session style inventory and removal map (#1046)
 - [ ] Build Storybook surface mapping for game-session migration targets (stories to keep/update/deprecate)
 - [ ] Execute clean-slate cutover on game-session surfaces (#1038)
 - [ ] Keep epic #1020 issue checklist updated as phases move
