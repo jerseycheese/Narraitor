@@ -9,6 +9,7 @@ const rootDir = path.resolve(__dirname, '..');
 const baseDir = path.join(rootDir, 'public_docs', 'design-system', 'redesign-planning');
 const sourceDir = path.join(baseDir, 'src');
 const outputFile = path.join(baseDir, 'design-system.html');
+const publicOutputFile = path.join(rootDir, 'public', 'design-system', 'index.html');
 
 const staticSources = {
   '{{INLINE_CSS}}': path.join(sourceDir, 'styles.css'),
@@ -55,9 +56,13 @@ async function buildDesignSystemDoc() {
   output = output.replace('{{CONTENT_TOP}}', contentTop);
   output = output.replace('{{CONTENT_BOTTOM}}', contentBottom);
 
+  await fs.mkdir(path.dirname(publicOutputFile), { recursive: true });
   await fs.writeFile(outputFile, output, 'utf8');
+  await fs.writeFile(publicOutputFile, output, 'utf8');
   // eslint-disable-next-line no-console
   console.log(`Built ${outputFile}`);
+  // eslint-disable-next-line no-console
+  console.log(`Published ${publicOutputFile}`);
 }
 
 async function readCompositeContent(dirPath, fallbackFilePath) {

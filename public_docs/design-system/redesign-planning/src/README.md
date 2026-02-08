@@ -3,6 +3,7 @@
 This directory is the source-of-truth for the generated file:
 
 - Output: `/Users/jackhaas/Projects/narraitor/public_docs/design-system/redesign-planning/design-system.html`
+- Published copy: `/Users/jackhaas/Projects/narraitor/public/design-system/index.html` (served on Vercel at `/design-system`)
 - Build command: `npm run docs:design-system:build`
 
 ## Editing workflow

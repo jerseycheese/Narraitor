@@ -16,6 +16,7 @@ node_modules
 /test-results/
 /data/
 index.html
+!public/design-system/index.html
 .playwright-mcp
 
 # Playwright downloaded artifacts (from CI failures)
