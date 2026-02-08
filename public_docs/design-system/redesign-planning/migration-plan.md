@@ -116,32 +116,7 @@ Storybook is part of the migration safety net, not optional documentation.
 - Storybook loads app globals via `.storybook/preview.js` importing `src/app/globals.css`, so token/global CSS changes are visible there immediately.
 - Storybook build is already a CI gate (`npm run build-storybook`), so migration PRs should treat story breakage as a blocking regression.
 - For each migrated surface, update or add corresponding stories in the same PR. This keeps design intent, implementation, and regression checks aligned.
-
-**Storybook contract per migration issue:**
-- #1037 / #1038: add a mapping of audited surfaces to story files (keep/update/deprecate)
-- #1046: add non-game-session mapping and route-shell gap callouts
-- #1032: update token/foundation stories first (`00-foundation`)
-- #1033: update narrative/streaming stories
-- #1034: update game-session page and organism stories
-- #1035: update progressive disclosure and drawer interaction stories
-- #1047: update non-game-session stories (navigation, wizards, journal, shared wrappers) in the same PRs as implementation changes
-
----
-
-## Storybook Role in Migration
-
-Storybook is part of the migration safety net, not optional documentation.
-
-- Storybook loads app globals via `.storybook/preview.js` importing `src/app/globals.css`, so token/global CSS changes are visible there immediately.
-- Storybook build is already a CI gate (`npm run build-storybook`), so migration PRs should treat story breakage as a blocking regression.
-- For each migrated surface, update or add corresponding stories in the same PR. This keeps design intent, implementation, and regression checks aligned.
-
-**Storybook contract per migration issue:**
-- #1037 / #1038: add a mapping of audited surfaces to story files (keep/update/deprecate)
-- #1032: update token/foundation stories first (`00-foundation`)
-- #1033: update narrative/streaming stories
-- #1034: update game-session page and organism stories
-- #1035: update progressive disclosure and drawer interaction stories
+- Use [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md) as the canonical migration contract for mapping format, gap policy, and per-issue Storybook obligations.
 
 ---
 
@@ -271,7 +246,7 @@ The current design-system.html has generic components (buttons, inputs, cards) a
 - Use [`issue-1037-legacy-styling-audit.md`](./issue-1037-legacy-styling-audit.md) as the source-of-truth for #1038 removal scope and Storybook follow-up actions
 - Track non-game-session audit coverage in [#1046](https://github.com/jerseycheese/Narraitor/issues/1046)
 - Use [`issue-1046-non-game-session-legacy-styling-audit.md`](./issue-1046-non-game-session-legacy-styling-audit.md) as the source-of-truth for #1047 migration scope and #1038 shared-global removal readiness
-- Include a Storybook mapping table (`surface -> story file -> keep/update/deprecate`) so #1038 removals do not leave stale stories behind
+- Use [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md) as the source-of-truth for Storybook mapping format, gap policy, and `npm run build-storybook` migration gating
 
 **Clean-Slate Cutover**
 - Remove or neutralize legacy game-session styling based on the audit

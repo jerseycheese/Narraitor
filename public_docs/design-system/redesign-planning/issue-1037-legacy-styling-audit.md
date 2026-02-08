@@ -3,6 +3,7 @@
 - Part of #1020
 - Implements #1037
 - Feeds #1038
+- Storybook contract: [issue-1045 storybook migration contract](./issue-1045-storybook-migration-contract.md)
 - Companion: [issue-1046 non-game-session audit](./issue-1046-non-game-session-legacy-styling-audit.md)
 - Last updated: 2026-02-08
 
@@ -252,6 +253,8 @@ Component source-to-table coverage check:
 | Virtualization and deferred optimization | No (deferred) | #1036 | #1036 |
 
 ## Storybook mapping table (surface -> story -> keep/update/deprecate)
+
+Mapping and gap statuses follow the canonical contract in [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md).
 
 | Surface | Story file(s) | Story action | Story gap handling |
 | --- | --- | --- | --- |
