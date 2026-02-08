@@ -620,7 +620,9 @@
         charactersRail.style.removeProperty('maxHeight');
         charactersRail.style.removeProperty('z-index');
         if (characterPanel) characterPanel.style.removeProperty('maxHeight');
+        if (characterPanel) characterPanel.style.removeProperty('width');
         if (toolsPanel) toolsPanel.style.removeProperty('maxHeight');
+        if (toolsPanel) toolsPanel.style.removeProperty('width');
         return;
       }
 
@@ -665,6 +667,14 @@
       charactersRail.style.left = `${mainStageRect.left}px`;
       charactersRail.style.width = `${railWidth}px`;
       charactersRail.style.zIndex = '20';
+
+      // Keep dropdown panel widths aligned with Characters Present rail width.
+      if (characterPanel) {
+        characterPanel.style.width = `${railWidth}px`;
+      }
+      if (toolsPanel) {
+        toolsPanel.style.width = `${railWidth}px`;
+      }
     }
 
     function renderManuscriptHudFromSourceRecords() {
