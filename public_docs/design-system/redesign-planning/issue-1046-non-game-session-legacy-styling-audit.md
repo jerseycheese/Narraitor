@@ -3,6 +3,7 @@
 - Part of #1020
 - Implements #1046
 - Feeds #1047
+- Storybook contract: [issue-1045 storybook migration contract](./issue-1045-storybook-migration-contract.md)
 - Companion: [issue-1037 game-session audit](./issue-1037-legacy-styling-audit.md)
 - Last updated: 2026-02-08
 
@@ -311,6 +312,8 @@ Required one-off pattern classifications:
 | Non-game-session pages that link into play flow | No new flag | Existing feature flag infra from #1039 remains unchanged for game-session flags. | #1047/#1039 |
 
 ## Storybook mapping table (surface -> story -> keep/update/deprecate)
+
+Mapping and gap statuses follow the canonical contract in [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md).
 
 | Surface | Story file(s) | Story action | Story gap handling |
 | --- | --- | --- | --- |
