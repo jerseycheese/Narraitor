@@ -3,6 +3,7 @@
 - Part of #1020
 - Implements #1037
 - Feeds #1038
+- Companion: [issue-1046 non-game-session audit](./issue-1046-non-game-session-legacy-styling-audit.md)
 - Last updated: 2026-02-08
 
 ## Inventory baseline captures
@@ -161,7 +162,7 @@ Coverage check:
 | --- | --- | --- | --- | --- |
 | `@layer base` root + dark CSS variables (`src/app/globals.css`) | Shadcn variable layer carries gray-era neutrals (`--secondary`, comments and mappings to gray family). | Requires synchronized zinc shift with TS primitives to prevent utility vs CSS-variable mismatch. | Defer to migration issue. | #1032 |
 | `@layer base` link defaults (`a`, `.prose a`, `p a`, `li a`, `span a`) | Global link behavior is applied broadly and partly duplicated by utility classes. | Not specifically gray-bound but overlaps with link utility system and can conflict during migration. | Keep baseline for #1038; consolidate in migration pass. | #1034 |
-| `.text-link-primary`, `.text-link-secondary`, `.text-link-nav`, `.text-link-nav-dark` | Legacy utility class family in global CSS; includes explicit gray/blue coupling. | Gray-specific nav-dark and secondary styles are part of neutral migration surface. | Remove in #1038 (replace by tokenized component patterns). | #1038 |
+| `.text-link-primary`, `.text-link-secondary`, `.text-link-nav`, `.text-link-nav-dark` | Legacy utility class family in global CSS; includes explicit gray/blue coupling. | Gray-specific nav-dark and secondary styles are part of neutral migration surface; 10 active non-game-session callsites found in #1046 audit. | Defer to migration issue. | #1047 |
 | `.narrative-content*` block | Forces `system-ui`, justification, and segment-specific formatting in global CSS. | Conflicts with target narrative typography direction (Mechanical Manuscript serif emphasis). | Remove in #1038 (reintroduced only where needed via scoped components). | #1038 |
 | Narrative scroll snap (`.narrative-history-container [data-radix-scroll-area-viewport]`) | Global scroll-snap and smooth scroll behavior for narrative viewport. | Must be reconciled with buffered streaming/anchoring behavior. | Defer to migration issue. | #1033 |
 | `.ending-*` classes | Global ending tone classes map to ending CSS variables. | `mysterious` currently gray-driven; other tones non-gray. | Keep baseline in #1038; retune values in #1032. | #1032 |
@@ -220,7 +221,7 @@ Component source-to-table coverage check:
 | TS token layer | `semantic.ts` gray semantic references | Defer to migration issue | #1032 | Requires synchronized semantic + primitive update. |
 | TS token layer | `contextual.ts` mysterious tone gray refs | Defer to migration issue | #1032 | Keep tone semantics, update neutral source. |
 | TS token layer | `tailwind.config.ts` gray/neutral aliases + prose refs | Defer to migration issue | #1032 | Update generated utilities and prose defaults together. |
-| Globals/CSS layer | `.text-link-*` | Remove in #1038 | #1038 | Replace with component-level/link token patterns. |
+| Globals/CSS layer | `.text-link-*` | Defer to migration issue | #1047 | Non-game-session callsites found in #1046 audit block early removal. |
 | Globals/CSS layer | `.narrative-content*` overrides | Remove in #1038 | #1038 | Remove global typography override coupling. |
 | Globals/CSS layer | `.card`, `.btn`, `.btn-primary` | Remove in #1038 | #1038 | Legacy helpers duplicate shadcn responsibilities. |
 | Globals/CSS layer | `.space-y-*` overrides | Remove in #1038 | #1038 | Remove duplicate utility behavior after callsite check. |
@@ -237,7 +238,7 @@ Component source-to-table coverage check:
 
 | Conflict area | Sources in conflict | Why this conflicts | Resolution direction |
 | --- | --- | --- | --- |
-| Link styling ownership | Global `a` and `.text-link-*` rules vs component-level link styling | Global defaults and utility classes both attempt to own link behavior. | Remove `.text-link-*` in #1038, keep minimal base links, then consolidate in #1034. |
+| Link styling ownership | Global `a` and `.text-link-*` rules vs component-level link styling | Global defaults and utility classes both attempt to own link behavior. | Defer `.text-link-*` removal to #1047 after non-game-session callsites are migrated; keep minimal base links. |
 | Card/button ownership | Global `.card`/`.btn` helpers vs shadcn `Card`/`Button` components | Two parallel component systems with overlapping semantics. | Remove legacy globals in #1038; keep shadcn/tokenized component path. |
 | Narrative typography ownership | `.narrative-content*` global overrides vs migrated manuscript typography intent | Global typography forces `system-ui` and justified text against target narrative spec. | Remove in #1038 and reintroduce scoped typography in #1034/#1032. |
 | Neutral token ownership | TS primitive/semantic gray + tailwind prose refs + CSS variable neutrals + component `gray-*` classes | Multiple layers can drift and produce mixed neutral palettes. | Execute coordinated gray-to-zinc migration in #1032 and sweep direct class usage in #1034. |
@@ -269,13 +270,13 @@ Explicit required callout:
 
 ### Safe removals for #1038 now
 
-- Remove legacy link utility classes: `.text-link-primary`, `.text-link-secondary`, `.text-link-nav`, `.text-link-nav-dark`.
 - Remove legacy global component helpers: `.card`, `.btn`, `.btn-primary`.
 - Remove legacy narrative global typography block: `.narrative-content*`.
 - Remove duplicated global `.space-y-*` overrides after validating current callsites do not require override-specific behavior.
 
 ### Deferred removals blocked by dependencies
 
+- Keep `.text-link-*` utility classes until #1047 migrates 10 active non-game-session callsites (see [#1046 audit](./issue-1046-non-game-session-legacy-styling-audit.md)).
 - Keep scroll snap behavior until #1033 defines replacement behavior under streaming migration.
 - Keep TS neutral token layer (`primitives/semantic/contextual/tailwind`) until #1032 executes synchronized zinc migration.
 - Keep `narrativeMaxHeight` and two-column shell cleanup for #1034, where layout migration is implemented.
