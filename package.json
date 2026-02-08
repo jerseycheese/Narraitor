@@ -11,6 +11,7 @@
     "build:app": "next build",
     "start": "next start",
     "lint": "next lint",
+    "style:no-tailwind": "bash scripts/design-system/tailwind-clean-slate/assert-no-tailwind-usage.sh",
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
