@@ -128,6 +128,23 @@ Storybook is part of the migration safety net, not optional documentation.
 
 ---
 
+## Storybook Role in Migration
+
+Storybook is part of the migration safety net, not optional documentation.
+
+- Storybook loads app globals via `.storybook/preview.js` importing `src/app/globals.css`, so token/global CSS changes are visible there immediately.
+- Storybook build is already a CI gate (`npm run build-storybook`), so migration PRs should treat story breakage as a blocking regression.
+- For each migrated surface, update or add corresponding stories in the same PR. This keeps design intent, implementation, and regression checks aligned.
+
+**Storybook contract per migration issue:**
+- #1037 / #1038: add a mapping of audited surfaces to story files (keep/update/deprecate)
+- #1032: update token/foundation stories first (`00-foundation`)
+- #1033: update narrative/streaming stories
+- #1034: update game-session page and organism stories
+- #1035: update progressive disclosure and drawer interaction stories
+
+---
+
 ## Current Pain Points
 
 **Performance issues:**
