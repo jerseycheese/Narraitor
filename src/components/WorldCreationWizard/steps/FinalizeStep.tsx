@@ -117,13 +117,13 @@ export default function FinalizeStep({
             <DataField 
               label="Name" 
               value={<span data-testid="review-world-name">{worldData.name}</span>}
-              variant=""
+              variant="outline"
               size="md"
             />
             <DataField 
               label="Genre" 
               value={<span data-testid="review-world-genre">{worldData.genre ? getGenreLabel(worldData.genre) : 'Unknown'}</span>}
-              variant=""
+              variant="outline"
               size="md"
             />
             <DataField 
@@ -243,7 +243,7 @@ export default function FinalizeStep({
           <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}
-            variant=""
+            variant="outline"
           >
             Cancel
           </Button>
@@ -252,7 +252,7 @@ export default function FinalizeStep({
             <Button
               type="button"
               onClick={onBack}
-              variant=""
+              variant="outline"
             >
               Back
             </Button>

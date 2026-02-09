@@ -353,7 +353,7 @@ export function GuidedFirstTimeExperience() {
             {!wizard.isFirstStep && (
               <Button
                 onClick={wizard.handlers.handleBack}
-                variant=""
+                variant="outline"
               >
                 Back
               </Button>

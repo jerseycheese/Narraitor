@@ -78,7 +78,7 @@ export function ConfirmationDialog({
           <Button
             ref={cancelButtonRef}
             onClick={onClose}
-            variant=""
+            variant="outline"
             disabled={isLoading}
             
           >

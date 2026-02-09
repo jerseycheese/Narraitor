@@ -298,7 +298,7 @@ export function SkillEditor({
             <Button
               type="button"
               onClick={onCancel}
-              variant=""
+              variant="outline"
             >
               Cancel
             </Button>

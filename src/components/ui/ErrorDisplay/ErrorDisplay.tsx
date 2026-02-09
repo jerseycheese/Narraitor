@@ -2,7 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { cssClasses } from '@/lib/utils';
 
-export type ErrorVariant = '' | 'section' | 'page' | 'toast';
+export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
 
 interface ErrorDisplayProps {
@@ -63,7 +63,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 }) => {
   const styles = severityStyles[severity];
 
-  if (variant === '') {
+  if (variant === 'inline') {
     return (
       <p 
         className={cssClasses('', styles.message, className)}
@@ -198,7 +198,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
 // Preset components for common use cases
 export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="" {...props} />
+  <ErrorDisplay variant="inline" {...props} />
 );
 
 export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (

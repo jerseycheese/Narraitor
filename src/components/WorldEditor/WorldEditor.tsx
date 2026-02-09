@@ -180,7 +180,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <div >
         <Button 
           type="button"
-          variant=""
+          variant="outline"
           onClick={handleCancel}
           disabled={saving}
         >

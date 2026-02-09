@@ -44,7 +44,7 @@ export function DropConfirmationDialog({
           <Button
             type="button"
             onClick={onClose}
-            variant=""
+            variant="outline"
             autoFocus
           >
             Cancel

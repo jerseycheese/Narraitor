@@ -48,7 +48,7 @@ export const LoreManagementImportExportTab: React.FC<LoreManagementImportExportT
           <div >
             <Button onClick={onImport}>Confirm Import</Button>
             <Button
-              variant=""
+              variant="outline"
               onClick={() => {
                 onShowImportDialog(false);
                 onImportDataChange('');

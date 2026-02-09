@@ -143,7 +143,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const categoryId = row.getValue('categoryId') as StandardInventoryCategory;
           return (
-            <Badge variant="">
+            <Badge variant="outline">
               {CATEGORY_NAMES[categoryId] || categoryId}
             </Badge>
           );

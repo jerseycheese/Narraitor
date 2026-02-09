@@ -63,7 +63,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
         <div >
           <Button
             onClick={onOpenJournal}
-            variant=""
+            variant="outline"
             className="group"
             data-tutorial="journal-toggle"
           >

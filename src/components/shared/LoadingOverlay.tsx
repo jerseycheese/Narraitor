@@ -136,7 +136,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           {onCancel && (
             <div >
               <Button
-                variant=""
+                variant="outline"
                 onClick={onCancel}
                 
                 tabIndex={0}

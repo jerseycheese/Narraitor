@@ -207,7 +207,7 @@ export function QuickPlay() {
               <DataField 
                 label="Progress" 
                 value={`${mostRecentSession.narrativeCount}entries`}
-                variant=""
+                variant="outline"
               />
               <time  dateTime={mostRecentSession.lastPlayed}>
                 Last played {lastPlayedText}
@@ -238,7 +238,7 @@ export function QuickPlay() {
         <p >Or</p>
         <Button
           onClick={handleNewGame}
-          variant=""
+          variant="outline"
           size="default"
           
         >

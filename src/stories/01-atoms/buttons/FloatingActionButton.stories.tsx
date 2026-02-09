@@ -137,10 +137,10 @@ export const Positions: Story = {
   },
   render: (args) => (
     <div >
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-left" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-right" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-left" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-right" />
     </div>
   ),
 };

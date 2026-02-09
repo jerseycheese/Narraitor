@@ -36,9 +36,9 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   const [viewMode, setViewMode] = useState<WorldViewMode>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('world-view-mode');
-      return (saved as WorldViewMode) || '';
+      return (saved as WorldViewMode) || 'grid';
     }
-    return '';
+    return 'grid';
   });
 
   const handleViewModeChange = (mode: WorldViewMode) => {
@@ -148,7 +148,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   return (
     <main>
-      {viewMode === '' ? (
+      {viewMode === 'table' ? (
         <WorldTable
           worlds={worlds}
           selectedWorldIds={selectedWorldIds}

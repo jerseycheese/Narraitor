@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid3x3, Table } from 'lucide-react';
 
-export type InventoryViewMode = '' | '';
+export type InventoryViewMode = 'grid' | 'table';
 
 interface InventoryViewToggleProps {
   mode: InventoryViewMode;
@@ -20,20 +20,20 @@ export function InventoryViewToggle({
   return (
     <div  role="group" aria-label="View mode toggle">
       <Button
-        variant={mode === '' ? 'default' : ''}
+        variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => onModeChange('')}
+        onClick={() => onModeChange('grid')}
         aria-label="Grid view"
-        aria-pressed={mode === ''}
+        aria-pressed={mode === 'grid'}
       >
         <Grid3x3  />
       </Button>
       <Button
-        variant={mode === '' ? 'default' : ''}
+        variant={mode === 'table' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => onModeChange('')}
+        onClick={() => onModeChange('table')}
         aria-label="Table view"
-        aria-pressed={mode === ''}
+        aria-pressed={mode === 'table'}
       >
         <Table  />
       </Button>

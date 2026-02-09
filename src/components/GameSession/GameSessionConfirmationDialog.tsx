@@ -63,7 +63,7 @@ export function GameSessionConfirmationDialog({
       showCloseButton={false}
       footer={
         <div >
-          <Button onClick={onClose} variant="" >
+          <Button onClick={onClose} variant="outline" >
             {config.cancelText}
           </Button>
           <Button

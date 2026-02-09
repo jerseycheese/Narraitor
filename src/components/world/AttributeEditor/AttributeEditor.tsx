@@ -241,7 +241,7 @@ export function AttributeEditor({
         <div >
           <Button
             onClick={onCancel}
-            variant=""
+            variant="outline"
           >
             Cancel
           </Button>

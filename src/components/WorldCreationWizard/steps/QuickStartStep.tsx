@@ -128,7 +128,7 @@ export default function QuickStartStep({
 
       {/* Alternative Actions */}
       <div >
-        <Button variant="" onClick={onComplete} data-tutorial="quickstart-skip">
+        <Button variant="outline" onClick={onComplete} data-tutorial="quickstart-skip">
           Skip Character Creation for Now
         </Button>
       </div>

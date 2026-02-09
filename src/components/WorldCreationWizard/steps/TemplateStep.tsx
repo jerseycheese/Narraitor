@@ -195,7 +195,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
                 <Button
                   type="button"
                   onClick={handleCreateOwnWorld}
-                  variant=""
+                  variant="outline"
                   data-testid="create-own-button"
                   data-tutorial="create-own-world-btn"
                 >
@@ -252,7 +252,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         <Button
           type="button"
           onClick={onCancel || (() => window.history.back())}
-          variant=""
+          variant="outline"
         >
           Cancel
         </Button>

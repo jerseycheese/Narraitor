@@ -175,7 +175,7 @@ export const Transition: Story = {
   args: {
     segment: createMockSegment(
       `Hours passed as they ventured deeper into the forest... The *ancient* path wound through towering trees. Time seemed to slow in this *mystical* place.`,
-      '',
+      'transition',
       {
         mood: 'neutral',
         tags: ['time-skip', 'travel', 'atmosphere'],
@@ -436,7 +436,7 @@ const MixedSegmentSequence = () => {
     ),
     createMockSegment(
       'Hours later, you leave the tavern and travel through the night toward the northern pass.',
-      '',
+      'transition',
       {
         mood: 'neutral',
         tags: ['travel', 'time-passage'],

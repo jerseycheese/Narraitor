@@ -25,7 +25,7 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
   <div >
     <div >
       <div >Usage Summary</div>
-      <Button variant="" size="sm" onClick={onClearUsage}>
+      <Button variant="outline" size="sm" onClick={onClearUsage}>
         Clear Usage
       </Button>
     </div>

@@ -71,7 +71,7 @@ export function DashboardContinueCard({
               <DataField
                 label="Progress"
                 value={`${session.narrativeCount}entries`}
-                variant=""
+                variant="outline"
               />
               <time  dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}

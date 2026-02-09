@@ -36,7 +36,7 @@ export const Variants: Story = {
       <Badge variant="default">Default</Badge>
       <Badge variant="secondary">Secondary</Badge>
       <Badge variant="destructive">Destructive</Badge>
-      <Badge variant="">Outline</Badge>
+      <Badge variant="outline">Outline</Badge>
       <Badge variant="success">Success</Badge>
       <Badge variant="warning">Warning</Badge>
       <Badge variant="info">Info</Badge>
@@ -59,8 +59,8 @@ export const WithCounts: Story = {
     <div >
       <Badge variant="secondary" count={8}>Strength</Badge>
       <Badge variant="secondary" count={6}>Intelligence</Badge>
-      <Badge variant="" count={9}>Combat</Badge>
-      <Badge variant="" count={7}>Magic</Badge>
+      <Badge variant="outline" count={9}>Combat</Badge>
+      <Badge variant="outline" count={7}>Magic</Badge>
     </div>
   ),
 };

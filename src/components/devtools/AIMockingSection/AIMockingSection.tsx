@@ -129,7 +129,7 @@ export const AIMockingSection: React.FC = () => {
         <Button
           onClick={handleModeToggle}
           size="sm"
-          variant={config.isEnabled ? "default" : ""}
+          variant={config.isEnabled ? "default" : "outline"}
           className={config.isEnabled 
             ? "" 
             : ""
@@ -200,7 +200,7 @@ export const AIMockingSection: React.FC = () => {
               <Button
                 onClick={() => setShowCustomScenario(!showCustomScenario)}
                 size="sm"
-                variant=""
+                variant="outline"
                 
               >
                 Add Custom
@@ -294,16 +294,16 @@ export const AIMockingSection: React.FC = () => {
           <div >
             <h4 >Configuration</h4>
             <div >
-              <Button onClick={handleExportConfig} size="sm" variant="" >
+              <Button onClick={handleExportConfig} size="sm" variant="outline" >
                 Export
               </Button>
-              <Button onClick={handleImportConfig} size="sm" variant="" >
+              <Button onClick={handleImportConfig} size="sm" variant="outline" >
                 Import
               </Button>
               <Button 
                 onClick={() => mockStateManager.reset()} 
                 size="sm" 
-                variant="" 
+                variant="outline" 
                 
               >
                 Reset

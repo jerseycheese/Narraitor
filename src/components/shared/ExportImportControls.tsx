@@ -78,7 +78,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         <Button
           onClick={handleExport}
           disabled={isLoading}
-          variant=""
+          variant="outline"
           
         >
           {isExporting ? 'Exporting...' : 'Export Game Data'}
@@ -101,7 +101,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
-            variant=""
+            variant="outline"
             
           >
             {isImporting ? 'Importing...' : 'Import Game Data'}

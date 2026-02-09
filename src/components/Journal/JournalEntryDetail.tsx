@@ -78,7 +78,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
           )}
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
-            <Badge variant="" size="sm" >
+            <Badge variant="outline" size="sm" >
               Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
@@ -102,7 +102,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
             <h4 >Related</h4>
             <div >
               {entry.relatedEntities.map((entity, index) => (
-                <Badge key={index} variant="" size="sm">
+                <Badge key={index} variant="outline" size="sm">
                   {titleCase(entity.type)}: {entity.name}
                 </Badge>
               ))}

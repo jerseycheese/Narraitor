@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 export interface ActionButton {
   label: string;
   onClick: () => void;
-  variant?: 'default' | 'secondary' | '' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   icon?: React.ReactNode;
   disabled?: boolean;
@@ -26,7 +26,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
       case 'secondary': return undefined; // Use custom styling instead  
       case 'success': return undefined; // Use custom styling instead
       case 'danger': return 'destructive';
-      default: return variant as 'default' | 'secondary' | '' | 'ghost' | 'link' | 'destructive' | undefined;
+      default: return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
     }
   };
 

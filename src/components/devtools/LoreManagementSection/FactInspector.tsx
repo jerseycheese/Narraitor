@@ -202,7 +202,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
         </Tabs>
 
         <div >
-          <Button variant="" onClick={onClose}>
+          <Button variant="outline" onClick={onClose}>
             Close
           </Button>
         </div>

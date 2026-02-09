@@ -260,7 +260,7 @@ export default function CharacterCreatePage() {
                 </p>
               </div>
               <Button
-                variant=""
+                variant="outline"
                 onClick={handleBackToQuickStart}
                 
               >

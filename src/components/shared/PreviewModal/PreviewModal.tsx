@@ -79,7 +79,7 @@ function PreviewModalInner<T>({
       <div className={wizardStyles.navigation.container + ""}>
         <Button
           onClick={onCancel}
-          variant=""
+          variant="outline"
           size="default"
         >
           {cancelText}

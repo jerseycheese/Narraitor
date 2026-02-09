@@ -47,7 +47,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
     return (
       <div className={cssClasses('', className)}>
         <ErrorDisplay
-          variant={compact ? '' : 'section'}
+          variant={compact ? 'inline' : 'section'}
           severity="error"
           title={compact ? undefined : 'Auto-Save Error'}
           message={errorMessage || 'Failed to save game progress'}

@@ -228,7 +228,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                       .map((skill, idx) => (
                         <Badge
                           key={`${template.id}-skill-${idx}`}
-                          variant=""
+                          variant="outline"
                           
                         >
                           {skill.name} {skill.level}

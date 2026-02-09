@@ -69,9 +69,9 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     // Load preference from localStorage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('inventory-view-mode');
-      return (saved as InventoryViewMode) || '';
+      return (saved as InventoryViewMode) || 'grid';
     }
-    return '';
+    return 'grid';
   });
 
   // Persist view mode preference
@@ -145,7 +145,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       )}
 
       {/* Table View */}
-      {viewMode === '' ? (
+      {viewMode === 'table' ? (
         <InventoryTable characterId={characterId} />
       ) : (
         /* Grid View */
@@ -232,7 +232,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     {/* Category Badge and Acquisition Method */}
                     <div >
                       <Badge
-                        variant=""
+                        variant="outline"
                         size="sm"
                         className="item-category"
                         aria-label={`Category:${categoryName}`}
@@ -249,7 +249,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     {/* Action Buttons */}
                     <div >
                       <Button
-                        variant=""
+                        variant="outline"
                         size="sm"
                         onClick={() => handleUseItem(item.id)}
                         disabled={usingItemId === item.id || item.quantity <= 0}
@@ -258,7 +258,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         {usingItemId === item.id ? 'Using...' : 'Use'}
                       </Button>
                       <Button
-                        variant=""
+                        variant="outline"
                         size="sm"
                         onClick={() => openDropDialog(item)}
                         aria-label={`Drop${item.name}`}

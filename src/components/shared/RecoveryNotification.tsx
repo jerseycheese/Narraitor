@@ -195,7 +195,7 @@ export function RecoveryNotification({
         </Button>
         <Button
           onClick={onDismiss}
-          variant=""
+          variant="outline"
           
         >
           Start Fresh

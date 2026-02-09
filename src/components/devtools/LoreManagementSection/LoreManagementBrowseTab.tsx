@@ -162,7 +162,7 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
                     <div >
                       <Button
                         size="sm"
-                        variant=""
+                        variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectFact(fact.id);

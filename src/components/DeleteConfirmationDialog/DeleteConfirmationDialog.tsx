@@ -40,7 +40,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            variant=""
+            variant="outline"
             aria-label={`${cancelButtonText}deletion`}
           >
             {cancelButtonText}

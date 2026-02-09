@@ -43,7 +43,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
             type="button"
             onClick={() => !isDisabled && onToggleGenre(genre.label)}
             disabled={isDisabled}
-            variant={isSelected ? 'default' : ''}
+            variant={isSelected ? 'default' : 'outline'}
             className={`${isSelected
                 ? ''
                 : ''

@@ -244,7 +244,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           {fact ? 'Save Changes' : 'Add Fact'}
         </Button>
         {onCancel && (
-          <Button type="button" variant="" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
         )}

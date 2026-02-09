@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid3x3, Table } from 'lucide-react';
 
-export type CharacterViewMode = '' | '';
+export type CharacterViewMode = 'grid' | 'table';
 
 interface CharacterViewToggleProps {
   mode: CharacterViewMode;
@@ -20,7 +20,7 @@ interface CharacterViewToggleProps {
  * a grid of cards and a searchable, sortable table.
  *
  * @param props - Component properties
- * @param props.mode - The current active view mode ('' or '')
+ * @param props.mode - The current active view mode ('grid' or 'table')
  * @param props.onModeChange - Callback function triggered when a new mode is selected
  */
 export function CharacterViewToggle({
@@ -30,20 +30,20 @@ export function CharacterViewToggle({
   return (
     <div  role="group" aria-label="View mode toggle">
       <Button
-        variant={mode === '' ? 'default' : ''}
+        variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => onModeChange('')}
+        onClick={() => onModeChange('grid')}
         aria-label="Grid view"
-        aria-pressed={mode === ''}
+        aria-pressed={mode === 'grid'}
       >
         <Grid3x3  />
       </Button>
       <Button
-        variant={mode === '' ? 'default' : ''}
+        variant={mode === 'table' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => onModeChange('')}
+        onClick={() => onModeChange('table')}
         aria-label="Table view"
-        aria-pressed={mode === ''}
+        aria-pressed={mode === 'table'}
       >
         <Table  />
       </Button>

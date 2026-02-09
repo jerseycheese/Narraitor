@@ -225,7 +225,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                     .map((skill, idx) => (
                       <Badge 
                         key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`} 
-                        variant="" 
+                        variant="outline" 
                         count={skill.level}
                         
                       >
@@ -274,7 +274,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             {
               label: loading ? 'Generating...' : 'Generate New Random Character',
               onClick: handleRandomSelect,
-              variant: '',
+              variant: 'secondary',
               size: 'lg',
               icon: loading ? (
                 <Loader2  aria-hidden="true" />

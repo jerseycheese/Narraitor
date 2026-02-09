@@ -118,7 +118,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           <Button
             onClick={onClose}
             disabled={isGenerating}
-            variant=""
+            variant="outline"
           >
             Cancel
           </Button>

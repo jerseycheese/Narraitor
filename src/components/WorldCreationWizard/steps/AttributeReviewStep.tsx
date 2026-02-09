@@ -255,7 +255,7 @@ export default function AttributeReviewStep({
             <Button
               type="button"
               onClick={() => setShowClearConfirmation(true)}
-              variant=""
+              variant="outline"
               size="sm"
               data-testid="clear-ai-suggestions-button"
             >
@@ -312,7 +312,7 @@ export default function AttributeReviewStep({
                     type="button"
                     data-testid={`attribute-toggle-${index}`}
                     onClick={() => handleToggleAttribute(index)}
-                    variant={suggestion.accepted ? "default" : ""}
+                    variant={suggestion.accepted ? "default" : "outline"}
                     size="sm"
                   >
                     {suggestion.accepted ? 'Selected' : 'Excluded'}
@@ -516,7 +516,7 @@ export default function AttributeReviewStep({
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}
-                variant=""
+                variant="outline"
                 size="sm"
                 data-testid="cancel-clear-button"
                 autoFocus

@@ -132,7 +132,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             )}
             <Button
               onClick={this.handleRetry}
-              variant=""
+              variant="outline"
               size="sm"
               
             >

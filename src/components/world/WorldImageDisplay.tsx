@@ -32,14 +32,14 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
         <DataField
           label="Image Type"
           value={image.type === 'ai-generated' ? 'AI Generated' : 'Custom'}
-          variant=""
+          variant="outline"
         />
 
         {image.generatedAt && (
           <DataField
             label="Generated"
             value={formatDate(image.generatedAt)}
-            variant=""
+            variant="outline"
           />
         )}
 

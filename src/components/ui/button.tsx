@@ -3,7 +3,7 @@ import { cssClasses } from '@/lib/utils/classNames'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'secondary' | '' | 'ghost' | 'link' | 'destructive' | 'success' | 'info' | 'warning'
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'success' | 'info' | 'warning'
   size?: 'default' | 'sm' | 'lg' | 'icon'
 }
 

@@ -18,22 +18,22 @@ export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
         <DataField 
           label="Max Attributes" 
           value={settings?.maxAttributes || 'Not set'} 
-          variant=""
+          variant="outline"
         />
         <DataField 
           label="Max Skills" 
           value={settings?.maxSkills || 'Not set'} 
-          variant=""
+          variant="outline"
         />
         <DataField 
           label="Attribute Point Pool" 
           value={settings?.attributePointPool || 'Not set'} 
-          variant=""
+          variant="outline"
         />
         <DataField 
           label="Skill Point Pool" 
           value={settings?.skillPointPool || 'Not set'} 
-          variant=""
+          variant="outline"
         />
       </div>
     </section>

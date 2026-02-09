@@ -5,7 +5,7 @@ import React from 'react';
 interface DataFieldProps {
   label: string;
   value: React.ReactNode;
-  variant?: 'default' | '' | 'stacked';
+  variant?: 'default' | 'outline' | 'stacked';
   size?: 'sm' | 'md';
   className?: string;
   id?: string;
@@ -30,7 +30,7 @@ export function DataField({
   const fieldId = id || `data-field-${label.toLowerCase().replace(/\s+/g, '-')}`;
   const valueId = `${fieldId}-value`;
 
-  if (variant === '') {
+  if (variant === 'outline') {
     return (
       <div className={`${className}`} id={fieldId}>
         <span className={labelClasses} aria-describedby={valueId}>

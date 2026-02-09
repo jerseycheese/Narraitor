@@ -75,7 +75,7 @@ export function StoryEndingDialog({
         <Button
           ref={closeButtonRef}
           onClick={onClose}
-          variant=""
+          variant="outline"
           
           type="button"
           aria-label={`${closeText}and dismiss dialog`}

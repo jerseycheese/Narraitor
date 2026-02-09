@@ -104,7 +104,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     </div>
                     <div >
                       {decisionWeight && (
-                        <Badge variant="" size="sm">
+                        <Badge variant="outline" size="sm">
                           {titleCase(decisionWeight)} decision
                         </Badge>
                       )}

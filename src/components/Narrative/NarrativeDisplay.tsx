@@ -74,7 +74,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           container: '',
           text: '',
         };
-      case '':
+      case 'transition':
         return {
           container: '',
           text: '',
@@ -95,7 +95,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return { formatDialogue: true };
       case 'scene':
         return { formatDialogue: true, paragraphSpacing: 'double' };
-      case '':
+      case 'transition':
         return { preserveLineBreaks: true };
       case 'action':
       default:
@@ -189,7 +189,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
         <FormattedNarrativeContent
           content={formattedContent}
-          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === '' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
           highlightTerms={highlightTerms}
         />
         {(participants.length > 0 || resolvedSegment.metadata?.location) && (

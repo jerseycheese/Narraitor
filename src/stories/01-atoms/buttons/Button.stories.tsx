@@ -64,7 +64,7 @@ export const Variants: Story = {
       <Button>Default</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="destructive">Destructive</Button>
-      <Button variant="">Outline</Button>
+      <Button variant="outline">Outline</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
       <Button variant="success">Action Green</Button>
@@ -103,7 +103,7 @@ export const WithIcons: Story = {
         <Play  aria-hidden="true" />
         Play
       </Button>
-      <Button  variant="">
+      <Button  variant="outline">
         <Sparkles  aria-hidden="true" />
         Generate
       </Button>

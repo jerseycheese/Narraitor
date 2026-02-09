@@ -105,7 +105,7 @@ export const CompleteShowcase: Story = {
             <div >
               <Button variant="default">Default</Button>
               <Button variant="secondary">Secondary</Button>
-              <Button variant="">Outline</Button>
+              <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
               <Button variant="link">Link</Button>
               <Button variant="destructive">Destructive</Button>
@@ -233,7 +233,7 @@ export const CompleteShowcase: Story = {
         <div >
           <Badge variant="default">Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
-          <Badge variant="">Outline</Badge>
+          <Badge variant="outline">Outline</Badge>
           <Badge variant="destructive">Destructive</Badge>
         </div>
       </section>
@@ -289,7 +289,7 @@ export const CompleteShowcase: Story = {
               </p>
             </CardContent>
             <CardFooter >
-              <Button variant="">Cancel</Button>
+              <Button variant="outline">Cancel</Button>
               <Button>Save</Button>
             </CardFooter>
           </Card>
@@ -486,7 +486,7 @@ export const ComponentMatrix: Story = {
           </div>
         </CardContent>
         <CardFooter >
-          <Button variant="">Cancel</Button>
+          <Button variant="outline">Cancel</Button>
           <Button>Register</Button>
         </CardFooter>
       </Card>
@@ -498,7 +498,7 @@ export const ComponentMatrix: Story = {
           Your game data is approaching the storage limit. Consider cleaning up old sessions.
         </AlertDescription>
         <div >
-          <Button size="sm" variant="">Manage Storage</Button>
+          <Button size="sm" variant="outline">Manage Storage</Button>
           <Button size="sm">Upgrade Plan</Button>
         </div>
       </Alert>
@@ -511,7 +511,7 @@ export const ComponentMatrix: Story = {
               <CardTitle>Fantasy Campaign</CardTitle>
               <CardDescription>Active gaming session</CardDescription>
             </div>
-            <Badge variant="">Live</Badge>
+            <Badge variant="outline">Live</Badge>
           </div>
         </CardHeader>
         <CardContent>

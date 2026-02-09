@@ -244,7 +244,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           Delete Character
         </Button>
         <div >
-          <Button variant="" onClick={handleCancel} disabled={saving}>
+          <Button variant="outline" onClick={handleCancel} disabled={saving}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={saving || !isPoolValid}>

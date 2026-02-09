@@ -95,7 +95,7 @@ export default function PlayPage() {
               // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)
               !currentEnding && (sessionStatus === 'active' || sessionStatus === 'paused' || sessionStatus === 'loading') ? (
                 <div >
-                  <Button size="sm" variant="" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
+                  <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
                     Switch Character
                   </Button>
                   <Button size="sm" variant="default" onClick={handleStartNewClick}>

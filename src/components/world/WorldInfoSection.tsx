@@ -19,25 +19,25 @@ export function WorldInfoSection({ world }: WorldInfoSectionProps) {
         <DataField 
           label="Created" 
           value={formatDate(world.createdAt)} 
-          variant=""
+          variant="outline"
         />
         <DataField 
           label="Updated" 
           value={formatDate(world.updatedAt)} 
-          variant=""
+          variant="outline"
         />
         {world.relationship && (
           <DataField 
             label="Relationship" 
             value={titleCase(world.relationship.replace(/_/g, ''))} 
-            variant=""
+            variant="outline"
           />
         )}
         {world.reference && (
           <DataField 
             label="Reference" 
             value={world.reference} 
-            variant=""
+            variant="outline"
           />
         )}
       </div>
