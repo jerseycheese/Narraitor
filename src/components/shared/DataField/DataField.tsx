@@ -5,7 +5,7 @@ import React from 'react';
 interface DataFieldProps {
   label: string;
   value: React.ReactNode;
-  variant?: 'default' | 'inline' | 'stacked';
+  variant?: 'default' | '' | 'stacked';
   size?: 'sm' | 'md';
   className?: string;
   id?: string;
@@ -20,19 +20,19 @@ export function DataField({
   id
 }: DataFieldProps) {
   const labelClasses = size === 'sm'
-    ? 'text-xs text-muted-foreground font-bold uppercase tracking-wide'
-    : 'text-sm text-muted-foreground font-bold uppercase tracking-wide';
+    ? ''
+    : '';
 
   const valueClasses = size === 'sm'
-    ? 'text-sm font-medium'
-    : 'text-base font-medium';
+    ? ''
+    : '';
 
   const fieldId = id || `data-field-${label.toLowerCase().replace(/\s+/g, '-')}`;
   const valueId = `${fieldId}-value`;
 
-  if (variant === 'inline') {
+  if (variant === '') {
     return (
-      <div className={`flex items-center gap-2 ${className}`} id={fieldId}>
+      <div className={`${className}`} id={fieldId}>
         <span className={labelClasses} aria-describedby={valueId}>
           {label}:
         </span>
@@ -49,7 +49,7 @@ export function DataField({
         <div className={labelClasses} aria-describedby={valueId}>
           {label}
         </div>
-        <div className={`${valueClasses} font-medium`} id={valueId} role="text">
+        <div className={`${valueClasses}`} id={valueId} role="text">
           {value}
         </div>
       </div>
@@ -62,7 +62,7 @@ export function DataField({
       <span className={labelClasses} aria-describedby={valueId}>
         {label}:
       </span>
-      <p className={`${valueClasses} font-medium mt-1`} id={valueId} role="text">
+      <p className={`${valueClasses}`} id={valueId} role="text">
         {value}
       </p>
     </div>

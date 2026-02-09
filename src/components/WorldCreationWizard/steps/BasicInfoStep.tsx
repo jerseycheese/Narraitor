@@ -36,7 +36,7 @@ export default function BasicInfoStep({
   return (
     <div data-testid="basic-info-step">
       {/* Main step header */}
-      <div className="mb-8">
+      <div >
         <h2 className={wizardStyles.step.title}>Basic Information</h2>
         <p className={wizardStyles.step.description}>Let&apos;s start with some basic information about your world and configure how stories will be told.</p>
       </div>
@@ -48,7 +48,7 @@ export default function BasicInfoStep({
         <WizardFormGroup
           label="World Name (optional)"
           error={combinedErrors.name}
-          helpText={guidance.nameExamples.length ? `Examples: ${guidance.nameExamples.slice(0, 3).join(', ')}` : 'Choose a genre below to see name examples'}
+          helpText={guidance.nameExamples.length ? `Examples:${guidance.nameExamples.slice(0, 3).join(',')}` : 'Choose a genre below to see name examples'}
         >
           <WizardTextField
             value={worldData.name || ''}
@@ -81,8 +81,8 @@ export default function BasicInfoStep({
             error={combinedErrors.relationship}
             helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
-            <div className="space-y-4 my-4">
-              <div className="flex items-start space-x-3">
+            <div >
+              <div >
                 <Input
                   type="radio"
                   id="relationship-none"
@@ -90,19 +90,19 @@ export default function BasicInfoStep({
                   value=""
                   checked={!worldData.relationship}
                   onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
-                  className="mt-1 h-4 w-4"
+                  
                 />
                 <div>
-                  <Label htmlFor="relationship-none" className="text-sm font-medium text-gray-900">
+                  <Label htmlFor="relationship-none" >
                     Original World
                   </Label>
-                  <p className="text-sm text-gray-700">
+                  <p >
                     Create a completely original world from your imagination
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start space-x-3">
+              <div >
                 <Input
                   type="radio"
                   id="relationship-based-on"
@@ -110,20 +110,20 @@ export default function BasicInfoStep({
                   value="based_on"
                   checked={worldData.relationship === 'inspired_by'}
                   onChange={() => onUpdate({ ...worldData, relationship: 'inspired_by' })}
-                  className="mt-1 h-4 w-4"
+                  
                   data-testid="relationship-based-on-radio"
                 />
                 <div>
-                  <Label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-900">
+                  <Label htmlFor="relationship-based-on" >
                     Inspired By
                   </Label>
-                  <p className="text-sm text-gray-700">
+                  <p >
                     Create an original world inspired by an existing fictional universe or real setting
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start space-x-3">
+              <div >
                 <Input
                   type="radio"
                   id="relationship-set-in"
@@ -131,14 +131,14 @@ export default function BasicInfoStep({
                   value="set_in"
                   checked={worldData.relationship === 'set_within'}
                   onChange={() => onUpdate({ ...worldData, relationship: 'set_within' })}
-                  className="mt-1 h-4 w-4"
+                  
                   data-testid="relationship-set-in-radio"
                 />
                 <div>
-                  <Label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-900">
+                  <Label htmlFor="relationship-set-in" >
                     Set Within
                   </Label>
-                  <p className="text-sm text-gray-700">
+                  <p >
                     Place your world directly within an existing fictional universe or real setting
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export default function BasicInfoStep({
               testId="world-reference-input"
               dataTutorial="world-reference"
             />
-            <div className="text-sm text-gray-500 mt-1">
+            <div >
               {worldData.relationship === 'set_within'
                 ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
                 : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'

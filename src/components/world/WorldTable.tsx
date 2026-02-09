@@ -40,7 +40,7 @@ const WorldTableRow = React.memo(({ world, isSelected, cells }: WorldTableRowPro
     if (hasImage && world.image?.url) {
       const opacity = isHovered ? '0.75, 0.7' : '0.5, 0.45';
       return {
-        backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, ${opacity.split(', ')[0]}), rgba(0, 0, 0, ${opacity.split(', ')[1]})), url(${world.image.url})`,
+        backgroundImage: `linear-gradient(to right, rgba(0, 0, 0,${opacity.split(',')[0]}), rgba(0, 0, 0,${opacity.split(',')[1]})), url(${world.image.url})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -56,7 +56,7 @@ const WorldTableRow = React.memo(({ world, isSelected, cells }: WorldTableRowPro
     }
   }, [hasImage, isHovered, isSelected, world.image?.url]);
 
-  const baseClasses = "border-b transition-colors h-32 [&>td]:align-middle data-[state=selected]:bg-primary/20 data-[state=selected]:border-primary data-[state=selected]:hover:bg-primary/25";
+  const baseClasses = "[&>td]:align-middle";
 
   return (
     <tr
@@ -136,7 +136,7 @@ export function WorldTable({
                   });
                 }
               }}
-              aria-label={`Select up to ${Math.min(worlds.length, 5)} worlds`}
+              aria-label={`Select up to${Math.min(worlds.length, 5)}worlds`}
             />
           );
         },
@@ -144,7 +144,7 @@ export function WorldTable({
           <Checkbox
             checked={selectedWorldIds.includes(row.original.id)}
             onChange={() => onToggleSelect(row.original.id)}
-            aria-label={`Select ${row.original.name} for comparison`}
+            aria-label={`Select${row.original.name}for comparison`}
             disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
           />
         ),
@@ -155,7 +155,7 @@ export function WorldTable({
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (
-          <div className="font-medium cursor-pointer hover:underline" onClick={() => handleViewWorld(row.original.id)}>
+          <div  onClick={() => handleViewWorld(row.original.id)}>
             {row.getValue('name')}
           </div>
         ),
@@ -167,7 +167,7 @@ export function WorldTable({
         cell: ({ row }) => {
           const genre = row.getValue('genre') as string;
           return (
-            <Badge variant="secondary" className="capitalize">
+            <Badge variant="secondary" >
               {getGenreLabel(genre)}
             </Badge>
           );
@@ -179,7 +179,7 @@ export function WorldTable({
         header: 'Attributes',
         accessorFn: (row) => row.attributes?.length || 0,
         cell: ({ row }) => (
-          <div className="text-center">{row.original.attributes?.length || 0}</div>
+          <div >{row.original.attributes?.length || 0}</div>
         ),
         enableSorting: true,
       },
@@ -188,7 +188,7 @@ export function WorldTable({
         header: 'Skills',
         accessorFn: (row) => row.skills?.length || 0,
         cell: ({ row }) => (
-          <div className="text-center">{row.original.skills?.length || 0}</div>
+          <div >{row.original.skills?.length || 0}</div>
         ),
         enableSorting: true,
       },
@@ -197,7 +197,7 @@ export function WorldTable({
         header: 'Characters',
         accessorFn: (row) => worldCharacterIds[row.id]?.length || 0,
         cell: ({ row }) => (
-          <div className="text-center">
+          <div >
             {worldCharacterIds[row.original.id]?.length || 0}
           </div>
         ),
@@ -207,7 +207,7 @@ export function WorldTable({
         accessorKey: 'createdAt',
         header: 'Created',
         cell: ({ row }) => (
-          <div className="text-sm whitespace-nowrap">
+          <div >
             {formatDate(row.getValue('createdAt'))}
           </div>
         ),
@@ -217,34 +217,34 @@ export function WorldTable({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
+          <div >
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleViewWorld(row.original.id)}
-              aria-label={`View ${row.original.name}`}
+              aria-label={`View${row.original.name}`}
               title="View world"
             >
-              <Eye className="h-4 w-4" />
+              <Eye  />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={(e) => handleEditWorld(row.original.id, e)}
-              aria-label={`Edit ${row.original.name}`}
+              aria-label={`Edit${row.original.name}`}
               title="Edit world"
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil  />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={(e) => onDeleteWorld(row.original.id, e)}
-              aria-label={`Delete ${row.original.name}`}
+              aria-label={`Delete${row.original.name}`}
               title="Delete world"
-              className="text-destructive hover:text-destructive"
+              
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2  />
             </Button>
           </div>
         ),
@@ -256,7 +256,7 @@ export function WorldTable({
 
   if (worlds.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div >
         <p>No worlds found. Create your first world to get started!</p>
       </div>
     );
@@ -289,7 +289,7 @@ export function WorldTable({
         placeholder: 'Search worlds...',
       }}
       rowSelection={rowSelection}
-      ariaLabel="Worlds table"
+      ariaLabel="Worlds"
       customRowRenderer={customRowRenderer}
     />
   );

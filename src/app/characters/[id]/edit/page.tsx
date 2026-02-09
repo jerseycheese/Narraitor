@@ -21,7 +21,7 @@ export default function CharacterEditPage() {
   if (!mounted) {
     return (
       <PageLayout>
-        <div className="mb-6" />
+        <div  />
       </PageLayout>
     );
   }
@@ -39,14 +39,14 @@ export default function CharacterEditPage() {
 
   return (
     <PageLayout 
-      title={`Edit Character: ${character.name}`}
-      className="bg-gray-100"
+      title={`Edit Character:${character.name}`}
+      
     >
       {/* Header with back button */}
-      <div className="mb-6">
+      <div >
         <button
           onClick={() => router.push(`/characters/${characterId}`)}
-          className="text-link-primary flex items-center gap-2 cursor-pointer"
+          
         >
           <span>←</span> Back to Character
         </button>

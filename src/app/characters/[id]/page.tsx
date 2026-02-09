@@ -60,7 +60,7 @@ export default function CharacterViewPage() {
       label: 'Edit Character',
       onClick: () => router.push(`/characters/${characterId}/edit`),
       variant: 'primary' as const,
-  icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
+  icon: (<Pencil  aria-hidden="true" />)
     },
     {
       label: 'Play with Character',
@@ -69,13 +69,13 @@ export default function CharacterViewPage() {
         router.push(`/worlds/${character.worldId}/play`);
       },
       variant: 'success' as const,
-  icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+  icon: (<Play  aria-hidden="true" />)
     },
     {
       label: 'Delete Character',
       onClick: () => setShowDeleteDialog(true),
       variant: 'danger' as const,
-  icon: (<Trash className="w-4 h-4" aria-hidden="true" />)
+  icon: (<Trash  aria-hidden="true" />)
     }
   ];
 
@@ -83,15 +83,15 @@ export default function CharacterViewPage() {
     <PageLayout>
       {/* Ultra-thin world hero */}
       {world.image?.url && (
-        <div className="mb-6">
+        <div >
           <Hero
             title={character.name}
             image={{
               url: world.image.url,
-              alt: `${world.name} world`
+              alt: `${world.name}world`
             }}
             subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
-            height="h-20 sm:h-24"
+            height=""
             titleElement="h1"
           />
         </div>
@@ -99,14 +99,14 @@ export default function CharacterViewPage() {
 
       {/* Back navigation for pages without world image */}
       {!world.image?.url && (
-        <div className="mb-6">
+        <div >
           <BackNavigation href="/characters" label="Back to Characters" />
         </div>
       )}
 
-      <ActionButtonGroup actions={actionButtons} className="mb-6" />
+      <ActionButtonGroup actions={actionButtons}  />
 
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <div >
         <CharacterHeader character={character} world={world} />
         <CharacterDetailsDisplay character={character} world={world} />
       </div>

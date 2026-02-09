@@ -87,16 +87,16 @@ export const InteractiveExample: Story = {
     ];
 
     return (
-      <div className="p-4 max-w-md border rounded">
-        <h2 className="text-xl font-bold mb-4">Character Attributes</h2>
-        <div className="space-y-6">
+      <div >
+        <h2 >Character Attributes</h2>
+        <div >
           {attributes.map((attribute, index) => (
-            <div key={index} className="p-3 border rounded">
-              <h3 className="font-medium mb-2">{attribute.name}</h3>
-              <p className="text-sm text-gray-700 mb-3">{attribute.description}</p>
+            <div key={index} >
+              <h3 >{attribute.name}</h3>
+              <p >{attribute.description}</p>
               <AttributeRangeEditor
                 attribute={attribute}
-                onChange={(updates) => action('updated')(`Attribute: ${attribute.name}`, updates)}
+                onChange={(updates) => action('updated')(`Attribute:${attribute.name}`, updates)}
               />
             </div>
           ))}

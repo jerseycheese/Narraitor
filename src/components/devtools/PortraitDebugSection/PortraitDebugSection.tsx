@@ -179,7 +179,7 @@ export function PortraitDebugSection({
         const errorText = await response.text();
         console.log('API error response:', errorText);
         throw new Error(
-          `API request failed: ${response.status} - ${errorText}`
+          `API request failed:${response.status}-${errorText}`
         );
       }
 
@@ -192,7 +192,7 @@ export function PortraitDebugSection({
       console.log('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(
-        `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error generating prompt:${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };
@@ -218,7 +218,7 @@ export function PortraitDebugSection({
       setGeneratedPrompt(result.prompt || 'No prompt returned');
     } catch (error) {
       setGeneratedPrompt(
-        `Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Generation failed:${error instanceof Error ? error.message : 'Unknown error'}`
       );
     } finally {
       setIsGenerating(false);
@@ -234,22 +234,22 @@ export function PortraitDebugSection({
       title="Portrait Generation Debug"
       initialCollapsed={true}
     >
-      <div className="space-y-4">
+      <div >
         {/* Character Selector */}
         {charactersArray.length > 0 && (
-          <div className="bg-gray-100 p-3 rounded border border-gray-300">
-            <label className="block text-sm font-medium mb-2 text-gray-900">
+          <div >
+            <label >
               Select Character:
             </label>
             <Select
               value={selectedCharacterId}
               onChange={(e) => setSelectedCharacterId(e.target.value)}
-              className="text-sm"
+              
             >
               <option value="">-- Select a character --</option>
               {charactersArray.map((char) => (
                 <option key={char.id} value={char.id}>
-                  {char.name} (Level{' '}
+                  {char.name} (Level{''}
                   {'level' in char
                     ? (char as { level?: number }).level || 1
                     : 1}
@@ -262,25 +262,25 @@ export function PortraitDebugSection({
 
         {/* Character Info Summary */}
         {effectiveCharacterData && (
-          <div className="bg-gray-100 p-3 rounded border border-gray-300">
-            <h4 className="font-medium mb-2 text-gray-900">
+          <div >
+            <h4 >
               Character Summary
             </h4>
-            <div className="text-sm space-y-1 text-gray-700">
+            <div >
               <div>
-                <strong>Name:</strong>{' '}
+                <strong>Name:</strong>{''}
                 {effectiveCharacterData.name || 'Not set'}
               </div>
               <div>
-                <strong>World Genre:</strong>{' '}
+                <strong>World Genre:</strong>{''}
                 {effectiveWorldConfig?.genre || 'Not set'}
               </div>
               <div>
-                <strong>Attributes:</strong>{' '}
+                <strong>Attributes:</strong>{''}
                 {effectiveCharacterData.attributes?.length || 0}
               </div>
               <div>
-                <strong>Skills:</strong>{' '}
+                <strong>Skills:</strong>{''}
                 {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   effectiveCharacterData.skills?.filter((s: any) =>
@@ -291,7 +291,7 @@ export function PortraitDebugSection({
                 }
               </div>
               <div>
-                <strong>Background:</strong>{' '}
+                <strong>Background:</strong>{''}
                 {effectiveCharacterData.background?.personality
                   ? 'Set'
                   : 'Not set'}
@@ -301,11 +301,11 @@ export function PortraitDebugSection({
         )}
 
         {/* Prompt Generation */}
-        <div className="space-y-2">
-          <div className="flex gap-2 flex-wrap">
+        <div >
+          <div >
             <Button
               onClick={generatePromptPreview}
-              className="!bg-blue-700 hover:!bg-blue-900 !text-white"
+              
               size="sm"
               variant="default"
               disabled={!effectiveCharacterData}
@@ -314,7 +314,7 @@ export function PortraitDebugSection({
             </Button>
             <Button
               onClick={testPromptGeneration}
-              className="!bg-green-700 hover:!bg-green-900 !text-white"
+              
               size="sm"
               variant="default"
               disabled={!effectiveCharacterData || isGenerating}
@@ -325,7 +325,7 @@ export function PortraitDebugSection({
               <>
                 <Button
                   onClick={copyPromptToClipboard}
-                  className="!bg-gray-700 hover:!bg-gray-900 !text-white"
+                  
                   size="sm"
                   variant="default"
                 >
@@ -333,7 +333,7 @@ export function PortraitDebugSection({
                 </Button>
                 <Button
                   onClick={() => setShowBreakdown(!showBreakdown)}
-                  className="!bg-blue-700 hover:!bg-blue-900 !text-white"
+                  
                   size="sm"
                   variant="default"
                 >
@@ -344,11 +344,11 @@ export function PortraitDebugSection({
           </div>
 
           {generatedPrompt && (
-            <div className="bg-gray-100 p-3 rounded border border-gray-300">
-              <h4 className="font-medium mb-2 text-gray-900">
+            <div >
+              <h4 >
                 Generated Prompt:
               </h4>
-              <pre className="text-sm whitespace-pre-wrap break-words bg-white p-2 rounded border border-gray-300 text-gray-900">
+              <pre >
                 {generatedPrompt}
               </pre>
             </div>
@@ -368,16 +368,16 @@ export function PortraitDebugSection({
 
         {/* Last Generated Image */}
         {lastGeneratedImage && (
-          <div className="bg-gray-100 p-3 rounded border border-gray-300">
-            <h4 className="font-medium mb-2 text-gray-900">
+          <div >
+            <h4 >
               Last Generated Image:
             </h4>
-            <div className="relative w-32 h-32">
+            <div >
               <Image
                 src={lastGeneratedImage}
                 alt="Generated portrait"
                 fill
-                className="rounded border border-gray-500 object-cover"
+                
                 unoptimized // For base64 data URLs
               />
             </div>
@@ -385,11 +385,11 @@ export function PortraitDebugSection({
         )}
 
         {/* Prompt Building Tips */}
-        <div className="bg-blue-50 p-3 rounded text-sm border border-blue-200">
-          <h4 className="font-medium mb-2 text-blue-900">
+        <div >
+          <h4 >
             Prompt Building Tips:
           </h4>
-          <ul className="list-disc list-inside space-y-1 text-gray-700">
+          <ul >
             <li>Character name is included automatically</li>
             <li>Personality traits influence appearance description</li>
             <li>Skills determine character class (warrior, mage, etc.)</li>
@@ -399,9 +399,9 @@ export function PortraitDebugSection({
         </div>
 
         {/* API Debug Info */}
-        <div className="bg-amber-50 p-3 rounded text-sm border border-amber-200">
-          <h4 className="font-medium mb-2 text-amber-900">API Debug Info:</h4>
-          <div className="space-y-1 text-gray-900">
+        <div >
+          <h4 >API Debug Info:</h4>
+          <div >
             <div>
               <strong>Endpoint:</strong> /api/generate-portrait
             </div>

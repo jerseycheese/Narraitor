@@ -1307,22 +1307,21 @@ Respond with JSON format:
         onRetry={handleRetry}
       />
       {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
-        <div className="mt-6 rounded-lg border border-dashed border-muted-foreground/50 bg-muted/40 p-4 text-sm text-muted-foreground">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+        <div>
+          <p>
             NPC roster (debug)
           </p>
-          <ul className="mt-3 space-y-3">
+          <ul>
             {npcRoster.map((npc) => (
-              <li key={npc.id} className="flex items-center gap-3">
+              <li key={npc.id}>
                 {npc.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={npc.avatarUrl}
                     alt={npc.name}
-                    className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted-foreground/20 text-xs font-semibold text-muted-foreground">
+                  <div>
                     {npc.name
                       .split(' ')
                       .map((segment) => segment[0])
@@ -1331,11 +1330,11 @@ Respond with JSON format:
                       .slice(0, 2)}
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <span className="font-medium text-foreground">
+                <div>
+                  <span>
                     {npc.name}
                   </span>
-                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground/80">
+                  <span>
                     {npc.id}
                   </span>
                 </div>

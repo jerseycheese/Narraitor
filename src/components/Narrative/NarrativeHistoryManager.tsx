@@ -91,7 +91,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       
       // For segment deduplication, only dedupe if content is EXACTLY the same
       // Don't use partial content matching as it removes valid segments
-      const normalizedContent = segment.content.trim().replace(/\s+/g, ' ');
+      const normalizedContent = segment.content.trim().replace(/\s+/g, '');
       const key = `${segment.type}-${normalizedContent}`;
       
       if (!contentMap.has(key)) {
@@ -136,7 +136,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   }, [sessionId]);
 
   return (
-    <div className={`narrative-history-manager ${className || ''}`}>
+    <div className={`narrative-history-manager${className || ''}`}>
       <NarrativeHistory
         // Only show segments when they've stabilized
         segments={stabilized ? segments : []}

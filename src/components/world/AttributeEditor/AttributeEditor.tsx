@@ -98,7 +98,7 @@ export function AttributeEditor({
     
     // Check maxAttributes limit in create mode
     if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
-      validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
+      validationErrors.push(`Cannot create more attributes. Maximum of${maxAttributes}attributes allowed.`);
     }
 
     if (validationErrors.length > 0) {
@@ -129,7 +129,7 @@ export function AttributeEditor({
     const skillsLinked = linkedSkills.filter(skill => skill.attributeIds?.includes(attributeId));
     if (skillsLinked.length > 0) {
       setDeleteWarnings([
-        `This attribute is linked to ${skillsLinked.length} skill${skillsLinked.length > 1 ? 's' : ''}`,
+        `This attribute is linked to${skillsLinked.length}skill${skillsLinked.length > 1 ? 's' : ''}`,
         'Deleting this attribute will affect these skills'
       ]);
     }
@@ -145,16 +145,16 @@ export function AttributeEditor({
 
   return (
     <>
-      <div className="flex flex-col space-y-1.5 text-center sm:text-left">
-        <h2 className="text-lg font-semibold leading-none tracking-tight">
+      <div >
+        <h2 >
           {mode === 'create' ? 'Create New Attribute' : 'Edit Attribute'}
         </h2>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div >
+        <div >
           <Label htmlFor="attribute-name">
-            Attribute Name <span className="text-destructive">*</span>
+            Attribute Name <span >*</span>
           </Label>
           <Input
             id="attribute-name"
@@ -167,7 +167,7 @@ export function AttributeEditor({
           />
         </div>
 
-        <div className="space-y-2">
+        <div >
           <Label htmlFor="attribute-description">
             Description
           </Label>
@@ -179,8 +179,8 @@ export function AttributeEditor({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div >
+          <div >
             <Label htmlFor="min-value">
               Minimum Value
             </Label>
@@ -194,7 +194,7 @@ export function AttributeEditor({
             />
           </div>
 
-          <div className="space-y-2">
+          <div >
             <Label htmlFor="max-value">
               Maximum Value
             </Label>
@@ -214,10 +214,10 @@ export function AttributeEditor({
             id="attribute-errors"
             role="alert" 
             aria-live="polite"
-            className="bg-destructive/10 border border-destructive rounded-lg p-3 space-y-1"
+            
           >
             {errors.map((error, index) => (
-              <p key={index} className="text-sm text-destructive">
+              <p key={index} >
                 {error}
               </p>
             ))}
@@ -225,8 +225,8 @@ export function AttributeEditor({
         )}
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 justify-between items-center">
-        <div className="flex gap-2">
+      <div >
+        <div >
           {mode === 'edit' && onDelete && (
             <Button
               onClick={handleDeleteClick}
@@ -238,10 +238,10 @@ export function AttributeEditor({
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div >
           <Button
             onClick={onCancel}
-            variant="outline"
+            variant=""
           >
             Cancel
           </Button>
@@ -262,7 +262,7 @@ export function AttributeEditor({
           title="Delete Attribute"
           description={
             deleteWarnings.length > 0 
-              ? deleteWarnings.join('. ') + '. This action cannot be undone.'
+              ? deleteWarnings.join('.') + '. This action cannot be undone.'
               : 'This action cannot be undone.'
           }
           itemName={formData.name || 'this attribute'}

@@ -81,13 +81,13 @@ const meta: Meta<typeof WorldListScreen> = {
   args: {
     _router: {
       push: (url: string) => {
-        console.log(`[Storybook] Navigating to: ${url}`);
+        console.log(`[Storybook] Navigating to:${url}`);
         return Promise.resolve();
       }
     },
     _storeActions: {
       setCurrentWorld: (id: string) => {
-        console.log(`[Storybook] Setting current world: ${id}`);
+        console.log(`[Storybook] Setting current world:${id}`);
       }
     }
   }

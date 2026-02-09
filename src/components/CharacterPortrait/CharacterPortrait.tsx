@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { GeneratedImage } from '@/types/common.types';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 
 interface CharacterPortraitProps {
   portrait: GeneratedImage;
@@ -15,10 +15,10 @@ interface CharacterPortraitProps {
 }
 
 const sizeClasses = {
-  small: 'w-8 h-8 text-xs',
-  medium: 'w-16 h-16 text-lg',
-  large: 'w-24 h-24 text-2xl',
-  xlarge: 'w-32 h-32 text-3xl'
+  small: '',
+  medium: '',
+  large: '',
+  xlarge: ''
 };
 
 export function CharacterPortrait({
@@ -33,11 +33,11 @@ export function CharacterPortrait({
     // Remove nicknames in quotes (single or double quotes, including spaces)
     const nameWithoutNickname = name
       .replace(/['"][^'"]+['"]/g, '') // Remove anything between quotes
-      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+      .replace(/\s+/g, '') // Normalize multiple spaces to single space
       .trim();
     
     // Split by spaces and filter out empty strings
-    const words = nameWithoutNickname.split(' ').filter(word => word.length > 0);
+    const words = nameWithoutNickname.split('').filter(word => word.length > 0);
     
     if (words.length === 0) {
       // Fallback to original name if nothing left after removing nicknames
@@ -56,26 +56,26 @@ export function CharacterPortrait({
       .toUpperCase();
   };
 
-  const containerClasses = cn(
+  const containerClasses = cssClasses(
     'component-character-portrait',
-    'relative rounded-full overflow-hidden',
+    '',
     sizeClasses[size],
-    onClick && 'cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all',
-    'bg-gray-200'
+    onClick && '',
+    ''
   );
 
   if (isGenerating) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-300">
-          <div className={cn(
-            "animate-spin rounded-full border-b-2 border-gray-900",
-            size === 'small' && "h-3 w-3",
-            size === 'medium' && "h-6 w-6",
-            size === 'large' && "h-8 w-8",
-            size === 'xlarge' && "h-10 w-10"
+        <div >
+          <div className={cssClasses(
+            "",
+            size === 'small' && "",
+            size === 'medium' && "",
+            size === 'large' && "",
+            size === 'xlarge' && ""
           )} role="status">
-            <span className="sr-only">Generating portrait...</span>
+            <span >Generating portrait...</span>
           </div>
         </div>
       </div>
@@ -85,8 +85,8 @@ export function CharacterPortrait({
   if (error) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-500">
-          <span className="text-xs text-center p-2">{error}</span>
+        <div >
+          <span >{error}</span>
         </div>
       </div>
     );
@@ -101,9 +101,9 @@ export function CharacterPortrait({
       >
         <Image
           src={portrait.url}
-          alt={`${characterName} portrait`}
+          alt={`${characterName}portrait`}
           fill
-          className="object-cover"
+          
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           unoptimized // For base64 data URLs
         />
@@ -118,7 +118,7 @@ export function CharacterPortrait({
       data-testid="character-portrait"
       onClick={onClick}
     >
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-500 text-white font-semibold">
+      <div >
         {getInitials(characterName)}
       </div>
     </div>

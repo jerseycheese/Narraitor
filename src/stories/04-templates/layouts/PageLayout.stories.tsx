@@ -11,16 +11,7 @@ const meta: Meta<typeof PageLayout> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: `
-        A reusable page layout component that provides consistent structure across all application pages.
-        
-        **Features:**
-        - Consistent header with title, description, and actions
-        - Responsive design with proper spacing
-        - Fixed 7xl container width to match navigation
-        - Semantic HTML structure
-        - Built-in action button area
-        `,
+        component: `A reusable page layout component that provides consistent structure across all application pages. **Features:** - Consistent header with title, description, and actions - Responsive design with proper spacing - Fixed 7xl width to match navigation - Semantic HTML structure - Built-in action button area`,
       },
     },
   },
@@ -65,11 +56,11 @@ const sampleActions = (
 );
 
 const sampleContent = (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div >
     {[1, 2, 3, 4, 5, 6].map(i => (
-      <div key={i} className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-2">Card {i}</h3>
-        <p className="text-gray-700">Sample content for card {i}</p>
+      <div key={i} >
+        <h3 >Card {i}</h3>
+        <p >Sample content for card {i}</p>
       </div>
     ))}
   </div>
@@ -104,9 +95,9 @@ export const MinimalPage: Story = {
   args: {
     title: '04-Templates/layouts/PageLayout',
     children: (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <h2 className="text-xl font-semibold mb-4">Empty State</h2>
-        <p className="text-gray-700">No content to display yet.</p>
+      <div >
+        <h2 >Empty State</h2>
+        <p >No content to display yet.</p>
       </div>
     )
   }
@@ -123,24 +114,24 @@ export const WorldsPageExample: Story = {
             label: 'Create World',
             onClick: () => console.log('Create World clicked'),
             variant: 'primary',
-            icon: (<Plus className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Plus  aria-hidden="true" />)
           },
           {
             label: 'Generate World',
             onClick: () => console.log('Generate World clicked'),
             variant: 'secondary',
-            icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Play  aria-hidden="true" />)
           }
         ]}
       />
     ),
     children: (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div >
         {['Fantasy Realm', 'Cyberpunk City', 'Wild West'].map(world => (
-          <div key={world} className="bg-white rounded-lg shadow p-6 border-2 border-transparent hover:border-blue-300 transition-colors">
-            <h3 className="text-lg font-semibold mb-2">{world}</h3>
-            <p className="text-gray-700 mb-4">A sample world description...</p>
-            <div className="flex gap-2">
+          <div key={world} >
+            <h3 >{world}</h3>
+            <p >A sample world description...</p>
+            <div >
               <Button variant="success" size="sm">
                 Make Active
               </Button>
@@ -166,33 +157,33 @@ export const CharactersPageExample: Story = {
             label: 'Create Character',
             onClick: () => console.log('Create Character clicked'),
             variant: 'primary',
-            icon: (<Plus className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Plus  aria-hidden="true" />)
           },
           {
             label: 'Generate Character',
             onClick: () => console.log('Generate Character clicked'),
             variant: 'secondary',
-            icon: (<Sparkles className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Sparkles  aria-hidden="true" />)
           },
           {
             label: 'Start Playing',
             onClick: () => console.log('Start Playing clicked'),
             variant: 'success',
-            icon: (<Sparkles className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Sparkles  aria-hidden="true" />)
           }
         ]}
       />
     ),
     children: (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div >
         {['Aria Starweaver', 'Zane Shadowblade', 'Luna Brightforge'].map(character => (
-          <div key={character} className="bg-white rounded-lg shadow p-6 border-2 border-green-500 bg-green-50 relative">
-            <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+          <div key={character} >
+            <div >
               Active
             </div>
-            <h3 className="text-lg font-semibold mb-2">{character}</h3>
-            <p className="text-gray-700 mb-4">Level 5 Warrior</p>
-            <div className="flex gap-2 flex-wrap">
+            <h3 >{character}</h3>
+            <p >Level 5 Warrior</p>
+            <div >
               <Button variant="default" size="sm">
                 View
               </Button>
@@ -215,9 +206,9 @@ export const ConsistentWidth: Story = {
     title: 'Consistent Width Layout',
     description: 'All pages now use the same max-width (7xl) to match navigation',
     children: (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div >
         <p>Content with consistent 7xl max width that matches the navigation bar.</p>
-        <p className="mt-2 text-gray-600">This ensures all page content aligns perfectly with the navigation structure.</p>
+        <p >This ensures all page content aligns perfectly with the navigation structure.</p>
       </div>
     )
   }

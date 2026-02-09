@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const worldValidation = validateWorld(worldData);
     if (!worldValidation.valid) {
       return createAPIErrorResponse(
-        new Error(`400 bad request: invalid world data - ${worldValidation.errors[0]}`),
+        new Error(`400 bad request: invalid world data -${worldValidation.errors[0]}`),
         400,
         worldValidation.errors[0]
       );

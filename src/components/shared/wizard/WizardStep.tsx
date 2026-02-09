@@ -13,10 +13,10 @@ export const WizardStep: React.FC<WizardStepProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`${wizardStyles.step.content} ${className}`}>
+    <div className={`${wizardStyles.step.content}${className}`}>
       {error && (
         <div className={wizardStyles.errorContainer}>
-          <p className="text-red-700">{error}</p>
+          <p >{error}</p>
         </div>
       )}
       {children}

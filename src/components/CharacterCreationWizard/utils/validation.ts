@@ -105,13 +105,13 @@ export const validateSkills = (
     const { minLevel, maxLevel } = getBounds(skill);
     const skillLabel = skill.name || skill.skillId;
     if (maxLevel === minLevel) {
-      errors.push(`Skill ${skillLabel} cannot be leveled because its configuration has no available range.`);
+      errors.push(`Skill${skillLabel}cannot be leveled because its configuration has no available range.`);
     }
     if (skill.level < minLevel) {
-      errors.push(`Skill ${skillLabel} is below its minimum level of ${minLevel}.`);
+      errors.push(`Skill${skillLabel}is below its minimum level of${minLevel}.`);
     }
     if (skill.level > maxLevel) {
-      errors.push(`Skill ${skillLabel} exceeds its maximum level of ${maxLevel}.`);
+      errors.push(`Skill${skillLabel}exceeds its maximum level of${maxLevel}.`);
     }
   });
 

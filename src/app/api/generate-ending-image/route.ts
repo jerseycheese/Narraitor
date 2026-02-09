@@ -32,7 +32,7 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   const tone = ending.tone;
   
   // Create a detailed prompt for ending image generation
-  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${characterName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
+  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of${characterName}'s story in${worldName}. This is a${tone}ending to their journey.`;
   
   // Add tone-specific visual guidance
   let toneGuidance = '';
@@ -59,35 +59,11 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   // Include brief narrative context if available
   let narrativeContext = '';
   if (recentNarrative && recentNarrative.length > 0) {
-    const recentEvents = recentNarrative.slice(-MAX_RECENT_SEGMENTS).join(' ').substring(0, MAX_CONTEXT_CHARS);
-    narrativeContext = `Recent story context: ${recentEvents}...`;
+    const recentEvents = recentNarrative.slice(-MAX_RECENT_SEGMENTS).join('').substring(0, MAX_CONTEXT_CHARS);
+    narrativeContext = `Recent story context:${recentEvents}...`;
   }
   
-  return `${basePrompt}
-
-${toneGuidance}
-
-${styleGuidance}
-
-${narrativeContext}
-
-Story Ending Context:
-- Epilogue: ${ending.epilogue.substring(0, MAX_EPILOGUE_CHARS)}...
-- Character Legacy: ${ending.characterLegacy.substring(0, MAX_LEGACY_CHARS)}...
-- World Impact: ${ending.worldImpact.substring(0, MAX_IMPACT_CHARS)}...
-
-Requirements:
-- Ultra-high quality, 4K resolution concept art
-- Cinematic composition showing story conclusion
-- Emotional depth matching the ${tone} tone
-- Rich detail and atmospheric depth
-- Professional game/film concept art style
-- Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner)
-- Horizontal panoramic composition
-- Show the end of a journey, conclusion, or resolution
-- Focus on ${characterName} or the aftermath of their actions
-- No text, logos, or watermarks
-- Colors and mood appropriate to the ${tone} ending tone`;
+  return `${basePrompt}${toneGuidance}${styleGuidance}${narrativeContext}Story Ending Context: - Epilogue:${ending.epilogue.substring(0, MAX_EPILOGUE_CHARS)}... - Character Legacy:${ending.characterLegacy.substring(0, MAX_LEGACY_CHARS)}... - World Impact:${ending.worldImpact.substring(0, MAX_IMPACT_CHARS)}... Requirements: - Ultra-high quality, 4K resolution concept art - Cinematic composition showing story conclusion - Emotional depth matching the${tone}tone - Rich detail and atmospheric depth - Professional game/film concept art style - Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner) - Horizontal panoramic composition - Show the end of a journey, conclusion, or resolution - Focus on${characterName}or the aftermath of their actions - No text, logos, or watermarks - Colors and mood appropriate to the${tone}ending tone`;
 }
 
 // Generate fallback placeholder if AI generation fails
@@ -121,15 +97,7 @@ export async function POST(request: NextRequest) {
       logger.debug('generate-ending-image', 'Generated image prompt:', imagePrompt);
 
       // Generate a detailed description that could be used with real AI image generation
-      const promptResponse = await client.generateContent(`
-        Generate a detailed, artistic description for an image showing the conclusion of this story that could be used as a prompt for an AI image generator. Be very specific about visual elements, atmosphere, lighting, composition, and emotional tone.
-        
-        ${imagePrompt}
-        
-        Focus on creating a powerful final image that captures the essence of this ${body.ending.tone} ending.
-        
-        Respond with only the detailed visual description, no other text.
-      `);
+      const promptResponse = await client.generateContent(`Generate a detailed, artistic description for an image showing the conclusion of this story that could be used as a prompt for an AI image generator. Be very specific about visual elements, atmosphere, lighting, composition, and emotional tone.${imagePrompt}Focus on creating a powerful final image that captures the essence of this${body.ending.tone}ending. Respond with only the detailed visual description, no other text.`);
 
       const imageDescription = promptResponse.content;
       logger.debug('generate-ending-image', 'Generated image description:', imageDescription);
@@ -156,19 +124,7 @@ export async function POST(request: NextRequest) {
         try {
           logger.debug('generate-ending-image', 'Attempting Gemini image generation');
           
-          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion. ${imageDescription}
-
-Requirements:
-- Epic cinematic scene showing story conclusion
-- High quality digital art style
-- Professional game/film concept art
-- Rich atmospheric lighting and emotional depth
-- ${body.ending.tone} tone and mood
-- ${body.world?.genre || 'fantasy'} genre elements
-- Focus on the end of the journey or its aftermath
-- No text, logos, or watermarks
-- Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format)
-- Horizontal panoramic composition suitable for wide hero display`;
+          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion.${imageDescription}Requirements: - Epic cinematic scene showing story conclusion - High quality digital art style - Professional game/film concept art - Rich atmospheric lighting and emotional depth -${body.ending.tone}tone and mood -${body.world?.genre || 'fantasy'}genre elements - Focus on the end of the journey or its aftermath - No text, logos, or watermarks - Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format) - Horizontal panoramic composition suitable for wide hero display`;
 
           const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
 
@@ -213,7 +169,7 @@ Requirements:
       
       return NextResponse.json({ 
         imageUrl: fallbackUrl,
-        description: `A ${body.ending.tone} ending scene for ${body.character?.name || 'the hero'} in ${body.world?.name || 'the realm'}`,
+        description: `A${body.ending.tone}ending scene for${body.character?.name || 'the hero'}in${body.world?.name || 'the realm'}`,
         placeholder: true,
         aiGenerated: false
       });

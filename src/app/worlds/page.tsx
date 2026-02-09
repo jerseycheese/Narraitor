@@ -131,7 +131,7 @@ export default function WorldsPage() {
       onClick: handleCreateWorld,
       variant: 'primary' as const,
       icon: (
-        <Plus className="w-4 h-4" aria-hidden="true" />
+        <Plus  aria-hidden="true" />
       )
     },
     {
@@ -140,7 +140,7 @@ export default function WorldsPage() {
       variant: 'secondary' as const,
       disabled: isGenerating,
       icon: (
-        <Sparkles className="w-4 h-4" aria-hidden="true" />
+        <Sparkles  aria-hidden="true" />
       )
     }
   ];
@@ -150,7 +150,7 @@ export default function WorldsPage() {
       title="My Worlds"
       description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
       actions={
-        <div className="flex items-center gap-3">
+        <div >
           {viewToggle}
           <ActionButtonGroup actions={actionButtons} />
         </div>
@@ -185,16 +185,16 @@ export default function WorldsPage() {
                 variant: 'primary',
                 disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
                 icon: (
-                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                  <Sparkles  aria-hidden="true" />
                 ),
                 dataTutorial: 'generate-world-button'
               }
             ]}
-            className="justify-end"
+            
           />
         }
       >
-        <div className="space-y-4">
+        <div >
           <WorldFormFields.NameInput
             value={worldName}
             onChange={setWorldName}
@@ -202,7 +202,7 @@ export default function WorldsPage() {
             required={false}
             placeholder="e.g., The Lost Kingdom"
           />
-          <p id="generate-world-desc" className="text-xs text-muted-foreground mt-1">
+          <p id="generate-world-desc" >
             Give your world a custom name, or leave empty for a generated name
           </p>
           
@@ -219,8 +219,8 @@ export default function WorldsPage() {
           )}
 
           {isGenerating && (
-            <p className="text-primary text-sm flex items-center gap-2">
-              <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+            <p >
+              <span ></span>
               {generatingStatus}
             </p>
           )}

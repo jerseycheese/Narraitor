@@ -140,21 +140,21 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       const worldTheme = testContext.world.genre;
       const characterName = testContext.character.name;
 
-      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
+      const narrativeText = `In the${worldTheme?.toLowerCase() || 'mysterious'}realm of${worldName},${characterName}stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
 
       // Generate context-aware choices based on genre
       const generateChoices = (genre: string = 'Fantasy'): string[] => {
         const baseChoices = [
-          `Explore the ${genre.toLowerCase()} landscape ahead`,
-          `Study the ${worldName} surroundings more carefully`,
-          `Call upon ${characterName}'s inner strength`,
+          `Explore the${genre.toLowerCase()}landscape ahead`,
+          `Study the${worldName}surroundings more carefully`,
+          `Call upon${characterName}'s inner strength`,
         ];
 
         if (genre.toLowerCase().includes('fantasy')) {
           return [
             'Venture deeper into the magical forest',
             'Seek out the ancient temple ruins',
-            'Cast a spell to reveal hidden paths',
+            'Cast a spell to reveal paths',
           ];
         } else if (
           genre.toLowerCase().includes('sci-fi') ||
@@ -203,21 +203,21 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   };
 
   return (
-    <div className={`flex flex-col space-y-3 ${className}`}>
-      <h3 className="text-sm font-medium text-gray-900 mb-3">
+    <div className={`${className}`}>
+      <h3 >
         AI Testing Panel
       </h3>
 
       {/* World Override Section */}
-      <div className="bg-gray-100 p-3 rounded border border-gray-300">
-        <h4 className="text-xs font-medium mb-2 text-gray-900">
+      <div >
+        <h4 >
           World Override
         </h4>
-        <div className="space-y-1">
+        <div >
           <div>
             <label
               htmlFor="world-name"
-              className="block text-xs text-gray-700 mb-0.5"
+              
             >
               World Name:
             </label>
@@ -227,13 +227,13 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className=""
+              
             />
           </div>
           <div>
             <label
               htmlFor="world-genre"
-              className="block text-xs text-gray-700 mb-0.5"
+              
             >
               World Genre:
             </label>
@@ -243,21 +243,21 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
               value={testConfig.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
-              className=""
+              
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="bg-gray-100 p-3 rounded border border-gray-300">
-        <h4 className="text-xs font-medium mb-2 text-gray-900">
+      <div >
+        <h4 >
           Character Override
         </h4>
         <div>
           <label
             htmlFor="character-name"
-            className="block text-xs text-gray-700 mb-0.5"
+            
           >
             Character Name:
           </label>
@@ -267,17 +267,17 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className=""
+            
           />
         </div>
       </div>
 
       {/* Generate Button */}
-      <div className="mt-3">
+      <div >
         <Button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
-          className="w-full"
+          
           variant="default"
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
@@ -286,35 +286,35 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="bg-amber-50 p-2 rounded border border-amber-200">
-          <p className="text-xs text-amber-900">Generating narrative...</p>
+        <div >
+          <p >Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 p-2 rounded border border-red-200">
-          <p className="text-xs text-red-900">Error: {error}</p>
+        <div >
+          <p >Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="bg-green-50 p-2 rounded border border-green-200">
-          <h4 className="text-xs font-medium mb-2 text-green-900">
+        <div >
+          <h4 >
             Generated Results
           </h4>
-          <div className="mb-2">
-            <p className="text-xs text-green-900">{result.text}</p>
+          <div >
+            <p >{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div>
-              <h5 className="text-xs font-medium mb-1 text-green-900">
+              <h5 >
                 Choices:
               </h5>
-              <ul className="text-xs text-green-900 list-none space-y-1">
+              <ul >
                 {result.choices.map((choice, index) => (
                   <li
                     key={index}
-                    className="pl-2 border-l-2 border-green-500 text-xs text-green-900"
+                    
                   >
                     • {choice}
                   </li>

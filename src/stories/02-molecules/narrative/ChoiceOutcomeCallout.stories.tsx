@@ -29,8 +29,8 @@ export const Default: Story = {
  */
 export const VariousDecisionTexts: Story = {
   render: () => (
-    <div className="flex flex-col gap-3 p-4 bg-background rounded-lg max-w-md">
-      <div className="text-sm font-semibold text-muted-foreground mb-2">
+    <div >
+      <div >
         Various Decision Types
       </div>
       <ChoiceOutcomeCallout
@@ -55,7 +55,7 @@ export const VariousDecisionTexts: Story = {
       />
       <ChoiceOutcomeCallout
         decisionId="decision-6"
-        decisionText="You choose to take the hidden treasure"
+        decisionText="You choose to take the treasure"
       />
     </div>
   ),
@@ -66,8 +66,8 @@ export const VariousDecisionTexts: Story = {
  */
 export const MobileView: Story = {
   render: () => (
-    <div className="flex flex-col gap-3 p-4 bg-background rounded-lg max-w-[375px]">
-      <div className="text-sm font-semibold text-muted-foreground mb-2">
+    <div >
+      <div >
         Mobile View (375px width)
       </div>
       <ChoiceOutcomeCallout

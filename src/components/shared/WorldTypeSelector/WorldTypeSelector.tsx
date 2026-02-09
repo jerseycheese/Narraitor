@@ -85,43 +85,43 @@ export function WorldTypeSelector({
 
   const sizeClasses = {
     small: {
-      container: 'space-y-2',
-      conditionalTop: 'mt-3',
-      radio: 'p-2',
-      title: 'text-sm font-medium',
-      description: 'text-xs',
-      input: 'text-sm py-1',
-      label: 'text-xs font-medium',
+      container: '',
+      conditionalTop: '',
+      radio: '',
+      title: '',
+      description: '',
+      input: '',
+      label: '',
     },
     medium: {
-      container: 'space-y-3',
-      conditionalTop: 'mt-4',
-      radio: 'p-3',
-      title: 'font-medium',
-      description: 'text-sm',
-      input: 'py-2',
-      label: 'text-sm font-medium',
+      container: '',
+      conditionalTop: '',
+      radio: '',
+      title: '',
+      description: '',
+      input: '',
+      label: '',
     },
     large: {
-      container: 'space-y-4',
-      conditionalTop: 'mt-6',
-      radio: 'p-4',
-      title: 'text-lg font-semibold',
-      description: 'text-base',
-      input: 'py-3',
-      label: 'text-base font-semibold',
+      container: '',
+      conditionalTop: '',
+      radio: '',
+      title: '',
+      description: '',
+      input: '',
+      label: '',
     },
   };
 
   const styles = sizeClasses[size];
-  const layoutClasses = layout === 'horizontal' ? 'flex flex-wrap gap-4' : 'space-y-3';
+  const layoutClasses = layout === 'horizontal' ? '' : '';
 
   return (
     <div className={`${className}`}>
       {/* World Type Selection */}
       {showLabels && (
-        <Label className={`block ${styles.label} text-gray-700 mb-3`}>
-          World Type <span className="text-red-500">*</span>
+        <Label className={`${styles.label}`}>
+          World Type <span >*</span>
         </Label>
       )}
       
@@ -134,17 +134,17 @@ export function WorldTypeSelector({
         {WORLD_TYPE_OPTIONS.map((option) => (
           <label
             key={option.id}
-            className={`flex items-start ${styles.radio} border rounded-lg cursor-pointer hover:bg-gray-100 ${
-              value.worldType === option.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`${styles.radio}${
+              value.worldType === option.id ? '' : ''
+            }${disabled ? '' : ''}`}
           >
             <RadioGroupItem
               value={option.id}
-              className="mt-1 mr-3"
+              
             />
-            <div className="flex-1">
-              <div className={`${styles.title} text-gray-900`}>{option.label}</div>
-              <div className={`${styles.description} text-gray-700`}>{option.description}</div>
+            <div >
+              <div className={`${styles.title}`}>{option.label}</div>
+              <div className={`${styles.description}`}>{option.description}</div>
             </div>
           </label>
         ))}
@@ -152,16 +152,16 @@ export function WorldTypeSelector({
 
       {/* Conditional Fields */}
       {selectedOption?.requiresReference && (
-        <div className={`${styles.conditionalTop} ${styles.container}`}>
+        <div className={`${styles.conditionalTop}${styles.container}`}>
           {/* Existing Setting Field */}
           <div>
-            <Label htmlFor="world-reference" className={`block ${styles.label} text-gray-700 mb-2`}>
-              {selectedOption.referenceLabel} <span className="text-red-500">*</span>
+            <Label htmlFor="world-reference" className={`${styles.label}`}>
+              {selectedOption.referenceLabel} <span >*</span>
             </Label>
             <Input
               id="world-reference"
               type="text"
-              className={`w-full px-3 ${styles.input} border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`${styles.input}`}
               placeholder={selectedOption.referencePlaceholder}
               value={value.worldReference}
               onChange={(e) => handleReferenceChange(e.target.value)}
@@ -171,17 +171,17 @@ export function WorldTypeSelector({
 
           {/* Additional Details Field */}
           <div>
-            <Label htmlFor="additional-details" className={`block ${styles.label} text-gray-700 mb-2`}>
+            <Label htmlFor="additional-details" className={`${styles.label}`}>
               {selectedOption.additionalDetailsLabel} {value.worldType === 'set_within' ? (
-                <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>
+                <span >(optional - will be inferred from your reference)</span>
               ) : (
-                <span className="text-red-500">*</span>
+                <span >*</span>
               )}
             </Label>
             <Textarea
               id="additional-details"
               rows={3}
-              className={`w-full px-3 ${styles.input} border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`${styles.input}`}
               placeholder={selectedOption.additionalDetailsPlaceholder}
               value={value.additionalDetails}
               onChange={(e) => handleAdditionalDetailsChange(e.target.value)}

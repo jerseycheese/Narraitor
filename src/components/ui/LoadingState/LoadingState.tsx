@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cssClasses } from '@/lib/utils';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 export type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -28,45 +28,45 @@ interface LoadingStateProps {
 
 const sizeClasses = {
   sm: {
-    spinner: 'w-4 h-4',
-    text: 'text-sm',
-    skeleton: 'h-3',
-    dots: 'h-1.5 w-1.5',
+    spinner: '',
+    text: '',
+    skeleton: '',
+    dots: '',
   },
   md: {
-    spinner: 'w-8 h-8',
-    text: 'text-base',
-    skeleton: 'h-4',
-    dots: 'h-2 w-2',
+    spinner: '',
+    text: '',
+    skeleton: '',
+    dots: '',
   },
   lg: {
-    spinner: 'w-12 h-12',
-    text: 'text-lg',
-    skeleton: 'h-5',
-    dots: 'h-2.5 w-2.5',
+    spinner: '',
+    text: '',
+    skeleton: '',
+    dots: '',
   },
   xl: {
-    spinner: 'w-16 h-16',
-    text: 'text-xl',
-    skeleton: 'h-6',
-    dots: 'h-3 w-3',
+    spinner: '',
+    text: '',
+    skeleton: '',
+    dots: '',
   },
 };
 
 const themeClasses = {
   light: {
-    text: 'text-gray-700',
-    skeleton: 'bg-gray-300',
-    spinnerTrack: 'text-gray-300',
-    spinnerFill: 'fill-blue-700',
-    dots: 'text-gray-700',
+    text: '',
+    skeleton: '',
+    spinnerTrack: '',
+    spinnerFill: '',
+    dots: '',
   },
   dark: {
-    text: 'text-gray-100',
-    skeleton: 'bg-gray-700',
-    spinnerTrack: 'text-gray-700',
-    spinnerFill: 'fill-blue-300',
-    dots: 'text-gray-300',
+    text: '',
+    skeleton: '',
+    spinnerTrack: '',
+    spinnerFill: '',
+    dots: '',
   },
 };
 
@@ -81,9 +81,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   skeletonLines = 3,
   showAvatar = false,
 }) => {
-  const containerClasses = cn(
-    inline ? 'inline-flex items-center gap-2' : 'flex flex-col items-center gap-2',
-    centered && !inline && 'justify-center p-8',
+  const containerClasses = cssClasses(
+    inline ? '' : '',
+    centered && !inline && '',
     className
   );
 
@@ -92,8 +92,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       case 'spinner':
         return (
           <svg
-            className={cn(
-              'animate-spin',
+            className={cssClasses(
+              '',
               sizeClasses[size].spinner,
               themeClasses[theme].spinnerTrack,
               themeClasses[theme].spinnerFill
@@ -111,30 +111,30 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
               d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
               fill="currentFill"
             />
-            <span className="sr-only">Loading...</span>
+            <span >Loading...</span>
           </svg>
         );
 
       case 'pulse':
         return (
-          <div className="animate-pulse" role="status" aria-label="Loading">
+          <div  role="status" aria-label="Loading">
             {showAvatar && (
-              <div className="flex items-center gap-4 mb-4">
-                <div className={cn('rounded-full h-12 w-12', themeClasses[theme].skeleton)} />
-                <div className="flex-1">
-                  <div className={cn('h-4 rounded w-3/4 mb-2', themeClasses[theme].skeleton)} />
-                  <div className={cn('h-3 rounded w-1/2', themeClasses[theme].skeleton)} />
+              <div >
+                <div className={cssClasses('', themeClasses[theme].skeleton)} />
+                <div >
+                  <div className={cssClasses('', themeClasses[theme].skeleton)} />
+                  <div className={cssClasses('', themeClasses[theme].skeleton)} />
                 </div>
               </div>
             )}
             {Array.from({ length: skeletonLines }).map((_, i) => (
               <div
                 key={i}
-                className={cn(
-                  'rounded mb-2',
+                className={cssClasses(
+                  '',
                   themeClasses[theme].skeleton,
                   sizeClasses[size].skeleton,
-                  i === skeletonLines - 1 ? 'w-2/3' : 'w-full'
+                  i === skeletonLines - 1 ? '' : ''
                 )}
               />
             ))}
@@ -143,36 +143,36 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
       case 'dots':
         return (
-          <div className={cn('flex items-center gap-1', themeClasses[theme].dots)} role="status" aria-label="Loading">
+          <div className={cssClasses('', themeClasses[theme].dots)} role="status" aria-label="Loading">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className={cn(
-                  'rounded-full bg-current animate-pulse',
+                className={cssClasses(
+                  '',
                   sizeClasses[size].dots,
                   `[animation-delay:${i * 150}ms]`
                 )}
               />
             ))}
-            <span className="sr-only">Loading...</span>
+            <span >Loading...</span>
           </div>
         );
 
       case 'skeleton':
         return (
-          <div className="w-full animate-pulse" role="status" aria-label="Loading">
-            <div className="space-y-2">
+          <div  role="status" aria-label="Loading">
+            <div >
               {Array.from({ length: skeletonLines }).map((_, i) => (
                 <div
                   key={i}
-                  className={cn(
-                    'rounded',
+                  className={cssClasses(
+                    '',
                     themeClasses[theme].skeleton,
                     sizeClasses[size].skeleton,
-                    i === 0 && 'w-3/4',
-                    i === 1 && 'w-full',
-                    i === 2 && 'w-5/6',
-                    i > 2 && 'w-full'
+                    i === 0 && '',
+                    i === 1 && '',
+                    i === 2 && '',
+                    i > 2 && ''
                   )}
                 />
               ))}
@@ -190,7 +190,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       {renderLoadingIndicator()}
       {message && (
         <p
-          className={cn(themeClasses[theme].text, sizeClasses[size].text)}
+          className={cssClasses(themeClasses[theme].text, sizeClasses[size].text)}
           aria-live="polite"
         >
           {message}

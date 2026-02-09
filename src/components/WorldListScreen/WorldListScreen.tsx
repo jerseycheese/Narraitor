@@ -36,9 +36,9 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   const [viewMode, setViewMode] = useState<WorldViewMode>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('world-view-mode');
-      return (saved as WorldViewMode) || 'grid';
+      return (saved as WorldViewMode) || '';
     }
-    return 'grid';
+    return '';
   });
 
   const handleViewModeChange = (mode: WorldViewMode) => {
@@ -126,7 +126,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   if (loading) {
     return (
-      <section className="p-8" data-testid="world-list-screen-loading-indicator">
+      <section  data-testid="world-list-screen-loading-indicator">
         <LoadingPulse message="Loading your worlds..." skeletonLines={3} />
       </section>
     );
@@ -134,7 +134,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   if (error) {
     return (
-      <section className="p-6" data-testid="world-list-screen-error-message">
+      <section  data-testid="world-list-screen-error-message">
         <SectionError
           title={error.title || 'Error Loading Worlds'}
           message={error.message}
@@ -148,7 +148,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   return (
     <main>
-      {viewMode === 'table' ? (
+      {viewMode === '' ? (
         <WorldTable
           worlds={worlds}
           selectedWorldIds={selectedWorldIds}

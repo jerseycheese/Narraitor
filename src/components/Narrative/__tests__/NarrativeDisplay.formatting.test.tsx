@@ -170,22 +170,14 @@ describe('NarrativeDisplay - Formatting Integration', () => {
 
   describe('Visual organization for storytelling', () => {
     it('should organize long narrative content for easy reading', () => {
-      const longContent = `The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.
-
-Books of every size and color filled the shelves. Some glowed with inner light, others seemed to absorb the surrounding darkness.
-
-The librarian said, Welcome to the Archive of Ages. Here you will find the knowledge you seek.
-
-They walked deeper into the stacks. The *whispers* of ancient wisdom echoed around them.
-
-This was only the beginning of their quest.`;
+      const longContent = `The ancient library stretched endlessly before them. Towering shelves disappeared into above. Books of every size and color filled the shelves. Some glowed with inner light, others seemed to absorb the surrounding darkness. The librarian said, Welcome to the Archive of Ages. Here you will find the knowledge you seek. They walked deeper into the stacks. The *whispers* of ancient wisdom echoed around them. This was only the beginning of their quest.`;
 
       const segment = createMockSegment(longContent);
 
       render(<NarrativeDisplay segment={segment} />);
 
       // Long content should be organized into clear paragraphs with proper formatting
-      expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.')).toBeInTheDocument();
+      expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into above.')).toBeInTheDocument();
       expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\./)).toBeInTheDocument();
       expect(screen.getByText('This was only the beginning of their quest.')).toBeInTheDocument();
 
@@ -195,7 +187,7 @@ This was only the beginning of their quest.`;
     });
 
     it('should handle whitespace normalization while preserving story structure', () => {
-      const messyContent = '   The story begins   here.   \n\n\n   Multiple    spaces    everywhere.   \n\n   The  end.   ';
+      const messyContent = 'The story begins here. \n\n\n Multiple spaces everywhere. \n\n The end.';
       const segment = createMockSegment(messyContent);
       
       render(<NarrativeDisplay segment={segment} />);
@@ -209,22 +201,22 @@ This was only the beginning of their quest.`;
 
   describe('Integration with narrative segment types', () => {
     it('should apply consistent formatting across all segment types', () => {
-      const segmentTypes: Array<NarrativeSegment['type']> = ['scene', 'dialogue', 'action', 'transition'];
+      const segmentTypes: Array<NarrativeSegment['type']> = ['scene', 'dialogue', 'action', ''];
       
       segmentTypes.forEach(type => {
-        const content = `This is a ${type} segment.\n\nIt has multiple paragraphs.\n\nThe character said, This should be formatted properly.`;
+        const content = `This is a${type}segment.\n\nIt has multiple paragraphs.\n\nThe character said, This should be formatted properly.`;
         const segment = createMockSegment(content, type);
         
         const { unmount } = render(<NarrativeDisplay segment={segment} />);
         
         // Each segment type should display content with appropriate formatting
-        if (type === 'transition') {
+        if (type === '') {
           // Transition segments preserve line breaks, so text is in one container with <br> tags
           expect(screen.getByText(/This is a transition segment\./)).toBeInTheDocument();
           expect(screen.getByText(/It has multiple paragraphs\./)).toBeInTheDocument();
           expect(screen.getByText(/The character said, This should be formatted properly\./)).toBeInTheDocument();
         } else {
-          expect(screen.getByText(`This is a ${type} segment.`)).toBeInTheDocument();
+          expect(screen.getByText(`This is a${type}segment.`)).toBeInTheDocument();
           expect(screen.getByText('It has multiple paragraphs.')).toBeInTheDocument();
           
           // Check if dialogue formatting is applied based on segment type

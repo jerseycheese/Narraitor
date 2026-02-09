@@ -32,13 +32,13 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
       // Use the enhanced sanitization utility for consistent handling
       const sanitized = sanitizeForSerialization(data, {
         maxDepth: 8, // Reasonable depth for DevTools display
-        functionHandler: (fn) => `[Function: ${fn.name || 'anonymous'}]`
+        functionHandler: (fn) => `[Function:${fn.name || 'anonymous'}]`
       });
       
       // Format with indentation
       return JSON.stringify(sanitized, null, 2);
     } catch (error) {
-      return `Error formatting JSON: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      return `Error formatting JSON:${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }, [data]);
 
@@ -58,7 +58,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   return (
     <pre
       data-testid="json-viewer"
-      className={`text-xs font-mono p-3 rounded overflow-auto max-h-60 bg-gray-50 border border-gray-300 text-gray-900 ${className}`}
+      className={`${className}`}
     >
       {!isMounted ? (
         // Simple content for server-side rendering

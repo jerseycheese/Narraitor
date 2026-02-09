@@ -89,7 +89,7 @@ describe('Toast Component', () => {
     const variants = ['success', 'error', 'warning', 'info'] as const;
 
     variants.forEach(variant => {
-      const { unmount } = render(<Toast title={`${variant} toast`} variant={variant} />);
+      const { unmount } = render(<Toast title={`${variant}toast`} variant={variant} />);
       const toast = screen.getByRole('alert');
       expect(toast).toHaveAttribute('data-variant', variant);
       unmount();

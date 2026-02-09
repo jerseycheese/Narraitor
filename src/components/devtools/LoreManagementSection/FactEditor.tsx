@@ -37,7 +37,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
   const [importance, setImportance] = useState<'low' | 'medium' | 'high'>(
     fact?.metadata?.importance || 'medium'
   );
-  const [tags, setTags] = useState(fact?.metadata?.tags?.join(', ') || '');
+  const [tags, setTags] = useState(fact?.metadata?.tags?.join(',') || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isDuplicate, setIsDuplicate] = useState(false);
 
@@ -135,7 +135,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} >
       <div>
         <Label htmlFor="fact-key">Fact Key</Label>
         <Input
@@ -143,10 +143,10 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           value={key}
           onChange={(e) => setKey(e.target.value)}
           placeholder="e.g., hero_name"
-          className={errors.key ? 'border-red-500' : ''}
+          className={errors.key ? '' : ''}
         />
         {errors.key && (
-          <p className="text-sm text-red-500 mt-1">{errors.key}</p>
+          <p >{errors.key}</p>
         )}
       </div>
 
@@ -158,10 +158,10 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           onChange={(e) => setValue(e.target.value)}
           placeholder="e.g., Lyra Starweaver"
           rows={2}
-          className={errors.value ? 'border-red-500' : ''}
+          className={errors.value ? '' : ''}
         />
         {errors.value && (
-          <p className="text-sm text-red-500 mt-1">{errors.value}</p>
+          <p >{errors.value}</p>
         )}
       </div>
 
@@ -178,7 +178,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           <option value="rules">Rules</option>
         </Select>
         {errors.category && (
-          <p className="text-sm text-red-500 mt-1">{errors.category}</p>
+          <p >{errors.category}</p>
         )}
       </div>
 
@@ -192,7 +192,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           <option value="session-private">Session Private</option>
           <option value="world-shared">World Shared</option>
         </Select>
-        <p className="text-xs text-gray-600 mt-1">
+        <p >
           Session Private: Only visible in this session. World Shared: Visible to all sessions.
         </p>
       </div>
@@ -232,19 +232,19 @@ export const FactEditor: React.FC<FactEditorProps> = ({
       </div>
 
       {isDuplicate && !fact && (
-        <Alert className="border-amber-500">
+        <Alert >
           <AlertDescription>
             Duplicate fact detected. This fact already exists for this world.
           </AlertDescription>
         </Alert>
       )}
 
-      <div className="flex gap-2">
+      <div >
         <Button type="submit" disabled={isDuplicate && !fact}>
           {fact ? 'Save Changes' : 'Add Fact'}
         </Button>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="" onClick={onCancel}>
             Cancel
           </Button>
         )}

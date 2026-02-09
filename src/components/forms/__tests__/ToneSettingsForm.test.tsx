@@ -12,7 +12,7 @@ jest.mock('@/lib/utils', () => ({
   descriptionsToSelectOptions: jest.fn((descriptions) => 
     Object.entries(descriptions).map(([value, description]) => ({
       value,
-      label: titleCase(value.replace(/-/g, ' ')),
+      label: titleCase(value.replace(/-/g, '')),
       description
     }))
   ),

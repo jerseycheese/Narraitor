@@ -69,9 +69,9 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     // Load preference from localStorage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('inventory-view-mode');
-      return (saved as InventoryViewMode) || 'grid';
+      return (saved as InventoryViewMode) || '';
     }
-    return 'grid';
+    return '';
   });
 
   // Persist view mode preference
@@ -120,7 +120,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   // Empty state when no items
   if (items.length === 0) {
     return (
-      <div className={`p-6 ${className}`}>
+      <div className={`${className}`}>
         <EmptyState
           title="No items in inventory"
           description="Items will appear here as they are added"
@@ -131,9 +131,9 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
+    <div className={`${className}`} role="region" aria-label="Character inventory">
       {/* View Toggle */}
-      <div className="flex justify-end">
+      <div >
         <InventoryViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
       </div>
 
@@ -145,7 +145,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       )}
 
       {/* Table View */}
-      {viewMode === 'table' ? (
+      {viewMode === '' ? (
         <InventoryTable characterId={characterId} />
       ) : (
         /* Grid View */
@@ -163,57 +163,57 @@ export const InventoryList: React.FC<InventoryListProps> = ({
             aria-labelledby={`category-${categoryId}`}
           >
             {/* Category Header with visual separation */}
-            <div className="mb-4 border-b border-border pb-2">
+            <div >
               <h3
                 id={`category-${categoryId}`}
-                className="text-lg font-semibold text-foreground"
+                
               >
                 {categoryName}
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p >
                 {categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'}
                 {categoryDescription && (
-                  <span className="sr-only"> - {categoryDescription}</span>
+                  <span > - {categoryDescription}</span>
                 )}
               </p>
             </div>
 
             {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
             <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              
               role="list"
-              aria-label={`${categoryName} items`}
+              aria-label={`${categoryName}items`}
             >
               {categoryItems.map((item) => (
                 <Card
                   key={item.id}
-                  className="p-4 border border-border hover:border-border/80 transition-colors inventory-item"
+                  className="inventory-item"
                   role="listitem"
                 >
                   {/* Item Image (if available) */}
                   {item.image?.url && (
-                    <div className="mb-3 flex justify-center">
+                    <div >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image.url}
                         alt={item.name}
-                        className="w-24 h-24 object-contain rounded-md item-image"
+                        className="item-image"
                         loading="lazy"
                       />
                     </div>
                   )}
 
                   {/* Item Header: Name and Quantity */}
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-foreground flex-1 item-name">
+                  <div >
+                    <h4 className="item-name">
                       {item.name}
                     </h4>
                     {item.stackable && (
                       <Badge
                         variant="secondary-static"
                         size="sm"
-                        className="ml-2 item-quantity"
-                        aria-label={`Quantity: ${item.quantity}`}
+                        className="item-quantity"
+                        aria-label={`Quantity:${item.quantity}`}
                       >
                         ×{item.quantity}
                       </Badge>
@@ -222,49 +222,49 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
                   {/* Item Description */}
                   {item.description && (
-                    <p className="text-sm text-muted-foreground mb-3 item-description">
+                    <p className="item-description">
                       {item.description}
                     </p>
                   )}
 
                   {/* Item Metadata and Actions */}
-                  <div className="space-y-2">
+                  <div >
                     {/* Category Badge and Acquisition Method */}
-                    <div className="flex items-center gap-2">
+                    <div >
                       <Badge
-                        variant="outline-static"
+                        variant=""
                         size="sm"
                         className="item-category"
-                        aria-label={`Category: ${categoryName}`}
+                        aria-label={`Category:${categoryName}`}
                       >
                         {categoryName}
                       </Badge>
                       {item.acquisitionHistory[0] && (
-                        <span className="text-xs text-muted-foreground capitalize">
+                        <span >
                           {item.acquisitionHistory[0].method}
                         </span>
                       )}
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
+                    <div >
                       <Button
-                        variant="outline"
+                        variant=""
                         size="sm"
                         onClick={() => handleUseItem(item.id)}
                         disabled={usingItemId === item.id || item.quantity <= 0}
-                        className="flex-1"
+                        
                       >
                         {usingItemId === item.id ? 'Using...' : 'Use'}
                       </Button>
                       <Button
-                        variant="outline"
+                        variant=""
                         size="sm"
                         onClick={() => openDropDialog(item)}
-                        aria-label={`Drop ${item.name}`}
+                        aria-label={`Drop${item.name}`}
                         title="Drop item"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2  />
                       </Button>
                     </div>
                   </div>

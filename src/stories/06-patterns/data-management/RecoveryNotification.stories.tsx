@@ -17,7 +17,7 @@ const meta = {
   argTypes: {
     isVisible: {
       control: 'boolean',
-      description: 'Whether the notification is visible',
+      description: 'Whether the notification is',
     },
     lastSaved: {
       control: 'text',
@@ -47,7 +47,7 @@ export const Visible: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Recovery notification in visible state with recent save timestamp.',
+        story: 'Recovery notification in state with recent save timestamp.',
       },
     },
   },

@@ -71,7 +71,7 @@ export const DisabledChecked: Story = {
 
 export const MultipleOptions: Story = {
   render: () => (
-    <div className="space-y-3">
+    <div >
       <Checkbox label="Strength" checked={true} />
       <Checkbox label="Intelligence" checked={false} />
       <Checkbox label="Dexterity" checked={true} />

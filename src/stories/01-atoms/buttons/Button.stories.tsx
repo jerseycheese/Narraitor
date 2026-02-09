@@ -37,7 +37,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'success', 'info', 'warning'],
+      options: ['default', 'destructive', '', 'secondary', 'ghost', 'link', 'success', 'info', 'warning'],
     },
     size: {
       control: 'select',
@@ -60,11 +60,11 @@ export const Default: Story = {
 
 export const Variants: Story = {
   render: () => (
-    <div className="flex gap-4 flex-wrap">
+    <div >
       <Button>Default</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="destructive">Destructive</Button>
-      <Button variant="outline">Outline</Button>
+      <Button variant="">Outline</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
       <Button variant="success">Action Green</Button>
@@ -74,18 +74,18 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div className="flex gap-4 items-center">
+    <div >
       <Button size="sm">Small</Button>
       <Button>Default</Button>
       <Button size="lg">Large</Button>
-      <Button size="icon"><Settings className="w-4 h-4" aria-hidden="true" /></Button>
+      <Button size="icon"><Settings  aria-hidden="true" /></Button>
     </div>
   ),
 }
 
 export const States: Story = {
   render: () => (
-    <div className="flex gap-4">
+    <div >
       <Button>Normal</Button>
       <Button disabled>Disabled</Button>
     </div>
@@ -94,21 +94,21 @@ export const States: Story = {
 
 export const WithIcons: Story = {
   render: () => (
-    <div className="flex gap-4 flex-wrap">
-      <Button className="flex items-center gap-2">
-        <Plus className="w-4 h-4" aria-hidden="true" />
+    <div >
+      <Button >
+        <Plus  aria-hidden="true" />
         Create
       </Button>
-      <Button className="flex items-center gap-2" variant="secondary">
-        <Play className="w-4 h-4" aria-hidden="true" />
+      <Button  variant="secondary">
+        <Play  aria-hidden="true" />
         Play
       </Button>
-      <Button className="flex items-center gap-2" variant="outline">
-        <Sparkles className="w-4 h-4" aria-hidden="true" />
+      <Button  variant="">
+        <Sparkles  aria-hidden="true" />
         Generate
       </Button>
-      <Button className="flex items-center gap-2" variant="destructive">
-        <Trash className="w-4 h-4" aria-hidden="true" />
+      <Button  variant="destructive">
+        <Trash  aria-hidden="true" />
         Delete
       </Button>
     </div>

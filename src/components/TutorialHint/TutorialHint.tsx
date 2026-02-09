@@ -18,17 +18,17 @@ export function TutorialHint({ id, children, className = '', dismissible = true 
   if (dismissedHints.includes(id)) return null;
 
   return (
-    <div className={`relative bg-card border border-primary/20 rounded-md p-3 shadow-sm ${className}`}>
+    <div className={`${className}`}>
       {dismissible && (
         <button 
           onClick={() => dismissTutorialHint(id)}
-          className="absolute top-1 right-1 text-muted-foreground hover:text-foreground"
+          
           aria-label="Dismiss hint"
         >
-          <X className="h-3 w-3" />
+          <X  />
         </button>
       )}
-      <div className="text-sm text-card-foreground pr-4">
+      <div >
         {children}
       </div>
     </div>

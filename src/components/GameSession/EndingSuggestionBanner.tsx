@@ -15,15 +15,15 @@ export function EndingSuggestionBanner({
   onDismiss,
 }: EndingSuggestionBannerProps) {
   return (
-    <Alert variant="warning" className="mb-4 ending-suggestion-banner">
-      <AlertTitle className="flex items-center gap-2 text-foreground">
-        <BookOpen className="w-4 h-4" />
+    <Alert variant="warning" className="ending-suggestion-banner">
+      <AlertTitle >
+        <BookOpen  />
         Your story could end here
       </AlertTitle>
-      <AlertDescription className="mt-2 text-sm text-foreground/80">
+      <AlertDescription >
         {reason}
       </AlertDescription>
-      <div className="flex gap-2 mt-4">
+      <div >
         <Button size="sm" onClick={onAccept}>
           View Ending
         </Button>

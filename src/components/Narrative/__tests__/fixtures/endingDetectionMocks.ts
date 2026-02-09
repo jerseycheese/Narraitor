@@ -15,49 +15,19 @@ export const createMockCheckForEndingIndicators = () => {
       const client = createDefaultGeminiClient();
       const recentSegments = allSegments.slice(-5);
       const narrativeContext = recentSegments
-        .map((segment, index) => `Segment ${index + 1}: ${segment.content}`)
+        .map((segment, index) => `Segment${index + 1}:${segment.content}`)
         .join('\n\n');
 
       const fullStoryContext =
         allSegments.length > 10
-          ? `Earlier story: ${allSegments
+          ? `Earlier story:${allSegments
               .slice(0, -5)
               .map((s) => s.content)
-              .join(' ')
+              .join('')
               .substring(0, 500)}...\n\n`
           : '';
 
-      const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
-
-${fullStoryContext}Recent narrative developments:
-${narrativeContext}
-
-Analyze this story for natural ending points. Consider:
-
-STORY STRUCTURE:
-- Has the central conflict been resolved or reached climax?
-- Are character arcs showing completion or fulfillment?
-- Is there a sense of narrative closure or resolution?
-- Does the story feel like it has reached a satisfying conclusion?
-
-EMOTIONAL SATISFACTION:
-- Would ending here feel fulfilling to the reader?
-- Are loose threads tied up or at a natural pause?
-- Is there dramatic or emotional resolution?
-
-DO NOT:
-- Look for specific keywords or phrases
-- Use pattern matching
-- Apply rigid rules
-- Suggest ending just because of story length
-
-Respond with JSON format:
-{
-  "suggestEnding": true/false,
-  "confidence": "high" | "medium" | "low",
-  "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-  "reason": "Clear explanation of why this is/isn't a good ending point"
-}`;
+      const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.${fullStoryContext}Recent narrative developments:${narrativeContext}Analyze this story for natural ending points. Consider: STORY STRUCTURE: - Has the central conflict been resolved or reached climax? - Are character arcs showing completion or fulfillment? - Is there a sense of narrative closure or resolution? - Does the story feel like it has reached a satisfying conclusion? EMOTIONAL SATISFACTION: - Would ending here feel fulfilling to the reader? - Are loose threads tied up or at a natural pause? - Is there dramatic or emotional resolution? DO NOT: - Look for specific keywords or phrases - Use pattern matching - Apply rigid rules - Suggest ending just because of story length Respond with JSON format: { "suggestEnding": true/false, "confidence": "high" | "medium" | "low", "endingType": "story-complete" | "character-retirement" | "session-limit" | "none", "reason": "Clear explanation of why this is/isn't a good ending point" }`;
 
       const response = await client.generateContent(analysisPrompt);
 

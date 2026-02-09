@@ -18,31 +18,7 @@ const meta = {
     },
     docs: {
       description: {
-        component: `
-CharacterEditor provides a comprehensive interface for editing existing characters.
-
-## Key Features
-- **Pre-populated forms** with current character data
-- **Custom prompt functionality** for portrait generation with undo capability
-- **Consistent UI components** using shadcn/ui throughout
-- **Save/Cancel functionality** with proper state management
-- **Validation reuse** from character creation system
-
-## Recent Improvements
-- ✅ Custom prompt field no longer gets polluted by API responses
-- ✅ "Customize physical description" is unchecked by default
-- ✅ Added "Undo customizations" button for easy reset
-- ✅ Replaced all raw HTML elements with proper shadcn/ui components
-- ✅ Consistent button variants (default, outline, destructive, link)
-- ✅ Proper checkbox, select, textarea, and input components
-- ✅ **NEW**: Comprehensive UI standardization across entire codebase
-- ✅ **NEW**: All world editing forms now use shadcn/ui components
-- ✅ **NEW**: World creation wizard steps updated with consistent UI
-- ✅ **NEW**: Improved accessibility and keyboard navigation
-
-## Usage
-The editor automatically loads character data and provides forms for all editable fields including basic info, background, attributes, skills, and portrait generation.
-        `,
+        component: `CharacterEditor provides a comprehensive interface for editing existing characters. ## Key Features - **Pre-populated forms** with current character data - **Custom prompt functionality** for portrait generation with undo capability - **Consistent UI components** using shadcn/ui throughout - **Save/Cancel functionality** with proper state management - **Validation reuse** from character creation system ## Recent Improvements - ✅ Custom prompt field no longer gets polluted by API responses - ✅ "Customize physical description" is unchecked by default - ✅ Added "Undo customizations" button for easy reset - ✅ Replaced all raw HTML elements with proper shadcn/ui components - ✅ Consistent button variants (default, outline, destructive, link) - ✅ Proper checkbox, select, textarea, and input components - ✅ **NEW**: Comprehensive UI standardization across entire codebase - ✅ **NEW**: All world editing forms now use shadcn/ui components - ✅ **NEW**: World creation wizard steps updated with consistent UI - ✅ **NEW**: Improved accessibility and keyboard navigation ## Usage The editor automatically loads character data and provides forms for all editable fields including basic info, background, attributes, skills, and portrait generation.`,
       },
     },
   },
@@ -111,7 +87,7 @@ The editor automatically loads character data and provides forms for all editabl
       });
 
       return (
-        <div className="min-h-screen bg-gray-100 p-4">
+        <div >
           <Story />
         </div>
       );
@@ -214,7 +190,7 @@ export const WithPortrait: Story = {
         derivedStats: [],
         background: {
           history: 'A legendary warrior from the northern kingdoms',
-          personality: 'Stoic and honorable, with a hidden sense of humor',
+          personality: 'Stoic and honorable, with a sense of humor',
           goals: ['Protecting the innocent and upholding justice'],
           fears: ['Dishonor', 'Failing in duty'],
           physicalDescription: 'Battle-scarred warrior with piercing eyes',
@@ -254,17 +230,17 @@ export const LoadingState: Story = {
     () => {
       // Simply show the loading state component without character setup
       return (
-        <div className="min-h-screen bg-gray-100 p-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold">
+        <div >
+          <div >
+            <div >
+              <h1 >
                 Character Editor - Loading State
               </h1>
-              <p className="text-gray-700">
+              <p >
                 Demonstrating the LoadingState component
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
+            <div >
               <LoadingStateComponent message="Loading character data..." />
             </div>
           </div>
@@ -286,13 +262,13 @@ export const ErrorWithRetry: Story = {
   },
   decorators: [
     () => (
-      <div className="min-h-screen bg-gray-100 p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold">
+      <div >
+        <div >
+          <div >
+            <h1 >
               Character Editor - Error State
             </h1>
-            <p className="text-gray-700">
+            <p >
               Demonstrating the PageError component
             </p>
           </div>
@@ -364,15 +340,15 @@ export const CustomPromptTesting: Story = {
       });
 
       return (
-        <div className="min-h-screen bg-gray-100 p-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h2 className="font-semibold text-blue-900 mb-2">
+        <div >
+          <div >
+            <div >
+              <h2 >
                 Custom Prompt Testing Instructions
               </h2>
-              <ul className="text-blue-700 space-y-1 text-sm">
+              <ul >
                 <li>
-                  1. Check that &quot;Customize physical description&quot; is{' '}
+                  1. Check that &quot;Customize physical description&quot; is{''}
                   <strong>unchecked by default</strong>
                 </li>
                 <li>
@@ -457,13 +433,13 @@ export const UIComponentShowcase: Story = {
       });
 
       return (
-        <div className="min-h-screen bg-gray-100 p-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-              <h2 className="font-semibold text-green-700 mb-2">
+        <div >
+          <div >
+            <div >
+              <h2 >
                 shadcn/ui Component Integration
               </h2>
-              <ul className="text-green-700 space-y-1 text-sm">
+              <ul >
                 <li>
                   ✅ <strong>Input</strong> components with proper styling and
                   focus states

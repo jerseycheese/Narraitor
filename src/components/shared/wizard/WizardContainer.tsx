@@ -13,10 +13,10 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`component-wizard-container ${wizardStyles.container} ${className}`}>
+    <div className={`component-wizard-container${wizardStyles.container}${className}`}>
       <div className={wizardStyles.header}>
         {typeof title === 'string' ? (
-          <h1 className={`${wizardStyles.title} text-center`}>{title}</h1>
+          <h1 className={`${wizardStyles.title}`}>{title}</h1>
         ) : (
           <div className={`${wizardStyles.title}`}>{title}</div>
         )}

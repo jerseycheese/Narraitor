@@ -86,7 +86,7 @@ export const Default: Story = {
   args: {
     columns,
     data: sampleData.slice(0, 5),
-    ariaLabel: 'Sample data table',
+    ariaLabel: 'Sample data',
   },
 };
 
@@ -105,7 +105,7 @@ export const WithSearchAndPagination: Story = {
       enabled: true,
       placeholder: 'Search items...',
     },
-    ariaLabel: 'Full-featured data table',
+    ariaLabel: 'Full-featured data',
   },
 };
 
@@ -117,7 +117,7 @@ export const LargeDataset: Story = {
     columns,
     data: Array.from({ length: 50 }, (_, i) => ({
       id: `${i + 1}`,
-      name: `Item ${i + 1}`,
+      name: `Item${i + 1}`,
       category: ['Consumables', 'Equipment', 'Documents', 'Valuables'][i % 4],
       quantity: Math.floor(Math.random() * 100) + 1,
       price: Math.floor(Math.random() * 1000) + 10,
@@ -130,6 +130,6 @@ export const LargeDataset: Story = {
       enabled: true,
       placeholder: 'Search large dataset...',
     },
-    ariaLabel: 'Large dataset table',
+    ariaLabel: 'Large dataset',
   },
 };

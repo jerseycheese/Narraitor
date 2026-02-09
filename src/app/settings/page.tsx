@@ -24,12 +24,12 @@ export default function SettingsPage() {
       description="Manage your application settings and backup your game data. Export creates a downloadable backup file, and import restores your data from a previously exported file."
     >
       {/* Data Management Section */}
-      <div className="space-y-6">
+      <div >
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Data Management</h2>
+          <h2 >Data Management</h2>
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Backup & Restore</CardTitle>
+              <CardTitle >Backup & Restore</CardTitle>
               <CardDescription>
                 Create backups of your worlds, characters, and game progress. 
                 Export generates a downloadable JSON file containing all your data, 
@@ -37,7 +37,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ExportImportControls className="max-w-none" />
+              <ExportImportControls  />
             </CardContent>
           </Card>
         </section>

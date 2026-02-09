@@ -8,7 +8,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { Button } from '@/components/ui/button';
 
@@ -62,17 +62,17 @@ export function Breadcrumbs({
   return (
     <nav 
       aria-label="Breadcrumb"
-      className={cn('flex items-center space-x-2 text-sm', className)}
+      className={cssClasses('', className)}
     >
       {showEllipsis && (
         <>
           <span 
             data-testid="breadcrumb-ellipsis"
-            className="text-gray-500"
+            
           >
             ...
           </span>
-          <span className="text-gray-500">{separator}</span>
+          <span >{separator}</span>
         </>
       )}
       
@@ -86,13 +86,13 @@ export function Breadcrumbs({
             <React.Fragment key={segment.href}>
               <span
                 data-testid={testId}
-                className="text-gray-500 flex items-center gap-2"
+                
               >
                 {getSegmentIcon(segment)}
                 {segment.label}
               </span>
               {!isLast && (
-                <span className="text-gray-500">{separator}</span>
+                <span >{separator}</span>
               )}
             </React.Fragment>
           );
@@ -105,18 +105,18 @@ export function Breadcrumbs({
               onClick={(e) => handleClick(e, segment)}
               data-testid={testId}
               aria-current={segment.isCurrentPage ? 'page' : undefined}
-              className={cn(
-                'hover:text-gray-700 transition-colors flex items-center gap-2',
+              className={cssClasses(
+                '',
                 segment.isCurrentPage 
-                  ? 'text-gray-900 font-medium cursor-default' 
-                  : 'text-gray-700'
+                  ? '' 
+                  : ''
               )}
             >
               {getSegmentIcon(segment)}
               {segment.label}
             </Link>
             {!isLast && (
-              <span className="text-gray-500">{separator}</span>
+              <span >{separator}</span>
             )}
           </React.Fragment>
         );
@@ -134,9 +134,9 @@ export function Breadcrumbs({
     if (nextStep.action === 'start-game' && nextStep.characterId) {
       const character = characters[nextStep.characterId];
       return (
-        <div className="ml-4 flex items-center">
-          <span className="text-gray-500 mr-2">{separator}</span>
-          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
+        <div >
+          <span >{separator}</span>
+          <span >Next: Start Playing</span>
           <Button
             onClick={() => {
               if (currentWorldId && nextStep.characterId) {
@@ -147,7 +147,7 @@ export function Breadcrumbs({
             }}
             variant="success"
             size="sm"
-            className="text-sm px-3 py-1 rounded-md transition-colors"
+            
           >
             Play as {character?.name}
           </Button>
@@ -157,9 +157,9 @@ export function Breadcrumbs({
 
     if (nextStep.action === 'select-character' && (Object.values(characters) as Character[]).filter(c => c.worldId === currentWorldId).length > 0) {
       return (
-        <div className="ml-4 flex items-center">
-          <span className="text-gray-500 mr-2">{separator}</span>
-          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
+        <div >
+          <span >{separator}</span>
+          <span >Next: Start Playing</span>
           <Button
             onClick={() => {
               const firstCharacter = (Object.values(characters) as Character[]).find(c => c.worldId === currentWorldId);
@@ -169,7 +169,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            className="text-sm px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white rounded-md transition-colors"
+            
             variant="default"
             size="sm"
           >
@@ -180,12 +180,12 @@ export function Breadcrumbs({
     }
 
     return (
-      <div className="ml-4 flex items-center">
-        <span className="text-gray-500 mr-2">{separator}</span>
-        <span className="text-sm text-gray-700 mr-2">Next: {nextStep.label}</span>
+      <div >
+        <span >{separator}</span>
+        <span >Next: {nextStep.label}</span>
         <Link
           href={nextStep.href}
-          className="text-sm text-link-primary font-medium no-underline"
+          
         >
           {nextStep.action === 'create-world' && 'Create Your First World'}
           {nextStep.action === 'create-character' && 'Create Character'}
@@ -236,22 +236,22 @@ function getTestId(segment: BreadcrumbSegment): string {
 function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
   // Home/Root segments
   if (segment.label === 'Worlds') {
-    return <Home className="w-4 h-4" data-testid="icon-home" aria-hidden="true" />;
+    return <Home  data-testid="icon-home" aria-hidden="true" />;
   }
   
   // World segments
   if (segment.href.startsWith('/worlds/') ) {
-    return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
+    return <Globe  data-testid="icon-globe" aria-hidden="true" />;
   }
   
   // Characters list page (multiple people)
   if (segment.href === '/characters') {
-    return <Users className="w-4 h-4" data-testid="icon-users" aria-hidden="true" />;
+    return <Users  data-testid="icon-users" aria-hidden="true" />;
   }
   
   // Individual character page (single person)
   if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
-    return <User className="w-4 h-4" data-testid="icon-user" aria-hidden="true" />;
+    return <User  data-testid="icon-user" aria-hidden="true" />;
   }
   
   // No icon for other segments

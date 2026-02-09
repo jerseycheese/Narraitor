@@ -11,8 +11,8 @@ interface DevToolsWrapperProps {
 // Create a component wrapper for the different states
 const DevToolsWrapper = ({ children, initialIsOpen = false }: DevToolsWrapperProps) => {
   return (
-    <div className="h-[90vh] relative">
-      <div className="h-full overflow-auto p-5">
+    <div >
+      <div >
         <h1>Page Content</h1>
         <p>This represents the main content of the page.</p>
         {/* Repeat content to show scrolling */}

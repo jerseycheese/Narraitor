@@ -79,7 +79,7 @@ export default function DescriptionStep({
     if (!hasAISuggestions) {
       return (
         <div
-          className="rounded-lg border border-dashed border-info/20 bg-info/10 p-4 text-sm text-info-text"
+          
           data-testid="ai-suggestion-empty"
         >
           {canGenerateSuggestions ? (
@@ -95,16 +95,16 @@ export default function DescriptionStep({
     const skillList = (aiSuggestions?.skills || []).slice(0, 3);
 
     return (
-      <div className="grid gap-4 md:grid-cols-2" data-testid="ai-suggestion-preview">
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <h4 className="text-sm font-semibold text-gray-900">Attributes to explore</h4>
-          <ul className="mt-2 space-y-2 text-sm text-gray-700">
+      <div  data-testid="ai-suggestion-preview">
+        <div >
+          <h4 >Attributes to explore</h4>
+          <ul >
             {attributeList.length > 0 ? (
               attributeList.map((attribute, index) => (
                 <li key={`${attribute.name}-${index}`}>
-                  <span className="font-medium">{attribute.name}</span>
+                  <span >{attribute.name}</span>
                   {attribute.description ? (
-                    <span className="block text-xs text-gray-600">{attribute.description}</span>
+                    <span >{attribute.description}</span>
                   ) : null}
                 </li>
               ))
@@ -113,15 +113,15 @@ export default function DescriptionStep({
             )}
           </ul>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <h4 className="text-sm font-semibold text-gray-900">Skill ideas</h4>
-          <ul className="mt-2 space-y-2 text-sm text-gray-700">
+        <div >
+          <h4 >Skill ideas</h4>
+          <ul >
             {skillList.length > 0 ? (
               skillList.map((skill, index) => (
                 <li key={`${skill.name}-${index}`}>
-                  <span className="font-medium">{skill.name}</span>
+                  <span >{skill.name}</span>
                   {skill.description ? (
-                    <span className="block text-xs text-gray-600">{skill.description}</span>
+                    <span >{skill.description}</span>
                   ) : null}
                 </li>
               ))
@@ -156,7 +156,7 @@ export default function DescriptionStep({
             testId="world-full-description"
             dataTutorial="world-description"
           />
-          <div className="mt-1 text-right text-sm" data-testid="description-char-count">
+          <div  data-testid="description-char-count">
             {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
           </div>
         </WizardFormGroup>
@@ -166,8 +166,8 @@ export default function DescriptionStep({
         title="Attribute & Skill Suggestions"
         description="Suggested attributes and skills based on your world description."
       >
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
+        <div >
+          <div >
             <Button
               type="button"
               onClick={() => {
@@ -183,7 +183,7 @@ export default function DescriptionStep({
                   ? 'Regenerate suggestions'
                   : 'Generate suggestions'}
             </Button>
-            <span className="text-xs text-gray-600">
+            <span >
               {hasAISuggestions && suggestionMeta?.source
                 ? SUGGESTION_SOURCE_LABELS[suggestionMeta.source]
                 : meetsAIMinimumLength
@@ -213,10 +213,10 @@ export default function DescriptionStep({
       </WizardFormSection>
 
       {isProcessing && (
-        <div className="fixed inset-0 z-10 flex items-center justify-center bg-black/50" data-testid="processing-overlay">
-          <div className="rounded bg-white p-8 text-center shadow">
-            <div className="mx-auto mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" role="status">
-              <span className="sr-only">Loading...</span>
+        <div  data-testid="processing-overlay">
+          <div >
+            <div  role="status">
+              <span >Loading...</span>
             </div>
             <p aria-live="polite">Analyzing your world description...</p>
           </div>

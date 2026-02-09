@@ -36,54 +36,54 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     switch (type) {
       case 'dialogue':
         return {
-          container: 'border-l-4 border-info bg-info-background',
-          text: 'italic text-muted-foreground',
+          container: '',
+          text: '',
         };
       case 'action':
         return {
-          container: 'border-2 border-warning bg-warning-background',
-          text: 'font-medium text-foreground',
+          container: '',
+          text: '',
         };
       case 'decision':
         return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'font-medium text-foreground',
+          container: '',
+          text: '',
         };
       case 'combat':
         return {
-          container: 'border-2 border-destructive bg-destructive/10',
-          text: 'font-bold text-foreground',
+          container: '',
+          text: '',
         };
       case 'exploration':
         return {
-          container: 'border-2 border-success bg-success-background',
-          text: 'text-muted-foreground',
+          container: '',
+          text: '',
         };
       case 'resolution':
         return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'text-muted-foreground',
+          container: '',
+          text: '',
         };
       case 'character_interaction':
         return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'text-muted-foreground',
+          container: '',
+          text: '',
         };
       case 'revelation':
         return {
-          container: 'border-2 border-destructive bg-destructive/10',
-          text: 'font-medium italic text-foreground',
+          container: '',
+          text: '',
         };
-      case 'transition':
+      case '':
         return {
-          container: 'bg-muted border border-border',
-          text: 'text-muted-foreground text-sm italic',
+          container: '',
+          text: '',
         };
       case 'scene':
       default:
         return {
-          container: 'bg-card border border-border',
-          text: 'text-foreground',
+          container: '',
+          text: '',
         };
     }
   };
@@ -95,7 +95,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         return { formatDialogue: true };
       case 'scene':
         return { formatDialogue: true, paragraphSpacing: 'double' };
-      case 'transition':
+      case '':
         return { preserveLineBreaks: true };
       case 'action':
       default:
@@ -134,7 +134,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (isLoading) {
     return (
-      <div className="p-8 snap-center">
+      <div >
         <LoadingState message="Writing your story..." theme="light" />
       </div>
     );
@@ -142,7 +142,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (error) {
     return (
-      <div className="snap-center">
+      <div >
         <ErrorDisplay
           variant="section"
           severity="error"
@@ -160,12 +160,12 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   }
 
   return (
-    <div className="space-y-3 snap-center">
-      <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
+    <div >
+      <div className={`narrative-segment${styles.container}`}>
         {/* Choice Outcome Callout (Issue #971) */}
         {resolvedSegment.metadata?.causedByDecisionId &&
          resolvedSegment.metadata?.causedByDecisionText && (
-          <div className="mb-3">
+          <div >
             <ChoiceOutcomeCallout
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
@@ -175,13 +175,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         )}
 
         {isDialogue && speakerId && speakerName && (
-          <div className="mb-3 flex items-center gap-2">
+          <div >
             <NarrativeCharacterAvatar
               name={speakerName}
               avatarUrl={speakerRecord?.avatarUrl}
               size="sm"
             />
-            <span className="text-sm font-semibold text-info">
+            <span >
               {speakerName}
             </span>
           </div>
@@ -189,30 +189,30 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
         <FormattedNarrativeContent
           content={formattedContent}
-          className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === '' ? 'preserve-breaks' : ''} ${styles.text}`}
           highlightTerms={highlightTerms}
         />
         {(participants.length > 0 || resolvedSegment.metadata?.location) && (
-          <div className="mt-4 pt-4 border-t border-border space-y-3">
+          <div >
             {resolvedSegment.metadata?.location && (
-              <p className="text-sm text-muted-foreground">
+              <p >
                 {resolvedSegment.metadata?.location}
               </p>
             )}
             {participants.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p >
                   Characters Present
                 </p>
                 <div
-                  className="mt-2 flex flex-wrap gap-2"
+                  
                   role="list"
                   aria-label="Characters present in this scene"
                 >
                   {participants.map((participant) => (
                     <div
                       key={participant.id}
-                      className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
+                      
                       role="listitem"
                     >
                       <NarrativeCharacterAvatar
@@ -220,7 +220,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
                         avatarUrl={participant.avatarUrl}
                         size="sm"
                       />
-                      <span className="text-sm font-medium text-muted-foreground">
+                      <span >
                         {participant.name}
                       </span>
                     </div>

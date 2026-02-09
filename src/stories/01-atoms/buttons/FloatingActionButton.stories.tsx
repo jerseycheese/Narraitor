@@ -27,7 +27,7 @@ const meta: Meta<typeof FloatingActionButton> = {
     },
     position: {
       control: 'select',
-      options: ['bottom-right', 'bottom-left', 'top-right', 'top-left'],
+      options: ['', '', '', ''],
       description: 'Position of the floating button'
     },
     variant: {
@@ -53,7 +53,7 @@ type Story = StoryObj<typeof meta>;
 // Journal book icon
 const JournalIcon = (
   <svg
-    className="h-6 w-6"
+    
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ const JournalIcon = (
 // Plus icon
 const PlusIcon = (
   <svg
-    className="h-6 w-6"
+    
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -91,7 +91,7 @@ export const JournalButton: Story = {
     icon: JournalIcon,
     label: 'Open journal (J)',
     variant: 'amber',
-    position: 'bottom-right',
+    position: '',
     size: 'lg',
   },
   parameters: {
@@ -108,7 +108,7 @@ export const AddButton: Story = {
     icon: PlusIcon,
     label: 'Add new item',
     variant: 'primary',
-    position: 'bottom-right',
+    position: '',
     size: 'lg',
   },
   parameters: {
@@ -136,11 +136,11 @@ export const Positions: Story = {
     },
   },
   render: (args) => (
-    <div className="relative h-96">
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-left" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-right" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-left" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-right" />
+    <div >
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="" />
     </div>
   ),
 };
@@ -151,7 +151,7 @@ export const Sizes: Story = {
     icon: JournalIcon,
     label: 'Test sizes',
     variant: 'amber',
-    position: 'bottom-right',
+    position: '',
   },
   parameters: {
     docs: {
@@ -161,10 +161,10 @@ export const Sizes: Story = {
     },
   },
   render: (args) => (
-    <div className="flex gap-4 justify-center items-center h-32">
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="sm" className="relative bottom-auto right-auto" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="md" className="relative bottom-auto right-auto" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="lg" className="relative bottom-auto right-auto" />
+    <div >
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="sm"  />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="md"  />
+      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="lg"  />
     </div>
   ),
 };

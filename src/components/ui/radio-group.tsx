@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils/classNames"
+import { cssClasses } from '@/lib/utils/classNames'
 
 export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
@@ -34,8 +34,8 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
     return (
       <RadioGroupContext.Provider value={contextValue}>
         <div
-          className={cn(
-            "grid gap-2",
+          className={cssClasses(
+            "",
             orientation === 'horizontal' ? "grid-flow-col auto-cols-max" : "grid-flow-row",
             className
           )}
@@ -55,7 +55,7 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
     const itemId = id || `radio-${value}`
 
     return (
-      <div className="flex items-center space-x-2">
+      <div >
         <input
           type="radio"
           id={itemId}
@@ -64,16 +64,16 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
           checked={context.value === value}
           onChange={() => context.onValueChange?.(value)}
           disabled={context.disabled || props.disabled}
-          className={cn(
-            "h-4 w-4 rounded-full border-gray-300 text-blue-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:ring-offset-0",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
+          className={cssClasses(
+            "",
+            "",
             className
           )}
           ref={ref}
           {...props}
         />
         {children && (
-          <label htmlFor={itemId} className="text-sm text-gray-700 cursor-pointer">
+          <label htmlFor={itemId} >
             {children}
           </label>
         )}

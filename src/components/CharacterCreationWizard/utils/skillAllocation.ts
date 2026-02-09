@@ -32,7 +32,7 @@ const DEFAULT_MIN_LEVEL = 1;
 
 const warnMissingWorldSkill = (skillId: EntityID, message: string) => {
   if (process.env.NODE_ENV !== 'production') {
-    console.warn(`[CharacterCreationWizard] ${message}`, { skillId });
+    console.warn(`[CharacterCreationWizard]${message}`, { skillId });
   }
 };
 

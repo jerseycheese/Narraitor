@@ -40,10 +40,10 @@ export function CharacterDetailsDisplay({
   const enrichedSkills = enrichCharacterSkills(character, world);
 
   return (
-    <div className="border-t pt-8 space-y-8">
+    <div >
       {showAttributes && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Attributes</h2>
+          <h2 >Attributes</h2>
           <CharacterAttributeDisplay
             attributes={enrichedAttributes}
             showCategories={showCategories}
@@ -55,7 +55,7 @@ export function CharacterDetailsDisplay({
         character.derivedStats &&
         character.derivedStats.length > 0 && (
           <section>
-            <h2 className="text-2xl font-semibold mb-4">Derived Stats</h2>
+            <h2 >Derived Stats</h2>
             <CharacterDerivedStatsDisplay
               derivedStats={character.derivedStats}
             />
@@ -64,7 +64,7 @@ export function CharacterDetailsDisplay({
 
       {showSkills && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+          <h2 >Skills</h2>
           <CharacterSkillDisplay
             skills={enrichedSkills}
             showCategories={showCategories}
@@ -74,7 +74,7 @@ export function CharacterDetailsDisplay({
 
       {showBackground && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Background</h2>
+          <h2 >Background</h2>
           <CharacterBackgroundDisplay background={character.background} />
         </section>
       )}

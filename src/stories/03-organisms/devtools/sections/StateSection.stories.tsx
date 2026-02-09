@@ -46,8 +46,8 @@ const MockStateSection = () => {
   };
 
   return (
-    <div data-testid="devtools-state-section" className="space-y-2">
-      <h2 className="text-sm font-bold mb-2">Application State</h2>
+    <div data-testid="devtools-state-section" >
+      <h2 >Application State</h2>
       
       {Object.entries(mockStores).map(([storeName, storeState]) => (
         <CollapsibleSection 
@@ -76,7 +76,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     (Story: React.ComponentType) => (
-      <div className="border p-4 w-full max-w-4xl">
+      <div >
         <Story />
       </div>
     )

@@ -57,14 +57,14 @@ export const AIMockingSection: React.FC = () => {
     const shouldSucceed = customScenario.shouldSucceed || true;
     const response = shouldSucceed 
       ? {
-          content: `Custom mock response: ${customScenario.name}`,
+          content: `Custom mock response:${customScenario.name}`,
           finishReason: 'STOP' as const,
           promptTokens: 20,
           completionTokens: 15
         }
       : {
           code: 'CUSTOM_ERROR',
-          message: `Custom error: ${customScenario.name}`,
+          message: `Custom error:${customScenario.name}`,
           retryable: true
         };
 
@@ -116,12 +116,12 @@ export const AIMockingSection: React.FC = () => {
   const activeScenario = allScenarios.find(s => s.id === config.activeScenarioId);
 
   return (
-    <div className="space-y-4" data-testid="ai-mocking-section">
+    <div  data-testid="ai-mocking-section">
       {/* Mode Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${config.isEnabled ? 'bg-amber-700' : 'bg-green-700'}`} />
-          <span className="text-xs text-gray-900">
+      <div >
+        <div >
+          <div className={`${config.isEnabled ? '' : ''}`} />
+          <span >
             Mode: {config.isEnabled ? 'Mock' : 'Live API'}
           </span>
         </div>
@@ -129,10 +129,10 @@ export const AIMockingSection: React.FC = () => {
         <Button
           onClick={handleModeToggle}
           size="sm"
-          variant={config.isEnabled ? "default" : "outline"}
+          variant={config.isEnabled ? "default" : ""}
           className={config.isEnabled 
-            ? "bg-amber-700 hover:bg-amber-900 text-white" 
-            : "border-gray-300 text-gray-900 hover:bg-gray-100"
+            ? "" 
+            : ""
           }
           data-testid="mock-mode-toggle"
         >
@@ -141,16 +141,16 @@ export const AIMockingSection: React.FC = () => {
       </div>
 
       {config.isEnabled && (
-        <div className="space-y-4">
+        <div >
           {/* Scenario Selection */}
           <div>
-            <label className="block text-xs font-medium text-gray-900 mb-1">
+            <label >
               Mock Scenario
             </label>
             <Select
               value={config.activeScenarioId}
               onChange={(e) => handleScenarioChange(e.target.value)}
-              className=""
+              
               data-testid="scenario-selector"
             >
               {allScenarios.map(scenario => (
@@ -161,31 +161,31 @@ export const AIMockingSection: React.FC = () => {
             </Select>
             
             {activeScenario && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p >
                 {activeScenario.description}
               </p>
             )}
           </div>
 
           {/* Settings */}
-          <div className="grid grid-cols-2 gap-3">
+          <div >
             <Checkbox
               id="delayVariation"
               checked={config.settings.delayVariation}
               onChange={(e) => mockStateManager.updateSettings({ delayVariation: e.target.checked })}
               label="Delay Variation"
-              className="text-xs text-gray-900"
+              
             />
             
             <div>
-              <label className="block text-xs font-medium text-gray-900 mb-1">
+              <label >
                 Variation %
               </label>
               <Input
                 type="number"
                 value={config.settings.variationPercent}
                 onChange={(e) => mockStateManager.updateSettings({ variationPercent: parseInt(e.target.value) || 0 })}
-                className=""
+                
                 min="0"
                 max="100"
                 disabled={!config.settings.delayVariation}
@@ -194,33 +194,33 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Custom Scenarios */}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-900">Custom Scenarios</h4>
+          <div >
+            <div >
+              <h4 >Custom Scenarios</h4>
               <Button
                 onClick={() => setShowCustomScenario(!showCustomScenario)}
                 size="sm"
-                variant="outline"
-                className=""
+                variant=""
+                
               >
                 Add Custom
               </Button>
             </div>
 
             {showCustomScenario && (
-              <div className="space-y-3 bg-gray-50 p-3 rounded border border-gray-300 mb-3">
-                <div className="grid grid-cols-2 gap-2">
+              <div >
+                <div >
                   <Input
                     placeholder="Scenario ID"
                     value={customScenario.id}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, id: e.target.value }))}
-                    className=""
+                    
                   />
                   <Input
                     placeholder="Scenario Name"
                     value={customScenario.name}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, name: e.target.value }))}
-                    className=""
+                    
                   />
                 </div>
                 
@@ -228,17 +228,17 @@ export const AIMockingSection: React.FC = () => {
                   placeholder="Description"
                   value={customScenario.description}
                   onChange={(e) => setCustomScenario(prev => ({ ...prev, description: e.target.value }))}
-                  className=""
+                  
                   rows={2}
                 />
                 
-                <div className="grid grid-cols-2 gap-2">
+                <div >
                   <Input
                     type="number"
                     placeholder="Delay (ms)"
                     value={customScenario.delay}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, delay: parseInt(e.target.value) || 1000 }))}
-                    className=""
+                    
                     min="0"
                   />
                   
@@ -247,11 +247,11 @@ export const AIMockingSection: React.FC = () => {
                     checked={customScenario.shouldSucceed}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, shouldSucceed: e.target.checked }))}
                     label="Should Succeed"
-                    className="text-xs text-gray-900"
+                    
                   />
                 </div>
                 
-                <div className="flex gap-2">
+                <div >
                   <Button onClick={handleAddCustomScenario} size="sm" variant="success">
                     Add Scenario
                   </Button>
@@ -259,7 +259,7 @@ export const AIMockingSection: React.FC = () => {
                     onClick={() => setShowCustomScenario(false)} 
                     size="sm" 
                     variant="ghost"
-                    className=""
+                    
                   >
                     Cancel
                   </Button>
@@ -269,18 +269,18 @@ export const AIMockingSection: React.FC = () => {
 
             {/* List Custom Scenarios */}
             {config.customScenarios.length > 0 && (
-              <div className="space-y-2">
+              <div >
                 {config.customScenarios.map(scenario => (
-                  <div key={scenario.id} className="flex items-center justify-between bg-gray-100 p-2 rounded border border-gray-300">
+                  <div key={scenario.id} >
                     <div>
-                      <div className="text-sm text-gray-900">{scenario.name}</div>
-                      <div className="text-xs text-gray-600">{scenario.description}</div>
+                      <div >{scenario.name}</div>
+                      <div >{scenario.description}</div>
                     </div>
                     <Button
                       onClick={() => handleRemoveCustomScenario(scenario.id)}
                       size="sm"
                       variant="ghost"
-                      className="text-red-600 hover:bg-red-50"
+                      
                     >
                       Remove
                     </Button>
@@ -291,20 +291,20 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Import/Export */}
-          <div className="border-t border-gray-200 pt-4">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">Configuration</h4>
-            <div className="flex gap-2">
-              <Button onClick={handleExportConfig} size="sm" variant="outline" className="">
+          <div >
+            <h4 >Configuration</h4>
+            <div >
+              <Button onClick={handleExportConfig} size="sm" variant="" >
                 Export
               </Button>
-              <Button onClick={handleImportConfig} size="sm" variant="outline" className="">
+              <Button onClick={handleImportConfig} size="sm" variant="" >
                 Import
               </Button>
               <Button 
                 onClick={() => mockStateManager.reset()} 
                 size="sm" 
-                variant="outline" 
-                className=""
+                variant="" 
+                
               >
                 Reset
               </Button>

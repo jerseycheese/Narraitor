@@ -79,7 +79,7 @@ export function CharacterTable({
         header: '',
         cell: ({ row }) => (
           <div
-            className="cursor-pointer"
+            
             onClick={() => handleViewCharacter(row.original.id)}
           >
             <CharacterPortrait
@@ -97,7 +97,7 @@ export function CharacterTable({
         header: 'Name',
         cell: ({ row }) => (
           <div
-            className="font-medium cursor-pointer hover:underline"
+            
             onClick={() => handleViewCharacter(row.original.id)}
           >
             {row.getValue('name')}
@@ -109,7 +109,7 @@ export function CharacterTable({
         accessorKey: 'level',
         header: 'Level',
         cell: ({ row }) => (
-          <div className="text-center">Level {row.getValue('level')}</div>
+          <div >Level {row.getValue('level')}</div>
         ),
         enableSorting: true,
       },
@@ -123,9 +123,9 @@ export function CharacterTable({
             <Badge
               icon={
                 isKnownFigure ? (
-                  <Star className="w-3 h-3 text-white" aria-hidden="true" />
+                  <Star  aria-hidden="true" />
                 ) : (
-                  <Plus className="w-3 h-3 text-white" aria-hidden="true" />
+                  <Plus  aria-hidden="true" />
                 )
               }
               variant={isKnownFigure ? 'warning-static' : 'default-static'}
@@ -140,7 +140,7 @@ export function CharacterTable({
         accessorKey: 'createdAt',
         header: 'Created',
         cell: ({ row }) => (
-          <div className="text-sm whitespace-nowrap">
+          <div >
             {formatDate(row.getValue('createdAt'))}
           </div>
         ),
@@ -153,54 +153,54 @@ export function CharacterTable({
           const isActive = currentCharacterId === row.original.id;
 
           return (
-            <div className="flex items-center space-x-2">
+            <div >
               {!isActive && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={(e) => handleMakeActive(row.original.id, e)}
-                  aria-label={`Make ${row.original.name} active`}
+                  aria-label={`Make${row.original.name}active`}
                   title="Make active"
                 >
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircle  />
                 </Button>
               )}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handlePlayCharacter(row.original.id, e)}
-                aria-label={`Play as ${row.original.name}`}
+                aria-label={`Play as${row.original.name}`}
                 title="Play"
               >
-                <Play className="h-4 w-4" />
+                <Play  />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => handleViewCharacter(row.original.id)}
-                aria-label={`View ${row.original.name}`}
+                aria-label={`View${row.original.name}`}
                 title="View"
               >
-                <Eye className="h-4 w-4" />
+                <Eye  />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handleEditCharacter(row.original.id, e)}
-                aria-label={`Edit ${row.original.name}`}
+                aria-label={`Edit${row.original.name}`}
                 title="Edit"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil  />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handleDeleteCharacter(row.original.id, e)}
-                aria-label={`Delete ${row.original.name}`}
+                aria-label={`Delete${row.original.name}`}
                 title="Delete"
-                className="text-destructive hover:text-destructive"
+                
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2  />
               </Button>
             </div>
           );
@@ -220,7 +220,7 @@ export function CharacterTable({
 
   if (characters.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div >
         <p>No characters found. Create your first character to get started!</p>
       </div>
     );
@@ -238,7 +238,7 @@ export function CharacterTable({
         enabled: true,
         placeholder: 'Search characters...',
       }}
-      ariaLabel="Characters table"
+      ariaLabel="Characters"
     />
   );
 }

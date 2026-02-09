@@ -174,13 +174,13 @@ export default function CharactersPage() {
   >([]);
 
   // View mode with localStorage persistence
-  const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
+  const [viewMode, setViewMode] = useState<CharacterViewMode>('');
 
   // Restore view mode from localStorage after mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('character-view-mode');
-      if (saved === 'table' || saved === 'grid') {
+      if (saved === '' || saved === '') {
         setViewMode(saved);
       }
     }
@@ -471,7 +471,7 @@ export default function CharactersPage() {
       // Success toast
       addToast({
         title: 'Character Deleted',
-        description: `${characterName} has been permanently deleted`,
+        description: `${characterName}has been permanently deleted`,
         variant: 'success',
       });
 
@@ -556,20 +556,20 @@ export default function CharactersPage() {
           'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.'
         }
       >
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <Globe className="w-10 h-10 text-blue-500" aria-hidden="true" />
+        <div >
+          <div >
+            <Globe  aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Choose Your World</h2>
-          <p className="text-gray-700 mb-6">
+          <h2 >Choose Your World</h2>
+          <p >
             Characters belong to specific worlds. To create characters, you need
             to select an active world first.
           </p>
-          <div className="bg-blue-100 border border-blue-500 rounded-md p-4 mb-6 text-sm">
-            <h3 className="font-medium text-blue-900 mb-2">
+          <div >
+            <h3 >
               How to get started:
             </h3>
-            <ol className="list-decimal list-inside space-y-1 text-blue-700">
+            <ol >
               <li>Go to the Worlds page</li>
               <li>
                 Click &quot;Make Active&quot; on any world you want to play in
@@ -586,9 +586,9 @@ export default function CharactersPage() {
                 size: 'lg',
               },
             ]}
-            className="justify-center"
+            
           />
-          <p className="text-sm text-gray-500 mt-4">
+          <p >
             Each world has unique attributes, skills, and themes that shape your
             characters
           </p>
@@ -602,14 +602,14 @@ export default function CharactersPage() {
       label: 'Create Character',
       onClick: handleCreateCharacter,
       variant: 'primary' as const,
-      icon: <Plus className="w-4 h-4" aria-hidden="true" />,
+      icon: <Plus  aria-hidden="true" />,
     },
     {
       label: 'Generate Character',
       onClick: () => setShowGenerateDialog(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: <Sparkles className="w-4 h-4" aria-hidden="true" />,
+      icon: <Sparkles  aria-hidden="true" />,
     },
     ...(currentCharacterId && effectiveWorldId
       ? [
@@ -622,7 +622,7 @@ export default function CharactersPage() {
               }
             },
             variant: 'success' as const,
-            icon: <Play className="w-4 h-4" aria-hidden="true" />,
+            icon: <Play  aria-hidden="true" />,
           },
         ]
       : []),
@@ -632,18 +632,18 @@ export default function CharactersPage() {
     <PageLayout title={headerTitle} description={headerDescription}>
       {/* Show world hero with image or themed background (after hydration) */}
       {mounted && currentWorld && (
-        <div className="mb-6">
+        <div >
           <Hero
             title={
               worldIdFromUrl
-                ? `${currentWorld.name} Characters`
-                : `${currentWorld.name} Characters`
+                ? `${currentWorld.name}Characters`
+                : `${currentWorld.name}Characters`
             }
             image={
               currentWorld.image?.url
                 ? {
                     url: currentWorld.image.url,
-                    alt: `${currentWorld.name} world`,
+                    alt: `${currentWorld.name}world`,
                   }
                 : undefined
             }
@@ -662,7 +662,7 @@ export default function CharactersPage() {
             subtitle={
               currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
             }
-            height="h-32 sm:h-40"
+            height=""
             titleElement="h2"
           />
         </div>
@@ -670,7 +670,7 @@ export default function CharactersPage() {
 
       {/* Action buttons below hero when world exists (after hydration) */}
       {mounted && currentWorld && (
-        <div className="mb-8 flex justify-end items-center gap-3">
+        <div >
           <CharacterViewToggle
             mode={viewMode}
             onModeChange={handleViewModeChange}
@@ -681,10 +681,10 @@ export default function CharactersPage() {
 
       {/* Show back link if viewing from a specific world without image */}
       {mounted && worldIdFromUrl && !currentWorld?.image?.url && (
-        <div className="mb-6 -mt-8">
+        <div >
           <Link
             href={`/worlds/${worldIdFromUrl}`}
-            className="text-link-primary flex items-center gap-2 no-underline"
+            
           >
             <span>←</span> Back to {currentWorld?.name || 'World'}
           </Link>
@@ -692,22 +692,22 @@ export default function CharactersPage() {
       )}
 
       {generateError && (
-        <div className="mb-4 p-4 bg-red-200 border border-red-500 rounded-lg text-red-700">
-          <p className="font-medium">Generation Failed</p>
-          <p className="text-sm mt-1">{generateError}</p>
+        <div >
+          <p >Generation Failed</p>
+          <p >{generateError}</p>
         </div>
       )}
 
       <SSRClientOnly>
         {!currentWorld || worldCharacters.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-2">
+          <div >
+            <div >
+              <h2 >
                 {currentWorld
-                  ? `No characters in ${currentWorld.name} yet`
+                  ? `No characters in${currentWorld.name}yet`
                   : 'No characters yet'}
               </h2>
-              <p className="text-gray-700 mb-2">
+              <p >
                 Choose how you&apos;d like to add your first character.
               </p>
             </div>
@@ -722,9 +722,9 @@ export default function CharactersPage() {
                   disabled: isGenerating,
                   size: 'lg',
                   icon: isGenerating ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div ></div>
                   ) : (
-                    <Sparkles className="w-5 h-5" aria-hidden="true" />
+                    <Sparkles  aria-hidden="true" />
                   ),
                 },
                 {
@@ -732,40 +732,40 @@ export default function CharactersPage() {
                   onClick: handleCreateCharacter,
                   variant: 'primary',
                   size: 'lg',
-                  icon: <Plus className="w-5 h-5" aria-hidden="true" />,
+                  icon: <Plus  aria-hidden="true" />,
                 },
               ]}
-              className="justify-center"
+              
             />
-            <div className="mt-6 text-sm text-gray-500">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+            <div >
+              <div >
                 <div>
-                  <p className="font-medium text-blue-700 mb-1">
+                  <p >
                     Generate Character
                   </p>
                   <p>
-                    AI creates a character{' '}
+                    AI creates a character{''}
                     {currentWorld?.reference
-                      ? `from ${currentWorld.reference}`
+                      ? `from${currentWorld.reference}`
                       : 'for your world'}
                   </p>
-                  <p className="text-xs mt-1">
+                  <p >
                     Choose known figures, original characters, or specific names
                   </p>
                 </div>
                 <div>
-                  <p className="font-medium text-green-700 mb-1">
+                  <p >
                     Create Character
                   </p>
                   <p>Design your own character with custom details</p>
-                  <p className="text-xs mt-1">
+                  <p >
                     Full control over attributes, skills, and background
                   </p>
                 </div>
               </div>
             </div>
           </div>
-        ) : viewMode === 'table' ? (
+        ) : viewMode === '' ? (
           <CharacterTable
             characters={worldCharacters as Character[]}
             currentCharacterId={currentCharacterId}
@@ -776,7 +776,7 @@ export default function CharactersPage() {
             onDelete={handleDeleteCharacter}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div >
             {(worldCharacters as Character[]).map((character) => (
               <CharacterCard
                 key={character.id}
@@ -838,7 +838,7 @@ export default function CharactersPage() {
       />
 
       {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 space-y-2 z-50">
+      <div >
         {toasts.map((toast) => (
           <Toast
             key={toast.id}

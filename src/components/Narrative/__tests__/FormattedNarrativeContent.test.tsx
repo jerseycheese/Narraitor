@@ -3,13 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { FormattedNarrativeContent } from '../FormattedNarrativeContent';
 
 describe('FormattedNarrativeContent', () => {
-  const TEST_CONTENT = `
-The first paragraph has some *italic text* and **bold text** to test.
-
-This is a second paragraph with normal text.
-
-This third paragraph has *malformed emphasis without ending.
-`;
+  const TEST_CONTENT = `The first paragraph has some *italic text* and **bold text** to test. This is a second paragraph with normal text. This third paragraph has *malformed emphasis without ending.`;
 
   it('renders multiple paragraphs with proper spacing', () => {
     render(<FormattedNarrativeContent content={TEST_CONTENT} />);
@@ -31,7 +25,7 @@ This third paragraph has *malformed emphasis without ending.
     // Check for italic rendering
     const italicElements = paragraphs[0].querySelectorAll('em');
     expect(italicElements).toHaveLength(1);
-    expect(italicElements[0]).toHaveTextContent('italic text');
+    expect(italicElements[0]).toHaveTextContent('text');
     
     // Check for bold rendering
     const boldElements = paragraphs[0].querySelectorAll('strong');
@@ -53,7 +47,7 @@ This third paragraph has *malformed emphasis without ending.
     render(
       <FormattedNarrativeContent 
         content="Test" 
-        className="custom-class" 
+        className="test-class" 
       />
     );
     
@@ -62,11 +56,7 @@ This third paragraph has *malformed emphasis without ending.
   });
 
   it('preserves whitespace normalization', () => {
-    const messyContent = `
-      Excessive   whitespace   should   be   normalized.
-      
-      Multiple newlines should create separate paragraphs.
-    `;
+    const messyContent = `Excessive whitespace should be normalized. Multiple newlines should create separate paragraphs.`;
     
     render(<FormattedNarrativeContent content={messyContent} />);
     

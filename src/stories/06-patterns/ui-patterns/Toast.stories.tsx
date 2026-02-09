@@ -22,25 +22,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: `
-          Toast notifications for displaying temporary messages to users.
-          
-          ## Features
-          - Four visual variants: success, error, warning, info
-          - Auto-dismissal with configurable duration
-          - Manual dismissal with close button
-          - Full accessibility support with ARIA attributes
-          - Mobile-responsive design
-          - Integration with AutoSave service
-          
-          ## Usage
-          Use the useToast hook to display notifications:
-          
-          \`\`\`tsx
-          const toast = useToast()
-          toast.success('Operation completed', 'Your changes have been saved')
-          \`\`\`
-        `,
+        component: `Toast notifications for displaying temporary messages to users. ## Features - Four visual variants: success, error, warning, info - Auto-dismissal with configurable duration - Manual dismissal with close button - Full accessibility support with ARIA attributes - Mobile-responsive design - Integration with AutoSave service ## Usage Use the useToast hook to display notifications: \`\`\`tsx const toast = useToast() toast.success('Operation completed', 'Your changes have been saved') \`\`\``,
       },
     },
   },
@@ -161,36 +143,36 @@ function InteractiveDemo() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <h3 className="text-lg font-semibold">Interactive Toast Demo</h3>
-      <div className="flex flex-wrap gap-2">
+    <div >
+      <h3 >Interactive Toast Demo</h3>
+      <div >
         <button
           onClick={showSuccess}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+          
         >
           Show Success
         </button>
         <button
           onClick={showError}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+          
         >
           Show Error
         </button>
         <button
           onClick={showWarning}
-          className="px-4 py-2 bg-amber-50000 text-white rounded hover:bg-amber-700"
+          
         >
           Show Warning
         </button>
         <button
           onClick={showInfo}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+          
         >
           Show Info
         </button>
         <button
           onClick={showMultiple}
-          className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-700"
+          
         >
           Show Multiple
         </button>
@@ -214,18 +196,7 @@ export const InteractiveToasts = {
   parameters: {
     docs: {
       description: {
-        story: `
-          Interactive demo showing all toast variants and the useToast hook in action.
-          
-          This story demonstrates:
-          - Integration with ToastProvider
-          - All four toast variants
-          - Multiple toast management
-          - Real-world usage patterns
-          - Auto-dismissal behavior
-          
-          Click the buttons to see different toast types in action.
-        `,
+        story: `Interactive demo showing all toast variants and the useToast hook in action. This story demonstrates: - Integration with ToastProvider - All four toast variants - Multiple toast management - Real-world usage patterns - Auto-dismissal behavior Click the buttons to see different toast types in action.`,
       },
     },
   },

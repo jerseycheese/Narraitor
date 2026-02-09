@@ -73,19 +73,19 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
   const isLoading = isExporting || isImporting;
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-4">
+    <div className={`${className}`}>
+      <div >
         <Button
           onClick={handleExport}
           disabled={isLoading}
-          variant="outline"
-          className="flex-1"
+          variant=""
+          
         >
           {isExporting ? 'Exporting...' : 'Export Game Data'}
         </Button>
 
-        <div className="flex-1">
-          <label htmlFor="import-file" className="sr-only">
+        <div >
+          <label htmlFor="import-file" >
             Import Game Data
           </label>
           <input
@@ -95,14 +95,14 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
             accept=".json"
             onChange={handleFileChange}
             disabled={isLoading}
-            className="hidden"
+            
             aria-label="Import game data from file"
           />
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
-            variant="outline"
-            className="w-full"
+            variant=""
+            
           >
             {isImporting ? 'Importing...' : 'Import Game Data'}
           </Button>
@@ -119,7 +119,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         />
       )}
 
-      <div className="text-xs text-gray-500 space-y-1">
+      <div >
         <p>
           <strong>Export:</strong> Creates a backup file of your complete game state including worlds, characters, and progress.
         </p>

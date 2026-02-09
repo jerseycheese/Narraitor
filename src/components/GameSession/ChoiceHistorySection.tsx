@@ -65,14 +65,14 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(new Set());
 
   return (
-    <section className="mt-6" data-testid="choice-history-section" data-tutorial="choice-history-section">
+    <section  data-testid="choice-history-section" data-tutorial="choice-history-section">
       <CollapsibleSection title="Choice History" initialCollapsed={initialCollapsed}>
         {resolvedEntries.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p >
             No recorded choices yet. Your decisions will appear here once you start choosing.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div >
             {resolvedEntries.map((entry) => {
               const choiceText = getChoiceText(entry);
               const decisionPrompt = entry.decision.prompt.trim();
@@ -93,18 +93,18 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
               return (
                 <Card
                   key={entry.decision.id}
-                  className="p-4 border border-amber-200 bg-white"
+                  
                   data-testid="choice-history-entry"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div >
                     <div>
-                      <p className="text-sm font-semibold text-amber-900">
+                      <p >
                         {choiceText}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div >
                       {decisionWeight && (
-                        <Badge variant="outline-static" size="sm">
+                        <Badge variant="" size="sm">
                           {titleCase(decisionWeight)} decision
                         </Badge>
                       )}
@@ -118,7 +118,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="text-xs text-amber-700"
+                          
                           aria-expanded={isExpanded}
                           aria-controls={detailsId}
                           onClick={() => {
@@ -131,7 +131,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     </div>
                   </div>
                   {(decisionTime || outcomeLocation) && (
-                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500">
+                    <div >
                       {decisionTime && (
                         <span title={timeTitle}>When: {timeLabel}</span>
                       )}
@@ -141,11 +141,11 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     </div>
                   )}
                   {hasDetails && isExpanded && (
-                    <p id={detailsId} className="mt-2 text-xs text-gray-600 whitespace-pre-wrap">
+                    <p id={detailsId} >
                       {decisionPrompt}
                     </p>
                   )}
-                  <p className={`mt-2 text-sm whitespace-pre-wrap ${outcomeSegment ? 'text-gray-700' : 'text-gray-500'}`}>
+                  <p className={`${outcomeSegment ? '' : ''}`}>
                     {outcomeText}
                   </p>
                 </Card>

@@ -49,47 +49,47 @@ export function TutorialMenu() {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div  ref={dropdownRef}>
       <Button
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size="icon"
-        className="text-gray-300 hover:text-white hover:bg-gray-700"
+        
         aria-label="Help & Tutorials"
       >
-        <HelpCircle className="w-5 h-5" />
+        <HelpCircle  />
       </Button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-popover text-popover-foreground rounded-md shadow-lg z-50 py-2 border border-border">
-          <div className="px-4 py-2 border-b border-border">
-            <h4 className="font-semibold text-sm">Tutorial Progress</h4>
+        <div >
+          <div >
+            <h4 >Tutorial Progress</h4>
           </div>
           
-          <div className="py-2">
+          <div >
             {Object.entries(tutorialProgress.phases).map(([phase, data]) => (
-              <div key={phase} className="px-4 py-1.5 flex items-center justify-between text-sm">
-                <span className="capitalize">{phase.replace(/([A-Z])/g, ' $1')}</span>
+              <div key={phase} >
+                <span >{phase.replace(/([A-Z])/g, '$1')}</span>
                 {data.completed ? (
-                  <CheckCircle className="w-4 h-4 text-success" />
+                  <CheckCircle  />
                 ) : data.skipped ? (
-                  <span className="text-xs text-muted-foreground">Skipped</span>
+                  <span >Skipped</span>
                 ) : ('lastStep' in data && (data as { lastStep: number }).lastStep > 0) ? (
-                  <span className="text-xs text-info">In Progress</span>
+                  <span >In Progress</span>
                 ) : (
-                  <span className="text-xs text-muted-foreground">Not Started</span>
+                  <span >Not Started</span>
                 )}
               </div>
             ))}
           </div>
           
-          <div className="border-t border-border mt-1 pt-1">
+          <div >
             <Button
               variant="ghost"
               onClick={handleRestart}
-              className="w-full justify-start px-4 py-2 text-destructive hover:text-destructive/90 hover:bg-accent h-auto font-normal rounded-none"
+              
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw  />
               Reset All Tutorials
             </Button>
           </div>

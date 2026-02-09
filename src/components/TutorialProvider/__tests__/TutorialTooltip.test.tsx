@@ -100,7 +100,7 @@ const createProps = (overrides: Partial<TooltipRenderProps> = {}): TooltipRender
 };
 
 describe('TutorialTooltip', () => {
-  it('shows skip button on last step when next is hidden', () => {
+  it('shows skip button on last step when next is', () => {
     render(<TutorialTooltip {...createProps()} />);
 
     expect(screen.getByRole('button', { name: 'Skip tutorial' })).toBeInTheDocument();

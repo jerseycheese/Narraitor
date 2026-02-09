@@ -249,37 +249,37 @@ export default function JournalAccessTestPage() {
   }, [entryCount]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div >
       {/* Test Controls */}
-      <div className="bg-white shadow-md p-6 border-b">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+      <div >
+        <h1 >
           📖 Journal Access Test Harness - Issue #278
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div >
           {/* Character Toggle */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-gray-700">Character Presence</h3>
-            <label className="flex items-center space-x-2">
+          <div >
+            <h3 >Character Presence</h3>
+            <label >
               <input
                 type="checkbox"
                 checked={hasCharacter}
                 onChange={(e) => setHasCharacter(e.target.checked)}
-                className="rounded"
+                
               />
               <span>Has Character (AC1: button visibility)</span>
             </label>
           </div>
 
           {/* Game Status */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-gray-700">Game Status</h3>
+          <div >
+            <h3 >Game Status</h3>
             <select
               value={gameStatus}
               onChange={(e) =>
                 setGameStatus(e.target.value as 'active' | 'paused' | 'ended')
               }
-              className="w-full p-2 border rounded"
+              
             >
               <option value="active">
                 Active (AC3: available at any point)
@@ -292,25 +292,25 @@ export default function JournalAccessTestPage() {
           </div>
 
           {/* Journal Entries */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-gray-700">Journal Entries</h3>
+          <div >
+            <h3 >Journal Entries</h3>
             <input
               type="range"
               min="0"
               max="4"
               value={entryCount}
               onChange={(e) => setEntryCount(parseInt(e.target.value))}
-              className="w-full"
+              
             />
-            <span className="text-sm text-gray-700">{entryCount} entries</span>
+            <span >{entryCount} entries</span>
           </div>
 
           {/* Journal Controls */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-gray-700">Journal Debug</h3>
+          <div >
+            <h3 >Journal Debug</h3>
             <button
               onClick={() => router.push('/worlds/test-world-1/play/journal')}
-              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-500"
+              
             >
               Open Journal Page
             </button>
@@ -322,7 +322,7 @@ export default function JournalAccessTestPage() {
                 setEntryCount(0);
                 setTimeout(() => setEntryCount(3), 100);
               }}
-              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-500"
+              
             >
               Clear & Regenerate Journal
             </button>
@@ -330,11 +330,11 @@ export default function JournalAccessTestPage() {
         </div>
 
         {/* Acceptance Criteria Checklist */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">
+        <div >
+          <h3 >
             ✅ Acceptance Criteria Testing
           </h3>
-          <ul className="text-sm text-blue-900 space-y-1">
+          <ul >
             <li>
               🎯 <strong>AC1:</strong> Journal button visible when character
               present
@@ -359,8 +359,8 @@ export default function JournalAccessTestPage() {
       </div>
 
       {/* Game Session Component */}
-      <div className="p-6">
-        <div className="max-w-6xl mx-auto">
+      <div >
+        <div >
           <ActiveGameSession
             worldId="test-world-1"
             sessionId="test-session-1"
@@ -374,17 +374,17 @@ export default function JournalAccessTestPage() {
       </div>
 
       {/* Testing Instructions */}
-      <div className="bg-gray-100 p-6 border-t">
-        <div className="max-w-6xl mx-auto">
-          <h3 className="font-semibold text-gray-900 mb-3">
+      <div >
+        <div >
+          <h3 >
             🧪 Testing Instructions
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div >
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">
+              <h4 >
                 Interactive Tests:
               </h4>
-              <ul className="space-y-1 text-gray-700">
+              <ul >
                 <li>• Toggle character presence to test AC1</li>
                 <li>• Change game status to test AC3</li>
                 <li>• Adjust entry count to test different journal states</li>
@@ -396,10 +396,10 @@ export default function JournalAccessTestPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">
+              <h4 >
                 Expected Behavior:
               </h4>
-              <ul className="space-y-1 text-gray-700">
+              <ul >
                 <li>• Journal button appears only with character</li>
                 <li>• Journal opens as a full-page view</li>
                 <li>• Journal entries display correctly</li>

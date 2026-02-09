@@ -107,7 +107,7 @@ export function Navigation() {
     setShowWorldSwitcher(false);
     // Navigate to the selected world's view page with loading state
     const worldName = worlds[worldId]?.name || 'world';
-    navigateWithLoading(`/worlds/${worldId}`, `Loading ${worldName}...`);
+    navigateWithLoading(`/worlds/${worldId}`, `Loading${worldName}...`);
   };
   
   // Don't show navigation on dev pages
@@ -118,44 +118,44 @@ export function Navigation() {
   return (
     <>
       <header role="banner">
-        <nav className="bg-gray-900 text-white shadow-lg" role="navigation" aria-label="Main">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+        <nav  role="navigation" aria-label="Main">
+          <div >
+            <div >
             {/* Left side - Logo and mobile menu button */}
-            <div className="flex items-center space-x-4">
+            <div >
               {/* Mobile menu button */}
               {isMobile && (
                 <Button
                   onClick={toggleMenu}
                   variant="ghost"
                   size="icon"
-                  className="md:hidden min-h-11 min-w-11 bg-gray-900 hover:bg-gray-700 text-white"
+                  
                   aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={isMenuOpen}
                 >
                   {isMenuOpen ? (
-                    <X className="w-5 h-5" aria-hidden="true" />
+                    <X  aria-hidden="true" />
                   ) : (
-                    <Menu className="w-5 h-5" aria-hidden="true" />
+                    <Menu  aria-hidden="true" />
                   )}
                 </Button>
               )}
               
               <Link 
                 href="/" 
-                className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+                
               >
-                <LogoIcon size="small" className="brightness-0 invert" />
-                <LogoText size="sm" className="text-white" />
+                <LogoIcon size="small" className="brightness-0" />
+                <LogoText size="sm"  />
               </Link>
               
               {/* Desktop navigation */}
-              <div className="hidden md:flex items-center space-x-1 ml-8" data-testid="desktop-navigation">
+              <div  data-testid="desktop-navigation">
                 <Link 
                   href="/worlds" 
                   data-navigation
-                  className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/worlds/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
+                  className={`${
+                    pathname === '/worlds' || pathname.startsWith('/worlds/') ? '' : ''
                   }`}
                 >
                   Worlds
@@ -165,17 +165,17 @@ export function Navigation() {
                   href="/characters" 
                   data-navigation
                   aria-disabled={!hasWorlds}
-                  className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
-                  } ${!hasWorlds ? 'hidden' : ''}`}
+                  className={`${
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? '' : ''
+                  }${!hasWorlds ? '' : ''}`}
                 >
                   Characters
                 </Link>
                 <Link 
                   href="/settings" 
                   data-navigation
-                  className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/settings' ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
+                  className={`${
+                    pathname === '/settings' ? '' : ''
                   }`}
                 >
                   Settings
@@ -184,30 +184,30 @@ export function Navigation() {
             </div>
             
             {/* Right side - Quick actions and current context (hidden on mobile) */}
-            <div className="hidden md:flex items-center gap-2 sm:gap-4">
+            <div >
               <TutorialMenu />
               {/* World Switcher Dropdown */}
               {hasWorlds && (
-                <div className="relative" ref={dropdownRef}>
+                <div  ref={dropdownRef}>
                   <Button
                     onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
                     variant="ghost"
                     className={headerDropdownTriggerClass}
                   >
-                    <Globe className="w-4 h-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">
+                    <Globe  aria-hidden="true" />
+                    <span >
                       {currentWorld ? currentWorld.name : 'Select World'}
                     </span>
                     {currentWorld && worldCharacterCount > 0 && (
-                      <span className="text-xs bg-gray-700 hover:bg-gray-700 text-white hover:text-white px-2 py-0.5 rounded-full">
+                      <span >
                         {worldCharacterCount}
                       </span>
                     )}
-                    <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                    <ChevronDown  aria-hidden="true" />
                   </Button>
                   
                   {showWorldSwitcher && (
-                    <div className={`${headerDropdownMenuClass} w-64 py-0 max-h-96 overflow-y-auto`}>
+                    <div className={`${headerDropdownMenuClass}`}>
                       {Object.values(worlds).map(world => {
                         const worldCharacters = (Object.values(characters) as Character[]).filter(
                           char => char.worldId === world.id
@@ -218,16 +218,16 @@ export function Navigation() {
                             key={world.id}
                             onClick={() => handleWorldSwitch(world.id)}
                             variant="ghost"
-                            className={`${headerDropdownItemClass} flex items-center justify-between rounded-none ${
-                              world.id === currentWorldId ? 'bg-green-50 border-l-4 border-green-500' : ''
+                            className={`${headerDropdownItemClass}${
+                              world.id === currentWorldId ? '' : ''
                             }`}
                           >
                             <div>
-                              <div className="font-medium text-gray-900">{world.name}</div>
-                              <div className="text-sm text-gray-500">{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
+                              <div >{world.name}</div>
+                              <div >{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
                             </div>
                             {world.id === currentWorldId && (
-                              <Check className="w-5 h-5 text-green-500" aria-hidden="true" />
+                              <Check  aria-hidden="true" />
                             )}
                           </Button>
                         );
@@ -236,10 +236,10 @@ export function Navigation() {
                       <div className={headerDropdownDividerClass}>
                         <Link
                           href="/worlds"
-                          className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav rounded-none`}
+                          className={`${headerDropdownItemClass}`}
                           onClick={() => setShowWorldSwitcher(false)}
                         >
-                          <Plus className="w-5 h-5" aria-hidden="true" />
+                          <Plus  aria-hidden="true" />
                           Create a world
                         </Link>
                       </div>
@@ -258,18 +258,18 @@ export function Navigation() {
                 {currentWorld ? (
                   <Button 
                     type="button"
-                    onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
+                    onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting${currentWorld.name}...`)}
                     variant="success"
-                    className="hidden sm:inline-flex items-center text-sm font-medium"
+                    
                   >
-                    <Play className="w-4 h-4 mr-1" aria-hidden="true" />
+                    <Play  aria-hidden="true" />
                     Play
                   </Button>
                 ) : (!hasWorldsStore ? (
                   <Button
                     type="button"
                     onClick={() => navigateWithLoading('/worlds/create', 'Setting up world creation...')}
-                    className="inline-flex items-center bg-primary hover:bg-primary/90 text-white text-sm font-medium"
+                    
                   >
                     Create Your First World
                   </Button>
@@ -290,13 +290,13 @@ export function Navigation() {
       
       {/* Breadcrumbs - render after hydration to keep SSR/client markup identical */}
       {shouldShowBreadcrumbs && (
-        <div className="bg-gray-100 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div >
+          <div >
             <SSRClientOnly>
-              <Breadcrumbs className="sm:hidden" maxItems={2} />
+              <Breadcrumbs  maxItems={2} />
             </SSRClientOnly>
             <SSRClientOnly>
-              <Breadcrumbs className="hidden sm:flex" />
+              <Breadcrumbs  />
             </SSRClientOnly>
           </div>
         </div>

@@ -17,7 +17,7 @@ jest.mock('@/lib/utils/logger', () => {
 });
 jest.mock('@/lib/utils/genrePromptGuide', () => ({
   getGenreStyleGuidance: jest.fn((genre: string, context: string) => {
-    return `Mocked style guidance for ${genre} ${context}`;
+    return `Mocked style guidance for${genre}${context}`;
   }),
   getGenreFallbackImage: jest.fn((genre: string, seed: string) => {
     return `https://picsum.photos/seed/${seed}/800/600`;

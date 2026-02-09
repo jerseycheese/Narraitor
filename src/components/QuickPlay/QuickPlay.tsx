@@ -112,45 +112,45 @@ export function QuickPlay() {
     const hasExistingData = Object.keys(actualWorlds).length > 0 || Object.keys(actualCharacters).length > 0;
     
     return (
-      <div className="space-y-8">
+      <div >
         {/* How it Works for new users */}
         {!hasExistingData && (
-          <section className="text-center space-y-6">
-            <div className="max-w-md mx-auto">
-              <p className="text-lg text-gray-700 mb-6">
+          <section >
+            <div >
+              <p >
                 Create a world and start a story
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6" role="list" aria-label="Steps to get started">
-              <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+            <div  role="list" aria-label="Steps to get started">
+              <div  role="listitem">
                 {/* Background Icon */}
-                <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">1</div>
-                  <h3 className="text-lg font-semibold mb-2">Build Your World</h3>
-                  <p className="text-sm text-muted-foreground">
+                <Globe  aria-hidden="true" />
+                <div >
+                  <div  aria-hidden="true">1</div>
+                  <h3 >Build Your World</h3>
+                  <p >
                     Create or generate unique worlds with custom rules and settings
                   </p>
                 </div>
               </div>
-              <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+              <div  role="listitem">
                 {/* Background Icon */}
-                <Users className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">2</div>
-                  <h3 className="text-lg font-semibold mb-2">Create Characters</h3>
-                  <p className="text-sm text-muted-foreground">
+                <Users  aria-hidden="true" />
+                <div >
+                  <div  aria-hidden="true">2</div>
+                  <h3 >Create Characters</h3>
+                  <p >
                     Design or generate playable characters that fit your world
                   </p>
                 </div>
               </div>
-              <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+              <div  role="listitem">
                 {/* Background Icon */}
-                <Play className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">3</div>
-                  <h3 className="text-lg font-semibold mb-2">Start Playing</h3>
-                  <p className="text-sm text-muted-foreground">
+                <Play  aria-hidden="true" />
+                <div >
+                  <div  aria-hidden="true">3</div>
+                  <h3 >Start Playing</h3>
+                  <p >
                     Make choices and shape your story
                   </p>
                 </div>
@@ -160,12 +160,12 @@ export function QuickPlay() {
         )}
         
         {/* Start New Game button */}
-        <div className="text-center">
+        <div >
           <Button
             onClick={handleNewGame}
             variant="default"
             size="lg"
-            className="px-8 py-4 text-lg font-medium"
+            
           >
             Start New Game
           </Button>
@@ -179,16 +179,16 @@ export function QuickPlay() {
   const lastPlayedText = formatRelativeTime(mostRecentSession.lastPlayed);
 
   return (
-    <div className="space-y-6">
+    <div >
       {/* Continue Last Game - Primary CTA */}
       <section 
-        className="bg-background rounded-lg border-2 border-primary p-6 shadow-md" 
+         
         aria-labelledby="continue-game-heading"
       >
-        <h2 id="continue-game-heading" className="sr-only">Continue Your Game</h2>
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
+        <h2 id="continue-game-heading" >Continue Your Game</h2>
+        <div >
           {/* Character Portrait */}
-          <div className="flex-shrink-0 mx-auto sm:mx-0">
+          <div >
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
               characterName={character.name}
@@ -197,19 +197,19 @@ export function QuickPlay() {
           </div>
           
           {/* Game Info */}
-          <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+          <div >
+            <div >
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-t pt-3">
+            <div >
               <DataField 
                 label="Progress" 
-                value={`${mostRecentSession.narrativeCount} entries`}
-                variant="inline"
+                value={`${mostRecentSession.narrativeCount}entries`}
+                variant=""
               />
-              <time className="text-xs text-muted-foreground" dateTime={mostRecentSession.lastPlayed}>
+              <time  dateTime={mostRecentSession.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
             </div>
@@ -229,18 +229,18 @@ export function QuickPlay() {
               variant: 'danger'
             }
           ]}
-          className="[&>button:first-child]:flex-1"
+          
         />
       </section>
 
       {/* Start New Game - Secondary Option */}
-      <div className="text-center">
-        <p className="text-sm text-muted-foreground mb-2">Or</p>
+      <div >
+        <p >Or</p>
         <Button
           onClick={handleNewGame}
-          variant="outline"
+          variant=""
           size="default"
-          className="px-6 py-2 font-medium"
+          
         >
           Start New Game
         </Button>
@@ -253,7 +253,7 @@ export function QuickPlay() {
         onConfirm={handleDeleteSession}
         title="Delete Campaign"
         description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
-        itemName={mostRecentSession ? `${world.name} - ${character.name}` : ''}
+        itemName={mostRecentSession ? `${world.name}-${character.name}` : ''}
         isDeleting={isDeleting}
       />
     </div>

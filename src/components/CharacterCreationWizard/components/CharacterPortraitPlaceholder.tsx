@@ -10,7 +10,7 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
   className = '' 
 }) => {
   const initials = name
-    .split(' ')
+    .split('')
     .map(n => n[0])
     .join('')
     .toUpperCase()
@@ -19,28 +19,22 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
   // Generate consistent color based on name, fallback to first gradient if name is empty
   const colorIndex = name ? name.charCodeAt(0) % 5 : 0;
   const gradients = [
-    'from-blue-500 to-blue-700',
-    'from-green-500 to-blue-500',
-    'from-amber-500 to-red-500',
-    'from-red-500 to-red-500',
-    'from-blue-500 to-blue-700'
+    '',
+    '',
+    '',
+    '',
+    ''
   ];
   
   // Use gray background with border when name is empty
   const isEmpty = !name.trim();
   const backgroundClass = isEmpty 
-    ? 'bg-gray-100 border-2 border-gray-300 border-dashed text-gray-500' 
-    : `bg-gradient-to-br ${gradients[colorIndex]} text-white`;
+    ? '' 
+    : `${gradients[colorIndex]}`;
   
   return (
     <div 
-      className={`
-        component-character-portrait-placeholder
-        ${backgroundClass}
-        rounded-full flex items-center justify-center 
-        font-bold text-2xl w-24 h-24
-        ${className}
-      `}
+      className={`component-character-portrait-placeholder${backgroundClass}${className}`}
       data-testid="character-portrait-placeholder"
     >
       {initials || '?'}

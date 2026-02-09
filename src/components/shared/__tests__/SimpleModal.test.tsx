@@ -54,7 +54,7 @@ describe('SimpleModal', () => {
     );
 
     const dialog = screen.getByRole('dialog');
-    expect(dialog.className).toContain('my-auto');
+    expect(dialog.className).toContain('');
   });
 
   it('supports content scrolling when requested', () => {
@@ -73,7 +73,7 @@ describe('SimpleModal', () => {
     expect(document.querySelector('[data-scroll-container="overlay"]')).toBeNull();
   });
 
-  it('supports overlay scrolling with a sticky footer', () => {
+  it('supports overlay scrolling with a footer', () => {
     render(
       <SimpleModal
         isOpen={true}

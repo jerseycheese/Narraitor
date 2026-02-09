@@ -172,7 +172,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       notches.push(
         <div
           key={`notch-${i}`}
-          className="absolute w-0.5 h-2 bg-muted-foreground"
+          
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         />
       );
@@ -190,7 +190,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       labels.push(
         <div 
           key={`label-${i}`} 
-          className="absolute text-xs text-muted-foreground"
+          
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         >
           {i}
@@ -201,23 +201,23 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   };
 
   return (
-    <div className="py-2" data-testid={testId}>
+    <div  data-testid={testId}>
       {showLabel && (
-        <div className="flex justify-between mb-1 text-sm">
+        <div >
           <span>{labelText}</span>
           {showLevelDescription && currentLevelDescription && (
-            <span className="font-medium text-primary" data-testid={`${testId}-level-label`}>
+            <span  data-testid={`${testId}-level-label`}>
               {currentLevelDescription.label}
             </span>
           )}
         </div>
       )}
       
-      <div className="relative">
+      <div >
         {/* Slider container with scale */}
-        <div className="space-y-1">
+        <div >
           {/* Scale notches */}
-          <div className="relative h-2">
+          <div >
             {generateScaleNotches()}
           </div>
           
@@ -231,9 +231,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               value={valueToScale(value)}
               onChange={handleChange}
               disabled={disabled}
-              className={`w-full m-0 appearance-none bg-transparent cursor-pointer h-1.5
-                accent-primary
-                ${isConstrained && effectiveMax !== undefined && value === effectiveMax
+              className={`appearance-none accent-primary${isConstrained && effectiveMax !== undefined && value === effectiveMax
                   ? 'accent-amber-500'
                   : ''
                 }`}
@@ -244,15 +242,15 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
           </div>
           
           {/* Scale labels */}
-          <div className="relative h-4 mt-1">
+          <div >
             {generateScaleLabels()}
           </div>
         </div>
         
         {/* Level description */}
         {showLevelDescription && currentLevelDescription && currentLevelDescription.description && (
-          <div className="mt-2 text-sm" data-testid={`${testId}-description`}>
-            <span className="font-medium">{currentLevelDescription.label}:</span> {currentLevelDescription.description}
+          <div  data-testid={`${testId}-description`}>
+            <span >{currentLevelDescription.label}:</span> {currentLevelDescription.description}
           </div>
         )}
       </div>

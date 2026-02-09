@@ -70,7 +70,7 @@ describe('ActiveGameSessionNarrativeColumn', () => {
     expect(container?.style.maxHeight).toBe('500px');
   });
 
-  it('sets the tutorial anchor on the narrative container', () => {
+  it('sets the tutorial anchor on the narrative', () => {
     render(<ActiveGameSessionNarrativeColumn {...baseProps} />);
 
     const container = document.getElementById('narrative-container');

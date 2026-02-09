@@ -118,12 +118,12 @@ export function normalizeDecisionOptions(
           }).filter((value): value is string => Boolean(value))
         );
       if (missingItems.length > 0) {
-        disabledReasonParts.push(`Items: ${missingItems.join(', ')}`);
+        disabledReasonParts.push(`Items:${missingItems.join(',')}`);
       }
     }
 
     const disabledReason = disabledReasonParts.length > 0
-      ? `Requires ${disabledReasonParts.join(' | ')}`
+      ? `Requires${disabledReasonParts.join('|')}`
       : undefined;
 
     return {

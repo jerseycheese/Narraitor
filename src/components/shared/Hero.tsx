@@ -49,7 +49,7 @@ interface HeroProps {
  *   title="My World"
  *   image={{ url: "/world-image.jpg", alt: "My World" }}
  *   subtitle="Fantasy Adventure"
- *   height="h-64 md:h-96"
+ *   height=""
  * />
  *
  * @example With themed background (no image)
@@ -57,7 +57,7 @@ interface HeroProps {
  *   title="Fantasy World"
  *   subtitle="A magical realm"
  *   theme="fantasy"
- *   height="h-64 md:h-96"
+ *   height=""
  * />
  */
 export const Hero: React.FC<HeroProps> = ({
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({
   image,
   subtitle,
   badge,
-  height = 'h-64 md:h-96',
+  height = '',
   titleTestId,
   titleElement: TitleElement = 'h1',
   theme = 'default',
@@ -76,23 +76,23 @@ export const Hero: React.FC<HeroProps> = ({
   const getThemeBackground = (theme: string) => {
     switch (theme) {
       case 'fantasy':
-        return 'bg-gradient-to-br from-blue-700 via-blue-900 to-gray-900';
+        return '';
       case 'sci-fi':
       case 'cyberpunk':
-        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
+        return '';
       case 'western':
-        return 'bg-gradient-to-br from-amber-500 via-red-500 to-red-700';
+        return '';
       case 'modern':
       case 'historical':
-        return 'bg-gradient-to-br from-gray-500 via-gray-700 to-gray-900';
+        return '';
       case 'horror':
-        return 'bg-gradient-to-br from-red-700 via-gray-900 to-black';
+        return '';
       case 'mystery':
-        return 'bg-gradient-to-br from-gray-700 via-gray-900 to-black';
+        return '';
       case 'other':
-        return 'bg-gradient-to-br from-gray-500 via-blue-500 to-gray-700';
+        return '';
       default:
-        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
+        return '';
     }
   };
 
@@ -100,19 +100,19 @@ export const Hero: React.FC<HeroProps> = ({
   const getBorderRadiusClass = (borderRadius: string) => {
     switch (borderRadius) {
       case 'top':
-        return 'rounded-t-lg';
+        return '';
       case 'none':
         return '';
       case 'all':
       default:
-        return 'rounded-lg';
+        return '';
     }
   };
 
   return (
     <div
-      className={`${height} overflow-hidden ${getBorderRadiusClass(borderRadius)} shadow-lg relative ${
-        image ? 'bg-gray-100' : getThemeBackground(theme)
+      className={`${height}${getBorderRadiusClass(borderRadius)}${
+        image ? '' : getThemeBackground(theme)
       }`}
     >
       {image && (
@@ -121,38 +121,38 @@ export const Hero: React.FC<HeroProps> = ({
           alt={image.alt}
           width={800}
           height={400}
-          className="w-full h-full object-cover"
+          
           // Use unoptimized for data URLs and tests to avoid Next optimization proxy
           unoptimized={typeof image.url === 'string' && image.url.startsWith('data:')}
         />
       )}
 
       {/* Title overlay with gradient background */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <div className={`px-4 py-4 ${
+      <div >
+        <div className={`${
           image 
-            ? 'bg-gradient-to-t from-black/80 to-transparent' 
-            : 'bg-gradient-to-t from-black/40 to-transparent'
+            ? '' 
+            : ''
         }`}>
           <TitleElement
-            className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-white"
+            
             data-testid={titleTestId}
           >
             {title}
           </TitleElement>
 
           {subtitle && (
-            <p className="text-gray-300 mt-1 text-sm sm:text-base">
+            <p >
               {subtitle}
             </p>
           )}
 
-          {badge && <div className="mt-2">{badge}</div>}
+          {badge && <div >{badge}</div>}
         </div>
       </div>
 
       {actions && (
-        <div className="absolute bottom-4 right-4">
+        <div >
           {actions}
         </div>
       )}

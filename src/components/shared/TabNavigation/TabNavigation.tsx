@@ -33,8 +33,8 @@ export function TabNavigation<T = string>({
   mobileLayout = 'wrap'
 }: TabNavigationProps<T>) {
   const containerClasses = mobileLayout === 'scroll' 
-    ? `component-tab-navigation flex gap-2 overflow-x-auto border-b border-border ${className}` 
-    : `component-tab-navigation flex flex-wrap gap-2 border-b border-border ${className}`;
+    ? `component-tab-navigation${className}` 
+    : `component-tab-navigation${className}`;
 
   return (
     <div className={containerClasses} role="tablist">
@@ -53,21 +53,21 @@ export function TabNavigation<T = string>({
             variant="ghost"
             size="sm"
             className={[
-              size === 'sm' ? 'px-1.5 py-1.5 sm:px-2' : 'px-1 py-2 sm:px-3',
-              size === 'sm' ? 'text-xs sm:text-sm' : 'text-sm sm:text-base',
-              'rounded-none',
-              'transition-colors',
-              'whitespace-nowrap',
-              'focus-visible:ring-offset-0',
-              'border-b-2',
-              '-mb-px',
-              'bg-transparent',
-              mobileLayout === 'scroll' ? 'flex-shrink-0' : '',
+              size === 'sm' ? '' : '',
+              size === 'sm' ? '' : '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              mobileLayout === 'scroll' ? '' : '',
               isActive
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground',
-              isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-            ].join(' ')}
+                ? ''
+                : '',
+              isDisabled ? '' : '',
+            ].join('')}
           >
             {option.label}
           </Button>

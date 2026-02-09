@@ -12,30 +12,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: `
-        # NarrativeController
-        
-        The NarrativeController manages the generation, storage, and display of narrative content.
-        
-        ## Features
-        
-        - Automatically generates initial narrative on mount
-        - Maintains history of narrative segments
-        - Handles player choices to generate new narrative segments
-        - Displays loading and error states
-        
-        ## Usage
-        
-        \`\`\`jsx
-        <NarrativeController
-          worldId="world-123"
-          sessionId="session-456"
-          triggerGeneration={true}
-          choiceId="choice-123"
-          onNarrativeGenerated={(segment) => console.log('New segment:', segment)}
-        />
-        \`\`\`
-        `,
+        component: `# NarrativeController The NarrativeController manages the generation, storage, and display of narrative content. ## Features - Automatically generates initial narrative on mount - Maintains history of narrative segments - Handles player choices to generate new narrative segments - Displays loading and error states ## Usage \`\`\`jsx <NarrativeController worldId="world-123" sessionId="session-456" triggerGeneration={true} choiceId="choice-123" onNarrativeGenerated={(segment) => console.log('New segment:', segment)} /> \`\`\``,
       },
     },
   },
@@ -83,9 +60,9 @@ function DefaultNarrativeControllerStory() {
   }, []);
   
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">NarrativeController Demo</h2>
-      <div className="p-4 bg-white rounded-lg shadow-md">
+    <div >
+      <h2 >NarrativeController Demo</h2>
+      <div >
         <NarrativeHistory 
           segments={segments}
           isLoading={isLoading}
@@ -215,24 +192,24 @@ function GeneratingFromChoiceStory() {
   };
   
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Narrative with Choices</h2>
-      <div className="p-4 bg-white rounded-lg shadow-md">
+    <div >
+      <h2 >Narrative with Choices</h2>
+      <div >
         <NarrativeHistory 
           segments={segments}
           isLoading={isLoading}
         />
         
         {!isLoading && !currentChoice && (
-          <div className="mt-4 grid grid-cols-2 gap-4">
+          <div >
             <button
-              className="p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100"
+              
               onClick={() => handleChoiceClick('left')}
             >
               Take the left path
             </button>
             <button
-              className="p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100"
+              
               onClick={() => handleChoiceClick('right')}
             >
               Take the right path
@@ -256,9 +233,9 @@ export const GeneratingFromChoice: Story = {
 // Loading state
 function LoadingStateStory() {
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Loading State</h2>
-      <div className="p-4 bg-white rounded-lg shadow-md">
+    <div >
+      <h2 >Loading State</h2>
+      <div >
         <NarrativeHistory 
           segments={[]}
           isLoading={true}
@@ -280,9 +257,9 @@ export const LoadingState: Story = {
 // Error state
 function ErrorStateStory() {
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Error State</h2>
-      <div className="p-4 bg-white rounded-lg shadow-md">
+    <div >
+      <h2 >Error State</h2>
+      <div >
         <NarrativeHistory 
           segments={[]}
           isLoading={false}

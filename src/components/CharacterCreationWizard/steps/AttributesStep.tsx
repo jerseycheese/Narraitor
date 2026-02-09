@@ -44,7 +44,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
     <div className="component-attributes-step">
       <WizardFormSection
         title="Allocate Attribute Points"
-        description={`Distribute ${data.pointPools.attributes.total} points across your character's attributes. Each attribute affects different aspects of gameplay.`}
+        description={`Distribute${data.pointPools.attributes.total}points across your character's attributes. Each attribute affects different aspects of gameplay.`}
       >
       <PointPoolManager
         allocations={allocations}
@@ -68,7 +68,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
 
       {remaining > 0 && (
         <div className={wizardStyles.card.base}>
-          <p className="text-sm text-gray-700">
+          <p >
             You have {remaining} unspent attribute points. Spending them will increase your character&apos;s level and overall capabilities. You can continue with the current allocation or spend more points.
           </p>
         </div>

@@ -55,7 +55,7 @@ export default function PlayPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main >
         <LoadingPulse message="Preparing your adventure..." />
       </main>
     );
@@ -69,16 +69,16 @@ export default function PlayPage() {
           message={error}
           severity="error"
         />
-        <div className="mt-4 flex gap-4">
+        <div >
           <button
             onClick={() => router.push('/worlds')}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
+            
           >
             Select World
           </button>
           <button
             onClick={() => router.push('/characters')}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500"
+            
           >
             Select Character
           </button>
@@ -99,11 +99,11 @@ export default function PlayPage() {
     );
   }
 
-  const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
+  const pageTitle = currentWorld ? `Playing in${currentWorld.name}` : 'Game Session';
   const pageDescription = currentWorld?.genre ? getGenreLabel(currentWorld.genre) : undefined;
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription} className="pb-0">
+    <PageLayout title={pageTitle} description={pageDescription} >
       <GameSession worldId={currentWorldId!} />
     </PageLayout>
   );

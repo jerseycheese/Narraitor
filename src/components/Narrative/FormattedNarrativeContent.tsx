@@ -38,7 +38,7 @@ export const FormattedNarrativeContent: React.FC<
     >();
 
     const addTerm = (term: string) => {
-      const cleaned = safeTrim(term).replace(/\s+/g, ' ');
+      const cleaned = safeTrim(term).replace(/\s+/g, '');
       if (!cleaned) {
         return;
       }
@@ -64,7 +64,7 @@ export const FormattedNarrativeContent: React.FC<
 
   const highlightClass =
     highlightClassName ||
-    'font-semibold text-primary bg-primary/10 ring-1 ring-primary/20 rounded-sm px-1 py-0.5';
+    '';
 
   const renderHighlightedNodes = React.useCallback(
     (text: string, keyBase: string): React.ReactNode[] => {
@@ -217,7 +217,7 @@ export const FormattedNarrativeContent: React.FC<
             paragraphNodes.push(
               <strong
                 key={`paragraph-${index}-strong-${partIndex}`}
-                className="text-primary font-bold"
+                
               >
                 {renderHighlightedNodes(
                   part.slice(2, -2),
@@ -229,7 +229,7 @@ export const FormattedNarrativeContent: React.FC<
             paragraphNodes.push(
               <em
                 key={`paragraph-${index}-em-${partIndex}`}
-                className="text-primary"
+                
               >
                 {renderHighlightedNodes(
                   part.slice(1, -1),

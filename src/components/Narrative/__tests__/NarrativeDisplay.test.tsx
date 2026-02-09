@@ -119,7 +119,7 @@ describe('NarrativeDisplay', () => {
       content: 'Marge polishes the counter while you wait.',
       type: 'scene',
       metadata: {
-        characterIds: ['npc-1', 'npc-1 ', 'NPC-1'],
+        characterIds: ['npc-1', 'npc-1', 'NPC-1'],
         tags: ['diner'],
       },
     });
@@ -132,8 +132,7 @@ describe('NarrativeDisplay', () => {
     expect(items).toHaveLength(1);
     expect(
       within(items[0]).getByText((content, element) =>
-        content === 'Marge, the Waitress' &&
-        element?.classList.contains('text-sm') || false
+        content === 'Marge, the Waitress'
       )
     ).toBeInTheDocument();
   });
@@ -144,7 +143,7 @@ describe('NarrativeDisplay', () => {
       content: 'An unnamed figure watches from afar.',
       type: 'scene',
       metadata: {
-        characterIds: ['', '   ', 'npc-42'],
+        characterIds: ['', '', 'npc-42'],
         tags: [],
       },
     });

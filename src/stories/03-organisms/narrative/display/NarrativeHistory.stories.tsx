@@ -114,8 +114,8 @@ export const LongConversation: Story = {
     segments: Array.from({ length: 10 }, (_, i) => 
       createMockSegment(
         `seg-${i + 1}`,
-        `This is narrative segment ${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-        i % 3 === 0 ? 'scene' : i % 3 === 1 ? 'action' : 'transition' // Changed to use valid types
+        `This is narrative segment${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
+        i % 3 === 0 ? 'scene' : i % 3 === 1 ? 'action' : '' // Changed to use valid types
       )
     ),
     isLoading: false,
@@ -129,7 +129,7 @@ export const MixedSegmentTypes: Story = {
       createMockSegment('seg-1', 'The adventure begins in the bustling marketplace of Eldoria.', 'scene'),
       createMockSegment('seg-2', 'You notice a hooded figure watching you from the shadows.', 'action'), // Changed from 'exploration'
       createMockSegment('seg-3', 'The figure suddenly attacks! Draw your weapon!', 'action'), // Changed from 'combat'
-      createMockSegment('seg-4', 'After defeating your assailant, you find a mysterious note.', 'transition'), // Changed from 'resolution'
+      createMockSegment('seg-4', 'After defeating your assailant, you find a mysterious note.', ''), // Changed from 'resolution'
       createMockSegment('seg-5', 'The note reveals the location of an ancient artifact.', 'scene'), // Changed from 'revelation'
       createMockSegment('seg-6', 'You met a fellow adventurer who offers to join your quest.', 'dialogue'), // Changed from 'character_interaction'
     ],

@@ -44,11 +44,11 @@ const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnPro
 }) => {
   return (
     <div
-      className="lg:flex-[1] min-h-0 flex flex-col"
+      
       id="choices-container"
       aria-busy={isGeneratingChoices}
     >
-      <div className="player-choices-container flex-1" data-tutorial="player-choices">
+      <div className="player-choices-container" data-tutorial="player-choices">
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
           <ChoiceSelector
@@ -64,24 +64,24 @@ const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnPro
             endingSuggestion={endingSuggestion}
           />
         ) : (
-          <div className="space-y-4 p-4">
+          <div >
             {/* Choice decision skeleton - matches ChoiceSelector layout */}
-            <div className="space-y-3">
+            <div >
               {/* Choice prompt skeleton */}
-              <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
+              <div  />
 
               {/* Choice buttons skeleton */}
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-12 bg-gray-200 border border-gray-300 rounded-lg animate-pulse"
+                  
                 />
               ))}
 
               {/* Custom input skeleton */}
-              <div className="mt-4 space-y-2">
-                <div className="h-4 bg-gray-300 rounded w-1/3 animate-pulse" />
-                <div className="h-10 bg-gray-200 border border-gray-300 rounded animate-pulse" />
+              <div >
+                <div  />
+                <div  />
               </div>
             </div>
           </div>

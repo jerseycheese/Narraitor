@@ -41,29 +41,7 @@ export async function POST(request: NextRequest) {
       ? 'location names'
       : 'entity names';
 
-    const prompt = `Are these two ${categoryContext} referring to the same entity? You must respond with ONLY a JSON object in this exact format:
-{
-  "similar": true or false,
-  "confidence": 0.0 to 1.0,
-  "rationale": "brief explanation"
-}
-
-Name 1: "${name1}"
-Name 2: "${name2}"
-
-Consider:
-- Spelling variations (Gandalf/Gandolf, Seraphina/Serafina)
-- Title differences (Lady Seraphina vs Seraphina, Sir John vs John)
-- Word order (John the Smith vs Smith, John)
-- Nicknames and shortened forms (Elizabeth vs Liz, Jonathan vs Jon)
-- Special characters and punctuation ("Sir John's Tavern" vs "Sir Johns Tavern")
-- Common fantasy name variations
-
-If they clearly refer to the same entity, return similar: true with high confidence.
-If they're definitely different entities, return similar: false.
-For uncertain cases, adjust confidence accordingly.
-
-Response (JSON only):`;
+    const prompt = `Are these two${categoryContext}referring to the same entity? You must respond with ONLY a JSON object in this exact format: { "similar": true or false, "confidence": 0.0 to 1.0, "rationale": "brief explanation" } Name 1: "${name1}" Name 2: "${name2}" Consider: - Spelling variations (Gandalf/Gandolf, Seraphina/Serafina) - Title differences (Lady Seraphina vs Seraphina, Sir John vs John) - Word order (John the Smith vs Smith, John) - Nicknames and shortened forms (Elizabeth vs Liz, Jonathan vs Jon) - Special characters and punctuation ("Sir John's Tavern" vs "Sir Johns Tavern") - Common fantasy name variations If they clearly refer to the same entity, return similar: true with high confidence. If they're definitely different entities, return similar: false. For uncertain cases, adjust confidence accordingly. Response (JSON only):`;
 
     const config = getDefaultConfig();
     const client = new GeminiClient(config);

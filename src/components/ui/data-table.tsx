@@ -51,7 +51,7 @@ export function DataTable<TData, TValue>({
   pagination = { pageSize: 10, showPagination: false },
   searchable = { enabled: false },
   rowSelection,
-  ariaLabel = 'Data table',
+  ariaLabel = 'Data',
   customRowRenderer,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -87,22 +87,22 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4 data-table">
+    <div className="data-table">
       {/* Search Filter */}
       {searchable.enabled && (
-        <div className="flex items-center">
+        <div >
           <Input
             placeholder={searchable.placeholder || 'Search...'}
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="max-w-sm"
-            aria-label={searchable.placeholder || 'Search table'}
+            
+            aria-label={searchable.placeholder || 'Search'}
           />
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div >
         <Table aria-label={ariaLabel}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -117,7 +117,7 @@ export function DataTable<TData, TValue>({
                         <div
                           className={
                             canSort
-                              ? 'flex items-center space-x-2 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm'
+                              ? ''
                               : ''
                           }
                           onClick={
@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
                               : undefined
                           }
                           onKeyDown={(e) => {
-                            if (canSort && (e.key === 'Enter' || e.key === ' ')) {
+                            if (canSort && (e.key === 'Enter' || e.key === '')) {
                               e.preventDefault();
                               header.column.getToggleSortingHandler()?.(e);
                             }
@@ -148,9 +148,9 @@ export function DataTable<TData, TValue>({
                           {canSort && isSorted && (
                             <span aria-hidden="true">
                               {isSorted === 'asc' ? (
-                                <ChevronUp className="h-4 w-4" />
+                                <ChevronUp  />
                               ) : (
-                                <ChevronDown className="h-4 w-4" />
+                                <ChevronDown  />
                               )}
                             </span>
                           )}
@@ -197,7 +197,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  
                 >
                   No data available.
                 </TableCell>
@@ -209,31 +209,31 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination */}
       {pagination.showPagination && (
-        <div className="flex items-center justify-between px-2">
-          <div className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
+        <div >
+          <div >
+            Page {table.getState().pagination.pageIndex + 1} of{''}
             {table.getPageCount()}
           </div>
-          <div className="flex items-center space-x-2">
+          <div >
             <Button
-              variant="outline"
+              variant=""
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
               aria-label="Previous page"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft  />
               Previous
             </Button>
             <Button
-              variant="outline"
+              variant=""
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
               aria-label="Next page"
             >
               Next
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight  />
             </Button>
           </div>
         </div>

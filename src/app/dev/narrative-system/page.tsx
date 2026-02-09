@@ -127,7 +127,7 @@ export default function NarrativeSystemHarness() {
     } else {
       // Manual generation for history view
       const choice = mockChoices.find(c => c.id === choiceId);
-      const content = `You chose to ${choice?.text}. ${choice?.consequence}`;
+      const content = `You chose to${choice?.text}.${choice?.consequence}`;
       
       const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
@@ -187,7 +187,7 @@ export default function NarrativeSystemHarness() {
     // to prevent duplications
     useNarrativeStore.getState().clearSessionSegments(newSessionId);
     
-    console.log(`New session created and cleared: ${newSessionId}`);
+    console.log(`New session created and cleared:${newSessionId}`);
     
     // Force a component refresh if in controller mode - wait a bit longer
     if (showController) {
@@ -214,46 +214,46 @@ export default function NarrativeSystemHarness() {
 
   if (!isClient) {
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Narrative System Test Harness</h1>
+      <div >
+        <h1 >Narrative System Test Harness</h1>
         <div>Loading test harness...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Narrative System Test Harness</h2>
+    <div >
+      <h2 >Narrative System Test Harness</h2>
       
       {/* Control Panel */}
-      <div className="mb-6 p-4 bg-gray-100 rounded">
-        <h2 className="text-xl font-semibold mb-4">Controls</h2>
+      <div >
+        <h2 >Controls</h2>
         
-        <div className="space-y-4">
-          <div className="flex gap-2">
+        <div >
+          <div >
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
+              
               onClick={handleGenerateNarrative}
             >
               Generate Initial Narrative
             </button>
             
             <button
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500"
+              
               onClick={() => setShowController(!showController)}
             >
               {showController ? 'Use Manual History' : 'Use Controller'}
             </button>
             
             <button
-              className="px-4 py-2 bg-amber-2000 text-white rounded hover:bg-amber-50000"
+              
               onClick={handleNewSession}
             >
               New Session
             </button>
             
             <button
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
+              
               onClick={handleClearSession}
             >
               Clear Session
@@ -261,17 +261,17 @@ export default function NarrativeSystemHarness() {
           </div>
           
           <div>
-            <p className="text-sm text-gray-700">
-              Session ID: <code className="bg-gray-200 px-2 py-1 rounded">{sessionId}</code>
+            <p >
+              Session ID: <code >{sessionId}</code>
             </p>
           </div>
         </div>
       </div>
 
       {/* Narrative Display */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Narrative</h2>
-        <div className="border rounded p-4 bg-white min-h-[400px]">
+      <div >
+        <h2 >Narrative</h2>
+        <div >
           {showController ? (
             <MockNarrativeController
               worldId={mockWorld.id}
@@ -292,35 +292,35 @@ export default function NarrativeSystemHarness() {
       </div>
 
       {/* Choice Panel */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Player Choices</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div >
+        <h2 >Player Choices</h2>
+        <div >
           {mockChoices.map((choice) => (
             <button
               key={choice.id}
-              className="p-4 bg-blue-50 hover:bg-blue-100 rounded border border-blue-300 text-left"
+              
               onClick={() => handleChoiceSelected(choice.id)}
             >
-              <div className="font-semibold">{choice.text}</div>
-              <div className="text-sm mt-2">{choice.consequence}</div>
+              <div >{choice.text}</div>
+              <div >{choice.consequence}</div>
             </button>
           ))}
         </div>
       </div>
 
       {/* State Display */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div >
         <div>
-          <h2 className="text-xl font-semibold mb-2">Store State</h2>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
-            <pre className="bg-transparent">{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
+          <h2 >Store State</h2>
+          <div >
+            <pre >{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         
         <div>
-          <h2 className="text-xl font-semibold mb-2">Current Segments</h2>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
-            <pre className="bg-transparent">{JSON.stringify(segments, null, 2)}</pre>
+          <h2 >Current Segments</h2>
+          <div >
+            <pre >{JSON.stringify(segments, null, 2)}</pre>
           </div>
         </div>
       </div>

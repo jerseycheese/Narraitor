@@ -103,7 +103,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out"
+      
       role="navigation"
       aria-label="Mobile navigation"
       ref={menuRef}
@@ -112,38 +112,38 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
       onTouchEnd={handleTouchEnd}
     >
       {/* Header with close button */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <LogoIcon size="small" className="brightness-0 invert" />
-          <LogoText size="sm" className="text-white" />
+      <div >
+        <div >
+          <LogoIcon size="small" className="brightness-0" />
+          <LogoText size="sm"  />
         </div>
-        <div className="flex items-center gap-2">
+        <div >
           {/* Tutorial menu for mobile feature parity with desktop */}
           <TutorialMenu />
           <Button
             onClick={onClose}
             variant="ghost"
             size="icon"
-            className="min-h-11 min-w-11 text-white hover:bg-gray-700"
+            
             aria-label="Close menu"
           >
-            <X className="w-5 h-5" aria-hidden="true" />
+            <X  aria-hidden="true" />
           </Button>
         </div>
       </div>
 
       {/* Main navigation items */}
-      <div className="flex-1 px-4 py-6 space-y-2">
+      <div >
         <Button
           onClick={() => handleNavigation('/worlds')}
           variant="ghost"
-          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
+          className={`${
             pathname === '/worlds' || pathname.startsWith('/worlds/') 
-              ? 'bg-gray-700 text-white' 
-              : 'text-link-nav-dark hover:bg-gray-900'
+              ? '' 
+              : ''
           }`}
         >
-          <Globe className="w-5 h-5" aria-hidden="true" />
+          <Globe  aria-hidden="true" />
           Worlds
         </Button>
 
@@ -152,36 +152,36 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
         <Button
           onClick={() => handleNavigation('/characters')}
           variant="ghost"
-          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
+          className={`${
             pathname === '/characters' || pathname.startsWith('/characters/') 
-              ? 'bg-gray-700 text-white' 
-              : 'text-link-nav-dark hover:bg-gray-900'
-          } ${!hasWorlds ? 'hidden' : ''}`}
+              ? '' 
+              : ''
+          }${!hasWorlds ? '' : ''}`}
         >
-          <User className="w-5 h-5" aria-hidden="true" />
+          <User  aria-hidden="true" />
           Characters
         </Button>
 
         <Button
           onClick={() => handleNavigation('/settings')}
           variant="ghost"
-          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
+          className={`${
             pathname === '/settings' 
-              ? 'bg-gray-700 text-white' 
-              : 'text-link-nav-dark hover:bg-gray-900'
+              ? '' 
+              : ''
           }`}
         >
-          <Settings className="w-5 h-5" aria-hidden="true" />
+          <Settings  aria-hidden="true" />
           Settings
         </Button>
 
         {/* World switcher section */}
         {Object.keys(worlds).length > 0 && (
-          <div className="pt-4 mt-4 border-t border-border">
-            <h3 className="px-4 text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
+          <div >
+            <h3 >
               Worlds
             </h3>
-            <div className="space-y-1 max-h-64 overflow-y-auto">
+            <div >
               {Object.values(worlds).map(world => {
                 const worldCharacters = (Object.values(characters) as Character[]).filter(
                   char => char.worldId === world.id
@@ -192,18 +192,18 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                     key={world.id}
                     onClick={() => handleWorldSwitch(world.id)}
                     variant="ghost"
-                    className={`w-full min-h-11 flex items-center justify-between px-4 py-3 text-left ${
+                    className={`${
                       world.id === currentWorldId 
-                        ? 'bg-success text-success-foreground hover:bg-success/90' 
-                        : 'text-link-nav-dark hover:bg-gray-900'
+                        ? '' 
+                        : ''
                     }`}
                   >
                     <div>
-                      <div className="font-medium">{world.name}</div>
-                      <div className="text-sm opacity-75">{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
+                      <div >{world.name}</div>
+                      <div >{getGenreLabel(world.genre)} • {worldCharacters} characters</div>
                     </div>
                     {world.id === currentWorldId && (
-                      <Check className="w-5 h-5 text-white" aria-hidden="true" />
+                      <Check  aria-hidden="true" />
                     )}
                   </Button>
                 );
@@ -213,30 +213,30 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
         )}
 
         {/* Quick actions */}
-        <div className="pt-4 mt-4 border-t border-border">
+        <div >
           {currentWorld ? (
             <Button
               onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}
               variant="success"
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 text-lg font-medium"
+              
            >
-              <Play className="w-5 h-5" aria-hidden="true" />
+              <Play  aria-hidden="true" />
               Play {currentWorld.name}
             </Button>
           ) : Object.keys(worlds).length === 0 ? (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 text-white text-lg font-medium"
+              
            >
-              <Plus className="w-5 h-5" aria-hidden="true" />
+              <Plus  aria-hidden="true" />
               Create Your First World
             </Button>
           ) : (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 text-white text-lg font-medium"
+              
            >
-              <Plus className="w-5 h-5" aria-hidden="true" />
+              <Plus  aria-hidden="true" />
               Create New World
             </Button>
           )}

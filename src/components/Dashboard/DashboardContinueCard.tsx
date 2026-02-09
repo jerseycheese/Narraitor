@@ -43,16 +43,16 @@ export function DashboardContinueCard({
   return (
     <>
       <section
-        className="component-dashboard-continue-card bg-background rounded-lg border-2 border-primary p-6 shadow-md"
+        className="component-dashboard-continue-card"
         aria-labelledby="continue-game-heading"
       >
-        <h2 id="continue-game-heading" className="text-lg font-semibold mb-4">
+        <h2 id="continue-game-heading" >
           Continue Your Game
         </h2>
 
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
+        <div >
           {/* Character Portrait */}
-          <div className="flex-shrink-0 mx-auto sm:mx-0">
+          <div >
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
               characterName={character.name}
@@ -61,19 +61,19 @@ export function DashboardContinueCard({
           </div>
 
           {/* Game Info */}
-          <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+          <div >
+            <div >
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-t pt-3">
+            <div >
               <DataField
                 label="Progress"
-                value={`${session.narrativeCount} entries`}
-                variant="inline"
+                value={`${session.narrativeCount}entries`}
+                variant=""
               />
-              <time className="text-xs text-muted-foreground" dateTime={session.lastPlayed}>
+              <time  dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
             </div>
@@ -93,7 +93,7 @@ export function DashboardContinueCard({
               variant: 'danger'
             }
           ]}
-          className="[&>button:first-child]:flex-1"
+          
         />
       </section>
 
@@ -103,7 +103,7 @@ export function DashboardContinueCard({
         onConfirm={handleDelete}
         title="Delete Campaign"
         description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
-        itemName={`${world.name} - ${character.name}`}
+        itemName={`${world.name}-${character.name}`}
         isDeleting={isDeleting}
       />
     </>

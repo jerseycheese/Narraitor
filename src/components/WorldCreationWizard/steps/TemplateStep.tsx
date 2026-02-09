@@ -121,7 +121,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Convert template data to wizard format and populate the state
       const convertedAttributes = template.attributes.map((attr) => ({
         name: attr.name,
-        description: attr.description || `${attr.name} represents a core aspect of characters in this world`,
+        description: attr.description || `${attr.name}represents a core aspect of characters in this world`,
         minValue: attr.minValue,
         maxValue: attr.maxValue,
         baseValue: attr.baseValue,
@@ -131,7 +131,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
 
       const convertedSkills = template.skills.map((skill) => ({
         name: skill.name,
-        description: skill.description || `${skill.name} is an important skill for characters in this world`,
+        description: skill.description || `${skill.name}is an important skill for characters in this world`,
         difficulty: skill.difficulty,
         category: skill.category || 'General',
         baseValue: skill.baseValue,
@@ -184,18 +184,18 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       >
         
         {/* Mode Selection */}
-        <div className="mb-6" data-tutorial="world-type-selector">
-          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch">
-            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-foreground">Start from Scratch</h4>
-                <p className="text-sm text-muted-foreground">
+        <div  data-tutorial="world-type-selector">
+          <div className="template-grid">
+            <div >
+              <div >
+                <h4 >Start from Scratch</h4>
+                <p >
                   Build your world without a template and define everything as you go.
                 </p>
                 <Button
                   type="button"
                   onClick={handleCreateOwnWorld}
-                  variant="outline"
+                  variant=""
                   data-testid="create-own-button"
                   data-tutorial="create-own-world-btn"
                 >
@@ -204,18 +204,18 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-center">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                <span className="h-px w-6 bg-border" />
+            <div >
+              <div >
+                <span  />
                 <span>or</span>
-                <span className="h-px w-6 bg-border" />
+                <span  />
               </div>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-4 min-w-0">
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-foreground">Use a Template</h4>
-                <p className="text-sm text-muted-foreground">
+            <div >
+              <div >
+                <h4 >Use a Template</h4>
+                <p >
                   Pick a curated template or generate one to jump-start your world.
                 </p>
                 <div data-tutorial="generate-tab">
@@ -225,7 +225,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
                     onChange={setCurrentMode}
                   />
                 </div>
-                <div className="pt-3">
+                <div >
                   {currentMode === 'traditional' ? (
                     <TemplateSelector
                       onSelect={handleSelectTemplate}
@@ -243,16 +243,16 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       </WizardFormSection>
       
       {errors.template && (
-        <div className={"mt-4 " + wizardStyles.form.error} data-testid="template-error">
+        <div className={"" + wizardStyles.form.error} data-testid="template-error">
           {errors.template}
         </div>
       )}
       
-      <div className="mt-6 flex justify-between">
+      <div >
         <Button
           type="button"
           onClick={onCancel || (() => window.history.back())}
-          variant="outline"
+          variant=""
         >
           Cancel
         </Button>

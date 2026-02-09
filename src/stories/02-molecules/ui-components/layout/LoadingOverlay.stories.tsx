@@ -16,7 +16,7 @@ const meta: Meta<typeof LoadingOverlay> = {
   argTypes: {
     isVisible: {
       control: 'boolean',
-      description: 'Whether the overlay is visible',
+      description: 'Whether the overlay is',
     },
     variant: {
       control: 'select',
@@ -82,18 +82,18 @@ export const InteractiveDemo: Story = {
   render: (args) => {
     return (
       <div>
-        <div className="p-8 bg-gray-100 min-h-screen">
-          <h1 className="text-2xl font-bold mb-4">Background Content</h1>
-          <p className="mb-4">This content should be blocked when the overlay is visible.</p>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded mr-4">
+        <div >
+          <h1 >Background Content</h1>
+          <p >This content should be blocked when the overlay is visible.</p>
+          <button >
             Background Button
           </button>
           <input 
             type="text" 
             placeholder="Try typing here..." 
-            className="px-3 py-2 border rounded"
+            
           />
-          <p className="mt-4 text-sm text-gray-700">
+          <p >
             Toggle overlay visibility with controls. Test keyboard navigation (Tab, Escape).
           </p>
         </div>

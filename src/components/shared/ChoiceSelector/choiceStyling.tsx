@@ -8,9 +8,9 @@ import { ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
 export const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
   switch (alignment) {
     case 'lawful':
-      return <Scale className="w-4 h-4" aria-hidden="true" />;
+      return <Scale  aria-hidden="true" />;
     case 'chaotic':
-      return <Flame className="w-4 h-4" aria-hidden="true" />;
+      return <Flame  aria-hidden="true" />;
     case 'neutral':
     default:
       return null;
@@ -22,22 +22,22 @@ export const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode =
  */
 export const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
   const baseClasses = {
-    lawful: 'bg-blue-50 border-blue-300',
-    chaotic: 'bg-red-200 border-red-300',
-    neutral: 'bg-white border-gray-200'
+    lawful: '',
+    chaotic: '',
+    neutral: ''
   };
 
   const hoverClasses = {
-    lawful: 'hover:bg-blue-100',
-    chaotic: 'hover:bg-red-100',
-    neutral: 'hover:bg-gray-100'
+    lawful: '',
+    chaotic: '',
+    neutral: ''
   };
 
   const alignmentKey = alignment || 'neutral';
   const base = baseClasses[alignmentKey];
   const hover = isDisabled ? '' : hoverClasses[alignmentKey];
 
-  return `${base} ${hover}`;
+  return `${base}${hover}`;
 };
 
 /**
@@ -48,22 +48,22 @@ export const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   switch (weight) {
     case 'critical':
       return {
-        container: 'border-4 border-red-500 bg-red-200/50 shadow-lg shadow-red-200',
-        dot: 'bg-red-500',
-        label: 'text-red-700'
+        container: '',
+        dot: '',
+        label: ''
       };
     case 'major':
       return {
-        container: 'border-2 border-amber-500 bg-amber-50/60 shadow-md shadow-amber-200',
-        dot: 'bg-amber-500',
-        label: 'text-amber-700'
+        container: '',
+        dot: '',
+        label: ''
       };
     case 'minor':
     default:
       return {
-        container: 'border-0 bg-gray-100/5',
-        dot: 'bg-gray-700',
-        label: 'text-gray-900'
+        container: '',
+        dot: '',
+        label: ''
       };
   }
 };

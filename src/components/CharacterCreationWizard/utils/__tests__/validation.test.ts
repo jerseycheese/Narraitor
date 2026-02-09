@@ -121,7 +121,7 @@ describe('Character Creation Validation', () => {
     it('returns error when too many skills selected', () => {
       const manySkills = Array.from({ length: 10 }, (_, i) => ({
         skillId: `skill-${i}`,
-        name: `Skill ${i}`,
+        name: `Skill${i}`,
         level: 1,
         isSelected: true,
       }));

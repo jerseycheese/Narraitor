@@ -24,7 +24,7 @@ export default function WorldCreationWizardTestHarness() {
   ];
 
   const handleComplete = (worldId: string) => {
-    setWizardResult(`World created with ID: ${worldId}`);
+    setWizardResult(`World created with ID:${worldId}`);
     setShowWizard(false);
   };
 
@@ -39,33 +39,33 @@ export default function WorldCreationWizardTestHarness() {
   };
 
   return (
-    <main className="p-8">
-      <h2 className="text-2xl font-bold mb-6">World Creation Wizard Test Harness</h2>
+    <main >
+      <h2 >World Creation Wizard Test Harness</h2>
 
       {/* Controls */}
-      <section className="mb-8 p-4 bg-gray-100 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">Test Controls</h2>
+      <section >
+        <h2 >Test Controls</h2>
         
-        <form className="mb-4">
-          <div className="mb-4">
-            <label className="block mb-2">
+        <form >
+          <div >
+            <label >
               AI Response Delay (ms):
               <input
                 type="number"
                 value={mockAIDelay}
                 onChange={(e) => setMockAIDelay(Number(e.target.value))}
-                className="ml-2 p-1"
+                
               />
             </label>
           </div>
 
-          <div className="mb-4">
-            <label className="flex items-center">
+          <div >
+            <label >
               <input
                 type="checkbox"
                 checked={mockAIError}
                 onChange={(e) => setMockAIError(e.target.checked)}
-                className="mr-2"
+                
               />
               Simulate AI Error
             </label>
@@ -74,7 +74,7 @@ export default function WorldCreationWizardTestHarness() {
           <button
             type="button"
             onClick={resetWizard}
-            className="py-2 px-4 bg-blue-500 text-white border-none rounded-md cursor-pointer hover:bg-blue-500 transition-colors"
+            
           >
             Reset Wizard
           </button>
@@ -83,26 +83,26 @@ export default function WorldCreationWizardTestHarness() {
 
       {/* Results */}
       {wizardResult && (
-        <section className="mb-8 p-4 bg-green-100 rounded-lg">
-          <h3 className="font-bold mb-2">Result:</h3>
+        <section >
+          <h3 >Result:</h3>
           <p>{wizardResult}</p>
         </section>
       )}
 
       {/* Wizard */}
       {showWizard && (
-        <section className="border border-gray-200 rounded-lg overflow-hidden">
+        <section >
           <WorldCreationWizard onComplete={handleComplete} onCancel={handleCancel} />
         </section>
       )}
 
       {/* State Inspector */}
-      <aside className="mt-8">
-        <h2 className="text-xl font-bold mb-4">
+      <aside >
+        <h2 >
           Mock Data Reference
         </h2>
-        <div className="bg-gray-100 p-4 rounded-md">
-          <pre className="text-sm">
+        <div >
+          <pre >
             {JSON.stringify({ mockAttributes, mockSkills }, null, 2)}
           </pre>
         </div>

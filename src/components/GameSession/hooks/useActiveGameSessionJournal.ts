@@ -102,10 +102,10 @@ export const useActiveGameSessionJournal = ({
         .toLowerCase();
 
       if (!cleanPrompt || GENERIC_PROMPT_REGEX.test(cleanPrompt)) {
-        return `Chose to ${cleanChoice}.`;
+        return `Chose to${cleanChoice}.`;
       }
 
-      return `Chose to ${cleanChoice} when ${cleanPrompt}.`;
+      return `Chose to${cleanChoice}when${cleanPrompt}.`;
     };
 
     // Map decision weight to significance

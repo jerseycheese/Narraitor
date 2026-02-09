@@ -369,11 +369,11 @@ export default function SkillReviewStep({
         dataTutorial="skill-editor"
       >
         {showClearButton && (
-          <div className="mb-4 flex justify-end">
+          <div >
             <Button
               type="button"
               onClick={() => setShowClearConfirmation(true)}
-              variant="outline"
+              variant=""
               size="sm"
               data-testid="clear-ai-suggestions-button"
             >
@@ -382,12 +382,12 @@ export default function SkillReviewStep({
           </div>
         )}
 
-      <div className="space-y-4 my-4">
+      <div >
         <div>
           {localSuggestions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p className="text-lg mb-2">No skill suggestions available</p>
-              <p className="text-sm">You can add skills to your world later in the world editor.</p>
+            <div >
+              <p >No skill suggestions available</p>
+              <p >You can add skills to your world later in the world editor.</p>
             </div>
           ) : (
             localSuggestions.map((suggestion, index) => (
@@ -397,12 +397,12 @@ export default function SkillReviewStep({
               data-testid={`skill-card-${index}`}
               {...(index === 0 ? { 'data-tutorial': 'skill-suggestions' } : {})}
             >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">
+              <div >
+                <div >
+                  <span >
                     {suggestion.name}
                   </span>
-                  <span className={`${wizardStyles.badge.base} ${
+                  <span className={`${wizardStyles.badge.base}${
                     suggestion.difficulty === 'easy' ? wizardStyles.badge.success :
                     suggestion.difficulty === 'medium' ? wizardStyles.badge.warning : 
                     wizardStyles.badge.danger
@@ -410,18 +410,18 @@ export default function SkillReviewStep({
                     {suggestion.difficulty}
                   </span>
                   {suggestion.isModified && (
-                    <span className="text-xs text-info bg-info/20 px-2 py-1 rounded">
+                    <span >
                       Modified
                     </span>
                   )}
                   {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      Linked: {suggestion.selectedAttributeNames.join(', ')}
+                    <span >
+                      Linked: {suggestion.selectedAttributeNames.join(',')}
                     </span>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div >
                   <Button 
                     type="button" 
                     variant="link"
@@ -442,7 +442,7 @@ export default function SkillReviewStep({
                     type="button"
                     data-testid={`skill-toggle-${index}`}
                     onClick={() => handleToggleSkill(index)}
-                    variant={suggestion.accepted ? "default" : "outline"}
+                    variant={suggestion.accepted ? "default" : ""}
                     size="sm"
                   >
                     {suggestion.accepted ? 'Selected' : 'Excluded'}
@@ -453,7 +453,7 @@ export default function SkillReviewStep({
               {suggestion.showDetails && (
                 <div 
                   key={`skill-expanded-${index}`}
-                  className="mt-4 pl-7">
+                  >
                   <WizardFormGroup label="Name">
                     <WizardTextField
                       value={suggestion.name}
@@ -471,8 +471,8 @@ export default function SkillReviewStep({
                     />
                   </WizardFormGroup>
                   
-                  <div className="flex gap-4">
-                    <div className="flex-1">
+                  <div >
+                    <div >
                       <WizardFormGroup label="Difficulty">
                         <WizardSelect
                           value={suggestion.difficulty}
@@ -486,15 +486,15 @@ export default function SkillReviewStep({
                       </WizardFormGroup>
                     </div>
                     
-                    <div className="flex-1">
+                    <div >
                       <WizardFormGroup label="Linked Attributes">
-                        <div className="text-sm text-gray-700 mb-3">
+                        <div >
                           Select one or more attributes this skill depends on
                         </div>
-                        <div className="space-y-2" data-testid={`skill-attributes-${index}`}>
+                        <div  data-testid={`skill-attributes-${index}`}>
                           {worldData.attributes && worldData.attributes.length > 0 ? (
                             worldData.attributes.map((attribute) => (
-                              <div key={attribute.id} className="space-y-1">
+                              <div key={attribute.id} >
                                 <Checkbox
                                   id={`skill-${index}-attribute-${attribute.id}`}
                                   checked={suggestion.selectedAttributeNames?.includes(attribute.name) || false}
@@ -503,21 +503,21 @@ export default function SkillReviewStep({
                                   data-testid={`skill-${index}-attribute-${attribute.name}-checkbox`}
                                 />
                                 {attribute.description && (
-                                  <div className="ml-6 text-xs text-gray-500">
+                                  <div >
                                     {attribute.description}
                                   </div>
                                 )}
                               </div>
                             ))
                           ) : (
-                            <p className="text-sm text-gray-500 italic">
+                            <p >
                               No attributes available. Skills will not be linked to any attributes.
                             </p>
                           )}
                         </div>
                         {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                          <div className="mt-2 text-xs text-info">
-                            Selected: {suggestion.selectedAttributeNames.join(', ')}
+                          <div >
+                            Selected: {suggestion.selectedAttributeNames.join(',')}
                           </div>
                         )}
                       </WizardFormGroup>
@@ -525,7 +525,7 @@ export default function SkillReviewStep({
                   </div>
                   
                   {/* Default Value Range Editor */}
-                  <div className="mt-4">
+                  <div >
                     {/* Create a temporary skill object for the range editor */}
                     {worldData.skills?.some(skill => skill.name === suggestion.name) && (
                       <SkillRangeEditor
@@ -555,7 +555,7 @@ export default function SkillReviewStep({
                       />
                     )}
                     
-                    <div className="text-xs text-gray-500">
+                    <div >
                       <p>Values range from 1 (Novice) to 5 (Master).</p>
                     </div>
                   </div>
@@ -567,11 +567,11 @@ export default function SkillReviewStep({
         </div>
         
         {/* Custom Skills Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200" data-tutorial="skill-custom">
-          <div className="flex justify-between items-center mb-4">
+        <div  data-tutorial="skill-custom">
+          <div >
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Custom Skills</h3>
-              <p className="text-sm text-gray-700">
+              <h3 >Custom Skills</h3>
+              <p >
                 Create your own unique skills for this world ({acceptedCount}/12 slots used)
               </p>
             </div>
@@ -587,30 +587,30 @@ export default function SkillReviewStep({
           </div>
           
           {customSkills.length === 0 && !isCreatingCustomSkill ? (
-            <div className="text-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-700 mb-2">No custom skills yet</p>
-              <p className="text-xs text-gray-500">
+            <div >
+              <p >No custom skills yet</p>
+              <p >
                 {acceptedCount < 12 
-                  ? `You have ${12 - acceptedCount} skill slot${12 - acceptedCount !== 1 ? 's' : ''} available for custom skills`
+                  ? `You have${12 - acceptedCount}skill slot${12 - acceptedCount !== 1 ? 's' : ''}available for custom skills`
                   : 'Remove some suggested skills to add custom ones'
                 }
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div >
               {customSkills.map((skill) => (
                 <div
                   key={skill.id}
-                  className={`${wizardStyles.card.base} border-l-4 border-l-blue-500`}
+                  className={`${wizardStyles.card.base}`}
                   data-testid={`custom-skill-card-${skill.id}`}
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{skill.name}</span>
-                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
+                  <div >
+                    <div >
+                      <span >{skill.name}</span>
+                      <span >
                         Custom
                       </span>
-                      <span className={`${wizardStyles.badge.base} ${
+                      <span className={`${wizardStyles.badge.base}${
                         skill.difficulty === 'easy' ? wizardStyles.badge.success :
                         skill.difficulty === 'medium' ? wizardStyles.badge.warning : 
                         wizardStyles.badge.danger
@@ -618,14 +618,14 @@ export default function SkillReviewStep({
                         {skill.difficulty}
                       </span>
                       {skill.attributeIds && skill.attributeIds.length > 0 && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        <span >
                           Linked: {skill.attributeIds.map(attrId => 
                             worldData.attributes?.find(attr => attr.id === attrId)?.name
-                          ).filter(Boolean).join(', ')}
+                          ).filter(Boolean).join(',')}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div >
                       <Button
                         type="button"
                         onClick={() => handleEditCustomSkill(skill.id)}
@@ -646,7 +646,7 @@ export default function SkillReviewStep({
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-700">
+                  <div >
                     {skill.description}
                   </div>
                 </div>
@@ -656,7 +656,7 @@ export default function SkillReviewStep({
           
           {/* Custom Skill Editor */}
           {isCreatingCustomSkill && (
-            <div className="mt-4 p-4 bg-gray-100 rounded-lg border" data-testid="custom-skill-editor">
+            <div  data-testid="custom-skill-editor">
               <SkillEditor
                 worldId={worldData.id || ''}
                 mode={editingCustomSkillId ? 'edit' : 'create'}
@@ -674,32 +674,32 @@ export default function SkillReviewStep({
       </div>
 
       <div
-        className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20"
+        
         data-testid="skill-count-summary"
         data-tutorial="skill-summary"
       >
-        <div className="flex justify-between items-center">
+        <div >
           <div>
-            <span className="text-sm font-medium text-gray-900">
+            <span >
               Skills Selected: {acceptedCount} / 12
             </span>
             {acceptedCount >= 12 && (
-              <span className="text-xs text-warning ml-2">
+              <span >
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-gray-700">
+          <div >
             {acceptedCount < 12
-              ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
+              ? `${12 - acceptedCount}slot${12 - acceptedCount !== 1 ? 's' : ''}available`
               : 'All slots filled'
             }
           </div>
         </div>
-        <div className="mt-2 w-full">
-          <div className="grid grid-cols-12 gap-0.5 h-2">
+        <div >
+          <div >
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? '' : ''}`} />
             ))}
           </div>
         </div>
@@ -712,17 +712,17 @@ export default function SkillReviewStep({
 
       {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-skills-dialog-title">
-          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 id="clear-skills-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear Suggestions?</h3>
-            <p className="text-sm text-gray-700 mb-4">
+        <div  data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-skills-dialog-title">
+          <div >
+            <h3 id="clear-skills-dialog-title" >Clear Suggestions?</h3>
+            <p >
               This will remove all skill suggestions. You can still add custom skills or regenerate suggestions later.
             </p>
-            <div className="flex justify-end gap-3">
+            <div >
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}
-                variant="outline"
+                variant=""
                 size="sm"
                 data-testid="cancel-clear-button"
                 autoFocus

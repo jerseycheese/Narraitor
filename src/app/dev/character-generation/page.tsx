@@ -116,19 +116,19 @@ export default function CharacterGenerationTestPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">
+    <div >
+      <h1 >
         Character Generation Test Harness
       </h1>
 
-      <div className="space-y-6">
+      <div >
         {/* World Selection */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Select World</h2>
+        <div >
+          <h2 >Select World</h2>
           <select
             value={selectedWorldId}
             onChange={(e) => setSelectedWorldId(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md"
+            
           >
             <option value="">-- Select a World --</option>
             {Object.entries(worlds).map(([id, world]) => (
@@ -140,10 +140,10 @@ export default function CharacterGenerationTestPage() {
         </div>
 
         {/* Generation Type */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Generation Type</h2>
-          <div className="space-y-3">
-            <label className="flex items-center gap-2">
+        <div >
+          <h2 >Generation Type</h2>
+          <div >
+            <label >
               <input
                 type="radio"
                 value="known"
@@ -154,7 +154,7 @@ export default function CharacterGenerationTestPage() {
               />
               <span>Known Figure (canonical character from source)</span>
             </label>
-            <label className="flex items-center gap-2">
+            <label >
               <input
                 type="radio"
                 value="original"
@@ -165,7 +165,7 @@ export default function CharacterGenerationTestPage() {
               />
               <span>Original Character (new character fitting the world)</span>
             </label>
-            <label className="flex items-center gap-2">
+            <label >
               <input
                 type="radio"
                 value="specific"
@@ -179,8 +179,8 @@ export default function CharacterGenerationTestPage() {
           </div>
 
           {generationType === 'specific' && (
-            <div className="mt-4">
-              <label className="block text-sm font-medium mb-1">
+            <div >
+              <label >
                 Character Name
               </label>
               <input
@@ -188,18 +188,18 @@ export default function CharacterGenerationTestPage() {
                 value={suggestedName}
                 onChange={(e) => setSuggestedName(e.target.value)}
                 placeholder="Enter character name"
-                className="w-full px-3 py-2 border rounded-md"
+                
               />
             </div>
           )}
         </div>
 
         {/* Generate Button */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div >
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !selectedWorldId}
-            className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            
           >
             {isGenerating ? 'Generating...' : 'Generate Character'}
           </button>
@@ -207,45 +207,45 @@ export default function CharacterGenerationTestPage() {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-200 border border-red-500 rounded-lg p-4">
-            <p className="text-red-700">{error}</p>
+          <div >
+            <p >{error}</p>
           </div>
         )}
 
         {/* Generated Character Display */}
         {generatedCharacter && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Generated Character</h2>
+          <div >
+            <h2 >Generated Character</h2>
 
-            <div className="space-y-4">
+            <div >
               <div>
-                <h3 className="font-semibold">Name:</h3>
+                <h3 >Name:</h3>
                 <p>{generatedCharacter.name}</p>
               </div>
 
               <div>
-                <h3 className="font-semibold">Level:</h3>
+                <h3 >Level:</h3>
                 <p>{generatedCharacter.level || 1}</p>
               </div>
 
               <div>
-                <h3 className="font-semibold">Background:</h3>
-                <div className="pl-4 space-y-2">
+                <h3 >Background:</h3>
+                <div >
                   <div>
-                    <span className="font-medium">Description:</span>
-                    <p className="text-gray-700">
+                    <span >Description:</span>
+                    <p >
                       {generatedCharacter.background.description}
                     </p>
                   </div>
                   <div>
-                    <span className="font-medium">Personality:</span>
-                    <p className="text-gray-700">
+                    <span >Personality:</span>
+                    <p >
                       {generatedCharacter.background.personality}
                     </p>
                   </div>
                   <div>
-                    <span className="font-medium">Motivation:</span>
-                    <p className="text-gray-700">
+                    <span >Motivation:</span>
+                    <p >
                       {generatedCharacter.background.motivation}
                     </p>
                   </div>
@@ -253,17 +253,17 @@ export default function CharacterGenerationTestPage() {
               </div>
 
               <div>
-                <h3 className="font-semibold">Attributes:</h3>
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <h3 >Attributes:</h3>
+                <div >
                   {generatedCharacter.attributes.map((attr) => {
                     const world = worlds[selectedWorldId];
                     const worldAttr = world.attributes.find(
                       (wa) => wa.id === attr.id
                     );
                     return (
-                      <div key={attr.id} className="flex justify-between">
+                      <div key={attr.id} >
                         <span>{worldAttr?.name}:</span>
-                        <span className="font-medium">{attr.value}</span>
+                        <span >{attr.value}</span>
                       </div>
                     );
                   })}
@@ -271,27 +271,27 @@ export default function CharacterGenerationTestPage() {
               </div>
 
               <div>
-                <h3 className="font-semibold">Skills:</h3>
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <h3 >Skills:</h3>
+                <div >
                   {generatedCharacter.skills.map((skill) => {
                     const world = worlds[selectedWorldId];
                     const worldSkill = world.skills.find(
                       (ws) => ws.id === skill.id
                     );
                     return (
-                      <div key={skill.id} className="flex justify-between">
+                      <div key={skill.id} >
                         <span>{worldSkill?.name}:</span>
-                        <span className="font-medium">{skill.level}/10</span>
+                        <span >{skill.level}/10</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
+              <div >
                 <button
                   onClick={handleCreateCharacter}
-                  className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-700"
+                  
                 >
                   Create This Character
                 </button>
@@ -301,21 +301,21 @@ export default function CharacterGenerationTestPage() {
         )}
 
         {/* Existing Characters */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div >
+          <h2 >
             Existing Characters in Selected World
           </h2>
           {selectedWorldId ? (
-            <div className="space-y-2">
+            <div >
               {(Object.values(characters) as Character[])
                 .filter((c) => c.worldId === selectedWorldId)
                 .map((character) => (
                   <div
                     key={character.id}
-                    className="flex justify-between items-center p-2 bg-gray-100 rounded"
+                    
                   >
                     <span>{character.name}</span>
-                    <span className="text-sm text-gray-500">
+                    <span >
                       Level {character.level}
                     </span>
                   </div>
@@ -323,11 +323,11 @@ export default function CharacterGenerationTestPage() {
               {(Object.values(characters) as Character[]).filter(
                 (c) => c.worldId === selectedWorldId
               ).length === 0 && (
-                <p className="text-gray-500">No characters in this world yet</p>
+                <p >No characters in this world yet</p>
               )}
             </div>
           ) : (
-            <p className="text-gray-500">Select a world to see characters</p>
+            <p >Select a world to see characters</p>
           )}
         </div>
       </div>

@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     mode: {
       control: 'radio',
-      options: ['grid', 'table'],
+      options: ['', ''],
       description: 'Current view mode',
     },
     onModeChange: { action: 'modeChanged' },
@@ -24,27 +24,27 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    mode: 'grid',
+    mode: '',
     onModeChange: () => {},
   },
 };
 
 export const TableMode: Story = {
   args: {
-    mode: 'table',
+    mode: '',
     onModeChange: () => {},
   },
 };
 
 // Create a proper React component for the interactive story
 const InteractiveViewToggle = () => {
-  const [mode, setMode] = useState<'grid' | 'table'>('grid');
+  const [mode, setMode] = useState<'' | ''>('');
   return <WorldViewToggle mode={mode} onModeChange={setMode} />;
 };
 
 export const Interactive: Story = {
   args: {
-    mode: 'grid',
+    mode: '',
     onModeChange: () => {},
   },
   render: () => <InteractiveViewToggle />,

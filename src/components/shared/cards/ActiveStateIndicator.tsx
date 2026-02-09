@@ -19,7 +19,7 @@ export interface ActiveStateIndicatorProps {
  * @example With custom icon
  * <ActiveStateIndicator 
  *   text="Active Character" 
- *   icon={<UserIcon className="w-4 h-4" />} 
+ *   icon={<UserIcon  />} 
  * />
  */
 export const ActiveStateIndicator: React.FC<ActiveStateIndicatorProps> = ({ 
@@ -27,13 +27,13 @@ export const ActiveStateIndicator: React.FC<ActiveStateIndicatorProps> = ({
   className = '',
   icon
 }) => {
-  const defaultIcon = (<CheckCircle className="w-4 h-4" aria-hidden="true" />);
+  const defaultIcon = (<CheckCircle  aria-hidden="true" />);
 
   return (
-    <div className={`bg-green-500 text-white px-4 py-2 flex items-center justify-center ${className}`}>
-      <div className="flex items-center gap-2">
+    <div className={`${className}`}>
+      <div >
         {icon || defaultIcon}
-        <span className="font-medium text-sm">{text}</span>
+        <span >{text}</span>
       </div>
     </div>
   );

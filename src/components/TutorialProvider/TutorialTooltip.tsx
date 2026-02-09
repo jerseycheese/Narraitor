@@ -81,12 +81,12 @@ export function TutorialTooltip({
       style={styles.tooltip}
       {...tooltipProps}
     >
-      <div style={styles.tooltipContainer} className="text-left">
+      <div style={styles.tooltipContainer} >
         {title && <h1 style={styles.tooltipTitle}>{title}</h1>}
         <div style={styles.tooltipContent}>
           {content}
           {isEndOfPage && (
-            <div className="mt-2 text-xs text-muted-foreground">
+            <div >
               {nextStepHint || 'Complete this step, then click Next to continue.'}
             </div>
           )}
@@ -102,7 +102,7 @@ export function TutorialTooltip({
                 type="button"
                 variant="link"
                 size="sm"
-                className={skipClassName ? `p-0 h-auto ${skipClassName}` : 'p-0 h-auto'}
+                className={skipClassName ? `${skipClassName}` : ''}
                 {...skipButtonProps}
               >
                 {skipLabel}
@@ -122,7 +122,7 @@ export function TutorialTooltip({
             </Button>
           )}
 
-          <div className="flex gap-2">
+          <div >
             {isEndOfPage && !isLastStep && (
               <Button
                 data-test-id="button-pause"

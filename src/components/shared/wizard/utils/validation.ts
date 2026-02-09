@@ -15,24 +15,24 @@ type UnknownValue = unknown;
 export const validators = {
   required: (value: UnknownValue, fieldName: string = 'Field'): string | null => {
     if (value === null || value === undefined || value === '') {
-      return `${fieldName} is required`;
+      return `${fieldName}is required`;
     }
     if (typeof value === 'string' && value.trim() === '') {
-      return `${fieldName} is required`;
+      return `${fieldName}is required`;
     }
     return null;
   },
 
   minLength: (value: string, min: number, fieldName: string = 'Field'): string | null => {
     if (value.length < min) {
-      return `${fieldName} must be at least ${min} characters`;
+      return `${fieldName}must be at least${min}characters`;
     }
     return null;
   },
 
   maxLength: (value: string, max: number, fieldName: string = 'Field'): string | null => {
     if (value.length > max) {
-      return `${fieldName} must be no more than ${max} characters`;
+      return `${fieldName}must be no more than${max}characters`;
     }
     return null;
   },
@@ -46,14 +46,14 @@ export const validators = {
 
   unique: <T>(value: T, existingValues: T[], fieldName: string = 'Value'): string | null => {
     if (existingValues.includes(value)) {
-      return `${fieldName} already exists`;
+      return `${fieldName}already exists`;
     }
     return null;
   },
 
   range: (value: number, min: number, max: number, fieldName: string = 'Value'): string | null => {
     if (value < min || value > max) {
-      return `${fieldName} must be between ${min} and ${max}`;
+      return `${fieldName}must be between${min}and${max}`;
     }
     return null;
   },

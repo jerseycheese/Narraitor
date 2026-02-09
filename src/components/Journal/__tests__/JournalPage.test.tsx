@@ -44,7 +44,7 @@ const createEntries = (count: number): JournalEntry[] =>
   Array.from({ length: count }, (_, index) =>
     createEntry({
       id: `entry-${index + 1}`,
-      title: `Entry ${index + 1}`,
+      title: `Entry${index + 1}`,
       createdAt: `2024-01-01T12:${String(index).padStart(2, '0')}:00Z`,
       updatedAt: `2024-01-01T12:${String(index).padStart(2, '0')}:00Z`,
     })

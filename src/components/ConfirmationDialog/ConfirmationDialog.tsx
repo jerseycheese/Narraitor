@@ -74,13 +74,13 @@ export function ConfirmationDialog({
       tone={modalToneMap[variant]}
       description={message}
       footer={(
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div >
           <Button
             ref={cancelButtonRef}
             onClick={onClose}
-            variant="outline"
+            variant=""
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            
           >
             {cancelText}
           </Button>
@@ -89,13 +89,13 @@ export function ConfirmationDialog({
             onClick={onConfirm}
             variant={confirmButtonVariants[variant]}
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            
           >
             {isLoading ? loadingText : confirmText}
           </Button>
         </div>
       )}
-      footerClassName="bg-background"
+      footerClassName=""
     />
   );
 }

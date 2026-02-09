@@ -21,10 +21,10 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
   children
 }) => {
   return (
-    <div className="space-y-2">
+    <div >
       <Label>
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        {required && <span >*</span>}
       </Label>
       {helpText && (
         <p className={wizardStyles.form.helpText} data-testid="wizard-form-help-text">
@@ -151,7 +151,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
       disabled={disabled}
-      className={`${wizardStyles.form.select} ${error ? wizardStyles.form.inputError : ''}`}
+      className={`${wizardStyles.form.select}${error ? wizardStyles.form.inputError : ''}`}
       data-testid={testId}
       data-tutorial={dataTutorial}
     >
@@ -198,9 +198,9 @@ export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
     : undefined;
 
   return (
-    <div className="space-y-4 my-4" {...sectionProps}>
+    <div  {...sectionProps}>
       {(title || description) && (
-        <div className="mb-4" {...headerProps}>
+        <div  {...headerProps}>
           {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
           {description && <p className={wizardStyles.step.description}>{description}</p>}
         </div>

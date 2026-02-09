@@ -45,18 +45,18 @@ export const CollapsibleSection = ({
   return (
     <div 
       data-testid="collapsible-section" 
-      className={`component-collapsible-section w-full border border-border rounded-md mb-3 bg-card shadow-sm ${className}`}
+      className={`component-collapsible-section${className}`}
       role="region"
       aria-labelledby={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
       <div 
-        className="border-b border-border p-3 flex justify-between items-center bg-muted cursor-pointer hover:bg-accent transition-colors"
+        
         onClick={toggleExpanded}
         data-testid="collapsible-section-header"
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === 'Enter' || e.key === '') {
             e.preventDefault();
             toggleExpanded();
           }
@@ -67,7 +67,7 @@ export const CollapsibleSection = ({
         <h3 
           id={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
           data-testid="collapsible-section-title"
-          className="font-semibold text-sm text-foreground select-none"
+          
         >
           {title}
         </h3>
@@ -79,8 +79,8 @@ export const CollapsibleSection = ({
             toggleExpanded();
           }}
           aria-expanded={isExpanded}
-          aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
-          className="text-base font-bold ml-2 bg-primary text-primary-foreground px-3 py-1 rounded-md border border-primary hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none transition-colors"
+          aria-label={isExpanded ? `Collapse${title}` : `Expand${title}`}
+          
         >
           {isExpanded ? '−' : '+'}
         </button>
@@ -88,7 +88,7 @@ export const CollapsibleSection = ({
       <div 
         id={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
         data-testid="collapsible-section-content"
-        className={`p-3 text-muted-foreground ${isExpanded ? 'block' : 'hidden'}`}
+        className={`${isExpanded ? '' : ''}`}
         aria-hidden={!isExpanded}
       >
         {children}

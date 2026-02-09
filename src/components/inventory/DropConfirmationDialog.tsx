@@ -40,11 +40,11 @@ export function DropConfirmationDialog({
       size="lg"
       tone="destructive"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div >
           <Button
             type="button"
             onClick={onClose}
-            variant="outline"
+            variant=""
             autoFocus
           >
             Cancel
@@ -59,10 +59,10 @@ export function DropConfirmationDialog({
           </Button>
         </div>
       }
-      footerClassName="bg-background"
+      footerClassName=""
     >
-      <div className="space-y-4">
-        <p className="text-muted-foreground">
+      <div >
+        <p >
           Are you sure you want to drop <strong>{item.name}</strong>?
         </p>
 
@@ -74,7 +74,7 @@ export function DropConfirmationDialog({
         )}
 
         {item.stackable && item.quantity > 1 && (
-          <div className="space-y-2">
+          <div >
             <Label htmlFor="drop-quantity">
               Quantity to drop
             </Label>
@@ -88,9 +88,9 @@ export function DropConfirmationDialog({
               aria-invalid={!!quantityError}
               aria-describedby={quantityError ? "quantity-error" : undefined}
             />
-            <p className="text-xs text-muted-foreground">Available: {item.quantity}</p>
+            <p >Available: {item.quantity}</p>
             {quantityError && (
-              <p id="quantity-error" className="text-sm text-destructive">
+              <p id="quantity-error" >
                 {quantityError}
               </p>
             )}

@@ -296,7 +296,7 @@ export default function GameSessionTestHarness() {
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Ancient Map',
-      description: 'Shows hidden locations',
+      description: 'Shows locations',
       quantity: 1,
       stackable: false,
       categorization: createCategorization('documents'),
@@ -381,36 +381,36 @@ export default function GameSessionTestHarness() {
   if (!isClient) {
     // Return loading placeholder to avoid hydration mismatch
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Game Session Test Harness</h1>
+      <div >
+        <h1 >Game Session Test Harness</h1>
         <div>Loading test harness...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
+    <div >
+      <h2 >Game Session Test Harness</h2>
 
-      <div className="mb-4">
+      <div >
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mb-4"
+          
           onClick={() => setShowRealComponent(!showRealComponent)}
         >
           {showRealComponent ? 'Hide Component' : 'Show Component'}
         </button>
       </div>
 
-      <div className="mb-4">
+      <div >
         <button
-          className="px-4 py-2 bg-green-500 text-white rounded mb-4"
+          
           onClick={createTestWorld}
         >
           Ensure Test World & Character Exist
         </button>
 
         <button
-          className="px-4 py-2 bg-amber-500 text-white rounded mb-4 ml-2"
+          
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
@@ -431,7 +431,7 @@ export default function GameSessionTestHarness() {
         </button>
 
         <button
-          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
+          
           onClick={() => {
             // End current session only
             logger.info('Ending session');
@@ -442,7 +442,7 @@ export default function GameSessionTestHarness() {
         </button>
 
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mb-4 ml-2"
+          
           onClick={() => {
             // Reset all session state to break infinite loops
             logger.info('🔄 Resetting all session and narrative state');
@@ -485,7 +485,7 @@ export default function GameSessionTestHarness() {
         </button>
       </div>
 
-      <div className="border p-4 rounded bg-gray-100">
+      <div >
         {showRealComponent ? (
           <GameSession
             worldId={mockWorld.id}
@@ -497,14 +497,14 @@ export default function GameSessionTestHarness() {
         )}
       </div>
 
-      <div className="mt-6">
-        <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <p className="text-sm text-gray-700 mb-2">
-          Status:{' '}
-          <span className="font-bold">{currentState.status || 'unknown'}</span>
+      <div >
+        <h2 >Current Session State</h2>
+        <p >
+          Status:{''}
+          <span >{currentState.status || 'unknown'}</span>
         </p>
-        <p className="text-sm text-gray-700 mb-2">
-          Store methods:{' '}
+        <p >
+          Store methods:{''}
           {Object.keys(useSessionStore.getState())
             .filter((key) => {
               const value =
@@ -513,16 +513,16 @@ export default function GameSessionTestHarness() {
                 ];
               return typeof value === 'function';
             })
-            .join(', ')}
+            .join(',')}
         </p>
-        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+        <div >
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
 
-      <div className="mt-6">
-        <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+      <div >
+        <h2 >Test World Data</h2>
+        <div >
           {JSON.stringify(mockWorld, null, 2)}
         </div>
       </div>

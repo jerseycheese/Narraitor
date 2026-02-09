@@ -90,7 +90,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const lines = componentStack.split('\n');
     for (const line of lines) {
       const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('in ') || trimmedLine.startsWith('at ')) {
+      if (trimmedLine.startsWith('in') || trimmedLine.startsWith('at')) {
         const match = trimmedLine.match(/(?:in|at)\s+(\w+)/);
         if (match && match[1]) {
           return match[1];
@@ -117,24 +117,24 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default fallback UI
       return (
-        <div className="flex flex-col items-center justify-center min-h-32 p-6 bg-red-200 border-2 border-red-500 rounded-lg">
-          <div className="text-center space-y-4">
-            <h3 className="text-lg font-semibold text-red-700">
+        <div >
+          <div >
+            <h3 >
               Something went wrong
             </h3>
-            <p className="text-red-500 text-sm max-w-md">
+            <p >
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             {this.state.errorId && (
-              <p className="text-xs text-red-500 font-mono">
+              <p >
                 Error ID: {this.state.errorId}
               </p>
             )}
             <Button
               onClick={this.handleRetry}
-              variant="outline"
+              variant=""
               size="sm"
-              className="mt-4"
+              
             >
               Try again
             </Button>

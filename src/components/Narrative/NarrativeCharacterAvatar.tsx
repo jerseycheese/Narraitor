@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 
 interface NarrativeCharacterAvatarProps {
   name: string;
@@ -9,8 +9,8 @@ interface NarrativeCharacterAvatarProps {
 }
 
 const sizeClassMap = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm'
+  sm: '',
+  md: ''
 } as const;
 
 const getInitials = (name: string): string => {
@@ -48,8 +48,8 @@ export function NarrativeCharacterAvatar({
   if (avatarUrl) {
     return (
       <div
-        className={cn(
-          'flex-shrink-0 overflow-hidden rounded-full bg-muted',
+        className={cssClasses(
+          '',
           dimensionClasses,
           className
         )}
@@ -61,7 +61,7 @@ export function NarrativeCharacterAvatar({
           alt={name}
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover"
+          
         />
       </div>
     );
@@ -69,8 +69,8 @@ export function NarrativeCharacterAvatar({
 
   return (
     <div
-      className={cn(
-        'flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-secondary text-secondary-foreground font-semibold',
+      className={cssClasses(
+        '',
         dimensionClasses,
         className
       )}
@@ -79,7 +79,7 @@ export function NarrativeCharacterAvatar({
       data-testid="narrative-avatar-placeholder"
     >
       <span aria-hidden="true">{initials}</span>
-      <span className="sr-only">{name}</span>
+      <span >{name}</span>
     </div>
   );
 }

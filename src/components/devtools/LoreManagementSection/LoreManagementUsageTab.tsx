@@ -22,15 +22,15 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
   categoryColors,
   onClearUsage,
 }) => (
-  <div className="space-y-4">
-    <div className="flex items-center justify-between">
-      <div className="text-sm font-semibold text-gray-900">Usage Summary</div>
-      <Button variant="outline" size="sm" onClick={onClearUsage}>
+  <div >
+    <div >
+      <div >Usage Summary</div>
+      <Button variant="" size="sm" onClick={onClearUsage}>
         Clear Usage
       </Button>
     </div>
 
-    <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+    <div >
       <div>Total Facts: {usageSummary.totalFacts}</div>
       <div>Used in Prompts: {usageSummary.usedFacts}</div>
       <div>Total Mentions: {usageSummary.totalMentions}</div>
@@ -39,19 +39,19 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
       </div>
     </div>
 
-    <div className="space-y-2">
-      <div className="text-sm font-semibold text-gray-900">Facts by Usage</div>
+    <div >
+      <div >Facts by Usage</div>
       {usageRows.length === 0 ? (
-        <div className="text-xs text-gray-500">No lore facts found for this filter.</div>
+        <div >No lore facts found for this filter.</div>
       ) : (
-        <div className="max-h-64 overflow-y-auto space-y-2">
+        <div >
           {usageRows.map(({ fact, stats }) => (
-            <div key={fact.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
-              <div className={`font-medium ${categoryColors[fact.category]}`}>
+            <div key={fact.id} >
+              <div className={`${categoryColors[fact.category]}`}>
                 {fact.category}: {fact.key}
               </div>
-              <div className="text-gray-700">{fact.value}</div>
-              <div className="text-gray-500 mt-1">
+              <div >{fact.value}</div>
+              <div >
                 Used: {stats.usageCount} · Mentions: {stats.mentionCount}
               </div>
             </div>
@@ -60,22 +60,22 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
       )}
     </div>
 
-    <div className="space-y-2">
-      <div className="text-sm font-semibold text-gray-900">Recent Usage Events</div>
+    <div >
+      <div >Recent Usage Events</div>
       {usageEvents.length === 0 ? (
-        <div className="text-xs text-gray-500">No usage events recorded yet.</div>
+        <div >No usage events recorded yet.</div>
       ) : (
-        <div className="max-h-56 overflow-y-auto space-y-2">
+        <div >
           {usageEvents.map((event) => (
-            <div key={event.id} className="rounded border border-gray-200 bg-white p-2 text-xs">
-              <div className="font-medium text-gray-900">
+            <div key={event.id} >
+              <div >
                 {event.eventType === 'context' ? 'Context Used' : 'Mentioned'} · {event.source}
               </div>
-              <div className="text-gray-600">
+              <div >
                 {new Date(event.timestamp).toLocaleString()} · {event.factIds.length} fact(s)
               </div>
               {event.responseExcerpt && (
-                <div className="text-gray-700 italic mt-1">
+                <div >
                   &ldquo;{event.responseExcerpt}&rdquo;
                 </div>
               )}

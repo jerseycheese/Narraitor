@@ -40,14 +40,14 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
     <>
       {/* Character Summary Panel below hero */}
       {character && (
-        <div className="mt-6">
+        <div >
           <CharacterSummary character={character} />
         </div>
       )}
 
       {/* Inventory Display */}
       {characterId && (
-        <div className="mt-6" data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
+        <div  data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
           </CollapsibleSection>
@@ -60,15 +60,15 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
 
       {/* Journal Button */}
       {character && (
-        <div className="mt-6">
+        <div >
           <Button
             onClick={onOpenJournal}
-            variant="outline"
-            className="w-full flex items-center justify-center h-auto py-4 px-6 bg-white hover:bg-amber-50 border-amber-200 text-amber-900 group"
+            variant=""
+            className="group"
             data-tutorial="journal-toggle"
           >
-            <span className="flex items-center gap-3 font-semibold text-lg">
-              <BookOpen className="w-5 h-5" />
+            <span >
+              <BookOpen  />
               Open Journal
             </span>
           </Button>
@@ -76,7 +76,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       )}
 
       {/* Autosave indicator anchored under the main content */}
-      <div className="mt-4">
+      <div >
         <SaveIndicator
           status={autoSave.status}
           lastSaveTime={autoSave.lastSaveTime}
@@ -86,7 +86,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
           onRetryError={autoSave.retry}
           retryable
           compact
-          className="text-xs sm:text-sm"
+          
         />
       </div>
 

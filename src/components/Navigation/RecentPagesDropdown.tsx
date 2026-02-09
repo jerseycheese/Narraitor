@@ -86,7 +86,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
 
   const handleNavigateToPage = (path: string, title?: string) => {
     setShowRecentPages(false);
-    navigateWithLoading(path, title ? `Loading ${title}...` : 'Loading...');
+    navigateWithLoading(path, title ? `Loading${title}...` : 'Loading...');
   };
 
   const handleRemoveFromHistory = (path: string, event: React.MouseEvent) => {
@@ -100,7 +100,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
    */
   const formatPageTitle = (entry: typeof recentPages[0]): string => {
     if (entry.title && entry.title !== 'Narraitor') {
-      return entry.title.replace(' - Narraitor', '');
+      return entry.title.replace('- Narraitor', '');
     }
     
     // Fallback to generating title from path
@@ -108,7 +108,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     if (segments.length === 0) return 'Home';
     
     const lastSegment = segments[segments.length - 1];
-    return capitalize(lastSegment.replace(/-/g, ' '));
+    return capitalize(lastSegment.replace(/-/g, ''));
   };
 
   /**
@@ -119,8 +119,8 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     if (segments.length === 0) return '/';
     
     return segments
-      .map(segment => capitalize(segment.replace(/-/g, ' ')))
-      .join(' › ');
+      .map(segment => capitalize(segment.replace(/-/g, '')))
+      .join('›');
   };
 
   /**
@@ -131,49 +131,49 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
   };
 
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div className={`${className}`} ref={dropdownRef}>
       <Button
         onClick={() => setShowRecentPages(!showRecentPages)}
         className={headerDropdownTriggerClass}
         aria-label="Recent pages"
         variant="ghost"
       >
-        <Clock className="w-4 h-4" aria-hidden="true" />
-        <span className="hidden sm:inline">Recent</span>
-        <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">
+        <Clock  aria-hidden="true" />
+        <span >Recent</span>
+        <span >
           {recentPages.length}
         </span>
       </Button>
       
       {showRecentPages && (
-        <div className={`${headerDropdownMenuClass} w-80 py-1 max-h-96 overflow-y-auto`}>
+        <div className={`${headerDropdownMenuClass}`}>
           <div className={headerDropdownHeaderClass}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-900">Recent Pages</h3>
-              <span className="text-xs text-gray-500">{recentPages.length} pages</span>
+            <div >
+              <h3 >Recent Pages</h3>
+              <span >{recentPages.length} pages</span>
             </div>
           </div>
           
           {recentPages.map((entry, index) => (
             <div
               key={`${entry.path}-${entry.timestamp}`}
-              className="group relative"
+              className="group"
             >
-              <div className="flex items-center">
+              <div >
                 <Button
                   onClick={() => handleNavigateToPage(entry.path, entry.title)}
-                  className={`${headerDropdownItemClass} flex-1`}
-                  aria-label={`Navigate to ${formatPageTitle(entry)}`}
+                  className={`${headerDropdownItemClass}`}
+                  aria-label={`Navigate to${formatPageTitle(entry)}`}
                   variant="ghost"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900 truncate">
+                  <div >
+                    <div >
                       {formatPageTitle(entry)}
                     </div>
-                    <div className="text-sm text-gray-500 truncate">
+                    <div >
                       {formatPathDisplay(entry.path)}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div >
                       {formatTimestamp(entry.timestamp)}
                     </div>
                   </div>
@@ -182,17 +182,17 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                 {/* Remove button - now a sibling, not nested */}
                 <Button
                   onClick={(e) => handleRemoveFromHistory(entry.path, e)}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all mr-4"
-                  aria-label={`Remove ${formatPageTitle(entry)} from history`}
+                  
+                  aria-label={`Remove${formatPageTitle(entry)}from history`}
                   variant="ghost"
                   size="icon"
                 >
-                  <X className="w-4 h-4 text-gray-500 hover:text-gray-700" aria-hidden="true" />
+                  <X  aria-hidden="true" />
                 </Button>
               </div>
               
               {index < recentPages.length - 1 && (
-                <div className="border-b border-gray-100 mx-4" />
+                <div  />
               )}
             </div>
           ))}
@@ -201,10 +201,10 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
             <div className={headerDropdownDividerClass}>
               <Link
                 href="/recent"
-                className={`${headerDropdownItemClass} flex items-center gap-2 text-link-nav text-sm`}
+                className={`${headerDropdownItemClass}`}
                 onClick={() => setShowRecentPages(false)}
               >
-                <List className="w-4 h-4" aria-hidden="true" />
+                <List  aria-hidden="true" />
                 View all recent pages
               </Link>
             </div>

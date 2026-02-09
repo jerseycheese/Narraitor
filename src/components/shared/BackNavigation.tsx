@@ -30,9 +30,9 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
       variant="ghost"
       size="sm"
       onClick={handleClick}
-      className="flex items-center gap-2"
+      
     >
-      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+      <ArrowLeft  aria-hidden="true" />
       <span>{label}</span>
     </Button>
   );

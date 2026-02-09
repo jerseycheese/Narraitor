@@ -79,16 +79,16 @@ export default function WorldGenerationTestPage() {
   ];
   
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">World Generation Test Harness</h1>
+    <div >
+      <h1 >World Generation Test Harness</h1>
       
-      <div className="space-y-6">
+      <div >
         {/* World Reference Input */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">World Reference</h2>
-          <div className="space-y-4">
+        <div >
+          <h2 >World Reference</h2>
+          <div >
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label >
                 Enter a fictional or non-fictional world reference:
               </label>
               <input
@@ -96,18 +96,18 @@ export default function WorldGenerationTestPage() {
                 value={worldReference}
                 onChange={(e) => setWorldReference(e.target.value)}
                 placeholder="e.g., Lord of the Rings, Ancient Rome, Cyberpunk 2077"
-                className="w-full px-3 py-2 border rounded-md"
+                
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Or choose a preset:</label>
-              <div className="grid grid-cols-3 gap-2">
+              <label >Or choose a preset:</label>
+              <div >
                 {presetReferences.map(preset => (
                   <button
                     key={preset}
                     onClick={() => setWorldReference(preset)}
-                    className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded border text-left"
+                    
                   >
                     {preset}
                   </button>
@@ -118,10 +118,10 @@ export default function WorldGenerationTestPage() {
         </div>
         
         {/* Custom Name */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Custom Name (Optional)</h2>
+        <div >
+          <h2 >Custom Name (Optional)</h2>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label >
               Override the AI-generated name:
             </label>
             <input
@@ -129,17 +129,17 @@ export default function WorldGenerationTestPage() {
               value={suggestedName}
               onChange={(e) => setSuggestedName(e.target.value)}
               placeholder="Leave empty to use AI-generated name"
-              className="w-full px-3 py-2 border rounded-md"
+              
             />
           </div>
         </div>
         
         {/* Generate Button */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div >
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !safeTrim(worldReference)}
-            className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            
           >
             {isGenerating ? 'Generating World...' : 'Generate World'}
           </button>
@@ -147,40 +147,40 @@ export default function WorldGenerationTestPage() {
         
         {/* Error Display */}
         {error && (
-          <div className="bg-red-200 border border-red-500 rounded-lg p-4">
-            <p className="text-red-700">{error}</p>
+          <div >
+            <p >{error}</p>
           </div>
         )}
         
         {/* Generated World Display */}
         {generatedWorld && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Generated World</h2>
+          <div >
+            <h2 >Generated World</h2>
             
-            <div className="space-y-6">
+            <div >
               <div>
-                <h3 className="font-semibold">Name:</h3>
+                <h3 >Name:</h3>
                 <p>{generatedWorld.name}</p>
               </div>
               
               <div>
-                <h3 className="font-semibold">Genre:</h3>
+                <h3 >Genre:</h3>
                 <p>{generatedWorld.genre}</p>
               </div>
               
               <div>
-                <h3 className="font-semibold">Description:</h3>
-                <p className="text-gray-700">{generatedWorld.description}</p>
+                <h3 >Description:</h3>
+                <p >{generatedWorld.description}</p>
               </div>
               
               <div>
-                <h3 className="font-semibold">Attributes ({generatedWorld.attributes.length}):</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <h3 >Attributes ({generatedWorld.attributes.length}):</h3>
+                <div >
                   {generatedWorld.attributes.map((attr, index: number) => (
-                    <div key={index} className="border rounded p-3">
-                      <div className="font-medium">{attr.name}</div>
-                      <div className="text-sm text-gray-700 mb-2">{attr.description}</div>
-                      <div className="text-sm">
+                    <div key={index} >
+                      <div >{attr.name}</div>
+                      <div >{attr.description}</div>
+                      <div >
                         Range: {attr.minValue} - {attr.maxValue} (Default: {attr.baseValue})
                       </div>
                     </div>
@@ -189,17 +189,17 @@ export default function WorldGenerationTestPage() {
               </div>
               
               <div>
-                <h3 className="font-semibold">Skills ({generatedWorld.skills.length}):</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <h3 >Skills ({generatedWorld.skills.length}):</h3>
+                <div >
                   {generatedWorld.skills.map((skill, index: number) => (
-                    <div key={index} className="border rounded p-3">
-                      <div className="font-medium">{skill.name}</div>
-                      <div className="text-sm text-gray-700 mb-2">{skill.description}</div>
-                      <div className="text-sm">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          skill.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                          skill.difficulty === 'medium' ? 'bg-amber-100 text-amber-700' :
-                          'bg-red-100 text-red-700'
+                    <div key={index} >
+                      <div >{skill.name}</div>
+                      <div >{skill.description}</div>
+                      <div >
+                        <span className={`${
+                          skill.difficulty === 'easy' ? '' :
+                          skill.difficulty === 'medium' ? '' :
+                          ''
                         }`}>
                           {capitalize(skill.difficulty)}
                         </span>
@@ -210,8 +210,8 @@ export default function WorldGenerationTestPage() {
               </div>
               
               <div>
-                <h3 className="font-semibold">Settings:</h3>
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                <h3 >Settings:</h3>
+                <div >
                   <div>Attribute Pool: {generatedWorld.settings.attributePointPool}</div>
                   <div>Skill Pool: {generatedWorld.settings.skillPointPool}</div>
                   <div>Max Attributes: {generatedWorld.settings.maxAttributes}</div>
@@ -219,10 +219,10 @@ export default function WorldGenerationTestPage() {
                 </div>
               </div>
               
-              <div className="mt-6 pt-6 border-t">
+              <div >
                 <button
                   onClick={handleCreateWorld}
-                  className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-700"
+                  
                 >
                   Create This World
                 </button>
@@ -232,22 +232,22 @@ export default function WorldGenerationTestPage() {
         )}
         
         {/* Existing Worlds */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Existing Worlds</h2>
-          <div className="space-y-2">
+        <div >
+          <h2 >Existing Worlds</h2>
+          <div >
             {Object.values(worlds).map(world => (
-              <div key={world.id} className="flex justify-between items-center p-3 bg-gray-100 rounded">
+              <div key={world.id} >
                 <div>
-                  <span className="font-medium">{world.name}</span>
-                  <span className="text-sm text-gray-500 ml-2">({world.genre})</span>
+                  <span >{world.name}</span>
+                  <span >({world.genre})</span>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div >
                   {world.attributes.length} attrs, {world.skills.length} skills
                 </div>
               </div>
             ))}
             {Object.values(worlds).length === 0 && (
-              <p className="text-gray-500">No worlds created yet</p>
+              <p >No worlds created yet</p>
             )}
           </div>
         </div>

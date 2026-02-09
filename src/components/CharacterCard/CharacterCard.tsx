@@ -79,14 +79,14 @@ export function CharacterCard({
       className="component-character-card"
     >
 
-      <div className="p-8 flex-grow flex flex-col">
-        <div className="flex-grow mb-6">
+      <div >
+        <div >
           <div 
             onClick={(e) => {
               e.stopPropagation();
               onView();
             }}
-            className="cursor-pointer float-right ml-4 mb-6"
+            
           >
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
@@ -99,17 +99,17 @@ export function CharacterCard({
               e.stopPropagation();
               onView();
             }}
-            className="text-xl font-semibold text-link-primary cursor-pointer mb-1"
+            
           >
             {character.name}
           </h3>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm text-gray-500">Level {character.level || 1}</span>
+          <div >
+            <span >Level {character.level || 1}</span>
             {character?.background?.isKnownFigure !== undefined && (
               <Badge
                 icon={character?.background?.isKnownFigure ?
-                  <Star className="w-3 h-3 text-white" aria-hidden="true" /> :
-                  <Plus className="w-3 h-3 text-white" aria-hidden="true" />
+                  <Star  aria-hidden="true" /> :
+                  <Plus  aria-hidden="true" />
                 }
                 variant={character?.background?.isKnownFigure ? 'warning-static' : 'default-static'}
               >
@@ -117,7 +117,7 @@ export function CharacterCard({
               </Badge>
             )}
           </div>
-          <p className="text-gray-700 text-sm leading-snug">
+          <p >
             {(() => {
               const text = (character?.background?.history ||
                           character?.background?.personality ||
@@ -128,53 +128,53 @@ export function CharacterCard({
                 const trimmed = safeTrim(sentence);
                 if (!trimmed) continue;
                 if ((result + trimmed + '.').length > 280) break;
-                result += (result ? ' ' : '') + trimmed + '.';
+                result += (result ? '' : '') + trimmed + '.';
               }
               return result || truncate(text, 280);
             })()}
           </p>
           {context?.relationships && context.relationships.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold text-gray-600 mb-1">Connections</h4>
-              <div className="flex flex-wrap gap-2">
+            <div >
+              <h4 >Connections</h4>
+              <div >
                 {context.relationships.map((relation) => (
                   <div
                     key={relation.characterId}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary"
+                    
                   >
                     {relation.portraitUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={relation.portraitUrl}
-                        alt={`${relation.characterName} portrait`}
-                        className="w-8 h-8 rounded-full object-cover"
+                        alt={`${relation.characterName}portrait`}
+                        
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">
+                      <div >
+                        <span >
                           {relation.characterName.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span className="text-sm leading-snug">{relation.characterName}</span>
+                    <span >{relation.characterName}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
           {context?.recentEvent && (
-            <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Recent Event</h4>
-              <p className="text-sm text-gray-700">
+            <div >
+              <h4 >Recent Event</h4>
+              <p >
                 {context.recentEvent}
               </p>
             </div>
           )}
-          <div className="clear-both"></div>
+          <div ></div>
         </div>
         
         {/* Footer with buttons - always at bottom */}
-        <footer className="mt-auto pt-6 border-t border-gray-200">
+        <footer >
           <CardActionGroup
             primaryActions={[
               // Add Make Active button as first primary action for inactive characters
@@ -184,7 +184,7 @@ export function CharacterCard({
                 onClick: onMakeActive,
                 variant: 'secondary' as const,
                 flex: true,
-                icon: (<CheckCircle className="w-4 h-4" aria-hidden="true" />)
+                icon: (<CheckCircle  aria-hidden="true" />)
               }]),
               {
                 key: 'play',
@@ -192,7 +192,7 @@ export function CharacterCard({
                 onClick: onPlay,
                 variant: 'success',
                 flex: true,
-                icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Play  aria-hidden="true" />)
               }
             ]}
             secondaryActions={[
@@ -201,21 +201,21 @@ export function CharacterCard({
                 text: 'View',
                 onClick: onView,
                 variant: 'secondary',
-                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Eye  aria-hidden="true" />)
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: onEdit,
                 variant: 'secondary',
-                icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Pencil  aria-hidden="true" />)
               },
               {
                 key: 'delete',
                 text: 'Delete',
                 onClick: onDelete,
                 variant: 'danger',
-                icon: (<Trash className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Trash  aria-hidden="true" />)
               }
             ]}
             primarySize="md"

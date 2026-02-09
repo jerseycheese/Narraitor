@@ -78,20 +78,20 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
 
   return (
-    <div className={`bg-white rounded-lg shadow p-6 ${className}`}>
-      <h2 className="text-xl font-bold mb-4">{title}</h2>
-      <div className="flex items-start gap-6">
-        <div className="flex-shrink-0">
+    <div className={`${className}`}>
+      <h2 >{title}</h2>
+      <div >
+        <div >
           {imageComponent}
         </div>
-        <div className="flex-1">
-          <p className="text-gray-700 mb-4">
-            {hasImage ? description : `No ${title.toLowerCase()} has been generated yet.`}
+        <div >
+          <p >
+            {hasImage ? description : `No${title.toLowerCase()}has been generated yet.`}
           </p>
           
           {/* Custom prompt toggle */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between">
+          <div >
+            <div >
               <Checkbox
                 checked={showCustomPrompt}
                 onChange={(e) => handleCustomPromptToggle(e.target.checked)}
@@ -103,7 +103,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
                   variant="link"
                   size="sm"
                   onClick={handleUndoCustomization}
-                  className="text-xs h-auto p-0"
+                  
                 >
                   Undo customizations
                 </Button>
@@ -113,34 +113,34 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           
           {/* Custom prompt textarea */}
           {showCustomPrompt && (
-            <div className="mb-4">
+            <div >
               <Textarea
                 value={userCustomPrompt}
                 onChange={(e) => handleCustomPromptChange(e.target.value)}
                 placeholder={customPromptPlaceholder}
                 rows={3}
-                className="text-sm"
+                
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p >
                 {customPromptHelpText}
               </p>
             </div>
           )}
           
-          <div className="flex gap-2">
+          <div >
             <Button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="flex items-center gap-2"
+              
             >
               {isGenerating ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div ></div>
                   Generating...
                 </>
               ) : (
                 <>
-                  <ImageIcon className="w-5 h-5" aria-hidden="true" />
+                  <ImageIcon  aria-hidden="true" />
                   {hasImage ? regenerateButtonText : generateButtonText}
                 </>
               )}
@@ -149,9 +149,9 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
               <Button
                 variant="destructive"
                 onClick={onRemove}
-                className="flex items-center gap-2"
+                
               >
-                <Trash className="w-5 h-5" aria-hidden="true" />
+                <Trash  aria-hidden="true" />
                 {removeButtonText}
               </Button>
             )}
@@ -159,13 +159,13 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
 
           {/* Error display */}
           {error && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-700">{error}</p>
+            <div >
+              <p >{error}</p>
             </div>
           )}
 
           {generatedAt && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p >
               Generated: {formatDate(generatedAt)}
             </p>
           )}

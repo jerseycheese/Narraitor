@@ -22,24 +22,24 @@ export const Default = {
 
 export const Sizes = {
   render: () => (
-    <div className="space-y-8">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Logo with Text</h3>
-        <div className="space-y-6">
+        <h3 >Logo with Text</h3>
+        <div >
           <div>
-            <p className="text-sm text-gray-500 mb-2">Small</p>
+            <p >Small</p>
             <Logo size="small" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-2">Medium (Default)</p>
+            <p >Medium (Default)</p>
             <Logo size="medium" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-2">Large</p>
+            <p >Large</p>
             <Logo size="large" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-2">Extra Large</p>
+            <p >Extra Large</p>
             <Logo size="xl" />
           </div>
         </div>
@@ -50,25 +50,25 @@ export const Sizes = {
 
 export const IconOnly = {
   render: () => (
-    <div className="space-y-6">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Icon Sizes</h3>
-        <div className="flex items-end gap-6">
-          <div className="text-center">
+        <h3 >Icon Sizes</h3>
+        <div >
+          <div >
             <LogoIcon size="small" />
-            <p className="text-xs text-gray-500 mt-1">Small (32px)</p>
+            <p >Small (32px)</p>
           </div>
-          <div className="text-center">
+          <div >
             <LogoIcon size="medium" />
-            <p className="text-xs text-gray-500 mt-1">Medium (64px)</p>
+            <p >Medium (64px)</p>
           </div>
-          <div className="text-center">
+          <div >
             <LogoIcon size="large" />
-            <p className="text-xs text-gray-500 mt-1">Large (96px)</p>
+            <p >Large (96px)</p>
           </div>
-          <div className="text-center">
+          <div >
             <LogoIcon size="xl" />
-            <p className="text-xs text-gray-500 mt-1">XL (128px)</p>
+            <p >XL (128px)</p>
           </div>
         </div>
       </div>
@@ -78,28 +78,28 @@ export const IconOnly = {
 
 export const TextOnly = {
   render: () => (
-    <div className="space-y-6">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Text Logo Variations</h3>
-        <div className="space-y-4">
+        <h3 >Text Logo Variations</h3>
+        <div >
           <div>
-            <p className="text-sm text-gray-500 mb-1">Small</p>
+            <p >Small</p>
             <LogoText size="sm" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-1">Medium</p>
+            <p >Medium</p>
             <LogoText size="md" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-1">Large (Default)</p>
+            <p >Large (Default)</p>
             <LogoText size="lg" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-1">Extra Large</p>
+            <p >Extra Large</p>
             <LogoText size="xl" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-1">2X Large</p>
+            <p >2X Large</p>
             <LogoText size="2xl" />
           </div>
         </div>
@@ -110,36 +110,36 @@ export const TextOnly = {
 
 export const Usage = {
   render: () => (
-    <div className="space-y-8 max-w-2xl">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Usage Examples</h3>
+        <h3 >Usage Examples</h3>
         
-        <div className="space-y-6">
-          <div className="border rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-3">Navigation Header</p>
-            <div className="bg-white p-3 rounded border flex justify-between items-center">
+        <div >
+          <div >
+            <p >Navigation Header</p>
+            <div >
               <Logo size="small" />
-              <div className="flex gap-3 text-sm">
-                <a href="#" className="hover:text-blue-700">Worlds</a>
-                <a href="#" className="hover:text-blue-700">Characters</a>
-                <a href="#" className="hover:text-blue-700">Play</a>
+              <div >
+                <a href="#" >Worlds</a>
+                <a href="#" >Characters</a>
+                <a href="#" >Play</a>
               </div>
             </div>
           </div>
 
-          <div className="border rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-3">Hero Section</p>
-            <div className="bg-gradient-to-br from-blue-50 to-blue-50 p-8 rounded text-center">
-              <Logo size="xl" className="justify-center mb-4" />
-              <p className="text-gray-700">Create immersive narrative experiences</p>
+          <div >
+            <p >Hero Section</p>
+            <div >
+              <Logo size="xl"  />
+              <p >Create immersive narrative experiences</p>
             </div>
           </div>
 
-          <div className="border rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-3">Footer</p>
-            <div className="bg-gray-900 text-white p-4 rounded">
-              <Logo size="small" className="mb-3" />
-              <p className="text-gray-500 text-sm">© 2024 Narraitor. All rights reserved.</p>
+          <div >
+            <p >Footer</p>
+            <div >
+              <Logo size="small"  />
+              <p >© 2024 Narraitor. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -150,14 +150,14 @@ export const Usage = {
 
 export const OnDarkBackground = {
   render: () => (
-    <div className="space-y-6">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Dark Background Usage</h3>
-        <div className="bg-gray-900 p-8 rounded-lg">
-          <div className="space-y-6">
-            <Logo size="medium" className="text-white" />
-            <Logo size="small" className="text-white" />
-            <LogoText className="text-white" />
+        <h3 >Dark Background Usage</h3>
+        <div >
+          <div >
+            <Logo size="medium"  />
+            <Logo size="small"  />
+            <LogoText  />
           </div>
         </div>
       </div>

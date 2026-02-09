@@ -19,19 +19,19 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
   const formattedDate = formatDateTime(savedSession.lastPlayed);
 
   return (
-    <div data-testid="game-session-resume" className="p-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Continue Your Story?</h2>
+    <div data-testid="game-session-resume" >
+      <div >
+        <h2 >Continue Your Story?</h2>
         
-        <div className="bg-gray-100 rounded p-4 mb-6">
-          <p className="text-sm text-gray-700 mb-1">Last played: {formattedDate}</p>
-          <p className="text-sm text-gray-700">Progress: {savedSession.narrativeCount} scenes</p>
+        <div >
+          <p >Last played: {formattedDate}</p>
+          <p >Progress: {savedSession.narrativeCount} scenes</p>
         </div>
         
-        <div className="space-y-3">
+        <div >
           <Button
             onClick={onResume}
-            className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+            
             data-testid="resume-session-button"
             variant="default"
           >
@@ -40,7 +40,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
           
           <Button
             onClick={onNewGame}
-            className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+            
             data-testid="new-session-button"
             variant="default"
           >
@@ -48,7 +48,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
           </Button>
         </div>
         
-        <p className="text-xs text-gray-500 mt-4 text-center">
+        <p >
           Starting a new adventure will save your current progress
         </p>
       </div>

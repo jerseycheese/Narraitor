@@ -207,8 +207,8 @@ describe('AttributeReviewStep', () => {
 
   test('enforces maximum 6 attributes limit', () => {
     const manySuggestions = Array.from({ length: 8 }, (_, i) => ({
-      name: `Attribute ${i}`,
-      description: `Description ${i}`,
+      name: `Attribute${i}`,
+      description: `Description${i}`,
       minValue: 1,
       maxValue: 10,
       baseValue: 5,
@@ -221,8 +221,8 @@ describe('AttributeReviewStep', () => {
       attributes: Array.from({ length: 8 }, (_, i) => ({
         id: `attr-${i}`,
         worldId: '',
-        name: `Attribute ${i}`,
-        description: `Description ${i}`,
+        name: `Attribute${i}`,
+        description: `Description${i}`,
         baseValue: 5,
         minValue: 1,
         maxValue: 10,
@@ -281,7 +281,7 @@ describe('AttributeReviewStep', () => {
     expect(screen.getByText(/attributes selected:/i)).toBeInTheDocument();
   });
 
-  test('can expand and collapse attribute details', () => {
+  test('can expand and attribute details', () => {
     const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
       ...s,
       accepted: i === 0,

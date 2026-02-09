@@ -10,7 +10,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 
 interface SimpleModalProps {
   /** Whether the modal is open */
@@ -58,10 +58,10 @@ export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
 };
 
 const SIZE_CLASSES: Record<NonNullable<SimpleModalProps['size']>, string> = {
-  sm: '!max-w-sm',
-  md: '!max-w-md',
-  lg: '!max-w-lg',
-  xl: '!max-w-xl',
+  sm: '',
+  md: '',
+  lg: '',
+  xl: '',
 };
 
 const TONE_STYLES: Record<NonNullable<SimpleModalProps['tone']>, {
@@ -72,39 +72,39 @@ const TONE_STYLES: Record<NonNullable<SimpleModalProps['tone']>, {
   closeButton: string;
 }> = {
   default: {
-    frame: 'border border-border',
+    frame: '',
     header: '',
-    headerBorder: 'border-border',
-    footerBorder: 'border-border',
-    closeButton: 'text-muted-foreground hover:text-foreground',
+    headerBorder: '',
+    footerBorder: '',
+    closeButton: '',
   },
   info: {
-    frame: 'border border-info/50',
-    header: 'bg-info/10',
-    headerBorder: 'border-info/40',
-    footerBorder: 'border-info/40',
-    closeButton: 'text-info hover:text-info/80',
+    frame: '',
+    header: '',
+    headerBorder: '',
+    footerBorder: '',
+    closeButton: '',
   },
   success: {
-    frame: 'border border-success/50',
-    header: 'bg-success/10',
-    headerBorder: 'border-success/40',
-    footerBorder: 'border-success/40',
-    closeButton: 'text-success hover:text-success/80',
+    frame: '',
+    header: '',
+    headerBorder: '',
+    footerBorder: '',
+    closeButton: '',
   },
   warning: {
-    frame: 'border border-warning/60',
-    header: 'bg-warning/10',
-    headerBorder: 'border-warning/40',
-    footerBorder: 'border-warning/40',
-    closeButton: 'text-warning hover:text-warning/80',
+    frame: '',
+    header: '',
+    headerBorder: '',
+    footerBorder: '',
+    closeButton: '',
   },
   destructive: {
-    frame: 'border border-destructive/60',
-    header: 'bg-destructive/10',
-    headerBorder: 'border-destructive/40',
-    footerBorder: 'border-destructive/40',
-    closeButton: 'text-destructive hover:text-destructive/80',
+    frame: '',
+    header: '',
+    headerBorder: '',
+    footerBorder: '',
+    closeButton: '',
   },
 };
 
@@ -147,13 +147,13 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={isOverlayScroll}
-        className={cn(
-          '!flex !flex-col !gap-0 !p-0 bg-background text-foreground shadow-xl focus:outline-none focus-visible:outline-none',
-          'dark:bg-white dark:text-gray-900',
+        className={cssClasses(
+          '',
+          '',
           toneStyles.frame,
-          'w-full sm:rounded-xl',
+          '',
           SIZE_CLASSES[size],
-          !isOverlayScroll ? 'max-h-[100dvh] overflow-hidden' : undefined,
+          !isOverlayScroll ? '' : undefined,
           className,
         )}
         onInteractOutside={event => {
@@ -174,22 +174,22 @@ export function SimpleModal({
       >
         {hasHeaderContent && (
           <div
-            className={cn(
-              'flex items-start justify-between gap-4 border-b px-6 py-5',
+            className={cssClasses(
+              '',
               toneStyles.header,
               toneStyles.headerBorder,
             )}
           >
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div >
               {title && (
-                <DialogTitle className="text-lg font-semibold text-foreground dark:text-gray-900">
+                <DialogTitle >
                   {title}
                 </DialogTitle>
               )}
               {description && (
                 <div
                   id={ariaDescribedBy ? undefined : resolvedDescriptionId}
-                  className="text-sm text-muted-foreground"
+                  
                 >
                   {description}
                 </div>
@@ -200,13 +200,13 @@ export function SimpleModal({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn(
-                    'h-9 w-9 shrink-0',
+                  className={cssClasses(
+                    '',
                     toneStyles.closeButton,
                   )}
                   aria-label="Close modal"
                 >
-                  <X className="h-4 w-4" aria-hidden="true" />
+                  <X  aria-hidden="true" />
                 </Button>
               </DialogClose>
             )}
@@ -216,9 +216,9 @@ export function SimpleModal({
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
             data-scroll-container={isOverlayScroll ? undefined : 'content'}
-            className={cn(
-              'flex-1 px-6 py-6',
-              isOverlayScroll ? undefined : 'overflow-y-auto',
+            className={cssClasses(
+              '',
+              isOverlayScroll ? undefined : '',
               contentClassName,
             )}
           >
@@ -229,10 +229,10 @@ export function SimpleModal({
         {footer && (
           <div
             data-sticky-footer={shouldStickFooter ? 'true' : undefined}
-            className={cn(
-              'border-t px-6 py-5',
+            className={cssClasses(
+              '',
               toneStyles.footerBorder,
-              shouldStickFooter ? 'sticky bottom-0 z-10 bg-background dark:bg-white' : undefined,
+              shouldStickFooter ? '' : undefined,
               footerClassName,
             )}
           >

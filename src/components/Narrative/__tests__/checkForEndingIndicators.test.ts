@@ -226,7 +226,7 @@ describe('Pure AI Ending Detection', () => {
 
       // Create many segments to test context building
       const manySegments = Array.from({ length: 12 }, (_, i) => 
-        createSegment(String(i + 1), `Story segment ${i + 1} with narrative content.`)
+        createSegment(String(i + 1), `Story segment${i + 1}with narrative content.`)
       );
       
       const newSegment = createSegment('13', 'Latest narrative development.');
@@ -264,7 +264,7 @@ describe('Pure AI Ending Detection', () => {
     ];
 
     endingTypes.forEach(({ type, scenario, reason }) => {
-      it(`should correctly identify ${type} ending type`, async () => {
+      it(`should correctly identify${type}ending type`, async () => {
         mockGenerateContent.mockResolvedValueOnce({
           content: JSON.stringify({
             suggestEnding: true,
@@ -280,7 +280,7 @@ describe('Pure AI Ending Detection', () => {
           createSegment('3', 'Story continues.')
         ];
 
-        const testSegment = createSegment('4', `Content representing ${scenario}.`);
+        const testSegment = createSegment('4', `Content representing${scenario}.`);
 
         await checkForEndingIndicators(existingSegments, testSegment, mockOnEndingSuggested);
 

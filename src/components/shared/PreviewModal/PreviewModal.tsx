@@ -61,25 +61,25 @@ function PreviewModalInner<T>({
       size="xl"
       className={className}
     >
-      <p className="text-sm text-gray-700 mb-6" id="preview-modal-desc">
+      <p  id="preview-modal-desc">
         {subtitle || "Preview content before confirming your selection."}
       </p>
 
-      <div className="space-y-6">
+      <div >
         {renderContent(data)}
 
         {/* Footer Note */}
         {footerNote && (
-          <div className="text-center text-sm text-muted-foreground italic border-t pt-4 mt-6">
+          <div >
             {footerNote}
           </div>
         )}
       </div>
 
-      <div className={wizardStyles.navigation.container + " mt-6"}>
+      <div className={wizardStyles.navigation.container + ""}>
         <Button
           onClick={onCancel}
-          variant="outline"
+          variant=""
           size="default"
         >
           {cancelText}

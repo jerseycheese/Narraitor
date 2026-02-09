@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { EntityID } from '@/types/common.types';
-import { cn } from '@/lib/utils';
+import { cssClasses } from '@/lib/utils';
 import { DecisionOutcome } from '@/types/narrative.types';
 
 interface ChoiceOutcomeCalloutProps {
@@ -25,11 +25,11 @@ const outcomeLabels: Record<DecisionOutcome, string> = {
 };
 
 const outcomeAccentClasses: Record<DecisionOutcome, string> = {
-  success: 'bg-success',
-  failure: 'bg-destructive',
-  mixed: 'bg-warning',
-  'critical-success': 'bg-success',
-  'critical-failure': 'bg-destructive',
+  success: '',
+  failure: '',
+  mixed: '',
+  'critical-success': '',
+  'critical-failure': '',
 };
 
 const buildOutcomeDecisionText = (
@@ -47,10 +47,10 @@ const buildOutcomeDecisionText = (
     return trimmed;
   }
   if (/^you\s+choose\s+to\s+/i.test(trimmed)) {
-    return trimmed.replace(/^you\s+choose\s+to\s+/i, 'You attempt to ');
+    return trimmed.replace(/^you\s+choose\s+to\s+/i, 'You attempt to');
   }
   if (/^you\s+/i.test(trimmed)) {
-    return trimmed.replace(/^you\s+/i, 'You attempt to ');
+    return trimmed.replace(/^you\s+/i, 'You attempt to');
   }
 
   const firstChar = trimmed.charAt(0);
@@ -59,7 +59,7 @@ const buildOutcomeDecisionText = (
       ? `${firstChar.toLowerCase()}${trimmed.slice(1)}`
       : trimmed;
 
-  return `You attempt to ${normalized}`;
+  return `You attempt to${normalized}`;
 };
 
 export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
@@ -75,20 +75,20 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
 
   return (
     <div
-      className={cn(
-        'choice-outcome-callout rounded-md border border-border bg-muted px-3 py-2 text-base text-muted-foreground',
+      className={cssClasses(
+        'choice-outcome-callout',
         className
       )}
       data-decision-id={decisionId}
     >
       <span>{displayDecisionText}</span>
       {decisionOutcome && (
-        <div className="mt-1 flex items-center gap-2 text-sm text-foreground">
+        <div >
           <span
-            className={cn('h-2 w-2 rounded-full', outcomeAccentClasses[decisionOutcome])}
+            className={cssClasses('', outcomeAccentClasses[decisionOutcome])}
             aria-hidden="true"
           />
-          <span className="font-medium">{outcomeLabels[decisionOutcome]}</span>
+          <span >{outcomeLabels[decisionOutcome]}</span>
         </div>
       )}
     </div>

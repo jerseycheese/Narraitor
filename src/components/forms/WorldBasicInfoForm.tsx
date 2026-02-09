@@ -14,8 +14,8 @@ interface WorldBasicInfoFormProps {
 
 const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange }) => {
   return (
-    <div className="component-world-basic-info-form space-y-4">
-      <div className="space-y-2">
+    <div className="component-world-basic-info-form">
+      <div >
         <Label htmlFor="worldName">
           Name
         </Label>
@@ -28,7 +28,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
         />
       </div>
       
-      <div className="space-y-2">
+      <div >
         <Label htmlFor="worldDescription">
           Description
         </Label>
@@ -41,7 +41,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
         />
       </div>
       
-      <div className="space-y-2">
+      <div >
         <Label htmlFor="worldGenre">
           Genre
         </Label>
@@ -59,7 +59,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
       </div>
       
       {/* World Type Section */}
-      <div className="space-y-2">
+      <div >
         <Label htmlFor="worldType">
           World Type
         </Label>
@@ -85,7 +85,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
 
       {/* Reference field - only show if not original world */}
       {world.reference !== undefined && (
-        <div className="space-y-2">
+        <div >
           <Label htmlFor="worldReference">
             {world.relationship === 'set_within' ? 'Set Within Universe' : 'Inspired By'}
           </Label>

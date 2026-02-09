@@ -21,58 +21,58 @@ type Story = StoryObj<typeof meta>;
 
 export const ButtonSizeComparison: Story = {
   render: () => (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">ActionButtonGroup Sizes</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-4">
-            <span className="w-16 text-sm text-gray-600">Small:</span>
+    <div >
+      <div >
+        <h3 >ActionButtonGroup Sizes</h3>
+        <div >
+          <div >
+            <span >Small:</span>
             <ActionButtonGroup 
               actions={[{
                 label: 'View',
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'sm',
-                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Eye  aria-hidden="true" />)
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;sm&quot;</code>
+            <code >size=&quot;sm&quot;</code>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="w-16 text-sm text-gray-600">Default:</span>
+          <div >
+            <span >Default:</span>
             <ActionButtonGroup 
               actions={[{
                 label: 'View',
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'default',
-                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Eye  aria-hidden="true" />)
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;default&quot;</code>
+            <code >size=&quot;default&quot;</code>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="w-16 text-sm text-gray-600">Large:</span>
+          <div >
+            <span >Large:</span>
             <ActionButtonGroup 
               actions={[{
                 label: 'View',
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'lg',
-                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Eye  aria-hidden="true" />)
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;lg&quot;</code>
+            <code >size=&quot;lg&quot;</code>
           </div>
         </div>
       </div>
       
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">CardActionGroup Small Secondary Actions</h3>
-        <div className="max-w-sm border border-gray-200 rounded-lg p-4">
-          <div className="mb-4">
-            <h4 className="font-medium">Sample Card</h4>
-            <p className="text-sm text-gray-600">This shows how small buttons appear in card contexts</p>
+      <div >
+        <h3 >CardActionGroup Small Secondary Actions</h3>
+        <div >
+          <div >
+            <h4 >Sample Card</h4>
+            <p >This shows how small buttons appear in card contexts</p>
           </div>
           <CardActionGroup
             secondaryActions={[
@@ -81,14 +81,14 @@ export const ButtonSizeComparison: Story = {
                 text: 'View',
                 onClick: () => {},
                 variant: 'secondary',
-                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Eye  aria-hidden="true" />)
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: () => {},
                 variant: 'secondary',
-                icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
+                icon: (<Pencil  aria-hidden="true" />)
               },
               {
                 key: 'delete',
@@ -99,15 +99,15 @@ export const ButtonSizeComparison: Story = {
             ]}
             secondarySize="sm"
           />
-          <p className="text-xs text-gray-500 mt-3">
+          <p >
             Secondary actions use <code>px-2 py-1 text-xs</code> sizing
           </p>
         </div>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">Size Usage Guidelines</h4>
-        <ul className="text-sm text-blue-800 space-y-1">
+      <div >
+        <h4 >Size Usage Guidelines</h4>
+        <ul >
           <li><strong>Small (sm):</strong> Secondary actions in cards, inline controls, compact layouts</li>
           <li><strong>Default:</strong> Standard page actions, primary navigation buttons</li>  
           <li><strong>Large (lg):</strong> Call-to-action buttons, hero sections, prominent actions</li>

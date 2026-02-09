@@ -142,10 +142,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Calculate character count styling
   const characterCount = customInputText.length;
   const characterCountClass = characterCount >= maxCustomLength
-    ? 'text-destructive'
+    ? ''
     : characterCount >= maxCustomLength * 0.8
-    ? 'text-amber-500'
-    : 'text-gray-500';
+    ? ''
+    : '';
 
   // Don't render if no options and custom input is disabled
   if (allOptions.length === 0 && !enableCustomInput) {
@@ -160,11 +160,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   return (
     <div
       data-testid="choice-selector"
-      className={`choice-selector rounded-lg ${weightStyling.container} ${className}`}
+      className={`choice-selector${weightStyling.container}${className}`}
       role="group"
       aria-labelledby="choices-heading"
     >
-      <div className="p-4">
+      <div >
 
       {/* Ending Suggestion Banner */}
       {endingSuggestion && (
@@ -179,16 +179,16 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       {decision.contextSummary && (
         <div
           data-testid="context-summary"
-          className="mb-4 p-3 bg-white/50 rounded border border-gray-200"
+          
         >
-          <p className="text-sm text-gray-700 italic">
+          <p >
             {decision.contextSummary}
           </p>
         </div>
       )}
       
       <h3 
-        className="text-lg font-bold mb-4 text-gray-900" 
+         
         id="choices-heading"
       >
         {displayPrompt}
@@ -196,7 +196,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       
       {/* Custom input field - shown first when enabled */}
       {enableCustomInput && (
-        <div className="mb-4 bg-gray-100 p-4 rounded border">
+        <div >
           <Textarea
             id="custom-input"
             ref={inputRef}
@@ -206,11 +206,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             placeholder={customInputPlaceholder}
             disabled={isDisabled}
             aria-label="Custom response input"
-            className="w-full resize-none"
+            
             rows={3}
           />
-          <div className="flex justify-between items-center mt-2">
-            <span className={`text-sm ${characterCountClass}`}>
+          <div >
+            <span className={`${characterCountClass}`}>
               {characterCount}/{maxCustomLength}
             </span>
             <Button
@@ -232,7 +232,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         >
           {/* Regular choice options */}
           <div 
-            className="space-y-2" 
+             
             role="radiogroup" 
             aria-labelledby="choices-heading"
           >
@@ -246,25 +246,25 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   variant="ghost"
                   title={isOptionDisabled ? option.disabledReason : undefined}
                   data-disabled-reason={isOptionDisabled ? option.disabledReason : undefined}
-                  className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
+                  className={`${
                     option.isSelected
-                      ? 'bg-primary/10 border-primary font-bold'
+                      ? ''
                       : getAlignmentClasses(option.alignment, isOptionDisabled)
-                  } ${isOptionDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  }${isOptionDisabled ? '' : ''}`}
                   onClick={() => handleOptionSelect(option.id, option.isDisabledByRequirements ?? false)}
                   disabled={isOptionDisabled}
                   aria-checked={option.isSelected}
                   role="radio"
                 >
-                  <div className="flex items-start gap-2">
-                    {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
+                  <div >
+                    {option.isSelected && <ChevronRight  aria-hidden="true" />}
                     {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                      <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
+                      <span >{getAlignmentIcon(option.alignment)}</span>
                     )}
-                    <span className="flex-1">{option.text}</span>
+                    <span >{option.text}</span>
                   </div>
                   {showHints && option.hint && (
-                    <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
+                    <div >{option.hint}</div>
                   )}
                   <SkillRequirementBadges
                     requirements={option.skillRequirements || []}

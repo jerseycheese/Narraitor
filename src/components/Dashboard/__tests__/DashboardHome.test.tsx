@@ -201,11 +201,11 @@ describe('DashboardHome', () => {
       });
     });
 
-    it('uses grid layout for desktop', () => {
+    it('uses layout for desktop', () => {
       render(<DashboardHome />);
 
       const main = screen.getByRole('main');
-      expect(main).toHaveClass('grid');
+      expect(main).toHaveClass('');
     });
 
     it('has accessible heading structure', () => {

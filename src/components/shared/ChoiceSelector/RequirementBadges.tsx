@@ -44,12 +44,12 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-1 mt-2">
+    <div >
       {requirements.map((skillReq, index) => (
         <Badge
           key={`${optionId}-skill-${index}`}
           variant="skill-requirement"
-          className="text-xs"
+          
         >
           {skillReq.skillName || 'Unknown Skill'} Check Required
         </Badge>
@@ -70,17 +70,17 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
   }
 
   return (
-    <div className="mt-2 space-y-2">
+    <div >
       {groups.map((group, groupIndex) => (
         <div key={`${optionId}-item-group-${groupIndex}`}>
-          <p className="text-xs font-medium text-muted-foreground">
+          <p >
             {group.logic === 'any' ? 'Requires any of:' : 'Requires all:'}
           </p>
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div >
             {group.requirements.map((itemReq, reqIndex) => {
               const label = itemReq.met
                 ? itemReq.itemName
-                : `${itemReq.itemName} (${itemReq.current}/${itemReq.required})`;
+                : `${itemReq.itemName}(${itemReq.current}/${itemReq.required})`;
 
               return (
                 <Badge
@@ -88,7 +88,7 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
                   variant={itemReq.met ? 'success' : 'destructive'}
                 >
                   {label}
-                  {!itemReq.met && <span className="sr-only"> - missing</span>}
+                  {!itemReq.met && <span > - missing</span>}
                 </Badge>
               );
             })}

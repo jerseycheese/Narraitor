@@ -13,28 +13,7 @@
  * - Auto-focus on primary action for optimal keyboard navigation
  * 
  * @example
- * ```tsx
- * function CharacterCreationWizard() {
- *   const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = 
- *     useCharacterCreationAutoSave(worldId);
- *   const [showDialog, setShowDialog] = useState(false);
- * 
- *   useEffect(() => {
- *     if (hasRecoveryData) setShowDialog(true);
- *   }, [hasRecoveryData]);
- * 
- *   return (
- *     <RecoveryNotification
- *       isVisible={showDialog}
- *       lastSaved={recoveryPreview?.lastSaved}
- *       recoveryData={recoveryPreview}
- *       hasCurrentData={hasCurrentData}
- *       onRecover={() => setShowDialog(false)}
- *       onDismiss={() => { clearAutoSave(); setShowDialog(false); }}
- *     />
- *   );
- * }
- * ```
+ * ```tsx * function CharacterCreationWizard() { * const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = * useCharacterCreationAutoSave(worldId); * const [showDialog, setShowDialog] = useState(false); * * useEffect(() => { * if (hasRecoveryData) setShowDialog(true); * }, [hasRecoveryData]); * * return ( * <RecoveryNotification * isVisible={showDialog} * lastSaved={recoveryPreview?.lastSaved} * recoveryData={recoveryPreview} * hasCurrentData={hasCurrentData} * onRecover={() => setShowDialog(false)} * onDismiss={() => { clearAutoSave(); setShowDialog(false); }} * /> * ); * } *```
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -129,7 +108,7 @@ export function RecoveryNotification({
   const getStepDescription = (step?: number): string => {
     const stepNames = ['Basic Info', 'Attributes', 'Skills', 'Background', 'Portrait'];
     if (step !== undefined && step >= 0 && step < stepNames.length) {
-      return `${stepNames[step]} step`;
+      return `${stepNames[step]}step`;
     }
     return 'Unknown step';
   };
@@ -143,12 +122,12 @@ export function RecoveryNotification({
       showCloseButton={true}
       size="md"
       ariaDescribedBy="recovery-notification-content"
-      className="max-w-lg"
+      
     >
-      <div id="recovery-notification-content" className="flex items-center mb-4">
-        <div className="flex-shrink-0 mr-3">
+      <div id="recovery-notification-content" >
+        <div >
           <svg
-            className="h-6 w-6 text-amber-500"
+            
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -165,11 +144,11 @@ export function RecoveryNotification({
       </div>
       
       <div>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p >
             {hasCurrentData && (
-              <span className="block mt-2 text-amber-500 font-medium inline-flex items-center gap-1">
-                <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-                <span className="sr-only">Warning:</span>
+              <span >
+                <AlertTriangle  aria-hidden="true" />
+                <span >Warning:</span>
                 <span>Recovering will replace any current form data you&apos;ve entered.</span>
               </span>
             )}
@@ -177,47 +156,47 @@ export function RecoveryNotification({
 
           {/* Recovery Data Preview */}
           {recoveryData && (
-            <div className="bg-muted rounded-md p-4 mb-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Saved Progress Preview:</h4>
-              <div className="space-y-1 text-sm text-muted-foreground">
+            <div >
+              <h4 >Saved Progress Preview:</h4>
+              <div >
                 {recoveryData.name && (
-                  <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
+                  <div>Character name: <span >{recoveryData.name}</span></div>
                 )}
                 {recoveryData.currentStep !== undefined && (
-                  <div>Progress: <span className="font-medium">{getStepDescription(recoveryData.currentStep)}</span></div>
+                  <div>Progress: <span >{getStepDescription(recoveryData.currentStep)}</span></div>
                 )}
                 {recoveryData.hasAttributes && recoveryData.totalAttributePoints !== undefined && (
-                  <div>Attribute points allocated: <span className="font-medium">{recoveryData.totalAttributePoints}</span></div>
+                  <div>Attribute points allocated: <span >{recoveryData.totalAttributePoints}</span></div>
                 )}
                 {recoveryData.hasSkills && recoveryData.selectedSkillCount !== undefined && (
-                  <div>Skills selected: <span className="font-medium">{recoveryData.selectedSkillCount}</span></div>
+                  <div>Skills selected: <span >{recoveryData.selectedSkillCount}</span></div>
                 )}
                 {recoveryData.hasBackground && (
-                  <div>Background: <span className="font-medium">Completed</span></div>
+                  <div>Background: <span >Completed</span></div>
                 )}
               </div>
             </div>
           )}
 
           {validDate && (
-            <p className="text-xs text-muted-foreground mb-3">
+            <p >
               Last saved: {validDate}
             </p>
           )}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mt-6">
+      <div >
         <Button
           ref={recoverButtonRef}
           onClick={onRecover}
-          className="flex-1"
+          
         >
           Recover Progress
         </Button>
         <Button
           onClick={onDismiss}
-          variant="outline"
-          className="flex-1"
+          variant=""
+          
         >
           Start Fresh
         </Button>

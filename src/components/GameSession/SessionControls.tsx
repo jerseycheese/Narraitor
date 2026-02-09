@@ -15,8 +15,8 @@ const SessionControls: React.FC<SessionControlsProps> = ({
   onEndStory,
 }) => {
   return (
-    <div className="mt-6 flex gap-2 justify-end">
-      <div className="flex gap-2">
+    <div >
+      <div >
         {onRestart && (
           <Button
             data-testid="game-session-controls-restart"
@@ -30,7 +30,7 @@ const SessionControls: React.FC<SessionControlsProps> = ({
           <Button
             data-testid="game-session-controls-end-story"
             variant="secondary"
-            className="bg-blue-700 hover:bg-blue-700 text-white"
+            
             onClick={onEndStory}
             title="End your story with an AI-generated epilogue"
           >

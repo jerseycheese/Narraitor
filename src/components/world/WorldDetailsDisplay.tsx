@@ -50,8 +50,8 @@ export function WorldDetailsDisplay({
   return (
     <>
       {showDescription && (
-        <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm" aria-labelledby="world-description-heading">
-          <h2 id="world-description-heading" className="text-2xl font-semibold mb-4">
+        <section  aria-labelledby="world-description-heading">
+          <h2 id="world-description-heading" >
             About this world
           </h2>
           <div className="prose prose-gray dark:prose-invert">
@@ -61,37 +61,37 @@ export function WorldDetailsDisplay({
       )}
 
       {worldNpcs.length > 0 && (
-        <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm" aria-labelledby="world-npcs-heading">
-          <h2 id="world-npcs-heading" className="text-2xl font-semibold mb-4">
+        <section  aria-labelledby="world-npcs-heading">
+          <h2 id="world-npcs-heading" >
             Characters you may meet
           </h2>
-          <p className="text-muted-foreground mb-4">
-            These NPCs were generated alongside <span className="font-semibold">{world.name}</span> and will appear in narrative scenes for this world.
+          <p >
+            These NPCs were generated alongside <span >{world.name}</span> and will appear in narrative scenes for this world.
           </p>
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ul >
             {worldNpcs.map((npc) => (
-              <li key={npc.id} className="flex items-start gap-3 rounded-lg border bg-muted/40 p-3 shadow-sm">
+              <li key={npc.id} >
                 {npc.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={npc.avatarUrl}
                     alt={npc.name}
-                    className="h-12 w-12 flex-shrink-0 rounded-full object-cover"
+                    
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-muted-foreground/20 text-sm font-semibold text-muted-foreground">
+                  <div >
                     {npc.name
-                      .split(' ')
+                      .split('')
                       .map((segment) => segment[0])
                       .join('')
                       .toUpperCase()
                       .slice(0, 2)}
                   </div>
                 )}
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground">{npc.name}</p>
-                  <p className="text-sm text-muted-foreground leading-snug">{npc.description}</p>
+                <div >
+                  <p >{npc.name}</p>
+                  <p >{npc.description}</p>
                 </div>
               </li>
             ))}

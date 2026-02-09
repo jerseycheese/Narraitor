@@ -23,24 +23,24 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
 
   if (worldCharacters.length === 0) {
     return (
-      <div className="text-center py-12">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      <div >
+        <h3 >
           No Characters Yet
         </h3>
-        <p className="text-gray-700 mb-8">
+        <p >
           Create a character for {world?.name} to continue
         </p>
-        <div className="space-y-4">
+        <div >
           <Link
             href="/characters/create"
-            className="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
+            
           >
             Create Your Character
           </Link>
           <div>
             <Button
               onClick={onBack}
-              className="text-gray-700 hover:text-gray-900"
+              
               variant="ghost"
             >
               ← Back to World Selection
@@ -53,29 +53,29 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
 
   return (
     <div data-testid="character-selection-step">
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      <h3 >
         Choose Your Character
       </h3>
-      <p className="text-gray-700 mb-6">
+      <p >
         World: {world?.name}
       </p>
       
-      <div className="space-y-4 mb-6">
+      <div >
         {worldCharacters.map(character => (
           <Button
             key={character.id}
             onClick={() => onNext(character.id)}
-            className="w-full text-left p-4 bg-gray-100 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+            
             variant="ghost"
           >
-            <div className="flex items-start justify-between">
+            <div >
               <div>
-                <h4 className="font-medium text-gray-900">{character.name}</h4>
-                <p className="text-sm text-gray-700 mt-1 line-clamp-2">
+                <h4 >{character.name}</h4>
+                <p >
                   {character.background.personality || 'No description available'}
                 </p>
               </div>
-              <span className="text-blue-700 ml-4">
+              <span >
                 Select →
               </span>
             </div>
@@ -83,17 +83,17 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
         ))}
       </div>
 
-      <div className="flex justify-between items-center pt-4 border-t">
+      <div >
         <Button
           onClick={onBack}
-          className="text-gray-700 hover:text-gray-900"
+          
           variant="ghost"
         >
           ← Back
         </Button>
         <Link
           href="/characters/create"
-          className="text-link-primary font-medium no-underline"
+          
         >
           Create New Character
         </Link>

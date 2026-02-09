@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 export interface ActionButton {
   label: string;
   onClick: () => void;
-  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
+  variant?: 'default' | 'secondary' | '' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   icon?: React.ReactNode;
   disabled?: boolean;
@@ -26,7 +26,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
       case 'secondary': return undefined; // Use custom styling instead  
       case 'success': return undefined; // Use custom styling instead
       case 'danger': return 'destructive';
-      default: return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
+      default: return variant as 'default' | 'secondary' | '' | 'ghost' | 'link' | 'destructive' | undefined;
     }
   };
 
@@ -34,15 +34,15 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
   // Now aligned with our design token system via CSS variables
   const getCustomStyling = (variant: string | undefined) => {
     switch (variant) {
-      case 'primary': return 'bg-primary text-primary-foreground hover:bg-primary/90';
-      case 'secondary': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-      case 'success': return 'bg-green-500 hover:bg-green-700 text-white'; // Keep success as design system color
+      case 'primary': return '';
+      case 'secondary': return '';
+      case 'success': return ''; // Keep success as design system color
       default: return '';
     }
   };
 
   return (
-    <div className={`flex gap-3 ${className}`}>
+    <div className={`${className}`}>
       {actions.map((action, index) => (
         <Button
           key={`action-${action.label}-${index}`}
@@ -50,7 +50,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
           variant={mapVariant(action.variant)}
           size={action.size || 'default'}
           disabled={action.disabled}
-          className={`flex items-center gap-2 ${getCustomStyling(action.variant)}`}
+          className={`${getCustomStyling(action.variant)}`}
           data-tutorial={action.dataTutorial}
         >
           {action.icon}

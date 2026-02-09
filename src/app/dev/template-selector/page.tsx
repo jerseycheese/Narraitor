@@ -21,7 +21,7 @@ export default function TemplateSelectorTestHarness() {
       try {
         const worldId = applyWorldTemplate(selectedTemplateId);
         setAppliedTemplateId(selectedTemplateId);
-        console.log(`Applied template ${selectedTemplateId} to create world ${worldId}`);
+        console.log(`Applied template${selectedTemplateId}to create world${worldId}`);
       } catch (error) {
         console.error('Error applying template:', error);
       }
@@ -29,22 +29,22 @@ export default function TemplateSelectorTestHarness() {
   };
   
   return (
-    <div className="p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-6">Template Selector Test Harness</h2>
+    <div >
+      <h2 >Template Selector Test Harness</h2>
       
-      <div className="flex gap-6 flex-col md:flex-row">
-        <div className="w-full md:w-2/3">
-          <h2 className="text-xl font-semibold mb-2">Template Selection</h2>
+      <div >
+        <div >
+          <h2 >Template Selection</h2>
           <TemplateSelector 
             onSelect={handleSelectTemplate} 
             selectedTemplateId={selectedTemplateId}
           />
           
           {selectedTemplateId && (
-            <div className="mt-4">
+            <div >
               <button
                 data-testid="apply-template-button"
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                
                 onClick={handleApplyTemplate}
               >
                 Apply Template
@@ -53,11 +53,11 @@ export default function TemplateSelectorTestHarness() {
           )}
         </div>
         
-        <div className="w-full md:w-1/3">
-          <h2 className="text-xl font-semibold mb-2">Test Controls</h2>
+        <div >
+          <h2 >Test Controls</h2>
           
-          <div className="mb-4 p-4 border rounded">
-            <h3 className="text-lg font-semibold mb-2">Selected Template</h3>
+          <div >
+            <h3 >Selected Template</h3>
             {selectedTemplate ? (
               <div data-testid="selected-template-info">
                 <p><strong>ID:</strong> {selectedTemplate.id}</p>
@@ -72,9 +72,9 @@ export default function TemplateSelectorTestHarness() {
           </div>
           
           {appliedTemplateId && (
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">Applied Template</h3>
-              <div data-testid="applied-template-info" className="p-3 bg-green-100 rounded">
+            <div >
+              <h3 >Applied Template</h3>
+              <div data-testid="applied-template-info" >
                 <p>Successfully applied template: <strong>{appliedTemplateId}</strong></p>
                 <p>Check your console for more details.</p>
               </div>

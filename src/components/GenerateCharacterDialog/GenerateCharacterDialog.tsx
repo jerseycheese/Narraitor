@@ -43,41 +43,41 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
       size="xl"
       ariaDescribedBy="generate-character-desc"
     >
-      <p id="generate-character-desc" className="text-sm text-gray-700 mb-6">
+      <p id="generate-character-desc" >
         Choose the type of character you want to generate for your story.
       </p>
         
-        <div className="space-y-4">
+        <div >
           {/* Generation Type Selection */}
           <div>
-            <Label className="block text-sm font-medium text-foreground mb-2">
+            <Label >
               What type of character would you like to create?
             </Label>
             <RadioGroup
               value={generationType}
               onValueChange={(value) => onGenerationTypeChange(value as 'known' | 'original' | 'specific')}
               disabled={isGenerating}
-              className="space-y-2"
+              
             >
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-muted">
-                <RadioGroupItem value="known" id="known" className="mr-3" />
+              <div >
+                <RadioGroupItem value="known" id="known"  />
                 <div>
-                  <div className="font-medium">Known Figure</div>
-                  <div className="text-sm text-muted-foreground">Generate a major character from {worldName}</div>
+                  <div >Known Figure</div>
+                  <div >Generate a major character from {worldName}</div>
                 </div>
               </div>
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-muted">
-                <RadioGroupItem value="original" id="original" className="mr-3" />
+              <div >
+                <RadioGroupItem value="original" id="original"  />
                 <div>
-                  <div className="font-medium">Original Character</div>
-                  <div className="text-sm text-muted-foreground">Create a unique character that fits the world</div>
+                  <div >Original Character</div>
+                  <div >Create a unique character that fits the world</div>
                 </div>
               </div>
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-muted">
-                <RadioGroupItem value="specific" id="specific" className="mr-3" />
+              <div >
+                <RadioGroupItem value="specific" id="specific"  />
                 <div>
-                  <div className="font-medium">Specific Known Figure</div>
-                  <div className="text-sm text-muted-foreground">Generate a specific character from {worldName} lore</div>
+                  <div >Specific Known Figure</div>
+                  <div >Generate a specific character from {worldName} lore</div>
                 </div>
               </div>
             </RadioGroup>
@@ -85,9 +85,9 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           
           {/* Name Input (only shown for specific type) */}
           {generationType === 'specific' && (
-            <div className="space-y-2">
+            <div >
               <Label>
-                Character Name <span className="text-destructive">*</span>
+                Character Name <span >*</span>
               </Label>
               <Input
                 type="text"
@@ -96,7 +96,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
                 placeholder="e.g., Aragorn, Princess Leia, Sherlock Holmes..."
                 disabled={isGenerating}
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p >
                 Enter the name of a known character from {worldName} lore
               </p>
             </div>
@@ -104,21 +104,21 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
         </div>
         
         {error && (
-          <div className="text-destructive text-sm">{error}</div>
+          <div >{error}</div>
         )}
         
         {isGenerating && (
-          <div className="text-primary text-sm flex items-center gap-2">
-            <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+          <div >
+            <span ></span>
             {generatingStatus}
           </div>
         )}
         
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+        <div >
           <Button
             onClick={onClose}
             disabled={isGenerating}
-            variant="outline"
+            variant=""
           >
             Cancel
           </Button>

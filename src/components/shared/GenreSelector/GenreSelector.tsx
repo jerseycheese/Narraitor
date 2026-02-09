@@ -32,7 +32,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
   const genresToDisplay = excludeOther ? MIXABLE_GENRES : GENRES;
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 ${className}`}>
+    <div className={`${className}`}>
       {genresToDisplay.map(genre => {
         const isSelected = selectedGenres.includes(genre.label);
         const isDisabled = isGenreDisabled(genre.label);
@@ -43,19 +43,14 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
             type="button"
             onClick={() => !isDisabled && onToggleGenre(genre.label)}
             disabled={isDisabled}
-            variant={isSelected ? 'default' : 'outline'}
-            className={`
-              p-3 rounded-lg text-sm font-medium transition-all duration-200
-              border-2 text-center
-              ${isSelected
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-100'
-              }
-              ${isDisabled
-                ? 'opacity-50 cursor-not-allowed'
-                : 'cursor-pointer'
-              }
-            `}
+            variant={isSelected ? 'default' : ''}
+            className={`${isSelected
+                ? ''
+                : ''
+              }${isDisabled
+                ? ''
+                : ''
+              }`}
             title={genre.description}
           >
             {genre.label}

@@ -28,7 +28,7 @@ const meta: Meta<typeof RecentPagesDropdown> = {
   },
   decorators: [
     (Story) => (
-      <div className="bg-gray-900 p-4 rounded">
+      <div >
         <Story />
       </div>
     ),

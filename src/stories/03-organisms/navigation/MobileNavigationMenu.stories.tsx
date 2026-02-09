@@ -11,17 +11,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: `
-        Mobile navigation menu with full-screen overlay design optimized for touch interaction.
-
-        **Features:**
-        - Touch-friendly 44px minimum button sizes
-        - Swipe left gesture to close menu
-        - Keyboard navigation and focus management
-        - World switcher with visual indicators
-        - Quick actions based on current context
-        - Smooth animations and transitions
-        `,
+        component: `Mobile navigation menu with full-screen overlay design optimized for touch interaction. **Features:** - Touch-friendly 44px minimum button sizes - Swipe left gesture to close menu - Keyboard navigation and focus management - World switcher with visual indicators - Quick actions based on current context - Smooth animations and transitions`,
       },
     },
     viewport: {
@@ -57,13 +47,13 @@ const meta: Meta<typeof MobileNavigationMenu> = {
       });
 
       return (
-        <div className="relative h-screen">
+        <div >
           <Story />
           {/* Background content to show overlay effect */}
-          <div className="absolute inset-0 bg-gray-100 p-8">
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-              <p className="text-gray-700">
+          <div >
+            <div >
+              <h2 >Page Content</h2>
+              <p >
                 This content is behind the mobile navigation overlay when open.
                 The overlay should cover the entire screen and prevent
                 interaction with background content.

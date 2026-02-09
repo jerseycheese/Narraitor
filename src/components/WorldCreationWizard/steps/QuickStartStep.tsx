@@ -109,11 +109,11 @@ export default function QuickStartStep({
   }, [world.id]);
 
   return (
-    <div className="space-y-6">
+    <div >
       {/* Back Button */}
-      <div className="flex justify-start">
-        <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+      <div >
+        <Button variant="ghost" onClick={onBack} >
+          <ArrowLeft  aria-hidden="true" />
           Back to World Setup
         </Button>
       </div>
@@ -127,8 +127,8 @@ export default function QuickStartStep({
       />
 
       {/* Alternative Actions */}
-      <div className="flex justify-center pt-8 border-t">
-        <Button variant="outline" onClick={onComplete} data-tutorial="quickstart-skip">
+      <div >
+        <Button variant="" onClick={onComplete} data-tutorial="quickstart-skip">
           Skip Character Creation for Now
         </Button>
       </div>

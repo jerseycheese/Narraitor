@@ -46,9 +46,9 @@ type Story = StoryObj<typeof meta>;
 
 // Journal icon
 const JournalIcon = (
-  <div className="w-16 h-16 mx-auto bg-amber-100 rounded-full flex items-center justify-center">
+  <div >
     <svg
-      className="w-8 h-8 text-amber-500"
+      
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

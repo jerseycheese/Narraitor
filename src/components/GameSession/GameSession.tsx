@@ -215,7 +215,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     const statusAnnouncer = document.createElement('div');
     statusAnnouncer.setAttribute('aria-live', 'polite');
     statusAnnouncer.setAttribute('aria-atomic', 'true');
-    statusAnnouncer.className = 'sr-only';
+    statusAnnouncer.className = '';
     document.body.appendChild(statusAnnouncer);
     
     // Function to announce messages to screen readers
@@ -231,7 +231,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     } else if (sessionState.status === 'active' && prevStatusRef.current === 'paused') {
       announce('Game session resumed.');
     } else if (sessionState.error) {
-      announce(`Error occurred: ${sessionState.error}`);
+      announce(`Error occurred:${sessionState.error}`);
     }
     
     return () => {
@@ -320,15 +320,15 @@ const GameSession: React.FC<GameSessionProps> = ({
     // Check if there are any characters for this world
     if (worldCharacters.length === 0) {
       return (
-        <div data-testid="game-session-no-characters" className="p-4">
-          <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 text-center">
-            <h2 className="text-xl font-bold mb-2">No Characters Found</h2>
-            <p className="text-gray-700 mb-4">
+        <div data-testid="game-session-no-characters" >
+          <div >
+            <h2 >No Characters Found</h2>
+            <p >
               You need to create a character before you can start playing in this world.
             </p>
             <Button
               variant="default"
-              className="bg-primary hover:bg-primary/90"
+              
               onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
             >
               Create Character
@@ -339,18 +339,18 @@ const GameSession: React.FC<GameSessionProps> = ({
     }
     
     return (
-      <div data-testid="game-session-initializing" className="p-4">
-        <div className="text-center">
-          <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
-          <p className="text-gray-700 mb-4">No active game session.</p>
+      <div data-testid="game-session-initializing" >
+        <div >
+          <h2 >Session Not Started</h2>
+          <p >No active game session.</p>
           {process.env.NODE_ENV === 'development' && (
-            <div className="text-xs text-gray-500 mb-4">
+            <div >
               Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
             </div>
           )}
           <Button
             variant="default"
-            className="bg-primary hover:bg-primary/90"
+            
             onClick={startSession}
           >
             Start Session
@@ -396,8 +396,8 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Default case - unknown state
   return (
-    <div data-testid="game-session-unknown" className="p-4">
-      <div className="text-center">
+    <div data-testid="game-session-unknown" >
+      <div >
         <p>Unknown session state: {sessionState.status}</p>
       </div>
     </div>

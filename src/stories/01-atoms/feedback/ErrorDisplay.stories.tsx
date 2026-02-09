@@ -17,7 +17,7 @@ const meta: Meta<typeof ErrorDisplay> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['inline', 'section', 'page', 'toast'],
+      options: ['', 'section', 'page', 'toast'],
       description: 'The display variant of the error',
     },
     severity: {
@@ -54,10 +54,10 @@ type Story = StoryObj<typeof ErrorDisplay>;
 // Showcase all variants and severities
 export const AllVariants: Story = {
   render: (args) => (
-    <div className="space-y-8">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Inline Errors</h3>
-        <div className="space-y-2">
+        <h3 >Inline Errors</h3>
+        <div >
           <InlineError message="This field is required" severity="error" />
           <InlineError message="This name is already taken" severity="warning" />
           <InlineError message="This field will be auto-filled" severity="info" />
@@ -65,8 +65,8 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Section Errors</h3>
-        <div className="space-y-4 max-w-md">
+        <h3 >Section Errors</h3>
+        <div >
           <SectionError
             title="Error Loading Data"
             message="Failed to load world data. Please check your connection and try again."
@@ -94,9 +94,9 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Page & Toast Examples</h3>
-        <div className="space-y-4">
-          <div className="border rounded-lg">
+        <h3 >Page & Toast Examples</h3>
+        <div >
+          <div >
             <PageError
               title="World Not Found"
               message="The world you're looking for doesn't exist or has been deleted."
@@ -105,7 +105,7 @@ export const AllVariants: Story = {
               onRetry={args.onRetry}
             />
           </div>
-          <div className="relative h-32 border rounded-lg">
+          <div >
             <ToastError
               title="Save Failed"
               message="Unable to save your changes."
@@ -123,29 +123,29 @@ export const AllVariants: Story = {
 // Form validation example
 export const FormValidation: Story = {
   render: () => (
-    <div className="w-96 p-6 border rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Create World</h2>
-      <form className="space-y-4">
+    <div >
+      <h2 >Create World</h2>
+      <form >
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
+          <label htmlFor="name" >
             World Name
           </label>
           <input
             id="name"
             type="text"
-            className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            
             aria-invalid="true"
             aria-describedby="name-error"
           />
           <InlineError message="World name must be at least 3 characters" fieldName="name" />
         </div>
         <div>
-          <label htmlFor="theme" className="block text-sm font-medium mb-1">
+          <label htmlFor="theme" >
             Theme
           </label>
           <select
             id="theme"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            
           >
             <option>Fantasy</option>
             <option>Sci-Fi</option>

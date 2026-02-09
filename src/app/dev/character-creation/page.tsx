@@ -103,40 +103,40 @@ export default function CharacterCreationTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h2 className="text-2xl font-bold mb-6">Character Creation Test Harness</h2>
+    <div >
+      <div >
+        <div >
+          <h2 >Character Creation Test Harness</h2>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div >
         {/* Test Controls */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
+        <div >
+          <h2 >Test Controls</h2>
           
-          <div className="space-y-4">
+          <div >
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label >
                 Select Test World
               </label>
-              <div className="flex gap-4">
+              <div >
                 <button
                   onClick={() => handleWorldChange('fantasy')}
-                  className={`px-4 py-2 rounded ${
+                  className={`${
                     selectedWorld === 'fantasy'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300'
+                      ? ''
+                      : ''
                   }`}
                 >
                   Fantasy World (6 attributes, 8 skills)
                 </button>
                 <button
                   onClick={() => handleWorldChange('western')}
-                  className={`px-4 py-2 rounded ${
+                  className={`${
                     selectedWorld === 'western'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300'
+                      ? ''
+                      : ''
                   }`}
                 >
                   Western World (5 attributes, 5 skills)
@@ -144,25 +144,25 @@ export default function CharacterCreationTestPage() {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div >
               <button
                 onClick={handleClearAutoSave}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                
               >
                 Clear Auto-Save Data
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
+                
               >
                 Refresh Page
               </button>
             </div>
           </div>
 
-          <div className="mt-4 p-4 bg-blue-50 rounded">
-            <h3 className="font-semibold text-sm mb-2">Test Scenarios:</h3>
-            <ul className="text-sm space-y-1 text-gray-700">
+          <div >
+            <h3 >Test Scenarios:</h3>
+            <ul >
               <li>• Test character name validation (min 3 chars, max 50 chars)</li>
               <li>• Test attribute point allocation ({testWorlds[selectedWorld].settings.attributePointPool} points)</li>
               <li>• Test skill selection (max 8 skills)</li>
@@ -176,7 +176,7 @@ export default function CharacterCreationTestPage() {
 
         {/* Character Creation Wizard */}
         {testWorldId && (
-          <div className="bg-white rounded-lg shadow p-8">
+          <div >
             <CharacterCreationWizard worldId={testWorldId} />
           </div>
         )}

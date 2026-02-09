@@ -101,7 +101,7 @@ export function InventoryTable({
             <img
               src={image.url}
               alt={row.original.name}
-              className="w-24 h-24 object-contain rounded-md item-image"
+              className="item-image"
               loading="lazy"
             />
           );
@@ -113,7 +113,7 @@ export function InventoryTable({
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (
-          <div className="font-medium">{row.getValue('name')}</div>
+          <div >{row.getValue('name')}</div>
         ),
         enableSorting: true,
       },
@@ -123,7 +123,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const description = row.getValue('description') as string;
           return description ? (
-            <div className="text-sm text-muted-foreground max-w-md">{description}</div>
+            <div >{description}</div>
           ) : null;
         },
         enableSorting: false,
@@ -132,7 +132,7 @@ export function InventoryTable({
         accessorKey: 'quantity',
         header: 'Quantity',
         cell: ({ row }) => (
-          <div className="text-center">{row.getValue('quantity')}</div>
+          <div >{row.getValue('quantity')}</div>
         ),
         enableSorting: true,
         sortingFn: 'basic',
@@ -143,7 +143,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const categoryId = row.getValue('categoryId') as StandardInventoryCategory;
           return (
-            <Badge variant="outline-static">
+            <Badge variant="">
               {CATEGORY_NAMES[categoryId] || categoryId}
             </Badge>
           );
@@ -161,7 +161,7 @@ export function InventoryTable({
           const firstAcquisition = row.original.acquisitionHistory[0];
           const method = firstAcquisition?.method || 'unknown';
           return (
-            <div className="text-sm capitalize">{method}</div>
+            <div >{method}</div>
           );
         },
         enableSorting: true,
@@ -172,25 +172,25 @@ export function InventoryTable({
         cell: ({ row }) => {
           const isUsing = usingItemId === row.original.id;
           return (
-            <div className="flex items-center space-x-2">
+            <div >
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleUseItem(row.original.id)}
                 disabled={isUsing}
-                aria-label={`Use ${row.original.name}`}
+                aria-label={`Use${row.original.name}`}
                 title="Use item"
               >
-                <PackageMinus className="h-4 w-4" />
+                <PackageMinus  />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => openDropDialog(row.original)}
-                aria-label={`Drop ${row.original.name}`}
+                aria-label={`Drop${row.original.name}`}
                 title="Drop item"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2  />
               </Button>
             </div>
           );
@@ -203,7 +203,7 @@ export function InventoryTable({
   // Handle empty state
   if (filteredItems.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div >
         <p>No items in inventory.</p>
       </div>
     );
@@ -222,7 +222,7 @@ export function InventoryTable({
           enabled: true,
           placeholder: 'Search items...',
         }}
-        ariaLabel={`Inventory table for character ${characterId}`}
+        ariaLabel={`Inventory for character${characterId}`}
       />
       <DropConfirmationDialog
         isOpen={isDialogOpen}

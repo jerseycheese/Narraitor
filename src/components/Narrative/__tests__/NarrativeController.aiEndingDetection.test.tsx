@@ -69,7 +69,7 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
 
   describe('Component Integration', () => {
     it('should render NarrativeController with ending detection enabled', () => {
-      const { container } = renderWithToast(
+      renderWithToast(
         <NarrativeController
           worldId="test-world"
           sessionId="test-session"
@@ -78,7 +78,8 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
         />
       );
 
-      expect(container.querySelector('.narrative-controller')).toBeInTheDocument();
+      // Should render the controller (NarrativeHistory mock has data-testid="narrative-history")
+      expect(screen.getByTestId('narrative-history')).toBeInTheDocument();
     });
 
     it('should accept onEndingSuggested callback prop', () => {
@@ -122,9 +123,9 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
         generateChoices: false
       };
 
-      const { container } = renderWithToast(<NarrativeController {...props} />);
+      renderWithToast(<NarrativeController {...props} />);
 
-      expect(container.querySelector('.narrative-controller')).toBeInTheDocument();
+      expect(screen.getByTestId('narrative-history')).toBeInTheDocument();
     });
   });
 });

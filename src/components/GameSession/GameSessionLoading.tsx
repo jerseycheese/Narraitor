@@ -11,7 +11,7 @@ const GameSessionLoading: React.FC<GameSessionLoadingProps> = ({
   loadingMessage = 'Loading your game...',
 }) => {
   return (
-    <div data-testid="game-session-loading" className="p-4">
+    <div data-testid="game-session-loading" >
       <LoadingState
         message={loadingMessage}
         size="md"

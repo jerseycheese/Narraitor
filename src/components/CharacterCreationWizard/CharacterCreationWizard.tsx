@@ -220,11 +220,11 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   if (!world) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-destructive">World not found</p>
+      <div >
+        <p >World not found</p>
         <button
           onClick={() => router.push('/worlds')}
-          className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+          
         >
           Go to Worlds
         </button>
@@ -295,14 +295,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   const currentValidation = wizard.state.validation[wizard.state.currentStep];
   const hasErrors = currentValidation?.touched && !currentValidation?.valid;
-  const error = hasErrors ? currentValidation.errors.join(', ') : undefined;
+  const error = hasErrors ? currentValidation.errors.join(',') : undefined;
 
   return (
     <>
-      <WizardContainer title={`Create Character in ${world.name}`} className="component-character-creation-wizard">
+      <WizardContainer title={`Create Character in${world.name}`} className="component-character-creation-wizard">
         <div>
           {/* Auto-save status indicator */}
-          <div className="mb-4 flex justify-end">
+          <div >
             <SaveIndicator
               status={saveStatus}
               lastSaveTime={data?.lastSaved}

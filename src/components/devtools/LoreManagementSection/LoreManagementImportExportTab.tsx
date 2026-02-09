@@ -21,34 +21,34 @@ export const LoreManagementImportExportTab: React.FC<LoreManagementImportExportT
   onShowImportDialog,
   onImportDataChange,
 }) => (
-  <div className="space-y-4">
+  <div >
     <div>
-      <h3 className="font-semibold mb-2">Export Facts</h3>
+      <h3 >Export Facts</h3>
       <Button onClick={onExport}>Export to JSON</Button>
       {exportedData && (
-        <div className="mt-2">
-          <div className="text-sm text-gray-700 mb-1">Exported data (copied to clipboard):</div>
-          <pre className="p-2 bg-gray-100 rounded text-xs overflow-auto max-h-48">{exportedData}</pre>
+        <div >
+          <div >Exported data (copied to clipboard):</div>
+          <pre >{exportedData}</pre>
         </div>
       )}
     </div>
 
     <div>
-      <h3 className="font-semibold mb-2">Import Facts</h3>
+      <h3 >Import Facts</h3>
       {!showImportDialog ? (
         <Button onClick={() => onShowImportDialog(true)}>Import from JSON</Button>
       ) : (
-        <div className="space-y-2">
+        <div >
           <Textarea
-            className="w-full h-48 font-mono text-sm"
+            
             placeholder="Paste JSON data here..."
             value={importData}
             onChange={(e) => onImportDataChange(e.target.value)}
           />
-          <div className="flex gap-2">
+          <div >
             <Button onClick={onImport}>Confirm Import</Button>
             <Button
-              variant="outline"
+              variant=""
               onClick={() => {
                 onShowImportDialog(false);
                 onImportDataChange('');

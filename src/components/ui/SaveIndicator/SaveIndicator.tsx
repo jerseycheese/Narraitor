@@ -7,7 +7,7 @@ import { CheckCircle } from 'lucide-react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { cn, formatTime } from '@/lib/utils';
+import { cssClasses, formatTime } from '@/lib/utils';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';
@@ -37,7 +37,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
       return 'Saving...';
     }
     if (lastSaveTime) {
-      return `Saved at ${formatTime(lastSaveTime)}`;
+      return `Saved at${formatTime(lastSaveTime)}`;
     }
     return 'Saved';
   };
@@ -45,9 +45,9 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle error state with ErrorDisplay component
   if (status === 'error') {
     return (
-      <div className={cn('max-w-sm', className)}>
+      <div className={cssClasses('', className)}>
         <ErrorDisplay
-          variant={compact ? 'inline' : 'section'}
+          variant={compact ? '' : 'section'}
           severity="error"
           title={compact ? undefined : 'Auto-Save Error'}
           message={errorMessage || 'Failed to save game progress'}
@@ -62,7 +62,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle saving state with LoadingState component
   if (status === 'saving') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
+      <div className={cssClasses('', className)}>
         <LoadingState
           variant="spinner"
           size="sm"
@@ -74,7 +74,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
         {onManualSave && (
           <button
             disabled={true}
-            className="px-2 py-1 text-xs bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+            
           >
             Save Now
           </button>
@@ -85,15 +85,15 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
 
   // Handle idle/saved states
   return (
-    <div className={cn('flex items-center gap-2 text-sm', className)}>
-      <div className="flex items-center gap-1">
-        <CheckCircle className="w-4 h-4 text-green-500" aria-hidden="true" />
+    <div className={cssClasses('', className)}>
+      <div >
+        <CheckCircle  aria-hidden="true" />
         
-        <div className="flex flex-col">
-          <span className="text-gray-700">{getStatusText()}</span>
+        <div >
+          <span >{getStatusText()}</span>
           
           {totalSaves > 0 && !compact && (
-            <span className="text-xs text-gray-500">
+            <span >
               {totalSaves} saves
             </span>
           )}
@@ -103,7 +103,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
       {onManualSave && (
         <button
           onClick={() => onManualSave('manual')}
-          className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-500 transition-colors"
+          
         >
           Save Now
         </button>

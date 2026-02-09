@@ -67,7 +67,7 @@ export const WithImageAndBadge: Story = {
       alt: 'Cyberpunk cityscape'
     },
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded-full">
+      <span >
         Sci-Fi
       </span>
     ),
@@ -80,9 +80,9 @@ export const TallHero: Story = {
     title: 'Middle-earth',
     subtitle: 'Epic Fantasy',
     image: sampleImage,
-    height: 'h-80 md:h-[500px]',
+    height: '',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-green-700 rounded-full">
+      <span >
         Set in Tolkien Universe
       </span>
     ),
@@ -93,7 +93,7 @@ export const ShortHero: Story = {
   args: {
     title: 'Quick Adventure',
     image: sampleImage,
-    height: 'h-48',
+    height: '',
   },
 };
 
@@ -104,27 +104,27 @@ export const CardTopOnly: Story = {
     subtitle: 'Integrated with card layout',
     theme: 'fantasy',
     borderRadius: 'top',
-    height: 'h-48',
+    height: '',
   },
 };
 
 export const NoBorderRadius: Story = {
   args: {
     title: 'Full Width Hero',
-    subtitle: 'No border radius applied',
+    subtitle: 'No radius applied',
     theme: 'sci-fi',
     borderRadius: 'none',
-    height: 'h-48',
+    height: '',
   },
 };
 
 export const AllBorderRadius: Story = {
   args: {
     title: 'Standalone Hero',
-    subtitle: 'Full border radius',
+    subtitle: 'Full radius',
     theme: 'western',
     borderRadius: 'all',
-    height: 'h-48',
+    height: '',
   },
 };
 

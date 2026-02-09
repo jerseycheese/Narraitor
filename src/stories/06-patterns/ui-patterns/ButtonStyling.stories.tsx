@@ -49,7 +49,7 @@ import { Plus, Sparkles, Play, Eye, Pencil, CheckCircle } from 'lucide-react';
  * - **Delete**: Trash icon (when needed)
  *
  * **Icon Standards:**
- * - Size: `w-4 h-4` for default buttons, `w-6 h-6` for large buttons
+ * - Size: `` for default buttons, `` for large buttons
  * - Style: `fill="none" stroke="currentColor" viewBox="0 0 24 24"`
  * - Stroke: `strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}`
  */
@@ -94,7 +94,7 @@ export const WorldDetailPageButtons: Story = {
         label: 'Play in World',
         onClick: () => console.log('Play clicked'),
         variant: 'success', // Green - primary goal action (last)
-        icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+        icon: (<Play  aria-hidden="true" />)
       }
     ]
   },
@@ -114,19 +114,19 @@ export const CharacterPageButtons: Story = {
         label: 'Create Character',
         onClick: () => console.log('Create clicked'),
         variant: 'primary', // Blue - main content action
-        icon: (<Plus className="w-4 h-4" aria-hidden="true" />)
+        icon: (<Plus  aria-hidden="true" />)
       },
       {
         label: 'Generate Character',
         onClick: () => console.log('Generate clicked'),
         variant: 'secondary', // Gray - alternative creation method  
-        icon: (<Sparkles className="w-4 h-4" aria-hidden="true" />)
+        icon: (<Sparkles  aria-hidden="true" />)
       },
       {
         label: 'Start Playing',
         onClick: () => console.log('Play clicked'),
         variant: 'success', // Green - primary goal action (last)
-        icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+        icon: (<Play  aria-hidden="true" />)
       }
     ]
   },
@@ -167,20 +167,20 @@ export const DestructiveActionPattern: Story = {
 export const IncorrectHardcodedColors: Story = {
   name: '✅ Fixed: Design System Colors',
   render: () => (
-    <div className="space-y-4">
-      <p className="text-sm text-green-600 font-medium mb-4">✅ Use only design system colors:</p>
-      <div className="flex gap-3">
-        <button className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-700">
+    <div >
+      <p >✅ Use only design system colors:</p>
+      <div >
+        <button >
           Fixed: Using amber from design system
         </button>
-        <button className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-900">
+        <button >
           Fixed: Using blue from design system  
         </button>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+        <button >
           Fixed: Using blue from design system
         </button>
       </div>
-      <p className="text-sm text-green-600 font-medium mt-4">✅ Instead, use ActionButtonGroup with design system variants:</p>
+      <p >✅ Instead, use ActionButtonGroup with design system variants:</p>
       <ActionButtonGroup
         actions={[
           { label: 'Primary Action', onClick: () => {}, variant: 'primary' },
@@ -202,62 +202,62 @@ export const IncorrectHardcodedColors: Story = {
 export const IncorrectButtonOrdering: Story = {
   name: '❌ Wrong: Poor Button Ordering',
   render: () => (
-    <div className="space-y-4">
-      <p className="text-sm text-red-600 font-medium mb-4">❌ Poor ordering - goal action first, setup actions scattered:</p>
+    <div >
+      <p >❌ Poor ordering - goal action first, setup actions scattered:</p>
       <ActionButtonGroup
         actions={[
           { 
             label: 'Play Game', 
             onClick: () => {}, 
             variant: 'success',
-            icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Play  aria-hidden="true" />)
           }, // Goal action first (wrong)
           { 
             label: 'Edit Settings', 
             onClick: () => {}, 
             variant: 'secondary',
-            icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Pencil  aria-hidden="true" />)
           },
           { 
             label: 'Make Active', 
             onClick: () => {}, 
             variant: 'secondary',
-            icon: (<CheckCircle className="w-4 h-4" aria-hidden="true" />)
+            icon: (<CheckCircle  aria-hidden="true" />)
           }, // Setup action in middle (confusing)
           { 
             label: 'View Details', 
             onClick: () => {}, 
             variant: 'primary',
-            icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Eye  aria-hidden="true" />)
           }
         ]}
       />
-      <p className="text-sm text-green-600 font-medium mt-4">✅ Better ordering - setup first, goal action last:</p>
+      <p >✅ Better ordering - setup first, goal action last:</p>
       <ActionButtonGroup
         actions={[
           { 
             label: 'Make Active', 
             onClick: () => {}, 
             variant: 'secondary',
-            icon: (<CheckCircle className="w-4 h-4" aria-hidden="true" />)
+            icon: (<CheckCircle  aria-hidden="true" />)
           }, // Setup first
           { 
             label: 'View Details', 
             onClick: () => {}, 
             variant: 'primary',
-            icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Eye  aria-hidden="true" />)
           }, // Content management
           { 
             label: 'Edit Settings', 
             onClick: () => {}, 
             variant: 'secondary',
-            icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Pencil  aria-hidden="true" />)
           }, // Secondary actions
           { 
             label: 'Play Game', 
             onClick: () => {}, 
             variant: 'success',
-            icon: (<Play className="w-4 h-4" aria-hidden="true" />)
+            icon: (<Play  aria-hidden="true" />)
           } // Goal action last (prominent)
         ]}
       />
@@ -276,28 +276,28 @@ export const IncorrectButtonOrdering: Story = {
 export const QuickReference: Story = {
   name: '📚 Quick Reference',
   render: () => (
-    <div className="max-w-4xl space-y-6 text-left">
+    <div >
       <div>
-        <h3 className="text-lg font-semibold mb-3">Button Variant Colors</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <h3 >Button Variant Colors</h3>
+        <div >
           <div>
-            <strong>primary:</strong> <span className="text-blue-700">Blue</span> - Main actions, content management
+            <strong>primary:</strong> <span >Blue</span> - Main actions, content management
           </div>
           <div>
-            <strong>secondary:</strong> <span className="text-gray-700">Gray</span> - Supporting actions, neutral choices
+            <strong>secondary:</strong> <span >Gray</span> - Supporting actions, neutral choices
           </div>
           <div>
-            <strong>success:</strong> <span className="text-green-700">Green</span> - Goal actions, positive outcomes
+            <strong>success:</strong> <span >Green</span> - Goal actions, positive outcomes
           </div>
           <div>
-            <strong>danger:</strong> <span className="text-red-700">Red</span> - Destructive actions, delete operations
+            <strong>danger:</strong> <span >Red</span> - Destructive actions, delete operations
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-3">Button Ordering Priority</h3>
-        <ol className="list-decimal list-inside space-y-1 text-sm">
+        <h3 >Button Ordering Priority</h3>
+        <ol >
           <li><strong>Context/Setup actions</strong> (Make Active, Select World)</li>
           <li><strong>Content management</strong> (Create, Edit, View, Manage)</li>
           <li><strong>Secondary actions</strong> (Import, Export, Settings)</li>
@@ -306,9 +306,9 @@ export const QuickReference: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-3">Implementation Checklist</h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <ul className="space-y-2 text-sm">
+        <h3 >Implementation Checklist</h3>
+        <div >
+          <ul >
             <li>✅ Use <code>ActionButtonGroup</code> instead of individual buttons</li>
             <li>✅ Use semantic variants (<code>primary</code>, <code>secondary</code>, <code>success</code>, <code>danger</code>)</li>
             <li>✅ Order buttons by user workflow priority</li>

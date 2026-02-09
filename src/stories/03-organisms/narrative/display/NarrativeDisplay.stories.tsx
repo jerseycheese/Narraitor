@@ -35,7 +35,7 @@ const ensureStorybookNPC = (id: string, name: string) => {
   const npcStore = useNPCStore.getState();
   const existing = npcStore.getById(id);
   const description =
-    existing?.description || `${name} (storybook preview character)`;
+    existing?.description || `${name}(storybook preview character)`;
 
   if (!existing) {
     npcStore.createNPC({
@@ -174,12 +174,8 @@ export const Action: Story = {
 export const Transition: Story = {
   args: {
     segment: createMockSegment(
-      `Hours passed as they ventured deeper into the forest...
-
-The *ancient* path wound through towering trees.
-
-Time seemed to slow in this *mystical* place.`,
-      'transition',
+      `Hours passed as they ventured deeper into the forest... The *ancient* path wound through towering trees. Time seemed to slow in this *mystical* place.`,
+      '',
       {
         mood: 'neutral',
         tags: ['time-skip', 'travel', 'atmosphere'],
@@ -221,13 +217,7 @@ const RealisticMixedStory: React.FC = () => {
 
     setSegment(
       createMockSegment(
-        `The ancient chamber fell silent as they entered. Dust motes danced in the *ethereal* light filtering through crystal windows.
-
-Guardian Lysara emerged from the shadows, their cloak whispering against the stone floor. "Welcome, travelers," Guardian Lysara said. "You have come seeking the *ancient* knowledge guarded within these walls."
-
-Captain Ryn Solis replied, "We need to understand the curse that plagues our land." She whispered, "The secret lies in the old texts." But Guardian Lysara asked, "How do we know which ones to trust?"
-
-Their quest would require both courage and wisdom to succeed.`,
+        `The ancient chamber fell silent as they entered. Dust motes danced in the *ethereal* light filtering through crystal windows. Guardian Lysara emerged from the shadows, their cloak whispering against the stone floor. "Welcome, travelers," Guardian Lysara said. "You have come seeking the *ancient* knowledge guarded within these walls." Captain Ryn Solis replied, "We need to understand the curse that plagues our land." She whispered, "The secret lies in the old texts." But Guardian Lysara asked, "How do we know which ones to trust?" Their quest would require both courage and wisdom to succeed.`,
         'scene',
         {
           location: 'Ancient Chamber',
@@ -398,7 +388,7 @@ const MultipleNPCs = () => {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div >
       {segments.map((segment, index) => (
         <NarrativeDisplay key={index} segment={segment} />
       ))}
@@ -446,7 +436,7 @@ const MixedSegmentSequence = () => {
     ),
     createMockSegment(
       'Hours later, you leave the tavern and travel through the night toward the northern pass.',
-      'transition',
+      '',
       {
         mood: 'neutral',
         tags: ['travel', 'time-passage'],
@@ -455,7 +445,7 @@ const MixedSegmentSequence = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div >
       {segments.map((segment, index) => (
         <NarrativeDisplay key={index} segment={segment} />
       ))}

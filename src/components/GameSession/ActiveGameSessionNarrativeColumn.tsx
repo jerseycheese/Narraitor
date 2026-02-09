@@ -43,25 +43,25 @@ const ActiveGameSessionNarrativeColumn: React.FC<ActiveGameSessionNarrativeColum
 }) => {
   return (
     <div
-      className="lg:flex-[2] min-h-0 flex flex-col lg:overflow-hidden relative"
+      
       id="narrative-container"
       data-tutorial="narrative-display"
       style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
     >
       {/* Fade-out overlay at top when multiple segments */}
       {segmentCount > 1 && (
-        <div className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-b from-background to-transparent" />
+        <div  />
       )}
       {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
       <NarrativeHistoryManager
         key={`display-${controllerKey}`}
         sessionId={sessionId}
-        className="flex flex-col flex-1 min-h-0"
+        
         disableInitialAutoScroll={false}
       />
 
       {/* Hidden controller just to generate content - always include it but hide from view */}
-      <div aria-hidden="true" className="hidden h-0 overflow-hidden">
+      <div aria-hidden="true" >
         <NarrativeController
           key={`generator-${controllerKey}`}
           worldId={worldId}

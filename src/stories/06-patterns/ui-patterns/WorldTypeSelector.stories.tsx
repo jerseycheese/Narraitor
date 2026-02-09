@@ -52,7 +52,7 @@ const InteractiveWorldTypeSelector = (args: Record<string, unknown>) => {
   const [data, setData] = useState<WorldTypeData>(createInitialWorldTypeData());
 
   return (
-    <div className="space-y-4">
+    <div >
       <WorldTypeSelector
         {...args}
         value={data}
@@ -60,9 +60,9 @@ const InteractiveWorldTypeSelector = (args: Record<string, unknown>) => {
       />
       
       {/* Debug output */}
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-700">
+      <div >
+        <h3 >Current Data:</h3>
+        <pre >
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -129,16 +129,16 @@ const InspiredByExampleComponent = () => {
   });
 
   return (
-    <div className="space-y-4">
+    <div >
       <WorldTypeSelector
         value={data}
         onChange={setData}
         size="medium"
       />
       
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-700">
+      <div >
+        <h3 >Current Data:</h3>
+        <pre >
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -165,16 +165,16 @@ const SetWithinExampleComponent = () => {
   });
 
   return (
-    <div className="space-y-4">
+    <div >
       <WorldTypeSelector
         value={data}
         onChange={setData}
         size="medium"
       />
       
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-700">
+      <div >
+        <h3 >Current Data:</h3>
+        <pre >
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>

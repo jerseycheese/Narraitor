@@ -94,19 +94,19 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-8" role="status" aria-label="Loading world data">
-        <div className="text-lg text-muted-foreground">Loading world data...</div>
+      <div  role="status" aria-label="Loading world data">
+        <div >Loading world data...</div>
       </div>
     );
   }
   
   if (error || !world) {
     return (
-      <div className="p-4" role="alert">
-        <div className="text-destructive">{error || 'World not found'}</div>
+      <div  role="alert">
+        <div >{error || 'World not found'}</div>
         <Button 
           onClick={() => router.push('/worlds')}
-          className="mt-4"
+          
         >
           Return to Worlds
         </Button>
@@ -115,10 +115,10 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   }
   
   return (
-    <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6 w-full">
+    <form data-testid="world-editor-root" onSubmit={(e) => { e.preventDefault(); handleSave(); }} >
       <CollapsibleSection
         title="Basic Information"
-        className="bg-background"
+        
       >
         <WorldBasicInfoForm 
           world={world} 
@@ -129,7 +129,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <CollapsibleSection
         title="World Image"
         initialCollapsed={true}
-        className="bg-background"
+        
       >
         <WorldImageForm
           world={world}
@@ -140,7 +140,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <CollapsibleSection
         title="Attributes"
         initialCollapsed={true}
-        className="bg-background"
+        
       >
         <WorldAttributesForm 
           attributes={world.attributes} 
@@ -154,7 +154,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <CollapsibleSection
         title="Skills"
         initialCollapsed={true}
-        className="bg-background"
+        
       >
         <WorldSkillsForm 
           skills={world.skills} 
@@ -167,7 +167,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <CollapsibleSection
         title="World Settings"
         initialCollapsed={true}
-        className="bg-background"
+        
       >
         <WorldSettingsForm 
           settings={world.settings} 
@@ -177,10 +177,10 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
       
-      <div className="flex justify-end space-x-4 pt-6 border-t border-border">
+      <div >
         <Button 
           type="button"
-          variant="outline"
+          variant=""
           onClick={handleCancel}
           disabled={saving}
         >

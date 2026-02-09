@@ -10,12 +10,11 @@ echo "Checking for Tailwind utility usage..."
 FAIL=0
 
 # Define patterns to search for
-# Note: This is a basic check and might need refinement.
-# We are looking for common Tailwind patterns.
 
 # 1. Check for composition helpers in .tsx and .ts files
 echo "Checking for composition helpers (cn, clsx, twMerge)..."
-COMPOSITION_MATCHES=$(grep -rE "cn\(|clsx\(|twMerge\(" src/app src/components src/stories --include="*.tsx" --include="*.ts" 2>/dev/null)
+# Use stricter word boundary checks
+COMPOSITION_MATCHES=$(grep -rE "\bcn\(|\bclsx\(|\btwMerge\(" src/app src/components src/stories --include="*.tsx" --include="*.ts" 2>/dev/null)
 
 if [ -n "$COMPOSITION_MATCHES" ]; then
   echo -e "${RED}Found composition helpers usage:${NC}"
@@ -23,19 +22,16 @@ if [ -n "$COMPOSITION_MATCHES" ]; then
   FAIL=1
 fi
 
-# 2. Check for Tailwind utility classes in className strings
-# We search for common prefixes like bg-, text-, flex, grid, p-, m-, etc.
-# avoiding false positives can be tricky, but we start with a broad check for known utilities.
-# Using a regex that matches common tailwind classes inside className="..." or className={`...`}
+# 2. Check for Tailwind utility classes
 echo "Checking for Tailwind utility classes..."
-# Look for 'className' followed by string containing typical tailwind tokens
-# This regex looks for className= then some quote, then potentially some tailwind class.
-# We'll search for specific obvious tailwind tokens to be sure.
-UTILITY_MATCHES=$(grep -rE "className=.*(bg-|text-|flex|grid|space-|p-|m-|w-|h-|border-|rounded-|shadow-|hover:|focus:|sm:|md:|lg:|xl:)" src/app src/components src/stories --include="*.tsx" 2>/dev/null)
+# Use regex that ensures prefix is at start of class (quote) or after space
+# We check for standard prefixes and exact matches.
+# [\"' ] matches quote or space.
+UTILITY_MATCHES=$(grep -rE "className=.*[\"' ](bg-|text-|flex|grid|space-|p-|m-|w-|h-|border-|rounded-|shadow-|hover:|focus:|sm:|md:|lg:|xl:)" src/app src/components src/stories --include="*.tsx" 2>/dev/null)
 
 if [ -n "$UTILITY_MATCHES" ]; then
   echo -e "${RED}Found Tailwind utility classes:${NC}"
-  echo "$UTILITY_MATCHES" | head -n 20 # Limit output
+  echo "$UTILITY_MATCHES" | head -n 20 
   if [ $(echo "$UTILITY_MATCHES" | wc -l) -gt 20 ]; then echo "... and more"; fi
   FAIL=1
 fi

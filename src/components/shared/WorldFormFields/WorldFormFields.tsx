@@ -30,20 +30,20 @@ export function WorldNameInput({
 }: WorldNameInputProps) {
   return (
     <div className={className}>
-      <Label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
-        World Name {required && <span className="text-destructive">*</span>}
+      <Label htmlFor="world-name" >
+        World Name {required && <span >*</span>}
       </Label>
       <Input
         id="world-name"
         type="text"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        
         placeholder={placeholder || "E.g., Neo-Tokyo..."}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
       />
       {error && (
-        <p className="text-sm text-destructive mt-1">{error}</p>
+        <p >{error}</p>
       )}
     </div>
   );
@@ -70,12 +70,12 @@ export function GenreSelect({
 }: GenreSelectProps) {
   return (
     <div className={className}>
-      <Label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
-        Genre {required && <span className="text-destructive">*</span>}
+      <Label htmlFor="world-genre" >
+        Genre {required && <span >*</span>}
       </Label>
       <Select
         id="world-genre"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -88,7 +88,7 @@ export function GenreSelect({
         ))}
       </Select>
       {error && (
-        <p className="text-sm text-destructive mt-1">{error}</p>
+        <p >{error}</p>
       )}
     </div>
   );
@@ -124,13 +124,13 @@ export function DescriptionTextArea({
 
   return (
     <div className={className}>
-      <Label htmlFor="world-description" className="block text-sm font-medium text-gray-700 mb-2">
-        {label} {required && <span className="text-destructive">*</span>}
+      <Label htmlFor="world-description" >
+        {label} {required && <span >*</span>}
       </Label>
       <Textarea
         id="world-description"
         rows={rows}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -140,13 +140,13 @@ export function DescriptionTextArea({
 
       {/* Character count */}
       {maxLength && (
-        <div className="flex justify-between items-center mt-1">
-          <div className="flex-1">
+        <div >
+          <div >
             {error && (
-              <p className="text-sm text-destructive">{error}</p>
+              <p >{error}</p>
             )}
           </div>
-          <p className={`text-xs ${isNearLimit ? 'text-amber-500' : 'text-gray-500'}`}>
+          <p className={`${isNearLimit ? '' : ''}`}>
             {characterCount}/{maxLength}
           </p>
         </div>
@@ -154,7 +154,7 @@ export function DescriptionTextArea({
 
       {/* Error without character count */}
       {!maxLength && error && (
-        <p className="text-sm text-destructive mt-1">{error}</p>
+        <p >{error}</p>
       )}
     </div>
   );
@@ -176,9 +176,9 @@ export function LoadingState({
   if (!isLoading) return null;
 
   return (
-    <div className={`p-4 ${className}`}>
+    <div className={`${className}`}>
       <UILoadingState
-        message={details ? `${message} - ${details}` : message}
+        message={details ? `${message}-${details}` : message}
         size="md"
         theme="light"
         centered={true}
@@ -203,24 +203,24 @@ export function ErrorDisplay({
   if (!error) return null;
 
   return (
-    <div className={`bg-destructive/10 border border-destructive rounded-md p-4 ${className}`}>
-      <div className="flex">
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-destructive">
+    <div className={`${className}`}>
+      <div >
+        <div >
+          <h3 >
             Error
           </h3>
-          <p className="text-sm text-destructive mt-1">
+          <p >
             {error}
           </p>
         </div>
 
         {(onRetry || onDismiss) && (
-          <div className="flex space-x-2 ml-4">
+          <div >
             {onRetry && (
               <Button
                 onClick={onRetry}
                 variant="ghost"
-                className="text-sm font-medium text-destructive hover:text-destructive/80 underline"
+                
               >
                 Retry
               </Button>
@@ -229,7 +229,7 @@ export function ErrorDisplay({
               <Button
                 onClick={onDismiss}
                 variant="ghost"
-                className="text-sm font-medium text-destructive hover:text-destructive/80"
+                
               >
                 ×
               </Button>

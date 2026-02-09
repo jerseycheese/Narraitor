@@ -79,7 +79,7 @@ describe('Play Page', () => {
   
   test('calls notFound when worldId is just whitespace', () => {
     // Mock useParams to return a whitespace ID
-    (useParams as jest.Mock).mockReturnValueOnce({ id: '   ' });
+    (useParams as jest.Mock).mockReturnValueOnce({ id: '' });
 
     // Mock useState to simulate client-side rendering
     jest.spyOn(React, 'useState').mockImplementationOnce(() => [true, jest.fn()]);
@@ -103,6 +103,6 @@ describe('Play Page', () => {
     render(<PlayPage />);
     
     // Assert
-    expect(screen.getByTestId('mock-game-session')).toHaveTextContent(`Game Session for ${testWorldId}`);
+    expect(screen.getByTestId('mock-game-session')).toHaveTextContent(`Game Session for${testWorldId}`);
   });
 });

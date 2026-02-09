@@ -31,15 +31,15 @@ type Story = StoryObj<typeof meta>
 
 // Color Swatch Component
 const ColorSwatch = ({ color, name }: { color: string; name: string }) => (
-  <div className="flex items-center gap-2 p-2 border rounded">
-    <div className="w-8 h-8 rounded border overflow-hidden">
-      <svg width="100%" height="100%" viewBox="0 0 32 32" role="img" aria-label={`${name} swatch`}>
+  <div >
+    <div >
+      <svg width="100%" height="100%" viewBox="0 0 32 32" role="img" aria-label={`${name}swatch`}>
         <rect x="0" y="0" width="32" height="32" fill={color} />
       </svg>
     </div>
-    <div className="text-xs">
-      <div className="font-medium">{name}</div>
-      <div className="text-muted-foreground font-mono">{color}</div>
+    <div >
+      <div >{name}</div>
+      <div >{color}</div>
     </div>
   </div>
 )
@@ -47,32 +47,32 @@ const ColorSwatch = ({ color, name }: { color: string; name: string }) => (
 export const CompleteShowcase: Story = {
   name: 'Complete Design System',
   render: () => (
-    <div className="space-y-12 max-w-6xl">
+    <div >
       {/* Typography */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Typography</h2>
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold">Heading 1 - Main Page Titles</h1>
-          <h2 className="text-3xl font-bold">Heading 2 - Section Titles</h2>
-          <h3 className="text-2xl font-semibold">Heading 3 - Subsection Titles</h3>
-          <h4 className="text-xl font-semibold">Heading 4 - Component Titles</h4>
-          <p className="text-lg">Large text - Prominent body copy</p>
-          <p className="text-base">Body text - Default paragraph text</p>
-          <p className="text-sm">Small text - Secondary information</p>
-          <p className="text-xs">Extra small - Captions and metadata</p>
-          <p className="text-muted-foreground">Muted text - Less important information</p>
-          <code className="bg-muted px-2 py-1 rounded font-mono text-sm">Inline code</code>
+        <h2 >Typography</h2>
+        <div >
+          <h1 >Heading 1 - Main Page Titles</h1>
+          <h2 >Heading 2 - Section Titles</h2>
+          <h3 >Heading 3 - Subsection Titles</h3>
+          <h4 >Heading 4 - Component Titles</h4>
+          <p >Large text - Prominent body copy</p>
+          <p >Body text - Default paragraph text</p>
+          <p >Small text - Secondary information</p>
+          <p >Extra small - Captions and metadata</p>
+          <p >Muted text - Less important information</p>
+          <code >Inline code</code>
         </div>
       </section>
 
       {/* Color System */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Color System</h2>
+        <h2 >Color System</h2>
         
         {/* Primitive Colors */}
-        <div className="space-y-4 mb-8">
-          <h3 className="text-xl font-semibold">Primitive Colors</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div >
+          <h3 >Primitive Colors</h3>
+          <div >
             {Object.entries(primitiveColors).map(([colorName, shades]) => 
               Object.entries(shades as Record<string, string>).map(([shade, color]) => (
                 <ColorSwatch key={`${colorName}-${shade}`} color={color} name={`${colorName}-${shade}`} />
@@ -82,9 +82,9 @@ export const CompleteShowcase: Story = {
         </div>
 
         {/* Semantic Colors */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Semantic Colors</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div >
+          <h3 >Semantic Colors</h3>
+          <div >
             {Object.entries(semanticColors).map(([colorName, shades]) => 
               Object.entries(shades as Record<string, string>).map(([shade, color]) => (
                 <ColorSwatch key={`${colorName}-${shade}`} color={color} name={`${colorName}-${shade}`} />
@@ -96,16 +96,16 @@ export const CompleteShowcase: Story = {
 
       {/* Buttons */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Buttons</h2>
+        <h2 >Buttons</h2>
         
         {/* Button Variants */}
-        <div className="space-y-6">
+        <div >
           <div>
-            <h3 className="text-xl font-semibold mb-4">Variants</h3>
-            <div className="flex flex-wrap gap-3">
+            <h3 >Variants</h3>
+            <div >
               <Button variant="default">Default</Button>
               <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
+              <Button variant="">Outline</Button>
               <Button variant="ghost">Ghost</Button>
               <Button variant="link">Link</Button>
               <Button variant="destructive">Destructive</Button>
@@ -117,21 +117,21 @@ export const CompleteShowcase: Story = {
 
           {/* Button Sizes */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Sizes</h3>
-            <div className="flex flex-wrap items-center gap-3">
+            <h3 >Sizes</h3>
+            <div >
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
               <Button size="icon">
-                <Settings className="w-4 h-4" />
+                <Settings  />
               </Button>
             </div>
           </div>
 
           {/* Button States */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">States</h3>
-            <div className="flex flex-wrap gap-3">
+            <h3 >States</h3>
+            <div >
               <Button>Normal</Button>
               <Button disabled>Disabled</Button>
             </div>
@@ -139,16 +139,16 @@ export const CompleteShowcase: Story = {
 
           {/* Semantic Action Buttons */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Semantic Action Buttons</h3>
-            <div className="flex flex-wrap gap-3">
+            <h3 >Semantic Action Buttons</h3>
+            <div >
               <Button variant="success">Start Game</Button>
               <Button variant="success">Create Character</Button>
               <Button variant="success">Play World</Button>
               <Button variant="success">Continue</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">Edit</Button>
+              <Button >Edit</Button>
               <Button variant="destructive">Delete</Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p >
               Green buttons (success variant) are used for forward momentum actions like starting games or creating content.
               They provide 4.6:1 contrast ratio for WCAG AA compliance.
             </p>
@@ -158,21 +158,21 @@ export const CompleteShowcase: Story = {
 
       {/* Form Elements */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Form Elements</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <h2 >Form Elements</h2>
+        <div >
           
           {/* Text Inputs */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Text Inputs</h3>
-            <div className="space-y-3">
+          <div >
+            <h3 >Text Inputs</h3>
+            <div >
               <div>
                 <Label htmlFor="input-default">Default Input</Label>
                 <Input id="input-default" placeholder="Enter text..." />
               </div>
               <div>
                 <Label htmlFor="input-error">Input with Error</Label>
-                <Input id="input-error" placeholder="Invalid input" className="border-destructive" />
-                <p className="text-sm text-destructive mt-1">This field is required</p>
+                <Input id="input-error" placeholder="Invalid input"  />
+                <p >This field is required</p>
               </div>
               <div>
                 <Label htmlFor="textarea">Textarea</Label>
@@ -182,9 +182,9 @@ export const CompleteShowcase: Story = {
           </div>
 
           {/* Selection Inputs */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Selection Inputs</h3>
-            <div className="space-y-3">
+          <div >
+            <h3 >Selection Inputs</h3>
+            <div >
               <div>
                 <Label htmlFor="select">Select Dropdown</Label>
                 <Select id="select">
@@ -197,12 +197,12 @@ export const CompleteShowcase: Story = {
               
               <div>
                 <Label>Checkboxes</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
+                <div >
+                  <div >
                     <Checkbox id="check1" />
                     <Label htmlFor="check1">Option 1</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div >
                     <Checkbox id="check2" />
                     <Label htmlFor="check2">Option 2</Label>
                   </div>
@@ -211,12 +211,12 @@ export const CompleteShowcase: Story = {
 
               <div>
                 <Label>Radio Group</Label>
-                <RadioGroup defaultValue="radio1" className="mt-2">
-                  <div className="flex items-center space-x-2">
+                <RadioGroup defaultValue="radio1" >
+                  <div >
                     <RadioGroupItem value="radio1" id="radio1" />
                     <Label htmlFor="radio1">Radio 1</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div >
                     <RadioGroupItem value="radio2" id="radio2" />
                     <Label htmlFor="radio2">Radio 2</Label>
                   </div>
@@ -229,19 +229,19 @@ export const CompleteShowcase: Story = {
 
       {/* Badges */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Badges</h2>
-        <div className="flex flex-wrap gap-3">
+        <h2 >Badges</h2>
+        <div >
           <Badge variant="default">Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
-          <Badge variant="outline">Outline</Badge>
+          <Badge variant="">Outline</Badge>
           <Badge variant="destructive">Destructive</Badge>
         </div>
       </section>
 
       {/* Alerts */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Alerts</h2>
-        <div className="space-y-4">
+        <h2 >Alerts</h2>
+        <div >
           <Alert>
             <AlertTitle>Default Alert</AlertTitle>
             <AlertDescription>
@@ -260,8 +260,8 @@ export const CompleteShowcase: Story = {
 
       {/* Cards */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Cards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 >Cards</h2>
+        <div >
           <Card>
             <CardHeader>
               <CardTitle>Simple Card</CardTitle>
@@ -270,7 +270,7 @@ export const CompleteShowcase: Story = {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p >
                 Card content goes here. This can contain any type of content.
               </p>
             </CardContent>
@@ -284,17 +284,17 @@ export const CompleteShowcase: Story = {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p >
                 This card demonstrates footer usage.
               </p>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline">Cancel</Button>
+            <CardFooter >
+              <Button variant="">Cancel</Button>
               <Button>Save</Button>
             </CardFooter>
           </Card>
 
-          <Card className="border-dashed">
+          <Card >
             <CardHeader>
               <CardTitle>Dashed Border</CardTitle>
               <CardDescription>
@@ -302,7 +302,7 @@ export const CompleteShowcase: Story = {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p >
                 Cards can be customized with different styles.
               </p>
             </CardContent>
@@ -312,14 +312,14 @@ export const CompleteShowcase: Story = {
 
       {/* Tabs */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Tabs</h2>
-        <Tabs defaultValue="tab1" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+        <h2 >Tabs</h2>
+        <Tabs defaultValue="tab1" >
+          <TabsList >
             <TabsTrigger value="tab1">Tab 1</TabsTrigger>
             <TabsTrigger value="tab2">Tab 2</TabsTrigger>
             <TabsTrigger value="tab3">Tab 3</TabsTrigger>
           </TabsList>
-          <TabsContent value="tab1" className="mt-6">
+          <TabsContent value="tab1" >
             <Card>
               <CardHeader>
                 <CardTitle>Tab 1 Content</CardTitle>
@@ -332,7 +332,7 @@ export const CompleteShowcase: Story = {
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="tab2" className="mt-6">
+          <TabsContent value="tab2" >
             <Card>
               <CardHeader>
                 <CardTitle>Tab 2 Content</CardTitle>
@@ -345,7 +345,7 @@ export const CompleteShowcase: Story = {
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="tab3" className="mt-6">
+          <TabsContent value="tab3" >
             <Card>
               <CardHeader>
                 <CardTitle>Tab 3 Content</CardTitle>
@@ -363,15 +363,15 @@ export const CompleteShowcase: Story = {
 
       {/* Layout Examples */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Layout Examples</h2>
+        <h2 >Layout Examples</h2>
         
         {/* Grid Layout */}
-        <div className="space-y-6">
+        <div >
           <div>
-            <h3 className="text-xl font-semibold mb-4">Grid Layout</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <h3 >Grid Layout</h3>
+            <div >
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-muted p-4 rounded text-center">
+                <div key={i} >
                   Grid Item {i}
                 </div>
               ))}
@@ -380,15 +380,15 @@ export const CompleteShowcase: Story = {
 
           {/* Flex Layout */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Flex Layout</h3>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex-1 bg-muted p-4 rounded text-center min-w-[200px]">
+            <h3 >Flex Layout</h3>
+            <div >
+              <div >
                 Flex Item 1
               </div>
-              <div className="flex-1 bg-muted p-4 rounded text-center min-w-[200px]">
+              <div >
                 Flex Item 2
               </div>
-              <div className="flex-1 bg-muted p-4 rounded text-center min-w-[200px]">
+              <div >
                 Flex Item 3
               </div>
             </div>
@@ -398,17 +398,17 @@ export const CompleteShowcase: Story = {
 
       {/* Spacing Scale */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Spacing Scale</h2>
-        <div className="space-y-3">
+        <h2 >Spacing Scale</h2>
+        <div >
           {[1, 2, 3, 4, 6, 8, 12, 16, 20, 24].map((space) => (
-            <div key={space} className="flex items-center gap-4">
-              <div className="w-16 text-sm font-mono">{space * 4}px</div>
-              <div className="rounded overflow-hidden">
+            <div key={space} >
+              <div >{space * 4}px</div>
+              <div >
                 <svg width={space * 4} height={16} role="img" aria-label={`${space * 4}px bar`}>
-                  <rect x="0" y="0" width={space * 4} height={16} className="fill-primary" rx="4" />
+                  <rect x="0" y="0" width={space * 4} height={16}  rx="4" />
                 </svg>
               </div>
-              <div className="text-sm text-muted-foreground">space-{space}</div>
+              <div >space-{space}</div>
             </div>
           ))}
         </div>
@@ -416,12 +416,12 @@ export const CompleteShowcase: Story = {
 
       {/* Theme-Specific Colors */}
       <section>
-        <h2 className="text-3xl font-bold mb-6">Theme-Specific Colors</h2>
+        <h2 >Theme-Specific Colors</h2>
         
         {/* Ending Tones */}
-        <div className="space-y-4 mb-8">
-          <h3 className="text-xl font-semibold">Ending Tones</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div >
+          <h3 >Ending Tones</h3>
+          <div >
             {Object.entries(endingTones).map(([tone, colors]) => 
               Object.entries(colors as Record<string, string>).map(([shade, color]) => (
                 <ColorSwatch key={`${tone}-${shade}`} color={color} name={`${tone}-${shade}`} />
@@ -431,9 +431,9 @@ export const CompleteShowcase: Story = {
         </div>
 
         {/* Lore Categories */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Lore Categories</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div >
+          <h3 >Lore Categories</h3>
+          <div >
             {Object.entries(loreCategories).map(([category, colors]) => 
               Object.entries(colors as Record<string, string>).map(([shade, color]) => (
                 <ColorSwatch key={`${category}-${shade}`} color={color} name={`${category}-${shade}`} />
@@ -449,21 +449,21 @@ export const CompleteShowcase: Story = {
 export const ComponentMatrix: Story = {
   name: 'Component Interaction Matrix',
   render: () => (
-    <div className="space-y-8">
-      <h2 className="text-3xl font-bold">Component Interaction Matrix</h2>
-      <p className="text-muted-foreground">
+    <div >
+      <h2 >Component Interaction Matrix</h2>
+      <p >
         This shows how different components work together in various combinations.
       </p>
 
       {/* Form in Card */}
-      <Card className="max-w-md">
+      <Card >
         <CardHeader>
           <CardTitle>User Registration</CardTitle>
           <CardDescription>
             Example of form components within a card
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent >
           <div>
             <Label htmlFor="username">Username</Label>
             <Input id="username" placeholder="Enter username" />
@@ -480,13 +480,13 @@ export const ComponentMatrix: Story = {
               <option value="gamemaster">Game Master</option>
             </Select>
           </div>
-          <div className="flex items-center space-x-2">
+          <div >
             <Checkbox id="terms" />
             <Label htmlFor="terms">I agree to the terms and conditions</Label>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
+        <CardFooter >
+          <Button variant="">Cancel</Button>
           <Button>Register</Button>
         </CardFooter>
       </Card>
@@ -494,11 +494,11 @@ export const ComponentMatrix: Story = {
       {/* Alert with Actions */}
       <Alert>
         <AlertTitle>Storage Limit Reached</AlertTitle>
-        <AlertDescription className="mt-2">
+        <AlertDescription >
           Your game data is approaching the storage limit. Consider cleaning up old sessions.
         </AlertDescription>
-        <div className="flex gap-2 mt-4">
-          <Button size="sm" variant="outline">Manage Storage</Button>
+        <div >
+          <Button size="sm" variant="">Manage Storage</Button>
           <Button size="sm">Upgrade Plan</Button>
         </div>
       </Alert>
@@ -506,47 +506,47 @@ export const ComponentMatrix: Story = {
       {/* Complex Card Layout */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-start">
+          <div >
             <div>
               <CardTitle>Fantasy Campaign</CardTitle>
               <CardDescription>Active gaming session</CardDescription>
             </div>
-            <Badge variant="outline">Live</Badge>
+            <Badge variant="">Live</Badge>
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs defaultValue="overview" >
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="players">Players</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
-            <TabsContent value="overview" className="mt-4">
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+            <TabsContent value="overview" >
+              <div >
+                <p >
                   Campaign started 3 days ago with 4 active players.
                 </p>
-                <div className="flex gap-2">
+                <div >
                   <Badge>Level 3</Badge>
                   <Badge variant="secondary">Fantasy</Badge>
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="players" className="mt-4">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Active Players (4)</p>
-                <div className="text-sm text-muted-foreground">
+            <TabsContent value="players" >
+              <div >
+                <p >Active Players (4)</p>
+                <div >
                   Player management interface would go here.
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="settings" className="mt-4">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
+            <TabsContent value="settings" >
+              <div >
+                <div >
                   <Checkbox id="notifications" />
                   <Label htmlFor="notifications">Enable notifications</Label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div >
                   <Checkbox id="public" />
                   <Label htmlFor="public">Public campaign</Label>
                 </div>
@@ -555,7 +555,7 @@ export const ComponentMatrix: Story = {
           </Tabs>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">Join Campaign</Button>
+          <Button >Join Campaign</Button>
         </CardFooter>
       </Card>
     </div>

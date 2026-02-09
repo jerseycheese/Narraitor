@@ -28,38 +28,38 @@ export function GameReadyStep({
   const character = characters[characterId];
 
   return (
-    <div data-testid="game-ready-step" className="text-center py-8">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">
+    <div data-testid="game-ready-step" >
+      <h3 >
         Ready to Begin Your Story!
       </h3>
       
-      <div className="bg-gray-100 rounded-lg p-6 mb-8 max-w-md mx-auto">
-        <div className="space-y-3 text-left">
+      <div >
+        <div >
           <div>
-            <span className="text-sm text-gray-700">World:</span>
-            <p className="font-medium text-gray-900">{world?.name}</p>
-            <p className="text-sm text-gray-700">{world?.genre ? getGenreLabel(world.genre) : 'Unknown'}</p>
+            <span >World:</span>
+            <p >{world?.name}</p>
+            <p >{world?.genre ? getGenreLabel(world.genre) : 'Unknown'}</p>
           </div>
-          <div className="pt-2 border-t">
-            <span className="text-sm text-gray-700">Character:</span>
-            <p className="font-medium text-gray-900">{character?.name}</p>
-            <p className="text-sm text-gray-700 line-clamp-2">
+          <div >
+            <span >Character:</span>
+            <p >{character?.name}</p>
+            <p >
               {character?.background?.personality || 'No description available'}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div >
         <Button
           onClick={onStart}
           disabled={isStarting}
-          className="inline-flex items-center px-8 py-3 bg-green-500 hover:bg-green-700 disabled:bg-green-500 text-white font-medium rounded-md transition-colors"
+          
           variant="default"
         >
           {isStarting ? (
             <>
-              <span className="animate-spin mr-2">⏳</span>
+              <span >⏳</span>
               Starting Game...
             </>
           ) : (
@@ -71,7 +71,7 @@ export function GameReadyStep({
           <Button
             onClick={onBack}
             disabled={isStarting}
-            className="text-gray-700 hover:text-gray-900 disabled:text-gray-500"
+            
             variant="ghost"
           >
             ← Change Character

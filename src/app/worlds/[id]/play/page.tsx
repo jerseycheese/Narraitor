@@ -61,7 +61,7 @@ export default function PlayPage() {
   if (!isClient) {
     return (
       <PageLayout title="Game Session">
-        <div className="p-4 text-center">
+        <div >
           <p>Creating your game...</p>
         </div>
       </PageLayout>
@@ -74,28 +74,28 @@ export default function PlayPage() {
   }
 
 
-  const pageTitle = world ? `Playing in ${world.name}` : 'Game Session';
+  const pageTitle = world ? `Playing in${world.name}` : 'Game Session';
 
   return (
-    <PageLayout className="pb-0">
+    <PageLayout >
       {/* Ultra-thin world hero - always show with image or themed background */}
       {world && (
-        <div className="mb-6">
+        <div >
           <Hero
             title={pageTitle}
             image={world.image?.url ? {
               url: world.image.url,
-              alt: `${world.name} world`
+              alt: `${world.name}world`
             } : undefined}
             theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height="h-20 sm:h-24"
+            height=""
             titleElement="h1"
             actions={
               // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)
               !currentEnding && (sessionStatus === 'active' || sessionStatus === 'paused' || sessionStatus === 'loading') ? (
-                <div className="hidden sm:flex flex-row gap-2">
-                  <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
+                <div >
+                  <Button size="sm" variant="" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
                     Switch Character
                   </Button>
                   <Button size="sm" variant="default" onClick={handleStartNewClick}>

@@ -32,27 +32,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const prompt = `Are these two item names referring to the same item? You must respond with ONLY a JSON object in this exact format:
-{
-  "similar": true or false,
-  "confidence": 0.0 to 1.0,
-  "rationale": "brief explanation"
-}
-
-Item 1: "${name1}"
-Item 2: "${name2}"
-
-Consider:
-- Synonyms (mom/mother, dad/father, sword/blade, etc.)
-- Singular/plural (coin/coins, potion/potions)
-- Word order (Photo of Mom vs Mom's Photo)
-- Descriptive modifiers (Rusty Iron Sword vs Iron Sword)
-- Possessives (your mother vs mother)
-
-If they clearly refer to the same item, return similar: true with high confidence.
-If they're definitely different items, return similar: false.
-
-Response (JSON only):`;
+    const prompt = `Are these two item names referring to the same item? You must respond with ONLY a JSON object in this exact format: { "similar": true or false, "confidence": 0.0 to 1.0, "rationale": "brief explanation" } Item 1: "${name1}" Item 2: "${name2}" Consider: - Synonyms (mom/mother, dad/father, sword/blade, etc.) - Singular/plural (coin/coins, potion/potions) - Word order (Photo of Mom vs Mom's Photo) - Descriptive modifiers (Rusty Iron Sword vs Iron Sword) - Possessives (your mother vs mother) If they clearly refer to the same item, return similar: true with high confidence. If they're definitely different items, return similar: false. Response (JSON only):`;
 
     const config = getDefaultConfig();
     const client = new GeminiClient(config);

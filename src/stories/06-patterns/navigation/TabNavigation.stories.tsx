@@ -24,7 +24,7 @@ const meta: Meta<typeof TabNavigation> = {
     },
     className: {
       control: 'text',
-      description: 'Additional CSS classes for the container'
+      description: 'Additional CSS classes for the'
     },
     mobileLayout: {
       control: { type: 'radio' },
@@ -48,13 +48,13 @@ const TabNavigationWrapper = (args: any) => {
   };
 
   return (
-    <div className="p-4">
+    <div >
       <TabNavigation
         {...args}
         activeValue={activeValue}
         onChange={handleChange}
       />
-      <div className="mt-4 text-sm text-gray-700">
+      <div >
         Active: {activeValue}
       </div>
     </div>

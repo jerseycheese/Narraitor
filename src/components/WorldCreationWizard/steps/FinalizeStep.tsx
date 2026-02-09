@@ -110,20 +110,20 @@ export default function FinalizeStep({
         description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
       >
 
-      <div className="space-y-6 my-4">
+      <div >
         <div data-tutorial="finalize-review">
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
-          <div className="space-y-3">
+          <div >
             <DataField 
               label="Name" 
               value={<span data-testid="review-world-name">{worldData.name}</span>}
-              variant="inline"
+              variant=""
               size="md"
             />
             <DataField 
               label="Genre" 
               value={<span data-testid="review-world-genre">{worldData.genre ? getGenreLabel(worldData.genre) : 'Unknown'}</span>}
-              variant="inline"
+              variant=""
               size="md"
             />
             <DataField 
@@ -162,16 +162,16 @@ export default function FinalizeStep({
                   size="medium"
                 />
               }
-              className="shadow-none bg-transparent p-0"
+              
             />
           ) : (
-            <div className="text-center py-8">
+            <div >
               <WorldImageComponent
                 image={worldData.image || { type: 'placeholder', url: null }}
                 worldName={worldData.name || 'Untitled World'}
                 size="medium"
               />
-              <p className="text-sm text-gray-700 mt-2">
+              <p >
                 {worldData.image?.url ? 'World image will be generated after creation' : 'No world image will be generated'}
               </p>
             </div>
@@ -181,31 +181,31 @@ export default function FinalizeStep({
         <div className={wizardStyles.divider} data-testid="review-attributes-section" data-tutorial="finalize-attributes">
           <h3 className={wizardStyles.subheading}>Attributes ({worldData.attributes?.length || 0})</h3>
         {worldData.attributes && worldData.attributes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div >
             {worldData.attributes.map((attr, index) => (
-              <div key={index} className={`${wizardStyles.card.base} bg-gray-100`} data-testid={`review-attribute-${index}`}>
-                <div className="font-semibold">{attr.name}</div>
-                <div className="text-sm">{attr.description}</div>
-                <div className="text-sm text-gray-500">
+              <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-attribute-${index}`}>
+                <div >{attr.name}</div>
+                <div >{attr.description}</div>
+                <div >
                   Range: {attr.minValue} - {attr.maxValue}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 italic">No attributes selected</p>
+          <p >No attributes selected</p>
         )}
         </div>
 
         <div className={wizardStyles.divider} data-testid="review-skills-section" data-tutorial="finalize-skills">
           <h3 className={wizardStyles.subheading}>Skills ({worldData.skills?.length || 0})</h3>
         {worldData.skills && worldData.skills.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div >
             {worldData.skills.map((skill, index) => (
-              <div key={index} className={`${wizardStyles.card.base} bg-gray-100`} data-testid={`review-skill-${index}`}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold">{skill.name}</span>
-                  <span className={`${wizardStyles.badge.base} ${
+              <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-skill-${index}`}>
+                <div >
+                  <span >{skill.name}</span>
+                  <span className={`${wizardStyles.badge.base}${
                     skill.difficulty === 'easy' ? wizardStyles.badge.success :
                     skill.difficulty === 'medium' ? wizardStyles.badge.warning : 
                     wizardStyles.badge.danger
@@ -213,20 +213,20 @@ export default function FinalizeStep({
                     {skill.difficulty}
                   </span>
                 </div>
-                <div className="text-sm">{skill.description}</div>
+                <div >{skill.description}</div>
                 {skill.attributeIds && skill.attributeIds.length > 0 && (
-                  <div className="text-sm text-primary mt-1">
+                  <div >
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)
-                      .join(', ') || 'Unknown'}
+                      .join(',') || 'Unknown'}
                   </div>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 italic">No skills selected</p>
+          <p >No skills selected</p>
         )}
         </div>
       </div>
@@ -238,12 +238,12 @@ export default function FinalizeStep({
         </div>
       )}
 
-      <div className="mt-6 flex justify-between">
-        <div className="flex gap-2">
+      <div >
+        <div >
           <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}
-            variant="outline"
+            variant=""
           >
             Cancel
           </Button>
@@ -252,7 +252,7 @@ export default function FinalizeStep({
             <Button
               type="button"
               onClick={onBack}
-              variant="outline"
+              variant=""
             >
               Back
             </Button>
@@ -264,7 +264,7 @@ export default function FinalizeStep({
           data-testid="step-complete-button"
           data-tutorial="finalize-world"
           onClick={() => {
-            log('[FinalizeStep.tsx - inline onClick] Button raw click detected.');
+            log('[FinalizeStep.tsx - onClick] Button raw click detected.');
             handleComplete();
           }}
         >

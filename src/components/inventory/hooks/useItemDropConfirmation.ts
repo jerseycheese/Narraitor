@@ -53,7 +53,7 @@ export const useItemDropConfirmation = (characterId: EntityID): UseItemDropConfi
     if (quantity < 1) {
       setQuantityError('Quantity must be at least 1');
     } else if (quantity > itemToDrop.quantity) {
-      setQuantityError(`Cannot drop more than ${itemToDrop.quantity} items`);
+      setQuantityError(`Cannot drop more than${itemToDrop.quantity}items`);
     } else {
       setQuantityError(null);
     }

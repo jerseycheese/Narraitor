@@ -118,37 +118,37 @@ export function GameStartWizard({
   const currentStepConfig = gameStartSteps[wizard.state.currentStep] || gameStartSteps[0];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div >
       {/* Progress Indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-gray-900">Start Your Adventure</h2>
+      <div >
+        <div >
+          <h2 >Start Your Adventure</h2>
           {onCancel && (
             <Button
               onClick={onCancel}
               variant="ghost"
               size="icon"
-              className="text-gray-500 hover:text-gray-700 h-8 w-8"
+              
               aria-label="Cancel"
             >
-              <X className="w-4 h-4" aria-hidden="true" />
+              <X  aria-hidden="true" />
             </Button>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-700">
+        <div >
+          <span >
             Step {wizard.state.currentStep + 1} of {gameStartSteps.length}: {currentStepConfig.label}
           </span>
         </div>
-        <div className="mt-2 grid grid-cols-3 gap-0.5 h-2">
+        <div >
           {Array.from({ length: gameStartSteps.length }).map((_, i) => (
-            <div key={i} className={`${i < (wizard.state.currentStep + 1) ? 'bg-blue-500' : 'bg-gray-200'} rounded-full`} />
+            <div key={i} className={`${i < (wizard.state.currentStep + 1) ? '' : ''}`} />
           ))}
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div >
         {wizard.state.currentStep === 0 && (
           <WorldSelectionStep 
             onNext={handleWorldSelect}

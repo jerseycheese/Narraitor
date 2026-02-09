@@ -44,26 +44,26 @@ export default function TestWorldGeneration() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">World Generation Genre Test</h1>
+    <div >
+      <h1 >World Generation Genre Test</h1>
       
-      <div className="mb-6">
-        <p className="text-gray-700 mb-4">
+      <div >
+        <p >
           Test that worlds set within non-fantasy universes don&apos;t get fantasy genres or elements.
         </p>
       </div>
 
-      <div className="space-y-4 mb-8">
+      <div >
         {testCases.map((testCase) => (
-          <div key={testCase.reference} className="flex items-center gap-4">
+          <div key={testCase.reference} >
             <button
               onClick={() => runTest(testCase)}
               disabled={isGenerating}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500 disabled:opacity-50"
+              
             >
               Test &quot;{testCase.reference}&quot;
             </button>
-            <span className="text-sm text-gray-700">
+            <span >
               Expected genre: {testCase.expectedGenre}
             </span>
           </div>
@@ -71,59 +71,59 @@ export default function TestWorldGeneration() {
       </div>
 
       {isGenerating && (
-        <div className="bg-blue-50 border border-blue-200 rounded p-4">
-          <p className="text-blue-700">Generating world...</p>
+        <div >
+          <p >Generating world...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-200 border border-red-500 rounded p-4 mb-4">
-          <p className="text-red-700 font-semibold">Error:</p>
-          <p className="text-red-500">{error}</p>
+        <div >
+          <p >Error:</p>
+          <p >{error}</p>
         </div>
       )}
 
       {generatedWorld && (
-        <div className="bg-white border border-gray-200 rounded p-6">
-          <h2 className="text-xl font-semibold mb-4">Generated World</h2>
+        <div >
+          <h2 >Generated World</h2>
           
-          <div className="space-y-3">
+          <div >
             <div>
-              <span className="font-semibold">Name:</span> {generatedWorld.name}
+              <span >Name:</span> {generatedWorld.name}
             </div>
-            <div className={`${generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') ? 'text-red-500' : ''}`}>
-              <span className="font-semibold">Genre:</span> {generatedWorld.genre}
+            <div className={`${generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') ? '' : ''}`}>
+              <span >Genre:</span> {generatedWorld.genre}
               {generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') && (
-                <span className="ml-2 text-red-500">(❌ Should not be Fantasy!)</span>
+                <span >(❌ Should not be Fantasy!)</span>
               )}
             </div>
             <div>
-              <span className="font-semibold">Description:</span> {generatedWorld.description}
+              <span >Description:</span> {generatedWorld.description}
             </div>
           </div>
 
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2">Attributes ({generatedWorld.attributes.length}):</h3>
-            <ul className="list-disc list-inside space-y-1">
+          <div >
+            <h3 >Attributes ({generatedWorld.attributes.length}):</h3>
+            <ul >
               {generatedWorld.attributes.map((attr, i) => (
-                <li key={i} className={`text-sm ${attr.name.match(/magic|mana|arcane/i) ? 'text-red-500' : ''}`}>
-                  <span className="font-medium">{attr.name}:</span> {attr.description}
+                <li key={i} className={`${attr.name.match(/magic|mana|arcane/i) ? '' : ''}`}>
+                  <span >{attr.name}:</span> {attr.description}
                   {attr.name.match(/magic|mana|arcane/i) && (
-                    <span className="ml-2 text-red-500">(❌ Fantasy element!)</span>
+                    <span >(❌ Fantasy element!)</span>
                   )}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2">Skills ({generatedWorld.skills.length}):</h3>
-            <ul className="list-disc list-inside space-y-1">
+          <div >
+            <h3 >Skills ({generatedWorld.skills.length}):</h3>
+            <ul >
               {generatedWorld.skills.map((skill, i) => (
-                <li key={i} className={`text-sm ${skill.name.match(/magic|spell|sorcery|enchant/i) ? 'text-red-500' : ''}`}>
-                  <span className="font-medium">{skill.name}:</span> {skill.description}
+                <li key={i} className={`${skill.name.match(/magic|spell|sorcery|enchant/i) ? '' : ''}`}>
+                  <span >{skill.name}:</span> {skill.description}
                   {skill.name.match(/magic|spell|sorcery|enchant/i) && (
-                    <span className="ml-2 text-red-500">(❌ Fantasy element!)</span>
+                    <span >(❌ Fantasy element!)</span>
                   )}
                 </li>
               ))}

@@ -251,11 +251,11 @@ export default function AttributeReviewStep({
         dataTutorial="attribute-editor"
       >
         {showClearButton && (
-          <div className="mb-4 flex justify-end">
+          <div >
             <Button
               type="button"
               onClick={() => setShowClearConfirmation(true)}
-              variant="outline"
+              variant=""
               size="sm"
               data-testid="clear-ai-suggestions-button"
             >
@@ -264,12 +264,12 @@ export default function AttributeReviewStep({
           </div>
         )}
 
-      <div className="space-y-4 my-4">
+      <div >
         <div>
           {localSuggestions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p className="text-lg mb-2">No attribute suggestions available</p>
-              <p className="text-sm">You can add attributes to your world later in the world editor.</p>
+            <div >
+              <p >No attribute suggestions available</p>
+              <p >You can add attributes to your world later in the world editor.</p>
             </div>
           ) : (
             localSuggestions.map((suggestion, index) => (
@@ -279,19 +279,19 @@ export default function AttributeReviewStep({
               data-testid={`attribute-card-${index}`}
               {...(index === 0 ? { 'data-tutorial': 'attribute-suggestions' } : {})}
             >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">
+              <div >
+                <div >
+                  <span >
                     {suggestion.name}
                   </span>
                   {suggestion.category && (
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    <span >
                       {suggestion.category}
                     </span>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div >
                   <Button 
                     type="button" 
                     variant="link"
@@ -312,7 +312,7 @@ export default function AttributeReviewStep({
                     type="button"
                     data-testid={`attribute-toggle-${index}`}
                     onClick={() => handleToggleAttribute(index)}
-                    variant={suggestion.accepted ? "default" : "outline"}
+                    variant={suggestion.accepted ? "default" : ""}
                     size="sm"
                   >
                     {suggestion.accepted ? 'Selected' : 'Excluded'}
@@ -323,7 +323,7 @@ export default function AttributeReviewStep({
               {suggestion.showDetails && (
                 <div 
                   key={`attribute-expanded-${index}`}
-                  className="mt-4 pl-7"
+                  
                   onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
                 >
                   <WizardFormGroup label="Name">
@@ -344,7 +344,7 @@ export default function AttributeReviewStep({
                   </WizardFormGroup>
 
                   {/* Fixed min/max range controls (for MVP) */}
-                  <div className="my-4">
+                  <div >
                     <AttributeRangeEditor
                       attribute={{
                         id: '',
@@ -371,11 +371,11 @@ export default function AttributeReviewStep({
         </div>
         
         {/* Custom Attributes Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200" data-tutorial="attribute-custom">
-          <div className="flex justify-between items-center mb-4">
+        <div  data-tutorial="attribute-custom">
+          <div >
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Custom Attributes</h3>
-              <p className="text-sm text-gray-700">
+              <h3 >Custom Attributes</h3>
+              <p >
                 Create your own unique attributes for this world ({acceptedCount}/6 slots used)
               </p>
             </div>
@@ -391,36 +391,36 @@ export default function AttributeReviewStep({
           </div>
           
           {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
-            <div className="text-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-700 mb-2">No custom attributes yet</p>
-              <p className="text-xs text-gray-500">
+            <div >
+              <p >No custom attributes yet</p>
+              <p >
                 {acceptedCount < 6 
-                  ? `You have ${6 - acceptedCount} attribute slot${6 - acceptedCount !== 1 ? 's' : ''} available for custom attributes`
+                  ? `You have${6 - acceptedCount}attribute slot${6 - acceptedCount !== 1 ? 's' : ''}available for custom attributes`
                   : 'Remove some suggested attributes to add custom ones'
                 }
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div >
               {customAttributes.map((attribute) => (
                 <div
                   key={attribute.id}
-                  className={`${wizardStyles.card.base} border-l-4 border-l-green-500`}
+                  className={`${wizardStyles.card.base}`}
                   data-testid={`custom-attribute-card-${attribute.id}`}
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{attribute.name}</span>
-                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
+                  <div >
+                    <div >
+                      <span >{attribute.name}</span>
+                      <span >
                         Custom
                       </span>
                       {attribute.category && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        <span >
                           {attribute.category}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div >
                       <Button
                         type="button"
                         onClick={() => handleEditCustomAttribute(attribute.id)}
@@ -441,7 +441,7 @@ export default function AttributeReviewStep({
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-700">
+                  <div >
                     {attribute.description}
                   </div>
                 </div>
@@ -451,7 +451,7 @@ export default function AttributeReviewStep({
           
           {/* Custom Attribute Editor */}
           {isCreatingCustomAttribute && (
-            <div className="mt-4 p-4 bg-gray-100 rounded-lg border" data-testid="custom-attribute-editor">
+            <div  data-testid="custom-attribute-editor">
               <AttributeEditor
                 worldId={worldData.id || ''}
                 mode={editingCustomAttributeId ? 'edit' : 'create'}
@@ -468,32 +468,32 @@ export default function AttributeReviewStep({
       </div>
 
       <div
-        className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20"
+        
         data-testid="attribute-count-summary"
         data-tutorial="attribute-summary"
       >
-        <div className="flex justify-between items-center">
+        <div >
           <div>
-            <span className="text-sm font-medium text-gray-900">
+            <span >
               Attributes Selected: {acceptedCount} / 6
             </span>
             {acceptedCount >= 6 && (
-              <span className="text-xs text-warning ml-2">
+              <span >
                 (Maximum reached)
               </span>
             )}
           </div>
-          <div className="text-xs text-gray-700">
+          <div >
             {acceptedCount < 6
-              ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
+              ? `${6 - acceptedCount}slot${6 - acceptedCount !== 1 ? 's' : ''}available`
               : 'All slots filled'
             }
           </div>
         </div>
-        <div className="mt-2 w-full">
-          <div className="grid grid-cols-6 gap-0.5 h-2">
+        <div >
+          <div >
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
+              <div key={i} className={`${i < acceptedCount ? '' : ''}`} />
             ))}
           </div>
         </div>
@@ -506,17 +506,17 @@ export default function AttributeReviewStep({
 
       {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
-          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear Suggestions?</h3>
-            <p className="text-sm text-gray-700 mb-4">
+        <div  data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
+          <div >
+            <h3 id="clear-dialog-title" >Clear Suggestions?</h3>
+            <p >
               This will remove all attribute suggestions. You can still add custom attributes or regenerate suggestions later.
             </p>
-            <div className="flex justify-end gap-3">
+            <div >
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}
-                variant="outline"
+                variant=""
                 size="sm"
                 data-testid="cancel-clear-button"
                 autoFocus

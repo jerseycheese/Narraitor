@@ -27,8 +27,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className="antialiased">
-      <body className="font-sans m-0 p-0 min-h-screen flex flex-col" suppressHydrationWarning>
+    <html lang="en" >
+      <body  suppressHydrationWarning>
         <SkipLinks />
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <main 
                     id="main-content" 
                     tabIndex={-1} 
-                    className="flex-1 min-h-0 flex flex-col"
+                    
                   >
                     {children}
                   </main>
