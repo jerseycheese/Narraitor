@@ -67,7 +67,7 @@ export function TabNavigation<T = string>({
                 ? ''
                 : '',
               isDisabled ? '' : '',
-            ].join('')}
+            ].join(' ')}
           >
             {option.label}
           </Button>

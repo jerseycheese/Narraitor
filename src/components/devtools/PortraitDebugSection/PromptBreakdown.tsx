@@ -28,7 +28,7 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
       !['with', 'and', 'the', 'very', 'quite', 'rather'].includes(word)
     ).slice(0, 3);
     
-    return descriptiveWords.length > 0 ? descriptiveWords.join('') + 'character' : '';
+    return descriptiveWords.length > 0 ? descriptiveWords.join(' ') + ' character' : '';
   };
   
   // Extract profession from history

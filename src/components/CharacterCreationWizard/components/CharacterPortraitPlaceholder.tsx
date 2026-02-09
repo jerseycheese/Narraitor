@@ -10,7 +10,7 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
   className = '' 
 }) => {
   const initials = name
-    .split('')
+    .split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase()

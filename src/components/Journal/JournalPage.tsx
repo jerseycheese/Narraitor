@@ -55,10 +55,10 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     }
 
     return entries.filter((entry) => {
-      const tagsText = entry.metadata.tags?.join('') ?? '';
+      const tagsText = entry.metadata.tags?.join(' ') ?? '';
       const relatedText = entry.relatedEntities
-        ?.map((entity) => `${entity.type}${entity.name}`)
-        .join('') ?? '';
+        ?.map((entity) => `${entity.type} ${entity.name}`)
+        .join(' ') ?? '';
       const haystack = [
         entry.title,
         entry.content,
@@ -67,7 +67,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         relatedText,
       ]
         .filter(Boolean)
-        .join('')
+        .join(' ')
         .toLowerCase();
 
       return haystack.includes(normalizedQuery);
@@ -118,7 +118,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const entrySummary = !sessionId
     ? 'No active session'
     : entries.length
-      ? `${entries.length}${entries.length === 1 ? 'entry' : 'entries'}`
+      ? `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`
       : 'No entries yet';
   const showEntrySummary = !!sessionId;
   const pageTitle = world ? `Journal in${world.name}` : 'Journal';

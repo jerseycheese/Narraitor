@@ -128,7 +128,7 @@ export function CharacterCard({
                 const trimmed = safeTrim(sentence);
                 if (!trimmed) continue;
                 if ((result + trimmed + '.').length > 280) break;
-                result += (result ? '' : '') + trimmed + '.';
+                result += (result ? ' ' : '') + trimmed + '.';
               }
               return result || truncate(text, 280);
             })()}

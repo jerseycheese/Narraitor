@@ -1,7 +1,7 @@
 // src/components/Narrative/__tests__/NarrativeController.aiEndingDetection.test.tsx
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { NarrativeController } from '../NarrativeController';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { mockZustandStore, createMockNarrativeStore } from '@/lib/test-utils';

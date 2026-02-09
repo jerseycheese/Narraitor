@@ -167,7 +167,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
                             <span >(Level {skill.level})</span>
                             {linkedAttributes.length > 0 && (
                               <div >
-                                Linked to: {linkedAttributes.join(',')}
+                                Linked to: {linkedAttributes.join(', ')}
                               </div>
                             )}
                           </div>

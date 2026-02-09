@@ -33,11 +33,11 @@ export function CharacterPortrait({
     // Remove nicknames in quotes (single or double quotes, including spaces)
     const nameWithoutNickname = name
       .replace(/['"][^'"]+['"]/g, '') // Remove anything between quotes
-      .replace(/\s+/g, '') // Normalize multiple spaces to single space
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
     
     // Split by spaces and filter out empty strings
-    const words = nameWithoutNickname.split('').filter(word => word.length > 0);
+    const words = nameWithoutNickname.split(' ').filter(word => word.length > 0);
     
     if (words.length === 0) {
       // Fallback to original name if nothing left after removing nicknames

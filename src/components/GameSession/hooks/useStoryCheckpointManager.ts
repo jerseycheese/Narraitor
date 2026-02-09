@@ -97,7 +97,7 @@ const collectNarrativeContext = (
     .slice(-3)
     .map((segment) => safeTrim(segment.content))
     .filter(Boolean)
-    .join('')
+    .join(' ')
     .slice(0, MAX_SEGMENT_SUMMARY);
 
   const latest = segments[segments.length - 1];

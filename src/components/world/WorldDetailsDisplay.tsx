@@ -82,7 +82,7 @@ export function WorldDetailsDisplay({
                 ) : (
                   <div >
                     {npc.name
-                      .split('')
+                      .split(' ')
                       .map((segment) => segment[0])
                       .join('')
                       .toUpperCase()

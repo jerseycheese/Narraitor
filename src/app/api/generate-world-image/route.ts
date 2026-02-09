@@ -19,12 +19,12 @@ function generateImagePrompt(world: World): string {
   const description = world.description;
 
   // Create a detailed prompt for image generation
-  const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre:${genre}. Description:${description}`;
+  const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
 
   // Get genre-specific style guidance from shared utility
   const styleGuidance = getGenreStyleGuidance(genre, 'landscape');
 
-  return `${basePrompt}${styleGuidance}Requirements: - Ultra-high quality, 4K resolution concept art - Cinematic composition with dramatic lighting - Rich detail and atmospheric depth - Professional game/film concept art style - Landscape orientation (16:9 or similar) - No text, logos, or watermarks - Vivid but realistic colors appropriate to the theme`;
+  return `${basePrompt}\n\n${styleGuidance}\n\nRequirements:\n- Ultra-high quality, 4K resolution concept art\n- Cinematic composition with dramatic lighting\n- Rich detail and atmospheric depth\n- Professional game/film concept art style\n- Landscape orientation (16:9 or similar)\n- No text, logos, or watermarks\n- Vivid but realistic colors appropriate to the theme`;
 }
 
 // Generate fallback placeholder if AI generation fails

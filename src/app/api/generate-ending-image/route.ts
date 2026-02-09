@@ -32,7 +32,7 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   const tone = ending.tone;
   
   // Create a detailed prompt for ending image generation
-  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of${characterName}'s story in${worldName}. This is a${tone}ending to their journey.`;
+  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${characterName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
   
   // Add tone-specific visual guidance
   let toneGuidance = '';
@@ -59,11 +59,11 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   // Include brief narrative context if available
   let narrativeContext = '';
   if (recentNarrative && recentNarrative.length > 0) {
-    const recentEvents = recentNarrative.slice(-MAX_RECENT_SEGMENTS).join('').substring(0, MAX_CONTEXT_CHARS);
-    narrativeContext = `Recent story context:${recentEvents}...`;
+    const recentEvents = recentNarrative.slice(-MAX_RECENT_SEGMENTS).join(' ').substring(0, MAX_CONTEXT_CHARS);
+    narrativeContext = `Recent story context: ${recentEvents}...`;
   }
   
-  return `${basePrompt}${toneGuidance}${styleGuidance}${narrativeContext}Story Ending Context: - Epilogue:${ending.epilogue.substring(0, MAX_EPILOGUE_CHARS)}... - Character Legacy:${ending.characterLegacy.substring(0, MAX_LEGACY_CHARS)}... - World Impact:${ending.worldImpact.substring(0, MAX_IMPACT_CHARS)}... Requirements: - Ultra-high quality, 4K resolution concept art - Cinematic composition showing story conclusion - Emotional depth matching the${tone}tone - Rich detail and atmospheric depth - Professional game/film concept art style - Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner) - Horizontal panoramic composition - Show the end of a journey, conclusion, or resolution - Focus on${characterName}or the aftermath of their actions - No text, logos, or watermarks - Colors and mood appropriate to the${tone}ending tone`;
+  return `${basePrompt}\n\n${toneGuidance}\n\n${styleGuidance}\n\n${narrativeContext}\n\nStory Ending Context:\n- Epilogue: ${ending.epilogue.substring(0, MAX_EPILOGUE_CHARS)}...\n- Character Legacy: ${ending.characterLegacy.substring(0, MAX_LEGACY_CHARS)}...\n- World Impact: ${ending.worldImpact.substring(0, MAX_IMPACT_CHARS)}...\n\nRequirements:\n- Ultra-high quality, 4K resolution concept art\n- Cinematic composition showing story conclusion\n- Emotional depth matching the ${tone} tone\n- Rich detail and atmospheric depth\n- Professional game/film concept art style\n- Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner)\n- Horizontal panoramic composition\n- Show the end of a journey, conclusion, or resolution\n- Focus on ${characterName} or the aftermath of their actions\n- No text, logos, or watermarks\n- Colors and mood appropriate to the ${tone} ending tone`;
 }
 
 // Generate fallback placeholder if AI generation fails
