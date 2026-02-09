@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 const ColorSwatch = ({ color, name, description }: { color: string; name: string; description?: string }) => (
   <div >
     <div >
-      <svg width="100%" height="100%" viewBox="0 0 48 48" role="img" aria-label={`${name}swatch`}>
+    <svg width="100%" height="100%" viewBox="0 0 48 48" role="img" aria-label={`${name} swatch`}>
         <rect x="0" y="0" width="48" height="48" fill={color} />
       </svg>
     </div>
@@ -134,7 +134,7 @@ export const ContextualTokens: Story = {
                 key={tone}
                 color={colors.background} 
                 name={tone.charAt(0).toUpperCase() + tone.slice(1)} 
-                description={`${tone}story ending theme`}
+              description={`${tone} story ending theme`}
               />
             ))}
           </div>
@@ -152,7 +152,7 @@ export const ContextualTokens: Story = {
                   bg: {colors.background} | border: {colors.border}
                 </div>
                 <div >
-                  <svg width="100%" height="32" viewBox="0 0 200 32" role="img" aria-label={`${category}example`}>
+                <svg width="100%" height="32" viewBox="0 0 200 32" role="img" aria-label={`${category} example`}>
                     <rect x="0" y="0" width="200" height="32" fill={colors.background} stroke={colors.border} />
                   </svg>
                 </div>

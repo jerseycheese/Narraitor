@@ -117,7 +117,7 @@ export const LargeDataset: Story = {
     columns,
     data: Array.from({ length: 50 }, (_, i) => ({
       id: `${i + 1}`,
-      name: `Item${i + 1}`,
+    name: `Item ${i + 1}`,
       category: ['Consumables', 'Equipment', 'Documents', 'Valuables'][i % 4],
       quantity: Math.floor(Math.random() * 100) + 1,
       price: Math.floor(Math.random() * 1000) + 10,

@@ -348,7 +348,7 @@ export const CustomPromptTesting: Story = {
               </h2>
               <ul >
                 <li>
-                  1. Check that &quot;Customize physical description&quot; is{''}
+                  1. Check that &quot;Customize physical description&quot; is{' '}
                   <strong>unchecked by default</strong>
                 </li>
                 <li>

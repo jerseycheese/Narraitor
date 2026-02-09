@@ -18,21 +18,21 @@ const meta: Meta<typeof PageLayout> = {
   argTypes: {
     title: {
       control: 'text',
-      description: 'The main page title'
+      description: 'The main page title',
     },
     description: {
       control: 'text',
-      description: 'Optional description text below the title'
+      description: 'Optional description text below the title',
     },
     actions: {
       control: false,
-      description: 'React nodes for action buttons'
+      description: 'React nodes for action buttons',
     },
     children: {
       control: false,
-      description: 'Page content'
-    }
-  }
+      description: 'Page content',
+    },
+  },
 };
 
 export default meta;
@@ -44,23 +44,23 @@ const sampleActions = (
       {
         label: 'Primary Action',
         onClick: () => console.log('Primary clicked'),
-        variant: 'primary'
+        variant: 'primary',
       },
       {
-        label: 'Secondary Action', 
+        label: 'Secondary Action',
         onClick: () => console.log('Secondary clicked'),
-        variant: 'secondary'
-      }
+        variant: 'secondary',
+      },
     ]}
   />
 );
 
 const sampleContent = (
-  <div >
-    {[1, 2, 3, 4, 5, 6].map(i => (
-      <div key={i} >
-        <h3 >Card {i}</h3>
-        <p >Sample content for card {i}</p>
+  <div>
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div key={i}>
+        <h3>Card {i}</h3>
+        <p>Sample content for card {i}</p>
       </div>
     ))}
   </div>
@@ -71,42 +71,43 @@ export const Default: Story = {
     title: '04-Templates/layouts/PageLayout',
     description: 'This is a sample page using the PageLayout component.',
     actions: sampleActions,
-    children: sampleContent
-  }
+    children: sampleContent,
+  },
 };
 
 export const NoActions: Story = {
   args: {
     title: '04-Templates/layouts/PageLayout',
     description: 'A page without any action buttons.',
-    children: sampleContent
-  }
+    children: sampleContent,
+  },
 };
 
 export const NoDescription: Story = {
   args: {
     title: '04-Templates/layouts/PageLayout',
     actions: sampleActions,
-    children: sampleContent
-  }
+    children: sampleContent,
+  },
 };
 
 export const MinimalPage: Story = {
   args: {
     title: '04-Templates/layouts/PageLayout',
     children: (
-      <div >
-        <h2 >Empty State</h2>
-        <p >No content to display yet.</p>
+      <div>
+        <h2>Empty State</h2>
+        <p>No content to display yet.</p>
       </div>
-    )
-  }
+    ),
+  },
 };
 
 export const WorldsPageExample: Story = {
   args: {
     title: 'My Worlds',
-    description: "Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar.",
+    description:
+      'Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar.',
     actions: (
       <ActionButtonGroup
         actions={[
@@ -114,24 +115,24 @@ export const WorldsPageExample: Story = {
             label: 'Create World',
             onClick: () => console.log('Create World clicked'),
             variant: 'primary',
-            icon: (<Plus  aria-hidden="true" />)
+            icon: <Plus aria-hidden="true" />,
           },
           {
             label: 'Generate World',
             onClick: () => console.log('Generate World clicked'),
             variant: 'secondary',
-            icon: (<Play  aria-hidden="true" />)
-          }
+            icon: <Play aria-hidden="true" />,
+          },
         ]}
       />
     ),
     children: (
-      <div >
-        {['Fantasy Realm', 'Cyberpunk City', 'Wild West'].map(world => (
-          <div key={world} >
-            <h3 >{world}</h3>
-            <p >A sample world description...</p>
-            <div >
+      <div>
+        {['Fantasy Realm', 'Cyberpunk City', 'Wild West'].map((world) => (
+          <div key={world}>
+            <h3>{world}</h3>
+            <p>A sample world description...</p>
+            <div>
               <Button variant="success" size="sm">
                 Make Active
               </Button>
@@ -142,14 +143,15 @@ export const WorldsPageExample: Story = {
           </div>
         ))}
       </div>
-    )
-  }
+    ),
+  },
 };
 
 export const CharactersPageExample: Story = {
   args: {
     title: 'Fantasy Realm Characters',
-    description: 'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.',
+    description:
+      'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.',
     actions: (
       <ActionButtonGroup
         actions={[
@@ -157,59 +159,65 @@ export const CharactersPageExample: Story = {
             label: 'Create Character',
             onClick: () => console.log('Create Character clicked'),
             variant: 'primary',
-            icon: (<Plus  aria-hidden="true" />)
+            icon: <Plus aria-hidden="true" />,
           },
           {
             label: 'Generate Character',
             onClick: () => console.log('Generate Character clicked'),
             variant: 'secondary',
-            icon: (<Sparkles  aria-hidden="true" />)
+            icon: <Sparkles aria-hidden="true" />,
           },
           {
             label: 'Start Playing',
             onClick: () => console.log('Start Playing clicked'),
             variant: 'success',
-            icon: (<Sparkles  aria-hidden="true" />)
-          }
+            icon: <Sparkles aria-hidden="true" />,
+          },
         ]}
       />
     ),
     children: (
-      <div >
-        {['Aria Starweaver', 'Zane Shadowblade', 'Luna Brightforge'].map(character => (
-          <div key={character} >
-            <div >
-              Active
+      <div>
+        {['Aria Starweaver', 'Zane Shadowblade', 'Luna Brightforge'].map(
+          (character) => (
+            <div key={character}>
+              <div>Active</div>
+              <h3>{character}</h3>
+              <p>Level 5 Warrior</p>
+              <div>
+                <Button variant="default" size="sm">
+                  View
+                </Button>
+                <Button variant="default" size="sm">
+                  Edit
+                </Button>
+                <Button variant="success" size="sm">
+                  Play
+                </Button>
+              </div>
             </div>
-            <h3 >{character}</h3>
-            <p >Level 5 Warrior</p>
-            <div >
-              <Button variant="default" size="sm">
-                View
-              </Button>
-              <Button variant="default" size="sm">
-                Edit
-              </Button>
-              <Button variant="success" size="sm">
-                Play
-              </Button>
-            </div>
-          </div>
-        ))}
+          )
+        )}
       </div>
-    )
-  }
+    ),
+  },
 };
 
 export const ConsistentWidth: Story = {
   args: {
     title: 'Consistent Width Layout',
-    description: 'All pages now use the same max-width (7xl) to match navigation',
+    description:
+      'All pages now use the same max-width (7xl) to match navigation',
     children: (
-      <div >
-        <p>Content with consistent 7xl max width that matches the navigation bar.</p>
-        <p >This ensures all page content aligns perfectly with the navigation structure.</p>
+      <div>
+        <p>
+          Content with consistent 7xl max width that matches the navigation bar.
+        </p>
+        <p>
+          This ensures all page content aligns perfectly with the navigation
+          structure.
+        </p>
       </div>
-    )
-  }
+    ),
+  },
 };

@@ -8,7 +8,8 @@ const meta: Meta<typeof FloatingActionButton> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Reusable floating action button component with customizable position, size, and variants.',
+        component:
+          'Reusable floating action button component with customizable position, size, and variants.',
       },
     },
   },
@@ -16,34 +17,34 @@ const meta: Meta<typeof FloatingActionButton> = {
   argTypes: {
     onClick: {
       action: 'clicked',
-      description: 'Callback when button is clicked'
+      description: 'Callback when button is clicked',
     },
     icon: {
-      description: 'Icon to display in the button'
+      description: 'Icon to display in the button',
     },
     label: {
       control: 'text',
-      description: 'Accessibility label and tooltip text'
+      description: 'Accessibility label and tooltip text',
     },
     position: {
       control: 'select',
       options: ['', '', '', ''],
-      description: 'Position of the floating button'
+      description: 'Position of the floating button',
     },
     variant: {
       control: 'select',
       options: ['primary', 'secondary', 'amber'],
-      description: 'Color variant of the button'
+      description: 'Color variant of the button',
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
-      description: 'Size of the button'
+      description: 'Size of the button',
     },
     className: {
       control: 'text',
-      description: 'Additional CSS classes'
-    }
+      description: 'Additional CSS classes',
+    },
   },
 };
 
@@ -53,7 +54,6 @@ type Story = StoryObj<typeof meta>;
 // Journal book icon
 const JournalIcon = (
   <svg
-    
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -71,7 +71,6 @@ const JournalIcon = (
 // Plus icon
 const PlusIcon = (
   <svg
-    
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -136,11 +135,39 @@ export const Positions: Story = {
     },
   },
   render: (args) => (
-    <div >
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-left" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="top-right" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-left" />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} size={args.size} position="bottom-right" />
+    <div>
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        size={args.size}
+        position="top-left"
+      />
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        size={args.size}
+        position="top-right"
+      />
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        size={args.size}
+        position="bottom-left"
+      />
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        size={args.size}
+        position="bottom-right"
+      />
     </div>
   ),
 };
@@ -161,10 +188,31 @@ export const Sizes: Story = {
     },
   },
   render: (args) => (
-    <div >
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="sm"  />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="md"  />
-      <FloatingActionButton onClick={args.onClick} icon={args.icon} label={args.label} variant={args.variant} position={args.position} size="lg"  />
+    <div>
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        position={args.position}
+        size="sm"
+      />
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        position={args.position}
+        size="md"
+      />
+      <FloatingActionButton
+        onClick={args.onClick}
+        icon={args.icon}
+        label={args.label}
+        variant={args.variant}
+        position={args.position}
+        size="lg"
+      />
     </div>
   ),
 };
