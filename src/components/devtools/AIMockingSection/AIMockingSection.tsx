@@ -65,14 +65,14 @@ export const AIMockingSection: React.FC = () => {
     const shouldSucceed = customScenario.shouldSucceed || true;
     const response = shouldSucceed
       ? {
-          content: `Custom mock response:${customScenario.name}`,
+          content: `Custom mock response: ${customScenario.name}`,
           finishReason: 'STOP' as const,
           promptTokens: 20,
           completionTokens: 15,
         }
       : {
           code: 'CUSTOM_ERROR',
-          message: `Custom error:${customScenario.name}`,
+          message: `Custom error: ${customScenario.name}`,
           retryable: true,
         };
 

@@ -107,7 +107,7 @@ export function EndingImageDebugSection() {
       
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API request failed:${response.status}-${errorText}`);
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
@@ -123,7 +123,7 @@ export function EndingImageDebugSection() {
       }
       
     } catch (error) {
-      setGeneratedPrompt(`Error generating prompt:${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsGenerating(false);
     }
@@ -172,7 +172,7 @@ export function EndingImageDebugSection() {
       
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API request failed:${response.status}-${errorText}`);
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
@@ -182,7 +182,7 @@ export function EndingImageDebugSection() {
       setLastGenerationResult(result);
       
     } catch (error) {
-      setGeneratedPrompt(`Generation failed:${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsGenerating(false);
     }

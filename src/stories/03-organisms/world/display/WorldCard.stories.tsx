@@ -132,13 +132,13 @@ const mockWorld: World = {
 const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
   const mockRouter = {
     push: (url: string) => {
-      console.log(`[Storybook] Navigating to:${url}`);
+      console.log(`[Storybook] Navigating to: ${url}`);
       return Promise.resolve();
     },
   };
   const mockStoreActions = {
     setCurrentWorld: (id: string) => {
-      console.log(`[Storybook] Setting current world:${id}`);
+      console.log(`[Storybook] Setting current world: ${id}`);
     },
   };
   // Use the component's test props to inject mocks
@@ -176,8 +176,8 @@ export const Default: Story = {
   args: {
     world: mockWorld,
     characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
 };
 // Story showing active world state
@@ -186,8 +186,8 @@ export const ActiveWorld: Story = {
     world: mockWorld,
     isActive: true,
     characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
@@ -206,8 +206,8 @@ export const NoImage: Story = {
       image: undefined,
     },
     characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
@@ -230,8 +230,8 @@ export const SetInWorld: Story = {
       relationship: 'set_within',
     },
     characters: mockCharacters.slice(0, 2),
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
@@ -254,8 +254,8 @@ export const InspiredByWorld: Story = {
       relationship: 'inspired_by',
     },
     characters: mockCharacters.slice(0, 2),
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
@@ -271,8 +271,8 @@ export const NoCharacters: Story = {
   args: {
     world: mockWorld,
     characters: [],
-    onSelect: (id: string) => console.log(`Selected world:${id}`),
-    onDelete: (id: string) => console.log(`Delete world:${id}`),
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {

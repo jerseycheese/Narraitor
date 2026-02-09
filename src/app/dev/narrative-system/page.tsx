@@ -187,7 +187,7 @@ export default function NarrativeSystemHarness() {
     // to prevent duplications
     useNarrativeStore.getState().clearSessionSegments(newSessionId);
     
-    console.log(`New session created and cleared:${newSessionId}`);
+    console.log(`New session created and cleared: ${newSessionId}`);
     
     // Force a component refresh if in controller mode - wait a bit longer
     if (showController) {

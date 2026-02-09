@@ -38,7 +38,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
       // Format with indentation
       return JSON.stringify(sanitized, null, 2);
     } catch (error) {
-      return `Error formatting JSON:${error instanceof Error ? error.message : 'Unknown error'}`;
+      return `Error formatting JSON: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }, [data]);
 

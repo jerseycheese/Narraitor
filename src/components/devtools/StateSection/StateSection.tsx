@@ -60,7 +60,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
           states[name] = store.getState();
         } catch (err) {
           // Use a generic message to capture any errors accessing store state
-          states[name] = { error: `Error accessing store state:${err instanceof Error ? err.message : 'Unknown error'}` };
+          states[name] = { error: `Error accessing store state: ${err instanceof Error ? err.message : 'Unknown error'}` };
         }
       }
     });

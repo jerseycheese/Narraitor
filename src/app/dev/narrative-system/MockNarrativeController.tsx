@@ -40,7 +40,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
     );
     
-    console.log(`[MockNarrativeController] Has initial scene:${hasInitialScene}`);
+    console.log(`[MockNarrativeController] Has initial scene: ${hasInitialScene}`);
     
     // If we have an initial scene already, make sure we don't generate another
     if (hasInitialScene) {
@@ -74,7 +74,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       return;
     }
     
-    console.log(`Starting narrative generation:${isInitial ? 'Initial Scene' : 'Choice Response'}`);
+    console.log(`Starting narrative generation: ${isInitial ? 'Initial Scene' : 'Choice Response'}`);
     setIsLoading(true);
     
     // Simulate async generation with clear log messages

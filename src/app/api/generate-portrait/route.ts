@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
       type: 'ai-generated' as const,
       url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
       generatedAt: getTimestamp(),
-      prompt: `Portrait fallback due to error:${error instanceof Error ? error.message : 'Unknown error'}`,
+      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
 
     return NextResponse.json({

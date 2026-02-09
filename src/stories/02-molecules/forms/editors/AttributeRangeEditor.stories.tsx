@@ -96,7 +96,7 @@ export const InteractiveExample: Story = {
               <p>{attribute.description}</p>
               <AttributeRangeEditor
                 attribute={attribute}
-                onChange={(updates) => action('updated')(`Attribute:${attribute.name}`, updates)}
+                onChange={(updates) => action('updated')(`Attribute: ${attribute.name}`, updates)}
               />
             </div>
           ))}

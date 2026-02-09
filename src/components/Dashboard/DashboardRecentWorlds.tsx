@@ -55,7 +55,7 @@ export function DashboardRecentWorlds({
             onClick={() => onNavigate(`/worlds/${world.id}`)}
             role="button"
             tabIndex={0}
-            aria-label={`View world:${world.name}, genre:${getGenreLabel(world.genre)}`}
+            aria-label={`View world: ${world.name}, genre: ${getGenreLabel(world.genre)}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();

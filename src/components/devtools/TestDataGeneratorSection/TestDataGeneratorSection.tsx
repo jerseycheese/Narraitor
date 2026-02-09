@@ -141,13 +141,13 @@ export const TestDataGeneratorSection: React.FC = () => {
       const worldId = createWorld(worldDataForStore);
       await ensureWorldNpcRoster(worldId);
       console.log(
-        `Test world "${testWorldData.name}" created with ID:${worldId}`
+        `Test world "${testWorldData.name}" created with ID: ${worldId}`
       );
 
       // Set the newly created world as the active world
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
-      console.log(`[DevTools] Set newly generated world as active:${worldId}`);
+      console.log(`[DevTools] Set newly generated world as active: ${worldId}`);
 
       // Generate world image asynchronously using my enhanced API
       try {
@@ -333,14 +333,14 @@ export const TestDataGeneratorSection: React.FC = () => {
         const worldId = createWorld(worldDataForStore);
         await ensureWorldNpcRoster(worldId);
         createdWorlds.push({ id: worldId, name: testWorldData.name });
-        console.log(`Created test world:${testWorldData.name}`);
+        console.log(`Created test world: ${testWorldData.name}`);
 
         // Set the first created world as active (for batch generation)
         if (i === 0) {
           const { setCurrentWorld } = useWorldStore.getState();
           setCurrentWorld(worldId);
           console.log(
-            `[DevTools] Set first generated world as active:${worldId}`
+            `[DevTools] Set first generated world as active: ${worldId}`
           );
         }
 
@@ -482,7 +482,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     try {
       sessionStorage.setItem(storageKey, JSON.stringify(wizardState));
       console.log(
-        `[TestDataGenerator] Stored test character data with key:${storageKey}`,
+        `[TestDataGenerator] Stored test character data with key: ${storageKey}`,
         wizardState
       );
 
@@ -519,14 +519,14 @@ export const TestDataGeneratorSection: React.FC = () => {
         JSON.parse(storedData)
       );
       alert(
-        `Data found in sessionStorage for key:${storageKey}. Check console for details.`
+        `Data found in sessionStorage for key: ${storageKey}. Check console for details.`
       );
     } else {
       console.log(
         '[TestDataGenerator] No data found in sessionStorage for key:',
         storageKey
       );
-      alert(`No data found in sessionStorage for key:${storageKey}`);
+      alert(`No data found in sessionStorage for key: ${storageKey}`);
     }
   };
 

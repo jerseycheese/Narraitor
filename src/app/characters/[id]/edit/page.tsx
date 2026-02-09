@@ -38,7 +38,7 @@ export default function CharacterEditPage() {
   }
 
   return (
-    <PageLayout title={`Edit Character:${character.name}`}>
+    <PageLayout title={`Edit Character: ${character.name}`}>
       {/* Header with back button */}
       <div>
         <button onClick={() => router.push(`/characters/${characterId}`)}>

@@ -231,7 +231,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     } else if (sessionState.status === 'active' && prevStatusRef.current === 'paused') {
       announce('Game session resumed.');
     } else if (sessionState.error) {
-      announce(`Error occurred:${sessionState.error}`);
+      announce(`Error occurred: ${sessionState.error}`);
     }
     
     return () => {

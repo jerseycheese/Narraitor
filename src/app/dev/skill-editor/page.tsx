@@ -84,7 +84,7 @@ export default function SkillEditorTestPage() {
   const handleSaveSkill = (skill: WorldSkill) => {
     if (editingSkill) {
       setSkills(prev => prev.map(s => s.id === skill.id ? skill : s));
-      logActivity(`Updated skill:${skill.name}`);
+      logActivity(`Updated skill: ${skill.name}`);
       setEditingSkill(null);
     } else {
       setSkills(prev => [...prev, skill]);
@@ -96,7 +96,7 @@ export default function SkillEditorTestPage() {
   const handleDeleteSkill = (skillId: string) => {
     const skill = skills.find(s => s.id === skillId);
     setSkills(prev => prev.filter(s => s.id !== skillId));
-    logActivity(`Deleted skill:${skill?.name || skillId}`);
+    logActivity(`Deleted skill: ${skill?.name || skillId}`);
     setEditingSkill(null);
   };
 

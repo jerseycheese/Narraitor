@@ -179,7 +179,7 @@ export function PortraitDebugSection({
         const errorText = await response.text();
         console.log('API error response:', errorText);
         throw new Error(
-          `API request failed:${response.status}-${errorText}`
+          `API request failed: ${response.status} - ${errorText}`
         );
       }
 
@@ -192,7 +192,7 @@ export function PortraitDebugSection({
       console.log('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(
-        `Error generating prompt:${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };
@@ -218,7 +218,7 @@ export function PortraitDebugSection({
       setGeneratedPrompt(result.prompt || 'No prompt returned');
     } catch (error) {
       setGeneratedPrompt(
-        `Generation failed:${error instanceof Error ? error.message : 'Unknown error'}`
+        `Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     } finally {
       setIsGenerating(false);

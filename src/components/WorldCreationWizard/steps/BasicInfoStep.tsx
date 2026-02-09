@@ -48,7 +48,7 @@ export default function BasicInfoStep({
         <WizardFormGroup
           label="World Name (optional)"
           error={combinedErrors.name}
-          helpText={guidance.nameExamples.length ? `Examples:${guidance.nameExamples.slice(0, 3).join(',')}` : 'Choose a genre below to see name examples'}
+          helpText={guidance.nameExamples.length ? `Examples: ${guidance.nameExamples.slice(0, 3).join(',')}` : 'Choose a genre below to see name examples'}
         >
           <WizardTextField
             value={worldData.name || ''}

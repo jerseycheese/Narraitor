@@ -24,7 +24,7 @@ export default function WorldCreationWizardTestHarness() {
   ];
 
   const handleComplete = (worldId: string) => {
-    setWizardResult(`World created with ID:${worldId}`);
+    setWizardResult(`World created with ID: ${worldId}`);
     setShowWizard(false);
   };
 

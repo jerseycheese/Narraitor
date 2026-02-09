@@ -86,7 +86,7 @@ export default function LoreViewerTestPage() {
       setExtractionResult(`AI extracted ${extracted} new structured facts! Check all categories for rich metadata.`);
       setTimeout(() => setExtractionResult(''), 7000);
     } catch (error) {
-      setExtractionResult(`Failed to extract structured lore:${error}`);
+      setExtractionResult(`Failed to extract structured lore: ${error}`);
       setTimeout(() => setExtractionResult(''), 5000);
     }
   };
@@ -108,7 +108,7 @@ export default function LoreViewerTestPage() {
       setTimeout(() => setExtractionResult(''), 7000);
 
     } catch (error) {
-      setExtractionResult(`AI extraction failed gracefully:${error}`);
+      setExtractionResult(`AI extraction failed gracefully: ${error}`);
       setTimeout(() => setExtractionResult(''), 5000);
     }
   };
@@ -155,7 +155,7 @@ export default function LoreViewerTestPage() {
     let message = `Search for "${searchQuery}":\n`;
     message += `- Found ${results.length} facts via search\n`;
     message += entityByName
-      ? `- Found exact match:${entityByName.value}`
+      ? `- Found exact match: ${entityByName.value}`
       : `- No exact match found`;
 
     setExtractionResult(message);
@@ -174,7 +174,7 @@ export default function LoreViewerTestPage() {
       setExtractionResult('AI alias extraction complete! Check if aliases were detected in the display above.');
       setTimeout(() => setExtractionResult(''), 7000);
     } catch (error) {
-      setExtractionResult(`AI alias extraction failed:${error}`);
+      setExtractionResult(`AI alias extraction failed: ${error}`);
       setTimeout(() => setExtractionResult(''), 5000);
     }
   };

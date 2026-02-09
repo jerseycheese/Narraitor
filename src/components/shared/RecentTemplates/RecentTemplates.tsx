@@ -68,7 +68,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
             onKeyPress={(e) => handleKeyPress(e, entry)}
             role="button"
             tabIndex={0}
-            aria-label={`Use template:${entry.template.name}(${getGenreLabel(entry.template.genre)})`}
+            aria-label={`Use template: ${entry.template.name} (${getGenreLabel(entry.template.genre)})`}
             data-testid={`recent-template-${index}`}
           >
             <div>

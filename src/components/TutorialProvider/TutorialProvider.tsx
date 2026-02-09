@@ -61,7 +61,7 @@ const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[]
         return { steps: [] };
     }
   } catch (error) {
-    logger.error(`Failed to load tour:${tourId}`, error);
+    logger.error(`Failed to load tour: ${tourId}`, error);
     return { steps: [] };
   }
 };

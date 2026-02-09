@@ -46,7 +46,7 @@ export function convertToGenerationParams(data: WorldTypeData): ExtendedWorldGen
     const additionalDetails = data.additionalDetails?.trim();
     return {
       reference: additionalDetails 
-        ? `${baseReference}. Additional context:${additionalDetails}`
+        ? `${baseReference}. Additional context: ${additionalDetails}`
         : baseReference,
       relationship: 'inspired_by', // Direct mapping - no conversion needed
     };
@@ -55,7 +55,7 @@ export function convertToGenerationParams(data: WorldTypeData): ExtendedWorldGen
     const additionalDetails = data.additionalDetails?.trim();
     return {
       reference: additionalDetails 
-        ? `${baseReference}. Specific setting/time:${additionalDetails}`
+        ? `${baseReference}. Specific setting/time: ${additionalDetails}`
         : baseReference,
       relationship: 'set_within', // Direct mapping - no conversion needed
     };

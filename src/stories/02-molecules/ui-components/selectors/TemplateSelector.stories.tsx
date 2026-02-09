@@ -24,7 +24,7 @@ type Story = StoryObj<typeof TemplateSelector>;
 // Default story
 export const Default: Story = {
   args: {
-    onSelect: (templateId: string) => console.log(`Selected template:${templateId}`),
+    onSelect: (templateId: string) => console.log(`Selected template: ${templateId}`),
   },
   parameters: {
     docs: {
@@ -39,7 +39,7 @@ export const Default: Story = {
 export const PreSelected: Story = {
   args: {
     selectedTemplateId: 'western',
-    onSelect: (templateId: string) => console.log(`Selected template:${templateId}`),
+    onSelect: (templateId: string) => console.log(`Selected template: ${templateId}`),
   },
   parameters: {
     docs: {
