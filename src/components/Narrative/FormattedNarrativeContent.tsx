@@ -37,16 +37,15 @@ export const FormattedNarrativeContent: React.FC<
       { pattern: RegExp; key: string; length: number }
     >();
 
-    const addTerm = (term: string) => {
-      const cleaned = safeTrim(term).replace(/\s+/g, '');
-      if (!cleaned) {
-        return;
-      }
-      const key = cleaned.toLowerCase();
-      if (uniqueTerms.has(key)) {
-        return;
-      }
-
+          const addTerm = (term: string) => {
+          const cleaned = safeTrim(term);
+          if (!cleaned) {
+            return;
+          }
+          const key = cleaned.toLowerCase();
+          if (uniqueTerms.has(key)) {
+            return;
+          }
       const pattern = new RegExp(escapeRegExp(cleaned), 'gi');
       uniqueTerms.set(key, {
         pattern,
@@ -64,7 +63,7 @@ export const FormattedNarrativeContent: React.FC<
 
   const highlightClass =
     highlightClassName ||
-    '';
+    'narrative-highlight';
 
   const renderHighlightedNodes = React.useCallback(
     (text: string, keyBase: string): React.ReactNode[] => {

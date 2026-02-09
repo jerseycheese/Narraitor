@@ -98,7 +98,7 @@ export function AttributeEditor({
     
     // Check maxAttributes limit in create mode
     if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
-      validationErrors.push(`Cannot create more attributes. Maximum of${maxAttributes}attributes allowed.`);
+      validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
     }
 
     if (validationErrors.length > 0) {
@@ -129,7 +129,7 @@ export function AttributeEditor({
     const skillsLinked = linkedSkills.filter(skill => skill.attributeIds?.includes(attributeId));
     if (skillsLinked.length > 0) {
       setDeleteWarnings([
-        `This attribute is linked to${skillsLinked.length}skill${skillsLinked.length > 1 ? 's' : ''}`,
+        `This attribute is linked to ${skillsLinked.length} skill${skillsLinked.length > 1 ? 's' : ''}`,
         'Deleting this attribute will affect these skills'
       ]);
     }
@@ -262,7 +262,7 @@ export function AttributeEditor({
           title="Delete Attribute"
           description={
             deleteWarnings.length > 0 
-              ? deleteWarnings.join('.') + '. This action cannot be undone.'
+              ? deleteWarnings.join('. ') + '. This action cannot be undone.'
               : 'This action cannot be undone.'
           }
           itemName={formData.name || 'this attribute'}

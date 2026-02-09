@@ -61,7 +61,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
               )}
             </span>
           )}
-          {entry.title || titleCase(entry.type.replace('_', ''))}
+          {entry.title || titleCase(entry.type.replace('_', ' '))}
         </h3>
         <div >
           <Badge

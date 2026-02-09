@@ -63,13 +63,13 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
                 )}
                 {debugInfo.toneSettings.complexity && (
                   <div>
-                    <span >Complexity:</span>{''}
+                    <span >Complexity:</span>{' '}
                     {debugInfo.toneSettings.complexity}
                   </div>
                 )}
                 {debugInfo.toneSettings.customTone && (
                   <div>
-                    <span >Custom Instructions:</span>{''}
+                    <span >Custom Instructions:</span>{' '}
                     {debugInfo.toneSettings.customTone}
                   </div>
                 )}
@@ -87,7 +87,7 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
                     <div >{char.name}</div>
                     {char.relevantTraits && char.relevantTraits.length > 0 && (
                       <div >
-                        Traits: {char.relevantTraits.join(',')}
+                        Traits: {char.relevantTraits.join(', ')}
                       </div>
                     )}
                   </div>

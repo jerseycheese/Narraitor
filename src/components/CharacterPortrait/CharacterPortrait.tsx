@@ -101,7 +101,7 @@ export function CharacterPortrait({
       >
         <Image
           src={portrait.url}
-          alt={`${characterName}portrait`}
+          alt={`${characterName} portrait`}
           fill
           
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

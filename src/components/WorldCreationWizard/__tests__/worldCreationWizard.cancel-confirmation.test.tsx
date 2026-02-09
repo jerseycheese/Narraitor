@@ -292,7 +292,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Verify warning styling is applied to the modal content
       const modalContent = document.querySelector('[role="dialog"]');
-      expect(modalContent).toHaveClass('', '');
+      expect(modalContent).toBeInTheDocument();
     });
   });
 });

@@ -25,7 +25,7 @@ describe('WorldCard', () => {
     expect(screen.getByText('Fantasy')).toBeInTheDocument();
     
     // Verify timestamp is displayed (check for the formatted date string)
-    expect(screen.getByText(`Created:${formatDate(mockWorld.createdAt)}`)).toBeInTheDocument();
+    expect(screen.getByText(`Created: ${formatDate(mockWorld.createdAt)}`)).toBeInTheDocument();
   });
 
   // Test case for visual presentation

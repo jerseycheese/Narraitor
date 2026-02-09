@@ -177,9 +177,9 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       render(<NarrativeDisplay segment={segment} />);
 
       // Long content should be organized into clear paragraphs with proper formatting
-      expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into above.')).toBeInTheDocument();
-      expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\./)).toBeInTheDocument();
-      expect(screen.getByText('This was only the beginning of their quest.')).toBeInTheDocument();
+      expect(screen.getByText(/The ancient library stretched endlessly before them\. Towering shelves disappeared into above\./)).toBeInTheDocument();
+      expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\."/)).toBeInTheDocument();
+      expect(screen.getByText(/This was only the beginning of their quest\./)).toBeInTheDocument();
 
       // Verify emphasis is rendered
       const emphasizedWord = screen.getByText('whispers');
@@ -201,22 +201,22 @@ describe('NarrativeDisplay - Formatting Integration', () => {
 
   describe('Integration with narrative segment types', () => {
     it('should apply consistent formatting across all segment types', () => {
-      const segmentTypes: Array<NarrativeSegment['type']> = ['scene', 'dialogue', 'action', ''];
+      const segmentTypes: Array<NarrativeSegment['type']> = ['scene', 'dialogue', 'action', 'transition'];
       
       segmentTypes.forEach(type => {
-        const content = `This is a${type}segment.\n\nIt has multiple paragraphs.\n\nThe character said, This should be formatted properly.`;
+        const content = `This is a ${type} segment.\n\nIt has multiple paragraphs.\n\nThe character said, This should be formatted properly.`;
         const segment = createMockSegment(content, type);
         
         const { unmount } = render(<NarrativeDisplay segment={segment} />);
         
         // Each segment type should display content with appropriate formatting
-        if (type === '') {
+        if (type === 'transition') {
           // Transition segments preserve line breaks, so text is in one container with <br> tags
           expect(screen.getByText(/This is a transition segment\./)).toBeInTheDocument();
           expect(screen.getByText(/It has multiple paragraphs\./)).toBeInTheDocument();
           expect(screen.getByText(/The character said, This should be formatted properly\./)).toBeInTheDocument();
         } else {
-          expect(screen.getByText(`This is a${type}segment.`)).toBeInTheDocument();
+          expect(screen.getByText(`This is a ${type} segment.`)).toBeInTheDocument();
           expect(screen.getByText('It has multiple paragraphs.')).toBeInTheDocument();
           
           // Check if dialogue formatting is applied based on segment type

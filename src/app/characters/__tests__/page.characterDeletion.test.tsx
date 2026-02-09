@@ -47,10 +47,10 @@ const TestWrapper = () => {
     <div>
       <div aria-label="Characters list">
         {characters.map(char => (
-          <div key={char.id} aria-label={`Character card for${char.name}`}>
+          <div key={char.id} aria-label={`Character card for ${char.name}`}>
             <span>{char.name}</span>
             <button 
-              aria-label={`Delete${char.name}`}
+              aria-label={`Delete ${char.name}`}
               onClick={() => handleDelete(char.id)}
             >
               Delete

@@ -56,7 +56,7 @@ describe('StorySummarySection', () => {
   it('renders checkpoint segment from a single checkpoint', () => {
     const checkpoint: StoryCheckpoint = {
       id: 'checkpoint-1',
-      segment: 'Heroes defeated the court and liberated the citadel.',
+      segment: 'Heroes defeated the shadow court and liberated the citadel.',
       highlights: ['Shadow court dismantled', 'Citadel liberated'],
       eventIds: ['event-1'],
       decisionIds: ['decision-1'],

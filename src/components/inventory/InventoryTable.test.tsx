@@ -111,7 +111,7 @@ describe('InventoryTable', () => {
   it('renders inventory items in format', () => {
     render(<InventoryTable characterId="char-1" />);
 
-    expect(screen.getByRole('')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText('Health Potion')).toBeInTheDocument();
     expect(screen.getByText('Iron Sword')).toBeInTheDocument();
     expect(screen.getByText('Ancient Map')).toBeInTheDocument();

@@ -79,7 +79,7 @@ export function CharacterTable({
         header: '',
         cell: ({ row }) => (
           <div
-            
+            className="character-portrait-clickable"
             onClick={() => handleViewCharacter(row.original.id)}
           >
             <CharacterPortrait
@@ -159,7 +159,7 @@ export function CharacterTable({
                   variant="ghost"
                   size="icon"
                   onClick={(e) => handleMakeActive(row.original.id, e)}
-                  aria-label={`Make${row.original.name}active`}
+                  aria-label={`Make ${row.original.name} active`}
                   title="Make active"
                 >
                   <CheckCircle  />
@@ -169,7 +169,7 @@ export function CharacterTable({
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handlePlayCharacter(row.original.id, e)}
-                aria-label={`Play as${row.original.name}`}
+                aria-label={`Play as ${row.original.name}`}
                 title="Play"
               >
                 <Play  />
@@ -178,7 +178,7 @@ export function CharacterTable({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleViewCharacter(row.original.id)}
-                aria-label={`View${row.original.name}`}
+                aria-label={`View ${row.original.name}`}
                 title="View"
               >
                 <Eye  />
@@ -187,7 +187,7 @@ export function CharacterTable({
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handleEditCharacter(row.original.id, e)}
-                aria-label={`Edit${row.original.name}`}
+                aria-label={`Edit ${row.original.name}`}
                 title="Edit"
               >
                 <Pencil  />
@@ -196,7 +196,7 @@ export function CharacterTable({
                 variant="ghost"
                 size="icon"
                 onClick={(e) => handleDeleteCharacter(row.original.id, e)}
-                aria-label={`Delete${row.original.name}`}
+                aria-label={`Delete ${row.original.name}`}
                 title="Delete"
                 
               >
@@ -238,7 +238,7 @@ export function CharacterTable({
         enabled: true,
         placeholder: 'Search characters...',
       }}
-      ariaLabel="Characters"
+      ariaLabel="Characters table"
     />
   );
 }

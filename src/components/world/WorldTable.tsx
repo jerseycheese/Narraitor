@@ -136,7 +136,7 @@ export function WorldTable({
                   });
                 }
               }}
-              aria-label={`Select up to${Math.min(worlds.length, 5)}worlds`}
+              aria-label={`Select up to ${Math.min(worlds.length, 5)} worlds`}
             />
           );
         },
@@ -144,7 +144,7 @@ export function WorldTable({
           <Checkbox
             checked={selectedWorldIds.includes(row.original.id)}
             onChange={() => onToggleSelect(row.original.id)}
-            aria-label={`Select${row.original.name}for comparison`}
+            aria-label={`Select ${row.original.name} for comparison`}
             disabled={!selectedWorldIds.includes(row.original.id) && selectedWorldIds.length >= 5}
           />
         ),
@@ -222,7 +222,7 @@ export function WorldTable({
               variant="ghost"
               size="icon"
               onClick={() => handleViewWorld(row.original.id)}
-              aria-label={`View${row.original.name}`}
+              aria-label={`View ${row.original.name}`}
               title="View world"
             >
               <Eye  />
@@ -231,7 +231,7 @@ export function WorldTable({
               variant="ghost"
               size="icon"
               onClick={(e) => handleEditWorld(row.original.id, e)}
-              aria-label={`Edit${row.original.name}`}
+              aria-label={`Edit ${row.original.name}`}
               title="Edit world"
             >
               <Pencil  />
@@ -240,7 +240,7 @@ export function WorldTable({
               variant="ghost"
               size="icon"
               onClick={(e) => onDeleteWorld(row.original.id, e)}
-              aria-label={`Delete${row.original.name}`}
+              aria-label={`Delete ${row.original.name}`}
               title="Delete world"
               
             >

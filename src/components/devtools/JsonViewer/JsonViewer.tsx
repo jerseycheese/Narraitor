@@ -32,7 +32,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
       // Use the enhanced sanitization utility for consistent handling
       const sanitized = sanitizeForSerialization(data, {
         maxDepth: 8, // Reasonable depth for DevTools display
-        functionHandler: (fn) => `[Function:${fn.name || 'anonymous'}]`
+        functionHandler: (fn) => `[Function: ${fn.name || 'anonymous'}]`
       });
       
       // Format with indentation

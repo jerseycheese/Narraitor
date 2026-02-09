@@ -206,7 +206,7 @@ export function QuickPlay() {
             <div >
               <DataField 
                 label="Progress" 
-                value={`${mostRecentSession.narrativeCount}entries`}
+                value={`${mostRecentSession.narrativeCount} entries`}
                 variant="outline"
               />
               <time  dateTime={mostRecentSession.lastPlayed}>
@@ -253,7 +253,7 @@ export function QuickPlay() {
         onConfirm={handleDeleteSession}
         title="Delete Campaign"
         description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
-        itemName={mostRecentSession ? `${world.name}-${character.name}` : ''}
+        itemName={mostRecentSession ? `${world.name} - ${character.name}` : ''}
         isDeleting={isDeleting}
       />
     </div>

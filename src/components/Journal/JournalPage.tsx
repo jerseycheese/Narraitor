@@ -121,7 +121,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
       ? `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`
       : 'No entries yet';
   const showEntrySummary = !!sessionId;
-  const pageTitle = world ? `Journal in${world.name}` : 'Journal';
+  const pageTitle = world ? `Journal in ${world.name}` : 'Journal';
   const visibleEntries = filteredEntries.slice(0, visibleCount);
   const canLoadMore = filteredEntries.length > visibleCount;
 
@@ -172,7 +172,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             <div
               className={cssClasses(
                 '',
-                viewMode === 'list' ? '' : '',
+                viewMode === 'list' ? '' : 'hidden',
                 ''
               )}
               data-testid="journal-list-pane"
@@ -222,7 +222,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             <div
               className={cssClasses(
                 '',
-                viewMode === 'detail' ? '' : '',
+                viewMode === 'detail' ? '' : 'hidden',
                 ''
               )}
               data-testid="journal-detail-pane"
@@ -267,7 +267,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             title={pageTitle}
             image={world.image?.url ? {
               url: world.image.url,
-              alt: `${world.name}world`
+              alt: `${world.name} world`
             } : undefined}
             theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}

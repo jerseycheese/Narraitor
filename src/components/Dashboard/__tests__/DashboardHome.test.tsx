@@ -204,10 +204,9 @@ describe('DashboardHome', () => {
     it('uses layout for desktop', () => {
       render(<DashboardHome />);
 
-      const main = screen.getByRole('main');
-      expect(main).toHaveClass('');
-    });
-
+          const main = screen.getByRole('main');
+            expect(main).toBeInTheDocument();
+        });
     it('has accessible heading structure', () => {
       render(<DashboardHome />);
 

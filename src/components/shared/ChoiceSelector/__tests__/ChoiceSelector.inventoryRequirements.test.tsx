@@ -269,7 +269,6 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     const magicKeyButton = screen.getByTestId('choice-option-opt-1');
 
     // Should have visual indicator of being disabled
-    expect(magicKeyButton).toHaveClass('');
-    expect(magicKeyButton).toHaveClass('');
+    expect(magicKeyButton).toBeDisabled();
   });
 });

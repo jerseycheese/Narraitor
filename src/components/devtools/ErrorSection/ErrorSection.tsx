@@ -154,7 +154,7 @@ export const ErrorSection = () => {
                   <Checkbox
                     checked={(filter.severity || []).includes(severity)}
                     onChange={(e) => handleSeverityFilter(severity, e.target.checked)}
-                    aria-label={`Filter by${severity.charAt(0).toUpperCase() + severity.slice(1)}severity errors`}
+                    aria-label={`Filter by ${severity.charAt(0).toUpperCase() + severity.slice(1)} severity errors`}
                   />
                   <span >{severity}</span>
                 </label>
@@ -171,7 +171,7 @@ export const ErrorSection = () => {
                   <Checkbox
                     checked={(filter.category || []).includes(category)}
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
-                    aria-label={`Filter by${category.charAt(0).toUpperCase() + category.slice(1).replace('_', '')}category errors`}
+                    aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', '')} category errors`}
                   />
                   <span >{category.replace('_', '')}</span>
                 </label>

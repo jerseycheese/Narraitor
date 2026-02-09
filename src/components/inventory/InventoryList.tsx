@@ -182,7 +182,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
             <div
               
               role="list"
-              aria-label={`${categoryName}items`}
+              aria-label={`${categoryName} items`}
             >
               {categoryItems.map((item) => (
                 <Card
@@ -213,7 +213,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         variant="secondary-static"
                         size="sm"
                         className="item-quantity"
-                        aria-label={`Quantity:${item.quantity}`}
+                        aria-label={`Quantity: ${item.quantity}`}
                       >
                         ×{item.quantity}
                       </Badge>
@@ -235,7 +235,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         variant="outline"
                         size="sm"
                         className="item-category"
-                        aria-label={`Category:${categoryName}`}
+                        aria-label={`Category: ${categoryName}`}
                       >
                         {categoryName}
                       </Badge>
@@ -261,7 +261,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         variant="outline"
                         size="sm"
                         onClick={() => openDropDialog(item)}
-                        aria-label={`Drop${item.name}`}
+                        aria-label={`Drop ${item.name}`}
                         title="Drop item"
                       >
                         <Trash2  />

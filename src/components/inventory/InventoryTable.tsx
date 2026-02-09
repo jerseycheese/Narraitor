@@ -178,7 +178,7 @@ export function InventoryTable({
                 size="sm"
                 onClick={() => handleUseItem(row.original.id)}
                 disabled={isUsing}
-                aria-label={`Use${row.original.name}`}
+                aria-label={`Use ${row.original.name}`}
                 title="Use item"
               >
                 <PackageMinus  />
@@ -187,7 +187,7 @@ export function InventoryTable({
                 variant="ghost"
                 size="sm"
                 onClick={() => openDropDialog(row.original)}
-                aria-label={`Drop${row.original.name}`}
+                aria-label={`Drop ${row.original.name}`}
                 title="Drop item"
               >
                 <Trash2  />
@@ -222,7 +222,7 @@ export function InventoryTable({
           enabled: true,
           placeholder: 'Search items...',
         }}
-        ariaLabel={`Inventory for character${characterId}`}
+        ariaLabel={`Inventory for character ${characterId}`}
       />
       <DropConfirmationDialog
         isOpen={isDialogOpen}

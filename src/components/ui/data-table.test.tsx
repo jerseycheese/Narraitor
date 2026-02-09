@@ -37,7 +37,7 @@ describe('DataTable', () => {
   it('renders with data', () => {
     render(<DataTable columns={mockColumns} data={mockData} />);
 
-    expect(screen.getByRole('')).toBeTruthy();
+    expect(screen.getByRole('table')).toBeTruthy();
     expect(screen.getByText('Health Potion')).toBeTruthy();
     expect(screen.getByText('Iron Sword')).toBeTruthy();
   });
@@ -78,7 +78,7 @@ describe('DataTable', () => {
     const user = userEvent.setup();
     const largeData = Array.from({ length: 15 }, (_, i) => ({
       id: `${i + 1}`,
-      name: `Item${i + 1}`,
+      name: `Item ${i + 1}`,
       quantity: i + 1,
     }));
 
@@ -136,7 +136,7 @@ describe('DataTable', () => {
     const user = userEvent.setup();
     render(<DataTable columns={mockColumns} data={mockData} />);
 
-    const table = screen.getByRole('');
+    const table = screen.getByRole('table');
     table.focus();
 
     await user.keyboard('{Tab}');

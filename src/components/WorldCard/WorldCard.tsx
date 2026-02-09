@@ -165,7 +165,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
               (window.navigator.userAgent.includes('Playwright') || (window as unknown as Record<string, unknown>).__playwright);
             const STABLE_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
             const heroImageUrl = world.image?.url || (isPlaywright ? STABLE_PLACEHOLDER : undefined);
-            const heroImage = heroImageUrl ? { url: heroImageUrl, alt: `${world.name}world` } : undefined;
+            const heroImage = heroImageUrl ? { url: heroImageUrl, alt: `${world.name} world` } : undefined;
             
             return (
             <Hero
@@ -195,7 +195,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
             <Checkbox
               checked={isSelected}
               onChange={() => onToggleSelect(world.id)}
-              aria-label={`Select${world.name}for comparison`}
+              aria-label={`Select ${world.name} for comparison`}
               
             />
           </div>
@@ -220,13 +220,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
                       }
                     }}
                     
-                    title={`Play as${char.name}- Level${char.level}`}
+                    title={`Play as ${char.name} - Level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
                     {char.portrait?.url ? (
                       <Image
                         src={char.portrait.url}
-                        alt={`${char.name}portrait`}
+                        alt={`${char.name} portrait`}
                         width={40}
                         height={40}
                         

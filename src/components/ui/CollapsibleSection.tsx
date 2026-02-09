@@ -79,7 +79,7 @@ export const CollapsibleSection = ({
             toggleExpanded();
           }}
           aria-expanded={isExpanded}
-          aria-label={isExpanded ? `Collapse${title}` : `Expand${title}`}
+          aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
           
         >
           {isExpanded ? '−' : '+'}

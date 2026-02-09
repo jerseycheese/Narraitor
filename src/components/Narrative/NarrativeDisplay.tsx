@@ -220,9 +220,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
                         avatarUrl={participant.avatarUrl}
                         size="sm"
                       />
-                      <span >
-                        {participant.name}
-                      </span>
+                      
                     </div>
                   ))}
                 </div>

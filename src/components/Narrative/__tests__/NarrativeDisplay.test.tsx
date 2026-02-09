@@ -82,7 +82,7 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={segment} />);
 
     expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
-    expect(screen.getByText('Eldria Sunshadow')).toBeInTheDocument();
+    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
     expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
     expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
@@ -131,9 +131,10 @@ describe('NarrativeDisplay', () => {
     const items = within(list).getAllByRole('listitem');
     expect(items).toHaveLength(1);
     expect(
-      within(items[0]).getByText((content, element) =>
-        content === 'Marge, the Waitress'
-      )
+      within(items[0]).getByRole('img', { name: 'Marge, the Waitress' })
+    ).toBeInTheDocument();
+    expect(
+      within(items[0]).getByText('Marge, the Waitress', { selector: 'span' })
     ).toBeInTheDocument();
   });
 
@@ -200,7 +201,7 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={segment} />);
 
     const content = screen.getByTestId('narrative-content-container');
-    const highlighted = content.querySelectorAll('span.font-semibold');
+    const highlighted = content.querySelectorAll('span.narrative-highlight');
     expect(highlighted.length).toBeGreaterThan(0);
     expect(
       Array.from(highlighted).some(

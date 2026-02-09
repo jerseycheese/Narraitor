@@ -103,6 +103,6 @@ describe('Play Page', () => {
     render(<PlayPage />);
     
     // Assert
-    expect(screen.getByTestId('mock-game-session')).toHaveTextContent(`Game Session for${testWorldId}`);
+    expect(screen.getByTestId('mock-game-session')).toHaveTextContent(`Game Session for ${testWorldId}`);
   });
 });

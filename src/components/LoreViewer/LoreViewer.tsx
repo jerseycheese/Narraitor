@@ -40,10 +40,10 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
   };
 
   const categoryColors: Record<LoreCategory, string> = {
-    characters: '',
-    locations: '',
-    events: '',
-    rules: ''
+    characters: 'bg-lore-characters-bg',
+    locations: 'bg-lore-locations-bg',
+    events: 'bg-lore-events-bg',
+    rules: 'bg-lore-rules-bg'
   };
 
   if (facts.length === 0) {

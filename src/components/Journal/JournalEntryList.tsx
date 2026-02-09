@@ -50,7 +50,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 onEntrySelect(entry);
               }
             }}
-            aria-label={`Select entry:${entry.title || entry.type}`}
+            aria-label={`Select entry: ${entry.title || entry.type}`}
           >
             <div >
               <h4 className={`${
@@ -65,7 +65,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                     )}
                   </span>
                 )}
-                {entry.title || titleCase(entry.type.replace('_', ''))}
+                {entry.title || titleCase(entry.type.replace('_', ' '))}
               </h4>
               {!entry.isRead && (
                 <div ></div>

@@ -34,8 +34,8 @@ describe('ChoiceOutcomeCallout', () => {
       <ChoiceOutcomeCallout {...defaultProps} className="test-class" />
     );
 
-    const badge = container.querySelector('.custom-class');
-    expect(badge).toBeInTheDocument();
+    const callout = container.querySelector('.choice-outcome-callout');
+    expect(callout).toBeInTheDocument();
   });
 
   it('should handle various decision text formats', () => {

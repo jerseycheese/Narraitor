@@ -21,7 +21,7 @@ export const deriveFallbackName = (id: string): string => {
     .trim();
 
   if (cleaned) {
-    return `NPC${cleaned}`;
+    return `NPC ${cleaned}`;
   }
 
   return 'Unknown NPC';
@@ -95,7 +95,7 @@ export function useNarrativeParticipants({
         return;
       }
 
-      const normalized = safeTrim(value).replace(/\s+/g, '');
+      const normalized = safeTrim(value);
       if (!normalized) {
         return;
       }
@@ -113,7 +113,7 @@ export function useNarrativeParticipants({
         }
       });
 
-      const leadingSegment = safeTrim(normalized.split(',')[0]).replace(/\s+/g, '');
+      const leadingSegment = safeTrim(normalized.split(',')[0]);
       if (
         leadingSegment &&
         leadingSegment.length >= 3 &&
