@@ -7,22 +7,22 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 
 export default function HomePage() {
   return (
-    <main >
-      <div >
+    <main>
+      <div>
         {/* Visually hidden H1 for accessibility */}
-        <h1 >Narraitor - Interactive Storytelling Game</h1>
+        <h1>Narraitor - Interactive Storytelling Game</h1>
 
-        <div >
+        <div>
           {/* Left Column - Dashboard Content (2/3 width) */}
-          <div >
+          <div>
             <SSRClientOnly>
               <DashboardHome />
             </SSRClientOnly>
           </div>
 
           {/* Right Column - Logo and Branding (1/3 width) */}
-          <div >
-            <div >
+          <div>
+            <div>
               <Image
                 src="/narraitor-logo.svg"
                 alt="Narraitor Logo"
@@ -30,10 +30,10 @@ export default function HomePage() {
                 height={240}
                 
               />
-              <h2 >
-                <span >Narr</span><span >ai</span><span >tor</span>
+              <h2>
+                <span>Narr</span><span>ai</span><span>tor</span>
               </h2>
-              <p >
+              <p>
                 Interactive storytelling in any universe you can imagine
               </p>
             </div>

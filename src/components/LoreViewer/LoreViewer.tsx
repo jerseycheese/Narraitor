@@ -50,14 +50,14 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
     return (
       <div className={`${className}`}>
         <p>No lore facts recorded yet.</p>
-        <p >Facts will appear here as the story unfolds.</p>
+        <p>Facts will appear here as the story unfolds.</p>
       </div>
     );
   }
 
   return (
     <div className={`${className}`}>
-      <h3 >Established Lore</h3>
+      <h3>Established Lore</h3>
       
       {(Object.keys(categoryLabels) as LoreCategory[]).map(category => {
         const categoryFacts = factsByCategory[category];
@@ -65,18 +65,18 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
 
         return (
           <div key={category} className={`${categoryColors[category]}`}>
-            <h4 >{categoryLabels[category]}</h4>
-            <ul >
+            <h4>{categoryLabels[category]}</h4>
+            <ul>
               {categoryFacts.map(fact => (
                 <li key={fact.id} >
-                  <span >{fact.value}</span>
+                  <span>{fact.value}</span>
                   {fact.aliases && fact.aliases.length > 0 && (
-                    <span >
+                    <span>
                       (also: {fact.aliases.join(',')})
                     </span>
                   )}
                   {fact.metadata?.description && (
-                    <p >
+                    <p>
                       {fact.metadata.description}
                     </p>
                   )}
@@ -87,7 +87,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
         );
       })}
       
-      <div >
+      <div>
         Total facts: {facts.length}
       </div>
     </div>

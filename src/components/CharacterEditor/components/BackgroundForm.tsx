@@ -28,9 +28,9 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
 
   return (
     <div className="component-background-form">
-      <h2 >Background</h2>
-      <div >
-        <div >
+      <h2>Background</h2>
+      <div>
+        <div>
           <Label>
             History
           </Label>
@@ -42,7 +42,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
           />
         </div>
         
-        <div >
+        <div>
           <Label>
             Personality
           </Label>
@@ -54,7 +54,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
           />
         </div>
         
-        <div >
+        <div>
           <Label>
             Goals & Motivations
           </Label>
@@ -64,12 +64,12 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={3}
             placeholder="List your character's goals and motivations (one per line)"
           />
-          <p >
+          <p>
             Enter each goal on a separate line
           </p>
         </div>
         
-        <div >
+        <div>
           <Label>
             Fears
           </Label>
@@ -79,12 +79,12 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={2}
             placeholder="What does your character fear? (one per line)"
           />
-          <p >
+          <p>
             Enter each fear on a separate line
           </p>
         </div>
         
-        <div >
+        <div>
           <Label>
             Physical Description
           </Label>
@@ -94,7 +94,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={3}
             placeholder="Describe your character's appearance, distinctive features, clothing style..."
           />
-          <p >
+          <p>
             This description will be used when generating character portraits. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
           </p>
         </div>

@@ -234,13 +234,13 @@ export function EndingImageDebugSection() {
 
   return (
     <CollapsibleSection title="Ending Image Generation Debug" initialCollapsed={true}>
-      <div >
+      <div>
         
         {/* Current Ending Info */}
         {currentEnding ? (
-          <div >
-            <h4 >Active Ending Available</h4>
-            <div >
+          <div>
+            <h4>Active Ending Available</h4>
+            <div>
               <div><strong>Tone:</strong> {currentEnding.tone}</div>
               <div><strong>Type:</strong> {currentEnding.type}</div>
               <div><strong>Character:</strong> {currentCharacter?.name || 'Unknown'}</div>
@@ -248,37 +248,37 @@ export function EndingImageDebugSection() {
             </div>
           </div>
         ) : (
-          <div >
-            <h4 >No Active Ending</h4>
-            <p >Using mock data for testing. Generate an actual ending to see real prompts.</p>
+          <div>
+            <h4>No Active Ending</h4>
+            <p>Using mock data for testing. Generate an actual ending to see real prompts.</p>
           </div>
         )}
 
         {/* Tone & CSS Class Inspection */}
         {currentEnding && (
-          <div >
-            <h4 >AI-Selected Tone & CSS Inspection</h4>
-            <div >
-              <div >
-                <div><strong>AI Selected Tone:</strong> <span >{currentEnding.tone}</span></div>
-                <div><strong>CSS Class Applied:</strong> <span >{getEndingCSSClass(currentEnding.tone)}</span></div>
-                <div><strong>Header Text Color:</strong> <span >{getHeaderTextColor(currentEnding.tone)}</span></div>
+          <div>
+            <h4>AI-Selected Tone & CSS Inspection</h4>
+            <div>
+              <div>
+                <div><strong>AI Selected Tone:</strong> <span>{currentEnding.tone}</span></div>
+                <div><strong>CSS Class Applied:</strong> <span>{getEndingCSSClass(currentEnding.tone)}</span></div>
+                <div><strong>Header Text Color:</strong> <span>{getHeaderTextColor(currentEnding.tone)}</span></div>
               </div>
               
               {/* Visual Preview */}
-              <div >
-                <div >EndingScreen Preview:</div>
+              <div>
+                <div>EndingScreen Preview:</div>
                 <div 
-                  className={`${getEndingCSSClass(currentEnding.tone)}${getHeaderTextColor(currentEnding.tone)}`}
+                  className={`${getEndingCSSClass(currentEnding.tone)} ${getHeaderTextColor(currentEnding.tone)}`}
                   style={{ backgroundColor: getToneBackgroundColor(currentEnding.tone) }}
                 >
-                  <div >The End</div>
-                  <div >{currentCharacter?.name} • {currentWorld?.name}</div>
+                  <div>The End</div>
+                  <div>{currentCharacter?.name} • {currentWorld?.name}</div>
                 </div>
               </div>
               
               {/* Tone Color Reference */}
-              <div >
+              <div>
                 <div><strong>Background Color:</strong> {getToneBackgroundColor(currentEnding.tone)}</div>
                 <div><strong>Expected in CSS:</strong> .ending-{currentEnding.tone}</div>
               </div>
@@ -288,12 +288,12 @@ export function EndingImageDebugSection() {
 
         {/* Mock Ending Configuration */}
         {!currentEnding && (
-          <div >
-            <h4 >Mock Ending Configuration</h4>
+          <div>
+            <h4>Mock Ending Configuration</h4>
             
-            <div >
+            <div>
               <div>
-                <label >Ending Tone:</label>
+                <label>Ending Tone:</label>
                 <Select 
                   value={selectedTone} 
                   onChange={(e) => setSelectedTone(e.target.value as EndingTone)}
@@ -308,7 +308,7 @@ export function EndingImageDebugSection() {
               </div>
               
               <div>
-                <label >Custom Epilogue (optional):</label>
+                <label>Custom Epilogue (optional):</label>
                 <Textarea
                   value={customEpilogue}
                   onChange={(e) => setCustomEpilogue(e.target.value)}
@@ -319,7 +319,7 @@ export function EndingImageDebugSection() {
               </div>
               
               <div>
-                <label >Custom Character Legacy (optional):</label>
+                <label>Custom Character Legacy (optional):</label>
                 <Textarea
                   value={customLegacy}
                   onChange={(e) => setCustomLegacy(e.target.value)}
@@ -330,7 +330,7 @@ export function EndingImageDebugSection() {
               </div>
               
               <div>
-                <label >Custom World Impact (optional):</label>
+                <label>Custom World Impact (optional):</label>
                 <Textarea
                   value={customWorldImpact}
                   onChange={(e) => setCustomWorldImpact(e.target.value)}
@@ -344,9 +344,9 @@ export function EndingImageDebugSection() {
         )}
 
         {/* Data Summary */}
-        <div >
-          <h4 >Data Summary</h4>
-          <div >
+        <div>
+          <h4>Data Summary</h4>
+          <div>
             <div><strong>Character:</strong> {currentCharacter?.name || 'No characters available'}</div>
             <div><strong>World:</strong> {currentWorld?.name || 'No worlds available'} ({currentWorld?.genre || 'No genre'})</div>
             <div><strong>Available Characters:</strong> {Object.keys(characters).length}</div>
@@ -355,8 +355,8 @@ export function EndingImageDebugSection() {
         </div>
 
         {/* Prompt Generation */}
-        <div >
-          <div >
+        <div>
+          <div>
             <Button
               onClick={generatePromptPreview}
               
@@ -388,9 +388,9 @@ export function EndingImageDebugSection() {
           </div>
 
           {generatedPrompt && (
-            <div >
-              <h4 >Generated Prompt:</h4>
-              <pre >
+            <div>
+              <h4>Generated Prompt:</h4>
+              <pre>
                 {generatedPrompt}
               </pre>
             </div>
@@ -399,28 +399,28 @@ export function EndingImageDebugSection() {
 
         {/* Last Generation Results */}
         {lastGenerationResult && (
-          <div >
-            <h4 >Last Generation Results:</h4>
-            <div >
+          <div>
+            <h4>Last Generation Results:</h4>
+            <div>
               
               {/* Tone Information */}
               {lastGenerationResult.tone && (
-                <div >
-                  <div><strong>Generated with Tone:</strong> <span >{lastGenerationResult.tone}</span></div>
-                  <div><strong>Would use CSS:</strong> <span >{getEndingCSSClass(lastGenerationResult.tone as EndingTone)}</span></div>
+                <div>
+                  <div><strong>Generated with Tone:</strong> <span>{lastGenerationResult.tone}</span></div>
+                  <div><strong>Would use CSS:</strong> <span>{getEndingCSSClass(lastGenerationResult.tone as EndingTone)}</span></div>
                   
                   {/* Tone Match Check */}
                   {currentEnding && currentEnding.tone !== lastGenerationResult.tone && (
-                    <div >
-                      <div >
+                    <div>
+                      <div>
                         <strong>Warning: Tone Mismatch!</strong> Current ending tone ({currentEnding.tone}) doesn&apos;t match last generation ({lastGenerationResult.tone})
                       </div>
                     </div>
                   )}
                   
                   {currentEnding && currentEnding.tone === lastGenerationResult.tone && (
-                    <div >
-                      <div >
+                    <div>
+                      <div>
                         Tone matches current ending
                       </div>
                     </div>
@@ -429,7 +429,7 @@ export function EndingImageDebugSection() {
               )}
               
               {/* API Response Details */}
-              <div >
+              <div>
                 <div><strong>AI Generated:</strong> {lastGenerationResult.aiGenerated ? 'Yes' : 'No (fallback used)'}</div>
                 <div><strong>Service:</strong> {lastGenerationResult.service || 'Unknown'}</div>
                 <div><strong>Placeholder:</strong> {lastGenerationResult.placeholder ? 'Yes' : 'No'}</div>
@@ -438,8 +438,8 @@ export function EndingImageDebugSection() {
               {/* Generated Image */}
               {lastGeneratedImage && (
                 <div>
-                  <div >Generated Image:</div>
-                  <div >
+                  <div>Generated Image:</div>
+                  <div>
                     <Image
                       src={lastGeneratedImage}
                       alt="Generated ending scene"
@@ -455,9 +455,9 @@ export function EndingImageDebugSection() {
         )}
 
         {/* Prompt Building Tips */}
-        <div >
-          <h4 >Ending Image Prompt Tips:</h4>
-          <ul >
+        <div>
+          <h4>Ending Image Prompt Tips:</h4>
+          <ul>
             <li>Tone determines visual mood and color palette</li>
             <li>World theme affects art style and setting elements</li>
             <li>Epilogue content influences scene composition</li>
@@ -468,9 +468,9 @@ export function EndingImageDebugSection() {
         </div>
 
         {/* API Debug Info */}
-        <div >
-          <h4 >API Debug Info:</h4>
-          <div >
+        <div>
+          <h4>API Debug Info:</h4>
+          <div>
             <div><strong>Endpoint:</strong> /api/generate-ending-image</div>
             <div><strong>Model:</strong> gemini-2.0-flash-preview-image-generation</div>
             <div><strong>Security:</strong> Server-side API key (secure)</div>

@@ -143,9 +143,9 @@ function InteractiveDemo() {
   };
 
   return (
-    <div >
-      <h3 >Interactive Toast Demo</h3>
-      <div >
+    <div>
+      <h3>Interactive Toast Demo</h3>
+      <div>
         <button
           onClick={showSuccess}
           

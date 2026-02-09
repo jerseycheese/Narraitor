@@ -49,11 +49,11 @@ export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
       className
     )}>
       {title && (
-        <h4 >
+        <h4>
           {title}
         </h4>
       )}
-      <div >
+      <div>
         {children}
       </div>
     </div>

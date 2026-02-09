@@ -60,9 +60,9 @@ function DefaultNarrativeControllerStory() {
   }, []);
   
   return (
-    <div >
-      <h2 >NarrativeController Demo</h2>
-      <div >
+    <div>
+      <h2>NarrativeController Demo</h2>
+      <div>
         <NarrativeHistory 
           segments={segments}
           isLoading={isLoading}
@@ -192,16 +192,16 @@ function GeneratingFromChoiceStory() {
   };
   
   return (
-    <div >
-      <h2 >Narrative with Choices</h2>
-      <div >
+    <div>
+      <h2>Narrative with Choices</h2>
+      <div>
         <NarrativeHistory 
           segments={segments}
           isLoading={isLoading}
         />
         
         {!isLoading && !currentChoice && (
-          <div >
+          <div>
             <button
               
               onClick={() => handleChoiceClick('left')}
@@ -233,9 +233,9 @@ export const GeneratingFromChoice: Story = {
 // Loading state
 function LoadingStateStory() {
   return (
-    <div >
-      <h2 >Loading State</h2>
-      <div >
+    <div>
+      <h2>Loading State</h2>
+      <div>
         <NarrativeHistory 
           segments={[]}
           isLoading={true}
@@ -257,9 +257,9 @@ export const LoadingState: Story = {
 // Error state
 function ErrorStateStory() {
   return (
-    <div >
-      <h2 >Error State</h2>
-      <div >
+    <div>
+      <h2>Error State</h2>
+      <div>
         <NarrativeHistory 
           segments={[]}
           isLoading={false}

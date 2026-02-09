@@ -71,7 +71,7 @@ export function StoryEndingDialog({
         endingTypeClasses[endingType]
       )}
     >
-      <div >
+      <div>
         <Button
           ref={closeButtonRef}
           onClick={onClose}

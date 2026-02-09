@@ -10,7 +10,7 @@ const meta: Meta<typeof PointPoolManager> = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <Story />
       </div>
     ),

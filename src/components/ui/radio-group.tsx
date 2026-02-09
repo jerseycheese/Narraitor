@@ -55,7 +55,7 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
     const itemId = id || `radio-${value}`
 
     return (
-      <div >
+      <div>
         <input
           type="radio"
           id={itemId}

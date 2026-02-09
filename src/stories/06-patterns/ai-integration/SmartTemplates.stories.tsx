@@ -82,14 +82,14 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
   const mockHistory = hasHistory ? mockTemplateHistory : [];
 
   return (
-    <div >
-      <div >
-        <h2 >Smart World Templates</h2>
-        <p >Get creative starting points for your world with AI assistance</p>
+    <div>
+      <div>
+        <h2>Smart World Templates</h2>
+        <p>Get creative starting points for your world with AI assistance</p>
       </div>
 
       {error && (
-        <div >
+        <div>
           {error}
         </div>
       )}
@@ -99,11 +99,11 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
       )}
 
       {!isGenerating && (
-        <div >
+        <div>
           {/* Mode Selection */}
-          <div >
+          <div>
             {/* Tab-style Mode Selection */}
-            <div >
+            <div>
               <TabNavigation
                 options={tabOptions}
                 activeValue={mode}
@@ -114,12 +114,12 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
             {/* Inspired By Mode */}
             {mode === 'inspired-by' && (
-              <div >
-                <div >
+              <div>
+                <div>
                   <div>
-                    <h3 >Describe Your World</h3>
+                    <h3>Describe Your World</h3>
                   </div>
-                  <div >
+                  <div>
                     <input
                       type="text"
                       placeholder="Steampunk Victorian London, Space pirates, etc."
@@ -141,14 +141,14 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
             {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
-              <div >
-                <div >
+              <div>
+                <div>
                   <div>
-                    <h3 >Mix Genres Together</h3>
-                    <p >Select 2 or more genres to blend together</p>
+                    <h3>Mix Genres Together</h3>
+                    <p>Select 2 or more genres to blend together</p>
                   </div>
-                  <div >
-                    <div >
+                  <div>
+                    <div>
                       {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery', 'Modern', 'Historical'].map(genre => (
                         <button
                           key={genre}
@@ -165,8 +165,8 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                         </button>
                       ))}
                     </div>
-                    <div >
-                      <span >
+                    <div>
+                      <span>
                         {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                       </span>
                       <button
@@ -184,11 +184,11 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
             {/* Surprise Me Mode */}
             {mode === 'surprise-me' && (
-              <div >
-                <div >
+              <div>
+                <div>
                   <div>
-                    <h3 >Random World Generation</h3>
-                    <p >Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                    <h3>Random World Generation</h3>
+                    <p>Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
                   </div>
                   <div>
                     <button
@@ -205,24 +205,24 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
           {/* Template History */}
           {mockHistory.length > 0 && (
-            <div >
-              <h3 >Recent Templates</h3>
-              <div >
+            <div>
+              <h3>Recent Templates</h3>
+              <div>
                 {mockHistory.map((entry, index) => (
                   <div 
                     key={index}
                     
                     onClick={() => onTemplateGenerated(entry.template)}
                   >
-                    <div >
+                    <div>
                       <div>
-                        <h4 >{entry.template.name}</h4>
-                        <p >{entry.template.genre}</p>
-                        <p >
+                        <h4>{entry.template.name}</h4>
+                        <p>{entry.template.genre}</p>
+                        <p>
                           {formatDate(entry.generatedAt)}
                         </p>
                       </div>
-                      <span >
+                      <span>
                         {(() => {
                           switch(entry.generationType) {
                             case 'inspired-by': return 'Inspired';
@@ -240,9 +240,9 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
           )}
 
           {mockHistory.length === 0 && (
-            <div >
+            <div>
               <p>No recent templates</p>
-              <p >Generate your first template to get started!</p>
+              <p>Generate your first template to get started!</p>
             </div>
           )}
         </div>

@@ -74,7 +74,7 @@ export function ConfirmationDialog({
       tone={modalToneMap[variant]}
       description={message}
       footer={(
-        <div >
+        <div>
           <Button
             ref={cancelButtonRef}
             onClick={onClose}

@@ -66,11 +66,11 @@ export const CompleteNarrativeSystem: Story = {
     }, []);
     
     return (
-      <div >
-        <div >
-          <h1 >Narrative System Demo</h1>
+      <div>
+        <div>
+          <h1>Narrative System Demo</h1>
           
-          <div >
+          <div>
             <NarrativeHistory
               segments={segments}
               isLoading={isLoading}
@@ -78,8 +78,8 @@ export const CompleteNarrativeSystem: Story = {
             />
           </div>
           
-          <div >
-            <p >
+          <div>
+            <p>
               This demo shows the complete narrative system in action. The NarrativeController
               manages generation and history, while NarrativeHistory displays all segments
               using NarrativeDisplay components.

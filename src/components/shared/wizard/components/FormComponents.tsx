@@ -152,7 +152,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
       disabled={disabled}
-      className={`${wizardStyles.form.select}${error ? wizardStyles.form.inputError : ''}`}
+      className={`${wizardStyles.form.select} ${error ? wizardStyles.form.inputError : ''}`}
       data-testid={testId}
       data-tutorial={dataTutorial}
     >

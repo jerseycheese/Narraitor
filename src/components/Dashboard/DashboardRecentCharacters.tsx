@@ -62,7 +62,7 @@ export function DashboardRecentCharacters({
               tabIndex={0}
               aria-label={`View character: ${character.name}${world ? ` from ${world.name}` : ''}`}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === '') {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   onNavigate(`/characters/${character.id}`);
                 }

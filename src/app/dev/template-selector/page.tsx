@@ -29,19 +29,19 @@ export default function TemplateSelectorTestHarness() {
   };
   
   return (
-    <div >
-      <h2 >Template Selector Test Harness</h2>
+    <div>
+      <h2>Template Selector Test Harness</h2>
       
-      <div >
-        <div >
-          <h2 >Template Selection</h2>
+      <div>
+        <div>
+          <h2>Template Selection</h2>
           <TemplateSelector 
             onSelect={handleSelectTemplate} 
             selectedTemplateId={selectedTemplateId}
           />
           
           {selectedTemplateId && (
-            <div >
+            <div>
               <button
                 data-testid="apply-template-button"
                 
@@ -53,11 +53,11 @@ export default function TemplateSelectorTestHarness() {
           )}
         </div>
         
-        <div >
-          <h2 >Test Controls</h2>
+        <div>
+          <h2>Test Controls</h2>
           
-          <div >
-            <h3 >Selected Template</h3>
+          <div>
+            <h3>Selected Template</h3>
             {selectedTemplate ? (
               <div data-testid="selected-template-info">
                 <p><strong>ID:</strong> {selectedTemplate.id}</p>
@@ -72,8 +72,8 @@ export default function TemplateSelectorTestHarness() {
           </div>
           
           {appliedTemplateId && (
-            <div >
-              <h3 >Applied Template</h3>
+            <div>
+              <h3>Applied Template</h3>
               <div data-testid="applied-template-info" >
                 <p>Successfully applied template: <strong>{appliedTemplateId}</strong></p>
                 <p>Check your console for more details.</p>

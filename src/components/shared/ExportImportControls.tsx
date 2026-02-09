@@ -74,7 +74,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
 
   return (
     <div className={`${className}`}>
-      <div >
+      <div>
         <Button
           onClick={handleExport}
           disabled={isLoading}
@@ -84,7 +84,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
           {isExporting ? 'Exporting...' : 'Export Game Data'}
         </Button>
 
-        <div >
+        <div>
           <label htmlFor="import-file" >
             Import Game Data
           </label>
@@ -119,7 +119,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         />
       )}
 
-      <div >
+      <div>
         <p>
           <strong>Export:</strong> Creates a backup file of your complete game state including worlds, characters, and progress.
         </p>

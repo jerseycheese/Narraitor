@@ -135,7 +135,7 @@ export const LoreManagementSection: React.FC = () => {
   return (
     <DevToolsSection title="Lore Management">
       {/* World Selector */}
-      <div >
+      <div>
         <label htmlFor="world-select" >
           Select World
         </label>
@@ -155,7 +155,7 @@ export const LoreManagementSection: React.FC = () => {
 
       {selectedWorldId && (
         <Tabs defaultValue="browse" >
-          <TabsList >
+          <TabsList>
             <TabsTrigger value="browse">Browse</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
             <TabsTrigger value="search">Search</TabsTrigger>

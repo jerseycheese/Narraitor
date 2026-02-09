@@ -35,8 +35,8 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
   categoryColors,
   onSelectFact,
 }) => (
-  <div >
-    <div >
+  <div>
+    <div>
       <Input
         placeholder="Search facts..."
         value={searchQuery}
@@ -74,10 +74,10 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
     </div>
 
     {searchQuery && (
-      <div >Found {facts.length} result(s) for &quot;{searchQuery}&quot;</div>
+      <div>Found {facts.length} result(s) for &quot;{searchQuery}&quot;</div>
     )}
 
-    <div >
+    <div>
       {facts.map((fact) => {
         const importance = fact.metadata?.importance;
         const importanceBadge = importance ? (
@@ -95,7 +95,7 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
             {importance.toUpperCase()}
           </span>
         ) : (
-          <span >NO IMPORTANCE</span>
+          <span>NO IMPORTANCE</span>
         );
 
         return (
@@ -104,13 +104,13 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
             
             onClick={() => onSelectFact(fact.id)}
           >
-            <div >
+            <div>
               <span className={`${categoryColors[fact.category]}`}>{fact.category}</span>
               {importanceBadge}
-              <span >{fact.key}</span>
+              <span>{fact.key}</span>
             </div>
-            <div >{fact.value}</div>
-            {fact.metadata?.description && <div >{fact.metadata.description}</div>}
+            <div>{fact.value}</div>
+            {fact.metadata?.description && <div>{fact.metadata.description}</div>}
           </div>
         );
       })}

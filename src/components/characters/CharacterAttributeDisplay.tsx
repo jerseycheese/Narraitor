@@ -20,7 +20,7 @@ interface CharacterAttributeDisplayProps {
 export function CharacterAttributeDisplay({ attributes, showCategories = false }: CharacterAttributeDisplayProps) {
   if (attributes.length === 0) {
     return (
-      <div >
+      <div>
         No attributes assigned to this character.
       </div>
     );
@@ -38,13 +38,13 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
     }, {} as Record<string, CharacterAttribute[]>);
 
     return (
-      <div >
+      <div>
         {Object.entries(categorizedAttributes).map(([category, attrs]) => (
           <div key={category}>
-            <h3 >
+            <h3>
               {category}
             </h3>
-            <div >
+            <div>
               {attrs.map((attr, index) => (
                 <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
               ))}
@@ -56,7 +56,7 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
   }
 
   return (
-    <div >
+    <div>
       {attributes.map((attr, index) => (
         <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
       ))}
@@ -66,20 +66,20 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
 
 function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         {attribute.name}
       </div>
-      <div >
+      <div>
         {attribute.modifiedValue}
       </div>
       {attribute.baseValue !== attribute.modifiedValue && (
-        <div >
+        <div>
           Base: {attribute.baseValue}
         </div>
       )}
       {attribute.description && (
-        <p >{attribute.description}</p>
+        <p>{attribute.description}</p>
       )}
     </div>
   );

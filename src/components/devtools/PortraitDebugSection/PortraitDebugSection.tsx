@@ -234,11 +234,11 @@ export function PortraitDebugSection({
       title="Portrait Generation Debug"
       initialCollapsed={true}
     >
-      <div >
+      <div>
         {/* Character Selector */}
         {charactersArray.length > 0 && (
-          <div >
-            <label >
+          <div>
+            <label>
               Select Character:
             </label>
             <Select
@@ -262,11 +262,11 @@ export function PortraitDebugSection({
 
         {/* Character Info Summary */}
         {effectiveCharacterData && (
-          <div >
-            <h4 >
+          <div>
+            <h4>
               Character Summary
             </h4>
-            <div >
+            <div>
               <div>
                 <strong>Name:</strong>{' '}
                 {effectiveCharacterData.name || 'Not set'}
@@ -301,8 +301,8 @@ export function PortraitDebugSection({
         )}
 
         {/* Prompt Generation */}
-        <div >
-          <div >
+        <div>
+          <div>
             <Button
               onClick={generatePromptPreview}
               
@@ -344,11 +344,11 @@ export function PortraitDebugSection({
           </div>
 
           {generatedPrompt && (
-            <div >
-              <h4 >
+            <div>
+              <h4>
                 Generated Prompt:
               </h4>
-              <pre >
+              <pre>
                 {generatedPrompt}
               </pre>
             </div>
@@ -368,11 +368,11 @@ export function PortraitDebugSection({
 
         {/* Last Generated Image */}
         {lastGeneratedImage && (
-          <div >
-            <h4 >
+          <div>
+            <h4>
               Last Generated Image:
             </h4>
-            <div >
+            <div>
               <Image
                 src={lastGeneratedImage}
                 alt="Generated portrait"
@@ -385,11 +385,11 @@ export function PortraitDebugSection({
         )}
 
         {/* Prompt Building Tips */}
-        <div >
-          <h4 >
+        <div>
+          <h4>
             Prompt Building Tips:
           </h4>
-          <ul >
+          <ul>
             <li>Character name is included automatically</li>
             <li>Personality traits influence appearance description</li>
             <li>Skills determine character class (warrior, mage, etc.)</li>
@@ -399,9 +399,9 @@ export function PortraitDebugSection({
         </div>
 
         {/* API Debug Info */}
-        <div >
-          <h4 >API Debug Info:</h4>
-          <div >
+        <div>
+          <h4>API Debug Info:</h4>
+          <div>
             <div>
               <strong>Endpoint:</strong> /api/generate-portrait
             </div>

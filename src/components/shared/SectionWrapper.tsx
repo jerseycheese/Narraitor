@@ -11,7 +11,7 @@ interface SectionWrapperProps {
 export function SectionWrapper({ title, children, className = '' }: SectionWrapperProps) {
   return (
     <section className={`${className}`}>
-      <h2 >{title}</h2>
+      <h2>{title}</h2>
       {children}
     </section>
   );

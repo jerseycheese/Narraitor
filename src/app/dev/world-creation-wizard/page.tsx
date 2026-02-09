@@ -39,16 +39,16 @@ export default function WorldCreationWizardTestHarness() {
   };
 
   return (
-    <main >
-      <h2 >World Creation Wizard Test Harness</h2>
+    <main>
+      <h2>World Creation Wizard Test Harness</h2>
 
       {/* Controls */}
-      <section >
-        <h2 >Test Controls</h2>
+      <section>
+        <h2>Test Controls</h2>
         
-        <form >
-          <div >
-            <label >
+        <form>
+          <div>
+            <label>
               AI Response Delay (ms):
               <input
                 type="number"
@@ -59,8 +59,8 @@ export default function WorldCreationWizardTestHarness() {
             </label>
           </div>
 
-          <div >
-            <label >
+          <div>
+            <label>
               <input
                 type="checkbox"
                 checked={mockAIError}
@@ -83,26 +83,26 @@ export default function WorldCreationWizardTestHarness() {
 
       {/* Results */}
       {wizardResult && (
-        <section >
-          <h3 >Result:</h3>
+        <section>
+          <h3>Result:</h3>
           <p>{wizardResult}</p>
         </section>
       )}
 
       {/* Wizard */}
       {showWizard && (
-        <section >
+        <section>
           <WorldCreationWizard onComplete={handleComplete} onCancel={handleCancel} />
         </section>
       )}
 
       {/* State Inspector */}
-      <aside >
-        <h2 >
+      <aside>
+        <h2>
           Mock Data Reference
         </h2>
-        <div >
-          <pre >
+        <div>
+          <pre>
             {JSON.stringify({ mockAttributes, mockSkills }, null, 2)}
           </pre>
         </div>

@@ -14,8 +14,8 @@ const meta: Meta<typeof AITestingPanel> = {
   },
   decorators: [
     (Story) => (
-      <div >
-        <div >
+      <div>
+        <div>
           <Story />
         </div>
       </div>
@@ -68,8 +68,8 @@ export const Compact: Story = {
   args: {},
   decorators: [
     (Story) => (
-      <div >
-        <div >
+      <div>
+        <div>
           <Story />
         </div>
       </div>

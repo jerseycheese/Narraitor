@@ -81,8 +81,14 @@ describe('NarrativeDisplay', () => {
 
     render(<NarrativeDisplay segment={segment} />);
 
-    expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: /characters present/i });
+    expect(list).toBeInTheDocument();
+    const items = within(list).getAllByRole('listitem');
+    expect(items).toHaveLength(2);
     expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
+    expect(
+      within(items[0]).getByText('Eldria Sunshadow', { selector: 'span' })
+    ).toBeInTheDocument();
     expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
     expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();

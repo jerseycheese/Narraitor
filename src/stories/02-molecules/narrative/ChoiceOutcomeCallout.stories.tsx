@@ -29,8 +29,8 @@ export const Default: Story = {
  */
 export const VariousDecisionTexts: Story = {
   render: () => (
-    <div >
-      <div >
+    <div>
+      <div>
         Various Decision Types
       </div>
       <ChoiceOutcomeCallout
@@ -66,8 +66,8 @@ export const VariousDecisionTexts: Story = {
  */
 export const MobileView: Story = {
   render: () => (
-    <div >
-      <div >
+    <div>
+      <div>
         Mobile View (375px width)
       </div>
       <ChoiceOutcomeCallout

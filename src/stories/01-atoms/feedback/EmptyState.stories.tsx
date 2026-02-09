@@ -46,7 +46,7 @@ type Story = StoryObj<typeof meta>;
 
 // Journal icon
 const JournalIcon = (
-  <div >
+  <div>
     <svg
       
       fill="none"

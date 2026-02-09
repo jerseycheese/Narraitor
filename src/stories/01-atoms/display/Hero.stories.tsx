@@ -67,7 +67,7 @@ export const WithImageAndBadge: Story = {
       alt: 'Cyberpunk cityscape'
     },
     badge: (
-      <span >
+      <span>
         Sci-Fi
       </span>
     ),
@@ -82,7 +82,7 @@ export const TallHero: Story = {
     image: sampleImage,
     height: '',
     badge: (
-      <span >
+      <span>
         Set in Tolkien Universe
       </span>
     ),

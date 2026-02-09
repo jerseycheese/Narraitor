@@ -204,16 +204,16 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
   return (
     <div className={`${className}`}>
-      <h3 >
+      <h3>
         AI Testing Panel
       </h3>
 
       {/* World Override Section */}
-      <div >
-        <h4 >
+      <div>
+        <h4>
           World Override
         </h4>
-        <div >
+        <div>
           <div>
             <label
               htmlFor="world-name"
@@ -250,8 +250,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       </div>
 
       {/* Character Override Section */}
-      <div >
-        <h4 >
+      <div>
+        <h4>
           Character Override
         </h4>
         <div>
@@ -273,7 +273,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       </div>
 
       {/* Generate Button */}
-      <div >
+      <div>
         <Button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
@@ -286,31 +286,31 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div >
-          <p >Generating narrative...</p>
+        <div>
+          <p>Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div >
-          <p >Error: {error}</p>
+        <div>
+          <p>Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div >
-          <h4 >
+        <div>
+          <h4>
             Generated Results
           </h4>
-          <div >
-            <p >{result.text}</p>
+          <div>
+            <p>{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div>
-              <h5 >
+              <h5>
                 Choices:
               </h5>
-              <ul >
+              <ul>
                 {result.choices.map((choice, index) => (
                   <li
                     key={index}

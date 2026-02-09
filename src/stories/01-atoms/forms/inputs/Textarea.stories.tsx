@@ -43,7 +43,7 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   render: (args) => (
-    <div >
+    <div>
       <Label htmlFor="description-textarea">Character Description</Label>
       <Textarea id="description-textarea" {...args} />
     </div>
@@ -56,14 +56,14 @@ export const WithLabel: Story = {
 
 export const WithError: Story = {
   render: (args) => (
-    <div >
+    <div>
       <Label htmlFor="error-textarea">Character Background</Label>
       <Textarea 
         id="error-textarea" 
         {...args} 
          
       />
-      <p >Background must be at least 50 characters</p>
+      <p>Background must be at least 50 characters</p>
     </div>
   ),
   args: {
@@ -75,10 +75,10 @@ export const WithError: Story = {
 
 export const WithHelpText: Story = {
   render: (args) => (
-    <div >
+    <div>
       <Label htmlFor="help-textarea">Physical Description</Label>
       <Textarea id="help-textarea" {...args} />
-      <p >
+      <p>
         This will be used to generate your character&apos;s portrait. 
         Tip: Add &quot;looks like [actor name]&quot; for specific appearance.
       </p>

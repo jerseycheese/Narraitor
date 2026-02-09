@@ -29,7 +29,7 @@ export const PortraitCustomizationSection: React.FC<PortraitCustomizationSection
           
           rows={2}
         />
-        <p >
+        <p>
           Describe appearance details you want in the portrait. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
         </p>
       </div>

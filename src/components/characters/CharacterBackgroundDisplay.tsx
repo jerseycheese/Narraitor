@@ -19,7 +19,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
     <div className="prose prose-gray dark:prose-invert">
       {/* History Section */}
       <div>
-        <h3 >
+        <h3>
           History
         </h3>
         <p>
@@ -29,7 +29,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
 
       {/* Personality Section */}
       <div>
-        <h3 >
+        <h3>
           Personality
         </h3>
         <p>
@@ -40,7 +40,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Goals Section */}
       {background.goals && background.goals.length > 0 && (
         <div>
-          <h3 >
+          <h3>
             Goals & Motivations
           </h3>
           {background.goals.length === 1 ? (
@@ -48,7 +48,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
               {background.goals[0]}
             </p>
           ) : (
-            <ul >
+            <ul>
               {background.goals.map((goal, index) => (
                 <li key={index}>{goal}</li>
               ))}
@@ -60,10 +60,10 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Fears Section */}
       {background.fears && background.fears.length > 0 && (
         <div>
-          <h3 >
+          <h3>
             Fears
           </h3>
-          <ul >
+          <ul>
             {background.fears.map((fear, index) => (
               <li key={index}>{fear}</li>
             ))}
@@ -74,7 +74,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
       {/* Physical Description Section (optional) */}
       {background.physicalDescription && (
         <div>
-          <h3 >
+          <h3>
             Physical Appearance
           </h3>
           <p>

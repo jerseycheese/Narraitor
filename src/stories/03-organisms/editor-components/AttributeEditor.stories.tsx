@@ -18,7 +18,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <Story />
       </div>
     ),

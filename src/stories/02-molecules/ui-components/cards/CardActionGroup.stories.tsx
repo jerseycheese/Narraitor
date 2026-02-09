@@ -104,9 +104,9 @@ export const CharacterCardActions: Story = {
 
 export const InCardContext: Story = {
   render: () => (
-    <div >
-      <h3 >Sample World</h3>
-      <p >
+    <div>
+      <h3>Sample World</h3>
+      <p>
         A fantasy medieval world with magic and dragons.
       </p>
       <CardActionGroup

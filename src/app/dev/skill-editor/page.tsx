@@ -114,21 +114,21 @@ export default function SkillEditorTestPage() {
   };
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >SkillEditor Test Harness</h1>
-          <p >
+    <div>
+      <div>
+        <div>
+          <h1>SkillEditor Test Harness</h1>
+          <p>
             Test the SkillEditor component with realistic data and interactions.
           </p>
         </div>
 
-        <div >
+        <div>
           {/* Main Editor Panel */}
-          <div >
-            <div >
-              <div >
-                <h2 >
+          <div>
+            <div>
+              <div>
+                <h2>
                   {editingSkill ? 'Edit Skill' : showCreateDialog ? 'Create New Skill' : 'Skill Management'}
                 </h2>
                 {!editingSkill && !showCreateDialog && (
@@ -154,22 +154,22 @@ export default function SkillEditorTestPage() {
                   onCancel={handleCancel}
                 />
               ) : (
-                <div >
-                  <h3 >Existing Skills ({skills.length}/12)</h3>
+                <div>
+                  <h3>Existing Skills ({skills.length}/12)</h3>
                   {skills.length === 0 ? (
-                    <p >No skills created yet.</p>
+                    <p>No skills created yet.</p>
                   ) : (
-                    <div >
+                    <div>
                       {skills.map(skill => (
                         <div
                           key={skill.id}
                           
                         >
-                          <div >
-                            <div >
-                              <h4 >{skill.name}</h4>
-                              <p >{skill.description}</p>
-                              <div >
+                          <div>
+                            <div>
+                              <h4>{skill.name}</h4>
+                              <p>{skill.description}</p>
+                              <div>
                                 <span>Linked Attributes: {getLinkedAttributeNames(skill.attributeIds) || 'None'}</span>
                                 <span>Difficulty: {skill.difficulty}</span>
                               </div>
@@ -191,26 +191,26 @@ export default function SkillEditorTestPage() {
           </div>
 
           {/* Side Panel */}
-          <div >
+          <div>
             {/* Available Attributes */}
-            <div >
-              <h3 >Available Attributes</h3>
-              <div >
+            <div>
+              <h3>Available Attributes</h3>
+              <div>
                 {mockAttributes.map(attr => (
                   <div key={attr.id} >
-                    <div >{attr.name}</div>
-                    <div >{attr.description}</div>
+                    <div>{attr.name}</div>
+                    <div>{attr.description}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Activity Log */}
-            <div >
-              <h3 >Activity Log</h3>
-              <div >
+            <div>
+              <h3>Activity Log</h3>
+              <div>
                 {activityLog.length === 0 ? (
-                  <p >No activity yet</p>
+                  <p>No activity yet</p>
                 ) : (
                   activityLog.map((entry, index) => (
                     <div key={index} >
@@ -222,9 +222,9 @@ export default function SkillEditorTestPage() {
             </div>
 
             {/* Testing Scenarios */}
-            <div >
-              <h3 >Testing Scenarios</h3>
-              <div >
+            <div>
+              <h3>Testing Scenarios</h3>
+              <div>
                 <div>
                   <strong>1. Create Skills:</strong> Test creating skills with different attribute combinations
                 </div>
@@ -244,9 +244,9 @@ export default function SkillEditorTestPage() {
             </div>
 
             {/* Quick Actions */}
-            <div >
-              <h3 >Quick Actions</h3>
-              <div >
+            <div>
+              <h3>Quick Actions</h3>
+              <div>
                 <button
                   onClick={() => {
                     setSkills(initialSkills);

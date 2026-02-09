@@ -10,7 +10,7 @@ const meta: Meta<typeof AttributesStep> = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <WizardContainer title="Create Character in Storybook Test World">
           <WizardProgress
             steps={[
@@ -23,7 +23,7 @@ const meta: Meta<typeof AttributesStep> = {
             currentStep={1}
             
           />
-          <div >
+          <div>
             <Story />
           </div>
         </WizardContainer>

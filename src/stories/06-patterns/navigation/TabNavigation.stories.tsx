@@ -48,13 +48,13 @@ const TabNavigationWrapper = (args: any) => {
   };
 
   return (
-    <div >
+    <div>
       <TabNavigation
         {...args}
         activeValue={activeValue}
         onChange={handleChange}
       />
-      <div >
+      <div>
         Active: {activeValue}
       </div>
     </div>

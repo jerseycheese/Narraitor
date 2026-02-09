@@ -26,12 +26,12 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
   };
   
   return (
-    <div >
-      <section >
-        <h3 >World Settings</h3>
+    <div>
+      <section>
+        <h3>World Settings</h3>
         
-        <div >
-          <div >
+        <div>
+          <div>
             <Label htmlFor="maxAttributes">
               Maximum Attributes
             </Label>
@@ -46,7 +46,7 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             />
           </div>
           
-          <div >
+          <div>
             <Label htmlFor="maxSkills">
               Maximum Skills
             </Label>
@@ -61,7 +61,7 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             />
           </div>
           
-          <div >
+          <div>
             <Label htmlFor="attributePointPool">
               Attribute Point Pool
             </Label>
@@ -76,7 +76,7 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
             />
           </div>
           
-          <div >
+          <div>
             <Label htmlFor="skillPointPool">
               Skill Point Pool
             </Label>

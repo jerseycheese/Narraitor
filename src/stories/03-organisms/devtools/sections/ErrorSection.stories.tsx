@@ -153,13 +153,13 @@ export const Interactive: Story = {
     ]);
     
     return (
-      <div >
-        <div >
-          <h3 >Interactive Demo</h3>
-          <p >
+      <div>
+        <div>
+          <h3>Interactive Demo</h3>
+          <p>
             This demo shows the ErrorSection with sample errors. You can:
           </p>
-          <ul >
+          <ul>
             <li>Expand error details to see stack traces and component context</li>
             <li>Dismiss individual errors using the × button</li>
             <li>Filter errors by severity or category using the filters</li>

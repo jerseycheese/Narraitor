@@ -146,7 +146,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           className={errors.key ? '' : ''}
         />
         {errors.key && (
-          <p >{errors.key}</p>
+          <p>{errors.key}</p>
         )}
       </div>
 
@@ -161,7 +161,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           className={errors.value ? '' : ''}
         />
         {errors.value && (
-          <p >{errors.value}</p>
+          <p>{errors.value}</p>
         )}
       </div>
 
@@ -178,7 +178,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           <option value="rules">Rules</option>
         </Select>
         {errors.category && (
-          <p >{errors.category}</p>
+          <p>{errors.category}</p>
         )}
       </div>
 
@@ -192,7 +192,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           <option value="session-private">Session Private</option>
           <option value="world-shared">World Shared</option>
         </Select>
-        <p >
+        <p>
           Session Private: Only visible in this session. World Shared: Visible to all sessions.
         </p>
       </div>
@@ -232,14 +232,14 @@ export const FactEditor: React.FC<FactEditorProps> = ({
       </div>
 
       {isDuplicate && !fact && (
-        <Alert >
+        <Alert>
           <AlertDescription>
             Duplicate fact detected. This fact already exists for this world.
           </AlertDescription>
         </Alert>
       )}
 
-      <div >
+      <div>
         <Button type="submit" disabled={isDuplicate && !fact}>
           {fact ? 'Save Changes' : 'Add Fact'}
         </Button>

@@ -45,7 +45,7 @@ export const CollapsibleSection = ({
   return (
     <div 
       data-testid="collapsible-section" 
-      className={`component-collapsible-section${className}`}
+      className={['component-collapsible-section', className].filter(Boolean).join(' ')}
       role="region"
       aria-labelledby={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
@@ -56,7 +56,7 @@ export const CollapsibleSection = ({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === '') {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             toggleExpanded();
           }

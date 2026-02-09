@@ -388,7 +388,7 @@ const MultipleNPCs = () => {
   }, []);
 
   return (
-    <div >
+    <div>
       {segments.map((segment, index) => (
         <NarrativeDisplay key={index} segment={segment} />
       ))}
@@ -445,7 +445,7 @@ const MixedSegmentSequence = () => {
   ];
 
   return (
-    <div >
+    <div>
       {segments.map((segment, index) => (
         <NarrativeDisplay key={index} segment={segment} />
       ))}

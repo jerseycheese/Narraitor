@@ -61,9 +61,9 @@ export const Placeholder: Story = {
 export const Generating: Story = {
   decorators: [
     () => (
-      <div >
-        <h3 >Generating Character Portrait</h3>
-        <div >
+      <div>
+        <h3>Generating Character Portrait</h3>
+        <div>
           <LoadingState message="Generating character portrait..." />
         </div>
       </div>
@@ -89,38 +89,38 @@ export const Error: Story = {
 export const SizeComparison: Story = {
   decorators: [
     () => (
-      <div >
-        <div >
+      <div>
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Small Hero"
             size="small"
           />
-          <p >Small</p>
+          <p>Small</p>
         </div>
-        <div >
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Medium Hero"
             size="medium"
           />
-          <p >Medium</p>
+          <p>Medium</p>
         </div>
-        <div >
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Large Hero"
             size="large"
           />
-          <p >Large</p>
+          <p>Large</p>
         </div>
-        <div >
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="XLarge Hero"
             size="xlarge"
           />
-          <p >XLarge</p>
+          <p>XLarge</p>
         </div>
       </div>
     )

@@ -87,7 +87,7 @@ const meta = {
       });
 
       return (
-        <div >
+        <div>
           <Story />
         </div>
       );
@@ -230,17 +230,17 @@ export const LoadingState: Story = {
     () => {
       // Simply show the loading state component without character setup
       return (
-        <div >
-          <div >
-            <div >
-              <h1 >
+        <div>
+          <div>
+            <div>
+              <h1>
                 Character Editor - Loading State
               </h1>
-              <p >
+              <p>
                 Demonstrating the LoadingState component
               </p>
             </div>
-            <div >
+            <div>
               <LoadingStateComponent message="Loading character data..." />
             </div>
           </div>
@@ -262,13 +262,13 @@ export const ErrorWithRetry: Story = {
   },
   decorators: [
     () => (
-      <div >
-        <div >
-          <div >
-            <h1 >
+      <div>
+        <div>
+          <div>
+            <h1>
               Character Editor - Error State
             </h1>
-            <p >
+            <p>
               Demonstrating the PageError component
             </p>
           </div>
@@ -340,13 +340,13 @@ export const CustomPromptTesting: Story = {
       });
 
       return (
-        <div >
-          <div >
-            <div >
-              <h2 >
+        <div>
+          <div>
+            <div>
+              <h2>
                 Custom Prompt Testing Instructions
               </h2>
-              <ul >
+              <ul>
                 <li>
                   1. Check that &quot;Customize physical description&quot; is{' '}
                   <strong>unchecked by default</strong>
@@ -433,13 +433,13 @@ export const UIComponentShowcase: Story = {
       });
 
       return (
-        <div >
-          <div >
-            <div >
-              <h2 >
+        <div>
+          <div>
+            <div>
+              <h2>
                 shadcn/ui Component Integration
               </h2>
-              <ul >
+              <ul>
                 <li>
                   ✅ <strong>Input</strong> components with proper styling and
                   focus states

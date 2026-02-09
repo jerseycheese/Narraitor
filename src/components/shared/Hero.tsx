@@ -111,7 +111,7 @@ export const Hero: React.FC<HeroProps> = ({
 
   return (
     <div
-      className={`${height}${getBorderRadiusClass(borderRadius)}${
+      className={`${height} ${getBorderRadiusClass(borderRadius)} ${
         image ? '' : getThemeBackground(theme)
       }`}
     >
@@ -128,7 +128,7 @@ export const Hero: React.FC<HeroProps> = ({
       )}
 
       {/* Title overlay with gradient background */}
-      <div >
+      <div>
         <div className={`${
           image 
             ? '' 
@@ -142,17 +142,17 @@ export const Hero: React.FC<HeroProps> = ({
           </TitleElement>
 
           {subtitle && (
-            <p >
+            <p>
               {subtitle}
             </p>
           )}
 
-          {badge && <div >{badge}</div>}
+          {badge && <div>{badge}</div>}
         </div>
       </div>
 
       {actions && (
-        <div >
+        <div>
           {actions}
         </div>
       )}

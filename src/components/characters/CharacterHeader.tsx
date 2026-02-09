@@ -16,25 +16,25 @@ interface CharacterHeaderProps {
 
 export function CharacterHeader({ character, world }: CharacterHeaderProps) {
   return (
-    <div >
+    <div>
       <CharacterPortrait
         portrait={character.portrait || { type: 'placeholder', url: null }}
         characterName={character.name}
         size="xlarge"
       />
       <div className="prose prose-gray dark:prose-invert">
-        <h2 >{character.name}</h2>
-        <p >Level {character.level}</p>
+        <h2>{character.name}</h2>
+        <p>Level {character.level}</p>
         {character.background.personality && (
-          <p >
+          <p>
             {character.background.personality}
           </p>
         )}
-        <div >
-          <p >
+        <div>
+          <p>
             <strong>Created:</strong> {formatDate(character.createdAt)}
           </p>
-          <p >
+          <p>
             <strong>World:</strong> {world.name}
           </p>
         </div>

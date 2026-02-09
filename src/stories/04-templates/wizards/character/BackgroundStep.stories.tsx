@@ -10,7 +10,7 @@ const meta: Meta<typeof BackgroundStep> = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <WizardContainer title="Create Character in Storybook Test World">
           <WizardProgress
             steps={[
@@ -23,7 +23,7 @@ const meta: Meta<typeof BackgroundStep> = {
             currentStep={3}
             
           />
-          <div >
+          <div>
             <Story />
           </div>
         </WizardContainer>

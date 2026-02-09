@@ -220,8 +220,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   if (!world) {
     return (
-      <div >
-        <p >World not found</p>
+      <div>
+        <p>World not found</p>
         <button
           onClick={() => router.push('/worlds')}
           
@@ -302,7 +302,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       <WizardContainer title={`Create Character in${world.name}`} className="component-character-creation-wizard">
         <div>
           {/* Auto-save status indicator */}
-          <div >
+          <div>
             <SaveIndicator
               status={saveStatus}
               lastSaveTime={data?.lastSaved}

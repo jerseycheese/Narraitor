@@ -33,14 +33,14 @@ type Story = StoryObj<typeof meta>;
 
 // Sample card content component
 const SampleContent = () => (
-  <div >
-    <h3 >Sample Card Title</h3>
-    <p >
+  <div>
+    <h3>Sample Card Title</h3>
+    <p>
       This is a sample card content to demonstrate the ActiveStateCard wrapper component.
     </p>
-    <div >
-      <button >Action 1</button>
-      <button >Action 2</button>
+    <div>
+      <button>Action 1</button>
+      <button>Action 2</button>
     </div>
   </div>
 );
@@ -84,8 +84,8 @@ export const WithImage: Story = {
     hasImage: true,
     children: (
       <>
-        <div >
-          <span >Image Placeholder</span>
+        <div>
+          <span>Image Placeholder</span>
         </div>
         <SampleContent />
       </>
@@ -100,8 +100,8 @@ export const ActiveWithImage: Story = {
     activeText: 'Featured Item',
     children: (
       <>
-        <div >
-          <span >Featured Image</span>
+        <div>
+          <span>Featured Image</span>
         </div>
         <SampleContent />
       </>
@@ -114,9 +114,9 @@ export const Clickable: Story = {
     isActive: false,
     onClick: () => alert('Card clicked!'),
     children: (
-      <div >
-        <h3 >Clickable Card</h3>
-        <p >Click anywhere on this card to trigger an action.</p>
+      <div>
+        <h3>Clickable Card</h3>
+        <p>Click anywhere on this card to trigger an action.</p>
       </div>
     ),
   },
@@ -129,23 +129,23 @@ export const Grid: Story = {
     children: <div>Default content</div>,
   },
   render: () => (
-    <div >
+    <div>
       <ActiveStateCard isActive={true} activeText="Active Item">
-        <div >
-          <h4 >Card 1</h4>
-          <p >This card is active</p>
+        <div>
+          <h4>Card 1</h4>
+          <p>This card is active</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
-        <div >
-          <h4 >Card 2</h4>
-          <p >This card is inactive</p>
+        <div>
+          <h4>Card 2</h4>
+          <p>This card is inactive</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
-        <div >
-          <h4 >Card 3</h4>
-          <p >This card is inactive</p>
+        <div>
+          <h4>Card 3</h4>
+          <p>This card is inactive</p>
         </div>
       </ActiveStateCard>
     </div>

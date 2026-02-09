@@ -47,8 +47,8 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
   onSelectFact,
   onDeleteFact,
 }) => (
-  <div >
-    <div >
+  <div>
+    <div>
       <Select
         
         value={categoryFilter}
@@ -86,12 +86,12 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
         <option value="session-private">Session Private Only</option>
         <option value="world-shared">World Shared Only</option>
       </Select>
-      <div >
+      <div>
         Total facts: {facts.length}
       </div>
     </div>
 
-    <div >
+    <div>
       <div>
         Visibility totals (world): {visibilityStats.total} total • {visibilityStats.worldShared} world-shared •{' '}
         {visibilityStats.sessionPrivate} session-private
@@ -103,7 +103,7 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
       <div>Note: AI-extracted lore uses session-private visibility when a session is active.</div>
     </div>
 
-    <div >
+    <div>
       {(Object.keys(factsByCategory) as LoreCategory[]).map((category) => {
         const categoryFacts = factsByCategory[category];
         if (!categoryFilter && categoryFacts.length === 0) return null;
@@ -113,7 +113,7 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
             <h3 className={`${categoryColors[category]}`}>
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </h3>
-            <div >
+            <div>
               {categoryFacts.map((fact) => {
                 const importance = fact.metadata?.importance;
                 const importanceBadge = importance ? (
@@ -131,7 +131,7 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
                     {importance.toUpperCase()}
                   </span>
                 ) : (
-                  <span >
+                  <span>
                     NO IMPORTANCE
                   </span>
                 );
@@ -154,12 +154,12 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
                     
                     onClick={() => onSelectFact(fact.id)}
                   >
-                    <div >
+                    <div>
                       {importanceBadge}
                       {visibilityBadge}
                       <span>{fact.value}</span>
                     </div>
-                    <div >
+                    <div>
                       <Button
                         size="sm"
                         variant="outline"

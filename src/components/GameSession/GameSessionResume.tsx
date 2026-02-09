@@ -20,15 +20,15 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
 
   return (
     <div data-testid="game-session-resume" >
-      <div >
-        <h2 >Continue Your Story?</h2>
+      <div>
+        <h2>Continue Your Story?</h2>
         
-        <div >
-          <p >Last played: {formattedDate}</p>
-          <p >Progress: {savedSession.narrativeCount} scenes</p>
+        <div>
+          <p>Last played: {formattedDate}</p>
+          <p>Progress: {savedSession.narrativeCount} scenes</p>
         </div>
         
-        <div >
+        <div>
           <Button
             onClick={onResume}
             
@@ -48,7 +48,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
           </Button>
         </div>
         
-        <p >
+        <p>
           Starting a new adventure will save your current progress
         </p>
       </div>

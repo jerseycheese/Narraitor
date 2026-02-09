@@ -67,39 +67,39 @@ export default function SmartTemplatesTestPage() {
   };
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >SmartTemplates Test Harness</h1>
-          <p >
+    <div>
+      <div>
+        <div>
+          <h1>SmartTemplates Test Harness</h1>
+          <p>
             Test the SmartTemplates component with live AI generation and template history. 
             Clicking &quot;Use This Template&quot; will redirect to the world creation wizard.
           </p>
           
-          <div >
+          <div>
             <SmartTemplates onTemplateGenerated={handleTemplateGenerated} />
           </div>
         </div>
 
         {generatedTemplate && (
-          <div >
-            <h2 >Last Generated Template</h2>
-            <div >
+          <div>
+            <h2>Last Generated Template</h2>
+            <div>
               <div>
-                <h3 >{generatedTemplate.name}</h3>
-                <p >{generatedTemplate.description}</p>
-                <span >
+                <h3>{generatedTemplate.name}</h3>
+                <p>{generatedTemplate.description}</p>
+                <span>
                   {generatedTemplate.genre}
                 </span>
               </div>
               
               <div>
-                <h4 >Attributes ({generatedTemplate.attributes.length})</h4>
-                <div >
+                <h4>Attributes ({generatedTemplate.attributes.length})</h4>
+                <div>
                   {generatedTemplate.attributes.map((attr, index) => (
                     <div key={index} >
-                      <span >{attr.name}</span>
-                      <span >
+                      <span>{attr.name}</span>
+                      <span>
                         (Base: {attr.baseValue}, Range: {attr.minValue}-{attr.maxValue})
                       </span>
                     </div>
@@ -108,12 +108,12 @@ export default function SmartTemplatesTestPage() {
               </div>
               
               <div>
-                <h4 >Skills ({generatedTemplate.skills.length})</h4>
-                <div >
+                <h4>Skills ({generatedTemplate.skills.length})</h4>
+                <div>
                   {generatedTemplate.skills.map((skill, index) => (
                     <div key={index} >
-                      <span >{skill.name}</span>
-                      <span >
+                      <span>{skill.name}</span>
+                      <span>
                         ({skill.difficulty}, Base: {skill.baseValue})
                       </span>
                     </div>
@@ -123,8 +123,8 @@ export default function SmartTemplatesTestPage() {
               
               {generatedTemplate.explanation && (
                 <div>
-                  <h4 >AI Explanation</h4>
-                  <p >{generatedTemplate.explanation}</p>
+                  <h4>AI Explanation</h4>
+                  <p>{generatedTemplate.explanation}</p>
                 </div>
               )}
             </div>

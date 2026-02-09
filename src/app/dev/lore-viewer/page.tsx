@@ -45,7 +45,7 @@ export default function LoreViewerTestPage() {
   
   // Don't render until we have a world
   if (!worldId) {
-    return <div >Loading test world...</div>;
+    return <div>Loading test world...</div>;
   }
 
   const addSampleFacts = () => {
@@ -180,11 +180,11 @@ export default function LoreViewerTestPage() {
   };
 
   return (
-    <div >
-      <h1 >Lore Viewer Test Harness</h1>
+    <div>
+      <h1>Lore Viewer Test Harness</h1>
       
-      <div >
-        <div >
+      <div>
+        <div>
           <button
             onClick={addSampleFacts}
             
@@ -217,7 +217,7 @@ export default function LoreViewerTestPage() {
             Clear All Facts
           </button>
 
-          <label >
+          <label>
             <input
               type="checkbox"
               checked={showSessionOnly}
@@ -228,9 +228,9 @@ export default function LoreViewerTestPage() {
           </label>
         </div>
 
-        <div >
-          <h3 >Alias Testing:</h3>
-          <div >
+        <div>
+          <h3>Alias Testing:</h3>
+          <div>
             <button
               onClick={testAliasAddition}
               
@@ -246,7 +246,7 @@ export default function LoreViewerTestPage() {
             </button>
           </div>
 
-          <div >
+          <div>
             <input
               type="text"
               value={searchQuery}
@@ -264,13 +264,13 @@ export default function LoreViewerTestPage() {
         </div>
         
         {extractionResult && (
-          <div >
+          <div>
             {extractionResult}
           </div>
         )}
         
         <div>
-          <label >
+          <label>
             Custom Narrative Text (optional - leave empty to use sample)
           </label>
           <textarea
@@ -282,16 +282,16 @@ export default function LoreViewerTestPage() {
         </div>
       </div>
       
-      <div >
+      <div>
         <LoreViewer 
           worldId={worldId} 
           sessionId={showSessionOnly ? sessionId : undefined}
         />
       </div>
       
-      <div >
-        <h2 >Test Instructions:</h2>
-        <ol >
+      <div>
+        <h2>Test Instructions:</h2>
+        <ol>
           <li><strong>Add Sample Facts:</strong> Manually adds predefined facts to test display</li>
           <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata</li>
           <li><strong>Test Error Handling:</strong> Demonstrates robust error handling when AI fails</li>
@@ -303,9 +303,9 @@ export default function LoreViewerTestPage() {
           <li><strong>Test Alias Search:</strong> Search for entities by their canonical name or any alias</li>
         </ol>
         
-        <div >
-          <h3 >AI Structured Extraction:</h3>
-          <ul >
+        <div>
+          <h3>AI Structured Extraction:</h3>
+          <ul>
             <li>• Extracts characters with roles, descriptions, and importance</li>
             <li>• Identifies locations with types and context</li>
             <li>• Detects aliases and alternative names for entities</li>
@@ -315,9 +315,9 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
 
-        <div >
-          <h3 >Alias Management:</h3>
-          <ul >
+        <div>
+          <h3>Alias Management:</h3>
+          <ul>
             <li>• Characters and locations can have multiple aliases</li>
             <li>• Search finds entities by canonical name or any alias</li>
             <li>• AI automatically detects aliases from narrative context</li>
@@ -326,9 +326,9 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
         
-        <div >
-          <h3 >Production Behavior:</h3>
-          <ul >
+        <div>
+          <h3>Production Behavior:</h3>
+          <ul>
             <li>• <strong>Primary:</strong> AI-powered structured extraction (production with API key)</li>
             <li>• <strong>Development:</strong> Mock structured extraction (intelligent patterns without API)</li>
             <li>• <strong>Error Handling:</strong> Graceful failure - no lore extraction rather than bad data</li>

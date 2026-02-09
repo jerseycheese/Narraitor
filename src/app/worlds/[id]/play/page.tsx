@@ -61,7 +61,7 @@ export default function PlayPage() {
   if (!isClient) {
     return (
       <PageLayout title="Game Session">
-        <div >
+        <div>
           <p>Creating your game...</p>
         </div>
       </PageLayout>

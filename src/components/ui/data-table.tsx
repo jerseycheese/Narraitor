@@ -134,7 +134,7 @@ export function DataTable<TData, TValue>({
                           onKeyDown={(e) => {
                             if (
                               canSort &&
-                              (e.key === 'Enter' || e.key === '')
+                              (e.key === 'Enter' || e.key === ' ')
                             ) {
                               e.preventDefault();
                               header.column.getToggleSortingHandler()?.(e);

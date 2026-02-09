@@ -13,16 +13,16 @@ const GuidedFirstTimeExperienceDemo = () => {
   ];
 
   const renderWelcomeStep = () => (
-    <div >
-      <div >
-        <h1 >
+    <div>
+      <div>
+        <h1>
           Welcome to Narraitor
         </h1>
-        <p >
+        <p>
           Create your own world and start your story
         </p>
-        <div >
-          <p >
+        <div>
+          <p>
             Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
@@ -37,20 +37,20 @@ const GuidedFirstTimeExperienceDemo = () => {
   );
 
   const renderConceptStep = () => (
-    <div >
-      <div >
-        <h2 >
+    <div>
+      <div>
+        <h2>
           World Concept
         </h2>
-        <p >
+        <p>
           Create an RPG in any fictional universe or original setting
         </p>
       </div>
       
-      <div >
+      <div>
         <div>
           <label htmlFor="world-concept" >
-            World Concept <span >*</span>
+            World Concept <span>*</span>
           </label>
           <textarea
             id="world-concept"
@@ -62,7 +62,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </div>
       </div>
       
-      <div >
+      <div>
         <button 
           onClick={() => setCurrentStep(0)}
           
@@ -80,17 +80,17 @@ const GuidedFirstTimeExperienceDemo = () => {
   );
 
   const renderDetailsStep = () => (
-    <div >
-      <div >
-        <h2 >
+    <div>
+      <div>
+        <h2>
           World Details
         </h2>
-        <p >
+        <p>
           Give your world a name and genre
         </p>
       </div>
       
-      <div >
+      <div>
         <div>
           <label htmlFor="world-name" >
             World Name (optional)
@@ -105,7 +105,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         
         <div>
           <label htmlFor="world-genre" >
-            Genre <span >*</span>
+            Genre <span>*</span>
           </label>
           <select
             id="world-genre"
@@ -121,7 +121,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </div>
       </div>
       
-      <div >
+      <div>
         <button 
           onClick={() => setCurrentStep(1)}
           
@@ -139,11 +139,11 @@ const GuidedFirstTimeExperienceDemo = () => {
   );
 
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         {/* Progress indicator */}
-        <div >
-          <div >
+        <div>
+          <div>
             {steps.map((step, index) => (
               <div key={step.id} >
                 <div
@@ -168,7 +168,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </div>
 
         {/* Step content */}
-        <div >
+        <div>
           {currentStep === 0 && renderWelcomeStep()}
           {currentStep === 1 && renderConceptStep()}
           {currentStep === 2 && renderDetailsStep()}

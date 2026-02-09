@@ -15,8 +15,8 @@ const SessionControls: React.FC<SessionControlsProps> = ({
   onEndStory,
 }) => {
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         {onRestart && (
           <Button
             data-testid="game-session-controls-restart"

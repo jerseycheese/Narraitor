@@ -50,32 +50,32 @@ export default function GameSessionComponentsTestPage() {
   };
 
   return (
-    <div >
-      <h1 >GameSession Components Test Page</h1>
+    <div>
+      <h1>GameSession Components Test Page</h1>
       
-      <div >
+      <div>
         {/* ChoiceSelector Component */}
-        <section >
-          <h2 >ChoiceSelector Component</h2>
+        <section>
+          <h2>ChoiceSelector Component</h2>
           <ChoiceSelector
             decision={mockDecision}
             onSelect={handleChoiceSelected}
           />
-          <p >
+          <p>
             Selected: {selectedChoiceId || 'None'}
           </p>
         </section>
 
         {/* SessionControls Component */}
-        <section >
-          <h2 >SessionControls Component</h2>
-          <div >
+        <section>
+          <h2>SessionControls Component</h2>
+          <div>
             <div>
-              <h3 >Basic Controls (End Only)</h3>
+              <h3>Basic Controls (End Only)</h3>
               <SessionControls onEnd={handleEnd} />
             </div>
             <div>
-              <h3 >All Controls</h3>
+              <h3>All Controls</h3>
               <SessionControls 
                 onEnd={handleEnd}
                 onRestart={handleRestart}
@@ -86,15 +86,15 @@ export default function GameSessionComponentsTestPage() {
         </section>
 
         {/* GameSessionLoading Component */}
-        <section >
-          <h2 >GameSessionLoading Component</h2>
+        <section>
+          <h2>GameSessionLoading Component</h2>
           <GameSessionLoading />
           <GameSessionLoading loadingMessage="Preparing your adventure..." />
         </section>
 
         {/* GameSessionError Component */}
-        <section >
-          <h2 >GameSessionError Component</h2>
+        <section>
+          <h2>GameSessionError Component</h2>
           <button
             onClick={() => setShowError(true)}
             
@@ -112,8 +112,8 @@ export default function GameSessionComponentsTestPage() {
 
 
         {/* Disabled State Demo */}
-        <section >
-          <h2 >Disabled ChoiceSelector</h2>
+        <section>
+          <h2>Disabled ChoiceSelector</h2>
           <ChoiceSelector
             decision={mockDecision}
             onSelect={handleChoiceSelected}

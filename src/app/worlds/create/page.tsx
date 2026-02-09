@@ -73,8 +73,8 @@ export default function CreateWorldPage() {
 
   
   return (
-    <main >
-      <h1 >Create New World</h1>
+    <main>
+      <h1>Create New World</h1>
       <WorldCreationWizard 
         onComplete={handleComplete}
         onCancel={handleCancel}

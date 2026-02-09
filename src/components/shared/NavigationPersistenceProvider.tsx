@@ -39,8 +39,8 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
   // Minimal loading state - only show very briefly on client
   if (!isInitialized) {
     return (
-      <div >
-        <div >
+      <div>
+        <div>
           Loading...
         </div>
       </div>

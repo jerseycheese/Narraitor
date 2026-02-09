@@ -96,10 +96,10 @@ export default function AttributeEditorTestPage() {
   };
 
   return (
-    <div >
-      <h1 >Attribute Editor Test Harness</h1>
+    <div>
+      <h1>Attribute Editor Test Harness</h1>
       
-      <div >
+      <div>
         <button
           onClick={() => setShowCreateModal(true)}
           
@@ -108,26 +108,26 @@ export default function AttributeEditorTestPage() {
         </button>
       </div>
 
-      <div >
-        <h2 >Existing Attributes</h2>
+      <div>
+        <h2>Existing Attributes</h2>
         {attributes.map((attribute) => (
           <div
             key={attribute.id}
             
           >
-            <div >
+            <div>
               <div>
-                <h3 >{attribute.name}</h3>
-                <p >{attribute.description}</p>
-                <div >
+                <h3>{attribute.name}</h3>
+                <p>{attribute.description}</p>
+                <div>
                   Range: {attribute.minValue} - {attribute.maxValue}
                 </div>
                 {skills.some(skill => skill.attributeIds?.includes(attribute.id)) && (
-                  <div >
-                    <span >
+                  <div>
+                    <span>
                       Linked Skills: 
                     </span>
-                    <span >
+                    <span>
                       {skills
                         .filter(skill => skill.attributeIds?.includes(attribute.id))
                         .map(skill => skill.name)
@@ -136,7 +136,7 @@ export default function AttributeEditorTestPage() {
                   </div>
                 )}
               </div>
-              <div >
+              <div>
                 <button
                   onClick={() => setEditingAttribute(attribute.id)}
                   
@@ -167,7 +167,7 @@ export default function AttributeEditorTestPage() {
         size="xl"
         
       >
-        <div >
+        <div>
           Create a new custom attribute for this test world.
         </div>
         <AttributeEditor
@@ -188,7 +188,7 @@ export default function AttributeEditorTestPage() {
         size="xl"
         
       >
-        <div >
+        <div>
           Modify the details of this test attribute.
         </div>
         {editingAttribute && (

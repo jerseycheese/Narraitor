@@ -181,7 +181,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   return (
     <div
       data-testid="choice-selector"
-      className={`choice-selector${weightStyling.container}${className}`}
+      className={['choice-selector', weightStyling.container, className]
+        .filter(Boolean)
+        .join(' ')}
       role="group"
       aria-labelledby="choices-heading"
     >

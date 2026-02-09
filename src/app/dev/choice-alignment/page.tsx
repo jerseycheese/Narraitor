@@ -143,20 +143,20 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >
+    <div>
+      <div>
+        <div>
+          <h1>
             Choice Alignment Test
           </h1>
           
           {/* Controls */}
-          <div >
-            <h2 >Test Controls</h2>
+          <div>
+            <h2>Test Controls</h2>
             
-            <div >
+            <div>
               <div>
-                <label >
+                <label>
                   Scenario
                 </label>
                 <select 
@@ -170,7 +170,7 @@ export default function ChoiceAlignmentTestPage() {
                 </select>
               </div>
               
-              <div >
+              <div>
                 <button
                   onClick={generateChoices}
                   disabled={loading || !worldId}
@@ -182,15 +182,15 @@ export default function ChoiceAlignmentTestPage() {
             </div>
             
             {/* Scenario Display */}
-            <div >
-              <h3 >Current Scenario:</h3>
-              <p >
+            <div>
+              <h3>Current Scenario:</h3>
+              <p>
                 <strong>Location:</strong> {scenarios[scenario].location}
               </p>
-              <p >
+              <p>
                 <strong>Situation:</strong> {scenarios[scenario].situation}
               </p>
-              <p >
+              <p>
                 {scenarios[scenario].context}
               </p>
             </div>
@@ -198,7 +198,7 @@ export default function ChoiceAlignmentTestPage() {
 
           {/* Error Display */}
           {error && (
-            <div >
+            <div>
               <strong>Error:</strong> {error}
             </div>
           )}
@@ -206,22 +206,22 @@ export default function ChoiceAlignmentTestPage() {
           {/* Results */}
           {decision && (
             <div>
-              <h2 >Generated Choices</h2>
+              <h2>Generated Choices</h2>
               
               {/* Alignment Legend */}
-              <div >
-                <h3 >Alignment Legend:</h3>
-                <div >
-                  <div >
-                    <div ></div>
+              <div>
+                <h3>Alignment Legend:</h3>
+                <div>
+                  <div>
+                    <div></div>
                     <span><strong>Lawful:</strong> Follows rules, respects authority</span>
                   </div>
-                  <div >
-                    <div ></div>
+                  <div>
+                    <div></div>
                     <span><strong>Neutral:</strong> Balanced, practical approach</span>
                   </div>
-                  <div >
-                    <div ></div>
+                  <div>
+                    <div></div>
                     <span><strong>Chaos:</strong> Unexpected, disruptive action</span>
                   </div>
                 </div>
@@ -237,13 +237,13 @@ export default function ChoiceAlignmentTestPage() {
               />
 
               {/* Debug Info */}
-              <div >
-                <h3 >Debug Information:</h3>
-                <div >
+              <div>
+                <h3>Debug Information:</h3>
+                <div>
                   <p><strong>Template Used:</strong> Aligned Choice Template</p>
                   <p><strong>Options Count:</strong> {decision.options.length}</p>
                   <p><strong>Alignment Distribution:</strong></p>
-                  <ul >
+                  <ul>
                     {['lawful', 'neutral', 'chaotic'].map(alignment => {
                       const count = decision.options.filter(opt => opt.alignment === alignment).length;
                       return (
@@ -255,11 +255,11 @@ export default function ChoiceAlignmentTestPage() {
                   </ul>
                 </div>
                 
-                <details >
-                  <summary >
+                <details>
+                  <summary>
                     Raw Decision Object
                   </summary>
-                  <pre >
+                  <pre>
                     {JSON.stringify(decision, null, 2)}
                   </pre>
                 </details>
@@ -268,9 +268,9 @@ export default function ChoiceAlignmentTestPage() {
           )}
 
           {/* Instructions */}
-          <div >
-            <h3 >Testing Instructions</h3>
-            <ul >
+          <div>
+            <h3>Testing Instructions</h3>
+            <ul>
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>
               <li>• <strong>CHAOS VERIFICATION:</strong> Red choices should be wildly unexpected, dramatic, and could completely change the situation</li>

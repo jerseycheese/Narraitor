@@ -64,18 +64,18 @@ export default function EndingSystemTestHarness() {
   }
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >
+    <div>
+      <div>
+        <div>
+          <h1>
             Ending System Test Harness
           </h1>
           
-          <div >
+          <div>
             {/* Status Display */}
-            <div >
-              <h2 >Current Status</h2>
-              <div >
+            <div>
+              <h2>Current Status</h2>
+              <div>
                 <p><strong>Is Generating:</strong> {isGeneratingEnding ? 'Yes' : 'No'}</p>
                 <p><strong>Has Ending:</strong> {currentEnding ? 'Yes' : 'No'}</p>
                 <p><strong>Error:</strong> {endingError || 'None'}</p>
@@ -83,9 +83,9 @@ export default function EndingSystemTestHarness() {
             </div>
 
             {/* Test Controls */}
-            <div >
+            <div>
               <div>
-                <label >
+                <label>
                   Ending Type
                 </label>
                 <select
@@ -101,7 +101,7 @@ export default function EndingSystemTestHarness() {
               </div>
 
               <div>
-                <label >
+                <label>
                   Desired Tone
                 </label>
                 <select
@@ -118,7 +118,7 @@ export default function EndingSystemTestHarness() {
             </div>
 
             <div>
-              <label >
+              <label>
                 Custom Prompt (Optional)
               </label>
               <textarea
@@ -131,7 +131,7 @@ export default function EndingSystemTestHarness() {
             </div>
 
             {/* Action Buttons */}
-            <div >
+            <div>
               <button
                 onClick={handleGenerateEnding}
                 disabled={isGeneratingEnding}
@@ -157,9 +157,9 @@ export default function EndingSystemTestHarness() {
             </div>
 
             {/* Test Information */}
-            <div >
-              <h3 >Test Information</h3>
-              <div >
+            <div>
+              <h3>Test Information</h3>
+              <div>
                 <p><strong>Session ID:</strong> {mockSessionId}</p>
                 <p><strong>Character ID:</strong> {mockCharacterId}</p>
                 <p><strong>World ID:</strong> {mockWorldId}</p>
@@ -169,22 +169,22 @@ export default function EndingSystemTestHarness() {
 
             {/* Error Display */}
             {endingError && (
-              <div >
-                <h3 >Error</h3>
-                <p >{endingError}</p>
+              <div>
+                <h3>Error</h3>
+                <p>{endingError}</p>
               </div>
             )}
 
             {/* Loading State */}
             {isGeneratingEnding && (
-              <div >
-                <h3 >Generating Ending</h3>
-                <p >Please wait while we create your story ending...</p>
-                <div >
-                  <div >
-                    <div ></div>
-                    <div ></div>
-                    <div ></div>
+              <div>
+                <h3>Generating Ending</h3>
+                <p>Please wait while we create your story ending...</p>
+                <div>
+                  <div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
                   </div>
                 </div>
               </div>

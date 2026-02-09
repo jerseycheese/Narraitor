@@ -37,10 +37,10 @@ const EnvironmentInfo = () => {
   
   return (
     <DevToolsSection title="Environment Info:" >
-      <div >NODE_ENV: {nodeEnv}</div>
-      <div >Is Client: {String(mounted)}</div>
-      <div >Is Development: {String(isDev)}</div>
-      <div >Window Location: {location}</div>
+      <div>NODE_ENV: {nodeEnv}</div>
+      <div>Is Client: {String(mounted)}</div>
+      <div>Is Development: {String(isDev)}</div>
+      <div>Window Location: {location}</div>
     </DevToolsSection>
   );
 };
@@ -58,7 +58,7 @@ const EnvironmentInfo = () => {
  * @example
  * // Adding a new section to the DevToolsPanel
  * {isOpen && (
- *   <div >
+ *   <div>
  *     <StateSection />
  *     <MyNewSection /> // Your new section
  *   </div>
@@ -120,14 +120,14 @@ export const DevToolsPanel = () => {
         data-testid="devtools-panel-header"
         
       >
-        <div >
+        <div>
           Narraitor DevTools
           {isTestPage && '(Test Page Mode)'}
         </div>
-        <div >
+        <div>
           {isOpen && (
             <>
-              <label >
+              <label>
                 <input
                   type="checkbox"
                   checked={settings.showPromptDebugInfo}
@@ -161,13 +161,13 @@ export const DevToolsPanel = () => {
           <EnvironmentInfo />
           
           {/* Two-column grid layout organized by function */}
-          <div >
+          <div>
             {/* Left Column: State Management & Error Tracking */}
-            <div >
+            <div>
               {/* State Management Group - only show if any child sections are visible */}
               {isSectionVisible(SectionId.STATE_SECTION) && (
-                <div >
-                  <h3 >
+                <div>
+                  <h3>
                     State Management
                   </h3>
                   <StateSection defaultCollapsed={true} />
@@ -176,8 +176,8 @@ export const DevToolsPanel = () => {
 
               {/* Error Tracking Group */}
               {isSectionVisible(SectionId.ERROR_SECTION) && (
-                <div >
-                  <h3 >
+                <div>
+                  <h3>
                     Error Tracking
                   </h3>
                   <CollapsibleSection title="Runtime Errors" initialCollapsed={true}>
@@ -188,17 +188,17 @@ export const DevToolsPanel = () => {
             </div>
             
             {/* Right Column: AI Tools, Test Data & Content Generation */}
-            <div >
+            <div>
               {/* AI Tools Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.AI_TESTING) ||
                 isSectionVisible(SectionId.AI_MOCKING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
-                <div >
-                  <h3 >
+                <div>
+                  <h3>
                     AI Tools & Validation
                   </h3>
-                  <div >
+                  <div>
                 {isSectionVisible(SectionId.AI_TESTING) && (
                   <CollapsibleSection title="AI Testing" initialCollapsed={true}>
                     <AITestingPanel />
@@ -227,8 +227,8 @@ export const DevToolsPanel = () => {
             )}
 
               {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
-                <div >
-                  <h3 >
+                <div>
+                  <h3>
                     Test Data & Generators
                   </h3>
                   <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
@@ -239,11 +239,11 @@ export const DevToolsPanel = () => {
               
               {/* Content Generation Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.PORTRAIT_DEBUG) || isSectionVisible(SectionId.ENDING_IMAGE_DEBUG)) && (
-                <div >
-                  <h3 >
+                <div>
+                  <h3>
                     Content Generation
                   </h3>
-                  <div >
+                  <div>
                     {isSectionVisible(SectionId.PORTRAIT_DEBUG) && <PortraitDebugSection />}
                     
                     {isSectionVisible(SectionId.ENDING_IMAGE_DEBUG) && <EndingImageDebugSection />}

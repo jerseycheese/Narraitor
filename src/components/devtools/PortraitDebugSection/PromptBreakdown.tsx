@@ -49,30 +49,30 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
   const promptParts = prompt.split(',');
   
   return (
-    <div >
+    <div>
       {/* Logic Flow Diagram */}
-      <div >
-        <h4 >Prompt Construction Logic Flow</h4>
+      <div>
+        <h4>Prompt Construction Logic Flow</h4>
         
-        <div >
+        <div>
           {/* Decision Tree */}
-          <div >
-            <div >1. Automatic Character Detection</div>
-            <div >
-              <div >AI analyzes &quot;{characterData?.name || 'Unknown'}&quot;</div>
+          <div>
+            <div>1. Automatic Character Detection</div>
+            <div>
+              <div>AI analyzes &quot;{characterData?.name || 'Unknown'}&quot;</div>
               {isPhotorealisticPrompt ? (
-                <div >→ Detected as known figure (photorealistic approach)</div>
+                <div>→ Detected as known figure (photorealistic approach)</div>
               ) : isFantasyPrompt ? (
-                <div >→ Detected as original character (fantasy art approach)</div>
+                <div>→ Detected as original character (fantasy art approach)</div>
               ) : (
-                <div >→ Detection pending...</div>
+                <div>→ Detection pending...</div>
               )}
             </div>
           </div>
           
-          <div >
-            <div >2. Opening Statement</div>
-            <div >
+          <div>
+            <div>2. Opening Statement</div>
+            <div>
               {isPhotorealisticPrompt ? 
                 '&quot;A portrait photograph of&quot;' : 
                 '&quot;A fantasy portrait of&quot;'
@@ -80,9 +80,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div >
-            <div >3. Subject Details</div>
-            <div >
+          <div>
+            <div>3. Subject Details</div>
+            <div>
               <div>Name: &quot;{characterData?.name || 'Unknown'}&quot;</div>
               {physicalDescription && (
                 <div>Physical: &quot;{physicalDescription}&quot;</div>
@@ -96,9 +96,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div >
-            <div >4. Context/Background</div>
-            <div >
+          <div>
+            <div>4. Context/Background</div>
+            <div>
               {isPhotorealisticPrompt ? (
                 <>
                   <div>• professional headshot</div>
@@ -113,9 +113,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div >
-            <div >5. Style Elements</div>
-            <div >
+          <div>
+            <div>5. Style Elements</div>
+            <div>
               {isPhotorealisticPrompt ? (
                 <>
                   <div>• 85mm lens</div>
@@ -137,9 +137,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
       </div>
       
       {/* Prompt Breakdown */}
-      <div >
-        <h4 >Prompt Component Breakdown</h4>
-        <div >
+      <div>
+        <h4>Prompt Component Breakdown</h4>
+        <div>
           {promptParts.map((part, index) => {
             const trimmedPart = part.trim();
             let category = 'other';
@@ -171,7 +171,7 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
                 <span className={`${color}`}>
                   {category}
                 </span>
-                <span >{trimmedPart}</span>
+                <span>{trimmedPart}</span>
               </div>
             );
           })}
@@ -179,39 +179,39 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
       </div>
       
       {/* Data Analysis */}
-      <div >
-        <h4 >Input Data Analysis</h4>
-        <div >
-          <div >
+      <div>
+        <h4>Input Data Analysis</h4>
+        <div>
+          <div>
             <div>
-              <span >Character Name:</span>
-              <span >{characterData?.name || 'Not set'}</span>
+              <span>Character Name:</span>
+              <span>{characterData?.name || 'Not set'}</span>
             </div>
             <div>
-              <span >Portrait Type:</span>
-              <span >
+              <span>Portrait Type:</span>
+              <span>
                 {isPhotorealisticPrompt ? 'Photorealistic' : isFantasyPrompt ? 'Fantasy Art' : 'Auto-detected'}
               </span>
             </div>
             <div>
-              <span >Physical Description:</span>
-            <span >{physicalDescription ? `${physicalDescription.length} chars` : 'None'}</span>
+              <span>Physical Description:</span>
+            <span>{physicalDescription ? `${physicalDescription.length} chars` : 'None'}</span>
             </div>
             <div>
-              <span >Personality Length:</span>
-              <span >{characterData?.background?.personality?.length || 0} chars</span>
+              <span>Personality Length:</span>
+              <span>{characterData?.background?.personality?.length || 0} chars</span>
             </div>
             <div>
-              <span >Extracted Traits:</span>
-              <span >{personalityTraits || 'None'}</span>
+              <span>Extracted Traits:</span>
+              <span>{personalityTraits || 'None'}</span>
             </div>
             <div>
-              <span >History Contains Class:</span>
-              <span >{profession || 'No'}</span>
+              <span>History Contains Class:</span>
+              <span>{profession || 'No'}</span>
             </div>
             <div>
-              <span >World Genre:</span>
-              <span >{worldConfig?.genre || 'Not set'}</span>
+              <span>World Genre:</span>
+              <span>{worldConfig?.genre || 'Not set'}</span>
             </div>
           </div>
         </div>

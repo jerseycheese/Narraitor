@@ -101,10 +101,10 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
         className
       )}
     >
-      <div >
-        <div >
+      <div>
+        <div>
           {/* Loading indicator */}
-          <div >
+          <div>
             <div aria-live="polite" aria-label="Loading">
               <LoadingState
                 variant={variant}
@@ -134,7 +134,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 
           {/* Cancel button */}
           {onCancel && (
-            <div >
+            <div>
               <Button
                 variant="outline"
                 onClick={onCancel}

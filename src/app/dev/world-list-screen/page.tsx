@@ -4,18 +4,18 @@ import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 
 export default function WorldListScreenTestHarness() {
   return (
-    <main >
-      <div >
-        <header >
-          <h1 >World List Screen Test Harness</h1>
-          <p >
+    <main>
+      <div>
+        <header>
+          <h1>World List Screen Test Harness</h1>
+          <p>
             Test world deletion functionality with the confirmation dialog
           </p>
         </header>
         
-        <section >
-          <h2 >Test Instructions:</h2>
-          <ul >
+        <section>
+          <h2>Test Instructions:</h2>
+          <ul>
             <li>Click the delete button on any world card</li>
             <li>Verify the confirmation dialog appears</li>
             <li>Test the cancel button to ensure it closes the dialog</li>
@@ -25,7 +25,7 @@ export default function WorldListScreenTestHarness() {
             <li>Test keyboard navigation (Escape key)</li>
           </ul>
           
-          <div >
+          <div>
             <WorldListScreen />
           </div>
         </section>

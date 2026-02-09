@@ -131,7 +131,7 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
         type="button"
       >
         {action.icon && (
-          <span >{action.icon}</span>
+          <span>{action.icon}</span>
         )}
         <span>{action.text}</span>
       </button>
@@ -143,12 +143,12 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   return (
     <div className={`${className}`}>
       {primaryActions.length > 0 && (
-        <div className={`${containerClasses}${gapClasses[gap]}`}>
+        <div className={`${containerClasses} ${gapClasses[gap]}`}>
           {renderActions(primaryActions, 'primary')}
         </div>
       )}
       {secondaryActions.length > 0 && (
-        <div className={`${containerClasses}${gapClasses[gap]}`}>
+        <div className={`${containerClasses} ${gapClasses[gap]}`}>
           {renderActions(secondaryActions, 'secondary')}
         </div>
       )}

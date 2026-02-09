@@ -52,12 +52,12 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
 
   return (
     <div className="component-attributes-form">
-      <div >
-        <h2 >Attributes</h2>
+      <div>
+        <h2>Attributes</h2>
         <PointPoolDisplay pool={pool} label="Attribute Points" />
       </div>
 
-      <div >
+      <div>
         {managedAttributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.id);
           const cannotIncrease = !canIncrease(attr.id);
@@ -72,16 +72,16 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
 
           return (
             <div key={uniqueKey} >
-              <Label >
+              <Label>
               {worldAttr?.name || `Attribute ${index + 1}`}
               </Label>
               {worldAttr?.description && (
-                <p >
+                <p>
                   {worldAttr.description}
                 </p>
               )}
               {cannotIncrease && currentValue < attr.maxValue && (
-                <p >
+                <p>
                   No points remaining. Reduce other attributes to increase this one.
                 </p>
               )}
@@ -96,7 +96,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 showLabel={false}
                 testId={`attribute-${attr.id}`}
               />
-              <div >
+              <div>
                 Range: {attr.minValue} - {attr.maxValue}
               </div>
             </div>

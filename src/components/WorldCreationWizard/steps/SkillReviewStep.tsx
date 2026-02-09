@@ -451,7 +451,7 @@ export default function SkillReviewStep({
                     <div>
                       <span>{suggestion.name}</span>
                       <span
-                        className={`${wizardStyles.badge.base}${
+                        className={`${wizardStyles.badge.base} ${
                           suggestion.difficulty === 'easy'
                             ? wizardStyles.badge.success
                             : suggestion.difficulty === 'medium'
@@ -688,7 +688,7 @@ export default function SkillReviewStep({
                         <span>{skill.name}</span>
                         <span>Custom</span>
                         <span
-                          className={`${wizardStyles.badge.base}${
+                          className={`${wizardStyles.badge.base} ${
                             skill.difficulty === 'easy'
                               ? wizardStyles.badge.success
                               : skill.difficulty === 'medium'

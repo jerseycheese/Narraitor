@@ -947,10 +947,10 @@ export const TestDataGeneratorSection: React.FC = () => {
   };
 
   return (
-    <div >
-      <h3 >Test Data Generators</h3>
+    <div>
+      <h3>Test Data Generators</h3>
 
-      <div >
+      <div>
         <Button
           onClick={handleGenerateWorld}
           
@@ -1016,23 +1016,23 @@ export const TestDataGeneratorSection: React.FC = () => {
         </Button>
       </div>
 
-      <p >
+      <p>
         AI generators create diverse content for testing: original worlds,
         &quot;set in&quot; universes, and &quot;based on&quot; worlds.
         {!effectiveWorldId && 'Select a world to enable character generation.'}
         {worldIdFromUrl && (
-          <span >
+          <span>
             Using world from current page: {worlds[worldIdFromUrl]?.name}
           </span>
         )}
       </p>
 
       {/* Destructive Operations Section */}
-      <div >
-        <h4 >
+      <div>
+        <h4>
           Destructive Operations
         </h4>
-        <div >
+        <div>
           <Button
             onClick={handleDeleteAllCharactersInWorld}
             
@@ -1065,7 +1065,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             NUKE EVERYTHING
           </Button>
         </div>
-        <p >
+        <p>
           WARNING: These operations are permanent and cannot be undone!
         </p>
 
@@ -1080,9 +1080,9 @@ export const TestDataGeneratorSection: React.FC = () => {
         </Button>
       </div>
 
-      <div >
+      <div>
         <strong>Troubleshooting:</strong>
-        <ul >
+        <ul>
           <li>
             If form isn&apos;t pre-filled, try the debug page at{' '}
             <code>/dev/test-character-form</code>

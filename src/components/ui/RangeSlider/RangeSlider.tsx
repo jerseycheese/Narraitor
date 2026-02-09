@@ -231,13 +231,17 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               value={valueToScale(value)}
               onChange={handleChange}
               disabled={disabled}
-              className={`appearance-none accent-primary${
+              className={[
+                'appearance-none',
+                'accent-primary',
                 isConstrained &&
                 effectiveMax !== undefined &&
                 value === effectiveMax
                   ? 'accent-amber-500'
-                  : ''
-              }`}
+                  : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
               data-testid={`${testId}-slider`}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledBy}

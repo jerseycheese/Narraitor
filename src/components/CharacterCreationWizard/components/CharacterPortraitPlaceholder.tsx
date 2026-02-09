@@ -34,7 +34,9 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
   
   return (
     <div 
-      className={`component-character-portrait-placeholder${backgroundClass}${className}`}
+      className={['component-character-portrait-placeholder', backgroundClass, className]
+        .filter(Boolean)
+        .join(' ')}
       data-testid="character-portrait-placeholder"
     >
       {initials || '?'}

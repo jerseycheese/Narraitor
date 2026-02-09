@@ -2,7 +2,7 @@ import { LoadingState } from '@/components/ui/LoadingState/LoadingState';
 
 export default function Loading() {
   return (
-    <div >
+    <div>
       <LoadingState
         message="Loading..."
         size="lg"

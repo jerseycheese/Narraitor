@@ -63,7 +63,7 @@ export const FullWizard: Story = {
   render: () => {
     const worldId = createTestWorld();
     return (
-      <div >
+      <div>
         <CharacterCreationWizard worldId={worldId} initialStep={0} />
       </div>
     );
@@ -81,7 +81,7 @@ export const StartAtPortraitStep: Story = {
   render: () => {
     const worldId = createTestWorld();
     return (
-      <div >
+      <div>
         <CharacterCreationWizard worldId={worldId} initialStep={5} />
       </div>
     );
@@ -101,9 +101,9 @@ export const WithGeneratedCharacter: Story = {
     
     // Simulate character data that would be present at the portrait step
     return (
-      <div >
-        <div >
-          <p >
+      <div>
+        <div>
+          <p>
             <strong>Story Context:</strong> This demonstrates the wizard after character generation 
             has occurred, where the character now has AI-generated data including portrait integration.
           </p>

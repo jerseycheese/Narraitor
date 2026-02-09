@@ -83,12 +83,12 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     >
       <span>{displayDecisionText}</span>
       {decisionOutcome && (
-        <div >
+        <div>
           <span
             className={cssClasses('', outcomeAccentClasses[decisionOutcome])}
             aria-hidden="true"
           />
-          <span >{outcomeLabels[decisionOutcome]}</span>
+          <span>{outcomeLabels[decisionOutcome]}</span>
         </div>
       )}
     </div>

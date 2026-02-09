@@ -16,21 +16,21 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
 
   return (
     <SectionWrapper title="Skills that characters can learn in this world">
-      <div >
+      <div>
         {skills.map((skill, index) => (
           <div key={`${skill.id ?? skill.name ?? index}`} >
-            <div >
-              <h3 >{skill.name}</h3>
+            <div>
+              <h3>{skill.name}</h3>
               {skill.difficulty && (
-                <span >
+                <span>
                   Difficulty: {skill.difficulty}
                 </span>
               )}
             </div>
             {skill.description && (
-              <p >{skill.description}</p>
+              <p>{skill.description}</p>
             )}
-            <div >
+            <div>
               {skill.attributeIds?.[0] && (
                 <span>
                   Linked to: {attributes.find(a => a.id === skill.attributeIds?.[0])?.name || 'Unknown'}

@@ -55,12 +55,12 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
 
   return (
     <div className="component-skills-form">
-      <div >
-        <h2 >Skills</h2>
+      <div>
+        <h2>Skills</h2>
         <PointPoolDisplay pool={pool} label="Skill Points" />
       </div>
 
-      <div >
+      <div>
         {managedSkills.map((skill, index) => {
           const uniqueKey = skill.id || `skill-${index}`;
           const worldSkill = world.skills.find(ws => ws.id === skill.id);
@@ -77,8 +77,8 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
               key={uniqueKey}
               
             >
-              <div >
-                <Label >
+              <div>
+                <Label>
                 {worldSkill?.name || `Skill ${index + 1}`}
                 </Label>
                 {worldSkill?.difficulty && (
@@ -96,12 +96,12 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 )}
               </div>
               {worldSkill?.description && (
-                <p >
+                <p>
                   {worldSkill.description}
                 </p>
               )}
               {cannotIncrease && currentValue < skill.maxValue && (
-                <p >
+                <p>
                   No points remaining. Reduce other skills to increase this one.
                 </p>
               )}
@@ -116,11 +116,11 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 showLabel={false}
                 testId={`skill-${skill.id}`}
               />
-              <div >
+              <div>
                 Range: {skill.minValue} - {skill.maxValue}
                 {worldSkill?.attributeIds &&
                   worldSkill.attributeIds.length > 0 && (
-                    <span >
+                    <span>
                     • Linked to:{' '}
                       {worldSkill.attributeIds
                         .map(

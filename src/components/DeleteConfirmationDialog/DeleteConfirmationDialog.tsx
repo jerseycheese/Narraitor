@@ -35,7 +35,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       size="lg"
       tone="destructive"
       footer={(
-        <div >
+        <div>
           <Button
             type="button"
             onClick={onClose}
@@ -59,7 +59,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       )}
       footerClassName=""
     >
-      <p >{itemName}</p>
+      <p>{itemName}</p>
     </SimpleModal>
   );
 };

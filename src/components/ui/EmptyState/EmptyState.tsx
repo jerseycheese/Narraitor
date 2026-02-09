@@ -43,7 +43,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       className
     )}>
       {icon && (
-        <div >
+        <div>
           {icon}
         </div>
       )}
@@ -58,7 +58,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         )}
       </div>
       {action && (
-        <div >
+        <div>
           {action}
         </div>
       )}

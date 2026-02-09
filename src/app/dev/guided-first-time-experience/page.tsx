@@ -55,16 +55,16 @@ export default function GuidedFirstTimeExperienceTestHarness() {
   };
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >
+    <div>
+      <div>
+        <div>
+          <h1>
             Guided First-Time Experience Test Harness
           </h1>
           
-          <div >
-            <div >
-              <span >
+          <div>
+            <div>
+              <span>
                 Onboarding Status:
               </span>
               <span className={`${
@@ -77,7 +77,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             </div>
 
             {/* Debug info */}
-            <div >
+            <div>
               shouldShow: {showOnboarding.toString()} |
               isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
             </div>
@@ -104,9 +104,9 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             </button>
           </div>
           
-          <div >
-            <h2 >Test Instructions:</h2>
-            <ul >
+          <div>
+            <h2>Test Instructions:</h2>
+            <ul>
               <li>• Test the complete 3-step onboarding flow</li>
               <li>• Verify skip functionality works correctly</li>
               <li>• Test mobile responsiveness by resizing window</li>
@@ -118,18 +118,18 @@ export default function GuidedFirstTimeExperienceTestHarness() {
         </div>
       </div>
       
-      <div >
-        <div >
+      <div>
+        <div>
           <div key={resetKey} >
             <GuidedFirstTimeExperience />
 
             {!showOnboarding && (
-              <div >
-                <div >
-                  <h3 >
+              <div>
+                <div>
+                  <h3>
                     Onboarding Completed
                   </h3>
-                  <p >
+                  <p>
                     The guided experience is hidden for returning users.
                   </p>
                   <button

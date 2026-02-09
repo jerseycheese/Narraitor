@@ -23,7 +23,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
   onUpdate
 }) => {
   const { facts, getFactHistory } = useLoreStore();
-  
+
   const fact = facts[factId];
   const history = getFactHistory(factId) || { factId, versions: [] };
 
@@ -36,19 +36,19 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
   };
 
   return (
-    <SimpleModal 
-      isOpen={true} 
+    <SimpleModal
+      isOpen={true}
       onClose={onClose}
       title="Fact Inspector"
       size="xl"
-      
+
     >
-      <div >
+      <div>
         Inspect and edit lore fact details, history, and relationships.
       </div>
 
         <Tabs defaultValue="details" >
-          <TabsList >
+          <TabsList>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="edit">Edit</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
@@ -56,68 +56,68 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
 
           {/* Details Tab */}
           <TabsContent value="details" >
-            <div >
-              <div >
+            <div>
+              <div>
                 <div>
-                  <span >ID:</span> 
-                  <span >{fact.id}</span>
+                  <span>ID:</span>
+                  <span>{fact.id}</span>
                 </div>
                 <div>
-                  <span >World ID:</span> 
-                  <span >{fact.worldId}</span>
+                  <span>World ID:</span>
+                  <span>{fact.worldId}</span>
                 </div>
               </div>
 
               <div>
-                <span >Key:</span> 
-                <span >{fact.key}</span>
+                <span>Key:</span>
+                <span>{fact.key}</span>
               </div>
 
               <div>
-                <span >Value:</span> 
-                <div >{fact.value}</div>
+                <span>Value:</span>
+                <div>{fact.value}</div>
               </div>
 
               <div>
-                <span >Category:</span> 
-                <span >{fact.category}</span>
+                <span>Category:</span>
+                <span>{fact.category}</span>
               </div>
 
               <div>
-                <span >Source:</span> 
-                <span >{fact.source}</span>
+                <span>Source:</span>
+                <span>{fact.source}</span>
               </div>
 
               {fact.sessionId && (
                 <div>
-                  <span >Session ID:</span> 
-                  <span >{fact.sessionId}</span>
+                  <span>Session ID:</span>
+                  <span>{fact.sessionId}</span>
                 </div>
               )}
 
               {fact.metadata && (
                 <div>
-                  <span >Metadata:</span>
-                  <div >
+                  <span>Metadata:</span>
+                  <div>
                     {fact.metadata.description && (
                       <div>
-                        <span >Description:</span> {fact.metadata.description}
+                        <span>Description:</span> {fact.metadata.description}
                       </div>
                     )}
                     {fact.metadata.importance && (
                       <div>
-                        <span >Importance:</span> {fact.metadata.importance}
+                        <span>Importance:</span> {fact.metadata.importance}
                       </div>
                     )}
                     {fact.metadata.type && (
                       <div>
-                        <span >Type:</span> {fact.metadata.type}
+                        <span>Type:</span> {fact.metadata.type}
                       </div>
                     )}
                     {fact.metadata.tags && fact.metadata.tags.length > 0 && (
                       <div>
-                        <span >Tags:</span>
-                        <div >
+                        <span>Tags:</span>
+                        <div>
                           {fact.metadata.tags.map((tag, index) => (
                             <span key={index} >
                               {tag}
@@ -128,8 +128,8 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                     )}
                     {fact.metadata.relatedEntities && fact.metadata.relatedEntities.length > 0 && (
                       <div>
-                        <span >Related Entities:</span>
-                        <div >
+                        <span>Related Entities:</span>
+                        <div>
                           {fact.metadata.relatedEntities.map((entity, index) => (
                             <span key={index} >
                               {entity}
@@ -142,14 +142,14 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                 </div>
               )}
 
-              <div >
+              <div>
                 <div>
-                  <span >Created:</span> 
-                  <span >{new Date(fact.createdAt).toLocaleString()}</span>
+                  <span>Created:</span>
+                  <span>{new Date(fact.createdAt).toLocaleString()}</span>
                 </div>
                 <div>
-                  <span >Updated:</span> 
-                  <span >{new Date(fact.updatedAt).toLocaleString()}</span>
+                  <span>Updated:</span>
+                  <span>{new Date(fact.updatedAt).toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -168,25 +168,25 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
           {/* History Tab */}
           <TabsContent value="history" >
             {history.length > 0 ? (
-              <div >
-                <div >
+              <div>
+                <div>
                   Showing {history.length} version(s) of this fact
                 </div>
                 {history.map((version, index) => (
                   <div key={index} >
-                    <div >
-                      <span >Version {history.length - index}</span>
-                      <span >
+                    <div>
+                      <span>Version {history.length - index}</span>
+                      <span>
                         {new Date(version.updatedAt).toLocaleString()}
                       </span>
                     </div>
-                    <div >
+                    <div>
                       <div>
-                        <span >Value:</span> {version.value}
+                        <span>Value:</span> {version.value}
                       </div>
                       {version.metadata?.description && (
                         <div>
-                          <span >Description:</span> {version.metadata.description}
+                          <span>Description:</span> {version.metadata.description}
                         </div>
                       )}
                     </div>
@@ -194,14 +194,14 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                 ))}
               </div>
             ) : (
-              <div >
+              <div>
                 No history available for this fact
               </div>
             )}
           </TabsContent>
         </Tabs>
 
-        <div >
+        <div>
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>

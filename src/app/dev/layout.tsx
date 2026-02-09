@@ -12,13 +12,13 @@ export default function DevLayout({
   }
 
   return (
-    <main >
-      <div >
-        <header >
+    <main>
+      <div>
+        <header>
           <Link href="/dev">
-            <h1 >Narraitor Development</h1>
+            <h1>Narraitor Development</h1>
           </Link>
-          <p >Test environments for component development</p>
+          <p>Test environments for component development</p>
         </header>
         {children}
       </div>

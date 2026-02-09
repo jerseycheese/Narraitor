@@ -137,11 +137,11 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         title="Choose a Starting Template"
         description="Character templates will help you get started quickly"
       >
-        <div >
-          <p >
+        <div>
+          <p>
             No templates available for this world yet.
           </p>
-          <p >
+          <p>
             Continue to create your character from scratch.
           </p>
         </div>
@@ -155,8 +155,8 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       description="Select a pre-configured character template or skip to create from scratch"
     >
       {/* Info banner */}
-      <div >
-        <p >
+      <div>
+        <p>
           These templates are tailored to your <strong>{getGenreLabel(worldConfig.genre)}</strong> world.
           Select one to get started quickly, or skip to create your own character from scratch.
           You can customize any template values in the following steps.
@@ -164,7 +164,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       </div>
 
       {/* Template Cards Grid */}
-      <div >
+      <div>
         {templates.map(template => (
           <ActiveStateCard
             key={template.id}
@@ -175,19 +175,19 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
             inactiveClassName=""
             testId="template-card"
           >
-            <CardHeader >
-              <CardTitle >
+            <CardHeader>
+              <CardTitle>
                 {template.name}
               </CardTitle>
-              <CardDescription >
+              <CardDescription>
                 {template.description}
               </CardDescription>
             </CardHeader>
 
-            <CardContent >
+            <CardContent>
               {/* Personality */}
               <div>
-                <p >
+                <p>
                   &ldquo;{template.background.personality}&rdquo;
                 </p>
               </div>
@@ -195,10 +195,10 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
               {/* Top 3 Attributes */}
               {template.attributes && template.attributes.length > 0 && (
                 <div>
-                  <h4 >
+                  <h4>
                     Key Attributes
                   </h4>
-                  <div >
+                  <div>
                     {[...template.attributes]
                       .sort((a, b) => b.value - a.value)
                       .slice(0, 3)
@@ -218,10 +218,10 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
               {/* Top 3 Skills */}
               {template.skills && template.skills.length > 0 && (
                 <div>
-                  <h4 >
+                  <h4>
                     Best Skills
                   </h4>
-                  <div >
+                  <div>
                     {[...template.skills]
                       .sort((a, b) => b.level - a.level)
                       .slice(0, 3)
@@ -240,10 +240,10 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
 
               {/* Motivation */}
               <div>
-                <h4 >
+                <h4>
                   Motivation
                 </h4>
-                <p >
+                <p>
                   &ldquo;{template.background.motivation}&rdquo;
                 </p>
               </div>
@@ -265,11 +265,11 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       </div>
 
       {/* Help Text */}
-      <div >
-        <p >
+      <div>
+        <p>
           Selected a template? Click <strong>Next</strong> to customize it further.
         </p>
-        <p >
+        <p>
           All template values can be modified in the following steps.
         </p>
       </div>

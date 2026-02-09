@@ -96,9 +96,9 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
   const [value, setValue] = useState('original');
   
   return (
-    <div >
-      <label >
-        World Type <span >*</span>
+    <div>
+      <label>
+        World Type <span>*</span>
       </label>
       <RadioGroup
         {...args}
@@ -106,29 +106,29 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
         onValueChange={setValue}
         name="world-type-radio"
       >
-        <div >
+        <div>
           <RadioGroupItem value="original" />
-          <div >
-            <div >Original World</div>
-            <div >
+          <div>
+            <div>Original World</div>
+            <div>
               Generate a completely original world with unique settings and themes
             </div>
           </div>
         </div>
-        <div >
+        <div>
           <RadioGroupItem value="inspired_by" />
-          <div >
-            <div >Inspired By</div>
-            <div >
+          <div>
+            <div>Inspired By</div>
+            <div>
               Generate an original world inspired by an existing fictional universe
             </div>
           </div>
         </div>
-        <div >
+        <div>
           <RadioGroupItem value="set_within" />
-          <div >
-            <div >Set Within</div>
-            <div >
+          <div>
+            <div>Set Within</div>
+            <div>
               Generate a world directly within an existing fictional universe
             </div>
           </div>

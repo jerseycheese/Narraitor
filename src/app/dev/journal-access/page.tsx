@@ -249,18 +249,18 @@ export default function JournalAccessTestPage() {
   }, [entryCount]);
 
   return (
-    <div >
+    <div>
       {/* Test Controls */}
-      <div >
-        <h1 >
+      <div>
+        <h1>
           📖 Journal Access Test Harness - Issue #278
         </h1>
 
-        <div >
+        <div>
           {/* Character Toggle */}
-          <div >
-            <h3 >Character Presence</h3>
-            <label >
+          <div>
+            <h3>Character Presence</h3>
+            <label>
               <input
                 type="checkbox"
                 checked={hasCharacter}
@@ -272,8 +272,8 @@ export default function JournalAccessTestPage() {
           </div>
 
           {/* Game Status */}
-          <div >
-            <h3 >Game Status</h3>
+          <div>
+            <h3>Game Status</h3>
             <select
               value={gameStatus}
               onChange={(e) =>
@@ -292,8 +292,8 @@ export default function JournalAccessTestPage() {
           </div>
 
           {/* Journal Entries */}
-          <div >
-            <h3 >Journal Entries</h3>
+          <div>
+            <h3>Journal Entries</h3>
             <input
               type="range"
               min="0"
@@ -302,12 +302,12 @@ export default function JournalAccessTestPage() {
               onChange={(e) => setEntryCount(parseInt(e.target.value))}
               
             />
-            <span >{entryCount} entries</span>
+            <span>{entryCount} entries</span>
           </div>
 
           {/* Journal Controls */}
-          <div >
-            <h3 >Journal Debug</h3>
+          <div>
+            <h3>Journal Debug</h3>
             <button
               onClick={() => router.push('/worlds/test-world-1/play/journal')}
               
@@ -330,11 +330,11 @@ export default function JournalAccessTestPage() {
         </div>
 
         {/* Acceptance Criteria Checklist */}
-        <div >
-          <h3 >
+        <div>
+          <h3>
             ✅ Acceptance Criteria Testing
           </h3>
-          <ul >
+          <ul>
             <li>
               🎯 <strong>AC1:</strong> Journal button visible when character
               present
@@ -359,8 +359,8 @@ export default function JournalAccessTestPage() {
       </div>
 
       {/* Game Session Component */}
-      <div >
-        <div >
+      <div>
+        <div>
           <ActiveGameSession
             worldId="test-world-1"
             sessionId="test-session-1"
@@ -374,17 +374,17 @@ export default function JournalAccessTestPage() {
       </div>
 
       {/* Testing Instructions */}
-      <div >
-        <div >
-          <h3 >
+      <div>
+        <div>
+          <h3>
             🧪 Testing Instructions
           </h3>
-          <div >
+          <div>
             <div>
-              <h4 >
+              <h4>
                 Interactive Tests:
               </h4>
-              <ul >
+              <ul>
                 <li>• Toggle character presence to test AC1</li>
                 <li>• Change game status to test AC3</li>
                 <li>• Adjust entry count to test different journal states</li>
@@ -396,10 +396,10 @@ export default function JournalAccessTestPage() {
               </ul>
             </div>
             <div>
-              <h4 >
+              <h4>
                 Expected Behavior:
               </h4>
-              <ul >
+              <ul>
                 <li>• Journal button appears only with character</li>
                 <li>• Journal opens as a full-page view</li>
                 <li>• Journal entries display correctly</li>

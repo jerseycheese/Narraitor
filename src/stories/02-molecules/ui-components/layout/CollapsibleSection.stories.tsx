@@ -48,9 +48,9 @@ export const Default: Story = {
   args: {
     title: 'Example Section',
     children: (
-      <div >
-        <p >Section content goes here.</p>
-        <p >This can be any React component.</p>
+      <div>
+        <p>Section content goes here.</p>
+        <p>This can be any React component.</p>
       </div>
     )
   }
@@ -61,8 +61,8 @@ export const InitiallyCollapsed: Story = {
     title: 'Collapsed Section',
     initialCollapsed: true,
     children: (
-      <div >
-        <p >This content is initially hidden.</p>
+      <div>
+        <p>This content is initially hidden.</p>
       </div>
     )
   }
@@ -72,13 +72,13 @@ export const WithNestedContent: Story = {
   args: {
     title: 'Complex Content',
     children: (
-      <div >
-        <h3 >Nested Heading</h3>
-        <div >
-          <div >Item 1</div>
-          <div >Item 2</div>
-          <div >Item 3</div>
-          <div >Item 4</div>
+      <div>
+        <h3>Nested Heading</h3>
+        <div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+          <div>Item 3</div>
+          <div>Item 4</div>
         </div>
       </div>
     )
@@ -89,15 +89,15 @@ export const WithDevToolsContent: Story = {
   args: {
     title: 'State Information',
     children: (
-      <div >
-        <div >
-          <span >currentWorldId:</span> <span >&quot;world-123&quot;</span>
+      <div>
+        <div>
+          <span>currentWorldId:</span> <span>&quot;world-123&quot;</span>
         </div>
-        <div >
-          <span >loading:</span> <span >false</span>
+        <div>
+          <span>loading:</span> <span>false</span>
         </div>
-        <div >
-          <span >error:</span> <span >null</span>
+        <div>
+          <span>error:</span> <span>null</span>
         </div>
       </div>
     )

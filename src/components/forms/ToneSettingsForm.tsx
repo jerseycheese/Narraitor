@@ -51,20 +51,20 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   };
 
   return (
-    <div >
+    <div>
       {showHeader && (
-        <div >
-          <h3 >Tone Settings</h3>
-          <p >
+        <div>
+          <h3>Tone Settings</h3>
+          <p>
             Configure the narrative style, content rating, and language complexity for generated content.
           </p>
         </div>
       )}
-      <div >
+      <div>
         {/* Tone Settings Grid */}
-        <div >
+        <div>
           {/* Content Rating */}
-          <div >
+          <div>
             <Label htmlFor="content-rating">Content Rating</Label>
             <p id="content-rating-description" >Set the age-appropriate content level for generated narratives</p>
             <Select
@@ -83,7 +83,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Narrative Style */}
-          <div >
+          <div>
             <Label htmlFor="narrative-style">Narrative Style</Label>
             <p id="narrative-style-description" >Choose how the story will be told and presented</p>
             <Select
@@ -102,7 +102,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Language Complexity */}
-          <div >
+          <div>
             <Label htmlFor="language-complexity">Language Complexity</Label>
             <p id="language-complexity-description" >Set the vocabulary and sentence complexity level</p>
             <Select
@@ -121,7 +121,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Custom Instructions */}
-          <div >
+          <div>
             <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
             <p id="custom-instructions-description" >Add specific guidance for tone, style, or narrative elements</p>
             <Textarea
@@ -142,7 +142,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
         )}
 
         {showSaveButton && onSave && (
-          <div >
+          <div>
             <Button 
               onClick={onSave}
               disabled={!validationResult.valid}

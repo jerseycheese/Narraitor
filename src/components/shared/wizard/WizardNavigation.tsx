@@ -31,7 +31,7 @@ export const WizardNavigation: React.FC<WizardNavigationProps> = ({
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
-    <div className={`${wizardStyles.navigation.container}${className}`}>
+    <div className={`${wizardStyles.navigation.container} ${className}`}>
       <button
         type="button"
         onClick={onCancel}

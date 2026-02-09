@@ -49,14 +49,14 @@ export default function DevPage() {
   };
 
   return (
-    <div >
-      <h1 >Development Test Harnesses</h1>
+    <div>
+      <h1>Development Test Harnesses</h1>
       
-      <div >
+      <div>
         {Object.entries(testHarnesses).map(([category, items]) => (
           <div key={category}>
-            <h2 >{category}</h2>
-            <div >
+            <h2>{category}</h2>
+            <div>
               {items.map((item) => (
                 <Link
                   key={item.href}

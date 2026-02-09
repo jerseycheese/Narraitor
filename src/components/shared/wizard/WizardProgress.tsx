@@ -20,11 +20,11 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   return (
     <div className={`${className}`}>
       {/* Steps and connectors */}
-      <div >
+      <div>
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
             {/* Step circle */}
-            <div >
+            <div>
               <div
                 className={cssClasses(
                   wizardStyles.progress.circle,
@@ -42,7 +42,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
             </div>
             {/* Connector (no connector after last circle) */}
             {index < steps.length - 1 && (
-              <div >
+              <div>
                 <div />
               </div>
             )}

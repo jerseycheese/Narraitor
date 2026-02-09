@@ -29,28 +29,28 @@ export function GameReadyStep({
 
   return (
     <div data-testid="game-ready-step" >
-      <h3 >
+      <h3>
         Ready to Begin Your Story!
       </h3>
       
-      <div >
-        <div >
+      <div>
+        <div>
           <div>
-            <span >World:</span>
-            <p >{world?.name}</p>
-            <p >{world?.genre ? getGenreLabel(world.genre) : 'Unknown'}</p>
+            <span>World:</span>
+            <p>{world?.name}</p>
+            <p>{world?.genre ? getGenreLabel(world.genre) : 'Unknown'}</p>
           </div>
-          <div >
-            <span >Character:</span>
-            <p >{character?.name}</p>
-            <p >
+          <div>
+            <span>Character:</span>
+            <p>{character?.name}</p>
+            <p>
               {character?.background?.personality || 'No description available'}
             </p>
           </div>
         </div>
       </div>
 
-      <div >
+      <div>
         <Button
           onClick={onStart}
           disabled={isStarting}
@@ -59,7 +59,7 @@ export function GameReadyStep({
         >
           {isStarting ? (
             <>
-              <span >⏳</span>
+              <span>⏳</span>
               Starting Game...
             </>
           ) : (

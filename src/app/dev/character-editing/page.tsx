@@ -127,9 +127,9 @@ export default function CharacterEditingTestPage() {
 
   if (!testCharacterId) {
     return (
-      <div >
-        <div >
-          <h1 >
+      <div>
+        <div>
+          <h1>
             Character Editing Test Harness
           </h1>
           <p>Setting up test data...</p>
@@ -139,17 +139,17 @@ export default function CharacterEditingTestPage() {
   }
 
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >
+    <div>
+      <div>
+        <div>
+          <h1>
             Character Editing Test Harness
           </h1>
-          <div >
-            <h2 >
+          <div>
+            <h2>
               Acceptance Criteria Testing
             </h2>
-            <ul >
+            <ul>
               <li>
                 ✅ An editing interface allows modification of existing
                 character fields

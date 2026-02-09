@@ -10,9 +10,9 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div >
-      <h2 >Something went wrong!</h2>
-      <p >{error.message || 'An unexpected error occurred'}</p>
+    <div>
+      <h2>Something went wrong!</h2>
+      <p>{error.message || 'An unexpected error occurred'}</p>
       <ActionButtonGroup
         actions={[{
           label: 'Try again',

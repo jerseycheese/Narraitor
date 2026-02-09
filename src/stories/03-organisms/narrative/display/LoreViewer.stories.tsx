@@ -61,7 +61,7 @@ export const WithFacts: Story = {
   },
   render: (args) => (
     <WithSampleData>
-      <div >
+      <div>
         <LoreViewer {...args} />
       </div>
     </WithSampleData>
@@ -77,7 +77,7 @@ const EmptyWrapper = ({ worldId }: { worldId: string }) => {
   }, [clearFacts]);
 
   return (
-    <div >
+    <div>
       <LoreViewer worldId={worldId} />
     </div>
   );
@@ -108,8 +108,8 @@ const SessionWrapper = ({ worldId, sessionId }: { worldId: string; sessionId?: s
   }, [addFact, clearFacts]);
 
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         Showing facts from session: {sessionId}
       </div>
       <LoreViewer worldId={worldId} sessionId={sessionId} />

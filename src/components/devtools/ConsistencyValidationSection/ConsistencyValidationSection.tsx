@@ -90,10 +90,10 @@ export const ConsistencyValidationSection = () => {
   }, [loreContext, worldLoreFacts]);
 
   return (
-    <div >
+    <div>
       {/* World Selection */}
       <DevToolsSection>
-        <label >
+        <label>
           Select World for Consistency Analysis:
         </label>
         <Select 
@@ -114,7 +114,7 @@ export const ConsistencyValidationSection = () => {
         <>
           {/* Lore Statistics */}
           <DevToolsSection title="Lore Statistics">
-            <div >
+            <div>
               <div>Total Facts: {loreStats.totalFacts}</div>
               <div>High Importance: {loreStats.highImportance}</div>
               <div>Characters: {loreStats.characters}</div>
@@ -126,14 +126,14 @@ export const ConsistencyValidationSection = () => {
 
           {/* Generated Consistency Instructions */}
           <DevToolsSection title="Generated Consistency Instructions">
-            <div >
+            <div>
               {consistencyInstructions || 'No instructions generated'}
             </div>
           </DevToolsSection>
 
           {/* Structured Lore Context */}
           <DevToolsSection title="Structured Lore Context">
-            <div >
+            <div>
               <JsonViewer 
                 data={loreContext} 
                 
@@ -143,7 +143,7 @@ export const ConsistencyValidationSection = () => {
 
           {/* Raw Lore Facts */}
           <DevToolsSection title={`Raw Lore Facts (${worldLoreFacts.length})`}>
-            <div >
+            <div>
               <JsonViewer 
                 data={worldLoreFacts} 
                 
@@ -153,10 +153,10 @@ export const ConsistencyValidationSection = () => {
 
           {/* Categorization Breakdown */}
           <DevToolsSection title="Categorization Details">
-            <div >
+            <div>
               {loreContext.characters.length > 0 && (
                 <div>
-                  <div >Characters:</div>
+                  <div>Characters:</div>
                   {loreContext.characters.map((char, idx) => (
                     <div key={idx} >
                       {char.name} - {char.importance} importance - Traits: {char.traits.join(',')}
@@ -167,7 +167,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.locations.length > 0 && (
                 <div>
-                  <div >Locations:</div>
+                  <div>Locations:</div>
                   {loreContext.locations.map((loc, idx) => (
                     <div key={idx} >
                       {loc.name} ({loc.type}) - {loc.importance} importance
@@ -178,7 +178,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.worldRules.length > 0 && (
                 <div>
-                  <div >World Rules:</div>
+                  <div>World Rules:</div>
                   {loreContext.worldRules.map((rule, idx) => (
                     <div key={idx} >
                       {rule.rule} - {rule.importance} importance
@@ -189,7 +189,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.historicalEvents.length > 0 && (
                 <div>
-                  <div >Historical Events:</div>
+                  <div>Historical Events:</div>
                   {loreContext.historicalEvents.map((event, idx) => (
                     <div key={idx} >
                       {event.event} - {event.importance} importance
@@ -203,7 +203,7 @@ export const ConsistencyValidationSection = () => {
       )}
 
       {!selectedWorldId && availableWorldIds.length === 0 && (
-        <div >
+        <div>
           No lore facts found. Create some lore in a game session to test consistency validation.
         </div>
       )}

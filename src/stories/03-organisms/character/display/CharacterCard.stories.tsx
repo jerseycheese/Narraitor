@@ -205,7 +205,7 @@ export const Grid: Story = {
     onDelete: () => console.log('Delete clicked'),
   },
   render: () => (
-    <div >
+    <div>
       <CharacterCard
         character={{
           ...mockCharacter,

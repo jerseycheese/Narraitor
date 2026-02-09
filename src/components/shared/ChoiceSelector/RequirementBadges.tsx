@@ -44,7 +44,7 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   }
 
   return (
-    <div >
+    <div>
       {requirements.map((skillReq, index) => (
         <Badge
           key={`${optionId}-skill-${index}`}
@@ -70,13 +70,13 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
   }
 
   return (
-    <div >
+    <div>
       {groups.map((group, groupIndex) => (
         <div key={`${optionId}-item-group-${groupIndex}`}>
-          <p >
+          <p>
             {group.logic === 'any' ? 'Requires any of:' : 'Requires all:'}
           </p>
-          <div >
+          <div>
             {group.requirements.map((itemReq, reqIndex) => {
               const label = itemReq.met
                 ? itemReq.itemName
@@ -88,7 +88,7 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
                   variant={itemReq.met ? 'success' : 'destructive'}
                 >
                   {label}
-                  {!itemReq.met && <span > - missing</span>}
+                  {!itemReq.met && <span> - missing</span>}
                 </Badge>
               );
             })}

@@ -36,12 +36,12 @@ const meta: Meta<typeof Navigation> = {
 
       return (
         <NavigationLoadingProvider>
-          <div >
+          <div>
             <Story />
-            <div >
-              <div >
-                <h2 >Page Content</h2>
-                <p >
+            <div>
+              <div>
+                <h2>Page Content</h2>
+                <p>
                   This area represents the page content below the navigation.
                   The navigation component adapts based on the current world
                   state and user context.
@@ -301,14 +301,14 @@ export const MobileView: Story = {
       useWorldStore.getState().setCurrentWorld(worldId1);
       return (
         <NavigationLoadingProvider>
-          <div >
+          <div>
             <Story />
-            <div >
-              <div >
-                <h2 >
+            <div>
+              <div>
+                <h2>
                   Mobile Page Content
                 </h2>
-                <p >
+                <p>
                   This shows the mobile navigation with hamburger menu. The menu
                   should show when screen width is ≤768px.
                 </p>

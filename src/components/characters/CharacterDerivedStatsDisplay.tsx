@@ -15,7 +15,7 @@ export function CharacterDerivedStatsDisplay({
   }
 
   return (
-    <div >
+    <div>
       {derivedStats.map((stat) => {
         const percentage =
           stat.maxValue > 0 ? (stat.currentValue / stat.maxValue) * 100 : 0;
@@ -28,11 +28,11 @@ export function CharacterDerivedStatsDisplay({
             
             data-testid={`derived-stat-${stat.name.toLowerCase().replace(/\s+/g, '-')}`}
           >
-            <div >
-              <h3 >{stat.name}</h3>
+            <div>
+              <h3>{stat.name}</h3>
             </div>
 
-            <div >
+            <div>
               <span
                 className={`${
                   isDepleted
@@ -44,11 +44,11 @@ export function CharacterDerivedStatsDisplay({
               >
                 {stat.currentValue}
               </span>
-              <span >/ {stat.maxValue}</span>
+              <span>/ {stat.maxValue}</span>
             </div>
 
             {/* Progress bar */}
-            <div >
+            <div>
               <div
                 className={`${
                   isDepleted
@@ -63,7 +63,7 @@ export function CharacterDerivedStatsDisplay({
 
             {/* Depletion warning */}
             {isDepleted && (
-              <p >Depleted</p>
+              <p>Depleted</p>
             )}
           </div>
         );

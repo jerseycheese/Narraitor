@@ -117,16 +117,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default fallback UI
       return (
-        <div >
-          <div >
-            <h3 >
+        <div>
+          <div>
+            <h3>
               Something went wrong
             </h3>
-            <p >
+            <p>
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             {this.state.errorId && (
-              <p >
+              <p>
                 Error ID: {this.state.errorId}
               </p>
             )}

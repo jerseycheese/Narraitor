@@ -16,9 +16,9 @@ interface TutorialContentProps {
 export function TutorialContent({ children, example }: TutorialContentProps) {
   return (
     <div className="tutorial-content">
-      <p >{children}</p>
+      <p>{children}</p>
       {example && (
-        <p >
+        <p>
           Example: {example}
         </p>
       )}

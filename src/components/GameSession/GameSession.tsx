@@ -321,9 +321,9 @@ const GameSession: React.FC<GameSessionProps> = ({
     if (worldCharacters.length === 0) {
       return (
         <div data-testid="game-session-no-characters" >
-          <div >
-            <h2 >No Characters Found</h2>
-            <p >
+          <div>
+            <h2>No Characters Found</h2>
+            <p>
               You need to create a character before you can start playing in this world.
             </p>
             <Button
@@ -340,11 +340,11 @@ const GameSession: React.FC<GameSessionProps> = ({
     
     return (
       <div data-testid="game-session-initializing" >
-        <div >
-          <h2 >Session Not Started</h2>
-          <p >No active game session.</p>
+        <div>
+          <h2>Session Not Started</h2>
+          <p>No active game session.</p>
           {process.env.NODE_ENV === 'development' && (
-            <div >
+            <div>
               Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
             </div>
           )}
@@ -397,7 +397,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Default case - unknown state
   return (
     <div data-testid="game-session-unknown" >
-      <div >
+      <div>
         <p>Unknown session state: {sessionState.status}</p>
       </div>
     </div>

@@ -55,7 +55,7 @@ export default function PlayPage() {
 
   if (isLoading) {
     return (
-      <main >
+      <main>
         <LoadingPulse message="Preparing your adventure..." />
       </main>
     );
@@ -69,7 +69,7 @@ export default function PlayPage() {
           message={error}
           severity="error"
         />
-        <div >
+        <div>
           <button
             onClick={() => router.push('/worlds')}
             

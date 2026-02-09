@@ -14,25 +14,25 @@ type Story = StoryObj<typeof meta>
 
 // Color Swatch Component
 const ColorSwatch = ({ color, name, description }: { color: string; name: string; description?: string }) => (
-  <div >
-    <div >
+  <div>
+    <div>
     <svg width="100%" height="100%" viewBox="0 0 48 48" role="img" aria-label={`${name} swatch`}>
         <rect x="0" y="0" width="48" height="48" fill={color} />
       </svg>
     </div>
-    <div >
-      <div >{name}</div>
-      <div >{color}</div>
-      {description && <div >{description}</div>}
+    <div>
+      <div>{name}</div>
+      <div>{color}</div>
+      {description && <div>{description}</div>}
     </div>
   </div>
 )
 
 // Color Scale Component
 const ColorScale = ({ colors, name }: { colors: Record<string, string>; name: string }) => (
-  <div >
-    <h3 >{name}</h3>
-    <div >
+  <div>
+    <h3>{name}</h3>
+    <div>
       {Object.entries(colors).map(([shade, color]) => (
         <ColorSwatch key={`${name}-${shade}`} color={color} name={`${name}-${shade}`} />
       ))}
@@ -43,10 +43,10 @@ const ColorScale = ({ colors, name }: { colors: Record<string, string>; name: st
 export const PrimitiveTokens: Story = {
   name: 'Primitive Tokens',
   render: () => (
-    <div >
+    <div>
       <div>
-        <h2 >Primitive Color Tokens</h2>
-        <p >
+        <h2>Primitive Color Tokens</h2>
+        <p>
           Foundation colors that are genre-neutral and used as building blocks for semantic tokens.
         </p>
       </div>
@@ -63,36 +63,36 @@ export const PrimitiveTokens: Story = {
 export const SemanticTokens: Story = {
   name: 'Semantic Tokens',
   render: () => (
-    <div >
+    <div>
       <div>
-        <h2 >Semantic Color Tokens</h2>
-        <p >
+        <h2>Semantic Color Tokens</h2>
+        <p>
           Colors with contextual meaning that map to primitive tokens.
         </p>
       </div>
       
-      <div >
-        <div >
-          <h3 >Primary Actions</h3>
-          <div >
+      <div>
+        <div>
+          <h3>Primary Actions</h3>
+          <div>
             <ColorSwatch color={semanticColors.primary.default} name="Primary" description="Main brand actions" />
             <ColorSwatch color={semanticColors.primary.hover} name="Primary Hover" />
             <ColorSwatch color={semanticColors.primary.active} name="Primary Active" />
           </div>
         </div>
         
-        <div >
-          <h3 >Secondary Actions</h3>
-          <div >
+        <div>
+          <h3>Secondary Actions</h3>
+          <div>
             <ColorSwatch color={semanticColors.secondary.default} name="Secondary" description="Secondary actions" />
             <ColorSwatch color={semanticColors.secondary.hover} name="Secondary Hover" />
             <ColorSwatch color={semanticColors.secondary.active} name="Secondary Active" />
           </div>
         </div>
         
-        <div >
-          <h3 >Status Colors</h3>
-          <div >
+        <div>
+          <h3>Status Colors</h3>
+          <div>
             <ColorSwatch color={semanticColors.success.default} name="Success" description="Positive outcomes" />
             <ColorSwatch color={semanticColors.warning.default} name="Warning" description="Caution states" />
             <ColorSwatch color={semanticColors.danger.default} name="Danger" description="Error states" />
@@ -100,9 +100,9 @@ export const SemanticTokens: Story = {
           </div>
         </div>
         
-        <div >
-          <h3 >Surface & Text</h3>
-          <div >
+        <div>
+          <h3>Surface & Text</h3>
+          <div>
             <ColorSwatch color={semanticColors.surface.default} name="Surface" description="Card/panel backgrounds" />
             <ColorSwatch color={semanticColors.text.primary} name="Text Primary" description="Main text content" />
             <ColorSwatch color={semanticColors.text.secondary} name="Text Secondary" description="Secondary text" />
@@ -117,18 +117,18 @@ export const SemanticTokens: Story = {
 export const ContextualTokens: Story = {
   name: 'Contextual Tokens',
   render: () => (
-    <div >
+    <div>
       <div>
-        <h2 >Contextual Color Tokens</h2>
-        <p >
+        <h2>Contextual Color Tokens</h2>
+        <p>
           Genre-specific colors used only in storytelling contexts.
         </p>
       </div>
       
-      <div >
-        <div >
-          <h3 >Story Ending Tones</h3>
-          <div >
+      <div>
+        <div>
+          <h3>Story Ending Tones</h3>
+          <div>
             {Object.entries(endingTones).map(([tone, colors]) => (
               <ColorSwatch 
                 key={tone}
@@ -140,18 +140,18 @@ export const ContextualTokens: Story = {
           </div>
         </div>
         
-        <div >
-          <h3 >Lore Categories</h3>
-          <div >
+        <div>
+          <h3>Lore Categories</h3>
+          <div>
             {Object.entries(loreCategories).map(([category, colors]) => (
               <div key={category} >
-                <div >
+                <div>
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </div>
-                <div >
+                <div>
                   bg: {colors.background} | border: {colors.border}
                 </div>
-                <div >
+                <div>
                 <svg width="100%" height="32" viewBox="0 0 200 32" role="img" aria-label={`${category} example`}>
                     <rect x="0" y="0" width="200" height="32" fill={colors.background} stroke={colors.border} />
                   </svg>
@@ -168,62 +168,62 @@ export const ContextualTokens: Story = {
 export const TokenUsageExamples: Story = {
   name: 'Usage Examples',
   render: () => (
-    <div >
+    <div>
       <div>
-        <h2 >Token Usage Examples</h2>
-        <p >
+        <h2>Token Usage Examples</h2>
+        <p>
           Examples showing how to use design tokens in components.
         </p>
       </div>
       
-      <div >
+      <div>
         <div>
-          <h3 >Button Variants</h3>
-          <div >
-            <button >
+          <h3>Button Variants</h3>
+          <div>
+            <button>
               Primary Button
             </button>
-            <button >
+            <button>
               Secondary Button
             </button>
-            <button >
+            <button>
               Destructive Button
             </button>
           </div>
         </div>
         
         <div>
-          <h3 >Status Indicators</h3>
-          <div >
-            <div >
-              <div >Success Message</div>
-              <div >Operation completed successfully</div>
+          <h3>Status Indicators</h3>
+          <div>
+            <div>
+              <div>Success Message</div>
+              <div>Operation completed successfully</div>
             </div>
-            <div >
-              <div >Warning Message</div>
-              <div >Please review before proceeding</div>
+            <div>
+              <div>Warning Message</div>
+              <div>Please review before proceeding</div>
             </div>
-            <div >
-              <div >Info Message</div>
-              <div >Additional information available</div>
+            <div>
+              <div>Info Message</div>
+              <div>Additional information available</div>
             </div>
           </div>
         </div>
         
         <div>
-          <h3 >Cards & Surfaces</h3>
-          <div >
-            <div >
-              <h4 >Default Card</h4>
-              <p >Uses standard surface tokens</p>
+          <h3>Cards & Surfaces</h3>
+          <div>
+            <div>
+              <h4>Default Card</h4>
+              <p>Uses standard surface tokens</p>
             </div>
-            <div >
-              <h4 >Muted Surface</h4>
-              <p >Subtle background variant</p>
+            <div>
+              <h4>Muted Surface</h4>
+              <p>Subtle background variant</p>
             </div>
-            <div >
-              <h4 >Accent Surface</h4>
-              <p >Highlighted content area</p>
+            <div>
+              <h4>Accent Surface</h4>
+              <p>Highlighted content area</p>
             </div>
           </div>
         </div>

@@ -67,7 +67,7 @@ export function CharacterPortrait({
   if (isGenerating) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div >
+        <div>
           <div className={cssClasses(
             "",
             size === 'small' && "",
@@ -75,7 +75,7 @@ export function CharacterPortrait({
             size === 'large' && "",
             size === 'xlarge' && ""
           )} role="status">
-            <span >Generating portrait...</span>
+            <span>Generating portrait...</span>
           </div>
         </div>
       </div>
@@ -85,8 +85,8 @@ export function CharacterPortrait({
   if (error) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div >
-          <span >{error}</span>
+        <div>
+          <span>{error}</span>
         </div>
       </div>
     );
@@ -118,7 +118,7 @@ export function CharacterPortrait({
       data-testid="character-portrait"
       onClick={onClick}
     >
-      <div >
+      <div>
         {getInitials(characterName)}
       </div>
     </div>

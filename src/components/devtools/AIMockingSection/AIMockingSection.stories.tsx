@@ -16,8 +16,8 @@ const meta: Meta<typeof AIMockingSection> = {
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div >
-          <div >
+        <div>
+          <div>
             <Story />
           </div>
         </div>
@@ -163,8 +163,8 @@ export const CompactLayout: Story = {
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div >
-          <div >
+        <div>
+          <div>
             <Story />
           </div>
         </div>
@@ -208,22 +208,22 @@ export const DevToolsIntegration: Story = {
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div >
+        <div>
           {/* Simulated DevTools environment */}
-          <div >
-            <h3 >
+          <div>
+            <h3>
               AI Tools & Validation
             </h3>
-            <div >
+            <div>
               {/* AI Mocking Section */}
-              <div >
-                <h4 >AI Response Mocking</h4>
+              <div>
+                <h4>AI Response Mocking</h4>
                 <Story />
               </div>
               {/* Simulated other sections */}
-              <div >
-                <h4 >AI Testing Panel</h4>
-                <div >Other DevTools sections...</div>
+              <div>
+                <h4>AI Testing Panel</h4>
+                <div>Other DevTools sections...</div>
               </div>
             </div>
           </div>

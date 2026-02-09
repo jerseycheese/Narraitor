@@ -23,9 +23,9 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
       type="button"
       data-testid={testId}
       onClick={onClick}
-      className={`${wizardStyles.toggle.button}${
+      className={`${wizardStyles.toggle.button} ${
         isActive ? wizardStyles.toggle.active : wizardStyles.toggle.inactive
-      }${className}`}
+      } ${className}`}
     >
       {isActive ? activeLabel : inactiveLabel}
     </button>

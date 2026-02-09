@@ -151,7 +151,7 @@ export function WorldTypeSelector({
 
       {/* Conditional Fields */}
       {selectedOption?.requiresReference && (
-        <div className={`${styles.conditionalTop}${styles.container}`}>
+        <div className={`${styles.conditionalTop} ${styles.container}`}>
           {/* Existing Setting Field */}
           <div>
             <Label htmlFor="world-reference" className={`${styles.label}`}>

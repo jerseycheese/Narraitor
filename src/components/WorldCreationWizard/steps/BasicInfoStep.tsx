@@ -36,7 +36,7 @@ export default function BasicInfoStep({
   return (
     <div data-testid="basic-info-step">
       {/* Main step header */}
-      <div >
+      <div>
         <h2 className={wizardStyles.step.title}>Basic Information</h2>
         <p className={wizardStyles.step.description}>Let&apos;s start with some basic information about your world and configure how stories will be told.</p>
       </div>
@@ -81,8 +81,8 @@ export default function BasicInfoStep({
             error={combinedErrors.relationship}
             helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
-            <div >
-              <div >
+            <div>
+              <div>
                 <Input
                   type="radio"
                   id="relationship-none"
@@ -96,13 +96,13 @@ export default function BasicInfoStep({
                   <Label htmlFor="relationship-none" >
                     Original World
                   </Label>
-                  <p >
+                  <p>
                     Create a completely original world from your imagination
                   </p>
                 </div>
               </div>
               
-              <div >
+              <div>
                 <Input
                   type="radio"
                   id="relationship-based-on"
@@ -117,13 +117,13 @@ export default function BasicInfoStep({
                   <Label htmlFor="relationship-based-on" >
                     Inspired By
                   </Label>
-                  <p >
+                  <p>
                     Create an original world inspired by an existing fictional universe or real setting
                   </p>
                 </div>
               </div>
               
-              <div >
+              <div>
                 <Input
                   type="radio"
                   id="relationship-set-in"
@@ -138,7 +138,7 @@ export default function BasicInfoStep({
                   <Label htmlFor="relationship-set-in" >
                     Set Within
                   </Label>
-                  <p >
+                  <p>
                     Place your world directly within an existing fictional universe or real setting
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export default function BasicInfoStep({
               testId="world-reference-input"
               dataTutorial="world-reference"
             />
-            <div >
+            <div>
               {worldData.relationship === 'set_within'
                 ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
                 : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'

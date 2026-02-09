@@ -193,12 +193,12 @@ export default function EndingScreenTestPage() {
   };
 
   return (
-    <div >
+    <div>
       {/* Test Controls */}
-      <div >
-        <div >
-          <h1 >EndingScreen Test Harness</h1>
-          <div >
+      <div>
+        <div>
+          <h1>EndingScreen Test Harness</h1>
+          <div>
             <button
               onClick={() => handleTestEnding('triumphant')}
               

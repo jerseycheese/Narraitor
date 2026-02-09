@@ -15,11 +15,11 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
 
   if (worldList.length === 0) {
     return (
-      <div >
-        <h3 >
+      <div>
+        <h3>
           No Worlds Yet
         </h3>
-        <p >
+        <p>
           Create your first world to begin your adventure
         </p>
         <Link
@@ -34,11 +34,11 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
 
   return (
     <div data-testid="world-selection-step">
-      <h3 >
+      <h3>
         Choose Your World
       </h3>
       
-      <div >
+      <div>
         {worldList.map(world => (
           <div key={world.id} >
             <WorldCard 
@@ -51,14 +51,14 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
         ))}
       </div>
 
-      <div >
+      <div>
         <Link
           href="/worlds/create"
           
         >
           Create New World
         </Link>
-        <p >
+        <p>
           Click a world to continue
         </p>
       </div>

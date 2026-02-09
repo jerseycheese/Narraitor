@@ -199,7 +199,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
   }, [segments]);
   
   return (
-    <div className={`narrative-controller${className || ''}`}>
+    <div className={['narrative-controller', className].filter(Boolean).join(' ')}>
       <NarrativeHistory 
         segments={deduplicatedSegments}
         isLoading={isLoading}

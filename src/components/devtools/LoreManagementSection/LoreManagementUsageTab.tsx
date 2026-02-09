@@ -22,15 +22,15 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
   categoryColors,
   onClearUsage,
 }) => (
-  <div >
-    <div >
-      <div >Usage Summary</div>
+  <div>
+    <div>
+      <div>Usage Summary</div>
       <Button variant="outline" size="sm" onClick={onClearUsage}>
         Clear Usage
       </Button>
     </div>
 
-    <div >
+    <div>
       <div>Total Facts: {usageSummary.totalFacts}</div>
       <div>Used in Prompts: {usageSummary.usedFacts}</div>
       <div>Total Mentions: {usageSummary.totalMentions}</div>
@@ -39,19 +39,19 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
       </div>
     </div>
 
-    <div >
-      <div >Facts by Usage</div>
+    <div>
+      <div>Facts by Usage</div>
       {usageRows.length === 0 ? (
-        <div >No lore facts found for this filter.</div>
+        <div>No lore facts found for this filter.</div>
       ) : (
-        <div >
+        <div>
           {usageRows.map(({ fact, stats }) => (
             <div key={fact.id} >
               <div className={`${categoryColors[fact.category]}`}>
                 {fact.category}: {fact.key}
               </div>
-              <div >{fact.value}</div>
-              <div >
+              <div>{fact.value}</div>
+              <div>
                 Used: {stats.usageCount} · Mentions: {stats.mentionCount}
               </div>
             </div>
@@ -60,22 +60,22 @@ export const LoreManagementUsageTab: React.FC<LoreManagementUsageTabProps> = ({
       )}
     </div>
 
-    <div >
-      <div >Recent Usage Events</div>
+    <div>
+      <div>Recent Usage Events</div>
       {usageEvents.length === 0 ? (
-        <div >No usage events recorded yet.</div>
+        <div>No usage events recorded yet.</div>
       ) : (
-        <div >
+        <div>
           {usageEvents.map((event) => (
             <div key={event.id} >
-              <div >
+              <div>
                 {event.eventType === 'context' ? 'Context Used' : 'Mentioned'} · {event.source}
               </div>
-              <div >
+              <div>
                 {new Date(event.timestamp).toLocaleString()} · {event.factIds.length} fact(s)
               </div>
               {event.responseExcerpt && (
-                <div >
+                <div>
                   &ldquo;{event.responseExcerpt}&rdquo;
                 </div>
               )}

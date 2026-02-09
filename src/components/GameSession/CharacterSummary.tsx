@@ -65,10 +65,10 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       {/* Compact Header - Always Visible */}
       <div 
            onClick={() => setIsExpanded(!isExpanded)}>
-        <div >
+        <div>
           {/* Portrait Section - show in header when collapsed */}
           {character.portrait && (
-            <div >
+            <div>
               <Link href={`/characters/${character.id}`} onClick={(e) => e.stopPropagation()}>
                 <CharacterPortrait
                   portrait={character.portrait}
@@ -80,7 +80,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           )}
           
           <div>
-            <h2 >
+            <h2>
               <Link 
                 href={`/characters/${character.id}`} 
                  
@@ -89,7 +89,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
                 {character.name}
               </Link>
             </h2>
-            <p >Level {character.level}</p>
+            <p>Level {character.level}</p>
           </div>
         </div>
         
@@ -112,27 +112,27 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
 
       {/* Expanded Details - Only show when expanded */}
       {isExpanded && (
-        <div >
+        <div>
           {character.background?.history && (
-            <p >{character.background.history}</p>
+            <p>{character.background.history}</p>
           )}
 
           {/* Attributes and Skills in two columns */}
           {((character.attributes && character.attributes.length > 0) || (character.skills && character.skills.length > 0)) && world && (
-            <div >
+            <div>
               {/* Attributes Column */}
               {character.attributes && character.attributes.length > 0 && (
                 <div>
-                  <h3 >Attributes</h3>
-                  <div >
+                  <h3>Attributes</h3>
+                  <div>
                     {character.attributes.map(attr => {
                       const worldAttribute = world.attributes.find(wa => wa.id === attr.worldAttributeId);
                       const displayName = worldAttribute?.name || attr.name;
                       
                       return (
                         <div key={attr.id} >
-                          <span >{displayName}</span>
-                          <span >({attr.modifiedValue})</span>
+                          <span>{displayName}</span>
+                          <span>({attr.modifiedValue})</span>
                         </div>
                       );
                     })}
@@ -143,16 +143,16 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
               {/* Skills Column */}
               {character.skills && character.skills.length > 0 && (
                 <div>
-                  <h3 >Skills</h3>
-                  <div >
+                  <h3>Skills</h3>
+                  <div>
                     {character.skills.map(skill => {
                         const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
                         if (!worldSkill) {
                           // Fallback if no world skill found, just show the skill name from character
                           return (
                             <div key={skill.id} >
-                              <span >{skill.name}</span>
-                              <span >(Level {skill.level})</span>
+                              <span>{skill.name}</span>
+                              <span>(Level {skill.level})</span>
                             </div>
                           );
                         }
@@ -163,10 +163,10 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
 
                         return (
                           <div key={skill.id} >
-                            <span >{worldSkill.name}</span>
-                            <span >(Level {skill.level})</span>
+                            <span>{worldSkill.name}</span>
+                            <span>(Level {skill.level})</span>
                             {linkedAttributes.length > 0 && (
-                              <div >
+                              <div>
                                 Linked to: {linkedAttributes.join(', ')}
                               </div>
                             )}

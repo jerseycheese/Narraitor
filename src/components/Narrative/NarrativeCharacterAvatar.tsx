@@ -79,7 +79,7 @@ export function NarrativeCharacterAvatar({
       data-testid="narrative-avatar-placeholder"
     >
       <span aria-hidden="true">{initials}</span>
-      <span >{name}</span>
+      <span>{name}</span>
     </div>
   );
 }

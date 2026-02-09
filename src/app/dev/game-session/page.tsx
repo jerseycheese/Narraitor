@@ -381,18 +381,18 @@ export default function GameSessionTestHarness() {
   if (!isClient) {
     // Return loading placeholder to avoid hydration mismatch
     return (
-      <div >
-        <h1 >Game Session Test Harness</h1>
+      <div>
+        <h1>Game Session Test Harness</h1>
         <div>Loading test harness...</div>
       </div>
     );
   }
 
   return (
-    <div >
-      <h2 >Game Session Test Harness</h2>
+    <div>
+      <h2>Game Session Test Harness</h2>
 
-      <div >
+      <div>
         <button
           
           onClick={() => setShowRealComponent(!showRealComponent)}
@@ -401,7 +401,7 @@ export default function GameSessionTestHarness() {
         </button>
       </div>
 
-      <div >
+      <div>
         <button
           
           onClick={createTestWorld}
@@ -485,7 +485,7 @@ export default function GameSessionTestHarness() {
         </button>
       </div>
 
-      <div >
+      <div>
         {showRealComponent ? (
           <GameSession
             worldId={mockWorld.id}
@@ -497,13 +497,13 @@ export default function GameSessionTestHarness() {
         )}
       </div>
 
-      <div >
-        <h2 >Current Session State</h2>
-        <p >
+      <div>
+        <h2>Current Session State</h2>
+        <p>
           Status:{' '}
-          <span >{currentState.status || 'unknown'}</span>
+          <span>{currentState.status || 'unknown'}</span>
         </p>
-        <p >
+        <p>
           Store methods:{' '}
           {Object.keys(useSessionStore.getState())
             .filter((key) => {
@@ -515,14 +515,14 @@ export default function GameSessionTestHarness() {
             })
             .join(',')}
         </p>
-        <div >
+        <div>
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
 
-      <div >
-        <h2 >Test World Data</h2>
-        <div >
+      <div>
+        <h2>Test World Data</h2>
+        <div>
           {JSON.stringify(mockWorld, null, 2)}
         </div>
       </div>

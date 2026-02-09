@@ -3,7 +3,7 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { parseNarrativeContent } from '@/lib/utils';
+import { cssClasses, parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
@@ -134,7 +134,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (isLoading) {
     return (
-      <div >
+      <div>
         <LoadingState message="Writing your story..." theme="light" />
       </div>
     );
@@ -142,7 +142,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (error) {
     return (
-      <div >
+      <div>
         <ErrorDisplay
           variant="section"
           severity="error"
@@ -160,12 +160,12 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   }
 
   return (
-    <div >
-      <div className={`narrative-segment${styles.container}`}>
+    <div>
+      <div className={cssClasses('narrative-segment', styles.container)}>
         {/* Choice Outcome Callout (Issue #971) */}
         {resolvedSegment.metadata?.causedByDecisionId &&
          resolvedSegment.metadata?.causedByDecisionText && (
-          <div >
+          <div>
             <ChoiceOutcomeCallout
               decisionId={resolvedSegment.metadata.causedByDecisionId}
               decisionText={resolvedSegment.metadata.causedByDecisionText}
@@ -175,13 +175,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         )}
 
         {isDialogue && speakerId && speakerName && (
-          <div >
+          <div>
             <NarrativeCharacterAvatar
               name={speakerName}
               avatarUrl={speakerRecord?.avatarUrl}
               size="sm"
             />
-            <span >
+            <span>
               {speakerName}
             </span>
           </div>
@@ -193,15 +193,15 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           highlightTerms={highlightTerms}
         />
         {(participants.length > 0 || resolvedSegment.metadata?.location) && (
-          <div >
+          <div>
             {resolvedSegment.metadata?.location && (
-              <p >
+              <p>
                 {resolvedSegment.metadata?.location}
               </p>
             )}
             {participants.length > 0 && (
               <div>
-                <p >
+                <p>
                   Characters Present
                 </p>
                 <div
@@ -220,7 +220,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
                         avatarUrl={participant.avatarUrl}
                         size="sm"
                       />
-                      
+                      {participant.avatarUrl ? <span>{participant.name}</span> : null}
                     </div>
                   ))}
                 </div>

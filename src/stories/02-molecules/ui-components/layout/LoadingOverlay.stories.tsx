@@ -82,10 +82,10 @@ export const InteractiveDemo: Story = {
   render: (args) => {
     return (
       <div>
-        <div >
-          <h1 >Background Content</h1>
-          <p >This content should be blocked when the overlay is visible.</p>
-          <button >
+        <div>
+          <h1>Background Content</h1>
+          <p>This content should be blocked when the overlay is visible.</p>
+          <button>
             Background Button
           </button>
           <input 
@@ -93,7 +93,7 @@ export const InteractiveDemo: Story = {
             placeholder="Try typing here..." 
             
           />
-          <p >
+          <p>
             Toggle overlay visibility with controls. Test keyboard navigation (Tab, Escape).
           </p>
         </div>

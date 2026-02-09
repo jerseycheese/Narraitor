@@ -198,7 +198,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // If generating ending, show loading state
   if (isGeneratingEnding) {
     return (
-      <div >
+      <div>
         <LoadingState
           message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
         />
@@ -210,7 +210,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // always mount the hidden NarrativeController to drive generation.
   if (!isGameReady) {
     return (
-      <div >
+      <div>
         <GameSessionSkeleton />
         {/* Hidden controller that actually performs generation while skeleton shows */}
         <div aria-hidden="true" >
@@ -231,7 +231,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
         {/* Character Summary Panel - show immediately when character data is available */}
         {character && (
-          <div >
+          <div>
             <CharacterSummary character={character} />
           </div>
         )}
@@ -243,7 +243,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     <div data-testid="game-session-active" role="region" aria-label="Game session" >
 
       {/* Two-column layout for larger screens */}
-      <div >
+      <div>
         {/* Story Column */}
         <ActiveGameSessionNarrativeColumn
           controllerKey={controllerKey}

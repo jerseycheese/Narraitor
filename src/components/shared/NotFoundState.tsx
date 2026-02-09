@@ -15,11 +15,11 @@ export function NotFoundState({ title, message, backUrl, backLabel }: NotFoundSt
   const router = useRouter();
   
   return (
-    <div >
-      <div >
-        <div >
-          <h1 >{title}</h1>
-          <p >{message}</p>
+    <div>
+      <div>
+        <div>
+          <h1>{title}</h1>
+          <p>{message}</p>
           <ActionButtonGroup
             actions={[{
               label: backLabel,

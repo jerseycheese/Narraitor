@@ -116,15 +116,15 @@ export default function CharacterGenerationTestPage() {
   };
 
   return (
-    <div >
-      <h1 >
+    <div>
+      <h1>
         Character Generation Test Harness
       </h1>
 
-      <div >
+      <div>
         {/* World Selection */}
-        <div >
-          <h2 >Select World</h2>
+        <div>
+          <h2>Select World</h2>
           <select
             value={selectedWorldId}
             onChange={(e) => setSelectedWorldId(e.target.value)}
@@ -140,10 +140,10 @@ export default function CharacterGenerationTestPage() {
         </div>
 
         {/* Generation Type */}
-        <div >
-          <h2 >Generation Type</h2>
-          <div >
-            <label >
+        <div>
+          <h2>Generation Type</h2>
+          <div>
+            <label>
               <input
                 type="radio"
                 value="known"
@@ -154,7 +154,7 @@ export default function CharacterGenerationTestPage() {
               />
               <span>Known Figure (canonical character from source)</span>
             </label>
-            <label >
+            <label>
               <input
                 type="radio"
                 value="original"
@@ -165,7 +165,7 @@ export default function CharacterGenerationTestPage() {
               />
               <span>Original Character (new character fitting the world)</span>
             </label>
-            <label >
+            <label>
               <input
                 type="radio"
                 value="specific"
@@ -179,8 +179,8 @@ export default function CharacterGenerationTestPage() {
           </div>
 
           {generationType === 'specific' && (
-            <div >
-              <label >
+            <div>
+              <label>
                 Character Name
               </label>
               <input
@@ -195,7 +195,7 @@ export default function CharacterGenerationTestPage() {
         </div>
 
         {/* Generate Button */}
-        <div >
+        <div>
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !selectedWorldId}
@@ -207,45 +207,45 @@ export default function CharacterGenerationTestPage() {
 
         {/* Error Display */}
         {error && (
-          <div >
-            <p >{error}</p>
+          <div>
+            <p>{error}</p>
           </div>
         )}
 
         {/* Generated Character Display */}
         {generatedCharacter && (
-          <div >
-            <h2 >Generated Character</h2>
+          <div>
+            <h2>Generated Character</h2>
 
-            <div >
+            <div>
               <div>
-                <h3 >Name:</h3>
+                <h3>Name:</h3>
                 <p>{generatedCharacter.name}</p>
               </div>
 
               <div>
-                <h3 >Level:</h3>
+                <h3>Level:</h3>
                 <p>{generatedCharacter.level || 1}</p>
               </div>
 
               <div>
-                <h3 >Background:</h3>
-                <div >
+                <h3>Background:</h3>
+                <div>
                   <div>
-                    <span >Description:</span>
-                    <p >
+                    <span>Description:</span>
+                    <p>
                       {generatedCharacter.background.description}
                     </p>
                   </div>
                   <div>
-                    <span >Personality:</span>
-                    <p >
+                    <span>Personality:</span>
+                    <p>
                       {generatedCharacter.background.personality}
                     </p>
                   </div>
                   <div>
-                    <span >Motivation:</span>
-                    <p >
+                    <span>Motivation:</span>
+                    <p>
                       {generatedCharacter.background.motivation}
                     </p>
                   </div>
@@ -253,8 +253,8 @@ export default function CharacterGenerationTestPage() {
               </div>
 
               <div>
-                <h3 >Attributes:</h3>
-                <div >
+                <h3>Attributes:</h3>
+                <div>
                   {generatedCharacter.attributes.map((attr) => {
                     const world = worlds[selectedWorldId];
                     const worldAttr = world.attributes.find(
@@ -263,7 +263,7 @@ export default function CharacterGenerationTestPage() {
                     return (
                       <div key={attr.id} >
                         <span>{worldAttr?.name}:</span>
-                        <span >{attr.value}</span>
+                        <span>{attr.value}</span>
                       </div>
                     );
                   })}
@@ -271,8 +271,8 @@ export default function CharacterGenerationTestPage() {
               </div>
 
               <div>
-                <h3 >Skills:</h3>
-                <div >
+                <h3>Skills:</h3>
+                <div>
                   {generatedCharacter.skills.map((skill) => {
                     const world = worlds[selectedWorldId];
                     const worldSkill = world.skills.find(
@@ -281,14 +281,14 @@ export default function CharacterGenerationTestPage() {
                     return (
                       <div key={skill.id} >
                         <span>{worldSkill?.name}:</span>
-                        <span >{skill.level}/10</span>
+                        <span>{skill.level}/10</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              <div >
+              <div>
                 <button
                   onClick={handleCreateCharacter}
                   
@@ -301,12 +301,12 @@ export default function CharacterGenerationTestPage() {
         )}
 
         {/* Existing Characters */}
-        <div >
-          <h2 >
+        <div>
+          <h2>
             Existing Characters in Selected World
           </h2>
           {selectedWorldId ? (
-            <div >
+            <div>
               {(Object.values(characters) as Character[])
                 .filter((c) => c.worldId === selectedWorldId)
                 .map((character) => (
@@ -315,7 +315,7 @@ export default function CharacterGenerationTestPage() {
                     
                   >
                     <span>{character.name}</span>
-                    <span >
+                    <span>
                       Level {character.level}
                     </span>
                   </div>
@@ -323,11 +323,11 @@ export default function CharacterGenerationTestPage() {
               {(Object.values(characters) as Character[]).filter(
                 (c) => c.worldId === selectedWorldId
               ).length === 0 && (
-                <p >No characters in this world yet</p>
+                <p>No characters in this world yet</p>
               )}
             </div>
           ) : (
-            <p >Select a world to see characters</p>
+            <p>Select a world to see characters</p>
           )}
         </div>
       </div>

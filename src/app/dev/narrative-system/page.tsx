@@ -214,23 +214,23 @@ export default function NarrativeSystemHarness() {
 
   if (!isClient) {
     return (
-      <div >
-        <h1 >Narrative System Test Harness</h1>
+      <div>
+        <h1>Narrative System Test Harness</h1>
         <div>Loading test harness...</div>
       </div>
     );
   }
 
   return (
-    <div >
-      <h2 >Narrative System Test Harness</h2>
+    <div>
+      <h2>Narrative System Test Harness</h2>
       
       {/* Control Panel */}
-      <div >
-        <h2 >Controls</h2>
+      <div>
+        <h2>Controls</h2>
         
-        <div >
-          <div >
+        <div>
+          <div>
             <button
               
               onClick={handleGenerateNarrative}
@@ -261,17 +261,17 @@ export default function NarrativeSystemHarness() {
           </div>
           
           <div>
-            <p >
-              Session ID: <code >{sessionId}</code>
+            <p>
+              Session ID: <code>{sessionId}</code>
             </p>
           </div>
         </div>
       </div>
 
       {/* Narrative Display */}
-      <div >
-        <h2 >Narrative</h2>
-        <div >
+      <div>
+        <h2>Narrative</h2>
+        <div>
           {showController ? (
             <MockNarrativeController
               worldId={mockWorld.id}
@@ -292,35 +292,35 @@ export default function NarrativeSystemHarness() {
       </div>
 
       {/* Choice Panel */}
-      <div >
-        <h2 >Player Choices</h2>
-        <div >
+      <div>
+        <h2>Player Choices</h2>
+        <div>
           {mockChoices.map((choice) => (
             <button
               key={choice.id}
               
               onClick={() => handleChoiceSelected(choice.id)}
             >
-              <div >{choice.text}</div>
-              <div >{choice.consequence}</div>
+              <div>{choice.text}</div>
+              <div>{choice.consequence}</div>
             </button>
           ))}
         </div>
       </div>
 
       {/* State Display */}
-      <div >
+      <div>
         <div>
-          <h2 >Store State</h2>
-          <div >
-            <pre >{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
+          <h2>Store State</h2>
+          <div>
+            <pre>{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         
         <div>
-          <h2 >Current Segments</h2>
-          <div >
-            <pre >{JSON.stringify(segments, null, 2)}</pre>
+          <h2>Current Segments</h2>
+          <div>
+            <pre>{JSON.stringify(segments, null, 2)}</pre>
           </div>
         </div>
       </div>

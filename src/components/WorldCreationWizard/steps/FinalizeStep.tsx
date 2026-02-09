@@ -110,10 +110,10 @@ export default function FinalizeStep({
         description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
       >
 
-      <div >
+      <div>
         <div data-tutorial="finalize-review">
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
-          <div >
+          <div>
             <DataField 
               label="Name" 
               value={<span data-testid="review-world-name">{worldData.name}</span>}
@@ -165,13 +165,13 @@ export default function FinalizeStep({
               
             />
           ) : (
-            <div >
+            <div>
               <WorldImageComponent
                 image={worldData.image || { type: 'placeholder', url: null }}
                 worldName={worldData.name || 'Untitled World'}
                 size="medium"
               />
-              <p >
+              <p>
                 {worldData.image?.url ? 'World image will be generated after creation' : 'No world image will be generated'}
               </p>
             </div>
@@ -181,31 +181,31 @@ export default function FinalizeStep({
         <div className={wizardStyles.divider} data-testid="review-attributes-section" data-tutorial="finalize-attributes">
           <h3 className={wizardStyles.subheading}>Attributes ({worldData.attributes?.length || 0})</h3>
         {worldData.attributes && worldData.attributes.length > 0 ? (
-          <div >
+          <div>
             {worldData.attributes.map((attr, index) => (
               <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-attribute-${index}`}>
-                <div >{attr.name}</div>
-                <div >{attr.description}</div>
-                <div >
+                <div>{attr.name}</div>
+                <div>{attr.description}</div>
+                <div>
                   Range: {attr.minValue} - {attr.maxValue}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p >No attributes selected</p>
+          <p>No attributes selected</p>
         )}
         </div>
 
         <div className={wizardStyles.divider} data-testid="review-skills-section" data-tutorial="finalize-skills">
           <h3 className={wizardStyles.subheading}>Skills ({worldData.skills?.length || 0})</h3>
         {worldData.skills && worldData.skills.length > 0 ? (
-          <div >
+          <div>
             {worldData.skills.map((skill, index) => (
               <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-skill-${index}`}>
-                <div >
-                  <span >{skill.name}</span>
-                  <span className={`${wizardStyles.badge.base}${
+                <div>
+                  <span>{skill.name}</span>
+                  <span className={`${wizardStyles.badge.base} ${
                     skill.difficulty === 'easy' ? wizardStyles.badge.success :
                     skill.difficulty === 'medium' ? wizardStyles.badge.warning : 
                     wizardStyles.badge.danger
@@ -213,9 +213,9 @@ export default function FinalizeStep({
                     {skill.difficulty}
                   </span>
                 </div>
-                <div >{skill.description}</div>
+                <div>{skill.description}</div>
                 {skill.attributeIds && skill.attributeIds.length > 0 && (
-                  <div >
+                  <div>
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)
@@ -226,7 +226,7 @@ export default function FinalizeStep({
             ))}
           </div>
         ) : (
-          <p >No skills selected</p>
+          <p>No skills selected</p>
         )}
         </div>
       </div>
@@ -238,8 +238,8 @@ export default function FinalizeStep({
         </div>
       )}
 
-      <div >
-        <div >
+      <div>
+        <div>
           <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}

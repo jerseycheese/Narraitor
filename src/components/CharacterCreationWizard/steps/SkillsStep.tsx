@@ -195,17 +195,17 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         title="Allocate Skill Points"
         description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
       >
-      <div >
-        <p >
+      <div>
+        <p>
           Each selected skill starts at its minimum level. Increase levels to invest skill points.
           Unspent points are allowed if you want to create a less experienced character.
         </p>
       </div>
 
-      <div >
+      <div>
         <div className={wizardStyles.card.base}>
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
-          <div >
+          <div>
             <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
             <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
             <span className={wizardStyles.badge.secondary}>
@@ -221,14 +221,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
         <div className={`${wizardStyles.card.base}`}>
           <h3 className={wizardStyles.subheading}>Skill Selection</h3>
-          <div >
+          <div>
             <span className={wizardStyles.badge.primary}>Selected: {selectedSkills.length}</span>
             <span className={wizardStyles.badge.secondary}>Maximum: {maxSelectable}</span>
           </div>
         </div>
       </div>
 
-      <div >
+      <div>
         {data.characterData.skills.map((skill, index) => {
           const bounds = boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
           const cost = costBySkillId.get(skill.skillId) ?? 0;
@@ -239,17 +239,17 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           return (
           <div 
             key={safeKey}
-            className={`${wizardStyles.card.base}${skill.isSelected ? wizardStyles.card.selected : ''}`}
+            className={`${wizardStyles.card.base} ${skill.isSelected ? wizardStyles.card.selected : ''}`}
           >
-            <div >
-              <div >
-                <div >
+            <div>
+              <div>
+                <div>
                   <span id={skillTitleId} >{skill.name}</span>
                   {skill.description && (
-                    <p >{skill.description}</p>
+                    <p>{skill.description}</p>
                   )}
                   {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
-                    <div >
+                    <div>
                       Linked to:{' '}
                       {skill.attributeIds
                         .map(attrId => worldConfig.attributes?.find(attr => attr.id === attrId)?.name || 'Unknown')
@@ -268,8 +268,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
               </div>
 
               {skill.isSelected && (
-                <div >
-                  <div >
+                <div>
+                  <div>
                     <span>Level: {skill.level}</span>
                     <span>Allocated Points: {cost}</span>
                   </div>
@@ -284,7 +284,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                     isConstrained={maxAllowedLevel < bounds.maxLevel}
                     ariaLabelledBy={skillTitleId}
                   />
-                  <div >
+                  <div>
                     <span>Min: {bounds.minLevel}</span>
                     <span>Max: {bounds.maxLevel}</span>
                   </div>
@@ -298,7 +298,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
       {totalSkillPoints > 0 && hasUnallocatedPoints && (
         <div className={`${wizardStyles.card.base}`}>
-          <p >
+          <p>
             {totalSkillPoints > totalCapacity
               ? 'Your skill point pool exceeds the current skill caps. You can maximize existing skills or leave points unspent.'
               : `You have ${remainingPoints} unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}

@@ -566,8 +566,8 @@ export default function WorldCreationWizard({
         if (!createdWorld) {
           // Fallback if world not found
           return (
-            <div >
-              <p >Error: World not found. Please try creating the world again.</p>
+            <div>
+              <p>Error: World not found. Please try creating the world again.</p>
               <Button onClick={handleBack} variant="link" >
                 Go Back
               </Button>

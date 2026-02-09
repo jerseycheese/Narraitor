@@ -106,11 +106,11 @@ export const ErrorSection = () => {
   };
 
   return (
-    <div >
+    <div>
       {/* Error Statistics */}
-      <div >
-        <div >
-          <h4 >Runtime Errors</h4>
+      <div>
+        <div>
+          <h4>Runtime Errors</h4>
           {statistics && statistics.total > 0 && (
             <Button
               onClick={handleClearAll}
@@ -124,12 +124,12 @@ export const ErrorSection = () => {
         </div>
         
         {statistics && (
-          <div >
-            <div >
+          <div>
+            <div>
               <span>Total: {statistics.total}</span>
               <span>Recent: {statistics.recentCount}</span>
             </div>
-            <div >
+            <div>
               {Object.entries(statistics.bySeverity).map(([severity, count]) => 
                 count > 0 && (
                   <span key={severity} >
@@ -144,11 +144,11 @@ export const ErrorSection = () => {
 
       {/* Filters */}
       <CollapsibleSection title="Filters" initialCollapsed={true}>
-        <div >
+        <div>
           {/* Severity Filter */}
           <div>
-            <h5 >Severity</h5>
-            <div >
+            <h5>Severity</h5>
+            <div>
               {Object.values(ErrorSeverity).map(severity => (
                 <label key={severity} >
                   <Checkbox
@@ -156,7 +156,7 @@ export const ErrorSection = () => {
                     onChange={(e) => handleSeverityFilter(severity, e.target.checked)}
                     aria-label={`Filter by ${severity.charAt(0).toUpperCase() + severity.slice(1)} severity errors`}
                   />
-                  <span >{severity}</span>
+                  <span>{severity}</span>
                 </label>
               ))}
             </div>
@@ -164,8 +164,8 @@ export const ErrorSection = () => {
 
           {/* Category Filter */}
           <div>
-            <h5 >Category</h5>
-            <div >
+            <h5>Category</h5>
+            <div>
               {Object.values(ErrorCategory).map(category => (
                 <label key={category} >
                   <Checkbox
@@ -173,7 +173,7 @@ export const ErrorSection = () => {
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
                     aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', '')} category errors`}
                   />
-                  <span >{category.replace('_', '')}</span>
+                  <span>{category.replace('_', '')}</span>
                 </label>
               ))}
             </div>
@@ -181,13 +181,13 @@ export const ErrorSection = () => {
 
           {/* Show Dismissed Toggle */}
           <div>
-            <label >
+            <label>
               <Checkbox
                 checked={filter.dismissed || false}
                 onChange={(e) => handleShowDismissed(e.target.checked)}
                 aria-label="Show dismissed errors in addition to active errors"
               />
-              <span >Show dismissed errors</span>
+              <span>Show dismissed errors</span>
             </label>
           </div>
 
@@ -202,9 +202,9 @@ export const ErrorSection = () => {
       </CollapsibleSection>
 
       {/* Error List */}
-      <div >
+      <div>
         {errors.length === 0 ? (
-          <div >
+          <div>
             No runtime errors captured
           </div>
         ) : (
@@ -218,9 +218,9 @@ export const ErrorSection = () => {
               }`}
             >
               {/* Error Header */}
-              <div >
-                <div >
-                  <div >
+              <div>
+                <div>
+                  <div>
                     <Badge className={`${getSeverityColor(error.severity)}`}>
                       {error.severity.toUpperCase()}
                     </Badge>
@@ -232,16 +232,16 @@ export const ErrorSection = () => {
                         {error.count}x
                       </Badge>
                     )}
-                    <span >
+                    <span>
                       {formatTimestamp(error.timestamp)}
                     </span>
                   </div>
-                  <p >
+                  <p>
                     {error.message}
                   </p>
                 </div>
                 
-                <div >
+                <div>
                   <Button
                     onClick={() => toggleErrorExpanded(error.id)}
                     variant="ghost"
@@ -267,12 +267,12 @@ export const ErrorSection = () => {
 
               {/* Expanded Error Details */}
               {expandedErrors.has(error.id) && (
-                <div >
+                <div>
                   {/* Stack Trace */}
                   {error.stack && (
                     <div>
-                      <h6 >Stack Trace</h6>
-                      <pre >
+                      <h6>Stack Trace</h6>
+                      <pre>
                         {error.stack}
                       </pre>
                     </div>
@@ -281,10 +281,10 @@ export const ErrorSection = () => {
                   {/* Component Context */}
                   {error.componentContext && (
                     <div>
-                      <h6 >Component Context</h6>
-                      <div >
+                      <h6>Component Context</h6>
+                      <div>
                         <div>Component: {error.componentContext.componentName}</div>
-                        <pre >
+                        <pre>
                           {error.componentContext.componentStack}
                         </pre>
                       </div>
@@ -294,8 +294,8 @@ export const ErrorSection = () => {
                   {/* State Snapshot */}
                   {error.stateSnapshot && (
                     <div>
-                      <h6 >State Snapshot</h6>
-                      <div >
+                      <h6>State Snapshot</h6>
+                      <div>
                         <div>Route: {error.stateSnapshot.route}</div>
                         <div>URL: {error.stateSnapshot.url}</div>
                         <div>User Agent: {error.stateSnapshot.userAgent}</div>

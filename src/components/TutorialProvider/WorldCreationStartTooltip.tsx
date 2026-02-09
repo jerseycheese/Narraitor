@@ -98,7 +98,7 @@ export function WorldCreationStartTooltip({
             </Button>
           )}
           
-          <div >
+          <div>
             {isEndOfPage && !isLastStep ? (
               <Button
                 data-test-id="button-pause"

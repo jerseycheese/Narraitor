@@ -15,7 +15,7 @@ const meta: Meta<typeof GameStartWizard> = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <Story />
       </div>
     ),

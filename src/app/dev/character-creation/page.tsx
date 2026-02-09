@@ -103,24 +103,24 @@ export default function CharacterCreationTestPage() {
   };
 
   return (
-    <div >
-      <div >
-        <div >
-          <h2 >Character Creation Test Harness</h2>
+    <div>
+      <div>
+        <div>
+          <h2>Character Creation Test Harness</h2>
         </div>
       </div>
 
-      <div >
+      <div>
         {/* Test Controls */}
-        <div >
-          <h2 >Test Controls</h2>
+        <div>
+          <h2>Test Controls</h2>
           
-          <div >
+          <div>
             <div>
-              <label >
+              <label>
                 Select Test World
               </label>
-              <div >
+              <div>
                 <button
                   onClick={() => handleWorldChange('fantasy')}
                   className={`${
@@ -144,7 +144,7 @@ export default function CharacterCreationTestPage() {
               </div>
             </div>
 
-            <div >
+            <div>
               <button
                 onClick={handleClearAutoSave}
                 
@@ -160,9 +160,9 @@ export default function CharacterCreationTestPage() {
             </div>
           </div>
 
-          <div >
-            <h3 >Test Scenarios:</h3>
-            <ul >
+          <div>
+            <h3>Test Scenarios:</h3>
+            <ul>
               <li>• Test character name validation (min 3 chars, max 50 chars)</li>
               <li>• Test attribute point allocation ({testWorlds[selectedWorld].settings.attributePointPool} points)</li>
               <li>• Test skill selection (max 8 skills)</li>
@@ -176,7 +176,7 @@ export default function CharacterCreationTestPage() {
 
         {/* Character Creation Wizard */}
         {testWorldId && (
-          <div >
+          <div>
             <CharacterCreationWizard worldId={testWorldId} />
           </div>
         )}

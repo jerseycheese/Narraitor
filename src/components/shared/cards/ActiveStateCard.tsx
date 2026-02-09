@@ -74,15 +74,15 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
     <article
       data-testid={testId}
       onClick={onClick}
-      className={`${baseClasses}${cursorClass}${stateClasses}${className}`}
+      className={`${baseClasses} ${cursorClass} ${stateClasses} ${className}`}
     >
       {/* Image section with overlay if present */}
       {hasImage ? (
-        <div >
+        <div>
           {imageChild}
           {/* Active state indicator overlay */}
           {isActive && showActiveIndicator && (
-            <div >
+            <div>
               <ActiveStateIndicator 
                 text={activeText}
                 icon={activeIcon}

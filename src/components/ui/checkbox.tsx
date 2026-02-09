@@ -10,7 +10,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, label, ...props }, ref) => {
     if (label) {
       return (
-        <label >
+        <label>
           <input
             type="checkbox"
             className={cssClasses(
@@ -20,7 +20,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             ref={ref}
             {...props}
           />
-          <span >{label}</span>
+          <span>{label}</span>
         </label>
       )
     }

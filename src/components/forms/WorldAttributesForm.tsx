@@ -131,10 +131,10 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   }, [attributeToDelete, getLinkedSkills]);
   
   return (
-    <section >
-      <div >
-        <h3 >Attributes</h3>
-        <div >
+    <section>
+      <div>
+        <h3>Attributes</h3>
+        <div>
           <Button
             onClick={() => setShowCreateModal(true)}
             disabled={isLimitReached}
@@ -149,7 +149,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             Add Attribute
           </Button>
           {isLimitReached && (
-            <p >
+            <p>
               Maximum {maxAttributes} attributes reached
             </p>
           )}
@@ -157,14 +157,14 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       </div>
       
       {attributes.length === 0 ? (
-        <p >No attributes defined yet.</p>
+        <p>No attributes defined yet.</p>
       ) : (
-        <div >
+        <div>
           {attributes.map((attribute, index) => (
             <div key={`${attribute.id ?? attribute.name ?? index}`} >
-              <div >
-                <h4 >{attribute.name}</h4>
-                <div >
+              <div>
+                <h4>{attribute.name}</h4>
+                <div>
                   <Button
                     onClick={() => setEditingAttribute(attribute.id)}
                     variant="ghost"
@@ -182,15 +182,15 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                 </div>
               </div>
               
-              <div >
-                <p >{attribute.description}</p>
-                <div >
+              <div>
+                <p>{attribute.description}</p>
+                <div>
                   <div>
-                    <span >Range:</span> {attribute.minValue} - {attribute.maxValue}
+                    <span>Range:</span> {attribute.minValue} - {attribute.maxValue}
                   </div>
                   {attribute.category && (
                     <div>
-                      <span >Category:</span> {attribute.category}
+                      <span>Category:</span> {attribute.category}
                     </div>
                   )}
                 </div>
@@ -208,7 +208,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         size="xl"
         
       >
-        <div >
+        <div>
           Create a new custom attribute for this world.
         </div>
         <AttributeEditor
@@ -230,7 +230,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         size="xl"
         
       >
-        <div >
+        <div>
           Modify the details of this world attribute.
         </div>
         {editingAttribute && (

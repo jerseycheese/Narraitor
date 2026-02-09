@@ -22,9 +22,9 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
 }) => {
   return (
     <div className="component-basic-info-form">
-      <div >
+      <div>
         <Label htmlFor="character-name">
-          Character Name <span >*</span>
+          Character Name <span>*</span>
         </Label>
         <Input
           id="character-name"
@@ -35,7 +35,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         />
       </div>
       
-      <div >
+      <div>
         <Label htmlFor="character-level">
           Level
         </Label>
@@ -50,7 +50,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         </Select>
       </div>
       
-      <div >
+      <div>
         <Label htmlFor="character-type">
           Character Type
         </Label>

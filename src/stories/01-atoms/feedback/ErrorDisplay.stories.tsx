@@ -54,10 +54,10 @@ type Story = StoryObj<typeof ErrorDisplay>;
 // Showcase all variants and severities
 export const AllVariants: Story = {
   render: (args) => (
-    <div >
+    <div>
       <div>
-        <h3 >Inline Errors</h3>
-        <div >
+        <h3>Inline Errors</h3>
+        <div>
           <InlineError message="This field is required" severity="error" />
           <InlineError message="This name is already taken" severity="warning" />
           <InlineError message="This field will be auto-filled" severity="info" />
@@ -65,8 +65,8 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 >Section Errors</h3>
-        <div >
+        <h3>Section Errors</h3>
+        <div>
           <SectionError
             title="Error Loading Data"
             message="Failed to load world data. Please check your connection and try again."
@@ -94,9 +94,9 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 >Page & Toast Examples</h3>
-        <div >
-          <div >
+        <h3>Page & Toast Examples</h3>
+        <div>
+          <div>
             <PageError
               title="World Not Found"
               message="The world you're looking for doesn't exist or has been deleted."
@@ -105,7 +105,7 @@ export const AllVariants: Story = {
               onRetry={args.onRetry}
             />
           </div>
-          <div >
+          <div>
             <ToastError
               title="Save Failed"
               message="Unable to save your changes."
@@ -123,9 +123,9 @@ export const AllVariants: Story = {
 // Form validation example
 export const FormValidation: Story = {
   render: () => (
-    <div >
-      <h2 >Create World</h2>
-      <form >
+    <div>
+      <h2>Create World</h2>
+      <form>
         <div>
           <label htmlFor="name" >
             World Name

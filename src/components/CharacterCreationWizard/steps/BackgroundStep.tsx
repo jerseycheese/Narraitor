@@ -72,16 +72,16 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         description="Provide details about your character's history, personality, and motivations."
       >
       {/* Helpful tip */}
-      <div >
-        <p >
+      <div>
+        <p>
           A compelling backstory helps bring your character to life and
           provides context for their actions and decisions in the game.
         </p>
       </div>
 
-      <div >
+      <div>
         <Label htmlFor="character-history">
-          Character History <span >*</span>
+          Character History <span>*</span>
         </Label>
         <Textarea
           id="character-history"
@@ -90,14 +90,14 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           rows={6}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
-        <p >
+        <p>
           {data.characterData.background.history.length} / 50 characters minimum
         </p>
       </div>
 
-      <div >
+      <div>
         <Label htmlFor="character-personality">
-          Personality <span >*</span>
+          Personality <span>*</span>
         </Label>
         <Textarea
           id="character-personality"
@@ -106,12 +106,12 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           rows={4}
           placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
-        <p >
+        <p>
           {data.characterData.background.personality.length} / 30 characters minimum
         </p>
       </div>
 
-      <div >
+      <div>
         <Label htmlFor="character-physical-description">
           Physical Appearance
         </Label>
@@ -122,12 +122,12 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           rows={4}
           placeholder="Describe your character's physical appearance... (optional)"
         />
-        <p >
+        <p>
           Optional field to describe how your character looks
         </p>
       </div>
 
-      <div >
+      <div>
         <Label htmlFor="character-motivation">
           Motivation (optional)
         </Label>
@@ -138,12 +138,12 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           onChange={handleMotivationChange}
           placeholder="What drives your character?"
         />
-        <p >
+        <p>
           Optional field to help define your character&apos;s driving force
         </p>
       </div>
 
-      <div >
+      <div>
         <Label htmlFor="character-goals">
           Goals (Optional)
         </Label>

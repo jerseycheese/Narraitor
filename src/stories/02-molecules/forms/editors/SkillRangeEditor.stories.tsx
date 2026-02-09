@@ -15,7 +15,7 @@ const meta: Meta<typeof SkillRangeEditor> = {
   },
   decorators: [
     (Story) => (
-      <div >
+      <div>
         <Story />
       </div>
     ),
@@ -49,9 +49,9 @@ export const Default: Story = {
 export const SkillLevels: Story = {
   render: (args) => {
     return (
-      <div >
+      <div>
         <div>
-          <h3 >Novice (Level 1)</h3>
+          <h3>Novice (Level 1)</h3>
           <SkillRangeEditor
             skill={{...defaultSkill, baseValue: 1}}
             onChange={args.onChange}
@@ -59,7 +59,7 @@ export const SkillLevels: Story = {
           />
         </div>
         <div>
-          <h3 >Competent (Level 3)</h3>
+          <h3>Competent (Level 3)</h3>
           <SkillRangeEditor
             skill={{...defaultSkill, baseValue: 3}}
             onChange={args.onChange}
@@ -67,7 +67,7 @@ export const SkillLevels: Story = {
           />
         </div>
         <div>
-          <h3 >Master (Level 5)</h3>
+          <h3>Master (Level 5)</h3>
           <SkillRangeEditor
             skill={{...defaultSkill, baseValue: 5}}
             onChange={args.onChange}

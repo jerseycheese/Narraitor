@@ -86,7 +86,7 @@ export function TutorialTooltip({
         <div style={styles.tooltipContent}>
           {content}
           {isEndOfPage && (
-            <div >
+            <div>
               {nextStepHint || 'Complete this step, then click Next to continue.'}
             </div>
           )}
@@ -122,7 +122,7 @@ export function TutorialTooltip({
             </Button>
           )}
 
-          <div >
+          <div>
             {isEndOfPage && !isLastStep && (
               <Button
                 data-test-id="button-pause"

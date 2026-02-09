@@ -29,7 +29,7 @@ export function SkipLinks() {
   };
 
   return (
-    <div >
+    <div>
       <a
         href="#main-content"
         onClick={handleSkipToMain}

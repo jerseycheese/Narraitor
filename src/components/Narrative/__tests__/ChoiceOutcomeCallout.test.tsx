@@ -36,6 +36,7 @@ describe('ChoiceOutcomeCallout', () => {
 
     const callout = container.querySelector('.choice-outcome-callout');
     expect(callout).toBeInTheDocument();
+    expect(callout).toHaveClass('test-class');
   });
 
   it('should handle various decision text formats', () => {

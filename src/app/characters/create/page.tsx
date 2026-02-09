@@ -92,21 +92,21 @@ export default function CharacterCreatePage() {
 
   if (!effectiveWorldId) {
     return (
-      <div >
-        <div >
-          <h1 >Create Character</h1>
-          <div >
-            <div >
+      <div>
+        <div>
+          <h1>Create Character</h1>
+          <div>
+            <div>
               <AlertTriangle
                 
                 aria-hidden="true"
               />
             </div>
-            <h2 >World Required</h2>
-            <p >
+            <h2>World Required</h2>
+            <p>
               Characters are created within specific worlds.
             </p>
-            <p >
+            <p>
               Each world defines unique attributes, skills, and rules that shape
               your characters.
             </p>
@@ -219,13 +219,13 @@ export default function CharacterCreatePage() {
     showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
 
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         {shouldShowQuickStart ? (
           <>
-            <div >
-              <h1 >Create New Character</h1>
-              <p >
+            <div>
+              <h1>Create New Character</h1>
+              <p>
                 <span suppressHydrationWarning>
                   {currentWorld
                     ? `Choose a quick start character for ${currentWorld.name} or create your own`
@@ -233,7 +233,7 @@ export default function CharacterCreatePage() {
                 </span>
               </p>
             </div>
-            <div >
+            <div>
               {mounted && currentWorld ? (
                 <QuickStartCharacters
                   world={currentWorld}
@@ -242,7 +242,7 @@ export default function CharacterCreatePage() {
                   onReady={() => setContentReady(true)}
                 />
               ) : (
-                <div >
+                <div>
                   Preparing quick start options...
                 </div>
               )}
@@ -250,12 +250,12 @@ export default function CharacterCreatePage() {
           </>
         ) : (
           <>
-            <div >
+            <div>
               <div>
-                <h1 >
+                <h1>
                   Create Custom Character
                 </h1>
-                <p >
+                <p>
                   Build your character from scratch with full customization
                 </p>
               </div>
@@ -267,7 +267,7 @@ export default function CharacterCreatePage() {
                 ← Back to Quick Start
               </Button>
             </div>
-            <div >
+            <div>
               <CharacterCreationWizard
                 key={`new-character-${effectiveWorldId}`}
                 worldId={effectiveWorldId}

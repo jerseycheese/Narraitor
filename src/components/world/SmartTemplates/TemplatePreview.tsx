@@ -23,17 +23,17 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
     <>
       {/* Basic Info */}
       <div className={wizardStyles.card.base}>
-        <h3 >{template.name}</h3>
-        <div >
+        <h3>{template.name}</h3>
+        <div>
           <div>
-            <span >Genre:</span>
-            <span className={`${wizardStyles.badge.base}${wizardStyles.badge.primary}`}>
+            <span>Genre:</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
               {getGenreLabel(template.genre)}
             </span>
           </div>
           <div>
-            <span >Description:</span>
-            <p >{template.description}</p>
+            <span>Description:</span>
+            <p>{template.description}</p>
           </div>
         </div>
       </div>
@@ -41,26 +41,26 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
       {/* AI Explanation */}
       {template.explanation && (
         <div className={wizardStyles.card.base}>
-          <h4 >Why these attributes and skills?</h4>
-          <p >{template.explanation}</p>
+          <h4>Why these attributes and skills?</h4>
+          <p>{template.explanation}</p>
         </div>
       )}
 
       {/* Attributes */}
       <div className={wizardStyles.card.base}>
-        <h4 >Attributes ({template.attributes.length})</h4>
-        <div >
+        <h4>Attributes ({template.attributes.length})</h4>
+        <div>
           {template.attributes.map((attr, index) => (
             <div key={index} >
               <div>
-                <span >{attr.name}</span>
+                <span>{attr.name}</span>
                 {attr.category && (
-                  <span className={`${wizardStyles.badge.base}${wizardStyles.badge.secondary}`}>
+                  <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                     {attr.category}
                   </span>
                 )}
               </div>
-              <div >
+              <div>
                 <div>Base: {attr.baseValue}</div>
                 <div>Range: {attr.minValue}-{attr.maxValue}</div>
               </div>
@@ -71,22 +71,22 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
 
       {/* Skills */}
       <div className={wizardStyles.card.base}>
-        <h4 >Skills ({template.skills.length})</h4>
-        <div >
+        <h4>Skills ({template.skills.length})</h4>
+        <div>
           {template.skills.map((skill, index) => (
             <div key={index} >
-              <div >
-                <span >{skill.name}</span>
-                <span className={`${wizardStyles.badge.base}${wizardStyles.badge.primary}`}>
+              <div>
+                <span>{skill.name}</span>
+                <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
                   {skill.difficulty}
                 </span>
                 {skill.category && (
-                  <span className={`${wizardStyles.badge.base}${wizardStyles.badge.secondary}`}>
+                  <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                     {skill.category}
                   </span>
                 )}
               </div>
-              <div >
+              <div>
                 <div>Base: {skill.baseValue}</div>
                 <div>Range: {skill.minValue}-{skill.maxValue}</div>
               </div>

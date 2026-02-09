@@ -40,7 +40,7 @@ export function DropConfirmationDialog({
       size="lg"
       tone="destructive"
       footer={
-        <div >
+        <div>
           <Button
             type="button"
             onClick={onClose}
@@ -61,8 +61,8 @@ export function DropConfirmationDialog({
       }
       footerClassName=""
     >
-      <div >
-        <p >
+      <div>
+        <p>
           Are you sure you want to drop <strong>{item.name}</strong>?
         </p>
 
@@ -74,7 +74,7 @@ export function DropConfirmationDialog({
         )}
 
         {item.stackable && item.quantity > 1 && (
-          <div >
+          <div>
             <Label htmlFor="drop-quantity">
               Quantity to drop
             </Label>
@@ -88,7 +88,7 @@ export function DropConfirmationDialog({
               aria-invalid={!!quantityError}
               aria-describedby={quantityError ? "quantity-error" : undefined}
             />
-            <p >Available: {item.quantity}</p>
+            <p>Available: {item.quantity}</p>
             {quantityError && (
               <p id="quantity-error" >
                 {quantityError}

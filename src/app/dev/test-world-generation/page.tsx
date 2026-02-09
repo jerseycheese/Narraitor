@@ -44,16 +44,16 @@ export default function TestWorldGeneration() {
   };
 
   return (
-    <div >
-      <h1 >World Generation Genre Test</h1>
+    <div>
+      <h1>World Generation Genre Test</h1>
       
-      <div >
-        <p >
+      <div>
+        <p>
           Test that worlds set within non-fantasy universes don&apos;t get fantasy genres or elements.
         </p>
       </div>
 
-      <div >
+      <div>
         {testCases.map((testCase) => (
           <div key={testCase.reference} >
             <button
@@ -63,7 +63,7 @@ export default function TestWorldGeneration() {
             >
               Test &quot;{testCase.reference}&quot;
             </button>
-            <span >
+            <span>
               Expected genre: {testCase.expectedGenre}
             </span>
           </div>
@@ -71,59 +71,59 @@ export default function TestWorldGeneration() {
       </div>
 
       {isGenerating && (
-        <div >
-          <p >Generating world...</p>
+        <div>
+          <p>Generating world...</p>
         </div>
       )}
 
       {error && (
-        <div >
-          <p >Error:</p>
-          <p >{error}</p>
+        <div>
+          <p>Error:</p>
+          <p>{error}</p>
         </div>
       )}
 
       {generatedWorld && (
-        <div >
-          <h2 >Generated World</h2>
+        <div>
+          <h2>Generated World</h2>
           
-          <div >
+          <div>
             <div>
-              <span >Name:</span> {generatedWorld.name}
+              <span>Name:</span> {generatedWorld.name}
             </div>
             <div>
-              <span >Genre:</span> {generatedWorld.genre}
+              <span>Genre:</span> {generatedWorld.genre}
               {generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') && (
-                <span >(❌ Should not be Fantasy!)</span>
+                <span>(❌ Should not be Fantasy!)</span>
               )}
             </div>
             <div>
-              <span >Description:</span> {generatedWorld.description}
+              <span>Description:</span> {generatedWorld.description}
             </div>
           </div>
 
-          <div >
-            <h3 >Attributes ({generatedWorld.attributes.length}):</h3>
-            <ul >
+          <div>
+            <h3>Attributes ({generatedWorld.attributes.length}):</h3>
+            <ul>
               {generatedWorld.attributes.map((attr, i) => (
                 <li key={i}>
-                  <span >{attr.name}:</span> {attr.description}
+                  <span>{attr.name}:</span> {attr.description}
                   {attr.name.match(/magic|mana|arcane/i) && (
-                    <span >(❌ Fantasy element!)</span>
+                    <span>(❌ Fantasy element!)</span>
                   )}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div >
-            <h3 >Skills ({generatedWorld.skills.length}):</h3>
-            <ul >
+          <div>
+            <h3>Skills ({generatedWorld.skills.length}):</h3>
+            <ul>
               {generatedWorld.skills.map((skill, i) => (
                 <li key={i}>
-                  <span >{skill.name}:</span> {skill.description}
+                  <span>{skill.name}:</span> {skill.description}
                   {skill.name.match(/magic|spell|sorcery|enchant/i) && (
-                    <span >(❌ Fantasy element!)</span>
+                    <span>(❌ Fantasy element!)</span>
                   )}
                 </li>
               ))}

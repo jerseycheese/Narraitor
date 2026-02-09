@@ -145,16 +145,16 @@ export function AttributeEditor({
 
   return (
     <>
-      <div >
-        <h2 >
+      <div>
+        <h2>
           {mode === 'create' ? 'Create New Attribute' : 'Edit Attribute'}
         </h2>
       </div>
 
-      <div >
-        <div >
+      <div>
+        <div>
           <Label htmlFor="attribute-name">
-            Attribute Name <span >*</span>
+            Attribute Name <span>*</span>
           </Label>
           <Input
             id="attribute-name"
@@ -167,7 +167,7 @@ export function AttributeEditor({
           />
         </div>
 
-        <div >
+        <div>
           <Label htmlFor="attribute-description">
             Description
           </Label>
@@ -179,8 +179,8 @@ export function AttributeEditor({
           />
         </div>
 
-        <div >
-          <div >
+        <div>
+          <div>
             <Label htmlFor="min-value">
               Minimum Value
             </Label>
@@ -194,7 +194,7 @@ export function AttributeEditor({
             />
           </div>
 
-          <div >
+          <div>
             <Label htmlFor="max-value">
               Maximum Value
             </Label>
@@ -225,8 +225,8 @@ export function AttributeEditor({
         )}
       </div>
 
-      <div >
-        <div >
+      <div>
+        <div>
           {mode === 'edit' && onDelete && (
             <Button
               onClick={handleDeleteClick}
@@ -238,7 +238,7 @@ export function AttributeEditor({
           )}
         </div>
 
-        <div >
+        <div>
           <Button
             onClick={onCancel}
             variant="outline"

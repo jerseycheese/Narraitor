@@ -79,19 +79,19 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
 
   return (
     <div className={`${className}`}>
-      <h2 >{title}</h2>
-      <div >
-        <div >
+      <h2>{title}</h2>
+      <div>
+        <div>
           {imageComponent}
         </div>
-        <div >
-          <p >
+        <div>
+          <p>
             {hasImage ? description : `No ${title.toLowerCase()} has been generated yet.`}
           </p>
           
           {/* Custom prompt toggle */}
-          <div >
-            <div >
+          <div>
+            <div>
               <Checkbox
                 checked={showCustomPrompt}
                 onChange={(e) => handleCustomPromptToggle(e.target.checked)}
@@ -113,7 +113,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           
           {/* Custom prompt textarea */}
           {showCustomPrompt && (
-            <div >
+            <div>
               <Textarea
                 value={userCustomPrompt}
                 onChange={(e) => handleCustomPromptChange(e.target.value)}
@@ -121,13 +121,13 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
                 rows={3}
                 
               />
-              <p >
+              <p>
                 {customPromptHelpText}
               </p>
             </div>
           )}
           
-          <div >
+          <div>
             <Button
               onClick={handleGenerate}
               disabled={isGenerating}
@@ -135,7 +135,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
             >
               {isGenerating ? (
                 <>
-                  <div ></div>
+                  <div></div>
                   Generating...
                 </>
               ) : (
@@ -159,13 +159,13 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
 
           {/* Error display */}
           {error && (
-            <div >
-              <p >{error}</p>
+            <div>
+              <p>{error}</p>
             </div>
           )}
 
           {generatedAt && (
-            <p >
+            <p>
               Generated: {formatDate(generatedAt)}
             </p>
           )}

@@ -15,20 +15,20 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
 
   return (
     <SectionWrapper title="Attributes that apply to characters in this world">
-      <div >
+      <div>
         {attributes.map((attr, index) => (
           <div key={`${attr.id ?? attr.name ?? index}`} >
-            <div >
-              <h3 >{attr.name}</h3>
-              <span >
+            <div>
+              <h3>{attr.name}</h3>
+              <span>
                 Range: {attr.minValue} - {attr.maxValue}
               </span>
             </div>
             {attr.description && (
-              <p >{attr.description}</p>
+              <p>{attr.description}</p>
             )}
             {attr.baseValue !== undefined && (
-              <p >Default: {attr.baseValue}</p>
+              <p>Default: {attr.baseValue}</p>
             )}
           </div>
         ))}

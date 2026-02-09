@@ -63,9 +63,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
   };
   
   return (
-    <section >
-      <div >
-        <h3 >Skills</h3>
+    <section>
+      <div>
+        <h3>Skills</h3>
         <Button
           onClick={handleAddSkill}
           size="sm"
@@ -75,13 +75,13 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       </div>
       
       {skills.length === 0 ? (
-        <p >No skills defined yet.</p>
+        <p>No skills defined yet.</p>
       ) : (
-        <div >
+        <div>
           {skills.map((skill, index) => (
             <div key={skill.id || skill.name || index} >
-              <div >
-                <h4 >{skill.name}</h4>
+              <div>
+                <h4>{skill.name}</h4>
                 <Button
                   onClick={() => handleRemoveSkill(index)}
                   variant="destructive"
@@ -91,9 +91,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 </Button>
               </div>
               
-              <div >
-                <div >
-                  <div >
+              <div>
+                <div>
+                  <div>
                     <Label htmlFor={`skill-name-${index}`}>
                       Name
                     </Label>
@@ -105,7 +105,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     />
                   </div>
                   
-                  <div >
+                  <div>
                     <Label htmlFor={`skill-category-${index}`}>
                       Category
                     </Label>
@@ -118,7 +118,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                 </div>
                 
-                <div >
+                <div>
                   <Label htmlFor={`skill-description-${index}`}>
                     Description
                   </Label>
@@ -130,8 +130,8 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   />
                 </div>
                 
-                <div >
-                  <div >
+                <div>
+                  <div>
                     <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
                     </Label>
@@ -150,14 +150,14 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     </Select>
                   </div>
                   
-                  <div >
+                  <div>
                     <Label>
                       Linked Attributes
                     </Label>
                     {attributes.length === 0 ? (
-                      <p >No attributes available</p>
+                      <p>No attributes available</p>
                     ) : (
-                      <div >
+                      <div>
                         {attributes.map((attr, aIndex) => (
                           <div key={attr.id || attr.name || aIndex} >
                             <Checkbox
@@ -180,9 +180,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                 </div>
                 
-                <div >
-                  <h5 >Skill Default Level</h5>
-                  <div >
+                <div>
+                  <h5>Skill Default Level</h5>
+                  <div>
                     {/* Use the SkillRangeEditor component */}
                     <SkillRangeEditor
                       skill={{

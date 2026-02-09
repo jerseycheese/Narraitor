@@ -47,13 +47,13 @@ const meta: Meta<typeof MobileNavigationMenu> = {
       });
 
       return (
-        <div >
+        <div>
           <Story />
           {/* Background content to show overlay effect */}
-          <div >
-            <div >
-              <h2 >Page Content</h2>
-              <p >
+          <div>
+            <div>
+              <h2>Page Content</h2>
+              <p>
                 This content is behind the mobile navigation overlay when open.
                 The overlay should cover the entire screen and prevent
                 interaction with background content.

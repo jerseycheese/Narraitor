@@ -19,7 +19,7 @@ interface CharacterSkillDisplayProps {
 export function CharacterSkillDisplay({ skills, showCategories = false }: CharacterSkillDisplayProps) {
   if (skills.length === 0) {
     return (
-      <div >
+      <div>
         No skills assigned to this character.
       </div>
     );
@@ -37,13 +37,13 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
     }, {} as Record<string, CharacterSkill[]>);
 
     return (
-      <div >
+      <div>
         {Object.entries(categorizedSkills).map(([category, skillList]) => (
           <div key={category}>
-            <h3 >
+            <h3>
               {category}
             </h3>
-            <div >
+            <div>
               {skillList.map((skill, index) => (
                 <SkillItem key={skill.id || `skill-${category}-${index}`} skill={skill} />
               ))}
@@ -55,7 +55,7 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
   }
 
   return (
-    <div >
+    <div>
       {skills.map((skill, index) => (
         <SkillItem key={skill.id || `skill-${index}`} skill={skill} />
       ))}
@@ -65,18 +65,18 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
 
 function SkillItem({ skill }: { skill: CharacterSkill }) {
   return (
-    <div >
-      <div >
+    <div>
+      <div>
         {skill.name}
       </div>
-      <div >
+      <div>
         {skill.level}
       </div>
-      <div >
+      <div>
         Level
       </div>
       {skill.description && (
-        <p >{skill.description}</p>
+        <p>{skill.description}</p>
       )}
     </div>
   );

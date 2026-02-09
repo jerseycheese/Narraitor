@@ -42,7 +42,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
   }, [onTemplateSelect]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent, entry: TemplateHistoryEntry) => {
-    if (e.key === 'Enter' || e.key === '') {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleTemplateClick(entry);
     }
@@ -54,12 +54,12 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
   }
 
   return (
-    <div className={`${wizardStyles.divider}${className}`}>
+    <div className={`${wizardStyles.divider} ${className}`}>
       <h3 className={wizardStyles.subheading}>{title}</h3>
       {description && (
-        <p >{description}</p>
+        <p>{description}</p>
       )}
-      <div >
+      <div>
         {templateHistoryManager.getRecent().map((entry, index) => (
           <div 
             key={index}
@@ -71,17 +71,17 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
             aria-label={`Use template:${entry.template.name}(${getGenreLabel(entry.template.genre)})`}
             data-testid={`recent-template-${index}`}
           >
-            <div >
+            <div>
               <div>
-                <h4 >{entry.template.name}</h4>
-                <div >
-                  <span >{getGenreLabel(entry.template.genre)}</span>
+                <h4>{entry.template.name}</h4>
+                <div>
+                  <span>{getGenreLabel(entry.template.genre)}</span>
                 </div>
-                <p >
+                <p>
                   Generated {formatDate(entry.generatedAt)}
                 </p>
               </div>
-              <span className={`${wizardStyles.badge.base}${wizardStyles.badge.secondary}`}>
+              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                 {entry.generationType === 'inspired-by' ? 'Inspired' : 
                  entry.generationType === 'genre-mix' ? 'Mixed' : 'Surprise'}
               </span>

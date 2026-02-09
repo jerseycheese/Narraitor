@@ -52,7 +52,7 @@ const InteractiveWorldTypeSelector = (args: Record<string, unknown>) => {
   const [data, setData] = useState<WorldTypeData>(createInitialWorldTypeData());
 
   return (
-    <div >
+    <div>
       <WorldTypeSelector
         {...args}
         value={data}
@@ -60,9 +60,9 @@ const InteractiveWorldTypeSelector = (args: Record<string, unknown>) => {
       />
       
       {/* Debug output */}
-      <div >
-        <h3 >Current Data:</h3>
-        <pre >
+      <div>
+        <h3>Current Data:</h3>
+        <pre>
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -129,16 +129,16 @@ const InspiredByExampleComponent = () => {
   });
 
   return (
-    <div >
+    <div>
       <WorldTypeSelector
         value={data}
         onChange={setData}
         size="medium"
       />
       
-      <div >
-        <h3 >Current Data:</h3>
-        <pre >
+      <div>
+        <h3>Current Data:</h3>
+        <pre>
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -165,16 +165,16 @@ const SetWithinExampleComponent = () => {
   });
 
   return (
-    <div >
+    <div>
       <WorldTypeSelector
         value={data}
         onChange={setData}
         size="medium"
       />
       
-      <div >
-        <h3 >Current Data:</h3>
-        <pre >
+      <div>
+        <h3>Current Data:</h3>
+        <pre>
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>

@@ -23,14 +23,14 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
 
   if (worldCharacters.length === 0) {
     return (
-      <div >
-        <h3 >
+      <div>
+        <h3>
           No Characters Yet
         </h3>
-        <p >
+        <p>
           Create a character for {world?.name} to continue
         </p>
-        <div >
+        <div>
           <Link
             href="/characters/create"
             
@@ -53,14 +53,14 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
 
   return (
     <div data-testid="character-selection-step">
-      <h3 >
+      <h3>
         Choose Your Character
       </h3>
-      <p >
+      <p>
         World: {world?.name}
       </p>
       
-      <div >
+      <div>
         {worldCharacters.map(character => (
           <Button
             key={character.id}
@@ -68,14 +68,14 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
             
             variant="ghost"
           >
-            <div >
+            <div>
               <div>
-                <h4 >{character.name}</h4>
-                <p >
+                <h4>{character.name}</h4>
+                <p>
                   {character.background.personality || 'No description available'}
                 </p>
               </div>
-              <span >
+              <span>
                 Select →
               </span>
             </div>
@@ -83,7 +83,7 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
         ))}
       </div>
 
-      <div >
+      <div>
         <Button
           onClick={onBack}
           
