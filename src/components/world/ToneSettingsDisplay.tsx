@@ -23,19 +23,19 @@ export function ToneSettingsDisplay({
   const getContentRatingDisplay = () => {
     const rating = toneSettings.contentRating;
     const description = CONTENT_RATING_DESCRIPTIONS[rating];
-    return `${rating}-${description}`;
+    return `${rating} - ${description}`;
   };
 
   const getNarrativeStyleDisplay = () => {
     const style = toneSettings.narrativeStyle;
     const description = NARRATIVE_STYLE_DESCRIPTIONS[style];
-    return `${style.charAt(0).toUpperCase() + style.slice(1)}-${description}`;
+    return `${style.charAt(0).toUpperCase() + style.slice(1)} - ${description}`;
   };
 
   const getLanguageComplexityDisplay = () => {
     const complexity = toneSettings.languageComplexity;
     const description = LANGUAGE_COMPLEXITY_DESCRIPTIONS[complexity];
-    return `${complexity.charAt(0).toUpperCase() + complexity.slice(1)}-${description}`;
+    return `${complexity.charAt(0).toUpperCase() + complexity.slice(1)} - ${description}`;
   };
 
   return (

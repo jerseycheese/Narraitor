@@ -162,7 +162,7 @@ export function LoadingState({
   return (
     <div className={`${className}`}>
       <UILoadingState
-        message={details ? `${message}-${details}` : message}
+        message={details ? `${message} - ${details}` : message}
         size="md"
         theme="light"
         centered={true}

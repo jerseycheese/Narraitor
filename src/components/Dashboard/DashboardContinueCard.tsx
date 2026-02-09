@@ -104,7 +104,7 @@ export function DashboardContinueCard({
         onConfirm={handleDelete}
         title="Delete Campaign"
         description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
-        itemName={`${world.name}-${character.name}`}
+        itemName={`${world.name} - ${character.name}`}
         isDeleting={isDeleting}
       />
     </>
