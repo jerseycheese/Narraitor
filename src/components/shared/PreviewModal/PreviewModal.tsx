@@ -50,46 +50,34 @@ function PreviewModalInner<T>({
   confirmText = 'Use This',
   cancelText = 'Back',
   footerNote,
-  className
+  className,
 }: PreviewModalProps<T>) {
   return (
-    <SimpleModal 
-      isOpen={isOpen} 
+    <SimpleModal
+      isOpen={isOpen}
       onClose={onCancel}
       title={title}
       showCloseButton={false}
       size="xl"
       className={className}
     >
-      <p  id="preview-modal-desc">
-        {subtitle || "Preview content before confirming your selection."}
+      <p id="preview-modal-desc">
+        {subtitle || 'Preview content before confirming your selection.'}
       </p>
 
-      <div >
+      <div>
         {renderContent(data)}
 
         {/* Footer Note */}
-        {footerNote && (
-          <div >
-            {footerNote}
-          </div>
-        )}
+        {footerNote && <div>{footerNote}</div>}
       </div>
 
-      <div className={wizardStyles.navigation.container + ""}>
-        <Button
-          onClick={onCancel}
-          variant="outline"
-          size="default"
-        >
+      <div className={wizardStyles.navigation.container + ''}>
+        <Button onClick={onCancel} variant="outline" size="default">
           {cancelText}
         </Button>
         <div className={wizardStyles.navigation.buttonGroup}>
-          <Button
-            onClick={onConfirm}
-            variant="default"
-            size="default"
-          >
+          <Button onClick={onConfirm} variant="default" size="default">
             {confirmText}
           </Button>
         </div>

@@ -78,7 +78,7 @@ export function StoryEndingDialog({
           variant="outline"
           
           type="button"
-          aria-label={`${closeText}and dismiss dialog`}
+        aria-label={`${closeText} and dismiss dialog`}
         >
           {closeText}
         </Button>

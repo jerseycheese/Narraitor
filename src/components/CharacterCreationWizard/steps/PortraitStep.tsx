@@ -152,11 +152,11 @@ export function PortraitStep({
 
   return (
     <div className="component-portrait-step">
-      <div >
-        <h3 >Character Portrait</h3>
-        <p >
+      <div>
+        <h3>Character Portrait</h3>
+        <p>
           {data.characterData.background?.isKnownFigure
-            ? `Generate a portrait of${data.characterData.name}as they are commonly recognized`
+            ? `Generate a portrait of ${data.characterData.name} as they are commonly recognized`
             : 'Generate a portrait for your character or use a placeholder'}
         </p>
       </div>
@@ -168,13 +168,12 @@ export function PortraitStep({
           setPhysicalDescription={setLocalPhysicalDescription}
           environmentHint={environmentHint}
           setEnvironmentHint={setEnvironmentHint}
-          
         />
       )}
 
-      <div >
+      <div>
         {isGenerating ? (
-          <div >
+          <div>
             <LoadingState variant="spinner" size="md" centered={false} />
           </div>
         ) : (
@@ -191,39 +190,33 @@ export function PortraitStep({
             type="button"
             onClick={handleGeneratePortrait}
             disabled={isGenerating}
-            
           >
             Generate Portrait
           </button>
         )}
 
         {portrait.type === 'ai-generated' && portrait.url && (
-          <div >
-            <p >
-              <CheckCircle  aria-hidden="true" />
+          <div>
+            <p>
+              <CheckCircle aria-hidden="true" />
               Portrait generated successfully
             </p>
-            <div >
+            <div>
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
                 disabled={isGenerating}
-                
               >
                 Regenerate Portrait
               </button>
-              <button
-                type="button"
-                onClick={handleRemovePortrait}
-                
-              >
+              <button type="button" onClick={handleRemovePortrait}>
                 Remove Portrait
               </button>
             </div>
           </div>
         )}
 
-        <p >
+        <p>
           Portrait generation is optional. You can skip portrait generation and
           continue.
         </p>

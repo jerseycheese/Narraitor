@@ -93,11 +93,11 @@ export const LoreManagementBrowseTab: React.FC<LoreManagementBrowseTabProps> = (
 
     <div >
       <div>
-        Visibility totals (world): {visibilityStats.total} total • {visibilityStats.worldShared} world-shared •{''}
+        Visibility totals (world): {visibilityStats.total} total • {visibilityStats.worldShared} world-shared •{' '}
         {visibilityStats.sessionPrivate} session-private
       </div>
       <div>
-        Narrative facts: {visibilityStats.narrativeWorldShared} world-shared • {visibilityStats.narrativeSessionPrivate}{''}
+        Narrative facts: {visibilityStats.narrativeWorldShared} world-shared • {visibilityStats.narrativeSessionPrivate}{' '}
         session-private
       </div>
       <div>Note: AI-extracted lore uses session-private visibility when a session is active.</div>

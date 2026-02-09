@@ -219,12 +219,12 @@ export default function NavigationFlowTestPage() {
                     <h3 >Current Flow State</h3>
                     <div >
                       <div>
-                        <span >Current Step:</span>{''}
+                        <span >Current Step:</span>{' '}
                         <span >{getCurrentFlowStep()}</span>
                       </div>
                       <div>
-                        <span >Can Quick Start:</span>{''}
-                        <span className={canQuickStart() ? '' : ''}>
+                        <span >Can Quick Start:</span>{' '}
+                        <span>
                           {canQuickStart() ? 'Yes' : 'No'}
                         </span>
                       </div>

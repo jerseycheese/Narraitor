@@ -140,14 +140,14 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       const worldTheme = testContext.world.genre;
       const characterName = testContext.character.name;
 
-      const narrativeText = `In the${worldTheme?.toLowerCase() || 'mysterious'}realm of${worldName},${characterName}stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
+      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
 
       // Generate context-aware choices based on genre
       const generateChoices = (genre: string = 'Fantasy'): string[] => {
         const baseChoices = [
-          `Explore the${genre.toLowerCase()}landscape ahead`,
-          `Study the${worldName}surroundings more carefully`,
-          `Call upon${characterName}'s inner strength`,
+          `Explore the ${genre.toLowerCase()} landscape ahead`,
+          `Study the ${worldName} surroundings more carefully`,
+          `Call upon ${characterName}'s inner strength`,
         ];
 
         if (genre.toLowerCase().includes('fantasy')) {

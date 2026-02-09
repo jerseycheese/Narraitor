@@ -14,26 +14,26 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
       label: 'Worlds',
       value: metrics.worldsCreated,
       icon: Globe,
-      color: ''
+      color: '',
     },
     {
       label: 'Characters',
       value: metrics.charactersCreated,
       icon: Users,
-      color: ''
+      color: '',
     },
     {
       label: 'Sessions',
       value: metrics.sessionsPlayed,
       icon: Play,
-      color: ''
+      color: '',
     },
     {
       label: 'Entries',
       value: metrics.narrativeSegments,
       icon: BookOpen,
-      color: ''
-    }
+      color: '',
+    },
   ];
 
   return (
@@ -42,23 +42,18 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
       aria-labelledby="progress-heading"
       role="region"
     >
-      <h2 id="progress-heading" >
-        Your Progress
-      </h2>
+      <h2 id="progress-heading">Your Progress</h2>
 
-      <div >
+      <div>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
-              key={stat.label}
-              className={`${stat.color}`}
-            >
-              <div >
-                <Icon  aria-hidden="true" />
-                <span >{stat.value}</span>
+            <div key={stat.label} className={`${stat.color}`}>
+              <div>
+                <Icon aria-hidden="true" />
+                <span>{stat.value}</span>
               </div>
-              <p >{stat.label}</p>
+              <p>{stat.label}</p>
             </div>
           );
         })}

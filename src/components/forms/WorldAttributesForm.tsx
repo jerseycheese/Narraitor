@@ -125,9 +125,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       return "Are you sure you want to delete this attribute? This action cannot be undone.";
     }
     
-    const skillNames = linkedSkills.map(s => s.name).join(',');
+    const skillNames = linkedSkills.map(s => s.name).join(', ');
     const skillText = linkedSkills.length > 1 ? 's' : '';
-    return `WARNING: This attribute is linked to${linkedSkills.length}skill${skillText}:${skillNames}. Deleting this attribute will affect these skills. This action cannot be undone.`;
+    return `WARNING: This attribute is linked to ${linkedSkills.length} skill${skillText}: ${skillNames}. Deleting this attribute will affect these skills. This action cannot be undone.`;
   }, [attributeToDelete, getLinkedSkills]);
   
   return (
@@ -142,7 +142,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             size="sm"
             aria-label={
               isLimitReached 
-                ? `Cannot add more attributes. Maximum of${maxAttributes}reached.` 
+                ? `Cannot add more attributes. Maximum of ${maxAttributes} reached.` 
                 : 'Add new attribute'
             }
           >

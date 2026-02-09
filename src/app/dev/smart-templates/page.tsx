@@ -29,7 +29,7 @@ export default function SmartTemplatesTestPage() {
       aiSuggestions: {
         attributes: template.attributes.map(attr => ({
           name: attr.name,
-          description: attr.description || `${attr.name}represents a core aspect of characters in this world`,
+        description: attr.description || `${attr.name} represents a core aspect of characters in this world`,
           minValue: attr.minValue,
           maxValue: attr.maxValue,
           baseValue: attr.baseValue,
@@ -38,7 +38,7 @@ export default function SmartTemplatesTestPage() {
         })),
         skills: template.skills.map(skill => ({
           name: skill.name,
-          description: skill.description || `${skill.name}is an important skill for characters in this world`,
+        description: skill.description || `${skill.name} is an important skill for characters in this world`,
           difficulty: skill.difficulty,
           category: skill.category,
           baseValue: skill.baseValue,

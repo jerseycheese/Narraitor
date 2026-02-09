@@ -5,12 +5,14 @@ import { ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
 /**
  * Get icon for choice alignment
  */
-export const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
+export const getAlignmentIcon = (
+  alignment?: ChoiceAlignment
+): React.ReactNode => {
   switch (alignment) {
     case 'lawful':
-      return <Scale  aria-hidden="true" />;
+      return <Scale aria-hidden="true" />;
     case 'chaotic':
-      return <Flame  aria-hidden="true" />;
+      return <Flame aria-hidden="true" />;
     case 'neutral':
     default:
       return null;
@@ -20,17 +22,20 @@ export const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode =
 /**
  * Get CSS classes for alignment-based styling
  */
-export const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
+export const getAlignmentClasses = (
+  alignment?: ChoiceAlignment,
+  isDisabled?: boolean
+): string => {
   const baseClasses = {
     lawful: '',
     chaotic: '',
-    neutral: ''
+    neutral: '',
   };
 
   const hoverClasses = {
     lawful: '',
     chaotic: '',
-    neutral: ''
+    neutral: '',
   };
 
   const alignmentKey = alignment || 'neutral';
@@ -50,20 +55,20 @@ export const getDecisionWeightStyling = (weight?: DecisionWeight) => {
       return {
         container: '',
         dot: '',
-        label: ''
+        label: '',
       };
     case 'major':
       return {
         container: '',
         dot: '',
-        label: ''
+        label: '',
       };
     case 'minor':
     default:
       return {
         container: '',
         dot: '',
-        label: ''
+        label: '',
       };
   }
 };

@@ -11,26 +11,32 @@ interface TutorialHintProps {
   dismissible?: boolean;
 }
 
-export function TutorialHint({ id, children, className = '', dismissible = true }: TutorialHintProps) {
-  const dismissedHints = useSessionStore(state => state.tutorialProgress.dismissedHints);
-  const dismissTutorialHint = useSessionStore(state => state.dismissTutorialHint);
-  
+export function TutorialHint({
+  id,
+  children,
+  className = '',
+  dismissible = true,
+}: TutorialHintProps) {
+  const dismissedHints = useSessionStore(
+    (state) => state.tutorialProgress.dismissedHints
+  );
+  const dismissTutorialHint = useSessionStore(
+    (state) => state.dismissTutorialHint
+  );
+
   if (dismissedHints.includes(id)) return null;
 
   return (
     <div className={`${className}`}>
       {dismissible && (
-        <button 
+        <button
           onClick={() => dismissTutorialHint(id)}
-          
           aria-label="Dismiss hint"
         >
-          <X  />
+          <X />
         </button>
       )}
-      <div >
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 }

@@ -92,7 +92,7 @@ async function buildPortraitPrompt(
     );
 
     // Fallback to basic prompt if AI detection fails
-    return `Create a professional portrait of${characterName},${physicalDescription}. ${isKnownFigure ?`This should be recognizable as ${characterName} from the source material.`: 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre:${worldGenre}.`;
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
   }
 }
 

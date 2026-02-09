@@ -2,14 +2,21 @@ import React from 'react';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<
+  typeof useCharacterStore.getState
+>['characters'][string];
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { 
-  ActiveStateCard, 
-  CardActionGroup
-} from '@/components/shared/cards';
+import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Star, CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
+import {
+  Plus,
+  Star,
+  CheckCircle,
+  Play,
+  Eye,
+  Pencil,
+  Trash,
+} from 'lucide-react';
 import { truncate, safeTrim } from '@/lib/utils';
 
 interface CharacterContextSummary {
@@ -42,14 +49,14 @@ interface CharacterCardProps {
 
 /**
  * CharacterCard - Display card for a character with actions
- * 
+ *
  * Shows character information including portrait, name, level, type badges,
  * and description. Provides action buttons for viewing, playing, editing,
  * and deleting the character. Active characters get special styling.
- * 
+ *
  * @param props - Character card configuration and event handlers
  * @returns A formatted character card with portrait and action buttons
- * 
+ *
  * @example Basic usage
  * <CharacterCard
  *   character={character}
@@ -71,57 +78,64 @@ export function CharacterCard({
   onDelete,
   context,
 }: CharacterCardProps) {
-
   return (
-    <ActiveStateCard 
+    <ActiveStateCard
       isActive={isActive}
       activeText="Currently Active Character"
       className="component-character-card"
     >
-
-      <div >
-        <div >
-          <div 
+      <div>
+        <div>
+          <div
             onClick={(e) => {
               e.stopPropagation();
               onView();
             }}
-            
           >
             <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
+              portrait={
+                character.portrait || { type: 'placeholder', url: null }
+              }
               characterName={character.name}
               size="large"
             />
           </div>
-          <h3 
+          <h3
             onClick={(e) => {
               e.stopPropagation();
               onView();
             }}
-            
           >
             {character.name}
           </h3>
-          <div >
-            <span >Level {character.level || 1}</span>
+          <div>
+            <span>Level {character.level || 1}</span>
             {character?.background?.isKnownFigure !== undefined && (
               <Badge
-                icon={character?.background?.isKnownFigure ?
-                  <Star  aria-hidden="true" /> :
-                  <Plus  aria-hidden="true" />
+                icon={
+                  character?.background?.isKnownFigure ? (
+                    <Star aria-hidden="true" />
+                  ) : (
+                    <Plus aria-hidden="true" />
+                  )
                 }
-                variant={character?.background?.isKnownFigure ? 'warning-static' : 'default-static'}
+                variant={
+                  character?.background?.isKnownFigure
+                    ? 'warning-static'
+                    : 'default-static'
+                }
               >
-                {character?.background?.isKnownFigure ? 'Known Figure' : 'Original'}
+                {character?.background?.isKnownFigure
+                  ? 'Known Figure'
+                  : 'Original'}
               </Badge>
             )}
           </div>
-          <p >
+          <p>
             {(() => {
               const text = (character?.background?.history ||
-                          character?.background?.personality ||
-                          'No description provided') as string;
+                character?.background?.personality ||
+                'No description provided') as string;
               const sentences = text.split(/[.!?]+/);
               let result = '';
               for (const sentence of sentences) {
@@ -134,66 +148,64 @@ export function CharacterCard({
             })()}
           </p>
           {context?.relationships && context.relationships.length > 0 && (
-            <div >
-              <h4 >Connections</h4>
-              <div >
+            <div>
+              <h4>Connections</h4>
+              <div>
                 {context.relationships.map((relation) => (
-                  <div
-                    key={relation.characterId}
-                    
-                  >
+                  <div key={relation.characterId}>
                     {relation.portraitUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={relation.portraitUrl}
-                        alt={`${relation.characterName}portrait`}
-                        
+                        alt={`${relation.characterName} portrait`}
                       />
                     ) : (
-                      <div >
-                        <span >
+                      <div>
+                        <span>
                           {relation.characterName.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span >{relation.characterName}</span>
+                    <span>{relation.characterName}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
           {context?.recentEvent && (
-            <div >
-              <h4 >Recent Event</h4>
-              <p >
-                {context.recentEvent}
-              </p>
+            <div>
+              <h4>Recent Event</h4>
+              <p>{context.recentEvent}</p>
             </div>
           )}
-          <div ></div>
+          <div></div>
         </div>
-        
+
         {/* Footer with buttons - always at bottom */}
-        <footer >
+        <footer>
           <CardActionGroup
             primaryActions={[
               // Add Make Active button as first primary action for inactive characters
-              ...(isActive ? [] : [{
-                key: 'make-active',
-                text: 'Make Active',
-                onClick: onMakeActive,
-                variant: 'secondary' as const,
-                flex: true,
-                icon: (<CheckCircle  aria-hidden="true" />)
-              }]),
+              ...(isActive
+                ? []
+                : [
+                    {
+                      key: 'make-active',
+                      text: 'Make Active',
+                      onClick: onMakeActive,
+                      variant: 'secondary' as const,
+                      flex: true,
+                      icon: <CheckCircle aria-hidden="true" />,
+                    },
+                  ]),
               {
                 key: 'play',
                 text: 'Play',
                 onClick: onPlay,
                 variant: 'success',
                 flex: true,
-                icon: (<Play  aria-hidden="true" />)
-              }
+                icon: <Play aria-hidden="true" />,
+              },
             ]}
             secondaryActions={[
               {
@@ -201,22 +213,22 @@ export function CharacterCard({
                 text: 'View',
                 onClick: onView,
                 variant: 'secondary',
-                icon: (<Eye  aria-hidden="true" />)
+                icon: <Eye aria-hidden="true" />,
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: onEdit,
                 variant: 'secondary',
-                icon: (<Pencil  aria-hidden="true" />)
+                icon: <Pencil aria-hidden="true" />,
               },
               {
                 key: 'delete',
                 text: 'Delete',
                 onClick: onDelete,
                 variant: 'danger',
-                icon: (<Trash  aria-hidden="true" />)
-              }
+                icon: <Trash aria-hidden="true" />,
+              },
             ]}
             primarySize="md"
             secondarySize="sm"

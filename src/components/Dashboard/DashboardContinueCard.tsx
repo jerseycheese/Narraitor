@@ -12,8 +12,10 @@ import { useCharacterStore } from '@/state/characterStore';
 
 interface DashboardContinueCardProps {
   session: SavedSessionInfo;
-  world: ReturnType<typeof useWorldStore.getState>["worlds"][string];
-  character: ReturnType<typeof useCharacterStore.getState>["characters"][string];
+  world: ReturnType<typeof useWorldStore.getState>['worlds'][string];
+  character: ReturnType<
+    typeof useCharacterStore.getState
+  >['characters'][string];
   onContinue: (sessionId: string) => void;
   onDelete: (sessionId: string) => void;
 }
@@ -23,7 +25,7 @@ export function DashboardContinueCard({
   world,
   character,
   onContinue,
-  onDelete
+  onDelete,
 }: DashboardContinueCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,34 +48,34 @@ export function DashboardContinueCard({
         className="component-dashboard-continue-card"
         aria-labelledby="continue-game-heading"
       >
-        <h2 id="continue-game-heading" >
-          Continue Your Game
-        </h2>
+        <h2 id="continue-game-heading">Continue Your Game</h2>
 
-        <div >
+        <div>
           {/* Character Portrait */}
-          <div >
+          <div>
             <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
+              portrait={
+                character.portrait || { type: 'placeholder', url: null }
+              }
               characterName={character.name}
               size="large"
             />
           </div>
 
           {/* Game Info */}
-          <div >
-            <div >
+          <div>
+            <div>
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
 
-            <div >
+            <div>
               <DataField
                 label="Progress"
-                value={`${session.narrativeCount}entries`}
+                value={`${session.narrativeCount} entries`}
                 variant="outline"
               />
-              <time  dateTime={session.lastPlayed}>
+              <time dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
             </div>
@@ -85,15 +87,14 @@ export function DashboardContinueCard({
             {
               label: 'Continue Last Game',
               onClick: () => onContinue(session.id),
-              variant: 'success'
+              variant: 'success',
             },
             {
               label: 'Delete',
               onClick: () => setIsDeleteDialogOpen(true),
-              variant: 'danger'
-            }
+              variant: 'danger',
+            },
           ]}
-          
         />
       </section>
 

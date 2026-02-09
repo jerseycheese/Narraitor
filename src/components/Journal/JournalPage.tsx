@@ -38,7 +38,9 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     loading: journalLoading,
   } = useJournalStore();
 
-  const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(null);
+  const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(
+    null
+  );
   const [viewMode, setViewMode] = React.useState<'list' | 'detail'>('list');
   const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -56,9 +58,10 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
 
     return entries.filter((entry) => {
       const tagsText = entry.metadata.tags?.join(' ') ?? '';
-      const relatedText = entry.relatedEntities
-        ?.map((entity) => `${entity.type} ${entity.name}`)
-        .join(' ') ?? '';
+      const relatedText =
+        entry.relatedEntities
+          ?.map((entity) => `${entity.type} ${entity.name}`)
+          .join(' ') ?? '';
       const haystack = [
         entry.title,
         entry.content,
@@ -75,15 +78,19 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   }, [entries, normalizedQuery]);
 
   const firstEntryId = filteredEntries[0]?.id ?? null;
-  const resolvedSelectedEntryId = React.useMemo(() => (
-    selectedEntryId && filteredEntries.some((entry) => entry.id === selectedEntryId)
-      ? selectedEntryId
-      : null
-  ), [filteredEntries, selectedEntryId]);
+  const resolvedSelectedEntryId = React.useMemo(
+    () =>
+      selectedEntryId &&
+      filteredEntries.some((entry) => entry.id === selectedEntryId)
+        ? selectedEntryId
+        : null,
+    [filteredEntries, selectedEntryId]
+  );
 
   const activeSelectedEntryId = resolvedSelectedEntryId ?? firstEntryId;
   const selectedEntry = activeSelectedEntryId
-    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) || null
+    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) ||
+      null
     : null;
 
   React.useEffect(() => {
@@ -132,20 +139,18 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
           title="No active session"
           description="Start or resume a session to view its journal entries."
           variant="centered"
-          
         />
       );
     }
 
     if (journalLoading) {
       return (
-        <div >
+        <div>
           <LoadingState
             variant="skeleton"
             size="md"
             message="Loading journal entries..."
             skeletonLines={6}
-            
           />
         </div>
       );
@@ -158,13 +163,12 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
           severity="warning"
           title={journalError.title}
           message={journalError.message}
-          
         />
       );
     }
 
     return (
-      <div >
+      <div>
         {entries.length === 0 ? (
           <JournalEmptyState />
         ) : (
@@ -177,26 +181,23 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
               )}
               data-testid="journal-list-pane"
             >
-              <div >
-                <h2 >Entries</h2>
+              <div>
+                <h2>Entries</h2>
               </div>
-              <div >
-                <div >
+              <div>
+                <div>
                   <Input
                     id="journal-search"
                     type="search"
                     placeholder="Search entries..."
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    
                     aria-label="Search entries"
                   />
                 </div>
               </div>
               {filteredEntries.length === 0 ? (
-                <div >
-                  No entries match your search.
-                </div>
+                <div>No entries match your search.</div>
               ) : (
                 <JournalEntryList
                   entries={visibleEntries}
@@ -205,13 +206,16 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                 />
               )}
               {canLoadMore && (
-                <div >
+                <div>
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
-                    
-                    onClick={() => setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, entries.length))}
+                    onClick={() =>
+                      setVisibleCount((prev) =>
+                        Math.min(prev + PAGE_SIZE, entries.length)
+                      )
+                    }
                   >
                     Load more
                   </Button>
@@ -228,7 +232,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
               data-testid="journal-detail-pane"
             >
               {selectedEntry ? (
-                <div  ref={detailRef} tabIndex={-1}>
+                <div ref={detailRef} tabIndex={-1}>
                   <JournalEntryDetail
                     entry={selectedEntry}
                     showBackButton={viewMode === 'detail'}
@@ -236,13 +240,13 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                   />
                 </div>
               ) : (
-                <div >
-                  <div >
-                    <div >
-                      <BookOpen  aria-hidden="true" />
+                <div>
+                  <div>
+                    <div>
+                      <BookOpen aria-hidden="true" />
                     </div>
-                    <h3 >Select an Entry</h3>
-                    <p >
+                    <h3>Select an Entry</h3>
+                    <p>
                       Choose an entry from the list to view its complete content
                     </p>
                   </div>
@@ -262,14 +266,29 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
       className="journal-page"
     >
       {world && (
-        <div >
+        <div>
           <Hero
             title={pageTitle}
-            image={world.image?.url ? {
-              url: world.image.url,
-              alt: `${world.name} world`
-            } : undefined}
-            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+            image={
+              world.image?.url
+                ? {
+                    url: world.image.url,
+                    alt: `${world.name} world`,
+                  }
+                : undefined
+            }
+            theme={
+              (world.genre as
+                | 'fantasy'
+                | 'sci-fi'
+                | 'modern'
+                | 'historical'
+                | 'horror'
+                | 'mystery'
+                | 'western'
+                | 'cyberpunk'
+                | 'other') || 'default'
+            }
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
             height=""
             titleElement="h1"
@@ -277,11 +296,9 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         </div>
       )}
 
-      <div >
+      <div>
         <BackNavigation href={`/worlds/${worldId}/play`} label="Back to Play" />
-        {showEntrySummary && (
-          <span >{entrySummary}</span>
-        )}
+        {showEntrySummary && <span>{entrySummary}</span>}
       </div>
       {renderContent()}
     </PageLayout>

@@ -8,19 +8,19 @@ interface GameSessionSkeletonProps {
 }
 
 export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
-  className = ''
+  className = '',
 }) => {
   return (
     <div data-testid="game-session-skeleton" className={`${className}`}>
       {/* Two-column layout matching ActiveGameSession */}
-      <div >
+      <div>
         {/* Narrative Column Skeleton */}
-        <div >
-          <div >
+        <div>
+          <div>
             {/* Narrative segments skeleton */}
-            <div >
+            <div>
               {/* First narrative segment */}
-              <div >
+              <div>
                 <LoadingSkeleton
                   skeletonLines={4}
                   size="md"
@@ -30,7 +30,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
               </div>
 
               {/* Second narrative segment */}
-              <div >
+              <div>
                 <LoadingSkeleton
                   skeletonLines={3}
                   size="md"
@@ -43,25 +43,22 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
         </div>
 
         {/* Choices Column Skeleton */}
-        <div >
-          <div >
+        <div>
+          <div>
             {/* Choice buttons skeleton */}
-            <div >
+            <div>
               {/* Choice prompt skeleton */}
-              <div  />
+              <div />
 
               {/* Choice buttons */}
               {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  
-                />
+                <div key={i} />
               ))}
 
               {/* Custom input skeleton */}
-              <div >
-                <div  />
-                <div  />
+              <div>
+                <div />
+                <div />
               </div>
             </div>
           </div>

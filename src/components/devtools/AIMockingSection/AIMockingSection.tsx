@@ -9,14 +9,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { MockScenarios, MockScenario } from '@/lib/ai/__mocks__/mockScenarios';
-import { mockStateManager, MockConfiguration } from '@/lib/devtools/mockStateManager';
+import {
+  mockStateManager,
+  MockConfiguration,
+} from '@/lib/devtools/mockStateManager';
 
 /**
  * AI Mocking Section component for DevTools
  * Provides controls to toggle between Live API and Mock modes
  */
 export const AIMockingSection: React.FC = () => {
-  const [config, setConfig] = useState<MockConfiguration>(mockStateManager.getConfiguration());
+  const [config, setConfig] = useState<MockConfiguration>(
+    mockStateManager.getConfiguration()
+  );
   const [scenarios] = useState<MockScenarios>(new MockScenarios());
   const [showCustomScenario, setShowCustomScenario] = useState(false);
   const [customScenario, setCustomScenario] = useState<Partial<MockScenario>>({
@@ -24,7 +29,7 @@ export const AIMockingSection: React.FC = () => {
     name: '',
     description: '',
     delay: 1000,
-    shouldSucceed: true
+    shouldSucceed: true,
   });
 
   // Subscribe to configuration changes
@@ -36,9 +41,12 @@ export const AIMockingSection: React.FC = () => {
   // Get all available scenarios (predefined + custom, deduplicated)
   const allScenarios = [
     ...scenarios.getAllScenarios(),
-    ...config.customScenarios.filter(custom => 
-      !scenarios.getAllScenarios().some(predefined => predefined.id === custom.id)
-    )
+    ...config.customScenarios.filter(
+      (custom) =>
+        !scenarios
+          .getAllScenarios()
+          .some((predefined) => predefined.id === custom.id)
+    ),
   ];
 
   const handleModeToggle = () => {
@@ -55,17 +63,17 @@ export const AIMockingSection: React.FC = () => {
     }
 
     const shouldSucceed = customScenario.shouldSucceed || true;
-    const response = shouldSucceed 
+    const response = shouldSucceed
       ? {
           content: `Custom mock response:${customScenario.name}`,
           finishReason: 'STOP' as const,
           promptTokens: 20,
-          completionTokens: 15
+          completionTokens: 15,
         }
       : {
           code: 'CUSTOM_ERROR',
           message: `Custom error:${customScenario.name}`,
-          retryable: true
+          retryable: true,
         };
 
     const newScenario: MockScenario = {
@@ -74,18 +82,18 @@ export const AIMockingSection: React.FC = () => {
       description: customScenario.description || '',
       delay: customScenario.delay || 1000,
       shouldSucceed,
-      response
+      response,
     };
 
     mockStateManager.addCustomScenario(newScenario);
-    
+
     // Reset form
     setCustomScenario({
       id: '',
       name: '',
       description: '',
       delay: 1000,
-      shouldSucceed: true
+      shouldSucceed: true,
     });
     setShowCustomScenario(false);
   };
@@ -113,27 +121,24 @@ export const AIMockingSection: React.FC = () => {
     });
   };
 
-  const activeScenario = allScenarios.find(s => s.id === config.activeScenarioId);
+  const activeScenario = allScenarios.find(
+    (s) => s.id === config.activeScenarioId
+  );
 
   return (
-    <div  data-testid="ai-mocking-section">
+    <div data-testid="ai-mocking-section">
       {/* Mode Toggle */}
-      <div >
-        <div >
-          <div className={`${config.isEnabled ? '' : ''}`} />
-          <span >
-            Mode: {config.isEnabled ? 'Mock' : 'Live API'}
-          </span>
+      <div>
+        <div>
+          <div />
+          <span>Mode: {config.isEnabled ? 'Mock' : 'Live API'}</span>
         </div>
-        
+
         <Button
           onClick={handleModeToggle}
           size="sm"
-          variant={config.isEnabled ? "default" : "outline"}
-          className={config.isEnabled 
-            ? "" 
-            : ""
-          }
+          variant={config.isEnabled ? 'default' : 'outline'}
+          className={config.isEnabled ? '' : ''}
           data-testid="mock-mode-toggle"
         >
           {config.isEnabled ? 'Disable Mock' : 'Enable Mock'}
@@ -141,51 +146,50 @@ export const AIMockingSection: React.FC = () => {
       </div>
 
       {config.isEnabled && (
-        <div >
+        <div>
           {/* Scenario Selection */}
           <div>
-            <label >
-              Mock Scenario
-            </label>
+            <label>Mock Scenario</label>
             <Select
               value={config.activeScenarioId}
               onChange={(e) => handleScenarioChange(e.target.value)}
-              
               data-testid="scenario-selector"
             >
-              {allScenarios.map(scenario => (
+              {allScenarios.map((scenario) => (
                 <option key={scenario.id} value={scenario.id}>
-                  {scenario.name} ({scenario.shouldSucceed ? 'Success' : 'Error'}) - {scenario.delay}ms
+                  {scenario.name} (
+                  {scenario.shouldSucceed ? 'Success' : 'Error'}) -{' '}
+                  {scenario.delay}ms
                 </option>
               ))}
             </Select>
-            
-            {activeScenario && (
-              <p >
-                {activeScenario.description}
-              </p>
-            )}
+
+            {activeScenario && <p>{activeScenario.description}</p>}
           </div>
 
           {/* Settings */}
-          <div >
+          <div>
             <Checkbox
               id="delayVariation"
               checked={config.settings.delayVariation}
-              onChange={(e) => mockStateManager.updateSettings({ delayVariation: e.target.checked })}
+              onChange={(e) =>
+                mockStateManager.updateSettings({
+                  delayVariation: e.target.checked,
+                })
+              }
               label="Delay Variation"
-              
             />
-            
+
             <div>
-              <label >
-                Variation %
-              </label>
+              <label>Variation %</label>
               <Input
                 type="number"
                 value={config.settings.variationPercent}
-                onChange={(e) => mockStateManager.updateSettings({ variationPercent: parseInt(e.target.value) || 0 })}
-                
+                onChange={(e) =>
+                  mockStateManager.updateSettings({
+                    variationPercent: parseInt(e.target.value) || 0,
+                  })
+                }
                 min="0"
                 max="100"
                 disabled={!config.settings.delayVariation}
@@ -194,72 +198,94 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Custom Scenarios */}
-          <div >
-            <div >
-              <h4 >Custom Scenarios</h4>
+          <div>
+            <div>
+              <h4>Custom Scenarios</h4>
               <Button
                 onClick={() => setShowCustomScenario(!showCustomScenario)}
                 size="sm"
                 variant="outline"
-                
               >
                 Add Custom
               </Button>
             </div>
 
             {showCustomScenario && (
-              <div >
-                <div >
+              <div>
+                <div>
                   <Input
                     placeholder="Scenario ID"
                     value={customScenario.id}
-                    onChange={(e) => setCustomScenario(prev => ({ ...prev, id: e.target.value }))}
-                    
+                    onChange={(e) =>
+                      setCustomScenario((prev) => ({
+                        ...prev,
+                        id: e.target.value,
+                      }))
+                    }
                   />
                   <Input
                     placeholder="Scenario Name"
                     value={customScenario.name}
-                    onChange={(e) => setCustomScenario(prev => ({ ...prev, name: e.target.value }))}
-                    
+                    onChange={(e) =>
+                      setCustomScenario((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
-                
+
                 <Textarea
                   placeholder="Description"
                   value={customScenario.description}
-                  onChange={(e) => setCustomScenario(prev => ({ ...prev, description: e.target.value }))}
-                  
+                  onChange={(e) =>
+                    setCustomScenario((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   rows={2}
                 />
-                
-                <div >
+
+                <div>
                   <Input
                     type="number"
                     placeholder="Delay (ms)"
                     value={customScenario.delay}
-                    onChange={(e) => setCustomScenario(prev => ({ ...prev, delay: parseInt(e.target.value) || 1000 }))}
-                    
+                    onChange={(e) =>
+                      setCustomScenario((prev) => ({
+                        ...prev,
+                        delay: parseInt(e.target.value) || 1000,
+                      }))
+                    }
                     min="0"
                   />
-                  
+
                   <Checkbox
                     id="shouldSucceed"
                     checked={customScenario.shouldSucceed}
-                    onChange={(e) => setCustomScenario(prev => ({ ...prev, shouldSucceed: e.target.checked }))}
+                    onChange={(e) =>
+                      setCustomScenario((prev) => ({
+                        ...prev,
+                        shouldSucceed: e.target.checked,
+                      }))
+                    }
                     label="Should Succeed"
-                    
                   />
                 </div>
-                
-                <div >
-                  <Button onClick={handleAddCustomScenario} size="sm" variant="success">
+
+                <div>
+                  <Button
+                    onClick={handleAddCustomScenario}
+                    size="sm"
+                    variant="success"
+                  >
                     Add Scenario
                   </Button>
-                  <Button 
-                    onClick={() => setShowCustomScenario(false)} 
-                    size="sm" 
+                  <Button
+                    onClick={() => setShowCustomScenario(false)}
+                    size="sm"
                     variant="ghost"
-                    
                   >
                     Cancel
                   </Button>
@@ -269,18 +295,17 @@ export const AIMockingSection: React.FC = () => {
 
             {/* List Custom Scenarios */}
             {config.customScenarios.length > 0 && (
-              <div >
-                {config.customScenarios.map(scenario => (
-                  <div key={scenario.id} >
+              <div>
+                {config.customScenarios.map((scenario) => (
+                  <div key={scenario.id}>
                     <div>
-                      <div >{scenario.name}</div>
-                      <div >{scenario.description}</div>
+                      <div>{scenario.name}</div>
+                      <div>{scenario.description}</div>
                     </div>
                     <Button
                       onClick={() => handleRemoveCustomScenario(scenario.id)}
                       size="sm"
                       variant="ghost"
-                      
                     >
                       Remove
                     </Button>
@@ -291,20 +316,19 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Import/Export */}
-          <div >
-            <h4 >Configuration</h4>
-            <div >
-              <Button onClick={handleExportConfig} size="sm" variant="outline" >
+          <div>
+            <h4>Configuration</h4>
+            <div>
+              <Button onClick={handleExportConfig} size="sm" variant="outline">
                 Export
               </Button>
-              <Button onClick={handleImportConfig} size="sm" variant="outline" >
+              <Button onClick={handleImportConfig} size="sm" variant="outline">
                 Import
               </Button>
-              <Button 
-                onClick={() => mockStateManager.reset()} 
-                size="sm" 
-                variant="outline" 
-                
+              <Button
+                onClick={() => mockStateManager.reset()}
+                size="sm"
+                variant="outline"
               >
                 Reset
               </Button>

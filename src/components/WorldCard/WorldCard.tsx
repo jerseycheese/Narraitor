@@ -7,10 +7,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
-import {
-  ActiveStateCard,
-  CardActionGroup,
-} from '@/components/shared/cards';
+import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
@@ -90,7 +87,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
     onSelect(world.id);
   };
 
-
   const handleDeleteClick = () => {
     onDelete(world.id);
   };
@@ -146,7 +142,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
     }
   };
 
-
   return (
     <ActiveStateCard
       isActive={isActive}
@@ -154,62 +149,75 @@ const WorldCard: React.FC<WorldCardProps> = ({
       showActiveIndicator={isActive}
       testId="world-card"
       hasImage={true}
-      className={isSelected ? "" : undefined}
+      className={isSelected ? '' : undefined}
     >
       {/* Always show Hero component - with image or themed background */}
       <div className="group">
-        <Link href={`/worlds/${world.id}`} >
+        <Link href={`/worlds/${world.id}`}>
           {(() => {
             // Use seeded placeholder image during Playwright tests if world has no image
-            const isPlaywright = typeof window !== 'undefined' &&
-              (window.navigator.userAgent.includes('Playwright') || (window as unknown as Record<string, unknown>).__playwright);
-            const STABLE_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
-            const heroImageUrl = world.image?.url || (isPlaywright ? STABLE_PLACEHOLDER : undefined);
-            const heroImage = heroImageUrl ? { url: heroImageUrl, alt: `${world.name} world` } : undefined;
-            
+            const isPlaywright =
+              typeof window !== 'undefined' &&
+              (window.navigator.userAgent.includes('Playwright') ||
+                (window as unknown as Record<string, unknown>).__playwright);
+            const STABLE_PLACEHOLDER =
+              'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
+            const heroImageUrl =
+              world.image?.url ||
+              (isPlaywright ? STABLE_PLACEHOLDER : undefined);
+            const heroImage = heroImageUrl
+              ? { url: heroImageUrl, alt: `${world.name} world` }
+              : undefined;
+
             return (
-            <Hero
-              title={world.name}
-              image={heroImage}
-              theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
-              badge={
-                world.genre && (
-                  <span
-                    data-testid="world-card-genre"
-                    
-                  >
-                    {getGenreLabel(world.genre)}
-                  </span>
-                )
-              }
-              height=""
-              titleTestId="world-card-name"
-              titleElement="h2"
-              borderRadius="top"
-            />
+              <Hero
+                title={world.name}
+                image={heroImage}
+                theme={
+                  (world.genre as
+                    | 'fantasy'
+                    | 'sci-fi'
+                    | 'modern'
+                    | 'historical'
+                    | 'horror'
+                    | 'mystery'
+                    | 'western'
+                    | 'cyberpunk'
+                    | 'other') || 'default'
+                }
+                badge={
+                  world.genre && (
+                    <span data-testid="world-card-genre">
+                      {getGenreLabel(world.genre)}
+                    </span>
+                  )
+                }
+                height=""
+                titleTestId="world-card-name"
+                titleElement="h2"
+                borderRadius="top"
+              />
             );
           })()}
         </Link>
         {onToggleSelect && (
-          <div >
+          <div>
             <Checkbox
               checked={isSelected}
               onChange={() => onToggleSelect(world.id)}
               aria-label={`Select ${world.name} for comparison`}
-              
             />
           </div>
         )}
       </div>
 
-      <div >
+      <div>
         {/* Content area that grows to fill space */}
-        <div >
-
+        <div>
           {/* Character badges and manage link */}
-          <div >
+          <div>
             {characters.length > 0 && (
-              <div >
+              <div>
                 {characters.map((char) => (
                   <button
                     key={char.id}
@@ -219,7 +227,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         actualRouter.push(`/characters/${char.id}`);
                       }
                     }}
-                    
                     title={`Play as ${char.name} - Level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
@@ -229,32 +236,24 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         alt={`${char.name} portrait`}
                         width={40}
                         height={40}
-                        
                       />
                     ) : (
-                      <div >
-                        <span >
-                          {char.name.charAt(0).toUpperCase()}
-                        </span>
+                      <div>
+                        <span>{char.name.charAt(0).toUpperCase()}</span>
                       </div>
                     )}
-                    <span >{char.name}</span>
+                    <span>{char.name}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div >
-            <p
-              data-testid="world-card-description"
-              
-            >
-              {world.description}
-            </p>
+          <div>
+            <p data-testid="world-card-description">{world.description}</p>
 
             {/* World type badge */}
-            <div >
+            <div>
               {world.reference ? (
                 <Badge
                   variant={
@@ -263,19 +262,14 @@ const WorldCard: React.FC<WorldCardProps> = ({
                       : 'success-static'
                   }
                   data-testid="world-card-type"
-                  
                 >
                   {world.relationship === 'set_within'
                     ? 'Set in'
-                    : 'Inspired by'}{''}
+                    : 'Inspired by'}{' '}
                   {world.reference}
                 </Badge>
               ) : (
-                <Badge
-                  variant="default-static"
-                  data-testid="world-card-type"
-                  
-                >
+                <Badge variant="default-static" data-testid="world-card-type">
                   Original World
                 </Badge>
               )}
@@ -284,26 +278,28 @@ const WorldCard: React.FC<WorldCardProps> = ({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer >
-          <div >
+        <footer>
+          <div>
             <time data-testid="world-card-createdAt">
               Created: {formatDate(world.createdAt)}
             </time>
           </div>
-          <div >
+          <div>
             <CardActionGroup
               primaryActions={[
                 // Add Make Active button as first primary action for inactive worlds
-                ...(isActive ? [] : [{
-                  key: 'make-active',
-                  text: 'Make Active',
-                  onClick: handleMakeActive,
-                  variant: 'secondary' as const,
-                  flex: true,
-                  icon: (
-                    <CheckCircle  aria-hidden="true" />
-                  )
-                }]),
+                ...(isActive
+                  ? []
+                  : [
+                      {
+                        key: 'make-active',
+                        text: 'Make Active',
+                        onClick: handleMakeActive,
+                        variant: 'secondary' as const,
+                        flex: true,
+                        icon: <CheckCircle aria-hidden="true" />,
+                      },
+                    ]),
                 {
                   key: 'manage-characters',
                   text: 'Manage Characters',
@@ -323,9 +319,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   variant: 'success',
                   flex: true,
                   testId: 'world-card-actions-play-button',
-                  icon: (
-                    <Play  aria-hidden="true" />
-                  )
+                  icon: <Play aria-hidden="true" />,
                 },
               ]}
               secondaryActions={[
@@ -339,9 +333,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     }
                   },
                   variant: 'secondary',
-                  icon: (
-                    <Eye  aria-hidden="true" />
-                  )
+                  icon: <Eye aria-hidden="true" />,
                 },
                 {
                   key: 'edit',
@@ -349,18 +341,14 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   onClick: handleEditClick,
                   variant: 'secondary',
                   testId: 'world-card-actions-edit-button',
-                  icon: (
-                    <Pencil  aria-hidden="true" />
-                  )
+                  icon: <Pencil aria-hidden="true" />,
                 },
                 {
                   key: 'delete',
                   text: 'Delete',
                   onClick: handleDeleteClick,
                   variant: 'danger',
-                  icon: (
-                    <Trash  aria-hidden="true" />
-                  )
+                  icon: <Trash aria-hidden="true" />,
                 },
               ]}
               primarySize="md"

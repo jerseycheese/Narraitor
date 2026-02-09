@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       logger.debug('generate-ending-image', 'Generated image prompt:', imagePrompt);
 
       // Generate a detailed description that could be used with real AI image generation
-      const promptResponse = await client.generateContent(`Generate a detailed, artistic description for an image showing the conclusion of this story that could be used as a prompt for an AI image generator. Be very specific about visual elements, atmosphere, lighting, composition, and emotional tone.${imagePrompt}Focus on creating a powerful final image that captures the essence of this${body.ending.tone}ending. Respond with only the detailed visual description, no other text.`);
+      const promptResponse = await client.generateContent(`Generate a detailed, artistic description for an image showing the conclusion of this story that could be used as a prompt for an AI image generator. Be very specific about visual elements, atmosphere, lighting, composition, and emotional tone. ${imagePrompt} Focus on creating a powerful final image that captures the essence of this ${body.ending.tone} ending. Respond with only the detailed visual description, no other text.`);
 
       const imageDescription = promptResponse.content;
       logger.debug('generate-ending-image', 'Generated image description:', imageDescription);
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         try {
           logger.debug('generate-ending-image', 'Attempting Gemini image generation');
           
-          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion.${imageDescription}Requirements: - Epic cinematic scene showing story conclusion - High quality digital art style - Professional game/film concept art - Rich atmospheric lighting and emotional depth -${body.ending.tone}tone and mood -${body.world?.genre || 'fantasy'}genre elements - Focus on the end of the journey or its aftermath - No text, logos, or watermarks - Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format) - Horizontal panoramic composition suitable for wide hero display`;
+          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion. ${imageDescription} Requirements: - Epic cinematic scene showing story conclusion - High quality digital art style - Professional game/film concept art - Rich atmospheric lighting and emotional depth - ${body.ending.tone} tone and mood - ${body.world?.genre || 'fantasy'} genre elements - Focus on the end of the journey or its aftermath - No text, logos, or watermarks - Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format) - Horizontal panoramic composition suitable for wide hero display`;
 
           const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
 
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json({ 
         imageUrl: fallbackUrl,
-        description: `A${body.ending.tone}ending scene for${body.character?.name || 'the hero'}in${body.world?.name || 'the realm'}`,
+        description: `A ${body.ending.tone} ending scene for ${body.character?.name || 'the hero'} in ${body.world?.name || 'the realm'}`,
         placeholder: true,
         aiGenerated: false
       });

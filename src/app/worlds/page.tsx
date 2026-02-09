@@ -8,7 +8,11 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { useWorldStore } from '@/state/worldStore';
 import { InlineError } from '@/components/shared';
-import { WorldTypeSelector, WorldTypeData, createInitialWorldTypeData } from '@/components/shared/WorldTypeSelector';
+import {
+  WorldTypeSelector,
+  WorldTypeData,
+  createInitialWorldTypeData,
+} from '@/components/shared/WorldTypeSelector';
 import { WorldFormFields } from '@/components/shared/WorldFormFields';
 import { worldCreationService } from '@/lib/services/worldCreationService';
 import { worldApi } from '@/lib/api/worldApi';
@@ -23,11 +27,15 @@ export default function WorldsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
-  
+
   // Tutorial integration
   const { startTour, stopTour, isTourActive } = useTutorial();
-  const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('worldGeneration'));
-  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+  const shouldShowTour = useSessionStore((state) =>
+    state.shouldShowTutorialPhase('worldGeneration')
+  );
+  const completeTutorialPhase = useSessionStore(
+    (state) => state.completeTutorialPhase
+  );
   const tourStartedRef = useRef(false);
 
   // Reset tour started flag when modal closes
@@ -39,12 +47,19 @@ export default function WorldsPage() {
 
   // Start tour when modal opens if needed (only once per modal session)
   useEffect(() => {
-    if (showPrompt && shouldShowTour && !isTourActive && !tourStartedRef.current) {
+    if (
+      showPrompt &&
+      shouldShowTour &&
+      !isTourActive &&
+      !tourStartedRef.current
+    ) {
       tourStartedRef.current = true;
       // Small delay to allow modal animation
       const timer = setTimeout(() => {
         // Re-check in case tutorial was completed during the timeout
-        const stillShouldShow = useSessionStore.getState().shouldShowTutorialPhase('worldGeneration');
+        const stillShouldShow = useSessionStore
+          .getState()
+          .shouldShowTutorialPhase('worldGeneration');
         if (stillShouldShow) {
           startTour('worldGeneration');
         }
@@ -55,7 +70,9 @@ export default function WorldsPage() {
     }
   }, [showPrompt, shouldShowTour, isTourActive, startTour, stopTour]);
 
-  const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(createInitialWorldTypeData());
+  const [worldTypeData, setWorldTypeData] = useState<WorldTypeData>(
+    createInitialWorldTypeData()
+  );
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [viewToggle, setViewToggle] = useState<React.ReactNode>(null);
@@ -66,8 +83,9 @@ export default function WorldsPage() {
 
   const handleGenerateWorld = async () => {
     // Validate world type data
-    const { reference, relationship } = convertToGenerationParams(worldTypeData);
-    
+    const { reference, relationship } =
+      convertToGenerationParams(worldTypeData);
+
     if (relationship && !reference?.trim()) {
       setError('Please enter an existing setting');
       return;
@@ -76,7 +94,7 @@ export default function WorldsPage() {
     setIsGenerating(true);
     setGeneratingStatus('Generating world configuration...');
     setError(null);
-    
+
     // Complete tutorial phase if active
     if (shouldShowTour) {
       completeTutorialPhase('worldGeneration');
@@ -86,7 +104,7 @@ export default function WorldsPage() {
     try {
       // Get existing world names to ensure uniqueness
       const { worlds } = useWorldStore.getState();
-      const existingNames = Object.values(worlds).map(w => w.name);
+      const existingNames = Object.values(worlds).map((w) => w.name);
 
       // Generate the world data using the API service
       setGeneratingStatus('Generating world configuration...');
@@ -94,7 +112,7 @@ export default function WorldsPage() {
         worldReference: reference,
         worldRelationship: relationship,
         existingNames,
-        suggestedName: worldName || undefined
+        suggestedName: worldName || undefined,
       });
 
       // Create the world using the service
@@ -102,12 +120,11 @@ export default function WorldsPage() {
       const { worldId } = await worldCreationService.createWorldFromGeneration({
         generatedData,
         customizations: worldName ? { name: worldName } : {},
-        generateImage: true
+        generateImage: true,
       });
 
       setGeneratingStatus('Generating world image...');
       // Image generation is handled by the service in the background
-      
 
       // Set as current world
       useWorldStore.getState().setCurrentWorld(worldId);
@@ -117,7 +134,7 @@ export default function WorldsPage() {
       setWorldTypeData(createInitialWorldTypeData());
       setWorldName('');
       setIsGenerating(false);
-      
+
       // Stay on worlds page to see the new world
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate world');
@@ -130,19 +147,15 @@ export default function WorldsPage() {
       label: 'Create World',
       onClick: handleCreateWorld,
       variant: 'primary' as const,
-      icon: (
-        <Plus  aria-hidden="true" />
-      )
+      icon: <Plus aria-hidden="true" />,
     },
     {
       label: 'Generate World',
       onClick: () => setShowPrompt(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: (
-        <Sparkles  aria-hidden="true" />
-      )
-    }
+      icon: <Sparkles aria-hidden="true" />,
+    },
   ];
 
   return (
@@ -150,16 +163,15 @@ export default function WorldsPage() {
       title="My Worlds"
       description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
       actions={
-        <div >
+        <div>
           {viewToggle}
           <ActionButtonGroup actions={actionButtons} />
         </div>
       }
     >
-
       {/* World Generation Prompt */}
-      <SimpleModal 
-        isOpen={showPrompt} 
+      <SimpleModal
+        isOpen={showPrompt}
         onClose={() => setShowPrompt(false)}
         title="Generate World"
         showCloseButton={false}
@@ -177,24 +189,24 @@ export default function WorldsPage() {
                   setError(null);
                 },
                 variant: 'secondary',
-                disabled: isGenerating
+                disabled: isGenerating,
               },
               {
                 label: isGenerating ? 'Generating...' : 'Generate',
                 onClick: handleGenerateWorld,
                 variant: 'primary',
-                disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
-                icon: (
-                  <Sparkles  aria-hidden="true" />
-                ),
-                dataTutorial: 'generate-world-button'
-              }
+                disabled:
+                  isGenerating ||
+                  (worldTypeData.worldType !== 'original' &&
+                    !worldTypeData.worldReference?.trim()),
+                icon: <Sparkles aria-hidden="true" />,
+                dataTutorial: 'generate-world-button',
+              },
             ]}
-            
           />
         }
       >
-        <div >
+        <div>
           <WorldFormFields.NameInput
             value={worldName}
             onChange={setWorldName}
@@ -202,10 +214,10 @@ export default function WorldsPage() {
             required={false}
             placeholder="e.g., The Lost Kingdom"
           />
-          <p id="generate-world-desc" >
+          <p id="generate-world-desc">
             Give your world a custom name, or leave empty for a generated name
           </p>
-          
+
           <WorldTypeSelector
             value={worldTypeData}
             onChange={setWorldTypeData}
@@ -214,13 +226,11 @@ export default function WorldsPage() {
             layout="vertical"
             size="medium"
           />
-          {error && (
-            <InlineError error={error} />
-          )}
+          {error && <InlineError error={error} />}
 
           {isGenerating && (
-            <p >
-              <span ></span>
+            <p>
+              <span></span>
               {generatingStatus}
             </p>
           )}

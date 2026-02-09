@@ -73,7 +73,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
           return (
             <div key={uniqueKey} >
               <Label >
-                {worldAttr?.name || `Attribute${index + 1}`}
+              {worldAttr?.name || `Attribute ${index + 1}`}
               </Label>
               {worldAttr?.description && (
                 <p >

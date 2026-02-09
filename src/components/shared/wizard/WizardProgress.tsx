@@ -43,7 +43,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
             {/* Connector (no connector after last circle) */}
             {index < steps.length - 1 && (
               <div >
-                <div className={`${index < currentStep ? '' : ''}`} />
+                <div />
               </div>
             )}
           </React.Fragment>

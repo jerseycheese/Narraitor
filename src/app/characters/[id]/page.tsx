@@ -19,10 +19,11 @@ export default function CharacterViewPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters, setCurrentCharacter, deleteCharacter } = useCharacterStore();
+  const { characters, setCurrentCharacter, deleteCharacter } =
+    useCharacterStore();
   const { worlds } = useWorldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   const [mounted, setMounted] = useState(false);
   const character = characters[characterId];
   const world = character ? worlds[character.worldId] : null;
@@ -33,7 +34,6 @@ export default function CharacterViewPage() {
     await deleteCharacter(characterId);
     router.push('/characters');
   };
-
 
   if (!mounted) {
     // Preserve SSR/client markup; decide what to show after hydration
@@ -60,7 +60,7 @@ export default function CharacterViewPage() {
       label: 'Edit Character',
       onClick: () => router.push(`/characters/${characterId}/edit`),
       variant: 'primary' as const,
-  icon: (<Pencil  aria-hidden="true" />)
+      icon: <Pencil aria-hidden="true" />,
     },
     {
       label: 'Play with Character',
@@ -69,26 +69,26 @@ export default function CharacterViewPage() {
         router.push(`/worlds/${character.worldId}/play`);
       },
       variant: 'success' as const,
-  icon: (<Play  aria-hidden="true" />)
+      icon: <Play aria-hidden="true" />,
     },
     {
       label: 'Delete Character',
       onClick: () => setShowDeleteDialog(true),
       variant: 'danger' as const,
-  icon: (<Trash  aria-hidden="true" />)
-    }
+      icon: <Trash aria-hidden="true" />,
+    },
   ];
 
   return (
     <PageLayout>
       {/* Ultra-thin world hero */}
       {world.image?.url && (
-        <div >
+        <div>
           <Hero
             title={character.name}
             image={{
               url: world.image.url,
-              alt: `${world.name}world`
+              alt: `${world.name} world`,
             }}
             subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
             height=""
@@ -99,18 +99,18 @@ export default function CharacterViewPage() {
 
       {/* Back navigation for pages without world image */}
       {!world.image?.url && (
-        <div >
+        <div>
           <BackNavigation href="/characters" label="Back to Characters" />
         </div>
       )}
 
-      <ActionButtonGroup actions={actionButtons}  />
+      <ActionButtonGroup actions={actionButtons} />
 
-      <div >
+      <div>
         <CharacterHeader character={character} world={world} />
         <CharacterDetailsDisplay character={character} world={world} />
       </div>
-      
+
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         isOpen={showDeleteDialog}

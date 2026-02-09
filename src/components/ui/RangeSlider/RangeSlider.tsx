@@ -17,57 +17,57 @@ export interface RangeSliderProps {
    * Current value of the slider
    */
   value: number;
-  
+
   /**
    * Minimum allowed value
    */
   min: number;
-  
+
   /**
    * Maximum allowed value
    */
   max: number;
-  
+
   /**
    * Callback when the value changes
    */
   onChange: (value: number) => void;
-  
+
   /**
    * Whether the slider is disabled
    */
   disabled?: boolean;
-  
+
   /**
    * Whether to show the header label
    */
   showLabel?: boolean;
-  
+
   /**
    * Custom label for the header (defaults to "Default Value")
    */
   labelText?: string;
-  
+
   /**
    * Level descriptions for displaying additional context with range values
    */
   levelDescriptions?: LevelDescription[];
-  
+
   /**
    * Whether to show the level description below the slider
    */
   showLevelDescription?: boolean;
-  
+
   /**
    * Test ID for the component
    */
   testId?: string;
-  
+
   /**
    * Whether the slider is at a constrained max (visual indicator)
    */
   isConstrained?: boolean;
-  
+
   /**
    * The effective maximum value (for constraints), while max remains the visual max
    */
@@ -95,17 +95,17 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   onChange,
   disabled = false,
   showLabel = true,
-  labelText = "Default Value",
+  labelText = 'Default Value',
   levelDescriptions = [],
   showLevelDescription = false,
-  testId = "range-slider",
+  testId = 'range-slider',
   isConstrained = false,
   effectiveMax,
   ariaLabel,
   ariaLabelledBy,
 }) => {
   const [value, setValue] = useState(initialValue);
-  
+
   // Keep internal state in sync with prop value
   useEffect(() => {
     setValue(initialValue);
@@ -136,20 +136,22 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const sliderValue = parseInt(e.target.value);
     if (isNaN(sliderValue)) return;
-    
+
     // Convert from scale to actual value
     const actualValue = scaleToValue(sliderValue);
-    
+
     // Ensure value is within bounds - use effectiveMax if provided
     const maxBound = effectiveMax !== undefined ? effectiveMax : max;
     const clampedValue = Math.max(min, Math.min(maxBound, actualValue));
-    
+
     setValue(clampedValue);
     onChange(clampedValue);
   };
 
   // Find the level description for the current value
-  const currentLevelDescription = levelDescriptions.find(level => level.value === value);
+  const currentLevelDescription = levelDescriptions.find(
+    (level) => level.value === value
+  );
 
   // Get the visual range for the slider - always use original max for consistency
   const getVisualRange = () => {
@@ -165,14 +167,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   // Generate notches with absolute positioning
   const generateScaleNotches = () => {
     const notches = [];
-    
+
     for (let i = visualRange.min; i <= visualRange.max; i++) {
-      const percentage = ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
-      
+      const percentage =
+        ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
+
       notches.push(
         <div
           key={`notch-${i}`}
-          
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         />
       );
@@ -183,14 +185,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   // Generate labels with absolute positioning
   const generateScaleLabels = () => {
     const labels = [];
-    
+
     for (let i = visualRange.min; i <= visualRange.max; i++) {
-      const percentage = ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
-      
+      const percentage =
+        ((i - visualRange.min) / (visualRange.max - visualRange.min)) * 100;
+
       labels.push(
-        <div 
-          key={`label-${i}`} 
-          
+        <div
+          key={`label-${i}`}
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         >
           {i}
@@ -201,26 +203,24 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   };
 
   return (
-    <div  data-testid={testId}>
+    <div data-testid={testId}>
       {showLabel && (
-        <div >
+        <div>
           <span>{labelText}</span>
           {showLevelDescription && currentLevelDescription && (
-            <span  data-testid={`${testId}-level-label`}>
+            <span data-testid={`${testId}-level-label`}>
               {currentLevelDescription.label}
             </span>
           )}
         </div>
       )}
-      
-      <div >
+
+      <div>
         {/* Slider container with scale */}
-        <div >
+        <div>
           {/* Scale notches */}
-          <div >
-            {generateScaleNotches()}
-          </div>
-          
+          <div>{generateScaleNotches()}</div>
+
           {/* Slider input */}
           <div>
             <input
@@ -231,28 +231,32 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               value={valueToScale(value)}
               onChange={handleChange}
               disabled={disabled}
-              className={`appearance-none accent-primary${isConstrained && effectiveMax !== undefined && value === effectiveMax
+              className={`appearance-none accent-primary${
+                isConstrained &&
+                effectiveMax !== undefined &&
+                value === effectiveMax
                   ? 'accent-amber-500'
                   : ''
-                }`}
+              }`}
               data-testid={`${testId}-slider`}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledBy}
             />
           </div>
-          
+
           {/* Scale labels */}
-          <div >
-            {generateScaleLabels()}
-          </div>
+          <div>{generateScaleLabels()}</div>
         </div>
-        
+
         {/* Level description */}
-        {showLevelDescription && currentLevelDescription && currentLevelDescription.description && (
-          <div  data-testid={`${testId}-description`}>
-            <span >{currentLevelDescription.label}:</span> {currentLevelDescription.description}
-          </div>
-        )}
+        {showLevelDescription &&
+          currentLevelDescription &&
+          currentLevelDescription.description && (
+            <div data-testid={`${testId}-description`}>
+              <span>{currentLevelDescription.label}:</span>{' '}
+              {currentLevelDescription.description}
+            </div>
+          )}
       </div>
     </div>
   );

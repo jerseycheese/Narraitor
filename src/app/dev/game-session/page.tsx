@@ -500,11 +500,11 @@ export default function GameSessionTestHarness() {
       <div >
         <h2 >Current Session State</h2>
         <p >
-          Status:{''}
+          Status:{' '}
           <span >{currentState.status || 'unknown'}</span>
         </p>
         <p >
-          Store methods:{''}
+          Store methods:{' '}
           {Object.keys(useSessionStore.getState())
             .filter((key) => {
               const value =

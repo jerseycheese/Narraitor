@@ -30,10 +30,10 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
 
   // Load existing segments on mount
   useEffect(() => {
-    console.log(`[MockNarrativeController] Initializing for session${sessionId}`);
+    console.log(`[MockNarrativeController] Initializing for session ${sessionId}`);
     
     const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-    console.log(`[MockNarrativeController] Found${existingSegments.length}existing segments`);
+    console.log(`[MockNarrativeController] Found ${existingSegments.length} existing segments`);
     
     // Check for initial scenes to avoid duplication using 'intro' or 'opening' tags
     const hasInitialScene = existingSegments.some(segment =>
@@ -63,7 +63,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     
     // Cleanup function - important for unmounting properly
     return () => {
-      console.log(`[MockNarrativeController] Unmounting controller for session${sessionId}`);
+      console.log(`[MockNarrativeController] Unmounting controller for session ${sessionId}`);
     };
   }, [sessionId]);
 
@@ -85,7 +85,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       // Sample theme-specific content for Western theme
       const content = isInitial
         ? 'You arrive at the dusty frontier town of Redemption. The wooden buildings line the main street, and a hot wind carries the scent of desert sage. The townsfolk eye you warily as you tie your horse to the hitching post outside the saloon.'
-        : `You decided to${choice}. The locals watch carefully as you make your way down the dirt road. In the distance, you hear the faint sound of a piano playing from within the saloon.`;
+        : `You decided to ${choice}. The locals watch carefully as you make your way down the dirt road. In the distance, you hear the faint sound of a piano playing from within the saloon.`;
       
       const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
@@ -122,7 +122,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       }
       
       // Add to store
-      console.log(`[MockNarrativeController] Adding segment to store:${newSegment.id}`);
+      console.log(`[MockNarrativeController] Adding segment to store: ${newSegment.id}`);
       useNarrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
@@ -175,7 +175,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     );
 
     if (initialScenes.length > 1) {
-      console.log(`[MockNarrativeController] Found${initialScenes.length}initial scenes, deduplicating`);
+      console.log(`[MockNarrativeController] Found ${initialScenes.length} initial scenes, deduplicating`);
 
       // Sort by timestamp (newest first)
       initialScenes.sort((a, b) =>
@@ -184,7 +184,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
 
       // Keep only the newest initial scene
       const keepScene = initialScenes[0];
-      console.log(`[MockNarrativeController] Keeping initial scene ID:${keepScene.id}`);
+      console.log(`[MockNarrativeController] Keeping initial scene ID: ${keepScene.id}`);
 
       // Filter out all other initial scenes
       const filteredSegments = segments.filter(segment =>

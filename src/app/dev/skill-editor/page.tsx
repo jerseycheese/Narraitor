@@ -88,7 +88,7 @@ export default function SkillEditorTestPage() {
       setEditingSkill(null);
     } else {
       setSkills(prev => [...prev, skill]);
-      logActivity(`Created skill:${skill.name}(linked to${skill.attributeIds?.length || 0}attributes)`);
+      logActivity(`Created skill: ${skill.name} (linked to ${skill.attributeIds?.length || 0} attributes)`);
       setShowCreateDialog(false);
     }
   };
@@ -110,7 +110,7 @@ export default function SkillEditorTestPage() {
     return attributeIds
       .map(id => mockAttributes.find(attr => attr.id === id)?.name)
       .filter(Boolean)
-      .join(',');
+      .join(', ');
   };
 
   return (
@@ -269,7 +269,7 @@ export default function SkillEditorTestPage() {
                   onClick={() => {
                     const manySkills: WorldSkill[] = Array.from({ length: 10 }, (_, i) => ({
                       id: `generated-${i}`,
-                      name: `Generated Skill${i + 1}`,
+                      name: `Generated Skill ${i + 1}`,
                       description: `Auto-generated skill for testing purposes`,
                       worldId: 'test-world',
                       attributeIds: [mockAttributes[i % mockAttributes.length].id],
@@ -279,7 +279,7 @@ export default function SkillEditorTestPage() {
                       maxValue: 10,
                     }));
                     setSkills(prev => [...prev, ...manySkills]);
-                    logActivity(`Generated${manySkills.length}test skills`);
+                    logActivity(`Generated ${manySkills.length} test skills`);
                   }}
                   
                 >

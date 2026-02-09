@@ -242,7 +242,7 @@ export const LoreManagementSection: React.FC = () => {
 
       {/* Message Display */}
       {message && (
-        <Alert className={`${message.type === 'error' ? '' : ''}`}>
+        <Alert>
           <AlertDescription>{message.text}</AlertDescription>
         </Alert>
       )}

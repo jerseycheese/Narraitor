@@ -28,7 +28,7 @@ export function CharacterViewToggle({
   onModeChange,
 }: CharacterViewToggleProps) {
   return (
-    <div  role="group" aria-label="View mode toggle">
+    <div role="group" aria-label="View mode toggle">
       <Button
         variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"
@@ -36,7 +36,7 @@ export function CharacterViewToggle({
         aria-label="Grid view"
         aria-pressed={mode === 'grid'}
       >
-        <Grid3x3  />
+        <Grid3x3 />
       </Button>
       <Button
         variant={mode === 'table' ? 'default' : 'outline'}
@@ -45,7 +45,7 @@ export function CharacterViewToggle({
         aria-label="Table view"
         aria-pressed={mode === 'table'}
       >
-        <Table  />
+        <Table />
       </Button>
     </div>
   );

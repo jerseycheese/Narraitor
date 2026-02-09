@@ -24,7 +24,9 @@ interface ActiveGameSessionNarrativeColumnProps {
   segmentCount: number;
 }
 
-const ActiveGameSessionNarrativeColumn: React.FC<ActiveGameSessionNarrativeColumnProps> = ({
+const ActiveGameSessionNarrativeColumn: React.FC<
+  ActiveGameSessionNarrativeColumnProps
+> = ({
   controllerKey,
   worldId,
   sessionId,
@@ -43,32 +45,30 @@ const ActiveGameSessionNarrativeColumn: React.FC<ActiveGameSessionNarrativeColum
 }) => {
   return (
     <div
-      
       id="narrative-container"
       data-tutorial="narrative-display"
       style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
     >
       {/* Fade-out overlay at top when multiple segments */}
-      {segmentCount > 1 && (
-        <div  />
-      )}
+      {segmentCount > 1 && <div />}
       {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
       <NarrativeHistoryManager
         key={`display-${controllerKey}`}
         sessionId={sessionId}
-        
         disableInitialAutoScroll={false}
       />
 
       {/* Hidden controller just to generate content - always include it but hide from view */}
-      <div aria-hidden="true" >
+      <div aria-hidden="true">
         <NarrativeController
           key={`generator-${controllerKey}`}
           worldId={worldId}
           sessionId={sessionId}
           characterId={characterId || undefined}
           decisionWeight={decisionWeight}
-          triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
+          triggerGeneration={
+            triggerGeneration || !initialized || shouldTriggerGeneration
+          }
           choiceId={localSelectedChoiceId || selectedChoiceId}
           onNarrativeGenerated={onNarrativeGenerated}
           onChoicesGenerated={onChoicesGenerated}

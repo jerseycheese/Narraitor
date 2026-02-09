@@ -10,10 +10,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
-import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
+import {
+  getCategoryMetadata,
+  STANDARD_CATEGORIES,
+} from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
-import { InventoryViewToggle, type InventoryViewMode } from './InventoryViewToggle';
+import {
+  InventoryViewToggle,
+  type InventoryViewMode,
+} from './InventoryViewToggle';
 import { InventoryTable } from './InventoryTable';
 import { Trash2 } from 'lucide-react';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
@@ -41,8 +47,10 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 }) => {
   // Select items and character inventory to re-render on changes
   const itemsObject = useInventoryStore((state) => state.items);
-  const characterInventories = useInventoryStore((state) => state.characterInventories);
-  
+  const characterInventories = useInventoryStore(
+    (state) => state.characterInventories
+  );
+
   const {
     isDialogOpen,
     itemToDrop,
@@ -88,7 +96,11 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     setErrorFeedback(null);
 
     try {
-      const result = await processItemUsage(characterId, itemId, sessionId || undefined);
+      const result = await processItemUsage(
+        characterId,
+        itemId,
+        sessionId || undefined
+      );
 
       if (result.success) {
         // Success path handled via narrative segment entry; no inline feedback needed.
@@ -103,14 +115,17 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   };
 
   // Group items by category
-  const itemsByCategory = items.reduce((acc, item) => {
-    const category = item.categoryId as StandardInventoryCategory;
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(item);
-    return acc;
-  }, {} as Record<StandardInventoryCategory, InventoryItem[]>);
+  const itemsByCategory = items.reduce(
+    (acc, item) => {
+      const category = item.categoryId as StandardInventoryCategory;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    },
+    {} as Record<StandardInventoryCategory, InventoryItem[]>
+  );
 
   // Get categories that have items (in canonical order from STANDARD_CATEGORIES)
   const populatedCategories = STANDARD_CATEGORIES.filter(
@@ -131,10 +146,17 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   }
 
   return (
-    <div className={`${className}`} role="region" aria-label="Character inventory">
+    <div
+      className={`${className}`}
+      role="region"
+      aria-label="Character inventory"
+    >
       {/* View Toggle */}
-      <div >
-        <InventoryViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
+      <div>
+        <InventoryViewToggle
+          mode={viewMode}
+          onModeChange={handleViewModeChange}
+        />
       </div>
 
       {/* Feedback message */}
@@ -151,129 +173,116 @@ export const InventoryList: React.FC<InventoryListProps> = ({
         /* Grid View */
         <>
           {populatedCategories.map((categoryId) => {
-        const categoryItems = itemsByCategory[categoryId];
-        const metadata = getCategoryMetadata(categoryId);
-        const categoryName = metadata?.name || categoryId;
-        const categoryDescription = metadata?.description;
+            const categoryItems = itemsByCategory[categoryId];
+            const metadata = getCategoryMetadata(categoryId);
+            const categoryName = metadata?.name || categoryId;
+            const categoryDescription = metadata?.description;
 
-        return (
-          <section
-            key={categoryId}
-            className="category-group"
-            aria-labelledby={`category-${categoryId}`}
-          >
-            {/* Category Header with visual separation */}
-            <div >
-              <h3
-                id={`category-${categoryId}`}
-                
+            return (
+              <section
+                key={categoryId}
+                className="category-group"
+                aria-labelledby={`category-${categoryId}`}
               >
-                {categoryName}
-              </h3>
-              <p >
-                {categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'}
-                {categoryDescription && (
-                  <span > - {categoryDescription}</span>
-                )}
-              </p>
-            </div>
-
-            {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-            <div
-              
-              role="list"
-              aria-label={`${categoryName} items`}
-            >
-              {categoryItems.map((item) => (
-                <Card
-                  key={item.id}
-                  className="inventory-item"
-                  role="listitem"
-                >
-                  {/* Item Image (if available) */}
-                  {item.image?.url && (
-                    <div >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.image.url}
-                        alt={item.name}
-                        className="item-image"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-
-                  {/* Item Header: Name and Quantity */}
-                  <div >
-                    <h4 className="item-name">
-                      {item.name}
-                    </h4>
-                    {item.stackable && (
-                      <Badge
-                        variant="secondary-static"
-                        size="sm"
-                        className="item-quantity"
-                        aria-label={`Quantity: ${item.quantity}`}
-                      >
-                        ×{item.quantity}
-                      </Badge>
+                {/* Category Header with visual separation */}
+                <div>
+                  <h3 id={`category-${categoryId}`}>{categoryName}</h3>
+                  <p>
+                    {categoryItems.length}{' '}
+                    {categoryItems.length === 1 ? 'item' : 'items'}
+                    {categoryDescription && (
+                      <span> - {categoryDescription}</span>
                     )}
-                  </div>
+                  </p>
+                </div>
 
-                  {/* Item Description */}
-                  {item.description && (
-                    <p className="item-description">
-                      {item.description}
-                    </p>
-                  )}
-
-                  {/* Item Metadata and Actions */}
-                  <div >
-                    {/* Category Badge and Acquisition Method */}
-                    <div >
-                      <Badge
-                        variant="outline"
-                        size="sm"
-                        className="item-category"
-                        aria-label={`Category: ${categoryName}`}
-                      >
-                        {categoryName}
-                      </Badge>
-                      {item.acquisitionHistory[0] && (
-                        <span >
-                          {item.acquisitionHistory[0].method}
-                        </span>
+                {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
+                <div role="list" aria-label={`${categoryName} items`}>
+                  {categoryItems.map((item) => (
+                    <Card
+                      key={item.id}
+                      className="inventory-item"
+                      role="listitem"
+                    >
+                      {/* Item Image (if available) */}
+                      {item.image?.url && (
+                        <div>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.image.url}
+                            alt={item.name}
+                            className="item-image"
+                            loading="lazy"
+                          />
+                        </div>
                       )}
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleUseItem(item.id)}
-                        disabled={usingItemId === item.id || item.quantity <= 0}
-                        
-                      >
-                        {usingItemId === item.id ? 'Using...' : 'Use'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDropDialog(item)}
-                        aria-label={`Drop ${item.name}`}
-                        title="Drop item"
-                      >
-                        <Trash2  />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
-        );
-      })}
+                      {/* Item Header: Name and Quantity */}
+                      <div>
+                        <h4 className="item-name">{item.name}</h4>
+                        {item.stackable && (
+                          <Badge
+                            variant="secondary-static"
+                            size="sm"
+                            className="item-quantity"
+                            aria-label={`Quantity: ${item.quantity}`}
+                          >
+                            ×{item.quantity}
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Item Description */}
+                      {item.description && (
+                        <p className="item-description">{item.description}</p>
+                      )}
+
+                      {/* Item Metadata and Actions */}
+                      <div>
+                        {/* Category Badge and Acquisition Method */}
+                        <div>
+                          <Badge
+                            variant="outline"
+                            size="sm"
+                            className="item-category"
+                            aria-label={`Category: ${categoryName}`}
+                          >
+                            {categoryName}
+                          </Badge>
+                          {item.acquisitionHistory[0] && (
+                            <span>{item.acquisitionHistory[0].method}</span>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUseItem(item.id)}
+                            disabled={
+                              usingItemId === item.id || item.quantity <= 0
+                            }
+                          >
+                            {usingItemId === item.id ? 'Using...' : 'Use'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openDropDialog(item)}
+                            aria-label={`Drop ${item.name}`}
+                            title="Drop item"
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </>
       )}
 

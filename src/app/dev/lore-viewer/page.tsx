@@ -83,7 +83,7 @@ export default function LoreViewerTestPage() {
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
       
-      setExtractionResult(`AI extracted${extracted}new structured facts! Check all categories for rich metadata.`);
+      setExtractionResult(`AI extracted ${extracted} new structured facts! Check all categories for rich metadata.`);
       setTimeout(() => setExtractionResult(''), 7000);
     } catch (error) {
       setExtractionResult(`Failed to extract structured lore:${error}`);
@@ -104,7 +104,7 @@ export default function LoreViewerTestPage() {
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
 
-      setExtractionResult(`AI extraction successful! Added${extracted}facts with robust error handling.`);
+      setExtractionResult(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
       setTimeout(() => setExtractionResult(''), 7000);
 
     } catch (error) {
@@ -153,7 +153,7 @@ export default function LoreViewerTestPage() {
     const entityByName = findEntityByAnyName(searchQuery, worldId);
 
     let message = `Search for "${searchQuery}":\n`;
-    message += `- Found${results.length}facts via search\n`;
+    message += `- Found ${results.length} facts via search\n`;
     message += entityByName
       ? `- Found exact match:${entityByName.value}`
       : `- No exact match found`;

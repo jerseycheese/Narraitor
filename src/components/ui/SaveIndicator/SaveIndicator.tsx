@@ -37,7 +37,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
       return 'Saving...';
     }
     if (lastSaveTime) {
-      return `Saved at${formatTime(lastSaveTime)}`;
+      return `Saved at ${formatTime(lastSaveTime)}`;
     }
     return 'Saved';
   };
@@ -71,14 +71,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
           inline={true}
           centered={false}
         />
-        {onManualSave && (
-          <button
-            disabled={true}
-            
-          >
-            Save Now
-          </button>
-        )}
+        {onManualSave && <button disabled={true}>Save Now</button>}
       </div>
     );
   }
@@ -86,27 +79,18 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle idle/saved states
   return (
     <div className={cssClasses('', className)}>
-      <div >
-        <CheckCircle  aria-hidden="true" />
-        
-        <div >
-          <span >{getStatusText()}</span>
-          
-          {totalSaves > 0 && !compact && (
-            <span >
-              {totalSaves} saves
-            </span>
-          )}
+      <div>
+        <CheckCircle aria-hidden="true" />
+
+        <div>
+          <span>{getStatusText()}</span>
+
+          {totalSaves > 0 && !compact && <span>{totalSaves} saves</span>}
         </div>
       </div>
 
       {onManualSave && (
-        <button
-          onClick={() => onManualSave('manual')}
-          
-        >
-          Save Now
-        </button>
+        <button onClick={() => onManualSave('manual')}>Save Now</button>
       )}
     </div>
   );

@@ -16,14 +16,14 @@ export const WorldImage: React.FC<WorldImageProps> = ({
   worldName,
   size = 'medium',
   className = '',
-  error
+  error,
 }) => {
   const [loadFailed, setLoadFailed] = useState(false);
   const sizeClasses = {
     small: '',
     medium: '',
     large: '',
-    xlarge: ''
+    xlarge: '',
   };
 
   const aspectRatio = size === 'small' ? 'aspect-square' : 'aspect-video';
@@ -31,9 +31,9 @@ export const WorldImage: React.FC<WorldImageProps> = ({
   if (error || loadFailed) {
     return (
       <div className={`${sizeClasses[size]}${aspectRatio}${className}`}>
-        <div >
-          <AlertCircle  aria-hidden="true" />
-          <p >Error loading image</p>
+        <div>
+          <AlertCircle aria-hidden="true" />
+          <p>Error loading image</p>
         </div>
       </div>
     );
@@ -42,9 +42,9 @@ export const WorldImage: React.FC<WorldImageProps> = ({
   if (!image || image.type === 'placeholder' || !image.url) {
     return (
       <div className={`${sizeClasses[size]}${aspectRatio}${className}`}>
-        <div >
-          <ImageOff  aria-hidden="true" />
-          <p >No image</p>
+        <div>
+          <ImageOff aria-hidden="true" />
+          <p>No image</p>
         </div>
       </div>
     );
@@ -54,10 +54,9 @@ export const WorldImage: React.FC<WorldImageProps> = ({
     <div className={`${sizeClasses[size]}${aspectRatio}${className}`}>
       <Image
         src={image.url}
-        alt={`${worldName}world image`}
+        alt={`${worldName} world image`}
         width={400}
         height={300}
-        
         onError={() => setLoadFailed(true)}
       />
     </div>

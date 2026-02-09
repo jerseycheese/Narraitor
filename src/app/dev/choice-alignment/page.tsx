@@ -80,7 +80,7 @@ export default function ChoiceAlignmentTestPage() {
     // Double-check that the world still exists
     const currentWorld = useWorldStore.getState().worlds[worldId];
     if (!currentWorld) {
-      setError(`World${worldId}no longer exists. This may be a persistence issue.`);
+      setError(`World ${worldId} no longer exists. This may be a persistence issue.`);
       console.error('Available worlds:', Object.keys(useWorldStore.getState().worlds));
       return;
     }

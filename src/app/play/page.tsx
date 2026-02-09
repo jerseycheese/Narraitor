@@ -99,7 +99,7 @@ export default function PlayPage() {
     );
   }
 
-  const pageTitle = currentWorld ? `Playing in${currentWorld.name}` : 'Game Session';
+  const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
   const pageDescription = currentWorld?.genre ? getGenreLabel(currentWorld.genre) : undefined;
 
   return (

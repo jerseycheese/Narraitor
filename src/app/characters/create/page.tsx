@@ -228,7 +228,7 @@ export default function CharacterCreatePage() {
               <p >
                 <span suppressHydrationWarning>
                   {currentWorld
-                    ? `Choose a quick start character for${currentWorld.name}or create your own`
+                    ? `Choose a quick start character for ${currentWorld.name} or create your own`
                     : 'Choose a quick start character or create your own'}
                 </span>
               </p>

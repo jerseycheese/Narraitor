@@ -72,7 +72,7 @@ export function GameSessionConfirmationDialog({
             
           >
             {type === 'character-switch' && characterName
-              ? `Play as${characterName}`
+            ? `Play as ${characterName}`
               : config.confirmText}
           </Button>
         </div>

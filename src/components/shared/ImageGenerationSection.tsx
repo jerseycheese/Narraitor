@@ -86,7 +86,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
         </div>
         <div >
           <p >
-            {hasImage ? description : `No${title.toLowerCase()}has been generated yet.`}
+            {hasImage ? description : `No ${title.toLowerCase()} has been generated yet.`}
           </p>
           
           {/* Custom prompt toggle */}
@@ -140,7 +140,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
                 </>
               ) : (
                 <>
-                  <ImageIcon  aria-hidden="true" />
+                  <ImageIcon aria-hidden="true" />
                   {hasImage ? regenerateButtonText : generateButtonText}
                 </>
               )}
@@ -151,7 +151,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
                 onClick={onRemove}
                 
               >
-                <Trash  aria-hidden="true" />
+                <Trash aria-hidden="true" />
                 {removeButtonText}
               </Button>
             )}

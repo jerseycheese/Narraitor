@@ -5,7 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { JournalEntry } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
-import { capitalize, formatRelativeTime, titleCase, truncate, cssClasses } from '@/lib/utils';
+import {
+  capitalize,
+  formatRelativeTime,
+  titleCase,
+  truncate,
+  cssClasses,
+} from '@/lib/utils';
 import { Play, Square, Settings } from 'lucide-react';
 import { getSignificanceBadgeVariant } from './journalUtils';
 
@@ -24,9 +30,10 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
 }) => {
   return (
     <div className={cssClasses('journal-entry-list', className)}>
-      {entries.map(entry => {
+      {entries.map((entry) => {
         // Detect system events for list styling (Issue #176)
-        const isSystemEvent = entry.metadata.automaticEntry &&
+        const isSystemEvent =
+          entry.metadata.automaticEntry &&
           (entry.type === 'session_start' || entry.type === 'session_end');
 
         return (
@@ -52,42 +59,39 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
             }}
             aria-label={`Select entry: ${entry.title || entry.type}`}
           >
-            <div >
-              <h4 className={`${
-                isSystemEvent ? '' : ''
-              }`}>
+            <div>
+              <h4>
                 {isSystemEvent && (
-                  <span  aria-label="System event">
-                    {entry.type === 'session_start' && <Play  aria-hidden="true" />}
-                    {entry.type === 'session_end' && <Square  aria-hidden="true" />}
-                    {entry.type !== 'session_start' && entry.type !== 'session_end' && (
-                      <Settings  aria-hidden="true" />
+                  <span aria-label="System event">
+                    {entry.type === 'session_start' && (
+                      <Play aria-hidden="true" />
                     )}
+                    {entry.type === 'session_end' && (
+                      <Square aria-hidden="true" />
+                    )}
+                    {entry.type !== 'session_start' &&
+                      entry.type !== 'session_end' && (
+                        <Settings aria-hidden="true" />
+                      )}
                   </span>
                 )}
                 {entry.title || titleCase(entry.type.replace('_', ' '))}
               </h4>
-              {!entry.isRead && (
-                <div ></div>
-              )}
+              {!entry.isRead && <div></div>}
             </div>
 
-            <p className={`${
-              isSystemEvent ? '' : ''
-            }`}>
+            <p>
               {truncate(entry.content, 60)}
             </p>
 
-            <div >
+            <div>
               <Badge
                 variant={getSignificanceBadgeVariant(entry.significance)}
                 size="sm"
               >
                 {capitalize(entry.significance)}
               </Badge>
-              <span className={`${
-                isSystemEvent ? '' : ''
-              }`}>
+              <span>
                 {formatRelativeTime(new Date(entry.createdAt))}
               </span>
             </div>

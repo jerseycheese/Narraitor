@@ -55,7 +55,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'set_within';
         console.log(
-          `[DevTools] Generating "set in" world for${randomReference}(canonical theme will be applied)...`
+          `[DevTools] Generating "set in" world for ${randomReference} (canonical theme will be applied)...`
         );
       } else {
         // 34% - "Based on" worlds (inspired by existing universe)
@@ -78,7 +78,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'inspired_by';
         console.log(
-          `[DevTools] Generating "based on" world inspired by${randomReference}...`
+          `[DevTools] Generating "based on" world inspired by ${randomReference}...`
         );
       }
 
@@ -176,13 +176,13 @@ export const TestDataGeneratorSection: React.FC = () => {
             };
             useWorldStore.getState().updateWorld(worldId, { image });
             console.log(
-              `[DevTools] Generated${service}image for test world "${testWorldData.name}":`,
+              `[DevTools] Generated ${service} image for test world "${testWorldData.name}":`,
               imageUrl
             );
           } else {
             const errorText = await response.text();
             console.warn(
-              `[DevTools] Failed to generate world image:${response.status}-${errorText}`
+              `[DevTools] Failed to generate world image: ${response.status} - ${errorText}`
             );
           }
         }
@@ -193,7 +193,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     } catch (error) {
       console.error('[DevTools] Error generating test world:', error);
       alert(
-        `Error generating test world:${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error generating test world: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };
@@ -206,7 +206,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       const existingNames = Object.values(worlds).map((w) => w.name);
 
       for (let i = 0; i < 5; i++) {
-        console.log(`[DevTools] Generating diverse world${i + 1}/5...`);
+        console.log(`[DevTools] Generating diverse world ${i + 1}/5...`);
 
         // Generate a diverse mix of world types for testing (my enhancement)
         const worldTypeRandom = Math.random();
@@ -215,7 +215,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         if (worldTypeRandom < 0.33) {
           // 33% - Original worlds (no reference)
-          console.log(`[DevTools] Generating original world${i + 1}/5...`);
+          console.log(`[DevTools] Generating original world ${i + 1}/5...`);
           randomReference = undefined;
           randomRelationship = undefined;
         } else if (worldTypeRandom < 0.66) {
@@ -241,7 +241,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             ];
           randomRelationship = 'set_within';
           console.log(
-            `[DevTools] Generating "set in" world${i + 1}/5 for${randomReference}(canonical theme will be applied)...`
+            `[DevTools] Generating "set in" world ${i + 1}/5 for ${randomReference} (canonical theme will be applied)...`
           );
         } else {
           // 34% - "Based on" worlds (inspired by existing universe)
@@ -266,7 +266,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             ];
           randomRelationship = 'inspired_by';
           console.log(
-            `[DevTools] Generating "based on" world${i + 1}/5 inspired by${randomReference}...`
+            `[DevTools] Generating "based on" world ${i + 1}/5 inspired by ${randomReference}...`
           );
         }
 
@@ -349,7 +349,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           // Get the created world from store
           const world = useWorldStore.getState().worlds[worldId];
           console.log(
-            `[DevTools] Attempting to generate image for world${i + 1}/5:`,
+            `[DevTools] Attempting to generate image for world ${i + 1}/5:`,
             world?.name
           );
           if (world) {
@@ -371,13 +371,13 @@ export const TestDataGeneratorSection: React.FC = () => {
               };
               useWorldStore.getState().updateWorld(worldId, { image });
               console.log(
-                `[DevTools] Generated${service}image for test world "${testWorldData.name}":`,
+                `[DevTools] Generated ${service} image for test world "${testWorldData.name}":`,
                 imageUrl
               );
             } else {
               const errorText = await response.text();
               console.warn(
-                `[DevTools] Failed to generate world image for "${testWorldData.name}":${response.status}-${errorText}`
+                `[DevTools] Failed to generate world image for "${testWorldData.name}": ${response.status} - ${errorText}`
               );
             }
           }
@@ -390,16 +390,16 @@ export const TestDataGeneratorSection: React.FC = () => {
         }
       }
 
-      const worldNames = createdWorlds.map((w) => w.name).join(',');
+      const worldNames = createdWorlds.map((w) => w.name).join(', ');
       console.log(
         `[DevTools] Generated 5 test worlds with images:`,
         createdWorlds
       );
-      alert(`Successfully generated 5 test worlds with images:${worldNames}`);
+      alert(`Successfully generated 5 test worlds with images: ${worldNames}`);
     } catch (error) {
       console.error('[DevTools] Error generating test worlds:', error);
       alert(
-        `Error generating test worlds:${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated${createdWorlds.length}worlds before error.`
+        `Error generating test worlds: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdWorlds.length} worlds before error.`
       );
     }
   };
@@ -551,7 +551,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     try {
       for (let i = 0; i < 5; i++) {
         console.log(
-          `[DevTools] Generating character${i + 1}/5 for world "${currentWorld.name}"...`
+          `[DevTools] Generating character ${i + 1}/5 for world "${currentWorld.name}"...`
         );
 
         // Random character type selection (50/50 between known and original)
@@ -559,7 +559,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         const characterType = types[Math.floor(Math.random() * types.length)];
 
         console.log(
-          `[DevTools] Generating${characterType}character for world "${currentWorld.name}"`
+          `[DevTools] Generating ${characterType} character for world "${currentWorld.name}"`
         );
 
         // Use the AI character generator via API route (secure approach from develop)
@@ -587,7 +587,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Convert AI-generated data to character store format
         const characterData = {
           name: aiCharacterData.name,
-          description: `A character from${currentWorld.name}`,
+          description: `A character from ${currentWorld.name}`,
           worldId: currentWorld.id,
           level: aiCharacterData.level || 1,
           isPlayer: true,
@@ -650,7 +650,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         const characterId = createCharacter(characterData);
         createdCharacters.push({ id: characterId, name: characterData.name });
         console.log(
-          `[DevTools] Created AI${characterType}character:${characterData.name}`
+          `[DevTools] Created AI ${characterType} character: ${characterData.name}`
         );
 
         // Generate portrait asynchronously via API route (secure approach)
@@ -660,7 +660,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             useCharacterStore.getState().characters[characterId];
           if (storeCharacter) {
             console.log(
-              `[DevTools] Generating portrait for${characterType}character "${characterData.name}"...`
+              `[DevTools] Generating portrait for ${characterType} character "${characterData.name}"...`
             );
 
             const response = await fetch('/api/generate-portrait', {
@@ -728,35 +728,35 @@ export const TestDataGeneratorSection: React.FC = () => {
                 .getState()
                 .updateCharacter(characterId, { portrait });
               console.log(
-                `[DevTools] Generated portrait for${characterType}character "${characterData.name}"`
+                `[DevTools] Generated portrait for ${characterType} character "${characterData.name}"`
               );
             } else {
               console.warn(
-                `[DevTools] Portrait generation failed for${characterType}character "${characterData.name}"`
+                `[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`
               );
             }
           }
         } catch (error) {
           console.error(
-            `[DevTools] Failed to generate portrait for${characterType}character "${characterData.name}":`,
+            `[DevTools] Failed to generate portrait for ${characterType} character "${characterData.name}":`,
             error
           );
           // Don't block character creation if portrait generation fails
         }
       }
 
-      const characterNames = createdCharacters.map((c) => c.name).join(',');
+      const characterNames = createdCharacters.map((c) => c.name).join(', ');
       console.log(
         `[DevTools] Generated 5 AI characters (random type selection) with portraits for world "${currentWorld.name}":`,
         createdCharacters
       );
       alert(
-        `Successfully generated 5 AI characters (random type selection) with portraits:${characterNames}`
+        `Successfully generated 5 AI characters (random type selection) with portraits: ${characterNames}`
       );
     } catch (error) {
       console.error('[DevTools] Error generating AI characters:', error);
       alert(
-        `Error generating characters:${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated${createdCharacters.length}characters before error.`
+        `Error generating characters: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdCharacters.length} characters before error.`
       );
     }
   };
@@ -769,7 +769,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const confirmed = confirm(
-      `DELETE ALL WORLDS?\\n\\nThis will permanently delete all${worldCount}worlds and their characters.\\n\\nThis action cannot be undone!`
+      `DELETE ALL WORLDS?\\n\\nThis will permanently delete all ${worldCount} worlds and their characters.\\n\\nThis action cannot be undone!`
     );
     if (!confirmed) return;
 
@@ -798,15 +798,15 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       console.log(
-        `[DevTools] Deleted all${worldCount}worlds and their characters`
+        `[DevTools] Deleted all ${worldCount} worlds and their characters`
       );
       alert(
-        `Successfully deleted all${worldCount}worlds and their characters`
+        `Successfully deleted all ${worldCount} worlds and their characters`
       );
     } catch (error) {
       console.error('[DevTools] Error deleting all worlds:', error);
       alert(
-        `Error during deletion:${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };
@@ -829,7 +829,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const confirmed = confirm(
-      `DELETE ALL CHARACTERS IN "${currentWorld.name}"?\\n\\nThis will permanently delete${worldCharacters.length}characters.\\n\\nThis action cannot be undone!`
+      `DELETE ALL CHARACTERS IN "${currentWorld.name}"?\\n\\nThis will permanently delete ${worldCharacters.length} characters.\\n\\nThis action cannot be undone!`
     );
     if (!confirmed) return;
 
@@ -841,18 +841,18 @@ export const TestDataGeneratorSection: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
-      const characterNames = worldCharacters.map((c) => c.name).join(',');
+      const characterNames = worldCharacters.map((c) => c.name).join(', ');
       console.log(
-        `[DevTools] Deleted${worldCharacters.length}characters from world "${currentWorld.name}":`,
+        `[DevTools] Deleted ${worldCharacters.length} characters from world "${currentWorld.name}":`,
         characterNames
       );
       alert(
-        `Successfully deleted${worldCharacters.length}characters from "${currentWorld.name}"`
+        `Successfully deleted ${worldCharacters.length} characters from "${currentWorld.name}"`
       );
     } catch (error) {
       console.error('[DevTools] Error deleting characters:', error);
       alert(
-        `Error during deletion:${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };
@@ -869,7 +869,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const confirmed = confirm(
-      `NUCLEAR OPTION - DELETE EVERYTHING?\\n\\nThis will permanently delete:\\n•${worldCount}worlds\\n•${characterCount}characters\\n• All associated data\\n\\nTHIS CANNOT BE UNDONE!\\n\\nAre you absolutely sure?`
+      `NUCLEAR OPTION - DELETE EVERYTHING?\\n\\nThis will permanently delete:\\n• ${worldCount} worlds\\n• ${characterCount} characters\\n• All associated data\\n\\nTHIS CANNOT BE UNDONE!\\n\\nAre you absolutely sure?`
     );
     if (!confirmed) return;
 
@@ -903,10 +903,10 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       console.log(
-        `[DevTools] NUKED EVERYTHING: Reset both stores, deleted${worldCount}worlds and${characterCount}characters`
+        `[DevTools] NUKED EVERYTHING: Reset both stores, deleted ${worldCount} worlds and ${characterCount} characters`
       );
       alert(
-        `NUCLEAR OPTION COMPLETE\\n\\nDeleted${worldCount}worlds and${characterCount}characters.\\n\\nDatabase is now empty.`
+        `NUCLEAR OPTION COMPLETE\\n\\nDeleted ${worldCount} worlds and ${characterCount} characters.\\n\\nDatabase is now empty.`
       );
 
       // Force a small delay before allowing any other operations
@@ -914,7 +914,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     } catch (error) {
       console.error('[DevTools] Error during nuclear deletion:', error);
       alert(
-        `Error during deletion:${error instanceof Error ? error.message : 'Unknown error'}\\n\\nSome data may not have been deleted. Check console for details.`
+        `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nSome data may not have been deleted. Check console for details.`
       );
     }
   };
@@ -1039,9 +1039,9 @@ export const TestDataGeneratorSection: React.FC = () => {
             size="sm"
             variant="warning"
             disabled={!effectiveWorldId}
-            title={`Deletes all characters in${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
+            title={`Deletes all characters in ${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
           >
-            Delete All Characters in{''}
+            Delete All Characters in{' '}
             {effectiveWorldId ? worlds[effectiveWorldId]?.name : 'World'}
           </Button>
 
@@ -1084,11 +1084,11 @@ export const TestDataGeneratorSection: React.FC = () => {
         <strong>Troubleshooting:</strong>
         <ul >
           <li>
-            If form isn&apos;t pre-filled, try the debug page at{''}
+            If form isn&apos;t pre-filled, try the debug page at{' '}
             <code>/dev/test-character-form</code>
           </li>
           <li>
-            Check browser console for <code>[TestDataGenerator]</code> and{''}
+            Check browser console for <code>[TestDataGenerator]</code> and{' '}
             <code>[CharacterCreationWizard]</code> logs
           </li>
           <li>Clear cache and hard refresh if needed (Cmd+Shift+R)</li>

@@ -27,7 +27,7 @@ export function WorldDetailsDisplay({
   showSettings = true,
   showToneSettings = true,
   showImageDetails = true,
-  showInfo = true
+  showInfo = true,
 }: WorldDetailsDisplayProps) {
   const npcIds = useNPCStore(
     useCallback(
@@ -44,16 +44,16 @@ export function WorldDetailsDisplay({
 
     return npcIds
       .map((id) => npcsById[id])
-      .filter((npc): npc is NonNullable<typeof npcsById[string]> => Boolean(npc));
+      .filter((npc): npc is NonNullable<(typeof npcsById)[string]> =>
+        Boolean(npc)
+      );
   }, [npcIds, npcsById]);
 
   return (
     <>
       {showDescription && (
-        <section  aria-labelledby="world-description-heading">
-          <h2 id="world-description-heading" >
-            About this world
-          </h2>
+        <section aria-labelledby="world-description-heading">
+          <h2 id="world-description-heading">About this world</h2>
           <div className="prose prose-gray dark:prose-invert">
             <p>{world.description}</p>
           </div>
@@ -61,26 +61,20 @@ export function WorldDetailsDisplay({
       )}
 
       {worldNpcs.length > 0 && (
-        <section  aria-labelledby="world-npcs-heading">
-          <h2 id="world-npcs-heading" >
-            Characters you may meet
-          </h2>
-          <p >
-            These NPCs were generated alongside <span >{world.name}</span> and will appear in narrative scenes for this world.
+        <section aria-labelledby="world-npcs-heading">
+          <h2 id="world-npcs-heading">Characters you may meet</h2>
+          <p>
+            These NPCs were generated alongside <span>{world.name}</span> and
+            will appear in narrative scenes for this world.
           </p>
-          <ul >
+          <ul>
             {worldNpcs.map((npc) => (
-              <li key={npc.id} >
+              <li key={npc.id}>
                 {npc.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={npc.avatarUrl}
-                    alt={npc.name}
-                    
-                    loading="lazy"
-                  />
+                  <img src={npc.avatarUrl} alt={npc.name} loading="lazy" />
                 ) : (
-                  <div >
+                  <div>
                     {npc.name
                       .split(' ')
                       .map((segment) => segment[0])
@@ -89,21 +83,23 @@ export function WorldDetailsDisplay({
                       .slice(0, 2)}
                   </div>
                 )}
-                <div >
-                  <p >{npc.name}</p>
-                  <p >{npc.description}</p>
+                <div>
+                  <p>{npc.name}</p>
+                  <p>{npc.description}</p>
                 </div>
               </li>
             ))}
           </ul>
         </section>
       )}
-      
+
       <WorldAttributesList attributes={world.attributes} />
       <WorldSkillsList skills={world.skills} attributes={world.attributes} />
 
       {showSettings && <WorldSettingsDisplay settings={world.settings} />}
-      {showToneSettings && <ToneSettingsDisplay toneSettings={world.toneSettings} />}
+      {showToneSettings && (
+        <ToneSettingsDisplay toneSettings={world.toneSettings} />
+      )}
       {showImageDetails && <WorldImageDisplay image={world.image} />}
       {showInfo && <WorldInfoSection world={world} />}
     </>

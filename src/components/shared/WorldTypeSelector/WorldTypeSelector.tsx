@@ -21,28 +21,33 @@ const WORLD_TYPE_OPTIONS: WorldTypeOption[] = [
   {
     id: 'original',
     label: 'Original World',
-    description: 'Generate a completely original world with unique settings and themes',
+    description:
+      'Generate a completely original world with unique settings and themes',
     requiresReference: false,
   },
   {
     id: 'inspired_by',
     label: 'Inspired By',
-    description: 'Generate an original world inspired by an existing fictional universe or real setting',
+    description:
+      'Generate an original world inspired by an existing fictional universe or real setting',
     requiresReference: true,
     referenceLabel: 'Existing Setting',
     referencePlaceholder: 'e.g., Star Wars, The Office, Breaking Bad',
     additionalDetailsLabel: 'Additional Details',
-    additionalDetailsPlaceholder: 'What aspects should your world be inspired by? What makes it unique?',
+    additionalDetailsPlaceholder:
+      'What aspects should your world be inspired by? What makes it unique?',
   },
   {
     id: 'set_within',
     label: 'Set Within',
-    description: 'Generate a world directly within an existing fictional universe or real setting',
+    description:
+      'Generate a world directly within an existing fictional universe or real setting',
     requiresReference: true,
     referenceLabel: 'Existing Setting',
     referencePlaceholder: 'e.g., Star Wars, The Office, Breaking Bad',
     additionalDetailsLabel: 'Specific Setting/Time',
-    additionalDetailsPlaceholder: 'Where specifically in this universe? What time period? What\'s the focus?',
+    additionalDetailsPlaceholder:
+      "Where specifically in this universe? What time period? What's the focus?",
   },
 ];
 
@@ -50,7 +55,6 @@ export function WorldTypeSelector({
   value,
   onChange,
   showLabels = true,
-  layout = 'vertical',
   size = 'medium',
   disabled = false,
   className = '',
@@ -59,15 +63,19 @@ export function WorldTypeSelector({
   if (!value) {
     return null;
   }
-  
-  const selectedOption = WORLD_TYPE_OPTIONS.find(option => option.id === value.worldType);
+
+  const selectedOption = WORLD_TYPE_OPTIONS.find(
+    (option) => option.id === value.worldType
+  );
 
   const handleTypeChange = (worldType: WorldTypeData['worldType']) => {
     onChange({
       ...value,
       worldType,
       // Clear reference fields when switching to original
-      ...(worldType === 'original' ? { worldReference: '', additionalDetails: '' } : {}),
+      ...(worldType === 'original'
+        ? { worldReference: '', additionalDetails: '' }
+        : {}),
     });
   };
 
@@ -114,37 +122,28 @@ export function WorldTypeSelector({
   };
 
   const styles = sizeClasses[size];
-  const layoutClasses = layout === 'horizontal' ? '' : '';
-
   return (
     <div className={`${className}`}>
       {/* World Type Selection */}
       {showLabels && (
         <Label className={`${styles.label}`}>
-          World Type <span >*</span>
+          World Type <span>*</span>
         </Label>
       )}
-      
+
       <RadioGroup
         value={value.worldType}
         onValueChange={handleRadioChange}
         disabled={disabled}
-        className={layoutClasses}
       >
         {WORLD_TYPE_OPTIONS.map((option) => (
-          <label
-            key={option.id}
-            className={`${styles.radio}${
-              value.worldType === option.id ? '' : ''
-            }${disabled ? '' : ''}`}
-          >
-            <RadioGroupItem
-              value={option.id}
-              
-            />
-            <div >
+          <label key={option.id} className={styles.radio}>
+            <RadioGroupItem value={option.id} />
+            <div>
               <div className={`${styles.title}`}>{option.label}</div>
-              <div className={`${styles.description}`}>{option.description}</div>
+              <div className={`${styles.description}`}>
+                {option.description}
+              </div>
             </div>
           </label>
         ))}
@@ -156,7 +155,7 @@ export function WorldTypeSelector({
           {/* Existing Setting Field */}
           <div>
             <Label htmlFor="world-reference" className={`${styles.label}`}>
-              {selectedOption.referenceLabel} <span >*</span>
+              {selectedOption.referenceLabel} <span>*</span>
             </Label>
             <Input
               id="world-reference"
@@ -172,10 +171,11 @@ export function WorldTypeSelector({
           {/* Additional Details Field */}
           <div>
             <Label htmlFor="additional-details" className={`${styles.label}`}>
-              {selectedOption.additionalDetailsLabel} {value.worldType === 'set_within' ? (
-                <span >(optional - will be inferred from your reference)</span>
+              {selectedOption.additionalDetailsLabel}{' '}
+              {value.worldType === 'set_within' ? (
+                <span>(optional - will be inferred from your reference)</span>
               ) : (
-                <span >*</span>
+                <span>*</span>
               )}
             </Label>
             <Textarea

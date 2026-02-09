@@ -15,7 +15,8 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
     return null;
   }
 
-  const hasMetadata = image.generatedAt || image.prompt || image.type === 'ai-generated';
+  const hasMetadata =
+    image.generatedAt || image.prompt || image.type === 'ai-generated';
 
   // Don't show a section if there's no meaningful metadata to display
   if (!hasMetadata) {
@@ -23,12 +24,10 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
   }
 
   return (
-    <section  aria-labelledby="image-details-heading">
-      <h2 id="image-details-heading" >
-        World image details
-      </h2>
+    <section aria-labelledby="image-details-heading">
+      <h2 id="image-details-heading">World image details</h2>
 
-      <div >
+      <div>
         <DataField
           label="Image Type"
           value={image.type === 'ai-generated' ? 'AI Generated' : 'Custom'}

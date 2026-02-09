@@ -44,7 +44,7 @@ export const validators = {
       const strValue = String(value);
       return strValue.length >= min 
         ? undefined 
-        : message || `Must be at least${min}characters`;
+        : message || `Must be at least ${min} characters`;
     },
 
   maxLength: (max: number, message?: string) => 
@@ -52,7 +52,7 @@ export const validators = {
       const strValue = String(value);
       return strValue.length <= max 
         ? undefined 
-        : message || `Must be no more than${max}characters`;
+        : message || `Must be no more than ${max} characters`;
     },
 
   pattern: (regex: RegExp, message = 'Invalid format') => 
@@ -66,7 +66,7 @@ export const validators = {
       const numValue = Number(value);
       return numValue >= min && numValue <= max 
         ? undefined 
-        : message || `Must be between${min}and${max}`;
+        : message || `Must be between ${min} and ${max}`;
     },
 
   compose: (...validators: Array<(value: string | number) => string | undefined>) => 

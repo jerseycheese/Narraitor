@@ -91,7 +91,7 @@ export default function TestWorldGeneration() {
             <div>
               <span >Name:</span> {generatedWorld.name}
             </div>
-            <div className={`${generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') ? '' : ''}`}>
+            <div>
               <span >Genre:</span> {generatedWorld.genre}
               {generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') && (
                 <span >(❌ Should not be Fantasy!)</span>
@@ -106,7 +106,7 @@ export default function TestWorldGeneration() {
             <h3 >Attributes ({generatedWorld.attributes.length}):</h3>
             <ul >
               {generatedWorld.attributes.map((attr, i) => (
-                <li key={i} className={`${attr.name.match(/magic|mana|arcane/i) ? '' : ''}`}>
+                <li key={i}>
                   <span >{attr.name}:</span> {attr.description}
                   {attr.name.match(/magic|mana|arcane/i) && (
                     <span >(❌ Fantasy element!)</span>
@@ -120,7 +120,7 @@ export default function TestWorldGeneration() {
             <h3 >Skills ({generatedWorld.skills.length}):</h3>
             <ul >
               {generatedWorld.skills.map((skill, i) => (
-                <li key={i} className={`${skill.name.match(/magic|spell|sorcery|enchant/i) ? '' : ''}`}>
+                <li key={i}>
                   <span >{skill.name}:</span> {skill.description}
                   {skill.name.match(/magic|spell|sorcery|enchant/i) && (
                     <span >(❌ Fantasy element!)</span>

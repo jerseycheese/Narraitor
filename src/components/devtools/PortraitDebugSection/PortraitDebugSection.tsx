@@ -249,7 +249,7 @@ export function PortraitDebugSection({
               <option value="">-- Select a character --</option>
               {charactersArray.map((char) => (
                 <option key={char.id} value={char.id}>
-                  {char.name} (Level{''}
+                  {char.name} (Level{' '}
                   {'level' in char
                     ? (char as { level?: number }).level || 1
                     : 1}
@@ -268,19 +268,19 @@ export function PortraitDebugSection({
             </h4>
             <div >
               <div>
-                <strong>Name:</strong>{''}
+                <strong>Name:</strong>{' '}
                 {effectiveCharacterData.name || 'Not set'}
               </div>
               <div>
-                <strong>World Genre:</strong>{''}
+                <strong>World Genre:</strong>{' '}
                 {effectiveWorldConfig?.genre || 'Not set'}
               </div>
               <div>
-                <strong>Attributes:</strong>{''}
+                <strong>Attributes:</strong>{' '}
                 {effectiveCharacterData.attributes?.length || 0}
               </div>
               <div>
-                <strong>Skills:</strong>{''}
+                <strong>Skills:</strong>{' '}
                 {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   effectiveCharacterData.skills?.filter((s: any) =>
@@ -291,7 +291,7 @@ export function PortraitDebugSection({
                 }
               </div>
               <div>
-                <strong>Background:</strong>{''}
+                <strong>Background:</strong>{' '}
                 {effectiveCharacterData.background?.personality
                   ? 'Set'
                   : 'Not set'}

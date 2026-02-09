@@ -11,32 +11,30 @@ interface WorldInfoSectionProps {
 
 export function WorldInfoSection({ world }: WorldInfoSectionProps) {
   return (
-    <section  aria-labelledby="world-details-heading">
-      <h2 id="world-details-heading" >
-        World details
-      </h2>
-      <div >
-        <DataField 
-          label="Created" 
-          value={formatDate(world.createdAt)} 
+    <section aria-labelledby="world-details-heading">
+      <h2 id="world-details-heading">World details</h2>
+      <div>
+        <DataField
+          label="Created"
+          value={formatDate(world.createdAt)}
           variant="outline"
         />
-        <DataField 
-          label="Updated" 
-          value={formatDate(world.updatedAt)} 
+        <DataField
+          label="Updated"
+          value={formatDate(world.updatedAt)}
           variant="outline"
         />
         {world.relationship && (
-          <DataField 
-            label="Relationship" 
-            value={titleCase(world.relationship.replace(/_/g, ''))} 
+          <DataField
+            label="Relationship"
+            value={titleCase(world.relationship.replace(/_/g, ''))}
             variant="outline"
           />
         )}
         {world.reference && (
-          <DataField 
-            label="Reference" 
-            value={world.reference} 
+          <DataField
+            label="Reference"
+            value={world.reference}
             variant="outline"
           />
         )}

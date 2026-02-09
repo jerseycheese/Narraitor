@@ -79,7 +79,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
             >
               <div >
                 <Label >
-                  {worldSkill?.name || `Skill${index + 1}`}
+                {worldSkill?.name || `Skill ${index + 1}`}
                 </Label>
                 {worldSkill?.difficulty && (
                   <span
@@ -121,7 +121,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 {worldSkill?.attributeIds &&
                   worldSkill.attributeIds.length > 0 && (
                     <span >
-                      • Linked to:{''}
+                    • Linked to:{' '}
                       {worldSkill.attributeIds
                         .map(
                           id => world.attributes.find(a => a.id === id)?.name

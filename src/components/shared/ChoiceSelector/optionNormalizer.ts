@@ -123,7 +123,7 @@ export function normalizeDecisionOptions(
     }
 
     const disabledReason = disabledReasonParts.length > 0
-      ? `Requires${disabledReasonParts.join('|')}`
+    ? `Requires ${disabledReasonParts.join('|')}`
       : undefined;
 
     return {

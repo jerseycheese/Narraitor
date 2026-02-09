@@ -75,7 +75,7 @@ export default function WorldViewPage() {
       onClick: () => router.push(`/characters?worldId=${worldId}`),
       variant: 'primary' as const,
       icon: (
-        <Users  aria-hidden="true" />
+        <Users aria-hidden="true" />
       )
     },
     {
@@ -83,7 +83,7 @@ export default function WorldViewPage() {
       onClick: () => router.push(`/worlds/${worldId}/edit`),
       variant: 'secondary' as const,
       icon: (
-        <Settings  aria-hidden="true" />
+        <Settings aria-hidden="true" />
       )
     },
     {
@@ -91,7 +91,7 @@ export default function WorldViewPage() {
       onClick: handlePlayInWorld,
       variant: 'success' as const,
       icon: (
-        <Play  aria-hidden="true" />
+        <Play aria-hidden="true" />
       )
     }
   ];
@@ -100,12 +100,12 @@ export default function WorldViewPage() {
   return (
     <PageLayout>
       {/* Hero section with image or themed background */}
-      <div >
+      <div>
         <Hero
           title={world.name}
           image={world.image?.url ? {
             url: world.image.url,
-            alt: `${world.name}world`
+            alt: `${world.name} world`
           } : undefined}
           subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
           theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
@@ -113,7 +113,7 @@ export default function WorldViewPage() {
         />
       </div>
 
-      <ActionButtonGroup actions={actionButtons}  />
+      <ActionButtonGroup actions={actionButtons} />
 
       <main role="main" aria-label="World details">
         <WorldDetailsDisplay world={world} />

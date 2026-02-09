@@ -16,14 +16,12 @@ export function EndingSuggestionBanner({
 }: EndingSuggestionBannerProps) {
   return (
     <Alert variant="warning" className="ending-suggestion-banner">
-      <AlertTitle >
-        <BookOpen  />
+      <AlertTitle>
+        <BookOpen />
         Your story could end here
       </AlertTitle>
-      <AlertDescription >
-        {reason}
-      </AlertDescription>
-      <div >
+      <AlertDescription>{reason}</AlertDescription>
+      <div>
         <Button size="sm" onClick={onAccept}>
           View Ending
         </Button>

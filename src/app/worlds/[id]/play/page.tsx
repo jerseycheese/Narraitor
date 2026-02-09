@@ -74,18 +74,18 @@ export default function PlayPage() {
   }
 
 
-  const pageTitle = world ? `Playing in${world.name}` : 'Game Session';
+  const pageTitle = world ? `Playing in ${world.name}` : 'Game Session';
 
   return (
-    <PageLayout >
+    <PageLayout>
       {/* Ultra-thin world hero - always show with image or themed background */}
       {world && (
-        <div >
+        <div>
           <Hero
             title={pageTitle}
             image={world.image?.url ? {
               url: world.image.url,
-              alt: `${world.name}world`
+              alt: `${world.name} world`
             } : undefined}
             theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
@@ -94,7 +94,7 @@ export default function PlayPage() {
             actions={
               // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)
               !currentEnding && (sessionStatus === 'active' || sessionStatus === 'paused' || sessionStatus === 'loading') ? (
-                <div >
+                <div>
                   <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
                     Switch Character
                   </Button>

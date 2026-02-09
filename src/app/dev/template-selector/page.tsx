@@ -21,7 +21,7 @@ export default function TemplateSelectorTestHarness() {
       try {
         const worldId = applyWorldTemplate(selectedTemplateId);
         setAppliedTemplateId(selectedTemplateId);
-        console.log(`Applied template${selectedTemplateId}to create world${worldId}`);
+        console.log(`Applied template ${selectedTemplateId} to create world ${worldId}`);
       } catch (error) {
         console.error('Error applying template:', error);
       }

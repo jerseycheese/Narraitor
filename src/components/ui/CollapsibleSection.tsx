@@ -85,10 +85,9 @@ export const CollapsibleSection = ({
           {isExpanded ? '−' : '+'}
         </button>
       </div>
-      <div 
+      <div
         id={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
         data-testid="collapsible-section-content"
-        className={`${isExpanded ? '' : ''}`}
         aria-hidden={!isExpanded}
       >
         {children}

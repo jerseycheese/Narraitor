@@ -4,13 +4,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { World, CharacterArchetype } from '@/types/world.types';
-import { 
-  generateCharacterArchetypes, 
-  generateRandomArchetype 
+import {
+  generateCharacterArchetypes,
+  generateRandomArchetype,
 } from '@/lib/utils/characterArchetypes';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
@@ -33,12 +38,14 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   onCharacterSelect,
   onCustomizeClick,
   existingCharacterNames = [],
-  onReady
+  onReady,
 }: QuickStartCharactersProps) {
   const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
+  const [selectedArchetype, setSelectedArchetype] = useState<string | null>(
+    null
+  );
 
   const generateArchetypes = async () => {
     try {
@@ -50,7 +57,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         setArchetypes(world.characterTemplates);
       } else {
         // Fall back to on-demand generation if templates not available
-        const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+        const generated = await generateCharacterArchetypes(
+          world,
+          existingCharacterNames
+        );
         setArchetypes(generated);
       }
     } catch (err) {
@@ -60,7 +70,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         world: world.name,
         genre: world.genre,
         attributes: world.attributes?.length || 0,
-        skills: world.skills?.length || 0
+        skills: world.skills?.length || 0,
       });
       setError(`Unable to generate character options:${errorMessage}`);
     } finally {
@@ -92,18 +102,23 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }, SELECTION_DELAY_MS);
   };
 
-
   const handleRandomSelect = async () => {
     try {
       setLoading(true);
-      const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
+      const randomArchetype = await generateRandomArchetype(
+        world,
+        existingCharacterNames
+      );
       handleArchetypeSelect(randomArchetype);
     } catch (err) {
-      console.error('QuickStartCharacters random archetype generation failed:', {
-        error: err,
-        world: world.name,
-        genre: world.genre
-      });
+      console.error(
+        'QuickStartCharacters random archetype generation failed:',
+        {
+          error: err,
+          world: world.name,
+          genre: world.genre,
+        }
+      );
       setError('Failed to generate random character. Please try again.');
     } finally {
       setLoading(false);
@@ -112,19 +127,16 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div >
-        <div >
-          <h2 >Quick Start Characters</h2>
-          <p >
-            Jump straight into your adventure with {world.name}
-          </p>
+      <div>
+        <div>
+          <h2>Quick Start Characters</h2>
+          <p>Jump straight into your adventure with {world.name}</p>
         </div>
         <LoadingSkeleton
           size="md"
           skeletonLines={6}
-          message={`Creating archetypes for your${getGenreLabel(world.genre)}world...`}
+          message={`Creating archetypes for your ${getGenreLabel(world.genre)} world...`}
           centered={true}
-          
         />
       </div>
     );
@@ -132,9 +144,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (error) {
     return (
-      <div >
-        <div >
-          <h2 >Quick Start Characters</h2>
+      <div>
+        <div>
+          <h2>Quick Start Characters</h2>
         </div>
         <ErrorDisplay
           variant="section"
@@ -143,31 +155,25 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           message={error}
           showRetry={true}
           onRetry={generateArchetypes}
-          
         />
       </div>
     );
   }
 
   return (
-    <div >
+    <div>
       {/* Header */}
-      <div >
-        <h2 >Quick Start Characters</h2>
-        <p >
-          Jump straight into your adventure with {world.name}
-        </p>
-        <p >
-          Choose from these pre-generated {getGenreLabel(world.genre)} archetypes or create your own
+      <div>
+        <h2>Quick Start Characters</h2>
+        <p>Jump straight into your adventure with {world.name}</p>
+        <p>
+          Choose from these pre-generated {getGenreLabel(world.genre)}{' '}
+          archetypes or create your own
         </p>
       </div>
 
       {/* Archetype Cards */}
-      <div 
-        
-        data-testid="archetypes-grid"
-        data-tutorial="quickstart-archetypes"
-      >
+      <div data-testid="archetypes-grid" data-tutorial="quickstart-archetypes">
         {archetypes.map((archetype) => (
           <ActiveStateCard
             key={archetype.id}
@@ -178,36 +184,29 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             inactiveClassName=""
             testId="archetype-card"
           >
-            <CardHeader >
-              <CardTitle >
-                {archetype.name}
-              </CardTitle>
-              <CardDescription >
-                {archetype.description}
-              </CardDescription>
+            <CardHeader>
+              <CardTitle>{archetype.name}</CardTitle>
+              <CardDescription>{archetype.description}</CardDescription>
             </CardHeader>
-            
-            <CardContent >
+
+            <CardContent>
               {/* Personality & Background */}
               <div>
-                <p >
-                  {archetype.background.personality}
-                </p>
+                <p>{archetype.background.personality}</p>
               </div>
 
               {/* Top Attributes */}
               <div>
-                <h4 >Key Attributes</h4>
-                <div >
+                <h4>Key Attributes</h4>
+                <div>
                   {archetype.attributes
                     .sort((a, b) => (b.value || 0) - (a.value || 0))
                     .slice(0, 3)
                     .map((attr, idx) => (
-                      <Badge 
+                      <Badge
                         key={`${archetype.id}-attr-${attr.id ?? attr.name}-${idx}`}
-                        variant="secondary" 
+                        variant="secondary"
                         count={attr.value}
-                        
                       >
                         {attr.name}
                       </Badge>
@@ -217,17 +216,16 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
               {/* Top Skills */}
               <div>
-                <h4 >Best Skills</h4>
-                <div >
+                <h4>Best Skills</h4>
+                <div>
                   {archetype.skills
                     .sort((a, b) => (b.level || 0) - (a.level || 0))
                     .slice(0, 3)
                     .map((skill, idx) => (
-                      <Badge 
-                        key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`} 
-                        variant="outline" 
+                      <Badge
+                        key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`}
+                        variant="outline"
                         count={skill.level}
-                        
                       >
                         {skill.name}
                       </Badge>
@@ -237,15 +235,12 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
               {/* Motivation */}
               <div>
-                <h4 >Motivation</h4>
-                <p >
-                  &ldquo;{archetype.background.motivation}&rdquo;
-                </p>
+                <h4>Motivation</h4>
+                <p>&ldquo;{archetype.background.motivation}&rdquo;</p>
               </div>
 
               {/* Select Button */}
-              <Button 
-                
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleArchetypeSelect(archetype);
@@ -254,7 +249,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               >
                 {selectedArchetype === archetype.id ? (
                   <>
-                    <Loader2  aria-hidden="true" />
+                    <Loader2 aria-hidden="true" />
                     Starting Game...
                   </>
                 ) : (
@@ -267,19 +262,20 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       </div>
 
       {/* Action Buttons */}
-      <div >
+      <div>
         <ActionButtonGroup
-          
           actions={[
             {
-              label: loading ? 'Generating...' : 'Generate New Random Character',
+              label: loading
+                ? 'Generating...'
+                : 'Generate New Random Character',
               onClick: handleRandomSelect,
               variant: 'secondary',
               size: 'lg',
               icon: loading ? (
-                <Loader2  aria-hidden="true" />
+                <Loader2 aria-hidden="true" />
               ) : (
-                <Sparkles  aria-hidden="true" />
+                <Sparkles aria-hidden="true" />
               ),
               disabled: loading,
               dataTutorial: 'quickstart-random',
@@ -289,24 +285,24 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               onClick: onCustomizeClick,
               variant: 'ghost',
               size: 'lg',
-              icon: (
-                <Plus  aria-hidden="true" />
-              ),
+              icon: <Plus aria-hidden="true" />,
               dataTutorial: 'quickstart-custom',
-            }
+            },
           ]}
         />
       </div>
 
       {/* Additional Info */}
-      <div >
-        <p >
-          <strong>Generate New Random Character:</strong> Creates a completely new random character for this world
+      <div>
+        <p>
+          <strong>Generate New Random Character:</strong> Creates a completely
+          new random character for this world
         </p>
-        <p >
-          <strong>Create Custom Character:</strong> Build your own character from scratch with full customization
+        <p>
+          <strong>Create Custom Character:</strong> Build your own character
+          from scratch with full customization
         </p>
-        <p >
+        <p>
           You can always edit any character later through the character editor
         </p>
       </div>

@@ -15,7 +15,7 @@ export function DashboardGettingStarted({
   hasWorlds,
   hasCharacters,
   hasSessions,
-  onNavigate
+  onNavigate,
 }: DashboardGettingStartedProps) {
   const steps = [
     {
@@ -23,22 +23,22 @@ export function DashboardGettingStarted({
       label: 'Create a world',
       completed: hasWorlds,
       cta: 'Create Your World',
-      path: '/worlds'
+      path: '/worlds',
     },
     {
       id: 'character',
       label: 'Create a character',
       completed: hasCharacters,
       cta: 'Create a Character',
-      path: '/characters'
+      path: '/characters',
     },
     {
       id: 'play',
       label: 'Start playing',
       completed: hasSessions,
       cta: 'Start Playing',
-      path: '/worlds'
-    }
+      path: '/worlds',
+    },
   ];
 
   const nextStep = steps.find((step) => !step.completed);
@@ -48,14 +48,16 @@ export function DashboardGettingStarted({
   if (allComplete) {
     return (
       <section className="component-dashboard-getting-started">
-        <div >
-          <CheckCircle  aria-hidden="true" />
+        <div>
+          <CheckCircle aria-hidden="true" />
           <div>
-            <h3 >Ready to Continue</h3>
-            <p >
-              Your world is set up. Continue your adventure!
-            </p>
-            <Button onClick={() => onNavigate('/worlds')} variant="default" size="lg">
+            <h3>Ready to Continue</h3>
+            <p>Your world is set up. Continue your adventure!</p>
+            <Button
+              onClick={() => onNavigate('/worlds')}
+              variant="default"
+              size="lg"
+            >
               Continue Playing
             </Button>
           </div>
@@ -66,24 +68,17 @@ export function DashboardGettingStarted({
 
   return (
     <section className="component-dashboard-getting-started">
-      <h2 >Getting Started</h2>
+      <h2>Getting Started</h2>
 
-      <div >
+      <div>
         {steps.map((step) => {
           const Icon = step.completed ? CheckCircle : Circle;
           return (
-            <div key={step.id} >
+            <div key={step.id}>
               <Icon
-                className={`${
-                  step.completed ? '' : ''
-                }`}
                 aria-hidden="true"
               />
-              <span
-                className={`${
-                  step.completed ? '' : ''
-                }`}
-              >
+              <span>
                 {step.label}
               </span>
             </div>
@@ -96,7 +91,6 @@ export function DashboardGettingStarted({
           onClick={() => onNavigate(nextStep.path)}
           variant="default"
           size="lg"
-          
         >
           {nextStep.cta}
         </Button>

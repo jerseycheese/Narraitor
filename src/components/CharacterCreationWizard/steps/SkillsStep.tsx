@@ -193,7 +193,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     <div className="component-skills-step">
       <WizardFormSection
         title="Allocate Skill Points"
-        description={`Choose up to${maxSelectable}starting skills and distribute${totalSkillPoints}skill points across them.`}
+        description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
       >
       <div >
         <p >
@@ -203,12 +203,12 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       </div>
 
       <div >
-        <div className={`${wizardStyles.card.base}${remainingPoints === 0 ? '' : ''}`}>
+        <div className={wizardStyles.card.base}>
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
           <div >
             <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
             <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
-            <span className={`${wizardStyles.badge.secondary}${remainingPoints <= 0 ? '' : ''}`}>
+            <span className={wizardStyles.badge.secondary}>
               Remaining: {Math.max(remainingPoints, 0)}
             </span>
             {totalSkillPoints > totalCapacity && (
@@ -250,7 +250,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                   )}
                   {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
                     <div >
-                      Linked to:{''}
+                      Linked to:{' '}
                       {skill.attributeIds
                         .map(attrId => worldConfig.attributes?.find(attr => attr.id === attrId)?.name || 'Unknown')
                         .filter(name => name !== 'Unknown')
@@ -301,7 +301,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           <p >
             {totalSkillPoints > totalCapacity
               ? 'Your skill point pool exceeds the current skill caps. You can maximize existing skills or leave points unspent.'
-              : `You have${remainingPoints}unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}
+              : `You have ${remainingPoints} unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}
           </p>
         </div>
       )}

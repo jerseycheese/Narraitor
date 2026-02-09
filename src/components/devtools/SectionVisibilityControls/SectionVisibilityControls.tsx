@@ -36,35 +36,46 @@ const SECTION_TEST_IDS = {
 
 /**
  * SectionVisibilityControls Component
- * 
+ *
  * Provides controls for toggling visibility of individual DevTools sections.
  * Includes dropdown menu with individual toggles and show all/hide all actions.
  */
 export const SectionVisibilityControls = () => {
-  const { sectionVisibility, toggleSectionVisibility, setSectionVisibility, isSectionVisible } = useDevTools();
+  const {
+    sectionVisibility,
+    toggleSectionVisibility,
+    setSectionVisibility,
+    isSectionVisible,
+  } = useDevTools();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const visibleCount = Object.values(sectionVisibility).filter(Boolean).length;
   const totalCount = Object.keys(SECTION_INFO).length;
 
   const handleShowAll = () => {
-    const allVisible = Object.keys(SECTION_INFO).reduce((acc, sectionId) => {
-      acc[sectionId] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+    const allVisible = Object.keys(SECTION_INFO).reduce(
+      (acc, sectionId) => {
+        acc[sectionId] = true;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
     setSectionVisibility(allVisible);
   };
 
   const handleHideAll = () => {
-    const allHidden = Object.keys(SECTION_INFO).reduce((acc, sectionId) => {
-      acc[sectionId] = false;
-      return acc;
-    }, {} as Record<string, boolean>);
+    const allHidden = Object.keys(SECTION_INFO).reduce(
+      (acc, sectionId) => {
+        acc[sectionId] = false;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
     setSectionVisibility(allHidden);
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(prev => !prev);
+    setIsDropdownOpen((prev) => !prev);
   };
 
   const handleSectionToggle = (sectionId: string) => {
@@ -72,12 +83,11 @@ export const SectionVisibilityControls = () => {
   };
 
   return (
-    <div  data-testid="section-visibility-controls">
+    <div data-testid="section-visibility-controls">
       <Button
         onClick={toggleDropdown}
         variant="ghost"
         size="sm"
-        
         aria-expanded={isDropdownOpen}
         aria-haspopup="menu"
         aria-label="Section visibility controls"
@@ -87,19 +97,14 @@ export const SectionVisibilityControls = () => {
       </Button>
 
       {isDropdownOpen && (
-        <div 
-          
-          data-testid="visibility-dropdown"
-          role="menu"
-        >
+        <div data-testid="visibility-dropdown" role="menu">
           {/* Header with bulk actions */}
-          <div >
-            <div >
+          <div>
+            <div>
               <Button
                 onClick={handleShowAll}
                 variant="ghost"
                 size="sm"
-                
                 data-testid="show-all-sections"
                 role="menuitem"
               >
@@ -109,7 +114,6 @@ export const SectionVisibilityControls = () => {
                 onClick={handleHideAll}
                 variant="ghost"
                 size="sm"
-                
                 data-testid="hide-all-sections"
                 role="menuitem"
               >
@@ -119,28 +123,27 @@ export const SectionVisibilityControls = () => {
           </div>
 
           {/* Individual section toggles */}
-          <div >
+          <div>
             {Object.entries(SECTION_INFO).map(([sectionId, displayName]) => {
               const isVisible = isSectionVisible?.(sectionId) ?? true;
-              
+
               return (
                 <Button
                   key={sectionId}
                   onClick={() => handleSectionToggle(sectionId)}
                   variant="ghost"
                   size="sm"
-                  
-                  data-testid={SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]}
+                  data-testid={
+                    SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]
+                  }
                   role="menuitemcheckbox"
                   aria-checked={isVisible}
-                  aria-label={`Toggle${displayName}visibility`}
+                  aria-label={`Toggle ${displayName} visibility`}
                 >
-                  <span className={`${
-                    isVisible ? '' : ''
-                  }`}>
+                  <span>
                     {isVisible && (
-                      <span  aria-hidden="true">
-                        <Check  aria-hidden="true" />
+                      <span aria-hidden="true">
+                        <Check aria-hidden="true" />
                       </span>
                     )}
                   </span>
@@ -151,12 +154,11 @@ export const SectionVisibilityControls = () => {
           </div>
 
           {/* Footer */}
-          <div >
+          <div>
             <Button
               onClick={() => setIsDropdownOpen(false)}
               variant="ghost"
               size="sm"
-              
               data-testid="close-dropdown"
             >
               Close
@@ -168,7 +170,6 @@ export const SectionVisibilityControls = () => {
       {/* Click outside to close */}
       {isDropdownOpen && (
         <div
-          
           onClick={() => setIsDropdownOpen(false)}
           data-testid="dropdown-backdrop"
         />

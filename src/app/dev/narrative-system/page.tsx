@@ -127,7 +127,7 @@ export default function NarrativeSystemHarness() {
     } else {
       // Manual generation for history view
       const choice = mockChoices.find(c => c.id === choiceId);
-      const content = `You chose to${choice?.text}.${choice?.consequence}`;
+    const content = `You chose to ${choice?.text}. ${choice?.consequence}`;
       
       const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,

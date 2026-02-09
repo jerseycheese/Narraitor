@@ -33,7 +33,7 @@ export const NavigationLoadingProvider: React.FC<NavigationLoadingProviderProps>
   useEffect(() => {
     if (navigationLoading.isLoading) {
       const timeout = setTimeout(() => {
-        console.warn(`Navigation loading state automatically cleared after${SAFETY_TIMEOUT_MS / 1000}seconds`);
+        console.warn(`Navigation loading state automatically cleared after ${SAFETY_TIMEOUT_MS / 1000} seconds`);
         navigationLoading.clearLoading();
       }, SAFETY_TIMEOUT_MS);
 

@@ -40,35 +40,42 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
     <>
       {/* Character Summary Panel below hero */}
       {character && (
-        <div >
+        <div>
           <CharacterSummary character={character} />
         </div>
       )}
 
       {/* Inventory Display */}
       {characterId && (
-        <div  data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
+        <div
+          data-testid="inventory-collapsible"
+          data-tutorial="inventory-toggle"
+        >
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
           </CollapsibleSection>
         </div>
       )}
 
-      <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
+      <StorySummarySection
+        worldId={worldId}
+        sessionId={sessionId}
+        characterId={characterId || undefined}
+      />
 
       <ChoiceHistorySection sessionId={sessionId} />
 
       {/* Journal Button */}
       {character && (
-        <div >
+        <div>
           <Button
             onClick={onOpenJournal}
             variant="outline"
             className="group"
             data-tutorial="journal-toggle"
           >
-            <span >
-              <BookOpen  />
+            <span>
+              <BookOpen />
               Open Journal
             </span>
           </Button>
@@ -76,7 +83,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       )}
 
       {/* Autosave indicator anchored under the main content */}
-      <div >
+      <div>
         <SaveIndicator
           status={autoSave.status}
           lastSaveTime={autoSave.lastSaveTime}
@@ -86,7 +93,6 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
           onRetryError={autoSave.retry}
           retryable
           compact
-          
         />
       </div>
 

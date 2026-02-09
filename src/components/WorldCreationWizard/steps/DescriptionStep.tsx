@@ -9,9 +9,15 @@ import {
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getWorldGuidance, type AIGuidanceSource } from '@/lib/constants/worldGuidance';
+import {
+  getWorldGuidance,
+  type AIGuidanceSource,
+} from '@/lib/constants/worldGuidance';
 import { type GenreValue } from '@/lib/constants/genres';
-import type { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
+import type {
+  AttributeSuggestion,
+  SkillSuggestion,
+} from '@/types/ai-suggestions.types';
 
 interface AISuggestionState {
   attributes: AttributeSuggestion[];
@@ -58,16 +64,17 @@ export default function DescriptionStep({
 
   const hasAISuggestions = Boolean(
     (aiSuggestions?.attributes?.length || 0) > 0 ||
-    (aiSuggestions?.skills?.length || 0) > 0
+      (aiSuggestions?.skills?.length || 0) > 0
   );
 
   const descriptionOutdated = Boolean(
     suggestionMeta?.descriptionSnapshot &&
-    suggestionMeta.descriptionSnapshot.trim() !== description.trim()
+      suggestionMeta.descriptionSnapshot.trim() !== description.trim()
   );
 
   const meetsAIMinimumLength = descriptionLength >= 50;
-  const canTriggerGeneration = canGenerateSuggestions && meetsAIMinimumLength && !isProcessing;
+  const canTriggerGeneration =
+    canGenerateSuggestions && meetsAIMinimumLength && !isProcessing;
 
   const handleDescriptionChange = (value: string) => {
     if (value.length <= MAX_DESCRIPTION_LENGTH) {
@@ -78,15 +85,12 @@ export default function DescriptionStep({
   const renderSuggestionPreview = () => {
     if (!hasAISuggestions) {
       return (
-        <div
-          
-          data-testid="ai-suggestion-empty"
-        >
-          {canGenerateSuggestions ? (
-            meetsAIMinimumLength
+        <div data-testid="ai-suggestion-empty">
+          {canGenerateSuggestions
+            ? meetsAIMinimumLength
               ? 'Generate suggestions to see examples tailored to your description.'
               : 'Add at least 50 characters so we can understand your world before generating suggestions.'
-          ) : 'Suggestions are pre-filled from your chosen template.'}
+            : 'Suggestions are pre-filled from your chosen template.'}
         </div>
       );
     }
@@ -95,16 +99,16 @@ export default function DescriptionStep({
     const skillList = (aiSuggestions?.skills || []).slice(0, 3);
 
     return (
-      <div  data-testid="ai-suggestion-preview">
-        <div >
-          <h4 >Attributes to explore</h4>
-          <ul >
+      <div data-testid="ai-suggestion-preview">
+        <div>
+          <h4>Attributes to explore</h4>
+          <ul>
             {attributeList.length > 0 ? (
               attributeList.map((attribute, index) => (
                 <li key={`${attribute.name}-${index}`}>
-                  <span >{attribute.name}</span>
+                  <span>{attribute.name}</span>
                   {attribute.description ? (
-                    <span >{attribute.description}</span>
+                    <span>{attribute.description}</span>
                   ) : null}
                 </li>
               ))
@@ -113,16 +117,14 @@ export default function DescriptionStep({
             )}
           </ul>
         </div>
-        <div >
-          <h4 >Skill ideas</h4>
-          <ul >
+        <div>
+          <h4>Skill ideas</h4>
+          <ul>
             {skillList.length > 0 ? (
               skillList.map((skill, index) => (
                 <li key={`${skill.name}-${index}`}>
-                  <span >{skill.name}</span>
-                  {skill.description ? (
-                    <span >{skill.description}</span>
-                  ) : null}
+                  <span>{skill.name}</span>
+                  {skill.description ? <span>{skill.description}</span> : null}
                 </li>
               ))
             ) : (
@@ -156,7 +158,7 @@ export default function DescriptionStep({
             testId="world-full-description"
             dataTutorial="world-description"
           />
-          <div  data-testid="description-char-count">
+          <div data-testid="description-char-count">
             {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
           </div>
         </WizardFormGroup>
@@ -166,8 +168,8 @@ export default function DescriptionStep({
         title="Attribute & Skill Suggestions"
         description="Suggested attributes and skills based on your world description."
       >
-        <div >
-          <div >
+        <div>
+          <div>
             <Button
               type="button"
               onClick={() => {
@@ -183,7 +185,7 @@ export default function DescriptionStep({
                   ? 'Regenerate suggestions'
                   : 'Generate suggestions'}
             </Button>
-            <span >
+            <span>
               {hasAISuggestions && suggestionMeta?.source
                 ? SUGGESTION_SOURCE_LABELS[suggestionMeta.source]
                 : meetsAIMinimumLength
@@ -193,15 +195,24 @@ export default function DescriptionStep({
           </div>
 
           {errors.ai && (
-            <Alert variant="warning" data-testid="ai-warning" aria-live="polite">
+            <Alert
+              variant="warning"
+              data-testid="ai-warning"
+              aria-live="polite"
+            >
               <AlertDescription>{errors.ai}</AlertDescription>
             </Alert>
           )}
 
           {descriptionOutdated && (
-            <Alert variant="warning" data-testid="ai-description-outdated" aria-live="polite">
+            <Alert
+              variant="warning"
+              data-testid="ai-description-outdated"
+              aria-live="polite"
+            >
               <AlertDescription>
-                Your description has changed since the last generation. Regenerate suggestions to keep them aligned.
+                Your description has changed since the last generation.
+                Regenerate suggestions to keep them aligned.
               </AlertDescription>
             </Alert>
           )}
@@ -213,10 +224,10 @@ export default function DescriptionStep({
       </WizardFormSection>
 
       {isProcessing && (
-        <div  data-testid="processing-overlay">
-          <div >
-            <div  role="status">
-              <span >Loading...</span>
+        <div data-testid="processing-overlay">
+          <div>
+            <div role="status">
+              <span>Loading...</span>
             </div>
             <p aria-live="polite">Analyzing your world description...</p>
           </div>

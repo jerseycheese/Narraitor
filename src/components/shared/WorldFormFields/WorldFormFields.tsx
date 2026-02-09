@@ -30,21 +30,18 @@ export function WorldNameInput({
 }: WorldNameInputProps) {
   return (
     <div className={className}>
-      <Label htmlFor="world-name" >
-        World Name {required && <span >*</span>}
+      <Label htmlFor="world-name">
+        World Name {required && <span>*</span>}
       </Label>
       <Input
         id="world-name"
         type="text"
-        
-        placeholder={placeholder || "E.g., Neo-Tokyo..."}
+        placeholder={placeholder || 'E.g., Neo-Tokyo...'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
       />
-      {error && (
-        <p >{error}</p>
-      )}
+      {error && <p>{error}</p>}
     </div>
   );
 }
@@ -70,12 +67,9 @@ export function GenreSelect({
 }: GenreSelectProps) {
   return (
     <div className={className}>
-      <Label htmlFor="world-genre" >
-        Genre {required && <span >*</span>}
-      </Label>
+      <Label htmlFor="world-genre">Genre {required && <span>*</span>}</Label>
       <Select
         id="world-genre"
-        
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -87,9 +81,7 @@ export function GenreSelect({
           </option>
         ))}
       </Select>
-      {error && (
-        <p >{error}</p>
-      )}
+      {error && <p>{error}</p>}
     </div>
   );
 }
@@ -120,17 +112,15 @@ export function DescriptionTextArea({
   className = '',
 }: DescriptionTextAreaProps) {
   const characterCount = value.length;
-  const isNearLimit = maxLength && characterCount > maxLength * 0.8;
 
   return (
     <div className={className}>
-      <Label htmlFor="world-description" >
-        {label} {required && <span >*</span>}
+      <Label htmlFor="world-description">
+        {label} {required && <span>*</span>}
       </Label>
       <Textarea
         id="world-description"
         rows={rows}
-        
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -140,22 +130,16 @@ export function DescriptionTextArea({
 
       {/* Character count */}
       {maxLength && (
-        <div >
-          <div >
-            {error && (
-              <p >{error}</p>
-            )}
-          </div>
-          <p className={`${isNearLimit ? '' : ''}`}>
+        <div>
+          <div>{error && <p>{error}</p>}</div>
+          <p>
             {characterCount}/{maxLength}
           </p>
         </div>
       )}
 
       {/* Error without character count */}
-      {!maxLength && error && (
-        <p >{error}</p>
-      )}
+      {!maxLength && error && <p>{error}</p>}
     </div>
   );
 }
@@ -204,33 +188,21 @@ export function ErrorDisplay({
 
   return (
     <div className={`${className}`}>
-      <div >
-        <div >
-          <h3 >
-            Error
-          </h3>
-          <p >
-            {error}
-          </p>
+      <div>
+        <div>
+          <h3>Error</h3>
+          <p>{error}</p>
         </div>
 
         {(onRetry || onDismiss) && (
-          <div >
+          <div>
             {onRetry && (
-              <Button
-                onClick={onRetry}
-                variant="ghost"
-                
-              >
+              <Button onClick={onRetry} variant="ghost">
                 Retry
               </Button>
             )}
             {onDismiss && (
-              <Button
-                onClick={onDismiss}
-                variant="ghost"
-                
-              >
+              <Button onClick={onDismiss} variant="ghost">
                 ×
               </Button>
             )}

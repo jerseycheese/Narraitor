@@ -44,7 +44,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
     <div className="component-attributes-step">
       <WizardFormSection
         title="Allocate Attribute Points"
-        description={`Distribute${data.pointPools.attributes.total}points across your character's attributes. Each attribute affects different aspects of gameplay.`}
+        description={`Distribute ${data.pointPools.attributes.total} points across your character's attributes. Each attribute affects different aspects of gameplay.`}
       >
       <PointPoolManager
         allocations={allocations}

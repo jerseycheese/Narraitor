@@ -8,7 +8,7 @@ import {
   capitalize,
   formatRelativeTime,
   titleCase,
-  formatAIResponse
+  formatAIResponse,
 } from '@/lib/utils';
 import { formatSessionDuration } from '@/lib/utils/sessionUtils';
 import { Play, Square, Settings } from 'lucide-react';
@@ -26,44 +26,33 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
   showBackButton = false,
 }) => {
   // Detect system events (Issue #176)
-  const isSystemEvent = entry.metadata.automaticEntry &&
+  const isSystemEvent =
+    entry.metadata.automaticEntry &&
     (entry.type === 'session_start' || entry.type === 'session_end');
 
   return (
     <div className="journal-entry-detail">
       {showBackButton && onBack && (
-        <div >
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            
-          >
+        <div>
+          <Button variant="ghost" size="sm" onClick={onBack}>
             &larr; Back to Entries
           </Button>
         </div>
       )}
 
-      <div className={`${
-        isSystemEvent
-          ? ''
-          : ''
-      }`}>
-        <h3 className={`${
-          isSystemEvent ? '' : ''
-        }`}>
+      <div>
+        <h3>
           {isSystemEvent && (
-            <span  aria-label="System event">
-              {entry.type === 'session_start' && <Play  aria-hidden="true" />}
-              {entry.type === 'session_end' && <Square  aria-hidden="true" />}
-              {entry.type !== 'session_start' && entry.type !== 'session_end' && (
-                <Settings  aria-hidden="true" />
-              )}
+            <span aria-label="System event">
+              {entry.type === 'session_start' && <Play aria-hidden="true" />}
+              {entry.type === 'session_end' && <Square aria-hidden="true" />}
+              {entry.type !== 'session_start' &&
+                entry.type !== 'session_end' && <Settings aria-hidden="true" />}
             </span>
           )}
           {entry.title || titleCase(entry.type.replace('_', ' '))}
         </h3>
-        <div >
+        <div>
           <Badge
             variant={getSignificanceBadgeVariant(entry.significance)}
             size="sm"
@@ -74,33 +63,35 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>
           {!entry.isRead && (
-            <Badge variant="secondary-static" size="sm">Unread</Badge>
+            <Badge variant="secondary-static" size="sm">
+              Unread
+            </Badge>
           )}
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
-            <Badge variant="outline" size="sm" >
+            <Badge variant="outline" size="sm">
               Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
         </div>
       </div>
 
-      <div >
+      <div>
         <div className="prose prose-gray dark:prose-invert">
-          <p >
+          <p>
             {entry.type === 'discovery'
               ? formatAIResponse(entry.detailedContent || entry.content, {
-                paragraphSpacing: 'single',
-                outputFormat: 'text'
-              })
-              : (entry.detailedContent || entry.content)}
+                  paragraphSpacing: 'single',
+                  outputFormat: 'text',
+                })
+              : entry.detailedContent || entry.content}
           </p>
         </div>
 
         {entry.relatedEntities && entry.relatedEntities.length > 0 && (
-          <div >
-            <h4 >Related</h4>
-            <div >
+          <div>
+            <h4>Related</h4>
+            <div>
               {entry.relatedEntities.map((entity, index) => (
                 <Badge key={index} variant="outline" size="sm">
                   {titleCase(entity.type)}: {entity.name}
@@ -111,9 +102,9 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
         )}
 
         {entry.metadata.tags && entry.metadata.tags.length > 0 && (
-          <div >
-            <h4 >Tags</h4>
-            <div >
+          <div>
+            <h4>Tags</h4>
+            <div>
               {entry.metadata.tags.map((tag, index) => (
                 <Badge key={index} variant="secondary-static" size="sm">
                   {tag}

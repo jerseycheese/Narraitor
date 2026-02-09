@@ -2,7 +2,13 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, Globe, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -13,11 +19,13 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
+import {
+  CardActionGroup,
+  type CardAction,
+} from '@/components/shared/cards/CardActionGroup';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
-
 
 /**
  * EndingScreen displays the story ending with narrative closure
@@ -32,18 +40,23 @@ export function EndingScreen() {
     endingError,
     // clearEnding, // Not currently used
     getSessionSegments,
-    updateCurrentEnding
+    updateCurrentEnding,
   } = useNarrativeStore();
-  
+
   const { characters } = useCharacterStore();
   const { worlds } = useWorldStore();
 
   // Get story checkpoints for this session (must be called before early returns)
-  const worldState = useWorldStore(state => currentEnding ? state.worldStates[currentEnding.worldId] : undefined);
+  const worldState = useWorldStore((state) =>
+    currentEnding ? state.worldStates[currentEnding.worldId] : undefined
+  );
   const sessionCheckpoints = useMemo(
-    () => currentEnding ? (worldState?.storyCheckpoints ?? []).filter(
-      checkpoint => checkpoint.sessionId === currentEnding.sessionId
-    ) : [],
+    () =>
+      currentEnding
+        ? (worldState?.storyCheckpoints ?? []).filter(
+            (checkpoint) => checkpoint.sessionId === currentEnding.sessionId
+          )
+        : [],
     [worldState?.storyCheckpoints, currentEnding]
   );
 
@@ -67,7 +80,11 @@ export function EndingScreen() {
   }, [currentEnding?.imageUrl, endingImage]);
 
   const generateEndingImage = useCallback(async () => {
-    if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
+    if (
+      !currentEnding ||
+      isGeneratingImage ||
+      generatedForEndingRef.current === currentEnding.id
+    ) {
       return; // Prevent multiple simultaneous requests or duplicate generation
     }
 
@@ -90,7 +107,7 @@ export function EndingScreen() {
       const recentSegments = getSessionSegments(currentEnding.sessionId);
       const recentNarrative = recentSegments
         .slice(-5)
-        .map(segment => segment.content);
+        .map((segment) => segment.content);
 
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
@@ -101,7 +118,7 @@ export function EndingScreen() {
           ending: currentEnding,
           world,
           character,
-          recentNarrative
+          recentNarrative,
         }),
       });
 
@@ -122,7 +139,7 @@ export function EndingScreen() {
         }
         return {
           ...current,
-          imageUrl: data.imageUrl
+          imageUrl: data.imageUrl,
         };
       });
     } catch (error) {
@@ -132,25 +149,41 @@ export function EndingScreen() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, updateCurrentEnding]);
+  }, [
+    currentEnding,
+    isGeneratingImage,
+    characters,
+    worlds,
+    getSessionSegments,
+    updateCurrentEnding,
+  ]);
 
   // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
     // Skip image generation in Storybook, test environment, or dev harness
-    const isStorybook = typeof window !== 'undefined' && 
-      (window.location.port === '6006' || window.location.hostname.includes('storybook'));
+    const isStorybook =
+      typeof window !== 'undefined' &&
+      (window.location.port === '6006' ||
+        window.location.hostname.includes('storybook'));
     const isTest = process.env.NODE_ENV === 'test';
-    const isDevHarness = typeof window !== 'undefined' && window.location.pathname.includes('/dev/ending-screen');
-    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
-    
-    if (currentEnding && 
-        !endingImage && 
-        !isGeneratingImage && 
-        !isStorybook &&
-        !isTest &&
-        !isDevHarness &&
-        !isPlaywright &&
-        generatedForEndingRef.current !== currentEnding.id) {
+    const isDevHarness =
+      typeof window !== 'undefined' &&
+      window.location.pathname.includes('/dev/ending-screen');
+    const isPlaywright =
+      typeof window !== 'undefined' &&
+      (window.navigator.userAgent.includes('Playwright') ||
+        !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
+
+    if (
+      currentEnding &&
+      !endingImage &&
+      !isGeneratingImage &&
+      !isStorybook &&
+      !isTest &&
+      !isDevHarness &&
+      !isPlaywright &&
+      generatedForEndingRef.current !== currentEnding.id
+    ) {
       generateEndingImage();
     }
   }, [currentEnding, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
@@ -161,10 +194,10 @@ export function EndingScreen() {
   // Show loading state while generating
   if (isGeneratingEnding) {
     return (
-      <div  role="main" aria-live="polite">
-        <div >
+      <div role="main" aria-live="polite">
+        <div>
           <LoadingState message="Loading your story ending..." />
-          <p >
+          <p>
             Please wait while we craft the perfect conclusion to your journey...
           </p>
         </div>
@@ -175,10 +208,10 @@ export function EndingScreen() {
   // Handle error state
   if (endingError) {
     return (
-      <ErrorDisplay 
+      <ErrorDisplay
         variant="page"
         title="Unable to load story ending"
-        message={endingError || "An unknown error occurred"}
+        message={endingError || 'An unknown error occurred'}
         showRetry={true}
         onRetry={() => router.back()}
       />
@@ -188,18 +221,20 @@ export function EndingScreen() {
   // Handle missing ending data
   if (!currentEnding) {
     return (
-      <div >
+      <div>
         <header>
-          <h1 >No Ending Available</h1>
-          <p >It looks like the story ending isn&apos;t available right now.</p>
+          <h1>No Ending Available</h1>
+          <p>It looks like the story ending isn&apos;t available right now.</p>
         </header>
-        <CardActionGroup 
-          primaryActions={[{
-            key: 'return-home',
-            text: 'Return to Home',
-            onClick: () => router.push('/worlds'),
-            variant: 'primary'
-          }]}
+        <CardActionGroup
+          primaryActions={[
+            {
+              key: 'return-home',
+              text: 'Return to Home',
+              onClick: () => router.push('/worlds'),
+              variant: 'primary',
+            },
+          ]}
         />
       </div>
     );
@@ -210,14 +245,14 @@ export function EndingScreen() {
 
   const formatPlayTime = (seconds?: number) => {
     if (!seconds) return 'Unknown';
-    
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
       return `${hours} hours ${minutes > 0 ? ` ${minutes} minutes` : ''}`;
     }
-    return `${minutes}minutes`;
+    return `${minutes} minutes`;
   };
 
   // Navigation actions using shared CardAction format
@@ -228,7 +263,7 @@ export function EndingScreen() {
       onClick: () => router.push('/worlds'),
       variant: 'primary',
       flex: true,
-      icon: (<Globe  aria-hidden="true" />)
+      icon: <Globe aria-hidden="true" />,
     },
     {
       key: 'new-story',
@@ -236,7 +271,8 @@ export function EndingScreen() {
       onClick: async () => {
         // Set the current character, end the session, clear the ending, then navigate to play
         const { setCurrentCharacter } = useCharacterStore.getState();
-        const { clearEnding, clearSessionSegments, clearSessionDecisions } = useNarrativeStore.getState();
+        const { clearEnding, clearSessionSegments, clearSessionDecisions } =
+          useNarrativeStore.getState();
         const { endSession } = useSessionStore.getState();
 
         // End the current session if it exists
@@ -254,53 +290,47 @@ export function EndingScreen() {
       },
       variant: 'success',
       flex: true,
-      icon: (<Play  aria-hidden="true" />)
-    }
+      icon: <Play aria-hidden="true" />,
+    },
   ];
 
   return (
     <>
       {/* Screen reader announcement */}
-      <div 
-         
-        role="status" 
-        aria-live="polite"
-        aria-label="story complete"
-      >
+      <div role="status" aria-live="polite" aria-label="story complete">
         Story Complete: {currentEnding.tone} ending
       </div>
 
       <div className="ending-screen-container" data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
-        <section
-          
-          aria-label="Story ending"
-        >
+        <section aria-label="Story ending">
           {isGeneratingImage ? (
-            <div  role="img" aria-live="polite" aria-label="Loading ending image">
-              <div >
+            <div
+              role="img"
+              aria-live="polite"
+              aria-label="Loading ending image"
+            >
+              <div>
                 <LoadingState message="Loading ending image..." />
-                <p >
-                  Preparing a visual representation of your story&apos;s conclusion...
+                <p>
+                  Preparing a visual representation of your story&apos;s
+                  conclusion...
                 </p>
               </div>
             </div>
           ) : endingImage ? (
-            <div >
+            <div>
               <Image
                 src={endingImage}
-                alt={`${currentEnding.tone}ending for${character?.name || 'the hero'}'s story`}
+                alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={1280}
                 height={720}
-                
                 priority
               />
-              <div >
-                <header >
-                  <h1 >
-                    The End
-                  </h1>
-                  <p >
+              <div>
+                <header>
+                  <h1>The End</h1>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
@@ -308,25 +338,22 @@ export function EndingScreen() {
             </div>
           ) : imageError ? (
             <div className={`ending-${currentEnding.tone}`}>
-              <div >
-                <ImageOff  aria-hidden="true" />
-                <p >Unable to load ending image</p>
+              <div>
+                <ImageOff aria-hidden="true" />
+                <p>Unable to load ending image</p>
                 <Button
                   onClick={generateEndingImage}
                   variant="link"
                   size="sm"
-                  
                   aria-label="Retry loading ending image"
                 >
                   Try Again
                 </Button>
               </div>
-              <div >
-                <header >
-                  <h2 >
-                    The End
-                  </h2>
-                  <p >
+              <div>
+                <header>
+                  <h2>The End</h2>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
@@ -334,16 +361,14 @@ export function EndingScreen() {
             </div>
           ) : (
             <div className={`ending-${currentEnding.tone}`}>
-              <div >
-                <ImageIcon  aria-hidden="true" />
-                <p >Ending image</p>
+              <div>
+                <ImageIcon aria-hidden="true" />
+                <p>Ending image</p>
               </div>
-              <div >
-                <header >
-                  <h2 >
-                    The End
-                  </h2>
-                  <p >
+              <div>
+                <header>
+                  <h2>The End</h2>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
@@ -352,21 +377,20 @@ export function EndingScreen() {
           )}
         </section>
 
-        <div >
-
+        <div>
           {/* Epilogue */}
           <section>
-            <SectionWrapper title="Epilogue" >
+            <SectionWrapper title="Epilogue">
               <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.epilogue}
               </div>
             </SectionWrapper>
           </section>
 
-          <div >
+          <div>
             {/* Character Legacy */}
             <section>
-              <SectionWrapper title="Character Legacy" >
+              <SectionWrapper title="Character Legacy">
                 <div className="prose prose-gray dark:prose-invert">
                   {currentEnding.characterLegacy}
                 </div>
@@ -374,38 +398,42 @@ export function EndingScreen() {
             </section>
 
             {/* Achievements */}
-            {currentEnding.achievements && currentEnding.achievements.length > 0 && (
-              <section aria-label="Story achievements">
-                <SectionWrapper title="Achievements" >
-                  <ul  role="list">
-                    {currentEnding.achievements.map((achievement, index) => {
-                      // Split achievement into title and description
-                      const colonIndex = achievement.indexOf(':');
-                      const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
-                      const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : '';
-                      
-                      return (
-                        <li
-                          key={index}
-                          
-                        >
-                          <Star  aria-hidden="true" />
-                          <div >
-                            <span >{title}</span>
-                            {description && <span >{description}</span>}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </SectionWrapper>
-              </section>
-            )}
+            {currentEnding.achievements &&
+              currentEnding.achievements.length > 0 && (
+                <section aria-label="Story achievements">
+                  <SectionWrapper title="Achievements">
+                    <ul role="list">
+                      {currentEnding.achievements.map((achievement, index) => {
+                        // Split achievement into title and description
+                        const colonIndex = achievement.indexOf(':');
+                        const title =
+                          colonIndex > 0
+                            ? achievement.substring(0, colonIndex)
+                            : achievement;
+                        const description =
+                          colonIndex > 0
+                            ? achievement.substring(colonIndex + 1).trim()
+                            : '';
+
+                        return (
+                          <li key={index}>
+                            <Star aria-hidden="true" />
+                            <div>
+                              <span>{title}</span>
+                              {description && <span>{description}</span>}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </SectionWrapper>
+                </section>
+              )}
           </div>
 
           {/* World Impact */}
           <section>
-            <SectionWrapper title="Impact on the World" >
+            <SectionWrapper title="Impact on the World">
               <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.worldImpact}
               </div>
@@ -415,19 +443,15 @@ export function EndingScreen() {
           {/* Your Story - Collapsible Section */}
           <section>
             <CollapsibleSection title="Your Story" initialCollapsed={true}>
-              <div >
+              <div>
                 {fullStory ? (
                   <div className="prose prose-gray dark:prose-invert">
                     {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                      <p key={`story-paragraph-${index}`}>
-                        {paragraph.trim()}
-                      </p>
+                      <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
                     ))}
                   </div>
                 ) : (
-                  <p >
-                    No story checkpoints available for this session.
-                  </p>
+                  <p>No story checkpoints available for this session.</p>
                 )}
               </div>
             </CollapsibleSection>
@@ -435,7 +459,7 @@ export function EndingScreen() {
 
           {/* Next Steps */}
           <section>
-            <SectionWrapper title="What's Next?" >
+            <SectionWrapper title="What's Next?">
               <CardActionGroup
                 primaryActions={navigationActions}
                 layout="horizontal"
@@ -445,7 +469,6 @@ export function EndingScreen() {
           </section>
         </div>
       </div>
-
     </>
   );
 }

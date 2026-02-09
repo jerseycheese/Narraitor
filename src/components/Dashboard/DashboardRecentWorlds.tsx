@@ -7,7 +7,7 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { useWorldStore } from '@/state/worldStore';
 
 interface DashboardRecentWorldsProps {
-  worlds: ReturnType<typeof useWorldStore.getState>["worlds"];
+  worlds: ReturnType<typeof useWorldStore.getState>['worlds'];
   maxItems: number;
   onNavigate: (path: string) => void;
 }
@@ -15,11 +15,14 @@ interface DashboardRecentWorldsProps {
 export function DashboardRecentWorlds({
   worlds,
   maxItems,
-  onNavigate
+  onNavigate,
 }: DashboardRecentWorldsProps) {
   const recentWorlds = useMemo(() => {
     return Object.values(worlds)
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
       .slice(0, maxItems);
   }, [worlds, maxItems]);
 
@@ -28,11 +31,11 @@ export function DashboardRecentWorlds({
   if (recentWorlds.length === 0) {
     return (
       <section className="component-dashboard-recent-worlds">
-        <h2 >Recent Worlds</h2>
-        <div >
-          <p >No worlds yet</p>
+        <h2>Recent Worlds</h2>
+        <div>
+          <p>No worlds yet</p>
           <Button onClick={() => onNavigate('/worlds')} variant="default">
-            <Plus  aria-hidden="true" />
+            <Plus aria-hidden="true" />
             Create Your First World
           </Button>
         </div>
@@ -42,14 +45,13 @@ export function DashboardRecentWorlds({
 
   return (
     <section className="component-dashboard-recent-worlds">
-      <h2 >Recent Worlds</h2>
+      <h2>Recent Worlds</h2>
 
-      <div >
+      <div>
         {/* Recent Worlds */}
         {recentWorlds.map((world) => (
           <div
             key={world.id}
-            
             onClick={() => onNavigate(`/worlds/${world.id}`)}
             role="button"
             tabIndex={0}
@@ -61,11 +63,9 @@ export function DashboardRecentWorlds({
               }
             }}
           >
-            <h3 >{world.name}</h3>
-            <div >
-              <span >
-                {getGenreLabel(world.genre)}
-              </span>
+            <h3>{world.name}</h3>
+            <div>
+              <span>{getGenreLabel(world.genre)}</span>
             </div>
           </div>
         ))}
@@ -73,17 +73,13 @@ export function DashboardRecentWorlds({
         {/* Empty Slots */}
         {emptySlots > 0 &&
           Array.from({ length: emptySlots }).map((_, index) => (
-            <div
-              key={`empty-${index}`}
-              
-            >
+            <div key={`empty-${index}`}>
               <Button
                 onClick={() => onNavigate('/worlds')}
                 variant="ghost"
                 size="sm"
-                
               >
-                <Plus  aria-hidden="true" />
+                <Plus aria-hidden="true" />
                 Create World
               </Button>
             </div>

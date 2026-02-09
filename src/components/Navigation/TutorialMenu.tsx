@@ -13,21 +13,25 @@ const RESET_DELAY_MS = 100;
 export function TutorialMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const { resetTutorial } = useTutorial();
-  const tutorialProgress = useSessionStore(state => state.tutorialProgress);
-  
+  const tutorialProgress = useSessionStore((state) => state.tutorialProgress);
+
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
-    
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isOpen]);
 
@@ -40,8 +44,8 @@ export function TutorialMenu() {
         // Zustand persist doesn't expose a flush/ready API for writes,
         // so we use a small delay. 100ms is generally sufficient for
         // IndexedDB operations on modern browsers.
-        await new Promise(resolve => setTimeout(resolve, RESET_DELAY_MS));
-        window.location.reload(); 
+        await new Promise((resolve) => setTimeout(resolve, RESET_DELAY_MS));
+        window.location.reload();
       } catch (error) {
         logger.error('Failed to reset tutorial', error);
       }
@@ -49,47 +53,43 @@ export function TutorialMenu() {
   };
 
   return (
-    <div  ref={dropdownRef}>
+    <div ref={dropdownRef}>
       <Button
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size="icon"
-        
         aria-label="Help & Tutorials"
       >
-        <HelpCircle  />
+        <HelpCircle />
       </Button>
-      
+
       {isOpen && (
-        <div >
-          <div >
-            <h4 >Tutorial Progress</h4>
+        <div>
+          <div>
+            <h4>Tutorial Progress</h4>
           </div>
-          
-          <div >
+
+          <div>
             {Object.entries(tutorialProgress.phases).map(([phase, data]) => (
-              <div key={phase} >
-                <span >{phase.replace(/([A-Z])/g, '$1')}</span>
+              <div key={phase}>
+                <span>{phase.replace(/([A-Z])/g, '$1')}</span>
                 {data.completed ? (
-                  <CheckCircle  />
+                  <CheckCircle />
                 ) : data.skipped ? (
-                  <span >Skipped</span>
-                ) : ('lastStep' in data && (data as { lastStep: number }).lastStep > 0) ? (
-                  <span >In Progress</span>
+                  <span>Skipped</span>
+                ) : 'lastStep' in data &&
+                  (data as { lastStep: number }).lastStep > 0 ? (
+                  <span>In Progress</span>
                 ) : (
-                  <span >Not Started</span>
+                  <span>Not Started</span>
                 )}
               </div>
             ))}
           </div>
-          
-          <div >
-            <Button
-              variant="ghost"
-              onClick={handleRestart}
-              
-            >
-              <RefreshCw  />
+
+          <div>
+            <Button variant="ghost" onClick={handleRestart}>
+              <RefreshCw />
               Reset All Tutorials
             </Button>
           </div>

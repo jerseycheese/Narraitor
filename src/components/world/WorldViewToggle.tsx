@@ -15,20 +15,17 @@ interface WorldViewToggleProps {
 
 /**
  * WorldViewToggle - Toggle between grid and table views for world management
- * 
+ *
  * Provides two buttons to switch the display mode of worlds between
  * a grid of cards and a searchable, sortable table.
- * 
+ *
  * @param props - Component properties
  * @param props.mode - The current active view mode ('grid' or 'table')
  * @param props.onModeChange - Callback function triggered when a new mode is selected
  */
-export function WorldViewToggle({
-  mode,
-  onModeChange,
-}: WorldViewToggleProps) {
+export function WorldViewToggle({ mode, onModeChange }: WorldViewToggleProps) {
   return (
-    <div  role="group" aria-label="View mode toggle">
+    <div role="group" aria-label="View mode toggle">
       <Button
         variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"
@@ -36,7 +33,7 @@ export function WorldViewToggle({
         aria-label="Grid view"
         aria-pressed={mode === 'grid'}
       >
-        <Grid3x3  />
+        <Grid3x3 />
       </Button>
       <Button
         variant={mode === 'table' ? 'default' : 'outline'}
@@ -45,7 +42,7 @@ export function WorldViewToggle({
         aria-label="Table view"
         aria-pressed={mode === 'table'}
       >
-        <Table  />
+        <Table />
       </Button>
     </div>
   );

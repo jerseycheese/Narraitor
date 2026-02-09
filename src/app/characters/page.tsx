@@ -50,7 +50,7 @@ function transformGeneratedAttributes(
     const worldAttr = currentWorld.attributes.find((wa) => wa.id === attr.id);
     return {
       id: generateUniqueId('attr'),
-      characterId: '', 
+      characterId: '',
       worldAttributeId: attr.id,
       name: worldAttr?.name || 'Unknown',
       baseValue: attr.value,
@@ -68,8 +68,8 @@ function transformGeneratedSkills(
     const worldSkill = currentWorld.skills.find((ws) => ws.id === skill.id);
     return {
       id: generateUniqueId('skill'),
-      characterId: '', 
-      worldSkillId: skill.id, 
+      characterId: '',
+      worldSkillId: skill.id,
       name: worldSkill?.name || 'Unknown',
       level: skill.level,
       category: worldSkill?.category,
@@ -174,7 +174,9 @@ export default function CharactersPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('character-view-mode') as CharacterViewMode | null;
+      const saved = localStorage.getItem(
+        'character-view-mode'
+      ) as CharacterViewMode | null;
       if (saved === 'grid' || saved === 'table') {
         setViewMode(saved);
       }
@@ -262,7 +264,18 @@ export default function CharactersPage() {
       ? undefined
       : 'Create unique characters for your interactive narrative adventures.';
 
-  const addToast = (toast: Omit<{ id: string; title: string; description?: string; variant: 'success' | 'error'; duration?: number }, 'id'>) => {
+  const addToast = (
+    toast: Omit<
+      {
+        id: string;
+        title: string;
+        description?: string;
+        variant: 'success' | 'error';
+        duration?: number;
+      },
+      'id'
+    >
+  ) => {
     const id = `toast-${Date.now()}-${Math.random()}`;
     const newToast = { ...toast, id };
     setToasts((prev) => [...prev, newToast]);
@@ -292,7 +305,8 @@ export default function CharactersPage() {
 
     try {
       const existingNames = worldCharacters.map((char) => char.name);
-      const nameToUse = generationType === 'specific' ? characterName : undefined;
+      const nameToUse =
+        generationType === 'specific' ? characterName : undefined;
 
       const response = await fetch('/api/generate-character', {
         method: 'POST',
@@ -340,7 +354,7 @@ export default function CharactersPage() {
           conditions: [],
         },
         inventory: {
-          characterId: '', 
+          characterId: '',
           items: [],
           capacity: 20,
           categories: [],
@@ -486,9 +500,9 @@ export default function CharactersPage() {
         title="My Characters"
         description="Choose a world to view your characters."
       >
-        <div >
-          <Globe  aria-hidden="true" />
-          <h2 >Choose Your World</h2>
+        <div>
+          <Globe aria-hidden="true" />
+          <h2>Choose Your World</h2>
           <ActionButtonGroup
             actions={[
               {
@@ -509,14 +523,14 @@ export default function CharactersPage() {
       label: 'Create Character',
       onClick: handleCreateCharacter,
       variant: 'primary' as const,
-      icon: <Plus  aria-hidden="true" />,
+      icon: <Plus aria-hidden="true" />,
     },
     {
       label: 'Generate Character',
       onClick: () => setShowGenerateDialog(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: <Sparkles  aria-hidden="true" />,
+      icon: <Sparkles aria-hidden="true" />,
     },
   ];
 
@@ -525,15 +539,21 @@ export default function CharactersPage() {
       {mounted && currentWorld && (
         <Hero
           title={currentWorld.name}
-          image={currentWorld.image?.url ? { url: currentWorld.image.url, alt: currentWorld.name } : undefined}
-          subtitle={currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined}
+          image={
+            currentWorld.image?.url
+              ? { url: currentWorld.image.url, alt: currentWorld.name }
+              : undefined
+          }
+          subtitle={
+            currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
+          }
           height=""
           titleElement="h2"
         />
       )}
 
       {mounted && currentWorld && (
-        <div >
+        <div>
           <CharacterViewToggle
             mode={viewMode}
             onModeChange={handleViewModeChange}
@@ -542,14 +562,16 @@ export default function CharactersPage() {
         </div>
       )}
 
-      <div >
+      <div>
         {!currentWorld || worldCharacters.length === 0 ? (
-          <div >
-            <h2 >No characters in {currentWorld?.name || 'this world'} yet</h2>
+          <div>
+            <h2>No characters in {currentWorld?.name || 'this world'} yet</h2>
             <ActionButtonGroup
               actions={[
                 {
-                  label: isGenerating ? generatingStatus || 'Generating...' : 'Generate Character',
+                  label: isGenerating
+                    ? generatingStatus || 'Generating...'
+                    : 'Generate Character',
                   onClick: handleGenerateCharacter,
                   variant: 'secondary',
                   disabled: isGenerating,
@@ -575,7 +597,7 @@ export default function CharactersPage() {
             onDelete={handleDeleteCharacter}
           />
         ) : (
-          <div >
+          <div>
             {(worldCharacters as Character[]).map((character) => (
               <CharacterCard
                 key={character.id}
@@ -628,7 +650,7 @@ export default function CharactersPage() {
         currentProgress={currentProgress}
       />
 
-      <div >
+      <div>
         {toasts.map((toast) => (
           <Toast
             key={toast.id}

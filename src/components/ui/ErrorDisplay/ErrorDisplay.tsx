@@ -65,7 +65,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'inline') {
     return (
-      <p 
+      <p
         className={cssClasses('', styles.message, className)}
         role="alert"
         aria-live="polite"
@@ -78,39 +78,25 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'page') {
     return (
-      <div 
+      <div
         className={cssClasses('', className)}
         role="alert"
         aria-live="polite"
       >
-        {title && (
-          <h1 className={cssClasses('', styles.title)}>
-            {title}
-          </h1>
-        )}
-        <p className={cssClasses('', styles.message)}>
-          {message}
-        </p>
+        {title && <h1 className={cssClasses('', styles.title)}>{title}</h1>}
+        <p className={cssClasses('', styles.message)}>{message}</p>
         {(showRetry || showDismiss) && (
-          <div >
+          <div>
             {showRetry && onRetry && (
               <button
                 onClick={onRetry}
-                className={cssClasses(
-                  '',
-                  styles.button
-                )}
+                className={cssClasses('', styles.button)}
               >
                 Try Again
               </button>
             )}
             {showDismiss && onDismiss && (
-              <button
-                onClick={onDismiss}
-                
-              >
-                Dismiss
-              </button>
+              <button onClick={onDismiss}>Dismiss</button>
             )}
           </div>
         )}
@@ -121,30 +107,18 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'toast') {
     return (
       <div
-        className={cssClasses(
-          '',
-          styles.container,
-          className
-        )}
+        className={cssClasses('', styles.container, className)}
         role="alert"
         aria-live="assertive"
       >
-        <div >
-          <div >
-            {title && (
-              <h3 className={cssClasses('', styles.title)}>
-                {title}
-              </h3>
-            )}
+        <div>
+          <div>
+            {title && <h3 className={cssClasses('', styles.title)}>{title}</h3>}
             <p className={cssClasses('', styles.message)}>{message}</p>
           </div>
           {showDismiss && onDismiss && (
-            <button
-              onClick={onDismiss}
-              
-              aria-label="Dismiss"
-            >
-              <X  aria-hidden="true" />
+            <button onClick={onDismiss} aria-label="Dismiss">
+              <X aria-hidden="true" />
             </button>
           )}
         </div>
@@ -155,40 +129,21 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cssClasses(
-        '',
-        styles.container,
-        className
-      )}
+      className={cssClasses('', styles.container, className)}
       role="alert"
       aria-live="polite"
     >
-      {title && (
-        <h2 className={cssClasses('', styles.title)}>
-          {title}
-        </h2>
-      )}
+      {title && <h2 className={cssClasses('', styles.title)}>{title}</h2>}
       <p className={styles.message}>{message}</p>
       {(showRetry || showDismiss) && (
-        <div >
+        <div>
           {showRetry && onRetry && (
-            <button
-              onClick={onRetry}
-              className={cssClasses(
-                '',
-                styles.button
-              )}
-            >
+            <button onClick={onRetry} className={cssClasses('', styles.button)}>
               Try Again
             </button>
           )}
           {showDismiss && onDismiss && (
-            <button
-              onClick={onDismiss}
-              
-            >
-              Dismiss
-            </button>
+            <button onClick={onDismiss}>Dismiss</button>
           )}
         </div>
       )}
@@ -197,18 +152,18 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 };
 
 // Preset components for common use cases
-export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="inline" {...props} />
-);
+export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="inline" {...props} />;
 
-export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="section" {...props} />
-);
+export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="section" {...props} />;
 
-export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="page" {...props} />
-);
+export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="page" {...props} />;
 
-export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="toast" {...props} />
-);
+export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="toast" {...props} />;

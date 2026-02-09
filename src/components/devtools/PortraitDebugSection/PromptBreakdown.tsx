@@ -195,7 +195,7 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
             <div>
               <span >Physical Description:</span>
-              <span >{physicalDescription ? `${physicalDescription.length}chars` : 'None'}</span>
+            <span >{physicalDescription ? `${physicalDescription.length} chars` : 'None'}</span>
             </div>
             <div>
               <span >Personality Length:</span>

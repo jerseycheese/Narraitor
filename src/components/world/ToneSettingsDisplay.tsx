@@ -6,14 +6,16 @@ import { ToneSettings } from '@/types/tone-settings.types';
 import {
   CONTENT_RATING_DESCRIPTIONS,
   NARRATIVE_STYLE_DESCRIPTIONS,
-  LANGUAGE_COMPLEXITY_DESCRIPTIONS
+  LANGUAGE_COMPLEXITY_DESCRIPTIONS,
 } from '@/types/tone-settings.types';
 
 interface ToneSettingsDisplayProps {
   toneSettings?: ToneSettings;
 }
 
-export function ToneSettingsDisplay({ toneSettings }: ToneSettingsDisplayProps) {
+export function ToneSettingsDisplay({
+  toneSettings,
+}: ToneSettingsDisplayProps) {
   if (!toneSettings) {
     return null;
   }
@@ -37,15 +39,14 @@ export function ToneSettingsDisplay({ toneSettings }: ToneSettingsDisplayProps) 
   };
 
   return (
-    <section  aria-labelledby="tone-settings-heading">
-      <h2 id="tone-settings-heading" >
-        Narrative tone settings
-      </h2>
-      <p >
-        These settings guide how AI-generated content will be written for this world.
+    <section aria-labelledby="tone-settings-heading">
+      <h2 id="tone-settings-heading">Narrative tone settings</h2>
+      <p>
+        These settings guide how AI-generated content will be written for this
+        world.
       </p>
 
-      <div >
+      <div>
         <DataField
           label="Content Rating"
           value={getContentRatingDisplay()}
