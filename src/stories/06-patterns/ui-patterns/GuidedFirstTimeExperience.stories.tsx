@@ -146,20 +146,11 @@ const GuidedFirstTimeExperienceDemo = () => {
           <div>
             {steps.map((step, index) => (
               <div key={step.id} >
-                <div
-                  className={`${
-                    index <= currentStep
-                      ? ''
-                      : ''
-                  }`}
-                >
+                <div>
                   {index + 1}
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`${
-                      index < currentStep ? '' : ''
-                    }`}
                   />
                 )}
               </div>

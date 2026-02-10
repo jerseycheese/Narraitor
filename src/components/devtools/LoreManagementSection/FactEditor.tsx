@@ -143,7 +143,6 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           value={key}
           onChange={(e) => setKey(e.target.value)}
           placeholder="e.g., hero_name"
-          className={errors.key ? '' : ''}
         />
         {errors.key && (
           <p>{errors.key}</p>
@@ -158,7 +157,6 @@ export const FactEditor: React.FC<FactEditorProps> = ({
           onChange={(e) => setValue(e.target.value)}
           placeholder="e.g., Lyra Starweaver"
           rows={2}
-          className={errors.value ? '' : ''}
         />
         {errors.value && (
           <p>{errors.value}</p>

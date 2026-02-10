@@ -8,10 +8,6 @@ export type LoadingTheme = 'light' | 'dark';
 interface LoadingStateProps {
   /** The variant of loading indicator to display */
   variant?: LoadingVariant;
-  /** Size of the loading indicator */
-  size?: LoadingSize;
-  /** Theme for text and elements (light or dark background) */
-  theme?: LoadingTheme;
   /** Optional message to display below the loading indicator */
   message?: string;
   /** Additional CSS classes */
@@ -26,54 +22,8 @@ interface LoadingStateProps {
   showAvatar?: boolean;
 }
 
-const sizeClasses = {
-  sm: {
-    spinner: '',
-    text: '',
-    skeleton: '',
-    dots: '',
-  },
-  md: {
-    spinner: '',
-    text: '',
-    skeleton: '',
-    dots: '',
-  },
-  lg: {
-    spinner: '',
-    text: '',
-    skeleton: '',
-    dots: '',
-  },
-  xl: {
-    spinner: '',
-    text: '',
-    skeleton: '',
-    dots: '',
-  },
-};
-
-const themeClasses = {
-  light: {
-    text: '',
-    skeleton: '',
-    spinnerTrack: '',
-    spinnerFill: '',
-    dots: '',
-  },
-  dark: {
-    text: '',
-    skeleton: '',
-    spinnerTrack: '',
-    spinnerFill: '',
-    dots: '',
-  },
-};
-
 export const LoadingState: React.FC<LoadingStateProps> = ({
   variant = 'spinner',
-  size = 'md',
-  theme = 'light',
   message,
   className,
   centered = true,

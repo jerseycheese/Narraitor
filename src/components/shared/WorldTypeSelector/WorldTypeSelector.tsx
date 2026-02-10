@@ -91,42 +91,11 @@ export function WorldTypeSelector({
     onChange({ ...value, additionalDetails });
   };
 
-  const sizeClasses = {
-    small: {
-      container: '',
-      conditionalTop: '',
-      radio: '',
-      title: '',
-      description: '',
-      input: '',
-      label: '',
-    },
-    medium: {
-      container: '',
-      conditionalTop: '',
-      radio: '',
-      title: '',
-      description: '',
-      input: '',
-      label: '',
-    },
-    large: {
-      container: '',
-      conditionalTop: '',
-      radio: '',
-      title: '',
-      description: '',
-      input: '',
-      label: '',
-    },
-  };
-
-  const styles = sizeClasses[size];
   return (
     <div className={`${className}`}>
       {/* World Type Selection */}
       {showLabels && (
-        <Label className={`${styles.label}`}>
+        <Label>
           World Type <span>*</span>
         </Label>
       )}
@@ -137,11 +106,11 @@ export function WorldTypeSelector({
         disabled={disabled}
       >
         {WORLD_TYPE_OPTIONS.map((option) => (
-          <label key={option.id} className={styles.radio}>
+          <label key={option.id}>
             <RadioGroupItem value={option.id} />
             <div>
-              <div className={`${styles.title}`}>{option.label}</div>
-              <div className={`${styles.description}`}>
+              <div>{option.label}</div>
+              <div>
                 {option.description}
               </div>
             </div>
@@ -151,16 +120,15 @@ export function WorldTypeSelector({
 
       {/* Conditional Fields */}
       {selectedOption?.requiresReference && (
-        <div className={`${styles.conditionalTop} ${styles.container}`}>
+        <div>
           {/* Existing Setting Field */}
           <div>
-            <Label htmlFor="world-reference" className={`${styles.label}`}>
+            <Label htmlFor="world-reference">
               {selectedOption.referenceLabel} <span>*</span>
             </Label>
             <Input
               id="world-reference"
               type="text"
-              className={`${styles.input}`}
               placeholder={selectedOption.referencePlaceholder}
               value={value.worldReference}
               onChange={(e) => handleReferenceChange(e.target.value)}
@@ -170,7 +138,7 @@ export function WorldTypeSelector({
 
           {/* Additional Details Field */}
           <div>
-            <Label htmlFor="additional-details" className={`${styles.label}`}>
+            <Label htmlFor="additional-details">
               {selectedOption.additionalDetailsLabel}{' '}
               {value.worldType === 'set_within' ? (
                 <span>(optional - will be inferred from your reference)</span>
@@ -181,7 +149,6 @@ export function WorldTypeSelector({
             <Textarea
               id="additional-details"
               rows={3}
-              className={`${styles.input}`}
               placeholder={selectedOption.additionalDetailsPlaceholder}
               value={value.additionalDetails}
               onChange={(e) => handleAdditionalDetailsChange(e.target.value)}

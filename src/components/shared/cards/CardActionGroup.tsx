@@ -66,60 +66,23 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   secondarySize,
   className = ''
 }) => {
-  const gapClasses = {
-    sm: '',
-    md: '',
-    lg: ''
-  };
-
-  const sizeClasses = {
-    sm: '',
-    md: '',
-    lg: ''
-  };
-
-  const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
-    // Determine which size to use
-    let buttonSize = size;
-    if (actionType === 'primary' && primarySize) {
-      buttonSize = primarySize;
-    } else if (actionType === 'secondary' && secondarySize) {
-      buttonSize = secondarySize;
-    }
-    
-    const baseClasses = `${sizeClasses[buttonSize]}`;
-    const flexClass = action.flex ? '' : '';
-    
-    let variantClasses = '';
-    switch (action.variant) {
-      case 'primary':
-        // Allow for custom primary colors via className
-        if (action.className?.includes('bg-')) {
-          variantClasses = action.className;
-        } else {
-          variantClasses = '';
-        }
-        break;
-      case 'success':
-        variantClasses = '';
-        break;
-      case 'danger':
-        variantClasses = '';
-        break;
-      case 'secondary':
-      default:
-        variantClasses = '';
-        break;
-    }
-
-    // If custom className includes bg-, ensure white text for primary buttons
-    if (action.variant === 'primary' && action.className?.includes('bg-')) {
-      return `${baseClasses}${flexClass}${action.className}`;
-    }
-
-    return `${baseClasses}${variantClasses}${flexClass}${action.className || ''}`;
-  };
-
+      const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
+      // Determine which size to use
+      let buttonSize = size;
+      if (actionType === 'primary' && primarySize) {
+        buttonSize = primarySize;
+      } else if (actionType === 'secondary' && secondarySize) {
+        buttonSize = secondarySize;
+      }
+      
+      let variantClasses = '';
+  
+      if (action.variant === 'primary' && action.className?.includes('bg-')) {
+        variantClasses = action.className;
+      }
+  
+      return `${variantClasses}${action.className || ''}`;
+    };
   const renderActions = (actions: CardAction[], actionType: 'primary' | 'secondary') => {
     return actions.map(action => (
       <button
@@ -138,17 +101,15 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
     ));
   };
 
-  const containerClasses = layout === 'vertical' ? '' : '';
-
   return (
     <div className={`${className}`}>
       {primaryActions.length > 0 && (
-        <div className={`${containerClasses} ${gapClasses[gap]}`}>
+        <div>
           {renderActions(primaryActions, 'primary')}
         </div>
       )}
       {secondaryActions.length > 0 && (
-        <div className={`${containerClasses} ${gapClasses[gap]}`}>
+        <div>
           {renderActions(secondaryActions, 'secondary')}
         </div>
       )}

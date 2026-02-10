@@ -17,8 +17,6 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
   pool,
   label = 'Point Pool',
 }) => {
-  const remainingColor = pool.remaining === 0 ? '' : '';
-
   const statusText =
     pool.remaining === 0
       ? 'All points allocated!'
@@ -26,10 +24,7 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
 
   return (
     <div
-      className={cssClasses(
-        'component-point-pool-display',
-        pool.remaining === 0 ? '' : ''
-      )}
+      className="component-point-pool-display"
       role="status"
       aria-live="polite"
       aria-atomic="true"
@@ -41,7 +36,7 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
             <span>
               Total: <span>{pool.total}</span>
             </span>
-            <span className={`${remainingColor}`}>
+            <span>
               Remaining: {pool.remaining}
             </span>
           </div>

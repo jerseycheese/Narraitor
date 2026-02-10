@@ -138,7 +138,6 @@ export const AIMockingSection: React.FC = () => {
           onClick={handleModeToggle}
           size="sm"
           variant={config.isEnabled ? 'default' : 'outline'}
-          className={config.isEnabled ? '' : ''}
           data-testid="mock-mode-toggle"
         >
           {config.isEnabled ? 'Disable Mock' : 'Enable Mock'}

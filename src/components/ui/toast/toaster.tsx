@@ -25,7 +25,7 @@ export interface ToastData {
  */
 export interface ToasterProps {
   /** Screen position where toasts should appear */
-  position?: '' | '' | '' | ''
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   /** Maximum number of toasts to display simultaneously */
   maxToasts?: number
 }
@@ -90,7 +90,7 @@ export function useToast() {
   }
 }
 
-export function Toaster({ position = '', maxToasts = 5 }: ToasterProps) {
+export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterProps) {
   const { toasts, removeToast } = useToast()
   const [container, setContainer] = useState<HTMLElement | null>(null)
 
@@ -108,10 +108,10 @@ export function Toaster({ position = '', maxToasts = 5 }: ToasterProps) {
   if (!container) return null
 
   const positionClasses = {
-    '': 'toast-top-left',
-    '': 'toast-top-right',
-    '': 'toast-bottom-left',
-    '': 'toast-bottom-right',
+    'top-left': 'toast-top-left',
+    'top-right': 'toast-top-right',
+    'bottom-left': 'toast-bottom-left',
+    'bottom-right': 'toast-bottom-right',
   }
 
   const visibleToasts = toasts.slice(-maxToasts)

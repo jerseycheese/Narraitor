@@ -111,9 +111,6 @@ export const DevToolsPanel = () => {
   return (
     <div 
       data-testid="devtools-panel-container"
-      className={`${
-        isOpen ? '' : ''
-      }`}
     >
       {/* Header with toggle button */}
       <div

@@ -130,7 +130,7 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
               <div>
                 {debugInfo.inventoryContext.map((item, idx) => (
                   <div key={idx} >
-                    <span className={item.isEquipped ? '' : ''}>
+                    <span>
                       {item.itemName}
                     </span>
                     {item.isEquipped && (

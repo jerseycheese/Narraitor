@@ -14,13 +14,6 @@ interface CharacterPortraitProps {
   onClick?: () => void;
 }
 
-const sizeClasses = {
-  small: '',
-  medium: '',
-  large: '',
-  xlarge: ''
-};
-
 export function CharacterPortrait({
   portrait,
   characterName,
@@ -56,25 +49,13 @@ export function CharacterPortrait({
       .toUpperCase();
   };
 
-  const containerClasses = cssClasses(
-    'component-character-portrait',
-    '',
-    sizeClasses[size],
-    onClick && '',
-    ''
-  );
+  const containerClasses = 'component-character-portrait';
 
   if (isGenerating) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
         <div>
-          <div className={cssClasses(
-            "",
-            size === 'small' && "",
-            size === 'medium' && "",
-            size === 'large' && "",
-            size === 'xlarge' && ""
-          )} role="status">
+          <div role="status">
             <span>Generating portrait...</span>
           </div>
         </div>
