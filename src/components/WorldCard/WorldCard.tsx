@@ -149,7 +149,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
       showActiveIndicator={isActive}
       testId="world-card"
       hasImage={true}
-      className={isSelected ? '' : undefined}
     >
       {/* Always show Hero component - with image or themed background */}
       <div className="group">
@@ -173,18 +172,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
               <Hero
                 title={world.name}
                 image={heroImage}
-                theme={
-                  (world.genre as
-                    | 'fantasy'
-                    | 'sci-fi'
-                    | 'modern'
-                    | 'historical'
-                    | 'horror'
-                    | 'mystery'
-                    | 'western'
-                    | 'cyberpunk'
-                    | 'other') || 'default'
-                }
                 badge={
                   world.genre && (
                     <span data-testid="world-card-genre">
