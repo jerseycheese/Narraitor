@@ -27,7 +27,7 @@ export function WorldInfoSection({ world }: WorldInfoSectionProps) {
         {world.relationship && (
           <DataField
             label="Relationship"
-            value={titleCase(world.relationship.replace(/_/g, ''))}
+            value={titleCase(world.relationship.replace(/_/g, ' '))}
             variant="outline"
           />
         )}

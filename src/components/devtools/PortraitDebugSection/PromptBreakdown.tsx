@@ -46,7 +46,7 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
   const physicalDescription = characterData?.background?.physicalDescription || '';
   
   // Break down the prompt into its components
-  const promptParts = prompt.split(',');
+  const promptParts = prompt.split(', ');
   
   return (
     <div>

@@ -102,7 +102,7 @@ export function RecentPagesDropdown({
    */
   const formatPageTitle = (entry: (typeof recentPages)[0]): string => {
     if (entry.title && entry.title !== 'Narraitor') {
-      return entry.title.replace('- Narraitor', '');
+      return entry.title.replace(' - Narraitor', '');
     }
 
     // Fallback to generating title from path
@@ -110,7 +110,7 @@ export function RecentPagesDropdown({
     if (segments.length === 0) return 'Home';
 
     const lastSegment = segments[segments.length - 1];
-    return capitalize(lastSegment.replace(/-/g, ''));
+    return capitalize(lastSegment.replace(/-/g, ' '));
   };
 
   /**
@@ -121,8 +121,8 @@ export function RecentPagesDropdown({
     if (segments.length === 0) return '/';
 
     return segments
-      .map((segment) => capitalize(segment.replace(/-/g, '')))
-      .join('›');
+      .map((segment) => capitalize(segment.replace(/-/g, ' ')))
+      .join(' › ');
   };
 
   /**

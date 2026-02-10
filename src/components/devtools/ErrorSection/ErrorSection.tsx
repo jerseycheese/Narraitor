@@ -171,9 +171,9 @@ export const ErrorSection = () => {
                   <Checkbox
                     checked={(filter.category || []).includes(category)}
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
-                    aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', '')} category errors`}
+                    aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')} category errors`}
                   />
-                  <span>{category.replace('_', '')}</span>
+                  <span>{category.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>

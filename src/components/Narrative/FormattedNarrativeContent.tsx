@@ -37,11 +37,11 @@ export const FormattedNarrativeContent: React.FC<
       { pattern: RegExp; key: string; length: number }
     >();
 
-          const addTerm = (term: string) => {
-          const cleaned = safeTrim(term);
-          if (!cleaned) {
-            return;
-          }
+    const addTerm = (term: string) => {
+      const cleaned = safeTrim(term).replace(/\s+/g, ' ');
+      if (!cleaned) {
+        return;
+      }
           const key = cleaned.toLowerCase();
           if (uniqueTerms.has(key)) {
             return;
