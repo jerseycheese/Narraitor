@@ -48,11 +48,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </div>
       )}
       <div>
-        <h3 className={cssClasses('', titleClasses)}>
+        <h3 className={titleClasses}>
           {title}
         </h3>
         {description && (
-          <p className={cssClasses('', descriptionClasses)}>
+          <p className={descriptionClasses}>
             {description}
           </p>
         )}

@@ -13,7 +13,7 @@ const Table = React.forwardRef<
   <div className="table-wrapper">
     <table
       ref={ref}
-      className={cssClasses('caption-bottom', className)}
+      className={className}
       {...props}
     />
   </div>
@@ -24,7 +24,7 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cssClasses('', className)} {...props} />
+  <thead ref={ref} className={className} {...props} />
 ));
 TableHeader.displayName = 'TableHeader';
 
@@ -34,7 +34,7 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cssClasses('', className)}
+    className={className}
     {...props}
   />
 ));
@@ -46,10 +46,7 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
-    className={cssClasses(
-      '',
-      className
-    )}
+    className={className}
     {...props}
   />
 ));
@@ -61,12 +58,7 @@ const TableRow = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tr
     ref={ref}
-    className={cssClasses(
-      '',
-      '',
-      '',
-      className
-    )}
+    className={className}
     {...props}
   />
 ));
@@ -78,10 +70,7 @@ const TableHead = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
-    className={cssClasses(
-      'align-middle',
-      className
-    )}
+    className={className}
     {...props}
   />
 ));
@@ -93,7 +82,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cssClasses('align-middle', className)}
+    className={className}
     {...props}
   />
 ));
@@ -105,7 +94,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cssClasses('', className)}
+    className={className}
     {...props}
   />
 ));

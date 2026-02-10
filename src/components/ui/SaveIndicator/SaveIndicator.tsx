@@ -45,7 +45,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle error state with ErrorDisplay component
   if (status === 'error') {
     return (
-      <div className={cssClasses('', className)}>
+      <div className={className}>
         <ErrorDisplay
           variant={compact ? 'inline' : 'section'}
           severity="error"
@@ -62,11 +62,9 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle saving state with LoadingState component
   if (status === 'saving') {
     return (
-      <div className={cssClasses('', className)}>
+      <div className={className}>
         <LoadingState
           variant="spinner"
-          size="sm"
-          theme="light"
           message={compact ? undefined : 'Saving...'}
           inline={true}
           centered={false}
@@ -78,7 +76,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
 
   // Handle idle/saved states
   return (
-    <div className={cssClasses('', className)}>
+    <div className={className}>
       <div>
         <CheckCircle aria-hidden="true" />
 

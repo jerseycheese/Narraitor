@@ -7,10 +7,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <select
-        className={cssClasses(
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          className
-        )}
+        className={className}
         ref={ref}
         {...props}
       >
@@ -37,7 +34,7 @@ const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <option
     ref={ref}
-    className={cssClasses("", className)}
+    className={className}
     {...props}
   >
     {children}
@@ -51,7 +48,7 @@ const SelectTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <Select
     ref={ref}
-    className={cssClasses("appearance-none", className)}
+    className={className}
     {...props}
   >
     {children}

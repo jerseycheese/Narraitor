@@ -43,7 +43,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'inline') {
     return (
       <p
-        className={cssClasses('', className)}
+        className={className}
         role="alert"
         aria-live="polite"
         {...(fieldName && { id: `${fieldName}-error` })}
@@ -56,7 +56,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'page') {
     return (
       <div
-        className={cssClasses('', className)}
+        className={className}
         role="alert"
         aria-live="polite"
       >
@@ -83,7 +83,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'toast') {
     return (
       <div
-        className={cssClasses('', className)}
+        className={className}
         role="alert"
         aria-live="assertive"
       >
@@ -105,7 +105,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cssClasses('', className)}
+      className={className}
       role="alert"
       aria-live="polite"
     >

@@ -48,10 +48,7 @@ const TabsList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props 
 }) => (
   <div
-    className={cssClasses(
-      "",
-      className
-    )}
+    className={className}
     {...props}
   >
     {children}
@@ -75,10 +72,7 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({
   
   return (
     <button
-      className={cssClasses(
-        "",
-        className
-      )}
+      className={className}
       onClick={() => context.onValueChange(value)}
       {...props}
     >
@@ -104,10 +98,7 @@ const TabsContent: React.FC<TabsContentProps> = ({
   
   return (
     <div
-      className={cssClasses(
-        "",
-        className
-      )}
+      className={className}
       {...props}
     >
       {children}

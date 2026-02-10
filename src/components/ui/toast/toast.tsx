@@ -93,7 +93,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
     return (
       <div
         ref={ref}
-        className={cssClasses('', '', className)}
+        className={className}
         style={variantConfig.style}
         role="alert"
         aria-live="polite"
