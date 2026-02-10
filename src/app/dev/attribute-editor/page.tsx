@@ -102,7 +102,6 @@ export default function AttributeEditorTestPage() {
       <div>
         <button
           onClick={() => setShowCreateModal(true)}
-          
         >
           Create New Attribute
         </button>
@@ -113,7 +112,6 @@ export default function AttributeEditorTestPage() {
         {attributes.map((attribute) => (
           <div
             key={attribute.id}
-            
           >
             <div>
               <div>
@@ -139,7 +137,6 @@ export default function AttributeEditorTestPage() {
               <div>
                 <button
                   onClick={() => setEditingAttribute(attribute.id)}
-                  
                 >
                   Edit
                 </button>
@@ -149,7 +146,6 @@ export default function AttributeEditorTestPage() {
                       handleDeleteAttribute(attribute.id);
                     }
                   }}
-                  
                 >
                   Delete
                 </button>
@@ -165,7 +161,6 @@ export default function AttributeEditorTestPage() {
         onClose={() => setShowCreateModal(false)}
         title="Create Attribute"
         size="xl"
-        
       >
         <div>
           Create a new custom attribute for this test world.
@@ -186,7 +181,6 @@ export default function AttributeEditorTestPage() {
         onClose={() => setEditingAttribute(null)}
         title="Edit Attribute"
         size="xl"
-        
       >
         <div>
           Modify the details of this test attribute.
