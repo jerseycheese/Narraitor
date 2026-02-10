@@ -125,7 +125,6 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : (
                         <div
-                          className={canSort ? '' : ''}
                           onClick={
                             canSort
                               ? header.column.getToggleSortingHandler()

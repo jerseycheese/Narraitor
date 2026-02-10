@@ -63,7 +63,7 @@ export function Breadcrumbs({
   };
 
   return (
-    <nav aria-label="Breadcrumb" className={cssClasses('', className)}>
+    <nav aria-label="Breadcrumb">
       {showEllipsis && (
         <>
           <span data-testid="breadcrumb-ellipsis">...</span>
@@ -95,7 +95,6 @@ export function Breadcrumbs({
               onClick={(e) => handleClick(e, segment)}
               data-testid={testId}
               aria-current={segment.isCurrentPage ? 'page' : undefined}
-              className={cssClasses('', segment.isCurrentPage ? '' : '')}
             >
               {getSegmentIcon(segment)}
               {segment.label}

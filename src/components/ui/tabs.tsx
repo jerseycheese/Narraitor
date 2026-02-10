@@ -77,7 +77,6 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({
     <button
       className={cssClasses(
         "",
-        isActive ? "" : "",
         className
       )}
       onClick={() => context.onValueChange(value)}

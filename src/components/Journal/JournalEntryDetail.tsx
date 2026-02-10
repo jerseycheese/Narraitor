@@ -59,7 +59,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
           >
             {capitalize(entry.significance)}
           </Badge>
-          <span className={isSystemEvent ? '' : ''}>
+          <span>
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>
           {!entry.isRead && (

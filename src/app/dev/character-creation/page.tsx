@@ -123,21 +123,11 @@ export default function CharacterCreationTestPage() {
               <div>
                 <button
                   onClick={() => handleWorldChange('fantasy')}
-                  className={`${
-                    selectedWorld === 'fantasy'
-                      ? ''
-                      : ''
-                  }`}
                 >
                   Fantasy World (6 attributes, 8 skills)
                 </button>
                 <button
                   onClick={() => handleWorldChange('western')}
-                  className={`${
-                    selectedWorld === 'western'
-                      ? ''
-                      : ''
-                  }`}
                 >
                   Western World (5 attributes, 5 skills)
                 </button>

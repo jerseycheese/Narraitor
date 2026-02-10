@@ -81,23 +81,13 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   skeletonLines = 3,
   showAvatar = false,
 }) => {
-  const containerClasses = cssClasses(
-    inline ? '' : '',
-    centered && !inline && '',
-    className
-  );
+  const containerClasses = className || '';
 
   const renderLoadingIndicator = () => {
     switch (variant) {
       case 'spinner':
         return (
           <svg
-            className={cssClasses(
-              '',
-              sizeClasses[size].spinner,
-              themeClasses[theme].spinnerTrack,
-              themeClasses[theme].spinnerFill
-            )}
             role="status"
             viewBox="0 0 100 101"
             fill="none"
@@ -120,46 +110,26 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           <div role="status" aria-label="Loading">
             {showAvatar && (
               <div>
-                <div className={cssClasses('', themeClasses[theme].skeleton)} />
+                <div />
                 <div>
-                  <div
-                    className={cssClasses('', themeClasses[theme].skeleton)}
-                  />
-                  <div
-                    className={cssClasses('', themeClasses[theme].skeleton)}
-                  />
+                  <div />
+                  <div />
                 </div>
               </div>
             )}
             {Array.from({ length: skeletonLines }).map((_, i) => (
-              <div
-                key={i}
-                className={cssClasses(
-                  '',
-                  themeClasses[theme].skeleton,
-                  sizeClasses[size].skeleton,
-                  i === skeletonLines - 1 ? '' : ''
-                )}
-              />
+              <div key={i} />
             ))}
           </div>
         );
 
       case 'dots':
         return (
-          <div
-            className={cssClasses('', themeClasses[theme].dots)}
-            role="status"
-            aria-label="Loading"
-          >
+          <div role="status" aria-label="Loading">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className={cssClasses(
-                  '',
-                  sizeClasses[size].dots,
-                  `[animation-delay:${i * 150}ms]`
-                )}
+                style={{ animationDelay: `${i * 150}ms` }}
               />
             ))}
             <span>Loading...</span>
@@ -171,18 +141,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           <div role="status" aria-label="Loading">
             <div>
               {Array.from({ length: skeletonLines }).map((_, i) => (
-                <div
-                  key={i}
-                  className={cssClasses(
-                    '',
-                    themeClasses[theme].skeleton,
-                    sizeClasses[size].skeleton,
-                    i === 0 && '',
-                    i === 1 && '',
-                    i === 2 && '',
-                    i > 2 && ''
-                  )}
-                />
+                <div key={i} />
               ))}
             </div>
           </div>
@@ -197,13 +156,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     <div className={containerClasses}>
       {renderLoadingIndicator()}
       {message && (
-        <p
-          className={cssClasses(
-            themeClasses[theme].text,
-            sizeClasses[size].text
-          )}
-          aria-live="polite"
-        >
+        <p aria-live="polite">
           {message}
         </p>
       )}
