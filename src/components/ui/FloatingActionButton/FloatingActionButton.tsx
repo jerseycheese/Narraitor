@@ -8,31 +8,9 @@ export interface FloatingActionButtonProps {
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  variant?: 'primary' | 'secondary' | 'amber';
-  size?: 'sm' | 'md' | 'lg';
   className?: string;
   dataTutorialId?: string;
 }
-
-const positionClasses = {
-  'top-left': 'fab-top-left',
-  'top-right': 'fab-top-right',
-  'bottom-left': 'fab-bottom-left',
-  'bottom-right': 'fab-bottom-right',
-};
-
-const sizeClasses = {
-  sm: 'fab-sm',
-  md: 'fab-md',
-  lg: 'fab-lg',
-};
-
-const variantClasses = {
-  primary: 'fab-primary',
-  secondary: 'fab-secondary',
-  amber: 'fab-amber',
-};
 
 /**
  * Reusable floating action button component
@@ -42,9 +20,6 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
   icon,
   label,
-  position = 'bottom-right',
-  variant = 'primary',
-  size = 'lg',
   className,
   dataTutorialId,
 }) => {
@@ -56,9 +31,6 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       data-tutorial={dataTutorialId}
       className={cssClasses(
         'component-floating-action-button',
-        positionClasses[position],
-        sizeClasses[size],
-        variantClasses[variant],
         className
       )}
     >

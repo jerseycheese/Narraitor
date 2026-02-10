@@ -24,8 +24,6 @@ export interface ToastData {
  * Props for the Toaster component
  */
 export interface ToasterProps {
-  /** Screen position where toasts should appear */
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   /** Maximum number of toasts to display simultaneously */
   maxToasts?: number
 }
@@ -90,7 +88,7 @@ export function useToast() {
   }
 }
 
-export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterProps) {
+export function Toaster({ maxToasts = 5 }: ToasterProps) {
   const { toasts, removeToast } = useToast()
   const [container, setContainer] = useState<HTMLElement | null>(null)
 
@@ -107,19 +105,10 @@ export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterPro
 
   if (!container) return null
 
-  const positionClasses = {
-    'top-left': 'toast-top-left',
-    'top-right': 'toast-top-right',
-    'bottom-left': 'toast-bottom-left',
-    'bottom-right': 'toast-bottom-right',
-  }
-
   const visibleToasts = toasts.slice(-maxToasts)
 
   return createPortal(
-    <div
-      className={`${positionClasses[position]}`}
-    >
+    <div>
       {visibleToasts.map((toast) => (
         <div key={toast.id} >
           <Toast

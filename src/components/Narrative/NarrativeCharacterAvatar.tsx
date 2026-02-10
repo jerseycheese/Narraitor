@@ -8,11 +8,6 @@ interface NarrativeCharacterAvatarProps {
   className?: string;
 }
 
-const sizeClassMap = {
-  sm: '',
-  md: ''
-} as const;
-
 const getInitials = (name: string): string => {
   const sanitized = name
     .replace(/['"][^'"]+['"]/g, '')
@@ -43,14 +38,12 @@ export function NarrativeCharacterAvatar({
   className
 }: NarrativeCharacterAvatarProps) {
   const initials = React.useMemo(() => getInitials(name), [name]);
-  const dimensionClasses = sizeClassMap[size];
 
   if (avatarUrl) {
     return (
       <div
         className={cssClasses(
           '',
-          dimensionClasses,
           className
         )}
       >
@@ -71,7 +64,6 @@ export function NarrativeCharacterAvatar({
     <div
       className={cssClasses(
         '',
-        dimensionClasses,
         className
       )}
       role="img"
