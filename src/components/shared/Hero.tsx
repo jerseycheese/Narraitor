@@ -13,16 +13,10 @@ interface HeroProps {
   subtitle?: string;
   /** Optional badge content to display */
   badge?: React.ReactNode;
-  /** Height class for the hero section */
-  height?: string;
   /** Optional test ID for the title */
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  /** Background color theme when no image is provided - uses genre values */
-  theme?: 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other' | 'default';
-  /** Border radius style - 'all' for all corners, 'top' for top only, 'none' for no radius */
-  borderRadius?: 'all' | 'top' | 'none';
   /** Optional actions to render anchored at bottom-right of the hero */
   actions?: React.ReactNode;
 }
@@ -39,7 +33,6 @@ interface HeroProps {
  * - Themed background colors for different genres
  * - Gradient overlay for text readability
  * - Optional subtitle and badge support
- * - Configurable height
  *
  * @param props - Hero configuration
  * @returns A hero section with overlaid content
@@ -49,15 +42,12 @@ interface HeroProps {
  *   title="My World"
  *   image={{ url: "/world-image.jpg", alt: "My World" }}
  *   subtitle="Fantasy Adventure"
- *   height=""
  * />
  *
  * @example With themed background (no image)
  * <Hero
  *   title="Fantasy World"
  *   subtitle="A magical realm"
- *   theme="fantasy"
- *   height=""
  * />
  */
 export const Hero: React.FC<HeroProps> = ({
@@ -65,56 +55,12 @@ export const Hero: React.FC<HeroProps> = ({
   image,
   subtitle,
   badge,
-  height = '',
   titleTestId,
   titleElement: TitleElement = 'h1',
-  theme = 'default',
-  borderRadius = 'all',
   actions,
 }) => {
-  // Genre-based background gradients using design system colors only
-  const getThemeBackground = (theme: string) => {
-    switch (theme) {
-      case 'fantasy':
-        return '';
-      case 'sci-fi':
-      case 'cyberpunk':
-        return '';
-      case 'western':
-        return '';
-      case 'modern':
-      case 'historical':
-        return '';
-      case 'horror':
-        return '';
-      case 'mystery':
-        return '';
-      case 'other':
-        return '';
-      default:
-        return '';
-    }
-  };
-
-  // Get border radius classes based on borderRadius prop
-  const getBorderRadiusClass = (borderRadius: string) => {
-    switch (borderRadius) {
-      case 'top':
-        return '';
-      case 'none':
-        return '';
-      case 'all':
-      default:
-        return '';
-    }
-  };
-
   return (
-    <div
-      className={`${height} ${getBorderRadiusClass(borderRadius)} ${
-        image ? '' : getThemeBackground(theme)
-      }`}
-    >
+    <div>
       {image && (
         <Image
           src={image.url}
@@ -129,11 +75,7 @@ export const Hero: React.FC<HeroProps> = ({
 
       {/* Title overlay with gradient background */}
       <div>
-        <div className={`${
-          image 
-            ? '' 
-            : ''
-        }`}>
+        <div>
           <TitleElement
             
             data-testid={titleTestId}

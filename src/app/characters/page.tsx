@@ -547,7 +547,6 @@ export default function CharactersPage() {
           subtitle={
             currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
           }
-          height=""
           titleElement="h2"
         />
       )}

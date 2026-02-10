@@ -180,8 +180,6 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             isActive={selectedArchetype === archetype.id}
             activeText="Selected Character"
             onClick={() => handleArchetypeSelect(archetype)}
-            activeClassName=""
-            inactiveClassName=""
             testId="archetype-card"
           >
             <CardHeader>

@@ -277,20 +277,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                   }
                 : undefined
             }
-            theme={
-              (world.genre as
-                | 'fantasy'
-                | 'sci-fi'
-                | 'modern'
-                | 'historical'
-                | 'horror'
-                | 'mystery'
-                | 'western'
-                | 'cyberpunk'
-                | 'other') || 'default'
-            }
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height=""
             titleElement="h1"
           />
         </div>

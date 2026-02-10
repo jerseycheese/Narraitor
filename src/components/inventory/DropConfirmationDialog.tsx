@@ -59,7 +59,6 @@ export function DropConfirmationDialog({
           </Button>
         </div>
       }
-      footerClassName=""
     >
       <div>
         <p>

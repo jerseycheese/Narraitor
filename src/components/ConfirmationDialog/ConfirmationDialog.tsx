@@ -95,7 +95,6 @@ export function ConfirmationDialog({
           </Button>
         </div>
       )}
-      footerClassName=""
     />
   );
 }

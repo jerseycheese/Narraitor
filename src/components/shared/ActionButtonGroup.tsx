@@ -30,17 +30,6 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
     }
   };
 
-  // Get custom styling for legacy variants using semantic tokens
-  // Now aligned with our design token system via CSS variables
-  const getCustomStyling = (variant: string | undefined) => {
-    switch (variant) {
-      case 'primary': return '';
-      case 'secondary': return '';
-      case 'success': return ''; // Keep success as design system color
-      default: return '';
-    }
-  };
-
   return (
     <div className={`${className}`}>
       {actions.map((action, index) => (
@@ -50,7 +39,6 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
           variant={mapVariant(action.variant)}
           size={action.size || 'default'}
           disabled={action.disabled}
-          className={`${getCustomStyling(action.variant)}`}
           data-tutorial={action.dataTutorial}
         >
           {action.icon}

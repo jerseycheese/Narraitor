@@ -109,7 +109,6 @@ export default function WorldViewPage() {
           } : undefined}
           subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
           theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
-          height=""
         />
       </div>
 

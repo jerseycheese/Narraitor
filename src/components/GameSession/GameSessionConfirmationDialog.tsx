@@ -77,7 +77,6 @@ export function GameSessionConfirmationDialog({
           </Button>
         </div>
       }
-      footerClassName=""
     />
   );
 }

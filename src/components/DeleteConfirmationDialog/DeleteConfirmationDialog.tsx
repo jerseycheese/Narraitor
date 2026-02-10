@@ -57,7 +57,6 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           </Button>
         </div>
       )}
-      footerClassName=""
     >
       <p>{itemName}</p>
     </SimpleModal>

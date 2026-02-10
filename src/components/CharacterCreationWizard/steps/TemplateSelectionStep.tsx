@@ -171,8 +171,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
             isActive={selectedTemplateId === template.id}
             activeText="Selected Template"
             onClick={() => handleTemplateSelect(template)}
-            activeClassName=""
-            inactiveClassName=""
             testId="template-card"
           >
             <CardHeader>

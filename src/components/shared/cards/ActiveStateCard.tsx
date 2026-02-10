@@ -41,8 +41,6 @@ export interface ActiveStateCardProps {
  * @example With custom styling
  * <ActiveStateCard 
  *   isActive={isActive}
- *   activeClassName=""
- *   inactiveClassName=""
  *   showActiveIndicator={false}
  * >
  *   <CardContent />
@@ -54,16 +52,14 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   activeIcon,
   onClick,
   className = '',
-  activeClassName = '',
-  inactiveClassName = '',
+  activeClassName,
+  inactiveClassName,
   showActiveIndicator = true,
   children,
   testId = 'active-state-card',
   hasImage = false
 }) => {
-  const baseClasses = '';
-  const cursorClass = onClick ? '' : '';
-  const stateClasses = isActive ? activeClassName : inactiveClassName;
+  const stateClasses = isActive ? (activeClassName || '') : (inactiveClassName || '');
 
   // Extract the image and content
   const childrenArray = React.Children.toArray(children);
@@ -74,7 +70,7 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
     <article
       data-testid={testId}
       onClick={onClick}
-      className={`${baseClasses} ${cursorClass} ${stateClasses} ${className}`}
+      className={`${stateClasses} ${className}`}
     >
       {/* Image section with overlay if present */}
       {hasImage ? (

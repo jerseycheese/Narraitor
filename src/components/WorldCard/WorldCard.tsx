@@ -192,10 +192,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     </span>
                   )
                 }
-                height=""
                 titleTestId="world-card-name"
                 titleElement="h2"
-                borderRadius="top"
               />
             );
           })()}

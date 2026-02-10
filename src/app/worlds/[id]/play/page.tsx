@@ -87,9 +87,7 @@ export default function PlayPage() {
               url: world.image.url,
               alt: `${world.name} world`
             } : undefined}
-            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height=""
             titleElement="h1"
             actions={
               // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)

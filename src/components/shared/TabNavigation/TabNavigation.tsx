@@ -52,22 +52,6 @@ export function TabNavigation<T = string>({
             aria-selected={isActive}
             variant="ghost"
             size="sm"
-            className={[
-              size === 'sm' ? '' : '',
-              size === 'sm' ? '' : '',
-              '',
-              '',
-              '',
-              '',
-              '',
-              '',
-              '',
-              mobileLayout === 'scroll' ? '' : '',
-              isActive
-                ? ''
-                : '',
-              isDisabled ? '' : '',
-            ].join(' ')}
           >
             {option.label}
           </Button>
