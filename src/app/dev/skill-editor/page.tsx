@@ -78,7 +78,7 @@ export default function SkillEditorTestPage() {
   const [activityLog, setActivityLog] = useState<string[]>([]);
 
   const logActivity = (message: string) => {
-    setActivityLog(prev => [`[${formatTime(new Date())}] ${message}`, ...prev.slice(0, 9)]);
+    setActivityLog(prev => [`[${formatTime(new Date())}]${message}`, ...prev.slice(0, 9)]);
   };
 
   const handleSaveSkill = (skill: WorldSkill) => {
@@ -114,27 +114,26 @@ export default function SkillEditorTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">SkillEditor Test Harness</h1>
-          <p className="text-gray-700 mt-2">
+    <div>
+      <div>
+        <div>
+          <h1>SkillEditor Test Harness</h1>
+          <p>
             Test the SkillEditor component with realistic data and interactions.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div>
           {/* Main Editor Panel */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">
+          <div>
+            <div>
+              <div>
+                <h2>
                   {editingSkill ? 'Edit Skill' : showCreateDialog ? 'Create New Skill' : 'Skill Management'}
                 </h2>
                 {!editingSkill && !showCreateDialog && (
                   <button
                     onClick={() => setShowCreateDialog(true)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                   >
                     Create New Skill
                   </button>
@@ -154,29 +153,28 @@ export default function SkillEditorTestPage() {
                   onCancel={handleCancel}
                 />
               ) : (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Existing Skills ({skills.length}/12)</h3>
+                <div>
+                  <h3>Existing Skills ({skills.length}/12)</h3>
                   {skills.length === 0 ? (
-                    <p className="text-gray-500 italic">No skills created yet.</p>
+                    <p>No skills created yet.</p>
                   ) : (
-                    <div className="space-y-3">
+                    <div>
                       {skills.map(skill => (
                         <div
                           key={skill.id}
-                          className="border rounded-lg p-4 hover:bg-gray-100"
+                          
                         >
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-900">{skill.name}</h4>
-                              <p className="text-sm text-gray-700 mt-1">{skill.description}</p>
-                              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div>
+                            <div>
+                              <h4>{skill.name}</h4>
+                              <p>{skill.description}</p>
+                              <div>
                                 <span>Linked Attributes: {getLinkedAttributeNames(skill.attributeIds) || 'None'}</span>
                                 <span>Difficulty: {skill.difficulty}</span>
                               </div>
                             </div>
                             <button
                               onClick={() => setEditingSkill(skill.id)}
-                              className="text-link-primary text-sm font-medium"
                             >
                               Edit
                             </button>
@@ -191,29 +189,29 @@ export default function SkillEditorTestPage() {
           </div>
 
           {/* Side Panel */}
-          <div className="space-y-6">
+          <div>
             {/* Available Attributes */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Available Attributes</h3>
-              <div className="space-y-2">
+            <div>
+              <h3>Available Attributes</h3>
+              <div>
                 {mockAttributes.map(attr => (
-                  <div key={attr.id} className="text-sm">
-                    <div className="font-medium">{attr.name}</div>
-                    <div className="text-gray-700 text-xs">{attr.description}</div>
+                  <div key={attr.id} >
+                    <div>{attr.name}</div>
+                    <div>{attr.description}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Activity Log */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Activity Log</h3>
-              <div className="space-y-1 text-sm">
+            <div>
+              <h3>Activity Log</h3>
+              <div>
                 {activityLog.length === 0 ? (
-                  <p className="text-gray-500 italic">No activity yet</p>
+                  <p>No activity yet</p>
                 ) : (
                   activityLog.map((entry, index) => (
-                    <div key={index} className="text-gray-700 font-mono text-xs">
+                    <div key={index} >
                       {entry}
                     </div>
                   ))
@@ -222,9 +220,9 @@ export default function SkillEditorTestPage() {
             </div>
 
             {/* Testing Scenarios */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Testing Scenarios</h3>
-              <div className="space-y-2 text-sm">
+            <div>
+              <h3>Testing Scenarios</h3>
+              <div>
                 <div>
                   <strong>1. Create Skills:</strong> Test creating skills with different attribute combinations
                 </div>
@@ -244,15 +242,14 @@ export default function SkillEditorTestPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-              <div className="space-y-2">
+            <div>
+              <h3>Quick Actions</h3>
+              <div>
                 <button
                   onClick={() => {
                     setSkills(initialSkills);
                     logActivity('Reset to initial skills');
                   }}
-                  className="w-full text-left text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
                 >
                   Reset Skills
                 </button>
@@ -261,7 +258,6 @@ export default function SkillEditorTestPage() {
                     setSkills([]);
                     logActivity('Cleared all skills');
                   }}
-                  className="w-full text-left text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
                 >
                   Clear All Skills
                 </button>
@@ -281,7 +277,6 @@ export default function SkillEditorTestPage() {
                     setSkills(prev => [...prev, ...manySkills]);
                     logActivity(`Generated ${manySkills.length} test skills`);
                   }}
-                  className="w-full text-left text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
                 >
                   Generate Test Skills
                 </button>

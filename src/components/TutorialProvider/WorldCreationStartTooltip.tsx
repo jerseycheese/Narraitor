@@ -64,7 +64,7 @@ export function WorldCreationStartTooltip({
       style={styles.tooltip}
       {...tooltipProps}
     >
-      <div style={styles.tooltipContainer} className="text-left">
+      <div style={styles.tooltipContainer} >
         {title && <h1 style={styles.tooltipTitle}>{title}</h1>}
         <div style={styles.tooltipContent}>{content}</div>
       </div>
@@ -78,7 +78,7 @@ export function WorldCreationStartTooltip({
                 type="button"
                 variant="link"
                 size="sm"
-                className={skipClassName ? `p-0 h-auto ${skipClassName}` : 'p-0 h-auto'}
+                className={skipClassName ? `${skipClassName}` : ''}
                 {...skipButtonProps}
               >
                 {skipLabel}
@@ -98,7 +98,7 @@ export function WorldCreationStartTooltip({
             </Button>
           )}
           
-          <div className="flex gap-2">
+          <div>
             {isEndOfPage && !isLastStep ? (
               <Button
                 data-test-id="button-pause"

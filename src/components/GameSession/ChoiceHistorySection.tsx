@@ -7,7 +7,10 @@ import { Card } from '@/components/ui/card';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { buildDecisionHistory } from '@/lib/narrative/decisionHistory';
 import { formatDateTime, formatRelativeTime, titleCase } from '@/lib/utils';
-import type { DecisionHistoryEntry, DecisionOutcome } from '@/types/narrative.types';
+import type {
+  DecisionHistoryEntry,
+  DecisionOutcome,
+} from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import type { EntityID } from '@/types/common.types';
 
@@ -27,7 +30,8 @@ const outcomeLabels: Record<DecisionOutcome, string> = {
 
 const resolveDate = (value?: Date | string): Date | null => {
   if (!value) return null;
-  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (value instanceof Date)
+    return Number.isNaN(value.getTime()) ? null : value;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
@@ -62,28 +66,43 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   initialCollapsed,
 }) => {
   const resolvedEntries = entries;
-  const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(new Set());
+  const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(
+    new Set()
+  );
 
   return (
-    <section className="mt-6" data-testid="choice-history-section" data-tutorial="choice-history-section">
-      <CollapsibleSection title="Choice History" initialCollapsed={initialCollapsed}>
+    <section
+      data-testid="choice-history-section"
+      data-tutorial="choice-history-section"
+    >
+      <CollapsibleSection
+        title="Choice History"
+        initialCollapsed={initialCollapsed}
+      >
         {resolvedEntries.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No recorded choices yet. Your decisions will appear here once you start choosing.
+          <p>
+            No recorded choices yet. Your decisions will appear here once you
+            start choosing.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div>
             {resolvedEntries.map((entry) => {
               const choiceText = getChoiceText(entry);
               const decisionPrompt = entry.decision.prompt.trim();
               const outcomeSegment = entry.outcomeSegment;
-              const outcomeText = outcomeSegment?.content || 'Impact unknown yet.';
+              const outcomeText =
+                outcomeSegment?.content || 'Impact unknown yet.';
               const outcomeLocation = outcomeSegment?.metadata?.location;
-              const decisionTime = resolveDate(entry.decision.selectedAt)
-                || resolveDate(outcomeSegment?.createdAt)
-                || resolveDate(outcomeSegment?.timestamp);
-              const timeLabel = decisionTime ? formatRelativeTime(decisionTime) : 'Time unknown';
-              const timeTitle = decisionTime ? formatDateTime(decisionTime) : undefined;
+              const decisionTime =
+                resolveDate(entry.decision.selectedAt) ||
+                resolveDate(outcomeSegment?.createdAt) ||
+                resolveDate(outcomeSegment?.timestamp);
+              const timeLabel = decisionTime
+                ? formatRelativeTime(decisionTime)
+                : 'Time unknown';
+              const timeTitle = decisionTime
+                ? formatDateTime(decisionTime)
+                : undefined;
               const decisionOutcome = outcomeSegment?.metadata?.decisionOutcome;
               const decisionWeight = entry.decision.decisionWeight;
               const hasDetails = Boolean(decisionPrompt);
@@ -93,18 +112,15 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
               return (
                 <Card
                   key={entry.decision.id}
-                  className="p-4 border border-amber-200 bg-white"
                   data-testid="choice-history-entry"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
                     <div>
-                      <p className="text-sm font-semibold text-amber-900">
-                        {choiceText}
-                      </p>
+                      <p>{choiceText}</p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div>
                       {decisionWeight && (
-                        <Badge variant="outline-static" size="sm">
+                        <Badge variant="outline" size="sm">
                           {titleCase(decisionWeight)} decision
                         </Badge>
                       )}
@@ -118,11 +134,12 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="text-xs text-amber-700"
                           aria-expanded={isExpanded}
                           aria-controls={detailsId}
                           onClick={() => {
-                            setExpandedEntries((previous) => buildExpandedSet(previous, entry.decision.id));
+                            setExpandedEntries((previous) =>
+                              buildExpandedSet(previous, entry.decision.id)
+                            );
                           }}
                         >
                           {isExpanded ? 'Hide details' : 'Details'}
@@ -131,23 +148,17 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     </div>
                   </div>
                   {(decisionTime || outcomeLocation) && (
-                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500">
+                    <div>
                       {decisionTime && (
                         <span title={timeTitle}>When: {timeLabel}</span>
                       )}
-                      {outcomeLocation && (
-                        <span>Where: {outcomeLocation}</span>
-                      )}
+                      {outcomeLocation && <span>Where: {outcomeLocation}</span>}
                     </div>
                   )}
                   {hasDetails && isExpanded && (
-                    <p id={detailsId} className="mt-2 text-xs text-gray-600 whitespace-pre-wrap">
-                      {decisionPrompt}
-                    </p>
+                    <p id={detailsId}>{decisionPrompt}</p>
                   )}
-                  <p className={`mt-2 text-sm whitespace-pre-wrap ${outcomeSegment ? 'text-gray-700' : 'text-gray-500'}`}>
-                    {outcomeText}
-                  </p>
+                  <p>{outcomeText}</p>
                 </Card>
               );
             })}
@@ -181,7 +192,11 @@ const ChoiceHistoryFromStore: React.FC<ChoiceHistorySectionProps> = ({
   );
 
   const resolvedEntries = React.useMemo(
-    () => buildDecisionHistory({ decisions: sessionDecisions, segments: sessionSegments }),
+    () =>
+      buildDecisionHistory({
+        decisions: sessionDecisions,
+        segments: sessionSegments,
+      }),
     [sessionDecisions, sessionSegments]
   );
 
@@ -200,11 +215,17 @@ export const ChoiceHistorySection: React.FC<ChoiceHistorySectionProps> = ({
 }) => {
   if (entries) {
     return (
-      <ChoiceHistoryContent entries={entries} initialCollapsed={initialCollapsed} />
+      <ChoiceHistoryContent
+        entries={entries}
+        initialCollapsed={initialCollapsed}
+      />
     );
   }
 
   return (
-    <ChoiceHistoryFromStore sessionId={sessionId} initialCollapsed={initialCollapsed} />
+    <ChoiceHistoryFromStore
+      sessionId={sessionId}
+      initialCollapsed={initialCollapsed}
+    />
   );
 };

@@ -45,7 +45,7 @@ export default function LoreViewerTestPage() {
   
   // Don't render until we have a world
   if (!worldId) {
-    return <div className="p-8">Loading test world...</div>;
+    return <div>Loading test world...</div>;
   }
 
   const addSampleFacts = () => {
@@ -73,16 +73,7 @@ export default function LoreViewerTestPage() {
   const testStructuredExtraction = async () => {
     const beforeCount = getFacts({ worldId }).length;
     
-    const sampleNarrative = customNarrative || `
-      You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares.
-      A mysterious woman named Lady Seraphina approaches you with an urgent request.
-      She tells you about the Lost Temple of Aethon, hidden deep in the Whispering Woods.
-      The temple is said to contain the Crystal of Truth, a powerful artifact.
-      
-      Sir Gareth, the captain of the guard, warns you that the woods are dangerous.
-      Many adventurers have entered the Whispering Woods, but few have returned.
-      The local tavern, The Dragon's Rest, might have more information.
-    `;
+    const sampleNarrative = customNarrative || `You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares. A mysterious woman named Lady Seraphina approaches you with an urgent request. She tells you about the Lost Temple of Aethon, deep in the Whispering Woods. The temple is said to contain the Crystal of Truth, a powerful artifact. Sir Gareth, the captain of the guard, warns you that the woods are dangerous. Many adventurers have entered the Whispering Woods, but few have returned. The local tavern, The Dragon's Rest, might have more information.`;
     
     try {
       setExtractionResult('Extracting structured lore with AI...');
@@ -103,16 +94,7 @@ export default function LoreViewerTestPage() {
   const testErrorHandling = async () => {
     const beforeCount = getFacts({ worldId }).length;
 
-    const sampleNarrative = customNarrative || `
-      You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares.
-      A mysterious woman named Lady Seraphina approaches you with an urgent request.
-      She tells you about the Lost Temple of Aethon, hidden deep in the Whispering Woods.
-      The temple is said to contain the Crystal of Truth, a powerful artifact.
-
-      Sir Gareth, the captain of the guard, warns you that the woods are dangerous.
-      Many adventurers have entered the Whispering Woods, but few have returned.
-      The local tavern, The Dragon's Rest, might have more information.
-    `;
+    const sampleNarrative = customNarrative || `You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares. A mysterious woman named Lady Seraphina approaches you with an urgent request. She tells you about the Lost Temple of Aethon, deep in the Whispering Woods. The temple is said to contain the Crystal of Truth, a powerful artifact. Sir Gareth, the captain of the guard, warns you that the woods are dangerous. Many adventurers have entered the Whispering Woods, but few have returned. The local tavern, The Dragon's Rest, might have more information.`;
 
     setExtractionResult('Testing AI extraction with error handling...');
 
@@ -181,12 +163,7 @@ export default function LoreViewerTestPage() {
   };
 
   const testAliasExtraction = async () => {
-    const narrativeWithAliases = `
-      You encounter Lady Seraphina Moonwhisper in the market. The locals call her "Sera" or "The Mysterious Woman".
-      She's accompanied by Sir Gareth "The Iron", captain of the guard, who many simply call "Captain".
-      They speak of Goldenhaven (also known as "The Golden City" or "Haven") and its troubles.
-      The Dragon's Rest tavern, which locals affectionately call "The Dragon" or "Dragon's", is nearby.
-    `;
+    const narrativeWithAliases = `You encounter Lady Seraphina Moonwhisper in the market. The locals call her "Sera" or "The Mysterious Woman". She's accompanied by Sir Gareth "The Iron", captain of the guard, who many simply call "Captain". They speak of Goldenhaven (also known as "The Golden City" or "Haven") and its troubles. The Dragon's Rest tavern, which locals affectionately call "The Dragon" or "Dragon's", is nearby.`;
 
     setExtractionResult('Testing AI alias extraction...');
 
@@ -203,28 +180,25 @@ export default function LoreViewerTestPage() {
   };
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">Lore Viewer Test Harness</h1>
+    <div>
+      <h1>Lore Viewer Test Harness</h1>
       
-      <div className="mb-6 space-y-4">
-        <div className="flex flex-wrap gap-4">
+      <div>
+        <div>
           <button
             onClick={addSampleFacts}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
           >
             Add Sample Facts
           </button>
           
           <button
             onClick={testStructuredExtraction}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
           >
             Test AI Structured Extraction
           </button>
           
           <button
             onClick={testErrorHandling}
-            className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500"
           >
             Test Error Handling
           </button>
@@ -235,51 +209,45 @@ export default function LoreViewerTestPage() {
               setExtractionResult('All facts cleared from this world');
               setTimeout(() => setExtractionResult(''), 3000);
             }}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
           >
             Clear All Facts
           </button>
 
-          <label className="inline-flex items-center">
+          <label>
             <input
               type="checkbox"
               checked={showSessionOnly}
               onChange={(e) => setShowSessionOnly(e.target.checked)}
-              className="mr-2"
             />
             Show Session Facts Only
           </label>
         </div>
 
-        <div className="border-t pt-4 space-y-3">
-          <h3 className="font-semibold text-sm">Alias Testing:</h3>
-          <div className="flex flex-wrap gap-4">
+        <div>
+          <h3>Alias Testing:</h3>
+          <div>
             <button
               onClick={testAliasAddition}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
             >
               Test Alias Addition
             </button>
 
             <button
               onClick={testAliasExtraction}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
             >
               Test AI Alias Extraction
             </button>
           </div>
 
-          <div className="flex gap-2 items-center">
+          <div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or alias (e.g., 'Sera', 'Captain')..."
-              className="flex-1 px-3 py-2 border rounded text-sm"
             />
             <button
               onClick={testAliasSearch}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700"
             >
               Test Alias Search
             </button>
@@ -287,34 +255,33 @@ export default function LoreViewerTestPage() {
         </div>
         
         {extractionResult && (
-          <div className="p-3 bg-green-100 border border-green-300 rounded text-green-700">
+          <div>
             {extractionResult}
           </div>
         )}
         
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label>
             Custom Narrative Text (optional - leave empty to use sample)
           </label>
           <textarea
             value={customNarrative}
             onChange={(e) => setCustomNarrative(e.target.value)}
             placeholder="Enter narrative text to test fact extraction..."
-            className="w-full p-2 border rounded h-32 font-mono text-sm"
           />
         </div>
       </div>
       
-      <div className="border-2 border-gray-200 rounded-lg p-4">
+      <div>
         <LoreViewer 
           worldId={worldId} 
           sessionId={showSessionOnly ? sessionId : undefined}
         />
       </div>
       
-      <div className="mt-6 p-4 bg-gray-100 rounded">
-        <h2 className="font-bold mb-2">Test Instructions:</h2>
-        <ol className="list-decimal list-inside space-y-2">
+      <div>
+        <h2>Test Instructions:</h2>
+        <ol>
           <li><strong>Add Sample Facts:</strong> Manually adds predefined facts to test display</li>
           <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata</li>
           <li><strong>Test Error Handling:</strong> Demonstrates robust error handling when AI fails</li>
@@ -326,9 +293,9 @@ export default function LoreViewerTestPage() {
           <li><strong>Test Alias Search:</strong> Search for entities by their canonical name or any alias</li>
         </ol>
         
-        <div className="mt-4 p-3 bg-blue-50 rounded">
-          <h3 className="font-semibold text-sm mb-1">AI Structured Extraction:</h3>
-          <ul className="text-sm space-y-1">
+        <div>
+          <h3>AI Structured Extraction:</h3>
+          <ul>
             <li>• Extracts characters with roles, descriptions, and importance</li>
             <li>• Identifies locations with types and context</li>
             <li>• Detects aliases and alternative names for entities</li>
@@ -338,9 +305,9 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
 
-        <div className="mt-4 p-3 bg-purple-50 rounded">
-          <h3 className="font-semibold text-sm mb-1">Alias Management:</h3>
-          <ul className="text-sm space-y-1">
+        <div>
+          <h3>Alias Management:</h3>
+          <ul>
             <li>• Characters and locations can have multiple aliases</li>
             <li>• Search finds entities by canonical name or any alias</li>
             <li>• AI automatically detects aliases from narrative context</li>
@@ -349,9 +316,9 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
         
-        <div className="mt-4 p-3 bg-amber-50 rounded">
-          <h3 className="font-semibold text-sm mb-1">Production Behavior:</h3>
-          <ul className="text-sm space-y-1">
+        <div>
+          <h3>Production Behavior:</h3>
+          <ul>
             <li>• <strong>Primary:</strong> AI-powered structured extraction (production with API key)</li>
             <li>• <strong>Development:</strong> Mock structured extraction (intelligent patterns without API)</li>
             <li>• <strong>Error Handling:</strong> Graceful failure - no lore extraction rather than bad data</li>

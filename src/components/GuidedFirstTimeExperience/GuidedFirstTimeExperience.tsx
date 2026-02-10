@@ -6,10 +6,18 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
-import { validators, validateField } from '@/components/shared/wizard/utils/validation';
+import {
+  validators,
+  validateField,
+} from '@/components/shared/wizard/utils/validation';
 import { GENRES } from '@/lib/constants/genres';
 import type { GenreValue } from '@/types/genre.types';
-import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
+import {
+  WorldTypeSelector,
+  WorldTypeData,
+  convertToGenerationParams,
+  validateWorldTypeData,
+} from '@/components/shared/WorldTypeSelector';
 import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
@@ -30,13 +38,16 @@ interface OnboardingData {
   description?: string;
 }
 
-
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
-  const updateTutorialProgress = useSessionStore(state => state.updateTutorialProgress);
-  const completeTutorialPhase = useSessionStore(state => state.completeTutorialPhase);
+  const updateTutorialProgress = useSessionStore(
+    (state) => state.updateTutorialProgress
+  );
+  const completeTutorialPhase = useSessionStore(
+    (state) => state.completeTutorialPhase
+  );
   const { setCurrentWorld } = useWorldStore();
-  
+
   const [confirmationState, setConfirmationState] = useState<{
     isOpen: boolean;
     pendingData: WorldTypeData | null;
@@ -59,7 +70,9 @@ export function GuidedFirstTimeExperience() {
         const isSetWithin = data.worldTypeData.worldType === 'set_within';
         const isInspiredBy = data.worldTypeData.worldType === 'inspired_by';
         const isGenreOptional = isSetWithin || isInspiredBy;
-        const genreValidators = isGenreOptional ? [] : [(value: string) => validators.required(value, 'Genre')];
+        const genreValidators = isGenreOptional
+          ? []
+          : [(value: string) => validators.required(value, 'Genre')];
         const genreError = validateField(data.genre, genreValidators);
         const errors = [genreError].filter(Boolean) as string[];
         return {
@@ -73,49 +86,56 @@ export function GuidedFirstTimeExperience() {
   }, []);
 
   // Complete onboarding and create world
-  const handleComplete = useCallback(async (data: OnboardingData) => {
-    try {
-      // Get existing world names to avoid duplicates
-      const { worlds } = useWorldStore.getState();
-      const existingNames = Object.values(worlds).map(world => world.name);
+  const handleComplete = useCallback(
+    async (data: OnboardingData) => {
+      try {
+        // Get existing world names to avoid duplicates
+        const { worlds } = useWorldStore.getState();
+        const existingNames = Object.values(worlds).map((world) => world.name);
 
-      // Use the AI world generator to create a complete world from the concept
-      const { generateWorld } = await import('@/lib/generators/worldGenerator');
-      
-      // Use the abstracted conversion function
-      const { reference, relationship, additionalContext } = convertToGenerationParams(data.worldTypeData);
+        // Use the AI world generator to create a complete world from the concept
+        const { generateWorld } = await import(
+          '@/lib/generators/worldGenerator'
+        );
 
-      const generatedWorldData = await generateWorld({
-        method: 'ai',
-        reference,
-        relationship,
-        existingNames,
-        suggestedName: data.name?.trim() || undefined,
-        genre: data.genre || undefined,
-        additionalContext
-      });
+        // Use the abstracted conversion function
+        const { reference, relationship, additionalContext } =
+          convertToGenerationParams(data.worldTypeData);
 
-      const { worldId } = await worldCreationService.createWorldFromGeneration({
-        generatedData: generatedWorldData,
-        customizations: {
-          name: data.name,
+        const generatedWorldData = await generateWorld({
+          method: 'ai',
+          reference,
+          relationship,
+          existingNames,
+          suggestedName: data.name?.trim() || undefined,
           genre: data.genre || undefined,
-          description: data.description,
-        },
-      });
+          additionalContext,
+        });
 
-      setCurrentWorld(worldId);
-      
-      // Mark onboarding as completed
-      completeTutorialPhase('intro');
-      
-      // Navigate to character creation to continue the flow
-      router.push(`/characters/create?worldId=${worldId}`);
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      throw error; // Re-throw to let wizard handle it
-    }
-  }, [setCurrentWorld, completeTutorialPhase, router]);
+        const { worldId } =
+          await worldCreationService.createWorldFromGeneration({
+            generatedData: generatedWorldData,
+            customizations: {
+              name: data.name,
+              genre: data.genre || undefined,
+              description: data.description,
+            },
+          });
+
+        setCurrentWorld(worldId);
+
+        // Mark onboarding as completed
+        completeTutorialPhase('intro');
+
+        // Navigate to character creation to continue the flow
+        router.push(`/characters/create?worldId=${worldId}`);
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+        throw error; // Re-throw to let wizard handle it
+      }
+    },
+    [setCurrentWorld, completeTutorialPhase, router]
+  );
 
   // Handle skip
   const handleSkip = useCallback(() => {
@@ -126,14 +146,14 @@ export function GuidedFirstTimeExperience() {
   // Initialize wizard state
   const wizard = useWizardState({
     steps: GUIDED_STEPS,
-    initialData: { 
-      name: '', 
-      genre: 'fantasy', 
-      worldTypeData: { 
-        worldType: 'original', 
-        worldReference: '', 
-        additionalDetails: '' 
-      } 
+    initialData: {
+      name: '',
+      genre: 'fantasy',
+      worldTypeData: {
+        worldType: 'original',
+        worldReference: '',
+        additionalDetails: '',
+      },
     },
     onComplete: handleComplete,
     onCancel: handleSkip,
@@ -142,140 +162,150 @@ export function GuidedFirstTimeExperience() {
   });
 
   // Memoized render functions for performance
-  const renderWelcomeStep = useMemo(() => (
-    <div className="text-center space-y-6" data-testid="guided-experience-container">
-      <div className="max-w-md mx-auto">
-        <p className="text-lg text-muted-foreground mb-6">
-          Create a world and start a story
-        </p>
-      </div>
-      
-      {/* How it Works */}
-      <section className="max-w-2xl mx-auto space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" role="list" aria-label="Steps to get started">
-          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
-            {/* Background Icon */}
-            <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-            <div className="relative z-10">
-              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">1</div>
-              <h4 className="text-lg font-semibold mb-2">Build Your World</h4>
-              <p className="text-sm text-muted-foreground">
-                Create or generate unique worlds with custom rules and settings
-              </p>
-            </div>
-          </div>
-          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
-            {/* Background Icon */}
-            <Users className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-            <div className="relative z-10">
-              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">2</div>
-              <h4 className="text-lg font-semibold mb-2">Create Characters</h4>
-              <p className="text-sm text-muted-foreground">
-                Design or generate playable characters that fit your world
-              </p>
-            </div>
-          </div>
-          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
-            {/* Background Icon */}
-            <Play className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
-            <div className="relative z-10">
-              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">3</div>
-              <h4 className="text-lg font-semibold mb-2">Start Playing</h4>
-              <p className="text-sm text-muted-foreground">
-                Make choices and shape your story
-              </p>
-            </div>
-          </div>
+  const renderWelcomeStep = useMemo(
+    () => (
+      <div data-testid="guided-experience-container">
+        <div>
+          <p>Create a world and start a story</p>
         </div>
-      </section>
-    </div>
-  ), []);
 
-  const renderConceptStep = useMemo(() => (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-foreground mb-2">
-          World Concept
-        </h2>
-        <p className="text-muted-foreground">
-          Create an RPG in any fictional universe or original setting
-        </p>
+        {/* How it Works */}
+        <section>
+          <div role="list" aria-label="Steps to get started">
+            <div role="listitem">
+              {/* Background Icon */}
+              <Globe aria-hidden="true" />
+              <div>
+                <div aria-hidden="true">1</div>
+                <h4>Build Your World</h4>
+                <p>
+                  Create or generate unique worlds with custom rules and
+                  settings
+                </p>
+              </div>
+            </div>
+            <div role="listitem">
+              {/* Background Icon */}
+              <Users aria-hidden="true" />
+              <div>
+                <div aria-hidden="true">2</div>
+                <h4>Create Characters</h4>
+                <p>
+                  Design or generate playable characters that fit your world
+                </p>
+              </div>
+            </div>
+            <div role="listitem">
+              {/* Background Icon */}
+              <Play aria-hidden="true" />
+              <div>
+                <div aria-hidden="true">3</div>
+                <h4>Start Playing</h4>
+                <p>Make choices and shape your story</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-      
-      <WorldTypeSelector
-        value={wizard.state.data.worldTypeData}
-        onChange={(worldTypeData) => {
-          // Auto-set genre to empty for "Set Within" and "Inspired By" types (auto-detect)
-          const isSetWithin = worldTypeData.worldType === 'set_within';
-          const isInspiredBy = worldTypeData.worldType === 'inspired_by';
-          const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
-          
-          if (shouldAutoDetectGenre && wizard.state.data.genre) {
-            setConfirmationState({ isOpen: true, pendingData: worldTypeData });
-          } else {
-            wizard.handlers.updateData({ 
-              worldTypeData,
-              ...(shouldAutoDetectGenre && { genre: '' })
-            });
-          }
-        }}
-        size="medium"
-      />
+    ),
+    []
+  );
 
-      {/* Validation Errors */}
-      {wizard.stepValidation?.errors.length > 0 && (
-        <div className="space-y-1">
-          {wizard.stepValidation.errors.map((error, index) => (
-            <p key={index} className="text-sm text-destructive">{error}</p>
-          ))}
+  const renderConceptStep = useMemo(
+    () => (
+      <div>
+        <div>
+          <h2>World Concept</h2>
+          <p>Create an RPG in any fictional universe or original setting</p>
         </div>
-      )}
-    </div>
-  ), [wizard.state.data.worldTypeData, wizard.state.data.genre, wizard.stepValidation, wizard.handlers]);
+
+        <WorldTypeSelector
+          value={wizard.state.data.worldTypeData}
+          onChange={(worldTypeData) => {
+            // Auto-set genre to empty for "Set Within" and "Inspired By" types (auto-detect)
+            const isSetWithin = worldTypeData.worldType === 'set_within';
+            const isInspiredBy = worldTypeData.worldType === 'inspired_by';
+            const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
+
+            if (shouldAutoDetectGenre && wizard.state.data.genre) {
+              setConfirmationState({
+                isOpen: true,
+                pendingData: worldTypeData,
+              });
+            } else {
+              wizard.handlers.updateData({
+                worldTypeData,
+                ...(shouldAutoDetectGenre && { genre: '' }),
+              });
+            }
+          }}
+          size="medium"
+        />
+
+        {/* Validation Errors */}
+        {wizard.stepValidation?.errors.length > 0 && (
+          <div>
+            {wizard.stepValidation.errors.map((error, index) => (
+              <p key={index}>{error}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    ),
+    [
+      wizard.state.data.worldTypeData,
+      wizard.state.data.genre,
+      wizard.stepValidation,
+      wizard.handlers,
+    ]
+  );
 
   const renderDetailsStep = useMemo(() => {
-    const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
-    const isInspiredBy = wizard.state.data.worldTypeData.worldType === 'inspired_by';
+    const isSetWithin =
+      wizard.state.data.worldTypeData.worldType === 'set_within';
+    const isInspiredBy =
+      wizard.state.data.worldTypeData.worldType === 'inspired_by';
     const isGenreOptional = isSetWithin || isInspiredBy;
-    
+
     return (
-      <div className="max-w-md mx-auto space-y-6">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-foreground mb-2">
-            World Details
-          </h2>
-          <p className="text-muted-foreground">
-            {isGenreOptional 
-              ? "Give your world a name and optionally override the genre"
-              : "Give your world a name and genre"
-            }
+      <div>
+        <div>
+          <h2>World Details</h2>
+          <p>
+            {isGenreOptional
+              ? 'Give your world a name and optionally override the genre'
+              : 'Give your world a name and genre'}
           </p>
         </div>
-        
-        <div className="space-y-4">
+
+        <div>
           <div>
-            <Label htmlFor="world-name" className="mb-2">
-              World Name (optional)
-            </Label>
+            <Label htmlFor="world-name">World Name (optional)</Label>
             <Input
               id="world-name"
               type="text"
               placeholder="E.g., Neo-Tokyo..."
               value={wizard.state.data.name}
-              onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
+              onChange={(e) =>
+                wizard.handlers.updateData({ name: e.target.value })
+              }
             />
           </div>
-          
+
           {isGenreOptional ? (
             <div>
-              <Label htmlFor="world-genre" className="mb-2">
-                Genre <span className="text-muted-foreground text-xs">(optional - will be inferred from your reference)</span>
+              <Label htmlFor="world-genre">
+                Genre{' '}
+                <span>(optional - will be inferred from your reference)</span>
               </Label>
               <select
                 id="world-genre"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={wizard.state.data.genre}
-                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue })}
+                onChange={(e) =>
+                  wizard.handlers.updateData({
+                    genre: e.target.value as GenreValue,
+                  })
+                }
               >
                 <option value="">Auto-detect</option>
                 {GENRES.map((genre) => (
@@ -287,14 +317,17 @@ export function GuidedFirstTimeExperience() {
             </div>
           ) : (
             <div>
-              <Label htmlFor="world-genre" className="mb-2">
-                Genre <span className="text-destructive">*</span>
+              <Label htmlFor="world-genre">
+                Genre <span>*</span>
               </Label>
               <select
                 id="world-genre"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={wizard.state.data.genre}
-                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value as GenreValue | '' })}
+                onChange={(e) =>
+                  wizard.handlers.updateData({
+                    genre: e.target.value as GenreValue | '',
+                  })
+                }
               >
                 <option value="">Select a genre</option>
                 {GENRES.map((genre) => (
@@ -307,7 +340,7 @@ export function GuidedFirstTimeExperience() {
           )}
 
           {wizard.stepValidation?.errors.length > 0 && (
-            <div className="text-sm text-destructive">
+            <div>
               {wizard.stepValidation.errors.map((error, index) => (
                 <p key={index}>{error}</p>
               ))}
@@ -316,7 +349,13 @@ export function GuidedFirstTimeExperience() {
         </div>
       </div>
     );
-  }, [wizard.state.data.name, wizard.state.data.genre, wizard.state.data.worldTypeData.worldType, wizard.stepValidation, wizard.handlers]);
+  }, [
+    wizard.state.data.name,
+    wizard.state.data.genre,
+    wizard.state.data.worldTypeData.worldType,
+    wizard.stepValidation,
+    wizard.handlers,
+  ]);
 
   // Render current step
   const renderCurrentStep = useCallback(() => {
@@ -330,13 +369,18 @@ export function GuidedFirstTimeExperience() {
       default:
         return renderWelcomeStep;
     }
-  }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
+  }, [
+    wizard.currentStep,
+    renderWelcomeStep,
+    renderConceptStep,
+    renderDetailsStep,
+  ]);
 
   const handleConfirmGenreChange = useCallback(() => {
     if (confirmationState.pendingData) {
-      wizard.handlers.updateData({ 
+      wizard.handlers.updateData({
         worldTypeData: confirmationState.pendingData,
-        genre: '' 
+        genre: '',
       });
       setConfirmationState({ isOpen: false, pendingData: null });
     }
@@ -344,62 +388,58 @@ export function GuidedFirstTimeExperience() {
 
   return (
     <WizardContainer title="First time?">
-      <div className="space-y-8">
-        
+      <div>
         {renderCurrentStep()}
-        
-        <div className="flex justify-center items-center pt-6">
-          <div className="flex gap-3">
+
+        <div>
+          <div>
             {!wizard.isFirstStep && (
-              <Button
-                onClick={wizard.handlers.handleBack}
-                variant="outline"
-              >
+              <Button onClick={wizard.handlers.handleBack} variant="outline">
                 Back
               </Button>
             )}
-            
+
             {wizard.isLastStep ? (
               <Button
                 onClick={wizard.handlers.handleComplete}
-                disabled={!wizard.stepValidation?.valid || wizard.state.isProcessing}
+                disabled={
+                  !wizard.stepValidation?.valid || wizard.state.isProcessing
+                }
                 variant="success"
-                className="min-h-12 px-6"
               >
-                {wizard.state.isProcessing ? 'Creating world...' : 'Create world'}
+                {wizard.state.isProcessing
+                  ? 'Creating world...'
+                  : 'Create world'}
               </Button>
             ) : (
               <Button
                 onClick={wizard.handlers.handleNext}
                 disabled={!wizard.stepValidation?.valid}
-                className="min-h-12 px-6"
               >
                 Next
               </Button>
             )}
           </div>
         </div>
-        
+
         {/* Skip option */}
-        <div className="text-center">
-          <Button
-            onClick={wizard.handlers.handleCancel}
-            variant="link"
-            className="text-sm"
-          >
+        <div>
+          <Button onClick={wizard.handlers.handleCancel} variant="link">
             Skip for now
           </Button>
         </div>
-        
+
         {wizard.currentError && (
-          <div className="bg-destructive/10 border border-destructive rounded-md p-3">
-            <p className="text-sm text-destructive">{wizard.currentError}</p>
+          <div>
+            <p>{wizard.currentError}</p>
           </div>
         )}
 
         <ConfirmationDialog
           isOpen={confirmationState.isOpen}
-          onClose={() => setConfirmationState({ isOpen: false, pendingData: null })}
+          onClose={() =>
+            setConfirmationState({ isOpen: false, pendingData: null })
+          }
           onConfirm={handleConfirmGenreChange}
           title="Clear Genre?"
           message="Changing the world type will clear your selected genre, as it will be inferred from the reference. Do you want to continue?"

@@ -21,10 +21,10 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
   onPlayerTypeChange
 }) => {
   return (
-    <div className="component-basic-info-form space-y-4">
-      <div className="space-y-2">
+    <div className="component-basic-info-form">
+      <div>
         <Label htmlFor="character-name">
-          Character Name <span className="text-destructive">*</span>
+          Character Name <span>*</span>
         </Label>
         <Input
           id="character-name"
@@ -35,7 +35,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         />
       </div>
       
-      <div className="space-y-2">
+      <div>
         <Label htmlFor="character-level">
           Level
         </Label>
@@ -50,7 +50,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         </Select>
       </div>
       
-      <div className="space-y-2">
+      <div>
         <Label htmlFor="character-type">
           Character Type
         </Label>

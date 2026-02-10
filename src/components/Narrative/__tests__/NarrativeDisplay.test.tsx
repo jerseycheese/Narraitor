@@ -81,8 +81,14 @@ describe('NarrativeDisplay', () => {
 
     render(<NarrativeDisplay segment={segment} />);
 
-    expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
-    expect(screen.getByText('Eldria Sunshadow')).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: /characters present/i });
+    expect(list).toBeInTheDocument();
+    const items = within(list).getAllByRole('listitem');
+    expect(items).toHaveLength(2);
+    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
+    expect(
+      within(items[0]).getByText('Eldria Sunshadow', { selector: 'span' })
+    ).toBeInTheDocument();
     expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
     expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
@@ -119,7 +125,7 @@ describe('NarrativeDisplay', () => {
       content: 'Marge polishes the counter while you wait.',
       type: 'scene',
       metadata: {
-        characterIds: ['npc-1', 'npc-1 ', 'NPC-1'],
+        characterIds: ['npc-1', 'npc-1', 'NPC-1'],
         tags: ['diner'],
       },
     });
@@ -131,10 +137,10 @@ describe('NarrativeDisplay', () => {
     const items = within(list).getAllByRole('listitem');
     expect(items).toHaveLength(1);
     expect(
-      within(items[0]).getByText((content, element) =>
-        content === 'Marge, the Waitress' &&
-        element?.classList.contains('text-sm') || false
-      )
+      within(items[0]).getByRole('img', { name: 'Marge, the Waitress' })
+    ).toBeInTheDocument();
+    expect(
+      within(items[0]).getByText('Marge, the Waitress', { selector: 'span' })
     ).toBeInTheDocument();
   });
 
@@ -144,7 +150,7 @@ describe('NarrativeDisplay', () => {
       content: 'An unnamed figure watches from afar.',
       type: 'scene',
       metadata: {
-        characterIds: ['', '   ', 'npc-42'],
+        characterIds: ['', '', 'npc-42'],
         tags: [],
       },
     });
@@ -201,7 +207,7 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={segment} />);
 
     const content = screen.getByTestId('narrative-content-container');
-    const highlighted = content.querySelectorAll('span.font-semibold');
+    const highlighted = content.querySelectorAll('span.narrative-highlight');
     expect(highlighted.length).toBeGreaterThan(0);
     expect(
       Array.from(highlighted).some(

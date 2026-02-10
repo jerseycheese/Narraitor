@@ -947,13 +947,13 @@ export const TestDataGeneratorSection: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="font-bold text-sm">Test Data Generators</h3>
+    <div>
+      <h3>Test Data Generators</h3>
 
-      <div className="space-y-2">
+      <div>
         <Button
           onClick={handleGenerateWorld}
-          className="w-full"
+          
           size="sm"
           variant="info"
           title="Creates diverse AI worlds: 33% original, 33% set in existing universes, 34% based on existing universes"
@@ -963,7 +963,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         <Button
           onClick={handleGenerate5Worlds}
-          className="w-full"
+          
           size="sm"
           variant="info"
           title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
@@ -973,7 +973,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         <Button
           onClick={handleGenerateCharacter}
-          className="w-full"
+          
           size="sm"
           variant="success"
           disabled={!effectiveWorldId}
@@ -984,7 +984,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         <Button
           onClick={handleGenerate5Characters}
-          className="w-full"
+          
           size="sm"
           variant="success"
           disabled={!effectiveWorldId}
@@ -995,7 +995,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         <Button
           onClick={handleNavigateEmpty}
-          className="w-full"
+          
           size="sm"
           variant="secondary"
           disabled={!effectiveWorldId}
@@ -1006,7 +1006,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         <Button
           onClick={handleDebugStorage}
-          className="w-full"
+          
           size="sm"
           variant="default"
           disabled={!effectiveWorldId}
@@ -1016,26 +1016,26 @@ export const TestDataGeneratorSection: React.FC = () => {
         </Button>
       </div>
 
-      <p className="text-xs text-gray-500">
+      <p>
         AI generators create diverse content for testing: original worlds,
         &quot;set in&quot; universes, and &quot;based on&quot; worlds.
-        {!effectiveWorldId && ' Select a world to enable character generation.'}
+        {!effectiveWorldId && 'Select a world to enable character generation.'}
         {worldIdFromUrl && (
-          <span className="block mt-1 text-blue-500">
+          <span>
             Using world from current page: {worlds[worldIdFromUrl]?.name}
           </span>
         )}
       </p>
 
       {/* Destructive Operations Section */}
-      <div className="border-t border-red-500 pt-4">
-        <h4 className="font-bold text-sm text-red-500 mb-2">
+      <div>
+        <h4>
           Destructive Operations
         </h4>
-        <div className="space-y-2">
+        <div>
           <Button
             onClick={handleDeleteAllCharactersInWorld}
-            className="w-full"
+            
             size="sm"
             variant="warning"
             disabled={!effectiveWorldId}
@@ -1047,7 +1047,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
           <Button
             onClick={handleDeleteAllWorlds}
-            className="w-full"
+            
             size="sm"
             variant="destructive"
             title="Deletes all worlds and their characters"
@@ -1057,7 +1057,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
           <Button
             onClick={handleNukeEverything}
-            className="w-full border-2 border-red-500"
+            
             size="sm"
             variant="destructive"
             title="NUCLEAR OPTION: Deletes absolutely everything"
@@ -1065,13 +1065,13 @@ export const TestDataGeneratorSection: React.FC = () => {
             NUKE EVERYTHING
           </Button>
         </div>
-        <p className="text-xs text-red-600 mt-2">
+        <p>
           WARNING: These operations are permanent and cannot be undone!
         </p>
 
         <Button
           onClick={handleDebugPersistence}
-          className="w-full mt-2"
+          
           size="sm"
           variant="default"
           title="Debug current store state and persistence"
@@ -1080,9 +1080,9 @@ export const TestDataGeneratorSection: React.FC = () => {
         </Button>
       </div>
 
-      <div className="text-xs text-gray-700 bg-gray-100 p-2 rounded border border-gray-300">
+      <div>
         <strong>Troubleshooting:</strong>
-        <ul className="list-disc list-inside mt-1 space-y-1">
+        <ul>
           <li>
             If form isn&apos;t pre-filled, try the debug page at{' '}
             <code>/dev/test-character-form</code>

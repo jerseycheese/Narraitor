@@ -62,22 +62,21 @@ export function GameSessionConfirmationDialog({
       size="md"
       showCloseButton={false}
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button onClick={onClose} variant="outline" className="w-full sm:w-auto">
+        <div>
+          <Button onClick={onClose} variant="outline" >
             {config.cancelText}
           </Button>
           <Button
             onClick={onConfirm}
             variant={tone === 'warning' ? 'warning' : 'info'}
-            className="w-full sm:w-auto"
+            
           >
             {type === 'character-switch' && characterName
-              ? `Play as ${characterName}`
+            ? `Play as ${characterName}`
               : config.confirmText}
           </Button>
         </div>
       }
-      footerClassName="bg-background"
     />
   );
 }

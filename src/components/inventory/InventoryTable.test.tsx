@@ -108,7 +108,7 @@ describe('InventoryTable', () => {
     mockZustandStore(useInventoryStore as jest.MockedFunction<typeof useInventoryStore>, createMockInventoryStore(mockState));
   });
 
-  it('renders inventory items in table format', () => {
+  it('renders inventory items in format', () => {
     render(<InventoryTable characterId="char-1" />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();

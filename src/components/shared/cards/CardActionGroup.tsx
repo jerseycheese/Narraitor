@@ -66,89 +66,50 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   secondarySize,
   className = ''
 }) => {
-  const gapClasses = {
-    sm: 'gap-1',
-    md: 'gap-2',
-    lg: 'gap-3'
-  };
-
-  const sizeClasses = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
-  };
-
-  const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
-    // Determine which size to use
-    let buttonSize = size;
-    if (actionType === 'primary' && primarySize) {
-      buttonSize = primarySize;
-    } else if (actionType === 'secondary' && secondarySize) {
-      buttonSize = secondarySize;
-    }
-    
-    const baseClasses = `${sizeClasses[buttonSize]} rounded-md font-medium transition-colors`;
-    const flexClass = action.flex ? 'flex-1' : '';
-    
-    let variantClasses = '';
-    switch (action.variant) {
-      case 'primary':
-        // Allow for custom primary colors via className
-        if (action.className?.includes('bg-')) {
-          variantClasses = action.className;
-        } else {
-          variantClasses = 'bg-blue-500 text-white hover:bg-blue-700';
-        }
-        break;
-      case 'success':
-        variantClasses = 'bg-green-500 text-white hover:bg-green-700';
-        break;
-      case 'danger':
-        variantClasses = 'bg-gray-100 text-red-500 hover:bg-red-200 hover:text-red-700';
-        break;
-      case 'secondary':
-      default:
-        variantClasses = 'bg-gray-100 text-gray-700 hover:bg-gray-300 hover:text-gray-900';
-        break;
-    }
-
-    // If custom className includes bg-, ensure white text for primary buttons
-    if (action.variant === 'primary' && action.className?.includes('bg-')) {
-      return `${baseClasses} ${flexClass} text-white ${action.className}`;
-    }
-
-    return `${baseClasses} ${variantClasses} ${flexClass} ${action.className || ''}`;
-  };
-
+      const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
+      // Determine which size to use
+      let buttonSize = size;
+      if (actionType === 'primary' && primarySize) {
+        buttonSize = primarySize;
+      } else if (actionType === 'secondary' && secondarySize) {
+        buttonSize = secondarySize;
+      }
+      
+      let variantClasses = '';
+  
+      if (action.variant === 'primary' && action.className?.includes('bg-')) {
+        variantClasses = action.className;
+      }
+  
+      return `${variantClasses}${action.className || ''}`;
+    };
   const renderActions = (actions: CardAction[], actionType: 'primary' | 'secondary') => {
     return actions.map(action => (
       <button
         key={action.key}
         onClick={action.onClick}
-        className={`${getButtonClasses(action, actionType)} flex items-center justify-center gap-2`}
+        className={`${getButtonClasses(action, actionType)}`}
         title={action.title}
         data-testid={action.testId}
         type="button"
       >
         {action.icon && (
-          <span className="flex items-center">{action.icon}</span>
+          <span>{action.icon}</span>
         )}
         <span>{action.text}</span>
       </button>
     ));
   };
 
-  const containerClasses = layout === 'vertical' ? 'flex flex-col' : 'flex';
-
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`${className}`}>
       {primaryActions.length > 0 && (
-        <div className={`${containerClasses} ${gapClasses[gap]}`}>
+        <div>
           {renderActions(primaryActions, 'primary')}
         </div>
       )}
       {secondaryActions.length > 0 && (
-        <div className={`${containerClasses} ${gapClasses[gap]}`}>
+        <div>
           {renderActions(secondaryActions, 'secondary')}
         </div>
       )}

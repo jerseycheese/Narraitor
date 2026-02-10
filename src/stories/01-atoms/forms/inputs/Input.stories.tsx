@@ -43,7 +43,7 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   render: (args) => (
-    <div className="space-y-2">
+    <div>
       <Label htmlFor="name-input">Character Name</Label>
       <Input id="name-input" {...args} />
     </div>
@@ -55,14 +55,14 @@ export const WithLabel: Story = {
 
 export const WithError: Story = {
   render: (args) => (
-    <div className="space-y-2">
-      <Label htmlFor="error-input">Character Name <span className="text-red-500">*</span></Label>
+    <div>
+      <Label htmlFor="error-input">Character Name <span>*</span></Label>
       <Input 
         id="error-input" 
         {...args} 
-        className="border-red-300 focus-visible:ring-red-500" 
+         
       />
-      <p className="text-red-500 text-sm">Character name is required</p>
+      <p>Character name is required</p>
     </div>
   ),
   args: {
@@ -81,20 +81,20 @@ export const Disabled: Story = {
 
 export const Types: Story = {
   render: () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div>
+      <div>
         <Label>Text Input</Label>
         <Input type="text" placeholder="Enter text" />
       </div>
-      <div className="space-y-2">
+      <div>
         <Label>Email Input</Label>
         <Input type="email" placeholder="Enter email" />
       </div>
-      <div className="space-y-2">
+      <div>
         <Label>Password Input</Label>
         <Input type="password" placeholder="Enter password" />
       </div>
-      <div className="space-y-2">
+      <div>
         <Label>Number Input</Label>
         <Input type="number" placeholder="Enter number" />
       </div>

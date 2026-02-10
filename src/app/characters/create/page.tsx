@@ -92,21 +92,20 @@ export default function CharacterCreatePage() {
 
   if (!effectiveWorldId) {
     return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Create Character</h1>
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="w-20 h-20 bg-amber-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+      <div>
+        <div>
+          <h1>Create Character</h1>
+          <div>
+            <div>
               <AlertTriangle
-                className="w-10 h-10 text-amber-500"
                 aria-hidden="true"
               />
             </div>
-            <h2 className="text-xl font-semibold mb-2">World Required</h2>
-            <p className="text-gray-700 mb-2">
+            <h2>World Required</h2>
+            <p>
               Characters are created within specific worlds.
             </p>
-            <p className="text-gray-500 text-sm mb-6">
+            <p>
               Each world defines unique attributes, skills, and rules that shape
               your characters.
             </p>
@@ -119,7 +118,6 @@ export default function CharacterCreatePage() {
                   size: 'lg',
                 },
               ]}
-              className="justify-center"
             />
           </div>
         </div>
@@ -219,13 +217,13 @@ export default function CharacterCreatePage() {
     showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div>
+      <div>
         {shouldShowQuickStart ? (
           <>
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Create New Character</h1>
-              <p className="text-gray-700">
+            <div>
+              <h1>Create New Character</h1>
+              <p>
                 <span suppressHydrationWarning>
                   {currentWorld
                     ? `Choose a quick start character for ${currentWorld.name} or create your own`
@@ -233,7 +231,7 @@ export default function CharacterCreatePage() {
                 </span>
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-8">
+            <div>
               {mounted && currentWorld ? (
                 <QuickStartCharacters
                   world={currentWorld}
@@ -242,7 +240,7 @@ export default function CharacterCreatePage() {
                   onReady={() => setContentReady(true)}
                 />
               ) : (
-                <div className="text-center py-12 text-gray-500">
+                <div>
                   Preparing quick start options...
                 </div>
               )}
@@ -250,24 +248,23 @@ export default function CharacterCreatePage() {
           </>
         ) : (
           <>
-            <div className="mb-8 flex items-center justify-between">
+            <div>
               <div>
-                <h1 className="text-3xl font-bold mb-2">
+                <h1>
                   Create Custom Character
                 </h1>
-                <p className="text-gray-700">
+                <p>
                   Build your character from scratch with full customization
                 </p>
               </div>
               <Button
                 variant="outline"
                 onClick={handleBackToQuickStart}
-                className="flex items-center gap-2"
               >
                 ← Back to Quick Start
               </Button>
             </div>
-            <div className="bg-white rounded-lg shadow p-8">
+            <div>
               <CharacterCreationWizard
                 key={`new-character-${effectiveWorldId}`}
                 worldId={effectiveWorldId}

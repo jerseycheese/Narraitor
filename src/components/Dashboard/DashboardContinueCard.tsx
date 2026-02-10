@@ -12,8 +12,10 @@ import { useCharacterStore } from '@/state/characterStore';
 
 interface DashboardContinueCardProps {
   session: SavedSessionInfo;
-  world: ReturnType<typeof useWorldStore.getState>["worlds"][string];
-  character: ReturnType<typeof useCharacterStore.getState>["characters"][string];
+  world: ReturnType<typeof useWorldStore.getState>['worlds'][string];
+  character: ReturnType<
+    typeof useCharacterStore.getState
+  >['characters'][string];
   onContinue: (sessionId: string) => void;
   onDelete: (sessionId: string) => void;
 }
@@ -23,7 +25,7 @@ export function DashboardContinueCard({
   world,
   character,
   onContinue,
-  onDelete
+  onDelete,
 }: DashboardContinueCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -43,37 +45,37 @@ export function DashboardContinueCard({
   return (
     <>
       <section
-        className="component-dashboard-continue-card bg-background rounded-lg border-2 border-primary p-6 shadow-md"
+        className="component-dashboard-continue-card"
         aria-labelledby="continue-game-heading"
       >
-        <h2 id="continue-game-heading" className="text-lg font-semibold mb-4">
-          Continue Your Game
-        </h2>
+        <h2 id="continue-game-heading">Continue Your Game</h2>
 
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
+        <div>
           {/* Character Portrait */}
-          <div className="flex-shrink-0 mx-auto sm:mx-0">
+          <div>
             <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
+              portrait={
+                character.portrait || { type: 'placeholder', url: null }
+              }
               characterName={character.name}
               size="large"
             />
           </div>
 
           {/* Game Info */}
-          <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+          <div>
+            <div>
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-t pt-3">
+            <div>
               <DataField
                 label="Progress"
                 value={`${session.narrativeCount} entries`}
-                variant="inline"
+                variant="outline"
               />
-              <time className="text-xs text-muted-foreground" dateTime={session.lastPlayed}>
+              <time dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
             </div>
@@ -85,15 +87,14 @@ export function DashboardContinueCard({
             {
               label: 'Continue Last Game',
               onClick: () => onContinue(session.id),
-              variant: 'success'
+              variant: 'success',
             },
             {
               label: 'Delete',
               onClick: () => setIsDeleteDialogOpen(true),
-              variant: 'danger'
-            }
+              variant: 'danger',
+            },
           ]}
-          className="[&>button:first-child]:flex-1"
         />
       </section>
 

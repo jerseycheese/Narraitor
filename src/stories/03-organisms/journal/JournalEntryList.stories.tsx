@@ -19,7 +19,7 @@ const meta: Meta<typeof JournalEntryList> = {
   },
   decorators: [
     (Story) => (
-      <div className="w-80 h-[480px] bg-white border border-amber-500 rounded-lg overflow-hidden">
+      <div>
         <Story />
       </div>
     ),

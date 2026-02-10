@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "@/lib/utils/classNames"
+import { cssClasses } from '@/lib/utils/classNames'
 
 interface TabsContextValue {
   value: string
@@ -35,7 +35,7 @@ const Tabs: React.FC<TabsProps> = ({
   
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={cn('component-tabs', className)}>
+      <div className={cssClasses('component-tabs', className)}>
         {children}
       </div>
     </TabsContext.Provider>
@@ -48,10 +48,7 @@ const TabsList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props 
 }) => (
   <div
-    className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500",
-      className
-    )}
+    className={className}
     {...props}
   >
     {children}
@@ -75,11 +72,7 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({
   
   return (
     <button
-      className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        isActive ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700",
-        className
-      )}
+      className={className}
       onClick={() => context.onValueChange(value)}
       {...props}
     >
@@ -105,10 +98,7 @@ const TabsContent: React.FC<TabsContentProps> = ({
   
   return (
     <div
-      className={cn(
-        "mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-        className
-      )}
+      className={className}
       {...props}
     >
       {children}

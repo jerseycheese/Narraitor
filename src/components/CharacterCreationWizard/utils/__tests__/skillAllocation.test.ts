@@ -81,7 +81,7 @@ describe('skillAllocation utilities', () => {
   });
 
   describe('calculateSkillPointPool', () => {
-    it('computes spent points relative to minimum level', () => {
+    it('computes spent points to minimum level', () => {
       const world = buildWorld();
       const result = calculateSkillPointPool(
         [

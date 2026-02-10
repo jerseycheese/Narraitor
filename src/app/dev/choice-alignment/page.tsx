@@ -57,7 +57,7 @@ export default function ChoiceAlignmentTestPage() {
     bandits: {
       location: 'Forest Path',
       situation: 'A group of bandits blocks your path',
-      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, weapons drawn, demanding you pay a toll to pass. Their leader, a scarred man with a wicked grin, counts your coin purse with greedy eyes while his companions block all escape routes.'
+      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, weapons drawn, demanding you pay a toll to pass. Their leader, a scarred man with a wicked grin, counts your coin purse with greedy eyes while his companions all escape routes.'
     },
     merchant: {
       location: 'Town Market',
@@ -143,26 +143,25 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-background rounded-lg border shadow-sm p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+    <div>
+      <div>
+        <div>
+          <h1>
             Choice Alignment Test
           </h1>
           
           {/* Controls */}
-          <div className="bg-gray-100 rounded-lg p-4 mb-6">
-            <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
+          <div>
+            <h2>Test Controls</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label>
                   Scenario
                 </label>
                 <select 
                   value={scenario} 
                   onChange={(e) => setScenario(e.target.value as 'bandits' | 'merchant' | 'dragon')}
-                  className="block w-full border border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="bandits">Forest Bandits</option>
                   <option value="merchant">Suspicious Merchant</option>
@@ -170,11 +169,10 @@ export default function ChoiceAlignmentTestPage() {
                 </select>
               </div>
               
-              <div className="flex items-end">
+              <div>
                 <button
                   onClick={generateChoices}
                   disabled={loading || !worldId}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
                   {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Aligned Choices'}
                 </button>
@@ -182,15 +180,15 @@ export default function ChoiceAlignmentTestPage() {
             </div>
             
             {/* Scenario Display */}
-            <div className="bg-white rounded p-3 border">
-              <h3 className="font-medium text-gray-900 mb-2">Current Scenario:</h3>
-              <p className="text-sm text-gray-700 mb-2">
+            <div>
+              <h3>Current Scenario:</h3>
+              <p>
                 <strong>Location:</strong> {scenarios[scenario].location}
               </p>
-              <p className="text-sm text-gray-700 mb-2">
+              <p>
                 <strong>Situation:</strong> {scenarios[scenario].situation}
               </p>
-              <p className="text-sm text-gray-700">
+              <p>
                 {scenarios[scenario].context}
               </p>
             </div>
@@ -198,7 +196,7 @@ export default function ChoiceAlignmentTestPage() {
 
           {/* Error Display */}
           {error && (
-            <div className="bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded mb-6">
+            <div>
               <strong>Error:</strong> {error}
             </div>
           )}
@@ -206,22 +204,22 @@ export default function ChoiceAlignmentTestPage() {
           {/* Results */}
           {decision && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Generated Choices</h2>
+              <h2>Generated Choices</h2>
               
               {/* Alignment Legend */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Alignment Legend:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-blue-50 border border-blue-300 rounded mr-2"></div>
+              <div>
+                <h3>Alignment Legend:</h3>
+                <div>
+                  <div>
+                    <div></div>
                     <span><strong>Lawful:</strong> Follows rules, respects authority</span>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-white border border-gray-200 rounded mr-2"></div>
+                  <div>
+                    <div></div>
                     <span><strong>Neutral:</strong> Balanced, practical approach</span>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-red-200 border border-red-300 rounded mr-2"></div>
+                  <div>
+                    <div></div>
                     <span><strong>Chaos:</strong> Unexpected, disruptive action</span>
                   </div>
                 </div>
@@ -237,13 +235,13 @@ export default function ChoiceAlignmentTestPage() {
               />
 
               {/* Debug Info */}
-              <div className="mt-6 bg-gray-100 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Debug Information:</h3>
-                <div className="text-xs text-gray-700 space-y-1">
+              <div>
+                <h3>Debug Information:</h3>
+                <div>
                   <p><strong>Template Used:</strong> Aligned Choice Template</p>
                   <p><strong>Options Count:</strong> {decision.options.length}</p>
                   <p><strong>Alignment Distribution:</strong></p>
-                  <ul className="ml-4 space-y-1">
+                  <ul>
                     {['lawful', 'neutral', 'chaotic'].map(alignment => {
                       const count = decision.options.filter(opt => opt.alignment === alignment).length;
                       return (
@@ -255,11 +253,11 @@ export default function ChoiceAlignmentTestPage() {
                   </ul>
                 </div>
                 
-                <details className="mt-4">
-                  <summary className="text-sm font-semibold text-gray-900 cursor-pointer">
+                <details>
+                  <summary>
                     Raw Decision Object
                   </summary>
-                  <pre className="text-xs text-gray-700 mt-2 overflow-auto">
+                  <pre>
                     {JSON.stringify(decision, null, 2)}
                   </pre>
                 </details>
@@ -268,9 +266,9 @@ export default function ChoiceAlignmentTestPage() {
           )}
 
           {/* Instructions */}
-          <div className="mt-8 bg-amber-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-amber-700 mb-2">Testing Instructions</h3>
-            <ul className="text-sm text-amber-700 space-y-1">
+          <div>
+            <h3>Testing Instructions</h3>
+            <ul>
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>
               <li>• <strong>CHAOS VERIFICATION:</strong> Red choices should be wildly unexpected, dramatic, and could completely change the situation</li>

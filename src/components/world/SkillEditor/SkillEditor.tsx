@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-
 export interface SkillEditorProps {
   worldId: EntityID;
   mode: 'create' | 'edit';
@@ -26,11 +25,11 @@ export interface SkillEditorProps {
 
 /**
  * SkillEditor - Create and edit skills with multi-attribute linking capabilities
- * 
+ *
  * This component implements the multi-attribute skill linking system.
  * Skills can now be linked to multiple attributes using a checkbox interface
  * instead of the previous single-attribute dropdown.
- * 
+ *
  * Features:
  * - Create/Edit mode support
  * - Multi-attribute selection via checkboxes
@@ -38,11 +37,11 @@ export interface SkillEditorProps {
  * - Delete confirmation dialog
  * - Duplicate name prevention
  * - Skill count limits enforcement
- * 
+ *
  * Data Format:
  * - Uses `attributeIds: EntityID[]` for multi-attribute linking
  * - Replaces deprecated `linkedAttributeId: EntityID` single-attribute format
- * 
+ *
  * @param worldId - ID of the world this skill belongs to
  * @param mode - 'create' for new skills, 'edit' for existing skills
  * @param skillId - Required when mode is 'edit'
@@ -79,7 +78,9 @@ export function SkillEditor({
   // Load existing skill data in edit mode
   useEffect(() => {
     if (mode === 'edit' && skillId) {
-      const existingSkill = existingSkills.find(skill => skill.id === skillId);
+      const existingSkill = existingSkills.find(
+        (skill) => skill.id === skillId
+      );
       if (existingSkill) {
         setFormData({
           ...existingSkill,
@@ -96,7 +97,15 @@ export function SkillEditor({
       setErrors(newErrors);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.name, formData.description, formData.attributeIds, errors.length, existingSkills, mode, skillId]);
+  }, [
+    formData.name,
+    formData.description,
+    formData.attributeIds,
+    errors.length,
+    existingSkills,
+    mode,
+    skillId,
+  ]);
 
   const validateForm = (): string[] => {
     const validationErrors: string[] = [];
@@ -123,9 +132,10 @@ export function SkillEditor({
 
     // Duplicate name validation (only for create mode or different skill in edit mode)
     if (trimmedName) {
-      const isDuplicate = existingSkills.some(skill => 
-        skill.name.toLowerCase() === trimmedName.toLowerCase() && 
-        (mode === 'create' || skill.id !== skillId)
+      const isDuplicate = existingSkills.some(
+        (skill) =>
+          skill.name.toLowerCase() === trimmedName.toLowerCase() &&
+          (mode === 'create' || skill.id !== skillId)
       );
       if (isDuplicate) {
         validationErrors.push(`Skill name "${trimmedName}" already exists`);
@@ -142,7 +152,7 @@ export function SkillEditor({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
@@ -170,15 +180,15 @@ export function SkillEditor({
   const handleAttributeToggle = (attributeId: EntityID) => {
     const currentAttributeIds = formData.attributeIds || [];
     const isSelected = currentAttributeIds.includes(attributeId);
-    
+
     let newAttributeIds: EntityID[];
     if (isSelected) {
-      newAttributeIds = currentAttributeIds.filter(id => id !== attributeId);
+      newAttributeIds = currentAttributeIds.filter((id) => id !== attributeId);
     } else {
       newAttributeIds = [...currentAttributeIds, attributeId];
     }
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       attributeIds: newAttributeIds,
     }));
@@ -191,115 +201,109 @@ export function SkillEditor({
   };
 
   // Check if we're at the maximum number of skills
-  const isAtMaxSkills = maxSkills !== undefined && existingSkills.length >= maxSkills;
+  const isAtMaxSkills =
+    maxSkills !== undefined && existingSkills.length >= maxSkills;
   const canCreateSkill = mode === 'edit' || !isAtMaxSkills;
 
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
-          {mode === 'create' ? 'Create New Skill' : 'Edit Skill'}
-        </h2>
+    <div>
+      <div>
+        <h2>{mode === 'create' ? 'Create New Skill' : 'Edit Skill'}</h2>
       </div>
 
       {mode === 'create' && isAtMaxSkills && (
-        <div className="p-4 bg-amber-200 border border-amber-200 rounded-md">
-          <p className="text-sm text-amber-700">
-            Maximum number of skills ({maxSkills}) reached. You cannot create more skills for this world.
+        <div>
+          <p>
+            Maximum number of skills ({maxSkills}) reached. You cannot create
+            more skills for this world.
           </p>
         </div>
       )}
 
       {errors.length > 0 && (
-        <div className="space-y-2">
+        <div>
           {errors.map((error, index) => (
-            <div key={index} className="text-sm text-destructive" role="alert">
+            <div key={index} role="alert">
               {error}
             </div>
           ))}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} role="form" className="space-y-6">
-        <div className="space-y-4">
+      <form onSubmit={handleSubmit} role="form">
+        <div>
           <div>
-            <Label htmlFor="skill-name">Skill Name <span className="text-destructive">*</span></Label>
+            <Label htmlFor="skill-name">
+              Skill Name <span>*</span>
+            </Label>
             <Input
               id="skill-name"
               type="text"
               value={formData.name || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
               placeholder="Enter skill name"
               disabled={!canCreateSkill}
-              className="mt-1"
             />
           </div>
 
           <div>
-            <Label htmlFor="skill-description">Description <span className="text-destructive">*</span></Label>
+            <Label htmlFor="skill-description">
+              Description <span>*</span>
+            </Label>
             <Textarea
               id="skill-description"
               value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               placeholder="Describe what this skill represents"
               disabled={!canCreateSkill}
               rows={3}
-              className="mt-1"
             />
           </div>
 
           <div>
-            <Label className="text-base font-medium">Linked Attributes</Label>
-            <p className="text-sm text-gray-700 mb-3">
-              Select one or more attributes this skill is based on
-            </p>
-            <div className="space-y-2">
+            <Label>Linked Attributes</Label>
+            <p>Select one or more attributes this skill is based on</p>
+            <div>
               {existingAttributes.map((attribute) => (
-                <div key={attribute.id} className="flex items-center space-x-2">
+                <div key={attribute.id}>
                   <Checkbox
                     id={`attribute-${attribute.id}`}
-                    checked={formData.attributeIds?.includes(attribute.id) || false}
+                    checked={
+                      formData.attributeIds?.includes(attribute.id) || false
+                    }
                     onChange={() => handleAttributeToggle(attribute.id)}
                     disabled={!canCreateSkill}
-                    className="rounded border-gray-300 focus:ring-blue-500"
                   />
-                  <Label 
-                    htmlFor={`attribute-${attribute.id}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
+                  <Label htmlFor={`attribute-${attribute.id}`}>
                     {attribute.name}
                   </Label>
                   {attribute.description && (
-                    <span className="text-xs text-gray-500">
-                      - {attribute.description}
-                    </span>
+                    <span>- {attribute.description}</span>
                   )}
                 </div>
               ))}
             </div>
             {existingAttributes.length === 0 && (
-              <p className="text-sm text-gray-500 italic">
+              <p>
                 No attributes available. Create attributes first to link skills.
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex justify-between pt-6 border-t">
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              disabled={!canCreateSkill}
-              variant="default"
-            >
+        <div>
+          <div>
+            <Button type="submit" disabled={!canCreateSkill} variant="default">
               {mode === 'create' ? 'Create Skill' : 'Save Changes'}
             </Button>
-            <Button
-              type="button"
-              onClick={onCancel}
-              variant="outline"
-            >
+            <Button type="button" onClick={onCancel} variant="outline">
               Cancel
             </Button>
           </div>

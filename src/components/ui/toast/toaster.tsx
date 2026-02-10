@@ -6,17 +6,6 @@ import { Toast } from "./toast"
 
 /**
  * Data structure for a toast notification
- * 
- * @example
- * ```tsx
- * const toastData: ToastData = {
- *   id: 'unique-id',
- *   title: 'Operation completed',
- *   description: 'Your file has been processed successfully.',
- *   variant: 'success',
- *   duration: 5000
- * }
- * ```
  */
 export interface ToastData {
   /** Unique identifier for the toast */
@@ -33,19 +22,8 @@ export interface ToastData {
 
 /**
  * Props for the Toaster component
- * 
- * @example
- * ```tsx
- * // Default position (bottom-right)
- * <Toaster />
- * 
- * // Custom position and max toasts
- * <Toaster position="top-right" maxToasts={3} />
- * ```
  */
 export interface ToasterProps {
-  /** Screen position where toasts should appear */
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   /** Maximum number of toasts to display simultaneously */
   maxToasts?: number
 }
@@ -59,24 +37,6 @@ const ToastContext = createContext<{
 
 /**
  * Toast Provider component that manages toast state and provides toast context
- * 
- * Must be placed at the root of your application to enable toast functionality.
- * Provides the toast context that allows components to add, remove, and manage toasts.
- * 
- * @example
- * ```tsx
- * // In your app layout or root component
- * function App() {
- *   return (
- *     <ToastProvider>
- *       <YourAppContent />
- *       <Toaster />
- *     </ToastProvider>
- *   )
- * }
- * ```
- * 
- * @component
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([])
@@ -109,53 +69,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-/**
- * Hook for managing toast notifications
- * 
- * Provides methods to display different types of toast notifications and manage the toast queue.
- * Must be used within a ToastProvider.
- * 
- * @example
- * ```tsx
- * import { Button } from '@/components/ui/button'
- * 
- * function MyComponent() {
- *   const toast = useToast()
- * 
- *   const handleSuccess = () => {
- *     toast.success('Operation completed', 'Your changes have been saved.')
- *   }
- * 
- *   const handleError = () => {
- *     toast.error('Something went wrong', 'Please try again later.')
- *   }
- * 
- *   const handleCustomToast = () => {
- *     const id = toast.addToast({
- *       title: 'Custom notification',
- *       variant: 'info',
- *       duration: 10000
- *     })
- *     
- *     // Remove it later
- *     setTimeout(() => toast.removeToast(id), 5000)
- *   }
- * 
- *   return (
- *     <div>
- *       <Button onClick={handleSuccess}>Show Success</Button>
- *       <Button onClick={handleError}>Show Error</Button>
- *       <Button onClick={handleCustomToast}>Show Custom</Button>
- *     </div>
- *   )
- * }
- * ```
- * 
- * @returns Object containing toast management methods
- * @throws {Error} When used outside of ToastProvider
- * 
- * @hook
- */
 export function useToast() {
   const context = useContext(ToastContext)
   if (!context) {
@@ -164,64 +77,18 @@ export function useToast() {
 
   return {
     ...context,
-    /** Display a success toast notification */
     success: (title: string, description?: string) => 
       context.addToast({ title, description, variant: 'success' }),
-    /** Display an error toast notification */
     error: (title: string, description?: string) => 
       context.addToast({ title, description, variant: 'error' }),
-    /** Display a warning toast notification */
     warning: (title: string, description?: string) => 
       context.addToast({ title, description, variant: 'warning' }),
-    /** Display an info toast notification */
     info: (title: string, description?: string) => 
       context.addToast({ title, description, variant: 'info' }),
   }
 }
 
-/**
- * Toaster component that renders and manages multiple toast notifications
- * 
- * Displays toasts in a fixed position on the screen using a portal.
- * Automatically manages the toast queue and handles positioning.
- * 
- * @example
- * ```tsx
- * // Basic usage with default settings
- * function App() {
- *   return (
- *     <ToastProvider>
- *       <YourAppContent />
- *       <Toaster />
- *     </ToastProvider>
- *   )
- * }
- * 
- * // Custom positioning and limits
- * function App() {
- *   return (
- *     <ToastProvider>
- *       <YourAppContent />
- *       <Toaster position="top-right" maxToasts={3} />
- *     </ToastProvider>
- *   )
- * }
- * ```
- * 
- * @component
- * @integration
- * Used in conjunction with ToastProvider and useToast hook:
- * 1. Wrap your app with ToastProvider
- * 2. Add Toaster component to your layout
- * 3. Use useToast hook in components to trigger notifications
- * 
- * @accessibility
- * - Uses createPortal to render outside normal DOM hierarchy
- * - Maintains proper focus management
- * - Toasts are automatically announced to screen readers
- * - Responsive positioning for mobile devices
- */
-export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterProps) {
+export function Toaster({ maxToasts = 5 }: ToasterProps) {
   const { toasts, removeToast } = useToast()
   const [container, setContainer] = useState<HTMLElement | null>(null)
 
@@ -238,21 +105,12 @@ export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterPro
 
   if (!container) return null
 
-  const positionClasses = {
-    'top-left': 'top-4 left-4',
-    'top-right': 'top-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-  }
-
   const visibleToasts = toasts.slice(-maxToasts)
 
   return createPortal(
-    <div
-      className={`fixed z-50 flex flex-col gap-2 ${positionClasses[position]} pointer-events-none max-w-[calc(100vw-2rem)]`}
-    >
+    <div>
       {visibleToasts.map((toast) => (
-        <div key={toast.id} className="pointer-events-auto">
+        <div key={toast.id} >
           <Toast
             {...toast}
             onDismiss={() => removeToast(toast.id)}

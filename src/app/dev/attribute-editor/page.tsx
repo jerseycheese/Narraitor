@@ -96,38 +96,42 @@ export default function AttributeEditorTestPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Attribute Editor Test Harness</h1>
+    <div>
+      <h1>Attribute Editor Test Harness</h1>
       
-      <div className="mb-6">
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
-        >
-          Create New Attribute
-        </button>
-      </div>
+            <div>
+      
+              <button
+      
+                onClick={() => setShowCreateModal(true)}
+      
+              >
+      
+                Create New Attribute
+      
+              </button>
+      
+            </div>
 
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Existing Attributes</h2>
-        {attributes.map((attribute) => (
-          <div
-            key={attribute.id}
-            className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
-          >
-            <div className="flex justify-between items-start">
+      <div>
+        <h2>Existing Attributes</h2>
+                {attributes.map((attribute) => (
+                  <div
+                    key={attribute.id}
+                  >
+            <div>
               <div>
-                <h3 className="font-semibold text-lg">{attribute.name}</h3>
-                <p className="text-gray-700">{attribute.description}</p>
-                <div className="mt-2 text-sm text-gray-500">
+                <h3>{attribute.name}</h3>
+                <p>{attribute.description}</p>
+                <div>
                   Range: {attribute.minValue} - {attribute.maxValue}
                 </div>
                 {skills.some(skill => skill.attributeIds?.includes(attribute.id)) && (
-                  <div className="mt-2">
-                    <span className="text-sm font-medium text-amber-500">
+                  <div>
+                    <span>
                       Linked Skills: 
                     </span>
-                    <span className="text-sm text-gray-700 ml-1">
+                    <span>
                       {skills
                         .filter(skill => skill.attributeIds?.includes(attribute.id))
                         .map(skill => skill.name)
@@ -136,24 +140,22 @@ export default function AttributeEditorTestPage() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setEditingAttribute(attribute.id)}
-                  className="px-3 py-1 text-blue-700 border border-blue-700 rounded hover:bg-blue-50"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm(`Delete "${attribute.name}"?`)) {
-                      handleDeleteAttribute(attribute.id);
-                    }
-                  }}
-                  className="px-3 py-1 text-red-500 border border-red-500 rounded hover:bg-red-200"
-                >
-                  Delete
-                </button>
-              </div>
+                            <div>
+                              <button
+                                onClick={() => setEditingAttribute(attribute.id)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (confirm(`Delete "${attribute.name}"?`)) {
+                                    handleDeleteAttribute(attribute.id);
+                                  }
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
             </div>
           </div>
         ))}
@@ -163,13 +165,12 @@ export default function AttributeEditorTestPage() {
       <SimpleModal 
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)}
-        title="Create Attribute"
-        size="xl"
-        className="max-h-[90vh] overflow-y-auto"
-      >
-        <div className="mb-4 text-sm text-muted-foreground">
-          Create a new custom attribute for this test world.
-        </div>
+                title="Create Attribute"
+                size="xl"
+              >
+                <div>
+                  Create a new custom attribute for this test world.
+                </div>
         <AttributeEditor
           worldId={'world-test' as EntityID}
           mode="create"
@@ -184,13 +185,12 @@ export default function AttributeEditorTestPage() {
       <SimpleModal 
         isOpen={!!editingAttribute} 
         onClose={() => setEditingAttribute(null)}
-        title="Edit Attribute"
-        size="xl"
-        className="max-h-[90vh] overflow-y-auto"
-      >
-        <div className="mb-4 text-sm text-muted-foreground">
-          Modify the details of this test attribute.
-        </div>
+                title="Edit Attribute"
+                size="xl"
+              >
+                <div>
+                  Modify the details of this test attribute.
+                </div>
         {editingAttribute && (
           <AttributeEditor
             worldId={'world-test' as EntityID}

@@ -59,31 +59,31 @@ export function PageLayout({
   const hasHeaderContent = title || actions || description;
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col min-h-0">
-      <div className={`w-full py-4 sm:py-8 flex-1 flex flex-col min-h-0 ${className}`}>
+    <div>
+      <div className={`${className}`}>
         {hasHeaderContent && (
-          <header className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+          <header>
+            <div>
               {title && (
-                <h1 className="text-4xl font-bold">
+                <h1>
                   {title}
                 </h1>
               )}
               {actions && (
-                <div className="flex gap-2">
+                <div>
                   {actions}
                 </div>
               )}
             </div>
             {description && (
-              <p className="opacity-90">
+              <p>
                 {description}
               </p>
             )}
           </header>
         )}
 
-        <section className="flex-1 min-h-0 flex flex-col">
+        <section>
           {children}
         </section>
       </div>

@@ -33,7 +33,6 @@ export const WorldCardActions: Story = {
         text: 'Create Character',
         onClick: () => console.log('Create character clicked'),
         variant: 'primary',
-        className: 'bg-green-500 hover:bg-green-700',
         flex: true,
       },
       {
@@ -50,14 +49,12 @@ export const WorldCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View clicked'),
         variant: 'primary',
-        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'edit',
         text: 'Edit',
         onClick: () => console.log('Edit clicked'),
         variant: 'primary',
-        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'delete',
@@ -77,7 +74,6 @@ export const CharacterCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View character clicked'),
         variant: 'primary',
-        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'play',
@@ -90,7 +86,6 @@ export const CharacterCardActions: Story = {
         text: 'Edit',
         onClick: () => console.log('Edit character clicked'),
         variant: 'primary',
-        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'delete',
@@ -104,9 +99,9 @@ export const CharacterCardActions: Story = {
 
 export const InCardContext: Story = {
   render: () => (
-    <div className="w-96 border border-gray-300 rounded-lg p-6">
-      <h3 className="text-xl font-semibold mb-2">Sample World</h3>
-      <p className="text-gray-700 mb-4">
+    <div>
+      <h3>Sample World</h3>
+      <p>
         A fantasy medieval world with magic and dragons.
       </p>
       <CardActionGroup
@@ -116,8 +111,7 @@ export const InCardContext: Story = {
             text: 'Create Character',
             onClick: () => console.log('Create character'),
             variant: 'primary',
-            className: 'bg-green-500 hover:bg-green-700',
-            flex: true,
+                flex: true,
           },
           {
             key: 'play',
@@ -133,15 +127,13 @@ export const InCardContext: Story = {
             text: 'View',
             onClick: () => console.log('View'),
             variant: 'primary',
-            className: 'bg-blue-500 hover:bg-blue-700',
-          },
+              },
           {
             key: 'edit',
             text: 'Edit',
             onClick: () => console.log('Edit'),
             variant: 'primary',
-            className: 'bg-blue-500 hover:bg-blue-700',
-          },
+              },
           {
             key: 'delete',
             text: 'Delete',

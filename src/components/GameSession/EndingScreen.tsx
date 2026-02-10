@@ -2,7 +2,13 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, Globe, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -13,11 +19,13 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
+import {
+  CardActionGroup,
+  type CardAction,
+} from '@/components/shared/cards/CardActionGroup';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
-
 
 /**
  * EndingScreen displays the story ending with narrative closure
@@ -32,18 +40,23 @@ export function EndingScreen() {
     endingError,
     // clearEnding, // Not currently used
     getSessionSegments,
-    updateCurrentEnding
+    updateCurrentEnding,
   } = useNarrativeStore();
-  
+
   const { characters } = useCharacterStore();
   const { worlds } = useWorldStore();
 
   // Get story checkpoints for this session (must be called before early returns)
-  const worldState = useWorldStore(state => currentEnding ? state.worldStates[currentEnding.worldId] : undefined);
+  const worldState = useWorldStore((state) =>
+    currentEnding ? state.worldStates[currentEnding.worldId] : undefined
+  );
   const sessionCheckpoints = useMemo(
-    () => currentEnding ? (worldState?.storyCheckpoints ?? []).filter(
-      checkpoint => checkpoint.sessionId === currentEnding.sessionId
-    ) : [],
+    () =>
+      currentEnding
+        ? (worldState?.storyCheckpoints ?? []).filter(
+            (checkpoint) => checkpoint.sessionId === currentEnding.sessionId
+          )
+        : [],
     [worldState?.storyCheckpoints, currentEnding]
   );
 
@@ -67,7 +80,11 @@ export function EndingScreen() {
   }, [currentEnding?.imageUrl, endingImage]);
 
   const generateEndingImage = useCallback(async () => {
-    if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
+    if (
+      !currentEnding ||
+      isGeneratingImage ||
+      generatedForEndingRef.current === currentEnding.id
+    ) {
       return; // Prevent multiple simultaneous requests or duplicate generation
     }
 
@@ -90,7 +107,7 @@ export function EndingScreen() {
       const recentSegments = getSessionSegments(currentEnding.sessionId);
       const recentNarrative = recentSegments
         .slice(-5)
-        .map(segment => segment.content);
+        .map((segment) => segment.content);
 
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
@@ -101,7 +118,7 @@ export function EndingScreen() {
           ending: currentEnding,
           world,
           character,
-          recentNarrative
+          recentNarrative,
         }),
       });
 
@@ -122,7 +139,7 @@ export function EndingScreen() {
         }
         return {
           ...current,
-          imageUrl: data.imageUrl
+          imageUrl: data.imageUrl,
         };
       });
     } catch (error) {
@@ -132,25 +149,41 @@ export function EndingScreen() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments, updateCurrentEnding]);
+  }, [
+    currentEnding,
+    isGeneratingImage,
+    characters,
+    worlds,
+    getSessionSegments,
+    updateCurrentEnding,
+  ]);
 
   // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
     // Skip image generation in Storybook, test environment, or dev harness
-    const isStorybook = typeof window !== 'undefined' && 
-      (window.location.port === '6006' || window.location.hostname.includes('storybook'));
+    const isStorybook =
+      typeof window !== 'undefined' &&
+      (window.location.port === '6006' ||
+        window.location.hostname.includes('storybook'));
     const isTest = process.env.NODE_ENV === 'test';
-    const isDevHarness = typeof window !== 'undefined' && window.location.pathname.includes('/dev/ending-screen');
-    const isPlaywright = typeof window !== 'undefined' && (window.navigator.userAgent.includes('Playwright') || !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
-    
-    if (currentEnding && 
-        !endingImage && 
-        !isGeneratingImage && 
-        !isStorybook &&
-        !isTest &&
-        !isDevHarness &&
-        !isPlaywright &&
-        generatedForEndingRef.current !== currentEnding.id) {
+    const isDevHarness =
+      typeof window !== 'undefined' &&
+      window.location.pathname.includes('/dev/ending-screen');
+    const isPlaywright =
+      typeof window !== 'undefined' &&
+      (window.navigator.userAgent.includes('Playwright') ||
+        !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
+
+    if (
+      currentEnding &&
+      !endingImage &&
+      !isGeneratingImage &&
+      !isStorybook &&
+      !isTest &&
+      !isDevHarness &&
+      !isPlaywright &&
+      generatedForEndingRef.current !== currentEnding.id
+    ) {
       generateEndingImage();
     }
   }, [currentEnding, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
@@ -161,10 +194,10 @@ export function EndingScreen() {
   // Show loading state while generating
   if (isGeneratingEnding) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background" role="main" aria-live="polite">
-        <div className="text-center space-y-4">
+      <div role="main" aria-live="polite">
+        <div>
           <LoadingState message="Loading your story ending..." />
-          <p className="text-muted-foreground">
+          <p>
             Please wait while we craft the perfect conclusion to your journey...
           </p>
         </div>
@@ -175,10 +208,10 @@ export function EndingScreen() {
   // Handle error state
   if (endingError) {
     return (
-      <ErrorDisplay 
+      <ErrorDisplay
         variant="page"
         title="Unable to load story ending"
-        message={endingError || "An unknown error occurred"}
+        message={endingError || 'An unknown error occurred'}
         showRetry={true}
         onRetry={() => router.back()}
       />
@@ -188,18 +221,20 @@ export function EndingScreen() {
   // Handle missing ending data
   if (!currentEnding) {
     return (
-      <div className="text-center space-y-8">
+      <div>
         <header>
-          <h1 className="text-4xl font-bold mb-4">No Ending Available</h1>
-          <p className="text-muted-foreground">It looks like the story ending isn&apos;t available right now.</p>
+          <h1>No Ending Available</h1>
+          <p>It looks like the story ending isn&apos;t available right now.</p>
         </header>
-        <CardActionGroup 
-          primaryActions={[{
-            key: 'return-home',
-            text: 'Return to Home',
-            onClick: () => router.push('/worlds'),
-            variant: 'primary'
-          }]}
+        <CardActionGroup
+          primaryActions={[
+            {
+              key: 'return-home',
+              text: 'Return to Home',
+              onClick: () => router.push('/worlds'),
+              variant: 'primary',
+            },
+          ]}
         />
       </div>
     );
@@ -210,12 +245,12 @@ export function EndingScreen() {
 
   const formatPlayTime = (seconds?: number) => {
     if (!seconds) return 'Unknown';
-    
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
-      return `${hours} hours${minutes > 0 ? ` ${minutes} minutes` : ''}`;
+      return `${hours} hours ${minutes > 0 ? ` ${minutes} minutes` : ''}`;
     }
     return `${minutes} minutes`;
   };
@@ -228,7 +263,7 @@ export function EndingScreen() {
       onClick: () => router.push('/worlds'),
       variant: 'primary',
       flex: true,
-      icon: (<Globe className="w-4 h-4" aria-hidden="true" />)
+      icon: <Globe aria-hidden="true" />,
     },
     {
       key: 'new-story',
@@ -236,7 +271,8 @@ export function EndingScreen() {
       onClick: async () => {
         // Set the current character, end the session, clear the ending, then navigate to play
         const { setCurrentCharacter } = useCharacterStore.getState();
-        const { clearEnding, clearSessionSegments, clearSessionDecisions } = useNarrativeStore.getState();
+        const { clearEnding, clearSessionSegments, clearSessionDecisions } =
+          useNarrativeStore.getState();
         const { endSession } = useSessionStore.getState();
 
         // End the current session if it exists
@@ -254,96 +290,85 @@ export function EndingScreen() {
       },
       variant: 'success',
       flex: true,
-      icon: (<Play className="w-4 h-4" aria-hidden="true" />)
-    }
+      icon: <Play aria-hidden="true" />,
+    },
   ];
 
   return (
     <>
       {/* Screen reader announcement */}
-      <div 
-        className="sr-only" 
-        role="status" 
-        aria-live="polite"
-        aria-label="story complete"
-      >
+      <div role="status" aria-live="polite" aria-label="story complete">
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <div className="pb-0 ending-screen-container" data-testid="ending-screen">
+      <div className="ending-screen-container" data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
-        <section
-          className="rounded-lg overflow-hidden shadow-lg mb-8 relative"
-          aria-label="Story ending"
-        >
+        <section aria-label="Story ending">
           {isGeneratingImage ? (
-            <div className="w-full h-64 md:h-96 bg-muted flex items-center justify-center" role="img" aria-live="polite" aria-label="Loading ending image">
-              <div className="text-center">
+            <div
+              role="img"
+              aria-live="polite"
+              aria-label="Loading ending image"
+            >
+              <div>
                 <LoadingState message="Loading ending image..." />
-                <p className="text-muted-foreground mt-2 text-sm">
-                  Preparing a visual representation of your story&apos;s conclusion...
+                <p>
+                  Preparing a visual representation of your story&apos;s
+                  conclusion...
                 </p>
               </div>
             </div>
           ) : endingImage ? (
-            <div className="relative h-64 md:h-96">
+            <div>
               <Image
                 src={endingImage}
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={1280}
                 height={720}
-                className="w-full h-full object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                <header className="w-full px-4 py-6">
-                  <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">
-                    The End
-                  </h1>
-                  <p className="text-white">
+              <div>
+                <header>
+                  <h1>The End</h1>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
               </div>
             </div>
           ) : imageError ? (
-            <div className={`w-full h-64 md:h-96 ending-${currentEnding.tone} flex flex-col items-center justify-center relative`}>
-              <div className="text-center text-muted-foreground z-10">
-                <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
-                <p className="text-sm">Unable to load ending image</p>
+            <div className={`ending-${currentEnding.tone}`}>
+              <div>
+                <ImageOff aria-hidden="true" />
+                <p>Unable to load ending image</p>
                 <Button
                   onClick={generateEndingImage}
                   variant="link"
                   size="sm"
-                  className="mt-2 text-sm"
                   aria-label="Retry loading ending image"
                 >
                   Try Again
                 </Button>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                <header className="w-full px-4 py-6">
-                  <h2 className="text-4xl md:text-5xl font-bold mb-2 text-white">
-                    The End
-                  </h2>
-                  <p className="text-white">
+              <div>
+                <header>
+                  <h2>The End</h2>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
               </div>
             </div>
           ) : (
-            <div className={`w-full h-64 md:h-96 ending-${currentEnding.tone} flex items-center justify-center relative`}>
-              <div className="text-center text-muted-foreground z-10">
-                <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
-                <p className="text-sm">Ending image</p>
+            <div className={`ending-${currentEnding.tone}`}>
+              <div>
+                <ImageIcon aria-hidden="true" />
+                <p>Ending image</p>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                <header className="w-full px-4 py-6">
-                  <h2 className="text-4xl md:text-5xl font-bold mb-2 text-white">
-                    The End
-                  </h2>
-                  <p className="text-white">
+              <div>
+                <header>
+                  <h2>The End</h2>
+                  <p>
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
@@ -352,21 +377,20 @@ export function EndingScreen() {
           )}
         </section>
 
-        <div className="space-y-8">
-
+        <div>
           {/* Epilogue */}
           <section>
-            <SectionWrapper title="Epilogue" className="bg-card/95 backdrop-blur-sm border border-border">
-              <div className="prose prose-gray dark:prose-invert text-lg">
+            <SectionWrapper title="Epilogue">
+              <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.epilogue}
               </div>
             </SectionWrapper>
           </section>
 
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div>
             {/* Character Legacy */}
             <section>
-              <SectionWrapper title="Character Legacy" className="bg-card/90 backdrop-blur-sm border border-border h-full">
+              <SectionWrapper title="Character Legacy">
                 <div className="prose prose-gray dark:prose-invert">
                   {currentEnding.characterLegacy}
                 </div>
@@ -374,38 +398,42 @@ export function EndingScreen() {
             </section>
 
             {/* Achievements */}
-            {currentEnding.achievements && currentEnding.achievements.length > 0 && (
-              <section aria-label="Story achievements">
-                <SectionWrapper title="Achievements" className="bg-card/90 backdrop-blur-sm border border-border h-full">
-                  <ul className="space-y-3" role="list">
-                    {currentEnding.achievements.map((achievement, index) => {
-                      // Split achievement into title and description
-                      const colonIndex = achievement.indexOf(':');
-                      const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
-                      const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : '';
-                      
-                      return (
-                        <li
-                          key={index}
-                          className="flex items-start justify-start space-x-3 text-card-foreground p-2"
-                        >
-                          <Star className="w-5 h-5 text-warning mt-0.5 flex-shrink-0" aria-hidden="true" />
-                          <div className="min-w-0 flex-1 break-words">
-                            <span className="font-semibold break-words">{title}</span>
-                            {description && <span className="block text-muted-foreground text-sm mt-1 break-words">{description}</span>}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </SectionWrapper>
-              </section>
-            )}
+            {currentEnding.achievements &&
+              currentEnding.achievements.length > 0 && (
+                <section aria-label="Story achievements">
+                  <SectionWrapper title="Achievements">
+                    <ul role="list">
+                      {currentEnding.achievements.map((achievement, index) => {
+                        // Split achievement into title and description
+                        const colonIndex = achievement.indexOf(':');
+                        const title =
+                          colonIndex > 0
+                            ? achievement.substring(0, colonIndex)
+                            : achievement;
+                        const description =
+                          colonIndex > 0
+                            ? achievement.substring(colonIndex + 1).trim()
+                            : '';
+
+                        return (
+                          <li key={index}>
+                            <Star aria-hidden="true" />
+                            <div>
+                              <span>{title}</span>
+                              {description && <span>{description}</span>}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </SectionWrapper>
+                </section>
+              )}
           </div>
 
           {/* World Impact */}
           <section>
-            <SectionWrapper title="Impact on the World" className="bg-card/90 backdrop-blur-sm border border-border">
+            <SectionWrapper title="Impact on the World">
               <div className="prose prose-gray dark:prose-invert">
                 {currentEnding.worldImpact}
               </div>
@@ -415,19 +443,15 @@ export function EndingScreen() {
           {/* Your Story - Collapsible Section */}
           <section>
             <CollapsibleSection title="Your Story" initialCollapsed={true}>
-              <div className="max-h-96 overflow-y-auto">
+              <div>
                 {fullStory ? (
                   <div className="prose prose-gray dark:prose-invert">
                     {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                      <p key={`story-paragraph-${index}`}>
-                        {paragraph.trim()}
-                      </p>
+                      <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground italic">
-                    No story checkpoints available for this session.
-                  </p>
+                  <p>No story checkpoints available for this session.</p>
                 )}
               </div>
             </CollapsibleSection>
@@ -435,7 +459,7 @@ export function EndingScreen() {
 
           {/* Next Steps */}
           <section>
-            <SectionWrapper title="What's Next?" className="bg-card/95 backdrop-blur-sm border border-border">
+            <SectionWrapper title="What's Next?">
               <CardActionGroup
                 primaryActions={navigationActions}
                 layout="horizontal"
@@ -445,7 +469,6 @@ export function EndingScreen() {
           </section>
         </div>
       </div>
-
     </>
   );
 }

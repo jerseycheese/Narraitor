@@ -37,12 +37,7 @@ import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
  * - Utilizes `JsonViewer` for structured data display
  * 
  * @example
- * ```tsx
- * // Used within DevToolsPanel
- * <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
- *   <ConsistencyValidationSection />
- * </CollapsibleSection>
- * ```
+ * ```tsx * // Used within DevToolsPanel * <CollapsibleSection title="Consistency Validation" initialCollapsed={true}> * <ConsistencyValidationSection /> * </CollapsibleSection> *```
  * 
  * @since 1.0.0 - Issue #184: AI Consistency Validation System
  */
@@ -95,16 +90,16 @@ export const ConsistencyValidationSection = () => {
   }, [loreContext, worldLoreFacts]);
 
   return (
-    <div className="flex flex-col space-y-3">
+    <div>
       {/* World Selection */}
       <DevToolsSection>
-        <label className="block text-xs text-gray-900 mb-1">
+        <label>
           Select World for Consistency Analysis:
         </label>
         <Select 
           value={selectedWorldId} 
           onChange={(e) => setSelectedWorldId(e.target.value)}
-          className="text-xs"
+          
         >
           <option value="">-- Select a World --</option>
           {availableWorldIds.map(worldId => (
@@ -119,7 +114,7 @@ export const ConsistencyValidationSection = () => {
         <>
           {/* Lore Statistics */}
           <DevToolsSection title="Lore Statistics">
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-900">
+            <div>
               <div>Total Facts: {loreStats.totalFacts}</div>
               <div>High Importance: {loreStats.highImportance}</div>
               <div>Characters: {loreStats.characters}</div>
@@ -131,39 +126,39 @@ export const ConsistencyValidationSection = () => {
 
           {/* Generated Consistency Instructions */}
           <DevToolsSection title="Generated Consistency Instructions">
-            <div className="bg-white p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-gray-900 border border-gray-300">
+            <div>
               {consistencyInstructions || 'No instructions generated'}
             </div>
           </DevToolsSection>
 
           {/* Structured Lore Context */}
           <DevToolsSection title="Structured Lore Context">
-            <div className="max-h-48 overflow-y-auto">
+            <div>
               <JsonViewer 
                 data={loreContext} 
-                className="bg-white"
+                
               />
             </div>
           </DevToolsSection>
 
           {/* Raw Lore Facts */}
           <DevToolsSection title={`Raw Lore Facts (${worldLoreFacts.length})`}>
-            <div className="max-h-48 overflow-y-auto">
+            <div>
               <JsonViewer 
                 data={worldLoreFacts} 
-                className="bg-white"
+                
               />
             </div>
           </DevToolsSection>
 
           {/* Categorization Breakdown */}
           <DevToolsSection title="Categorization Details">
-            <div className="space-y-2 text-xs">
+            <div>
               {loreContext.characters.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-900">Characters:</div>
+                  <div>Characters:</div>
                   {loreContext.characters.map((char, idx) => (
-                    <div key={idx} className="ml-2 text-gray-700">
+                    <div key={idx} >
                       {char.name} - {char.importance} importance - Traits: {char.traits.join(', ')}
                     </div>
                   ))}
@@ -172,9 +167,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.locations.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-900">Locations:</div>
+                  <div>Locations:</div>
                   {loreContext.locations.map((loc, idx) => (
-                    <div key={idx} className="ml-2 text-gray-700">
+                    <div key={idx} >
                       {loc.name} ({loc.type}) - {loc.importance} importance
                     </div>
                   ))}
@@ -183,9 +178,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.worldRules.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-900">World Rules:</div>
+                  <div>World Rules:</div>
                   {loreContext.worldRules.map((rule, idx) => (
-                    <div key={idx} className="ml-2 text-gray-700">
+                    <div key={idx} >
                       {rule.rule} - {rule.importance} importance
                     </div>
                   ))}
@@ -194,9 +189,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.historicalEvents.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-900">Historical Events:</div>
+                  <div>Historical Events:</div>
                   {loreContext.historicalEvents.map((event, idx) => (
-                    <div key={idx} className="ml-2 text-gray-700">
+                    <div key={idx} >
                       {event.event} - {event.importance} importance
                     </div>
                   ))}
@@ -208,7 +203,7 @@ export const ConsistencyValidationSection = () => {
       )}
 
       {!selectedWorldId && availableWorldIds.length === 0 && (
-        <div className="text-xs text-gray-700">
+        <div>
           No lore facts found. Create some lore in a game session to test consistency validation.
         </div>
       )}

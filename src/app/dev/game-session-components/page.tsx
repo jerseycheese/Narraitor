@@ -50,32 +50,32 @@ export default function GameSessionComponentsTestPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">GameSession Components Test Page</h1>
+    <div>
+      <h1>GameSession Components Test Page</h1>
       
-      <div className="space-y-8">
+      <div>
         {/* ChoiceSelector Component */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">ChoiceSelector Component</h2>
+        <section>
+          <h2>ChoiceSelector Component</h2>
           <ChoiceSelector
             decision={mockDecision}
             onSelect={handleChoiceSelected}
           />
-          <p className="mt-2 text-sm text-gray-700">
+          <p>
             Selected: {selectedChoiceId || 'None'}
           </p>
         </section>
 
         {/* SessionControls Component */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">SessionControls Component</h2>
-          <div className="space-y-4">
+        <section>
+          <h2>SessionControls Component</h2>
+          <div>
             <div>
-              <h3 className="font-medium mb-2">Basic Controls (End Only)</h3>
+              <h3>Basic Controls (End Only)</h3>
               <SessionControls onEnd={handleEnd} />
             </div>
             <div>
-              <h3 className="font-medium mb-2">All Controls</h3>
+              <h3>All Controls</h3>
               <SessionControls 
                 onEnd={handleEnd}
                 onRestart={handleRestart}
@@ -86,18 +86,17 @@ export default function GameSessionComponentsTestPage() {
         </section>
 
         {/* GameSessionLoading Component */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">GameSessionLoading Component</h2>
+        <section>
+          <h2>GameSessionLoading Component</h2>
           <GameSessionLoading />
           <GameSessionLoading loadingMessage="Preparing your adventure..." />
         </section>
 
         {/* GameSessionError Component */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">GameSessionError Component</h2>
+        <section>
+          <h2>GameSessionError Component</h2>
           <button
             onClick={() => setShowError(true)}
-            className="mb-4 px-4 py-2 bg-red-500 text-white rounded"
           >
             Show Error
           </button>
@@ -112,8 +111,8 @@ export default function GameSessionComponentsTestPage() {
 
 
         {/* Disabled State Demo */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">Disabled ChoiceSelector</h2>
+        <section>
+          <h2>Disabled ChoiceSelector</h2>
           <ChoiceSelector
             decision={mockDecision}
             onSelect={handleChoiceSelected}

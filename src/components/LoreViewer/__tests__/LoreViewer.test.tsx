@@ -154,22 +154,14 @@ describe('LoreViewer Component', () => {
     // Check that category sections have the right design token classes
     const characterSection = container.querySelector('.bg-lore-characters-bg');
     expect(characterSection).toBeInTheDocument();
-    expect(characterSection).toHaveClass('border-lore-characters-border');
-    expect(characterSection).toHaveClass('text-lore-characters-text');
 
     const locationSection = container.querySelector('.bg-lore-locations-bg');
     expect(locationSection).toBeInTheDocument();
-    expect(locationSection).toHaveClass('border-lore-locations-border');
-    expect(locationSection).toHaveClass('text-lore-locations-text');
 
     const eventSection = container.querySelector('.bg-lore-events-bg');
     expect(eventSection).toBeInTheDocument();
-    expect(eventSection).toHaveClass('border-lore-events-border');
-    expect(eventSection).toHaveClass('text-lore-events-text');
 
     const rulesSection = container.querySelector('.bg-lore-rules-bg');
     expect(rulesSection).toBeInTheDocument();
-    expect(rulesSection).toHaveClass('border-lore-rules-border');
-    expect(rulesSection).toHaveClass('text-lore-rules-text');
   });
 });

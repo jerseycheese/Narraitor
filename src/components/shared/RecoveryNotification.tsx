@@ -1,40 +1,19 @@
 /**
  * RecoveryNotification Component
- * 
+ *
  * A modal dialog that presents recovery options when saved character creation data is detected.
- * Provides clear user choice between recovering previous progress or starting fresh with 
+ * Provides clear user choice between recovering previous progress or starting fresh with
  * comprehensive data preview and conflict detection.
- * 
+ *
  * Key Features:
  * - Data preview with character name, progress step, and completion status
  * - Conflict warnings when current form data would be overwritten
  * - Accessible modal dialog with proper ARIA attributes and focus management
  * - Formatted timestamp display with graceful error handling
  * - Auto-focus on primary action for optimal keyboard navigation
- * 
+ *
  * @example
- * ```tsx
- * function CharacterCreationWizard() {
- *   const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = 
- *     useCharacterCreationAutoSave(worldId);
- *   const [showDialog, setShowDialog] = useState(false);
- * 
- *   useEffect(() => {
- *     if (hasRecoveryData) setShowDialog(true);
- *   }, [hasRecoveryData]);
- * 
- *   return (
- *     <RecoveryNotification
- *       isVisible={showDialog}
- *       lastSaved={recoveryPreview?.lastSaved}
- *       recoveryData={recoveryPreview}
- *       hasCurrentData={hasCurrentData}
- *       onRecover={() => setShowDialog(false)}
- *       onDismiss={() => { clearAutoSave(); setShowDialog(false); }}
- *     />
- *   );
- * }
- * ```
+ * ```tsx * function CharacterCreationWizard() { * const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = * useCharacterCreationAutoSave(worldId); * const [showDialog, setShowDialog] = useState(false); * * useEffect(() => { * if (hasRecoveryData) setShowDialog(true); * }, [hasRecoveryData]); * * return ( * <RecoveryNotification * isVisible={showDialog} * lastSaved={recoveryPreview?.lastSaved} * recoveryData={recoveryPreview} * hasCurrentData={hasCurrentData} * onRecover={() => setShowDialog(false)} * onDismiss={() => { clearAutoSave(); setShowDialog(false); }} * /> * ); * } *```
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -85,10 +64,10 @@ interface RecoveryNotificationProps {
 
 /**
  * RecoveryNotification Component
- * 
+ *
  * Renders a modal dialog allowing users to choose between recovering saved character data
  * or starting fresh. Includes comprehensive data preview and conflict warnings.
- * 
+ *
  * @param props - Component props
  * @returns JSX element or null if not visible
  */
@@ -119,7 +98,8 @@ export function RecoveryNotification({
 
   // Format timestamp with error handling
   const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;
-  const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
+  const validDate =
+    formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
 
   /**
    * Maps step index to user-friendly step name
@@ -127,7 +107,13 @@ export function RecoveryNotification({
    * @returns Human-readable step description
    */
   const getStepDescription = (step?: number): string => {
-    const stepNames = ['Basic Info', 'Attributes', 'Skills', 'Background', 'Portrait'];
+    const stepNames = [
+      'Basic Info',
+      'Attributes',
+      'Skills',
+      'Background',
+      'Portrait',
+    ];
     if (step !== undefined && step >= 0 && step < stepNames.length) {
       return `${stepNames[step]} step`;
     }
@@ -143,12 +129,10 @@ export function RecoveryNotification({
       showCloseButton={true}
       size="md"
       ariaDescribedBy="recovery-notification-content"
-      className="max-w-lg"
     >
-      <div id="recovery-notification-content" className="flex items-center mb-4">
-        <div className="flex-shrink-0 mr-3">
+      <div id="recovery-notification-content">
+        <div>
           <svg
-            className="h-6 w-6 text-amber-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -163,62 +147,68 @@ export function RecoveryNotification({
           </svg>
         </div>
       </div>
-      
+
       <div>
-          <p className="text-sm text-muted-foreground mb-4">
-            {hasCurrentData && (
-              <span className="block mt-2 text-amber-500 font-medium inline-flex items-center gap-1">
-                <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-                <span className="sr-only">Warning:</span>
-                <span>Recovering will replace any current form data you&apos;ve entered.</span>
+        <p>
+          {hasCurrentData && (
+            <span>
+              <AlertTriangle aria-hidden="true" />
+              <span>Warning:</span>
+              <span>
+                Recovering will replace any current form data you&apos;ve
+                entered.
               </span>
-            )}
-          </p>
+            </span>
+          )}
+        </p>
 
-          {/* Recovery Data Preview */}
-          {recoveryData && (
-            <div className="bg-muted rounded-md p-4 mb-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Saved Progress Preview:</h4>
-              <div className="space-y-1 text-sm text-muted-foreground">
-                {recoveryData.name && (
-                  <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
+        {/* Recovery Data Preview */}
+        {recoveryData && (
+          <div>
+            <h4>Saved Progress Preview:</h4>
+            <div>
+              {recoveryData.name && (
+                <div>
+                  Character name: <span>{recoveryData.name}</span>
+                </div>
+              )}
+              {recoveryData.currentStep !== undefined && (
+                <div>
+                  Progress:{' '}
+                  <span>{getStepDescription(recoveryData.currentStep)}</span>
+                </div>
+              )}
+              {recoveryData.hasAttributes &&
+                recoveryData.totalAttributePoints !== undefined && (
+                  <div>
+                    Attribute points allocated:{' '}
+                    <span>{recoveryData.totalAttributePoints}</span>
+                  </div>
                 )}
-                {recoveryData.currentStep !== undefined && (
-                  <div>Progress: <span className="font-medium">{getStepDescription(recoveryData.currentStep)}</span></div>
+              {recoveryData.hasSkills &&
+                recoveryData.selectedSkillCount !== undefined && (
+                  <div>
+                    Skills selected:{' '}
+                    <span>{recoveryData.selectedSkillCount}</span>
+                  </div>
                 )}
-                {recoveryData.hasAttributes && recoveryData.totalAttributePoints !== undefined && (
-                  <div>Attribute points allocated: <span className="font-medium">{recoveryData.totalAttributePoints}</span></div>
-                )}
-                {recoveryData.hasSkills && recoveryData.selectedSkillCount !== undefined && (
-                  <div>Skills selected: <span className="font-medium">{recoveryData.selectedSkillCount}</span></div>
-                )}
-                {recoveryData.hasBackground && (
-                  <div>Background: <span className="font-medium">Completed</span></div>
-                )}
-              </div>
+              {recoveryData.hasBackground && (
+                <div>
+                  Background: <span>Completed</span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {validDate && (
-            <p className="text-xs text-muted-foreground mb-3">
-              Last saved: {validDate}
-            </p>
-          )}
+        {validDate && <p>Last saved: {validDate}</p>}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mt-6">
-        <Button
-          ref={recoverButtonRef}
-          onClick={onRecover}
-          className="flex-1"
-        >
+      <div>
+        <Button ref={recoverButtonRef} onClick={onRecover}>
           Recover Progress
         </Button>
-        <Button
-          onClick={onDismiss}
-          variant="outline"
-          className="flex-1"
-        >
+        <Button onClick={onDismiss} variant="outline">
           Start Fresh
         </Button>
       </div>

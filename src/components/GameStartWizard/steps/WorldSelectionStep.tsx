@@ -15,16 +15,16 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
 
   if (worldList.length === 0) {
     return (
-      <div className="text-center py-12">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+      <div>
+        <h3>
           No Worlds Yet
         </h3>
-        <p className="text-gray-700 mb-8">
+        <p>
           Create your first world to begin your adventure
         </p>
         <Link
           href="/worlds/create"
-          className="inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+          
         >
           Create Your First World
         </Link>
@@ -34,13 +34,13 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
 
   return (
     <div data-testid="world-selection-step">
-      <h3 className="text-xl font-semibold text-gray-900 mb-6">
+      <h3>
         Choose Your World
       </h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div>
         {worldList.map(world => (
-          <div key={world.id} className="cursor-pointer">
+          <div key={world.id} >
             <WorldCard 
               world={world}
               isActive={false}
@@ -51,14 +51,14 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
         ))}
       </div>
 
-      <div className="flex justify-between items-center pt-4 border-t">
+      <div>
         <Link
           href="/worlds/create"
-          className="text-link-primary font-medium no-underline"
+          
         >
           Create New World
         </Link>
-        <p className="text-sm text-gray-700">
+        <p>
           Click a world to continue
         </p>
       </div>

@@ -13,7 +13,7 @@ interface BackNavigationProps {
 
 export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
   const router = useRouter();
-  
+
   const handleClick = () => {
     if (onClick) {
       onClick();
@@ -25,14 +25,8 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
   };
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      onClick={handleClick}
-      className="flex items-center gap-2"
-    >
-      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+    <Button type="button" variant="ghost" size="sm" onClick={handleClick}>
+      <ArrowLeft aria-hidden="true" />
       <span>{label}</span>
     </Button>
   );

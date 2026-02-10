@@ -57,14 +57,13 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
     <div className={`${wizardStyles.divider} ${className}`}>
       <h3 className={wizardStyles.subheading}>{title}</h3>
       {description && (
-        <p className="text-sm text-gray-700 mb-4">{description}</p>
+        <p>{description}</p>
       )}
-      <div className="space-y-2">
+      <div>
         {templateHistoryManager.getRecent().map((entry, index) => (
           <div 
             key={index}
-            className={`border rounded-lg p-4 cursor-pointer transition-all hover:border-blue-500 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-              ${selectedTemplateId === `ai-template-${entry.template.name}` ? 'selected-template border-blue-500 bg-blue-50 shadow-md' : 'border-gray-300'}`}
+            className={`${selectedTemplateId === `ai-template-${entry.template.name}` ? 'selected-template' : ''}`}
             onClick={() => handleTemplateClick(entry)}
             onKeyPress={(e) => handleKeyPress(e, entry)}
             role="button"
@@ -72,17 +71,17 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
             aria-label={`Use template: ${entry.template.name} (${getGenreLabel(entry.template.genre)})`}
             data-testid={`recent-template-${index}`}
           >
-            <div className="space-y-2">
+            <div>
               <div>
-                <h4 className="font-medium text-lg">{entry.template.name}</h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm font-medium text-gray-700">{getGenreLabel(entry.template.genre)}</span>
+                <h4>{entry.template.name}</h4>
+                <div>
+                  <span>{getGenreLabel(entry.template.genre)}</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p>
                   Generated {formatDate(entry.generatedAt)}
                 </p>
               </div>
-              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary} self-start`}>
+              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                 {entry.generationType === 'inspired-by' ? 'Inspired' : 
                  entry.generationType === 'genre-mix' ? 'Mixed' : 'Surprise'}
               </span>

@@ -12,14 +12,23 @@ interface StorySummarySectionProps {
   characterId?: string;
 }
 
-export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldId, sessionId, characterId }) => {
+export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
+  worldId,
+  sessionId,
+  characterId,
+}) => {
   useStoryCheckpointManager({ worldId, sessionId, characterId });
-  const worldState = useWorldStore(state => worldId ? state.worldStates[worldId] : undefined);
+  const worldState = useWorldStore((state) =>
+    worldId ? state.worldStates[worldId] : undefined
+  );
 
   // Get all checkpoints for this session
   const checkpointsForSession = React.useMemo(
-    () => (worldState?.storyCheckpoints ?? []).filter((checkpoint) => checkpoint.sessionId === sessionId),
-    [worldState?.storyCheckpoints, sessionId],
+    () =>
+      (worldState?.storyCheckpoints ?? []).filter(
+        (checkpoint) => checkpoint.sessionId === sessionId
+      ),
+    [worldState?.storyCheckpoints, sessionId]
   );
 
   // Build complete story from all segments
@@ -37,7 +46,10 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
     : [];
 
   return (
-    <section className="mt-6" data-testid="story-summary-section" data-tutorial="story-summary-section">
+    <section
+      data-testid="story-summary-section"
+      data-tutorial="story-summary-section"
+    >
       <CollapsibleSection title="The Story So Far" initialCollapsed>
         <div>
           {summaryParagraphs.length > 0 ? (
@@ -47,9 +59,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">
-              Your story will appear here once major events occur.
-            </p>
+            <p>Your story will appear here once major events occur.</p>
           )}
         </div>
       </CollapsibleSection>

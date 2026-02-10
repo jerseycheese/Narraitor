@@ -137,11 +137,11 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         title="Choose a Starting Template"
         description="Character templates will help you get started quickly"
       >
-        <div className="text-center py-8">
-          <p className="text-muted-foreground mb-4">
+        <div>
+          <p>
             No templates available for this world yet.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p>
             Continue to create your character from scratch.
           </p>
         </div>
@@ -155,8 +155,8 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       description="Select a pre-configured character template or skip to create from scratch"
     >
       {/* Info banner */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700">
+      <div>
+        <p>
           These templates are tailored to your <strong>{getGenreLabel(worldConfig.genre)}</strong> world.
           Select one to get started quickly, or skip to create your own character from scratch.
           You can customize any template values in the following steps.
@@ -164,30 +164,28 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       </div>
 
       {/* Template Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div>
         {templates.map(template => (
           <ActiveStateCard
             key={template.id}
             isActive={selectedTemplateId === template.id}
             activeText="Selected Template"
             onClick={() => handleTemplateSelect(template)}
-            activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-500"
-            inactiveClassName="border-gray-300 bg-white hover:shadow-lg hover:border-gray-400"
             testId="template-card"
           >
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xl font-bold text-gray-900">
+            <CardHeader>
+              <CardTitle>
                 {template.name}
               </CardTitle>
-              <CardDescription className="text-sm text-gray-700">
+              <CardDescription>
                 {template.description}
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent>
               {/* Personality */}
               <div>
-                <p className="text-sm text-gray-700 leading-relaxed italic">
+                <p>
                   &ldquo;{template.background.personality}&rdquo;
                 </p>
               </div>
@@ -195,10 +193,10 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
               {/* Top 3 Attributes */}
               {template.attributes && template.attributes.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
+                  <h4>
                     Key Attributes
                   </h4>
-                  <div className="flex flex-wrap gap-1">
+                  <div>
                     {[...template.attributes]
                       .sort((a, b) => b.value - a.value)
                       .slice(0, 3)
@@ -206,7 +204,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                         <Badge
                           key={`${template.id}-attr-${idx}`}
                           variant="secondary"
-                          className="text-xs"
+                          
                         >
                           {attr.name} {attr.value}
                         </Badge>
@@ -218,10 +216,10 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
               {/* Top 3 Skills */}
               {template.skills && template.skills.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
+                  <h4>
                     Best Skills
                   </h4>
-                  <div className="flex flex-wrap gap-1">
+                  <div>
                     {[...template.skills]
                       .sort((a, b) => b.level - a.level)
                       .slice(0, 3)
@@ -229,7 +227,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                         <Badge
                           key={`${template.id}-skill-${idx}`}
                           variant="outline"
-                          className="text-xs"
+                          
                         >
                           {skill.name} {skill.level}
                         </Badge>
@@ -240,17 +238,17 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
 
               {/* Motivation */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                <h4>
                   Motivation
                 </h4>
-                <p className="text-xs text-gray-700 italic">
+                <p>
                   &ldquo;{template.background.motivation}&rdquo;
                 </p>
               </div>
 
               {/* Select Button */}
               <Button
-                className="w-full mt-4"
+                
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTemplateSelect(template);
@@ -265,11 +263,11 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       </div>
 
       {/* Help Text */}
-      <div className="mt-6 text-center space-y-2">
-        <p className="text-sm text-muted-foreground">
+      <div>
+        <p>
           Selected a template? Click <strong>Next</strong> to customize it further.
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p>
           All template values can be modified in the following steps.
         </p>
       </div>

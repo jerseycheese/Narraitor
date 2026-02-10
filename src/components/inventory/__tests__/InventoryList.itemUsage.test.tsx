@@ -265,7 +265,7 @@ describe('InventoryList - Item Usage', () => {
       jest.clearAllMocks();
     });
 
-    it('should not display inline success feedback after item is used', async () => {
+    it('should not display success feedback after item is used', async () => {
       const user = userEvent.setup();
 
       // Mock successful item usage with immediate response

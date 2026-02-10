@@ -62,7 +62,7 @@ export const WithErrors: Story = {
         category: ErrorCategory.REACT,
         componentContext: {
           componentName: 'UserProfile',
-          componentStack: 'at UserProfile\n  at Dashboard\n  at App'
+          componentStack: 'at UserProfile\n at Dashboard\n at App'
         }
       },
       {
@@ -96,7 +96,7 @@ export const HighSeverityOnly: Story = {
         category: ErrorCategory.REACT,
         componentContext: {
           componentName: 'DataVisualization',
-          componentStack: 'at DataVisualization\n  at ReportPage\n  at App'
+          componentStack: 'at DataVisualization\n at ReportPage\n at App'
         }
       }
     ]);
@@ -142,7 +142,7 @@ export const Interactive: Story = {
         category: ErrorCategory.REACT,
         componentContext: {
           componentName: 'ExampleComponent',
-          componentStack: 'at ExampleComponent\n  at ExamplePage\n  at App'
+          componentStack: 'at ExampleComponent\n at ExamplePage\n at App'
         }
       },
       {
@@ -153,13 +153,13 @@ export const Interactive: Story = {
     ]);
     
     return (
-      <div className="space-y-4">
-        <div className="bg-blue-50 p-4 rounded border border-blue-200">
-          <h3 className="font-medium text-blue-900 mb-2">Interactive Demo</h3>
-          <p className="text-sm text-blue-700 mb-3">
+      <div>
+        <div>
+          <h3>Interactive Demo</h3>
+          <p>
             This demo shows the ErrorSection with sample errors. You can:
           </p>
-          <ul className="text-sm text-blue-700 space-y-1 ml-4 list-disc">
+          <ul>
             <li>Expand error details to see stack traces and component context</li>
             <li>Dismiss individual errors using the × button</li>
             <li>Filter errors by severity or category using the filters</li>

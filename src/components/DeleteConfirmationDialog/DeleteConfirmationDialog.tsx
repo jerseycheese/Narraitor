@@ -35,7 +35,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       size="lg"
       tone="destructive"
       footer={(
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div>
           <Button
             type="button"
             onClick={onClose}
@@ -57,9 +57,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           </Button>
         </div>
       )}
-      footerClassName="bg-background"
     >
-      <p className="text-base font-semibold text-foreground">{itemName}</p>
+      <p>{itemName}</p>
     </SimpleModal>
   );
 };

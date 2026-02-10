@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 import { safeTrim } from '@/lib/utils';
 
 
@@ -21,10 +21,10 @@ export interface StoryEndingDialogProps {
 }
 
 const endingTypeClasses: Record<EndingType, string> = {
-  triumphant: 'ending-triumphant border-amber-300',
-  mysterious: 'ending-mysterious border-gray-300',
-  tragic: 'ending-tragic border-destructive',
-  default: 'ending-default border-gray-300',
+  triumphant: 'ending-triumphant',
+  mysterious: 'ending-mysterious',
+  tragic: 'ending-tragic',
+  default: 'ending-default',
 };
 
 export function StoryEndingDialog({
@@ -66,19 +66,19 @@ export function StoryEndingDialog({
       showCloseButton={false}
       size="xl"
       ariaDescribedBy="story-ending-content"
-      className={cn(
-        'sm:rounded-lg',
+      className={cssClasses(
+        '',
         endingTypeClasses[endingType]
       )}
     >
-      <div className="mt-6 flex flex-col-reverse sm:flex-row gap-2">
+      <div>
         <Button
           ref={closeButtonRef}
           onClick={onClose}
           variant="outline"
-          className="w-full sm:w-auto"
+          
           type="button"
-          aria-label={`${closeText} and dismiss dialog`}
+        aria-label={`${closeText} and dismiss dialog`}
         >
           {closeText}
         </Button>
@@ -86,10 +86,10 @@ export function StoryEndingDialog({
           <Button
             ref={continueButtonRef}
             onClick={onContinue}
-            className="w-full sm:w-auto bg-blue-700 hover:bg-blue-900 text-white border-0 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            
             variant="default"
             type="button"
-            aria-label={`${continueText} - this will show the story ending`}
+            aria-label={`${continueText}- this will show the story ending`}
           >
             {continueText}
           </Button>

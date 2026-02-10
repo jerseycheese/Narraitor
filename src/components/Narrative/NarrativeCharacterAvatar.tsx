@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 
 interface NarrativeCharacterAvatarProps {
   name: string;
@@ -7,11 +7,6 @@ interface NarrativeCharacterAvatarProps {
   size?: 'sm' | 'md';
   className?: string;
 }
-
-const sizeClassMap = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm'
-} as const;
 
 const getInitials = (name: string): string => {
   const sanitized = name
@@ -43,14 +38,12 @@ export function NarrativeCharacterAvatar({
   className
 }: NarrativeCharacterAvatarProps) {
   const initials = React.useMemo(() => getInitials(name), [name]);
-  const dimensionClasses = sizeClassMap[size];
 
   if (avatarUrl) {
     return (
       <div
-        className={cn(
-          'flex-shrink-0 overflow-hidden rounded-full bg-muted',
-          dimensionClasses,
+        className={cssClasses(
+          '',
           className
         )}
       >
@@ -61,7 +54,7 @@ export function NarrativeCharacterAvatar({
           alt={name}
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover"
+          
         />
       </div>
     );
@@ -69,9 +62,8 @@ export function NarrativeCharacterAvatar({
 
   return (
     <div
-      className={cn(
-        'flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-secondary text-secondary-foreground font-semibold',
-        dimensionClasses,
+      className={cssClasses(
+        '',
         className
       )}
       role="img"
@@ -79,7 +71,7 @@ export function NarrativeCharacterAvatar({
       data-testid="narrative-avatar-placeholder"
     >
       <span aria-hidden="true">{initials}</span>
-      <span className="sr-only">{name}</span>
+      <span>{name}</span>
     </div>
   );
 }

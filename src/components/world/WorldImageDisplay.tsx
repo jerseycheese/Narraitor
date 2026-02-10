@@ -15,7 +15,8 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
     return null;
   }
 
-  const hasMetadata = image.generatedAt || image.prompt || image.type === 'ai-generated';
+  const hasMetadata =
+    image.generatedAt || image.prompt || image.type === 'ai-generated';
 
   // Don't show a section if there's no meaningful metadata to display
   if (!hasMetadata) {
@@ -23,23 +24,21 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
   }
 
   return (
-    <section className="bg-background rounded-lg border p-6 mb-6 shadow-sm" aria-labelledby="image-details-heading">
-      <h2 id="image-details-heading" className="text-2xl font-semibold mb-4">
-        World image details
-      </h2>
+    <section aria-labelledby="image-details-heading">
+      <h2 id="image-details-heading">World image details</h2>
 
-      <div className="space-y-4">
+      <div>
         <DataField
           label="Image Type"
           value={image.type === 'ai-generated' ? 'AI Generated' : 'Custom'}
-          variant="inline"
+          variant="outline"
         />
 
         {image.generatedAt && (
           <DataField
             label="Generated"
             value={formatDate(image.generatedAt)}
-            variant="inline"
+            variant="outline"
           />
         )}
 

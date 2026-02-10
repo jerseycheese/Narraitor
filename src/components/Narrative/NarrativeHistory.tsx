@@ -239,7 +239,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   };
 
   // Use full height - let the parent container control the height via JavaScript or CSS
-  const heightClass = 'h-full flex-1';
+  const heightClass = '';
   
   // Get the ScrollArea's viewport element for scroll control
   useEffect(() => {
@@ -259,17 +259,17 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   
   return (
     <div
-      className={`narrative-history-container outline-none ${className}`}
+      className={['narrative-history-container', className].filter(Boolean).join(' ')}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <ScrollArea 
         ref={scrollAreaRef}
-        className={`${heightClass} mobile-scroll`}
-        viewportClassName="snap-y snap-mandatory scroll-smooth"
+        className={[heightClass, 'mobile-scroll'].filter(Boolean).join(' ')}
+        viewportClassName="scroll-smooth"
         viewportStyle={{ scrollPaddingBlock: '2rem' }}
       >
-        <div className="space-y-4">
+        <div>
           {renderContent()}
         </div>
       </ScrollArea>

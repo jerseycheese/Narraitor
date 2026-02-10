@@ -1,6 +1,8 @@
-export default {
+const config = {
   plugins: {
-    tailwindcss: {},
+    // tailwindcss: {}, // Removed for Clean Slate
     autoprefixer: {},
   },
-}
+};
+
+export default config;

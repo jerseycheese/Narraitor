@@ -18,23 +18,24 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
   error,
   required = false,
   helpText,
-  children
+  children,
 }) => {
   return (
-    <div className="space-y-2">
+    <div>
       <Label>
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        {required && <span>*</span>}
       </Label>
       {helpText && (
-        <p className={wizardStyles.form.helpText} data-testid="wizard-form-help-text">
+        <p
+          className={wizardStyles.form.helpText}
+          data-testid="wizard-form-help-text"
+        >
           {helpText}
         </p>
       )}
       {children}
-      {error && (
-        <p className={errorStyles.message}>{error}</p>
-      )}
+      {error && <p className={errorStyles.message}>{error}</p>}
     </div>
   );
 };
@@ -171,12 +172,12 @@ interface WizardFieldErrorProps {
   error?: string;
 }
 
-export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({ error }) => {
+export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({
+  error,
+}) => {
   if (!error) return null;
-  
-  return (
-    <p className={errorStyles.message}>{error}</p>
-  );
+
+  return <p className={errorStyles.message}>{error}</p>;
 };
 
 interface WizardFormSectionProps {
@@ -192,17 +193,22 @@ export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
   children,
   dataTutorial,
 }) => {
-  const headerProps = dataTutorial ? { 'data-tutorial': dataTutorial } : undefined;
-  const sectionProps = !title && !description && dataTutorial
+  const headerProps = dataTutorial
     ? { 'data-tutorial': dataTutorial }
     : undefined;
+  const sectionProps =
+    !title && !description && dataTutorial
+      ? { 'data-tutorial': dataTutorial }
+      : undefined;
 
   return (
-    <div className="space-y-4 my-4" {...sectionProps}>
+    <div {...sectionProps}>
       {(title || description) && (
-        <div className="mb-4" {...headerProps}>
+        <div {...headerProps}>
           {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
-          {description && <p className={wizardStyles.step.description}>{description}</p>}
+          {description && (
+            <p className={wizardStyles.step.description}>{description}</p>
+          )}
         </div>
       )}
       {children}

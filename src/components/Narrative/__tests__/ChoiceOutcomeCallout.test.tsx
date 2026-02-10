@@ -15,7 +15,7 @@ describe('ChoiceOutcomeCallout', () => {
     expect(screen.getByText(/You choose to help the merchant/)).toBeInTheDocument();
   });
 
-  it('should render callout container with decision id', () => {
+  it('should render callout with decision id', () => {
     render(<ChoiceOutcomeCallout {...defaultProps} />);
 
     const badge = screen.getByText(/You choose to help the merchant/).closest('[data-decision-id]');
@@ -31,11 +31,12 @@ describe('ChoiceOutcomeCallout', () => {
 
   it('should accept custom className', () => {
     const { container } = render(
-      <ChoiceOutcomeCallout {...defaultProps} className="custom-class" />
+      <ChoiceOutcomeCallout {...defaultProps} className="test-class" />
     );
 
-    const badge = container.querySelector('.custom-class');
-    expect(badge).toBeInTheDocument();
+    const callout = container.querySelector('.choice-outcome-callout');
+    expect(callout).toBeInTheDocument();
+    expect(callout).toHaveClass('test-class');
   });
 
   it('should handle various decision text formats', () => {

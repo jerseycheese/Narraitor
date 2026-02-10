@@ -16,25 +16,25 @@ interface CharacterHeaderProps {
 
 export function CharacterHeader({ character, world }: CharacterHeaderProps) {
   return (
-    <div className="flex items-start gap-6 mb-8">
+    <div>
       <CharacterPortrait
         portrait={character.portrait || { type: 'placeholder', url: null }}
         characterName={character.name}
         size="xlarge"
       />
-      <div className="flex-1 prose prose-gray dark:prose-invert">
-        <h2 className="text-3xl font-bold mb-2">{character.name}</h2>
-        <p className="text-muted-foreground mb-4">Level {character.level}</p>
+      <div className="prose prose-gray dark:prose-invert">
+        <h2>{character.name}</h2>
+        <p>Level {character.level}</p>
         {character.background.personality && (
-          <p className="italic">
+          <p>
             {character.background.personality}
           </p>
         )}
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
+        <div>
+          <p>
             <strong>Created:</strong> {formatDate(character.createdAt)}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p>
             <strong>World:</strong> {world.name}
           </p>
         </div>

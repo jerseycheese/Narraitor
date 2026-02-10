@@ -20,7 +20,7 @@ interface CharacterAttributeDisplayProps {
 export function CharacterAttributeDisplay({ attributes, showCategories = false }: CharacterAttributeDisplayProps) {
   if (attributes.length === 0) {
     return (
-      <div className="text-muted-foreground text-center py-4">
+      <div>
         No attributes assigned to this character.
       </div>
     );
@@ -38,13 +38,13 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
     }, {} as Record<string, CharacterAttribute[]>);
 
     return (
-      <div className="space-y-6">
+      <div>
         {Object.entries(categorizedAttributes).map(([category, attrs]) => (
           <div key={category}>
-            <h3 className="text-lg font-semibold mb-3 text-foreground capitalize">
+            <h3>
               {category}
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
               {attrs.map((attr, index) => (
                 <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
               ))}
@@ -56,7 +56,7 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div>
       {attributes.map((attr, index) => (
         <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
       ))}
@@ -66,20 +66,20 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
 
 function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
   return (
-    <div className="bg-muted rounded-lg p-4 border">
-      <div className="text-sm font-medium text-muted-foreground mb-1">
+    <div>
+      <div>
         {attribute.name}
       </div>
-      <div className="text-2xl font-bold">
+      <div>
         {attribute.modifiedValue}
       </div>
       {attribute.baseValue !== attribute.modifiedValue && (
-        <div className="text-xs text-muted-foreground mb-2">
+        <div>
           Base: {attribute.baseValue}
         </div>
       )}
       {attribute.description && (
-        <p className="text-xs text-muted-foreground">{attribute.description}</p>
+        <p>{attribute.description}</p>
       )}
     </div>
   );

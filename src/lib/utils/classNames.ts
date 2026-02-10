@@ -1,12 +1,10 @@
 import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
 
 /**
- * Enhanced utility for combining class names with Tailwind CSS support
+ * Utility for combining class names
  * - Uses clsx for flexible className combining (strings, objects, arrays)
- * - Uses twMerge for intelligent Tailwind class deduplication and merging
- * - Handles conflicting Tailwind classes (e.g., "bg-red-500 bg-blue-500" → "bg-blue-500")
+ * - REPLACES Tailwind-aware 'cn' utility for Clean Slate implementation
  */
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs))
+export function cssClasses(...inputs: ClassValue[]): string {
+  return clsx(inputs)
 }

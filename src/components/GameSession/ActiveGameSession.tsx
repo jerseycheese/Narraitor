@@ -198,7 +198,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // If generating ending, show loading state
   if (isGeneratingEnding) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div>
         <LoadingState
           message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
         />
@@ -210,10 +210,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // always mount the hidden NarrativeController to drive generation.
   if (!isGameReady) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div>
         <GameSessionSkeleton />
         {/* Hidden controller that actually performs generation while skeleton shows */}
-        <div aria-hidden="true" className="hidden h-0 overflow-hidden">
+        <div aria-hidden="true" >
           <NarrativeController
             key={`generator-${controllerKey}`}
             worldId={worldId}
@@ -231,7 +231,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
         {/* Character Summary Panel - show immediately when character data is available */}
         {character && (
-          <div className="mt-6">
+          <div>
             <CharacterSummary character={character} />
           </div>
         )}
@@ -240,10 +240,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }
 
   return (
-    <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
+    <div data-testid="game-session-active" role="region" aria-label="Game session" >
 
       {/* Two-column layout for larger screens */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
+      <div>
         {/* Story Column */}
         <ActiveGameSessionNarrativeColumn
           controllerKey={controllerKey}

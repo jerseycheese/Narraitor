@@ -66,7 +66,7 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(ChoiceSelector).not.toHaveBeenCalled();
   });
 
-  it('sets the tutorial anchor on the choices container', () => {
+  it('sets the tutorial anchor on the choices', () => {
     const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} />);
     const choicesContainer = container.querySelector('[data-tutorial="player-choices"]');
     expect(choicesContainer).toBeInTheDocument();

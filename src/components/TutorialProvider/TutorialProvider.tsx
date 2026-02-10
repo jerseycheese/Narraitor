@@ -284,7 +284,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         const rect = element.getBoundingClientRect();
         const isActuallyMounted = rect.width > 0 && rect.height > 0;
         const style = window.getComputedStyle(element);
-        const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+        const isVisible = style.display !== 'none' && style.visibility !== '';
 
         if (isActuallyMounted && isVisible) {
           missingTargetRef.current = null;

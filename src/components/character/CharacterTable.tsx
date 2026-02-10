@@ -8,7 +8,15 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash2, CheckCircle, Play, Star, Plus } from 'lucide-react';
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  CheckCircle,
+  Play,
+  Star,
+  Plus,
+} from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import type { Character } from '@/state/characterStore';
 import type { EntityID } from '@/types/common.types';
@@ -48,29 +56,44 @@ export function CharacterTable({
   onEdit,
   onDelete,
 }: CharacterTableProps) {
-  const handleViewCharacter = React.useCallback((characterId: EntityID) => {
-    onView(characterId);
-  }, [onView]);
+  const handleViewCharacter = React.useCallback(
+    (characterId: EntityID) => {
+      onView(characterId);
+    },
+    [onView]
+  );
 
-  const handlePlayCharacter = React.useCallback((characterId: EntityID, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPlay(characterId);
-  }, [onPlay]);
+  const handlePlayCharacter = React.useCallback(
+    (characterId: EntityID, e: React.MouseEvent) => {
+      e.stopPropagation();
+      onPlay(characterId);
+    },
+    [onPlay]
+  );
 
-  const handleEditCharacter = React.useCallback((characterId: EntityID, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit(characterId);
-  }, [onEdit]);
+  const handleEditCharacter = React.useCallback(
+    (characterId: EntityID, e: React.MouseEvent) => {
+      e.stopPropagation();
+      onEdit(characterId);
+    },
+    [onEdit]
+  );
 
-  const handleDeleteCharacter = React.useCallback((characterId: EntityID, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete(characterId);
-  }, [onDelete]);
+  const handleDeleteCharacter = React.useCallback(
+    (characterId: EntityID, e: React.MouseEvent) => {
+      e.stopPropagation();
+      onDelete(characterId);
+    },
+    [onDelete]
+  );
 
-  const handleMakeActive = React.useCallback((characterId: EntityID, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onMakeActive(characterId);
-  }, [onMakeActive]);
+  const handleMakeActive = React.useCallback(
+    (characterId: EntityID, e: React.MouseEvent) => {
+      e.stopPropagation();
+      onMakeActive(characterId);
+    },
+    [onMakeActive]
+  );
 
   const columns: ColumnDef<Character>[] = React.useMemo(
     () => [
@@ -79,11 +102,13 @@ export function CharacterTable({
         header: '',
         cell: ({ row }) => (
           <div
-            className="cursor-pointer"
+            className="character-portrait-clickable"
             onClick={() => handleViewCharacter(row.original.id)}
           >
             <CharacterPortrait
-              portrait={row.original.portrait || { type: 'placeholder', url: null }}
+              portrait={
+                row.original.portrait || { type: 'placeholder', url: null }
+              }
               characterName={row.original.name}
               size="large"
             />
@@ -96,10 +121,7 @@ export function CharacterTable({
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (
-          <div
-            className="font-medium cursor-pointer hover:underline"
-            onClick={() => handleViewCharacter(row.original.id)}
-          >
+          <div onClick={() => handleViewCharacter(row.original.id)}>
             {row.getValue('name')}
           </div>
         ),
@@ -108,24 +130,23 @@ export function CharacterTable({
       {
         accessorKey: 'level',
         header: 'Level',
-        cell: ({ row }) => (
-          <div className="text-center">Level {row.getValue('level')}</div>
-        ),
+        cell: ({ row }) => <div>Level {row.getValue('level')}</div>,
         enableSorting: true,
       },
       {
         id: 'type',
         header: 'Type',
-        accessorFn: (row) => row.background?.isKnownFigure ? 'known' : 'original',
+        accessorFn: (row) =>
+          row.background?.isKnownFigure ? 'known' : 'original',
         cell: ({ row }) => {
           const isKnownFigure = row.original.background?.isKnownFigure;
           return (
             <Badge
               icon={
                 isKnownFigure ? (
-                  <Star className="w-3 h-3 text-white" aria-hidden="true" />
+                  <Star aria-hidden="true" />
                 ) : (
-                  <Plus className="w-3 h-3 text-white" aria-hidden="true" />
+                  <Plus aria-hidden="true" />
                 )
               }
               variant={isKnownFigure ? 'warning-static' : 'default-static'}
@@ -139,11 +160,7 @@ export function CharacterTable({
       {
         accessorKey: 'createdAt',
         header: 'Created',
-        cell: ({ row }) => (
-          <div className="text-sm whitespace-nowrap">
-            {formatDate(row.getValue('createdAt'))}
-          </div>
-        ),
+        cell: ({ row }) => <div>{formatDate(row.getValue('createdAt'))}</div>,
         enableSorting: true,
       },
       {
@@ -153,7 +170,7 @@ export function CharacterTable({
           const isActive = currentCharacterId === row.original.id;
 
           return (
-            <div className="flex items-center space-x-2">
+            <div>
               {!isActive && (
                 <Button
                   variant="ghost"
@@ -162,7 +179,7 @@ export function CharacterTable({
                   aria-label={`Make ${row.original.name} active`}
                   title="Make active"
                 >
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircle />
                 </Button>
               )}
               <Button
@@ -172,7 +189,7 @@ export function CharacterTable({
                 aria-label={`Play as ${row.original.name}`}
                 title="Play"
               >
-                <Play className="h-4 w-4" />
+                <Play />
               </Button>
               <Button
                 variant="ghost"
@@ -181,7 +198,7 @@ export function CharacterTable({
                 aria-label={`View ${row.original.name}`}
                 title="View"
               >
-                <Eye className="h-4 w-4" />
+                <Eye />
               </Button>
               <Button
                 variant="ghost"
@@ -190,7 +207,7 @@ export function CharacterTable({
                 aria-label={`Edit ${row.original.name}`}
                 title="Edit"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil />
               </Button>
               <Button
                 variant="ghost"
@@ -198,9 +215,8 @@ export function CharacterTable({
                 onClick={(e) => handleDeleteCharacter(row.original.id, e)}
                 aria-label={`Delete ${row.original.name}`}
                 title="Delete"
-                className="text-destructive hover:text-destructive"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 />
               </Button>
             </div>
           );
@@ -220,7 +236,7 @@ export function CharacterTable({
 
   if (characters.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div>
         <p>No characters found. Create your first character to get started!</p>
       </div>
     );

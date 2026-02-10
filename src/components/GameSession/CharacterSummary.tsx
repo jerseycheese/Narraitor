@@ -58,17 +58,17 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
   return (
     <div 
       data-testid="character-summary" 
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
+      
       role="region"
       aria-label="Character information"
     >
       {/* Compact Header - Always Visible */}
-      <div className="flex items-center justify-between gap-4 cursor-pointer select-none hover:bg-gray-100 -m-2 p-2 rounded transition-colors"
+      <div 
            onClick={() => setIsExpanded(!isExpanded)}>
-        <div className="flex items-center gap-4">
+        <div>
           {/* Portrait Section - show in header when collapsed */}
           {character.portrait && (
-            <div className="flex-shrink-0">
+            <div>
               <Link href={`/characters/${character.id}`} onClick={(e) => e.stopPropagation()}>
                 <CharacterPortrait
                   portrait={character.portrait}
@@ -80,16 +80,16 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           )}
           
           <div>
-            <h2 className="text-lg font-bold">
+            <h2>
               <Link 
                 href={`/characters/${character.id}`} 
-                className="text-link-primary no-underline" 
+                 
                 onClick={(e) => e.stopPropagation()}
               >
                 {character.name}
               </Link>
             </h2>
-            <p className="text-sm text-gray-700">Level {character.level}</p>
+            <p>Level {character.level}</p>
           </div>
         </div>
         
@@ -97,7 +97,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           type="button" 
           variant="link"
           size="sm"
-          className="p-0 h-auto"
+          
           data-tutorial="character-sheet-toggle"
           onClick={(e) => {
             e.stopPropagation();
@@ -112,27 +112,27 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
 
       {/* Expanded Details - Only show when expanded */}
       {isExpanded && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div>
           {character.background?.history && (
-            <p className="text-gray-700 mb-4">{character.background.history}</p>
+            <p>{character.background.history}</p>
           )}
 
           {/* Attributes and Skills in two columns */}
           {((character.attributes && character.attributes.length > 0) || (character.skills && character.skills.length > 0)) && world && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
               {/* Attributes Column */}
               {character.attributes && character.attributes.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Attributes</h3>
-                  <div className="space-y-1">
+                  <h3>Attributes</h3>
+                  <div>
                     {character.attributes.map(attr => {
                       const worldAttribute = world.attributes.find(wa => wa.id === attr.worldAttributeId);
                       const displayName = worldAttribute?.name || attr.name;
                       
                       return (
-                        <div key={attr.id} className="text-sm">
-                          <span className="font-medium text-gray-700">{displayName}</span>
-                          <span className="text-gray-500 ml-1">({attr.modifiedValue})</span>
+                        <div key={attr.id} >
+                          <span>{displayName}</span>
+                          <span>({attr.modifiedValue})</span>
                         </div>
                       );
                     })}
@@ -143,16 +143,16 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
               {/* Skills Column */}
               {character.skills && character.skills.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Skills</h3>
-                  <div className="space-y-1">
+                  <h3>Skills</h3>
+                  <div>
                     {character.skills.map(skill => {
                         const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
                         if (!worldSkill) {
                           // Fallback if no world skill found, just show the skill name from character
                           return (
-                            <div key={skill.id} className="text-sm">
-                              <span className="font-medium text-gray-700">{skill.name}</span>
-                              <span className="text-gray-500 ml-1">(Level {skill.level})</span>
+                            <div key={skill.id} >
+                              <span>{skill.name}</span>
+                              <span>(Level {skill.level})</span>
                             </div>
                           );
                         }
@@ -162,11 +162,11 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
                         ).filter(Boolean) || [];
 
                         return (
-                          <div key={skill.id} className="text-sm">
-                            <span className="font-medium text-gray-700">{worldSkill.name}</span>
-                            <span className="text-gray-500 ml-1">(Level {skill.level})</span>
+                          <div key={skill.id} >
+                            <span>{worldSkill.name}</span>
+                            <span>(Level {skill.level})</span>
                             {linkedAttributes.length > 0 && (
-                              <div className="text-xs text-blue-700">
+                              <div>
                                 Linked to: {linkedAttributes.join(', ')}
                               </div>
                             )}

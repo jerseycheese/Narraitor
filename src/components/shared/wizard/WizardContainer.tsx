@@ -1,5 +1,5 @@
 import React from 'react';
-import { wizardStyles } from './styles/wizardStyles';
+import { cssClasses, wizardStyles } from './styles/wizardStyles';
 
 interface WizardContainerProps {
   title: string | React.ReactNode;
@@ -13,12 +13,18 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`component-wizard-container ${wizardStyles.container} ${className}`}>
+    <div
+      className={cssClasses(
+        'component-wizard-container',
+        wizardStyles.container,
+        className
+      )}
+    >
       <div className={wizardStyles.header}>
         {typeof title === 'string' ? (
-          <h1 className={`${wizardStyles.title} text-center`}>{title}</h1>
+          <h1 className={wizardStyles.title}>{title}</h1>
         ) : (
-          <div className={`${wizardStyles.title}`}>{title}</div>
+          <div className={wizardStyles.title}>{title}</div>
         )}
       </div>
       {children}

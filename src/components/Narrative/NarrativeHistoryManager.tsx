@@ -136,7 +136,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   }, [sessionId]);
 
   return (
-    <div className={`narrative-history-manager ${className || ''}`}>
+    <div className={['narrative-history-manager', className].filter(Boolean).join(' ')}>
       <NarrativeHistory
         // Only show segments when they've stabilized
         segments={stabilized ? segments : []}

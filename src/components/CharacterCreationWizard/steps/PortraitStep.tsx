@@ -87,7 +87,7 @@ export function PortraitStep({
         background: {
           history:
             data.characterData.background.history +
-            (environmentHint ? ` ${environmentHint}` : ''),
+            (environmentHint ? `${environmentHint}` : ''),
           personality: data.characterData.background.personality,
           physicalDescription:
             localPhysicalDescription ||
@@ -151,10 +151,10 @@ export function PortraitStep({
   };
 
   return (
-    <div className="component-portrait-step space-y-6">
-      <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Character Portrait</h3>
-        <p className="text-sm text-gray-700">
+    <div className="component-portrait-step">
+      <div>
+        <h3>Character Portrait</h3>
+        <p>
           {data.characterData.background?.isKnownFigure
             ? `Generate a portrait of ${data.characterData.name} as they are commonly recognized`
             : 'Generate a portrait for your character or use a placeholder'}
@@ -168,13 +168,12 @@ export function PortraitStep({
           setPhysicalDescription={setLocalPhysicalDescription}
           environmentHint={environmentHint}
           setEnvironmentHint={setEnvironmentHint}
-          className="max-w-md mx-auto"
         />
       )}
 
-      <div className="flex flex-col items-center space-y-4">
+      <div>
         {isGenerating ? (
-          <div className="w-32 h-32 flex items-center justify-center">
+          <div>
             <LoadingState variant="spinner" size="md" centered={false} />
           </div>
         ) : (
@@ -191,39 +190,33 @@ export function PortraitStep({
             type="button"
             onClick={handleGeneratePortrait}
             disabled={isGenerating}
-            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Generate Portrait
           </button>
         )}
 
         {portrait.type === 'ai-generated' && portrait.url && (
-          <div className="text-center space-y-2">
-            <p className="text-sm text-green-500 inline-flex items-center gap-1">
-              <CheckCircle className="w-4 h-4" aria-hidden="true" />
+          <div>
+            <p>
+              <CheckCircle aria-hidden="true" />
               Portrait generated successfully
             </p>
-            <div className="flex gap-2 justify-center">
+            <div>
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
                 disabled={isGenerating}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Regenerate Portrait
               </button>
-              <button
-                type="button"
-                onClick={handleRemovePortrait}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
-              >
+              <button type="button" onClick={handleRemovePortrait}>
                 Remove Portrait
               </button>
             </div>
           </div>
         )}
 
-        <p className="text-xs text-gray-500 text-center">
+        <p>
           Portrait generation is optional. You can skip portrait generation and
           continue.
         </p>

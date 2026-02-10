@@ -170,8 +170,8 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   }
   
   return (
-    <div className="component-character-editor space-y-6">
-      <CollapsibleSection title="Character Portrait" initialCollapsed={true} className="bg-background">
+    <div className="component-character-editor">
+      <CollapsibleSection title="Character Portrait" initialCollapsed={true} >
         <PortraitSection
           portrait={editingCharacter.portrait}
           characterName={editingCharacter.name}
@@ -185,7 +185,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Basic Information" className="bg-background">
+      <CollapsibleSection title="Basic Information" >
         <BasicInfoForm
           name={editingCharacter.name}
           level={editingCharacter.level}
@@ -196,7 +196,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Background" initialCollapsed={true} className="bg-background">
+      <CollapsibleSection title="Background" initialCollapsed={true} >
         <BackgroundForm
           background={editingCharacter.background}
           onBackgroundChange={(background) => setEditingCharacter({
@@ -206,7 +206,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Attributes" initialCollapsed={true} className="bg-background">
+      <CollapsibleSection title="Attributes" initialCollapsed={true} >
         <AttributesForm
           attributes={editingCharacter.attributes.map(attr => ({ attributeId: attr.worldAttributeId || attr.id, value: attr.baseValue }))}
           world={world}
@@ -220,7 +220,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Skills" initialCollapsed={true} className="bg-background">
+      <CollapsibleSection title="Skills" initialCollapsed={true} >
         <SkillsForm
           skills={editingCharacter.skills.map(skill => ({
             skillId: skill.worldSkillId || skill.id,
@@ -239,11 +239,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      <div className="flex justify-between pt-6 border-t border-border">
+      <div>
         <Button variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={saving}>
           Delete Character
         </Button>
-        <div className="flex space-x-4">
+        <div>
           <Button variant="outline" onClick={handleCancel} disabled={saving}>
             Cancel
           </Button>

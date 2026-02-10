@@ -23,17 +23,17 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
     <>
       {/* Basic Info */}
       <div className={wizardStyles.card.base}>
-        <h3 className="text-xl font-bold mb-4">{template.name}</h3>
-        <div className="space-y-3">
+        <h3>{template.name}</h3>
+        <div>
           <div>
-            <span className="font-medium text-gray-700">Genre:</span>
-            <span className={`ml-2 ${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
+            <span>Genre:</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
               {getGenreLabel(template.genre)}
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-700 block mb-2">Description:</span>
-            <p className="text-gray-900 leading-relaxed">{template.description}</p>
+            <span>Description:</span>
+            <p>{template.description}</p>
           </div>
         </div>
       </div>
@@ -41,28 +41,28 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
       {/* AI Explanation */}
       {template.explanation && (
         <div className={wizardStyles.card.base}>
-          <h4 className="font-semibold mb-3 text-blue-700">Why these attributes and skills?</h4>
-          <p className="text-gray-700 leading-relaxed">{template.explanation}</p>
+          <h4>Why these attributes and skills?</h4>
+          <p>{template.explanation}</p>
         </div>
       )}
 
       {/* Attributes */}
       <div className={wizardStyles.card.base}>
-        <h4 className="font-semibold mb-4">Attributes ({template.attributes.length})</h4>
-        <div className="grid gap-3 md:grid-cols-2">
+        <h4>Attributes ({template.attributes.length})</h4>
+        <div>
           {template.attributes.map((attr, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+            <div key={index} >
               <div>
-                <span className="font-medium">{attr.name}</span>
+                <span>{attr.name}</span>
                 {attr.category && (
-                  <span className={`ml-2 ${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
+                  <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                     {attr.category}
                   </span>
                 )}
               </div>
-              <div className="text-right text-sm text-gray-700">
+              <div>
                 <div>Base: {attr.baseValue}</div>
-                <div>Range: {attr.minValue}-{attr.maxValue}</div>
+                <div>Range: {attr.minValue} - {attr.maxValue}</div>
               </div>
             </div>
           ))}
@@ -71,12 +71,12 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
 
       {/* Skills */}
       <div className={wizardStyles.card.base}>
-        <h4 className="font-semibold mb-4">Skills ({template.skills.length})</h4>
-        <div className="grid gap-3">
+        <h4>Skills ({template.skills.length})</h4>
+        <div>
           {template.skills.map((skill, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <span className="font-medium">{skill.name}</span>
+            <div key={index} >
+              <div>
+                <span>{skill.name}</span>
                 <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
                   {skill.difficulty}
                 </span>
@@ -86,9 +86,9 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
                   </span>
                 )}
               </div>
-              <div className="text-right text-sm text-gray-700">
+              <div>
                 <div>Base: {skill.baseValue}</div>
-                <div>Range: {skill.minValue}-{skill.maxValue}</div>
+                <div>Range: {skill.minValue} - {skill.maxValue}</div>
               </div>
             </div>
           ))}

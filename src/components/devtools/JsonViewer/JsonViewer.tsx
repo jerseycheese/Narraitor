@@ -58,7 +58,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   return (
     <pre
       data-testid="json-viewer"
-      className={`text-xs font-mono p-3 rounded overflow-auto max-h-60 bg-gray-50 border border-gray-300 text-gray-900 ${className}`}
+      className={`${className}`}
     >
       {!isMounted ? (
         // Simple content for server-side rendering
