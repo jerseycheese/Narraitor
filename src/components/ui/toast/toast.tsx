@@ -26,19 +26,15 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const toastVariants = {
   success: {
-    className: '',
     style: { backgroundColor: primitiveColors.green[50] },
   },
   error: {
-    className: '',
     style: { backgroundColor: primitiveColors.red[50] },
   },
   warning: {
-    className: '',
     style: { backgroundColor: primitiveColors.amber[50] },
   },
   info: {
-    className: '',
     style: { backgroundColor: primitiveColors.blue[50] },
   },
 };
@@ -97,7 +93,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
     return (
       <div
         ref={ref}
-        className={cssClasses('', '', variantConfig.className, className)}
+        className={cssClasses('', '', className)}
         style={variantConfig.style}
         role="alert"
         aria-live="polite"

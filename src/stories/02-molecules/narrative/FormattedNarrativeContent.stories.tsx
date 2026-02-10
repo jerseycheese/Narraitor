@@ -44,7 +44,6 @@ export const EmptyContent: Story = {
 export const WithCustomStyling: Story = {
   args: {
     content: `This paragraph has custom styling applied through the className prop. The text should maintain proper spacing while inheriting the custom styles.`,
-    className: '',
   },
 };
 

@@ -33,7 +33,6 @@ export const WorldCardActions: Story = {
         text: 'Create Character',
         onClick: () => console.log('Create character clicked'),
         variant: 'primary',
-        className: '',
         flex: true,
       },
       {
@@ -50,14 +49,12 @@ export const WorldCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View clicked'),
         variant: 'primary',
-        className: '',
       },
       {
         key: 'edit',
         text: 'Edit',
         onClick: () => console.log('Edit clicked'),
         variant: 'primary',
-        className: '',
       },
       {
         key: 'delete',
@@ -77,7 +74,6 @@ export const CharacterCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View character clicked'),
         variant: 'primary',
-        className: '',
       },
       {
         key: 'play',
@@ -90,7 +86,6 @@ export const CharacterCardActions: Story = {
         text: 'Edit',
         onClick: () => console.log('Edit character clicked'),
         variant: 'primary',
-        className: '',
       },
       {
         key: 'delete',
@@ -116,8 +111,7 @@ export const InCardContext: Story = {
             text: 'Create Character',
             onClick: () => console.log('Create character'),
             variant: 'primary',
-            className: '',
-            flex: true,
+                flex: true,
           },
           {
             key: 'play',
@@ -133,15 +127,13 @@ export const InCardContext: Story = {
             text: 'View',
             onClick: () => console.log('View'),
             variant: 'primary',
-            className: '',
-          },
+              },
           {
             key: 'edit',
             text: 'Edit',
             onClick: () => console.log('Edit'),
             variant: 'primary',
-            className: '',
-          },
+              },
           {
             key: 'delete',
             text: 'Delete',

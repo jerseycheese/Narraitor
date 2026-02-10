@@ -17,20 +17,6 @@ const meta = {
       control: 'text',
       description: 'Optional subtitle to display under the title'
     },
-    height: {
-      control: 'text',
-      description: 'CSS height class for the hero section'
-    },
-    theme: {
-      control: 'select',
-      options: ['fantasy', 'sci-fi', 'modern', 'historical', 'horror', 'mystery', 'western', 'cyberpunk', 'other', 'default'],
-      description: 'Genre theme for gradient background (when no image provided)'
-    },
-    borderRadius: {
-      control: 'select',
-      options: ['all', 'top', 'none'],
-      description: 'Border radius application - useful for card integration'
-    }
   },
 } satisfies Meta<typeof Hero>;
 
@@ -80,7 +66,6 @@ export const TallHero: Story = {
     title: 'Middle-earth',
     subtitle: 'Epic Fantasy',
     image: sampleImage,
-    height: '',
     badge: (
       <span>
         Set in Tolkien Universe
@@ -93,7 +78,6 @@ export const ShortHero: Story = {
   args: {
     title: 'Quick Adventure',
     image: sampleImage,
-    height: '',
   },
 };
 
@@ -102,9 +86,6 @@ export const CardTopOnly: Story = {
   args: {
     title: 'World Card Hero',
     subtitle: 'Integrated with card layout',
-    theme: 'fantasy',
-    borderRadius: 'top',
-    height: '',
   },
 };
 
@@ -112,9 +93,6 @@ export const NoBorderRadius: Story = {
   args: {
     title: 'Full Width Hero',
     subtitle: 'No radius applied',
-    theme: 'sci-fi',
-    borderRadius: 'none',
-    height: '',
   },
 };
 
@@ -122,9 +100,6 @@ export const AllBorderRadius: Story = {
   args: {
     title: 'Standalone Hero',
     subtitle: 'Full radius',
-    theme: 'western',
-    borderRadius: 'all',
-    height: '',
   },
 };
 
