@@ -24,7 +24,18 @@ function generateImagePrompt(world: World): string {
   // Get genre-specific style guidance from shared utility
   const styleGuidance = getGenreStyleGuidance(genre, 'landscape');
 
-  return `${basePrompt}\n\n${styleGuidance}\n\nRequirements:\n- Ultra-high quality, 4K resolution concept art\n- Cinematic composition with dramatic lighting\n- Rich detail and atmospheric depth\n- Professional game/film concept art style\n- Landscape orientation (16:9 or similar)\n- No text, logos, or watermarks\n- Vivid but realistic colors appropriate to the theme`;
+  return `${basePrompt}
+
+${styleGuidance}
+
+Requirements:
+- Ultra-high quality, 4K resolution concept art
+- Cinematic composition with dramatic lighting
+- Rich detail and atmospheric depth
+- Professional game/film concept art style
+- Landscape orientation (16:9 or similar)
+- No text, logos, or watermarks
+- Vivid but realistic colors appropriate to the theme`;
 }
 
 // Generate fallback placeholder if AI generation fails
@@ -70,7 +81,13 @@ export async function POST(request: NextRequest) {
         logger.debug('generate-world-image', 'Using custom prompt as image description:', imageDescription);
       } else {
         // Generate a detailed description using AI
-        const promptResponse = await client.generateContent(`Generate a detailed, artistic description for an image of this world that could be used as a prompt for an AI image generator like DALL-E or Midjourney. Be very specific about visual elements, atmosphere, lighting, and composition. ${imagePrompt} Respond with only the detailed visual description, no other text.`);
+        const promptResponse = await client.generateContent(`
+          Generate a detailed, artistic description for an image of this world that could be used as a prompt for an AI image generator like DALL-E or Midjourney. Be very specific about visual elements, atmosphere, lighting, and composition.
+          
+          ${imagePrompt}
+          
+          Respond with only the detailed visual description, no other text.
+        `);
         imageDescription = promptResponse.content;
         logger.debug('generate-world-image', 'Generated image description:', imageDescription);
       }
@@ -88,7 +105,16 @@ export async function POST(request: NextRequest) {
           logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.5-flash-image');
 
           // Use the same approach as the portrait generation API
-          const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription} Requirements: - Epic cinematic landscape - High quality digital art style - Professional game concept art - Rich atmospheric lighting and details - ${body.world.genre} genre elements - No text, logos, or watermarks - Landscape orientation suitable for world imagery`;
+          const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
+
+Requirements:
+- Epic cinematic landscape
+- High quality digital art style
+- Professional game concept art
+- Rich atmospheric lighting and details
+- ${body.world.genre} genre elements
+- No text, logos, or watermarks
+- Landscape orientation suitable for world imagery`;
 
           // Generate and save the image to the file system
           const savedImage = await generateAndSaveImageWithGemini(
