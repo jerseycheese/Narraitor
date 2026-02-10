@@ -155,11 +155,6 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                           onClick={() => setSelectedGenres(prev => 
                             prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
                           )}
-                          className={`${
-                            selectedGenres.includes(genre) 
-                              ? '' 
-                              : ''
-                          }`}
                         >
                           {genre}
                         </button>
