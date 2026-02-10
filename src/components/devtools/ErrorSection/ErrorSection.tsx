@@ -89,17 +89,6 @@ export const ErrorSection = () => {
     });
   };
 
-  // Get severity badge color
-  const getSeverityColor = (severity: ErrorSeverity) => {
-    switch (severity) {
-      case ErrorSeverity.CRITICAL: return '';
-      case ErrorSeverity.HIGH: return '';
-      case ErrorSeverity.MEDIUM: return '';
-      case ErrorSeverity.LOW: return '';
-      default: return '';
-    }
-  };
-
   // Format timestamp
   const formatTimestamp = (timestamp: Date) => {
     return timestamp.toLocaleTimeString();
@@ -211,17 +200,12 @@ export const ErrorSection = () => {
           errors.map((error) => (
             <div
               key={error.id}
-              className={`${
-                error.dismissed 
-                  ? '' 
-                  : ''
-              }`}
             >
               {/* Error Header */}
               <div>
                 <div>
                   <div>
-                    <Badge className={`${getSeverityColor(error.severity)}`}>
+                    <Badge>
                       {error.severity.toUpperCase()}
                     </Badge>
                     <Badge variant="outline" >
