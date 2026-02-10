@@ -19,6 +19,8 @@ interface HeroProps {
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   /** Optional actions to render anchored at bottom-right of the hero */
   actions?: React.ReactNode;
+  /** Theme/genre for styling (unused in clean slate) */
+  theme?: string;
 }
 
 /**
@@ -58,6 +60,7 @@ export const Hero: React.FC<HeroProps> = ({
   titleTestId,
   titleElement: TitleElement = 'h1',
   actions,
+  theme, // Destructure but ignore
 }) => {
   return (
     <div>

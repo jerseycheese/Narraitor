@@ -72,7 +72,7 @@ function PreviewModalInner<T>({
         {footerNote && <div>{footerNote}</div>}
       </div>
 
-      <div className={wizardStyles.navigation.container + ''}>
+      <div className={wizardStyles.navigation.container}>
         <Button onClick={onCancel} variant="outline" size="default">
           {cancelText}
         </Button>

@@ -39,6 +39,14 @@ interface SimpleModalProps {
   footer?: React.ReactNode;
   /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
+  /** Scroll behavior: 'overlay' (default) or 'content' */
+  scrollBehavior?: 'overlay' | 'content';
+  /** Whether the footer should stick to the bottom */
+  stickyFooter?: boolean;
+  /** Modal size (deprecated/unused in clean slate) */
+  size?: string;
+  /** Modal tone/variant (deprecated/unused in clean slate) */
+  tone?: string;
 }
 
 export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
@@ -69,6 +77,10 @@ export function SimpleModal({
   description,
   footer,
   footerClassName,
+  scrollBehavior = 'overlay',
+  stickyFooter,
+  size, // Destructure but ignore for now to satisfy interface
+  tone, // Destructure but ignore
 }: SimpleModalProps) {
   const fallbackDescriptionId = useId();
   const resolvedDescriptionId =
@@ -84,8 +96,8 @@ export function SimpleModal({
       <DialogContent
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
+        overlayScroll={scrollBehavior === 'overlay'}
         className={cssClasses(
-          '',
           className
         )}
         onInteractOutside={(event) => {
@@ -96,6 +108,7 @@ export function SimpleModal({
 
           if (!closeOnBackdropClick) {
             event.preventDefault();
+            return;
           }
         }}
         onEscapeKeyDown={(event) => {
@@ -131,6 +144,7 @@ export function SimpleModal({
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
             className={contentClassName}
+            data-scroll-container={scrollBehavior === 'content' ? 'content' : undefined}
           >
             {children}
           </div>
@@ -139,6 +153,7 @@ export function SimpleModal({
         {footer && (
           <div
             className={footerClassName}
+            data-sticky-footer={stickyFooter ? 'true' : undefined}
           >
             {footer}
           </div>

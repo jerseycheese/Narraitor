@@ -272,7 +272,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
 
       {errors.template && (
         <div
-          className={'' + wizardStyles.form.error}
+          className={wizardStyles.form.error}
           data-testid="template-error"
         >
           {errors.template}

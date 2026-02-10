@@ -133,7 +133,7 @@ export default function LoreViewerTestPage() {
         setAliases(fact.id, ['Gareth', 'Captain', 'Guard Captain']);
       } else {
         // Add generic aliases for other characters
-        const firstName = fact.value.split('')[0];
+        const firstName = fact.value.split(' ')[0];
         setAliases(fact.id, [firstName, fact.value]);
       }
     });

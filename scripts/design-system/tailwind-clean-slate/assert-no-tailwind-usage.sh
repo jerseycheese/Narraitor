@@ -11,9 +11,9 @@ FAIL=0
 
 # Scope gate to issue #1038 game-session surface.
 TARGET_PATHS=(
-  "src/app/worlds/[id]/play"
-  "src/components/GameSession"
-  "src/components/Narrative"
+  "src/app"
+  "src/components"
+  "src/stories"
 )
 
 echo "Scoped paths:"
@@ -22,7 +22,7 @@ printf " - %s\n" "${TARGET_PATHS[@]}"
 # 1. Check for composition helpers in .tsx and .ts files
 echo "Checking for composition helpers (cn, clsx, twMerge)..."
 # Use stricter word boundary checks
-COMPOSITION_MATCHES=$(grep -rE "\bcn\(|\bclsx\(|\btwMerge\(" "${TARGET_PATHS[@]}" --include="*.tsx" --include="*.ts" 2>/dev/null)
+COMPOSITION_MATCHES=$(grep -rE "\bcn\(|\bclsx\(|\btwMerge\(" "${TARGET_PATHS[@]}" --include="*.tsx" --include="*.ts" --include="*.jsx" 2>/dev/null)
 
 if [ -n "$COMPOSITION_MATCHES" ]; then
   echo -e "${RED}Found composition helpers usage:${NC}"
@@ -35,7 +35,7 @@ echo "Checking for Tailwind utility classes..."
 # Use regex that ensures prefix is at start of class (quote) or after space
 # We check for standard prefixes and exact matches.
 # [\"' ] matches quote or space.
-UTILITY_MATCHES=$(grep -rE "className=.*[\"' ](bg-|text-|flex|grid|space-|p-|m-|w-|h-|border-|rounded-|shadow-|hover:|focus:|sm:|md:|lg:|xl:)" "${TARGET_PATHS[@]}" --include="*.tsx" 2>/dev/null)
+UTILITY_MATCHES=$(grep -rE "className=.*[\"' ](bg-|text-|flex|grid|space-|p-|m-|w-|h-|border-|rounded-|shadow-|hover:|focus:|sm:|md:|lg:|xl:|underline-offset-|divide-|gap-|inset-|translate-|scale-|rotate-|opacity-|z-)" "${TARGET_PATHS[@]}" --include="*.tsx" --include="*.jsx" 2>/dev/null)
 
 if [ -n "$UTILITY_MATCHES" ]; then
   echo -e "${RED}Found Tailwind utility classes:${NC}"

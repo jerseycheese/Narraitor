@@ -35,7 +35,6 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
       <RadioGroupContext.Provider value={contextValue}>
         <div
           className={cssClasses(
-            "",
             orientation === 'horizontal' ? "grid-flow-col auto-cols-max" : "grid-flow-row",
             className
           )}
@@ -65,8 +64,6 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
           onChange={() => context.onValueChange?.(value)}
           disabled={context.disabled || props.disabled}
           className={cssClasses(
-            "",
-            "",
             className
           )}
           ref={ref}

@@ -8,7 +8,6 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cssClasses(
-      "",
       className
     )}
     {...props}

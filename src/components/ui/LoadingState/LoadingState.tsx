@@ -1,5 +1,4 @@
 import React from 'react';
-import { cssClasses } from '@/lib/utils';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 export type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -8,6 +7,10 @@ export type LoadingTheme = 'light' | 'dark';
 interface LoadingStateProps {
   /** The variant of loading indicator to display */
   variant?: LoadingVariant;
+  /** Size of the loading indicator */
+  size?: LoadingSize;
+  /** Color theme */
+  theme?: LoadingTheme;
   /** Optional message to display below the loading indicator */
   message?: string;
   /** Additional CSS classes */
@@ -24,6 +27,8 @@ interface LoadingStateProps {
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
   variant = 'spinner',
+  size = 'md',
+  theme = 'light',
   message,
   className,
   centered = true,

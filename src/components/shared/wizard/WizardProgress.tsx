@@ -38,7 +38,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
                 {index + 1}
               </div>
               {/* Label */}
-              <span className={cssClasses(wizardStyles.progress.label, '')}>{step.label}</span>
+              <span className={cssClasses(wizardStyles.progress.label)}>{step.label}</span>
             </div>
             {/* Connector (no connector after last circle) */}
             {index < steps.length - 1 && (

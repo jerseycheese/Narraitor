@@ -14,7 +14,6 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           <input
             type="checkbox"
             className={cssClasses(
-              "",
               className
             )}
             ref={ref}
@@ -29,7 +28,6 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       <input
         type="checkbox"
         className={cssClasses(
-          "",
           className
         )}
         ref={ref}

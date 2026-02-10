@@ -9,7 +9,7 @@ const meta: Meta<typeof FloatingActionButton> = {
     docs: {
       description: {
         component:
-          'Reusable floating action button component with customizable position, size, and variants.',
+          'Reusable floating action button component.',
       },
     },
   },
@@ -25,21 +25,6 @@ const meta: Meta<typeof FloatingActionButton> = {
     label: {
       control: 'text',
       description: 'Accessibility label and tooltip text',
-    },
-    position: {
-      control: 'select',
-      options: ['', '', '', ''],
-      description: 'Position of the floating button',
-    },
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'amber'],
-      description: 'Color variant of the button',
-    },
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
-      description: 'Size of the button',
     },
     className: {
       control: 'text',
@@ -89,14 +74,11 @@ export const JournalButton: Story = {
   args: {
     icon: JournalIcon,
     label: 'Open journal (J)',
-    variant: 'amber',
-    position: '',
-    size: 'lg',
   },
   parameters: {
     docs: {
       description: {
-        story: 'Journal floating action button with amber variant.',
+        story: 'Journal floating action button.',
       },
     },
   },
@@ -106,113 +88,12 @@ export const AddButton: Story = {
   args: {
     icon: PlusIcon,
     label: 'Add new item',
-    variant: 'primary',
-    position: '',
-    size: 'lg',
   },
   parameters: {
     docs: {
       description: {
-        story: 'Add button with primary variant.',
+        story: 'Add button.',
       },
     },
   },
-};
-
-export const Positions: Story = {
-  args: {
-    onClick: () => {},
-    icon: PlusIcon,
-    label: 'Test position',
-    variant: 'secondary',
-    size: 'md',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates different position options.',
-      },
-    },
-  },
-  render: (args) => (
-    <div>
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        size={args.size}
-        position="top-left"
-      />
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        size={args.size}
-        position="top-right"
-      />
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        size={args.size}
-        position="bottom-left"
-      />
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        size={args.size}
-        position="bottom-right"
-      />
-    </div>
-  ),
-};
-
-export const Sizes: Story = {
-  args: {
-    onClick: () => {},
-    icon: JournalIcon,
-    label: 'Test sizes',
-    variant: 'amber',
-    position: '',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates different size options.',
-      },
-    },
-  },
-  render: (args) => (
-    <div>
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        position={args.position}
-        size="sm"
-      />
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        position={args.position}
-        size="md"
-      />
-      <FloatingActionButton
-        onClick={args.onClick}
-        icon={args.icon}
-        label={args.label}
-        variant={args.variant}
-        position={args.position}
-        size="lg"
-      />
-    </div>
-  ),
 };

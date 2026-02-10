@@ -180,7 +180,6 @@ describe('PromptDebugSection', () => {
     await user.click(toggleButton);
 
     // Now the content should be visible
-    // expect(mainContent).not.toHaveClass('');
     expect(screen.getByText('Scene Template')).toBeVisible();
   });
 
@@ -204,7 +203,6 @@ describe('PromptDebugSection', () => {
     await user.click(nestedToggle);
 
     // Now full prompt should be visible
-    // expect(nestedContent).not.toHaveClass('');
     expect(screen.getByText('Test prompt text that was sent to the AI')).toBeVisible();
   });
 

@@ -12,8 +12,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cssClasses(
-          "",
-          variant === 'link' ? "underline-offset-4" : "",
           className
         )}
         ref={ref}
