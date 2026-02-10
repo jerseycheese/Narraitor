@@ -34,20 +34,6 @@ export default function DevPage() {
     ],
   };
 
-  const colorClasses = {
-    blue: '',
-    green: '',
-    purple: '',
-    orange: '',
-    yellow: '',
-    gray: '',
-    indigo: '',
-    teal: '',
-    pink: '',
-    cyan: '',
-    amber: '',
-  };
-
   return (
     <div>
       <h1>Development Test Harnesses</h1>
@@ -61,7 +47,6 @@ export default function DevPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`${colorClasses[item.color as keyof typeof colorClasses]}`}
                 >
                   {item.label}
                 </Link>

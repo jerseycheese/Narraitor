@@ -14,25 +14,21 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
       label: 'Worlds',
       value: metrics.worldsCreated,
       icon: Globe,
-      color: '',
     },
     {
       label: 'Characters',
       value: metrics.charactersCreated,
       icon: Users,
-      color: '',
     },
     {
       label: 'Sessions',
       value: metrics.sessionsPlayed,
       icon: Play,
-      color: '',
     },
     {
       label: 'Entries',
       value: metrics.narrativeSegments,
       icon: BookOpen,
-      color: '',
     },
   ];
 
@@ -48,7 +44,7 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className={`${stat.color}`}>
+            <div key={stat.label}>
               <div>
                 <Icon aria-hidden="true" />
                 <span>{stat.value}</span>

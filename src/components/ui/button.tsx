@@ -7,33 +7,13 @@ export interface ButtonProps
   size?: 'default' | 'sm' | 'lg' | 'icon'
 }
 
-const buttonVariants = {
-  default: "",
-  destructive: "",
-  outline: "",
-  secondary: "",
-  ghost: "",
-  link: "underline-offset-4",
-  success: "",
-  info: "",
-  warning: "",
-}
-
-const buttonSizes = {
-  default: "",
-  sm: "",
-  lg: "",
-  icon: "",
-}
-
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
     return (
       <button
         className={cssClasses(
           "",
-          buttonVariants[variant],
-          buttonSizes[size],
+          variant === 'link' ? "underline-offset-4" : "",
           className
         )}
         ref={ref}
@@ -44,4 +24,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-export { Button, buttonVariants }
+export { Button }

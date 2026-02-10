@@ -24,14 +24,6 @@ const outcomeLabels: Record<DecisionOutcome, string> = {
   'critical-failure': 'Critical failure',
 };
 
-const outcomeAccentClasses: Record<DecisionOutcome, string> = {
-  success: '',
-  failure: '',
-  mixed: '',
-  'critical-success': '',
-  'critical-failure': '',
-};
-
 const buildOutcomeDecisionText = (
   decisionText: string,
   decisionOutcome?: DecisionOutcome
@@ -85,7 +77,6 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
       {decisionOutcome && (
         <div>
           <span
-            className={cssClasses('', outcomeAccentClasses[decisionOutcome])}
             aria-hidden="true"
           />
           <span>{outcomeLabels[decisionOutcome]}</span>

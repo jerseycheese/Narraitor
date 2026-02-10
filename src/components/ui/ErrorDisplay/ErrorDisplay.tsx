@@ -28,27 +28,6 @@ interface ErrorDisplayProps {
   fieldName?: string;
 }
 
-const severityStyles = {
-  error: {
-    container: '',
-    title: '',
-    message: '',
-    button: '',
-  },
-  warning: {
-    container: '',
-    title: '',
-    message: '',
-    button: '',
-  },
-  info: {
-    container: '',
-    title: '',
-    message: '',
-    button: '',
-  },
-};
-
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   variant = 'section',
   severity = 'error',
@@ -61,12 +40,10 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   className,
   fieldName,
 }) => {
-  const styles = severityStyles[severity];
-
   if (variant === 'inline') {
     return (
       <p
-        className={cssClasses('', styles.message, className)}
+        className={cssClasses('', className)}
         role="alert"
         aria-live="polite"
         {...(fieldName && { id: `${fieldName}-error` })}
@@ -83,14 +60,13 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
         role="alert"
         aria-live="polite"
       >
-        {title && <h1 className={cssClasses('', styles.title)}>{title}</h1>}
-        <p className={cssClasses('', styles.message)}>{message}</p>
+        {title && <h1>{title}</h1>}
+        <p>{message}</p>
         {(showRetry || showDismiss) && (
           <div>
             {showRetry && onRetry && (
               <button
                 onClick={onRetry}
-                className={cssClasses('', styles.button)}
               >
                 Try Again
               </button>
@@ -107,14 +83,14 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'toast') {
     return (
       <div
-        className={cssClasses('', styles.container, className)}
+        className={cssClasses('', className)}
         role="alert"
         aria-live="assertive"
       >
         <div>
           <div>
-            {title && <h3 className={cssClasses('', styles.title)}>{title}</h3>}
-            <p className={cssClasses('', styles.message)}>{message}</p>
+            {title && <h3>{title}</h3>}
+            <p>{message}</p>
           </div>
           {showDismiss && onDismiss && (
             <button onClick={onDismiss} aria-label="Dismiss">
@@ -129,16 +105,16 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cssClasses('', styles.container, className)}
+      className={cssClasses('', className)}
       role="alert"
       aria-live="polite"
     >
-      {title && <h2 className={cssClasses('', styles.title)}>{title}</h2>}
-      <p className={styles.message}>{message}</p>
+      {title && <h2>{title}</h2>}
+      <p>{message}</p>
       {(showRetry || showDismiss) && (
         <div>
           {showRetry && onRetry && (
-            <button onClick={onRetry} className={cssClasses('', styles.button)}>
+            <button onClick={onRetry}>
               Try Again
             </button>
           )}

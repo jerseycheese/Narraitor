@@ -32,63 +32,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getById = useNPCStore((state) => state.getById);
   const { settings } = useDevTools();
 
-  const getSegmentStyles = (type: string) => {
-    switch (type) {
-      case 'dialogue':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'action':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'decision':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'combat':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'exploration':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'resolution':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'character_interaction':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'revelation':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'transition':
-        return {
-          container: '',
-          text: '',
-        };
-      case 'scene':
-      default:
-        return {
-          container: '',
-          text: '',
-        };
-    }
-  };
-
-
   const getFormattingOptions = (type: string): FormattingOptions => {
     switch (type) {
       case 'dialogue':
@@ -107,7 +50,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const segmentType = resolvedSegment?.type ?? 'scene';
   const isDialogue = segmentType === 'dialogue';
 
-  const styles = getSegmentStyles(segmentType);
   const formattingOptions = getFormattingOptions(segmentType);
   const parsedContent = React.useMemo(
     () => (resolvedSegment ? parseNarrativeContent(resolvedSegment.content) : ''),
@@ -135,7 +77,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   if (isLoading) {
     return (
       <div>
-        <LoadingState message="Writing your story..." theme="light" />
+        <LoadingState message="Writing your story..." />
       </div>
     );
   }
@@ -161,7 +103,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   return (
     <div>
-      <div className={cssClasses('narrative-segment', styles.container)}>
+      <div className="narrative-segment">
         {/* Choice Outcome Callout (Issue #971) */}
         {resolvedSegment.metadata?.causedByDecisionId &&
          resolvedSegment.metadata?.causedByDecisionText && (
@@ -189,7 +131,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
         <FormattedNarrativeContent
           content={formattedContent}
-          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''}`}
           highlightTerms={highlightTerms}
         />
         {(participants.length > 0 || resolvedSegment.metadata?.location) && (

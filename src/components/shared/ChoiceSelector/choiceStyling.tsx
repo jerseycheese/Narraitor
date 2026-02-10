@@ -26,23 +26,7 @@ export const getAlignmentClasses = (
   alignment?: ChoiceAlignment,
   isDisabled?: boolean
 ): string => {
-  const baseClasses = {
-    lawful: '',
-    chaotic: '',
-    neutral: '',
-  };
-
-  const hoverClasses = {
-    lawful: '',
-    chaotic: '',
-    neutral: '',
-  };
-
-  const alignmentKey = alignment || 'neutral';
-  const base = baseClasses[alignmentKey];
-  const hover = isDisabled ? '' : hoverClasses[alignmentKey];
-
-  return `${base}${hover}`;
+  return '';
 };
 
 /**
@@ -50,25 +34,9 @@ export const getAlignmentClasses = (
  * Critical decisions use bright red, while choice alignments use muted red
  */
 export const getDecisionWeightStyling = (weight?: DecisionWeight) => {
-  switch (weight) {
-    case 'critical':
-      return {
-        container: '',
-        dot: '',
-        label: '',
-      };
-    case 'major':
-      return {
-        container: '',
-        dot: '',
-        label: '',
-      };
-    case 'minor':
-    default:
-      return {
-        container: '',
-        dot: '',
-        label: '',
-      };
-  }
+  return {
+    container: '',
+    dot: '',
+    label: '',
+  };
 };
