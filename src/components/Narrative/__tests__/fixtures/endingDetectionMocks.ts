@@ -32,7 +32,32 @@ export const createMockCheckForEndingIndicators = () => {
 ${fullStoryContext}Recent narrative developments:
 ${narrativeContext}
 
-Analyze this story for natural ending points. Consider: STORY STRUCTURE: - Has the central conflict been resolved or reached climax? - Are character arcs showing completion or fulfillment? - Is there a sense of narrative closure or resolution? - Does the story feel like it has reached a satisfying conclusion? EMOTIONAL SATISFACTION: - Would ending here feel fulfilling to the reader? - Are loose threads tied up or at a natural pause? - Is there dramatic or emotional resolution? DO NOT: - Look for specific keywords or phrases - Use pattern matching - Apply rigid rules - Suggest ending just because of story length Respond with JSON format: { "suggestEnding": true/false, "confidence": "high" | "medium" | "low", "endingType": "story-complete" | "character-retirement" | "session-limit" | "none", "reason": "Clear explanation of why this is/isn't a good ending point" }`;
+Analyze this story for natural ending points. Consider:
+
+STORY STRUCTURE:
+- Has the central conflict been resolved or reached climax?
+- Are character arcs showing completion or fulfillment?
+- Is there a sense of narrative closure or resolution?
+- Does the story feel like it has reached a satisfying conclusion?
+
+EMOTIONAL SATISFACTION:
+- Would ending here feel fulfilling to the reader?
+- Are loose threads tied up or at a natural pause?
+- Is there dramatic or emotional resolution?
+
+DO NOT:
+- Look for specific keywords or phrases
+- Use pattern matching
+- Apply rigid rules
+- Suggest ending just because of story length
+
+Respond with JSON format:
+{
+  "suggestEnding": true/false,
+  "confidence": "high" | "medium" | "low",
+  "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
+  "reason": "Clear explanation of why this is/isn't a good ending point"
+}`;
 
       const response = await client.generateContent(analysisPrompt);
 
