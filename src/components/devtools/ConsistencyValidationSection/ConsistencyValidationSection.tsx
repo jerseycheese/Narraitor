@@ -159,7 +159,7 @@ export const ConsistencyValidationSection = () => {
                   <div>Characters:</div>
                   {loreContext.characters.map((char, idx) => (
                     <div key={idx} >
-                      {char.name} - {char.importance} importance - Traits: {char.traits.join(',')}
+                      {char.name} - {char.importance} importance - Traits: {char.traits.join(', ')}
                     </div>
                   ))}
                 </div>

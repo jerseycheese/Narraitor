@@ -254,7 +254,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                       {skill.attributeIds
                         .map(attrId => worldConfig.attributes?.find(attr => attr.id === attrId)?.name || 'Unknown')
                         .filter(name => name !== 'Unknown')
-                        .join(',') || 'Unknown attributes'}
+                        .join(', ') || 'Unknown attributes'}
                     </div>
                   )}
                 </div>

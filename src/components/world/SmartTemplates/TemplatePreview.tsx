@@ -62,7 +62,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
               </div>
               <div>
                 <div>Base: {attr.baseValue}</div>
-                <div>Range: {attr.minValue}-{attr.maxValue}</div>
+                <div>Range: {attr.minValue} - {attr.maxValue}</div>
               </div>
             </div>
           ))}
@@ -88,7 +88,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
               </div>
               <div>
                 <div>Base: {skill.baseValue}</div>
-                <div>Range: {skill.minValue}-{skill.maxValue}</div>
+                <div>Range: {skill.minValue} - {skill.maxValue}</div>
               </div>
             </div>
           ))}

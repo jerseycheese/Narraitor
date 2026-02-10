@@ -54,7 +54,7 @@ const createMockError = (id: string, message: string, severity: ErrorSeverity, c
   stack: 'Mock stack trace',
   componentContext: {
     componentName: 'TestComponent',
-    componentStack: 'at TestComponent\n at App'
+    componentStack: 'at TestComponent\n  at App'
   },
   stateSnapshot: {
     route: '/test',

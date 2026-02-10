@@ -114,7 +114,7 @@ export const LongConversation: Story = {
     segments: Array.from({ length: 10 }, (_, i) => 
       createMockSegment(
         `seg-${i + 1}`,
-      `This is narrative segment ${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
+        `This is narrative segment ${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
         i % 3 === 0 ? 'scene' : i % 3 === 1 ? 'action' : 'transition' // Changed to use valid types
       )
     ),

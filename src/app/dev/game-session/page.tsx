@@ -513,7 +513,7 @@ export default function GameSessionTestHarness() {
                 ];
               return typeof value === 'function';
             })
-            .join(',')}
+            .join(', ')}
         </p>
         <div>
           {JSON.stringify(currentState, null, 2)}

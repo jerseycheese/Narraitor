@@ -47,7 +47,6 @@
   white-space: pre-line;
 }
 
-/* Design Token CSS Variables */
 :root {
   /* Base shadcn/ui colors */
   --background: 0 0% 100%;

@@ -72,7 +72,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
                   <span>{fact.value}</span>
                   {fact.aliases && fact.aliases.length > 0 && (
                     <span>
-                      (also: {fact.aliases.join(',')})
+                      (also: {fact.aliases.join(', ')})
                     </span>
                   )}
                   {fact.metadata?.description && (

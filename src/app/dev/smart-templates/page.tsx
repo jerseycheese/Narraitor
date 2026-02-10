@@ -100,7 +100,7 @@ export default function SmartTemplatesTestPage() {
                     <div key={index} >
                       <span>{attr.name}</span>
                       <span>
-                        (Base: {attr.baseValue}, Range: {attr.minValue}-{attr.maxValue})
+                        (Base: {attr.baseValue}, Range: {attr.minValue} - {attr.maxValue})
                       </span>
                     </div>
                   ))}

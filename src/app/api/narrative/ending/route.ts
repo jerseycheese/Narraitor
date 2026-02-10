@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const validEndingTypes: EndingType[] = ['player-choice', 'story-complete', 'session-limit', 'character-retirement'];
     if (!validEndingTypes.includes(endingType as EndingType)) {
       return NextResponse.json(
-        { error: `Invalid ending type. Must be one of: ${validEndingTypes.join(',')}` },
+        { error: `Invalid ending type. Must be one of: ${validEndingTypes.join(', ')}` },
         { status: 400 }
       );
     }
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       const validTones: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
       if (!validTones.includes(body.desiredTone as EndingTone)) {
         return NextResponse.json(
-          { error: `Invalid tone. Must be one of: ${validTones.join(',')}` },
+          { error: `Invalid tone. Must be one of: ${validTones.join(', ')}` },
           { status: 400 }
         );
       }

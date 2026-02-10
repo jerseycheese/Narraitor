@@ -583,7 +583,7 @@ export default function SkillReviewStep({
                               suggestion.selectedAttributeNames.length > 0 && (
                                 <div>
                                   Selected:{' '}
-                                  {suggestion.selectedAttributeNames.join(',')}
+                                  {suggestion.selectedAttributeNames.join(', ')}
                                 </div>
                               )}
                           </WizardFormGroup>
@@ -701,17 +701,16 @@ export default function SkillReviewStep({
                         {skill.attributeIds &&
                           skill.attributeIds.length > 0 && (
                             <span>
-                              Linked:{' '}
-                              {skill.attributeIds
-                                .map(
-                                  (attrId) =>
-                                    worldData.attributes?.find(
-                                      (attr) => attr.id === attrId
-                                    )?.name
-                                )
-                                .filter(Boolean)
-                                .join(',')}
-                            </span>
+                                                          Linked:{' '}
+                                                          {skill.attributeIds
+                                                            .map(
+                                                              (attrId) =>
+                                                                worldData.attributes?.find(
+                                                                  (attr) => attr.id === attrId
+                                                                )?.name
+                                                            )
+                                                            .filter(Boolean)
+                                                            .join(', ')}                            </span>
                           )}
                       </div>
                       <div>

@@ -127,7 +127,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                           id => world.attributes.find(a => a.id === id)?.name
                         )
                         .filter(Boolean)
-                        .join(',') || 'Unknown'}
+                        .join(', ') || 'Unknown'}
                     </span>
                   )}
               </div>

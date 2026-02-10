@@ -219,7 +219,7 @@ export default function FinalizeStep({
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)
-                      .join(',') || 'Unknown'}
+                      .join(', ') || 'Unknown'}
                   </div>
                 )}
               </div>

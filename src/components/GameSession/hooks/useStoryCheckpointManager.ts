@@ -71,11 +71,11 @@ const buildDecisionPayload = (
       const consequenceText = decision.consequences
         ?.map((consequence) => consequence.description)
         .filter((entry): entry is string => Boolean(entry))
-        .join(';');
+        .join('; ');
 
       return {
         id: decision.id,
-        text: selectedOption ? `${decision.prompt}⇒${selectedOption.text}` : decision.prompt,
+        text: selectedOption ? `${decision.prompt} ⇒ ${selectedOption.text}` : decision.prompt,
         consequence: consequenceText,
         alignment: selectedOption?.alignment,
         timestamp: decision.selectedAt ? new Date(decision.selectedAt).toISOString() : undefined,

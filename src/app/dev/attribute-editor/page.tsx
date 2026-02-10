@@ -131,7 +131,7 @@ export default function AttributeEditorTestPage() {
                       {skills
                         .filter(skill => skill.attributeIds?.includes(attribute.id))
                         .map(skill => skill.name)
-                        .join(',')}
+                        .join(', ')}
                     </span>
                   </div>
                 )}

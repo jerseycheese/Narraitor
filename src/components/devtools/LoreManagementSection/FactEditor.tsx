@@ -37,7 +37,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
   const [importance, setImportance] = useState<'low' | 'medium' | 'high'>(
     fact?.metadata?.importance || 'medium'
   );
-  const [tags, setTags] = useState(fact?.metadata?.tags?.join(',') || '');
+  const [tags, setTags] = useState(fact?.metadata?.tags?.join(', ') || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isDuplicate, setIsDuplicate] = useState(false);
 

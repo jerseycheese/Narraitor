@@ -594,7 +594,7 @@ export default function WorldCreationWizard({
   }));
 
   const currentValidation = wizard.state.validation[wizard.state.currentStep];
-  const currentError = currentValidation?.touched && !currentValidation?.valid ? currentValidation.errors.join(',') : undefined;
+  const currentError = currentValidation?.touched && !currentValidation?.valid ? currentValidation.errors.join(', ') : undefined;
 
   return (
     <WizardContainer title="Create New World">
