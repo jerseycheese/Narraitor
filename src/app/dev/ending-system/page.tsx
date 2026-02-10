@@ -35,9 +35,21 @@ export default function EndingSystemTestHarness() {
     worldId: mockWorldId,
     type: endingType,
     tone: desiredTone,
-    epilogue: `As the sun set over the kingdom, our brave hero ${endingType === 'character-retirement' ? 'decided to lay down their sword and live peacefully' : 'stood victorious after their great adventure'}. The journey that began with uncertainty ended with ${desiredTone === 'tragic' ? 'great sacrifice' : desiredTone === 'mysterious' ? 'lingering questions' : 'celebration'}. The lands would remember this day for generations to come, when a simple adventurer became the ${desiredTone === 'mysterious' ? 'enigmatic figure of legend' : 'hero the realm needed'}. Through trials and tribulations, they proved that courage and determination can overcome any obstacle. As the stars began to twinkle in the evening sky, our hero ${endingType === 'character-retirement' ? 'smiled peacefully, knowing their adventuring days were behind them' : 'looked toward the horizon, ready for whatever adventures lay ahead'}.`,
-    characterLegacy: `The hero's name would be spoken with ${desiredTone === 'tragic' ? 'solemn respect' : 'admiration'} throughout the realm. Their ${endingType === 'character-retirement' ? 'wise decision to step away at the peak of their power' : 'incredible journey from humble beginnings to legendary status'} inspired countless others to pursue their own adventures. Young warriors would train hoping to follow in their footsteps, and bards would sing songs of their ${desiredTone === 'mysterious' ? 'enigmatic deeds' : 'heroic exploits'} for centuries to come.`,
-    worldImpact: `The realm was forever changed by the hero's actions. ${endingType === 'story-complete' ? 'With the main quest completed, peace returned to the land' : endingType === 'character-retirement' ? 'The hero\'s retirement marked the end of an era' : 'The adventure\'s conclusion brought new possibilities'}. Trade routes reopened, alliances were strengthened, and the people looked toward the future with ${desiredTone === 'hopeful' ? 'unbridled optimism' : desiredTone === 'tragic' ? 'cautious hope despite their losses' : 'renewed confidence'}. The world had been saved, and all knew that heroes like this one would always rise when needed.`,
+    epilogue: `As the sun set over the kingdom, our brave hero ${endingType === 'character-retirement' ? 'decided to lay down their sword and live peacefully' : 'stood victorious after their great adventure'}.
+
+The journey that began with uncertainty ended with ${desiredTone === 'tragic' ? 'great sacrifice' : desiredTone === 'mysterious' ? 'lingering questions' : 'celebration'}. The lands would remember this day for generations to come, when a simple adventurer became the ${desiredTone === 'mysterious' ? 'enigmatic figure of legend' : 'hero the realm needed'}.
+
+Through trials and tribulations, they proved that courage and determination can overcome any obstacle. As the stars began to twinkle in the evening sky, our hero ${endingType === 'character-retirement' ? 'smiled peacefully, knowing their adventuring days were behind them' : 'looked toward the horizon, ready for whatever adventures lay ahead'}.`,
+    characterLegacy: `The hero's name would be spoken with ${desiredTone === 'tragic' ? 'solemn respect' : 'admiration'} throughout the realm.
+
+Their ${endingType === 'character-retirement' ? 'wise decision to step away at the peak of their power' : 'incredible journey from humble beginnings to legendary status'} inspired countless others to pursue their own adventures.
+
+Young warriors would train hoping to follow in their footsteps, and bards would sing songs of their ${desiredTone === 'mysterious' ? 'enigmatic deeds' : 'heroic exploits'} for centuries to come.`,
+    worldImpact: `The realm was forever changed by the hero's actions. ${endingType === 'story-complete' ? 'With the main quest completed, peace returned to the land' : endingType === 'character-retirement' ? 'The hero\'s retirement marked the end of an era' : 'The adventure\'s conclusion brought new possibilities'}.
+
+Trade routes reopened, alliances were strengthened, and the people looked toward the future with ${desiredTone === 'hopeful' ? 'unbridled optimism' : desiredTone === 'tragic' ? 'cautious hope despite their losses' : 'renewed confidence'}.
+
+The world had been saved, and all knew that heroes like this one would always rise when needed.`,
     timestamp: new Date(),
     createdAt: getTimestamp(),
     updatedAt: getTimestamp(),

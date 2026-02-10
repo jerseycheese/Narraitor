@@ -11,7 +11,14 @@ const meta: Meta<typeof PageLayout> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: `A reusable page layout component that provides consistent structure across all application pages. **Features:** - Consistent header with title, description, and actions - Responsive design with proper spacing - Fixed 7xl width to match navigation - Semantic HTML structure - Built-in action button area`,
+        component: `A reusable page layout component that provides consistent structure across all application pages.
+
+**Features:**
+- Consistent header with title, description, and actions
+- Responsive design with proper spacing
+- Fixed 7xl width to match navigation
+- Semantic HTML structure
+- Built-in action button area`,
       },
     },
   },
