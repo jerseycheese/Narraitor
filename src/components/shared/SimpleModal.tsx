@@ -25,16 +25,12 @@ interface SimpleModalProps {
   className?: string;
   /** Optional classes for the scrolling content wrapper */
   contentClassName?: string;
-  /** Determines where scrolling happens */
-  scrollBehavior?: 'content' | 'overlay';
   /** Whether to show the close button */
   showCloseButton?: boolean;
   /** Whether to close on backdrop click */
   closeOnBackdropClick?: boolean;
   /** Whether to close on escape key */
   closeOnEscape?: boolean;
-  /** Modal size */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** ID of element describing the modal content */
   ariaDescribedBy?: string;
   /** Optional contextual descriptor rendered under the title */
@@ -43,10 +39,6 @@ interface SimpleModalProps {
   footer?: React.ReactNode;
   /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
-  /** Whether to keep the footer visible while overlay scrolling */
-  stickyFooter?: boolean;
-  /** Contextual tone to align borders and accents with design tokens */
-  tone?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
 }
 
 export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
@@ -55,60 +47,6 @@ export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
   }
 
   return Boolean(target.closest('.react-joyride__tooltip'));
-};
-
-const SIZE_CLASSES: Record<NonNullable<SimpleModalProps['size']>, string> = {
-  sm: '',
-  md: '',
-  lg: '',
-  xl: '',
-};
-
-const TONE_STYLES: Record<
-  NonNullable<SimpleModalProps['tone']>,
-  {
-    frame: string;
-    header: string;
-    headerBorder: string;
-    footerBorder: string;
-    closeButton: string;
-  }
-> = {
-  default: {
-    frame: '',
-    header: '',
-    headerBorder: '',
-    footerBorder: '',
-    closeButton: '',
-  },
-  info: {
-    frame: '',
-    header: '',
-    headerBorder: '',
-    footerBorder: '',
-    closeButton: '',
-  },
-  success: {
-    frame: '',
-    header: '',
-    headerBorder: '',
-    footerBorder: '',
-    closeButton: '',
-  },
-  warning: {
-    frame: '',
-    header: '',
-    headerBorder: '',
-    footerBorder: '',
-    closeButton: '',
-  },
-  destructive: {
-    frame: '',
-    header: '',
-    headerBorder: '',
-    footerBorder: '',
-    closeButton: '',
-  },
 };
 
 /**
@@ -124,26 +62,19 @@ export function SimpleModal({
   children,
   className,
   contentClassName,
-  scrollBehavior = 'overlay',
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeOnEscape = true,
-  size = 'md',
   ariaDescribedBy,
   description,
   footer,
   footerClassName,
-  stickyFooter = false,
-  tone = 'default',
 }: SimpleModalProps) {
-  const toneStyles = TONE_STYLES[tone];
   const fallbackDescriptionId = useId();
   const resolvedDescriptionId =
     ariaDescribedBy ||
     (description ? `${fallbackDescriptionId}-description` : undefined);
   const hasHeaderContent = Boolean(title || showCloseButton || description);
-  const isOverlayScroll = scrollBehavior === 'overlay';
-  const shouldStickFooter = Boolean(footer) && stickyFooter && isOverlayScroll;
 
   return (
     <Dialog
@@ -153,14 +84,8 @@ export function SimpleModal({
       <DialogContent
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
-        overlayScroll={isOverlayScroll}
         className={cssClasses(
           '',
-          '',
-          toneStyles.frame,
-          '',
-          SIZE_CLASSES[size],
-          !isOverlayScroll ? '' : undefined,
           className
         )}
         onInteractOutside={(event) => {
@@ -180,13 +105,7 @@ export function SimpleModal({
         }}
       >
         {hasHeaderContent && (
-          <div
-            className={cssClasses(
-              '',
-              toneStyles.header,
-              toneStyles.headerBorder
-            )}
-          >
+          <div>
             <div>
               {title && <DialogTitle>{title}</DialogTitle>}
               {description && (
@@ -200,7 +119,6 @@ export function SimpleModal({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cssClasses('', toneStyles.closeButton)}
                   aria-label="Close modal"
                 >
                   <X aria-hidden="true" />
@@ -212,12 +130,7 @@ export function SimpleModal({
 
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
-            data-scroll-container={isOverlayScroll ? undefined : 'content'}
-            className={cssClasses(
-              '',
-              isOverlayScroll ? undefined : '',
-              contentClassName
-            )}
+            className={contentClassName}
           >
             {children}
           </div>
@@ -225,13 +138,7 @@ export function SimpleModal({
 
         {footer && (
           <div
-            data-sticky-footer={shouldStickFooter ? 'true' : undefined}
-            className={cssClasses(
-              '',
-              toneStyles.footerBorder,
-              shouldStickFooter ? '' : undefined,
-              footerClassName
-            )}
+            className={footerClassName}
           >
             {footer}
           </div>
