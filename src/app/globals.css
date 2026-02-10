@@ -1,7 +1,6 @@
 /* Global Styles - Clean Slate (No Tailwind) */
 
-/* Scroll snap styles for narrative components */
-.narrative-history-container [data-radix-scroll-area-viewport] {
+/* Scroll snap styles for narrative components */.narrative-history-container [data-radix-scroll-area-viewport] {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 }

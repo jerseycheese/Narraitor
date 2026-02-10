@@ -98,7 +98,6 @@ export default function CharacterCreatePage() {
           <div>
             <div>
               <AlertTriangle
-                
                 aria-hidden="true"
               />
             </div>
@@ -119,7 +118,6 @@ export default function CharacterCreatePage() {
                   size: 'lg',
                 },
               ]}
-              
             />
           </div>
         </div>
@@ -262,7 +260,6 @@ export default function CharacterCreatePage() {
               <Button
                 variant="outline"
                 onClick={handleBackToQuickStart}
-                
               >
                 ← Back to Quick Start
               </Button>

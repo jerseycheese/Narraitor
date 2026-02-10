@@ -162,7 +162,6 @@ export default function ChoiceAlignmentTestPage() {
                 <select 
                   value={scenario} 
                   onChange={(e) => setScenario(e.target.value as 'bandits' | 'merchant' | 'dragon')}
-                  
                 >
                   <option value="bandits">Forest Bandits</option>
                   <option value="merchant">Suspicious Merchant</option>
@@ -174,7 +173,6 @@ export default function ChoiceAlignmentTestPage() {
                 <button
                   onClick={generateChoices}
                   disabled={loading || !worldId}
-                  
                 >
                   {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Aligned Choices'}
                 </button>

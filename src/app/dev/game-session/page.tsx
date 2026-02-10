@@ -394,7 +394,6 @@ export default function GameSessionTestHarness() {
 
       <div>
         <button
-          
           onClick={() => setShowRealComponent(!showRealComponent)}
         >
           {showRealComponent ? 'Hide Component' : 'Show Component'}
@@ -403,7 +402,6 @@ export default function GameSessionTestHarness() {
 
       <div>
         <button
-          
           onClick={createTestWorld}
         >
           Ensure Test World & Character Exist

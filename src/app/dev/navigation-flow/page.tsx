@@ -154,7 +154,6 @@ export default function NavigationFlowTestPage() {
                     <select
                       value={wizardWorldId}
                       onChange={(e) => setWizardWorldId(e.target.value)}
-                      
                     >
                       <option value="">No pre-selection</option>
                       {worldList.map(world => (
@@ -169,7 +168,6 @@ export default function NavigationFlowTestPage() {
                     <select
                       value={wizardCharacterId}
                       onChange={(e) => setWizardCharacterId(e.target.value)}
-                      
                       disabled={!wizardWorldId}
                     >
                       <option value="">No pre-selection</option>

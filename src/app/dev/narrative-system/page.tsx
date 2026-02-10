@@ -232,28 +232,24 @@ export default function NarrativeSystemHarness() {
         <div>
           <div>
             <button
-              
               onClick={handleGenerateNarrative}
             >
               Generate Initial Narrative
             </button>
             
             <button
-              
               onClick={() => setShowController(!showController)}
             >
               {showController ? 'Use Manual History' : 'Use Controller'}
             </button>
             
             <button
-              
               onClick={handleNewSession}
             >
               New Session
             </button>
             
             <button
-              
               onClick={handleClearSession}
             >
               Clear Session
@@ -298,7 +294,6 @@ export default function NarrativeSystemHarness() {
           {mockChoices.map((choice) => (
             <button
               key={choice.id}
-              
               onClick={() => handleChoiceSelected(choice.id)}
             >
               <div>{choice.text}</div>

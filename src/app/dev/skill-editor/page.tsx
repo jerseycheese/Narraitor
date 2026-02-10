@@ -134,7 +134,6 @@ export default function SkillEditorTestPage() {
                 {!editingSkill && !showCreateDialog && (
                   <button
                     onClick={() => setShowCreateDialog(true)}
-                    
                   >
                     Create New Skill
                   </button>
@@ -176,7 +175,6 @@ export default function SkillEditorTestPage() {
                             </div>
                             <button
                               onClick={() => setEditingSkill(skill.id)}
-                              
                             >
                               Edit
                             </button>
@@ -252,7 +250,6 @@ export default function SkillEditorTestPage() {
                     setSkills(initialSkills);
                     logActivity('Reset to initial skills');
                   }}
-                  
                 >
                   Reset Skills
                 </button>
@@ -261,7 +258,6 @@ export default function SkillEditorTestPage() {
                     setSkills([]);
                     logActivity('Cleared all skills');
                   }}
-                  
                 >
                   Clear All Skills
                 </button>
@@ -281,7 +277,6 @@ export default function SkillEditorTestPage() {
                     setSkills(prev => [...prev, ...manySkills]);
                     logActivity(`Generated ${manySkills.length} test skills`);
                   }}
-                  
                 >
                   Generate Test Skills
                 </button>

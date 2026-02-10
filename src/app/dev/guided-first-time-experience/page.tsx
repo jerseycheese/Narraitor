@@ -84,21 +84,18 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             
             <button
               onClick={handleReset}
-              
             >
               Reset (Show Onboarding)
             </button>
             
             <button
               onClick={handleMarkCompleted}
-              
             >
               Mark Completed (Hide Onboarding)
             </button>
             
             <button
               onClick={handleClearStorage}
-              
             >
               Clear All Storage & Reload
             </button>
@@ -134,7 +131,6 @@ export default function GuidedFirstTimeExperienceTestHarness() {
                   </p>
                   <button
                     onClick={handleReset}
-                    
                   >
                     Reset to Test Again
                   </button>

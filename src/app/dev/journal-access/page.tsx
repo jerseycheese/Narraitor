@@ -265,7 +265,6 @@ export default function JournalAccessTestPage() {
                 type="checkbox"
                 checked={hasCharacter}
                 onChange={(e) => setHasCharacter(e.target.checked)}
-                
               />
               <span>Has Character (AC1: button visibility)</span>
             </label>
@@ -279,7 +278,6 @@ export default function JournalAccessTestPage() {
               onChange={(e) =>
                 setGameStatus(e.target.value as 'active' | 'paused' | 'ended')
               }
-              
             >
               <option value="active">
                 Active (AC3: available at any point)
@@ -300,7 +298,6 @@ export default function JournalAccessTestPage() {
               max="4"
               value={entryCount}
               onChange={(e) => setEntryCount(parseInt(e.target.value))}
-              
             />
             <span>{entryCount} entries</span>
           </div>
@@ -310,7 +307,6 @@ export default function JournalAccessTestPage() {
             <h3>Journal Debug</h3>
             <button
               onClick={() => router.push('/worlds/test-world-1/play/journal')}
-              
             >
               Open Journal Page
             </button>
@@ -322,7 +318,6 @@ export default function JournalAccessTestPage() {
                 setEntryCount(0);
                 setTimeout(() => setEntryCount(3), 100);
               }}
-              
             >
               Clear & Regenerate Journal
             </button>

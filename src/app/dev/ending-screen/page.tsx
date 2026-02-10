@@ -201,31 +201,26 @@ export default function EndingScreenTestPage() {
           <div>
             <button
               onClick={() => handleTestEnding('triumphant')}
-              
             >
               Test Triumphant
             </button>
             <button
               onClick={() => handleTestEnding('tragic')}
-              
             >
               Test Tragic
             </button>
             <button
               onClick={() => handleTestEnding('mysterious')}
-              
             >
               Test Mysterious
             </button>
             <button
               onClick={() => handleTestEnding('hopeful')}
-              
             >
               Test Hopeful
             </button>
             <button
               onClick={() => setCurrentEnding(null)}
-              
             >
               Clear Ending
             </button>

@@ -72,13 +72,11 @@ export default function PlayPage() {
         <div>
           <button
             onClick={() => router.push('/worlds')}
-            
           >
             Select World
           </button>
           <button
             onClick={() => router.push('/characters')}
-            
           >
             Select Character
           </button>
@@ -103,7 +101,7 @@ export default function PlayPage() {
   const pageDescription = currentWorld?.genre ? getGenreLabel(currentWorld.genre) : undefined;
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription} >
+    <PageLayout title={pageTitle} description={pageDescription}>
       <GameSession worldId={currentWorldId!} />
     </PageLayout>
   );

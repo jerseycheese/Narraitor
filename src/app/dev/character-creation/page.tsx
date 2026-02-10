@@ -137,13 +137,11 @@ export default function CharacterCreationTestPage() {
             <div>
               <button
                 onClick={handleClearAutoSave}
-                
               >
                 Clear Auto-Save Data
               </button>
               <button
                 onClick={() => window.location.reload()}
-                
               >
                 Refresh Page
               </button>

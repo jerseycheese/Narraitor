@@ -56,14 +56,12 @@ export default function TestWorldGeneration() {
       <div>
         {testCases.map((testCase) => (
           <div key={testCase.reference} >
-            <button
-              onClick={() => runTest(testCase)}
-              disabled={isGenerating}
-              
-            >
-              Test &quot;{testCase.reference}&quot;
-            </button>
-            <span>
+                        <button
+                           onClick={() => runTest(testCase)}
+                           disabled={isGenerating}
+                         >
+                           Test &quot;{testCase.reference}&quot;
+                         </button>            <span>
               Expected genre: {testCase.expectedGenre}
             </span>
           </div>

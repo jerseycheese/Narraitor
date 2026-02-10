@@ -60,10 +60,8 @@ export function Navigation() {
   const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
-  const hasWorldsStore = Object.keys(worlds).length > 0;
+    const [mounted, setMounted] = useState(false);
+    const currentWorld = currentWorldId ? worlds[currentWorldId] : null;  const hasWorldsStore = Object.keys(worlds).length > 0;
   const worldCharacterCount = (Object.values(characters) as Character[]).filter(
     (char) => char.worldId === currentWorldId
   ).length;

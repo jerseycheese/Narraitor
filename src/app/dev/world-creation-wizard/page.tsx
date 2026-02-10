@@ -54,7 +54,6 @@ export default function WorldCreationWizardTestHarness() {
                 type="number"
                 value={mockAIDelay}
                 onChange={(e) => setMockAIDelay(Number(e.target.value))}
-                
               />
             </label>
           </div>
@@ -65,7 +64,6 @@ export default function WorldCreationWizardTestHarness() {
                 type="checkbox"
                 checked={mockAIError}
                 onChange={(e) => setMockAIError(e.target.checked)}
-                
               />
               Simulate AI Error
             </label>
@@ -74,7 +72,6 @@ export default function WorldCreationWizardTestHarness() {
           <button
             type="button"
             onClick={resetWizard}
-            
           >
             Reset Wizard
           </button>

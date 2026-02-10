@@ -97,7 +97,6 @@ export default function GameSessionComponentsTestPage() {
           <h2>GameSessionError Component</h2>
           <button
             onClick={() => setShowError(true)}
-            
           >
             Show Error
           </button>

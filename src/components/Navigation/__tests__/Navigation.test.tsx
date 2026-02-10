@@ -97,7 +97,6 @@ describe('Navigation', () => {
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       const charactersLink = screen.getByText('Characters');
       expect(charactersLink).toBeInTheDocument();
-      // expect(charactersLink).toHaveClass('');
       expect(screen.getByText('Settings')).toBeInTheDocument();
     });
 

@@ -187,21 +187,18 @@ export default function LoreViewerTestPage() {
         <div>
           <button
             onClick={addSampleFacts}
-            
           >
             Add Sample Facts
           </button>
           
           <button
             onClick={testStructuredExtraction}
-            
           >
             Test AI Structured Extraction
           </button>
           
           <button
             onClick={testErrorHandling}
-            
           >
             Test Error Handling
           </button>
@@ -212,7 +209,6 @@ export default function LoreViewerTestPage() {
               setExtractionResult('All facts cleared from this world');
               setTimeout(() => setExtractionResult(''), 3000);
             }}
-            
           >
             Clear All Facts
           </button>
@@ -222,7 +218,6 @@ export default function LoreViewerTestPage() {
               type="checkbox"
               checked={showSessionOnly}
               onChange={(e) => setShowSessionOnly(e.target.checked)}
-              
             />
             Show Session Facts Only
           </label>
@@ -233,14 +228,12 @@ export default function LoreViewerTestPage() {
           <div>
             <button
               onClick={testAliasAddition}
-              
             >
               Test Alias Addition
             </button>
 
             <button
               onClick={testAliasExtraction}
-              
             >
               Test AI Alias Extraction
             </button>
@@ -252,11 +245,9 @@ export default function LoreViewerTestPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or alias (e.g., 'Sera', 'Captain')..."
-              
             />
             <button
               onClick={testAliasSearch}
-              
             >
               Test Alias Search
             </button>
@@ -277,7 +268,6 @@ export default function LoreViewerTestPage() {
             value={customNarrative}
             onChange={(e) => setCustomNarrative(e.target.value)}
             placeholder="Enter narrative text to test fact extraction..."
-            
           />
         </div>
       </div>

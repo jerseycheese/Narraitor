@@ -128,7 +128,6 @@ export default function CharacterGenerationTestPage() {
           <select
             value={selectedWorldId}
             onChange={(e) => setSelectedWorldId(e.target.value)}
-            
           >
             <option value="">-- Select a World --</option>
             {Object.entries(worlds).map(([id, world]) => (
@@ -188,7 +187,6 @@ export default function CharacterGenerationTestPage() {
                 value={suggestedName}
                 onChange={(e) => setSuggestedName(e.target.value)}
                 placeholder="Enter character name"
-                
               />
             </div>
           )}
@@ -199,7 +197,6 @@ export default function CharacterGenerationTestPage() {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !selectedWorldId}
-            
           >
             {isGenerating ? 'Generating...' : 'Generate Character'}
           </button>
@@ -291,7 +288,6 @@ export default function CharacterGenerationTestPage() {
               <div>
                 <button
                   onClick={handleCreateCharacter}
-                  
                 >
                   Create This Character
                 </button>
@@ -312,7 +308,6 @@ export default function CharacterGenerationTestPage() {
                 .map((character) => (
                   <div
                     key={character.id}
-                    
                   >
                     <span>{character.name}</span>
                     <span>

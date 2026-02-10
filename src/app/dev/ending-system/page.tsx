@@ -91,7 +91,6 @@ export default function EndingSystemTestHarness() {
                 <select
                   value={endingType}
                   onChange={(e) => setEndingType(e.target.value as EndingType)}
-                  
                 >
                   <option value="player-choice">Player Choice</option>
                   <option value="story-complete">Story Complete</option>
@@ -107,7 +106,6 @@ export default function EndingSystemTestHarness() {
                 <select
                   value={desiredTone}
                   onChange={(e) => setDesiredTone(e.target.value as EndingTone)}
-                  
                 >
                   <option value="triumphant">Triumphant</option>
                   <option value="mysterious">Mysterious</option>
@@ -125,7 +123,6 @@ export default function EndingSystemTestHarness() {
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
                 placeholder="Enter any specific instructions for the ending..."
-                
                 rows={3}
               />
             </div>
@@ -135,14 +132,12 @@ export default function EndingSystemTestHarness() {
               <button
                 onClick={handleGenerateEnding}
                 disabled={isGeneratingEnding}
-                
               >
                 {isGeneratingEnding ? 'Generating...' : 'Generate AI Ending'}
               </button>
 
               <button
                 onClick={handleUseMockData}
-                
               >
                 Use Mock Ending Data
               </button>
@@ -150,7 +145,6 @@ export default function EndingSystemTestHarness() {
               <button
                 onClick={clearEnding}
                 disabled={!currentEnding}
-                
               >
                 Clear Ending
               </button>

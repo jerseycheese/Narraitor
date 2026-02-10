@@ -328,7 +328,6 @@ const GameSession: React.FC<GameSessionProps> = ({
             </p>
             <Button
               variant="default"
-              
               onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
             >
               Create Character
@@ -350,7 +349,6 @@ const GameSession: React.FC<GameSessionProps> = ({
           )}
           <Button
             variant="default"
-            
             onClick={startSession}
           >
             Start Session

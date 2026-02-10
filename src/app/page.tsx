@@ -28,7 +28,6 @@ export default function HomePage() {
                 alt="Narraitor Logo"
                 width={240}
                 height={240}
-                
               />
               <h2>
                 <span>Narr</span><span>ai</span><span>tor</span>

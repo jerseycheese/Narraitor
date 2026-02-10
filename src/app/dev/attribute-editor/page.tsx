@@ -99,20 +99,26 @@ export default function AttributeEditorTestPage() {
     <div>
       <h1>Attribute Editor Test Harness</h1>
       
-      <div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-        >
-          Create New Attribute
-        </button>
-      </div>
+            <div>
+      
+              <button
+      
+                onClick={() => setShowCreateModal(true)}
+      
+              >
+      
+                Create New Attribute
+      
+              </button>
+      
+            </div>
 
       <div>
         <h2>Existing Attributes</h2>
-        {attributes.map((attribute) => (
-          <div
-            key={attribute.id}
-          >
+                {attributes.map((attribute) => (
+                  <div
+                    key={attribute.id}
+                  >
             <div>
               <div>
                 <h3>{attribute.name}</h3>
@@ -134,22 +140,22 @@ export default function AttributeEditorTestPage() {
                   </div>
                 )}
               </div>
-              <div>
-                <button
-                  onClick={() => setEditingAttribute(attribute.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm(`Delete "${attribute.name}"?`)) {
-                      handleDeleteAttribute(attribute.id);
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
+                            <div>
+                              <button
+                                onClick={() => setEditingAttribute(attribute.id)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (confirm(`Delete "${attribute.name}"?`)) {
+                                    handleDeleteAttribute(attribute.id);
+                                  }
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
             </div>
           </div>
         ))}
@@ -159,12 +165,12 @@ export default function AttributeEditorTestPage() {
       <SimpleModal 
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)}
-        title="Create Attribute"
-        size="xl"
-      >
-        <div>
-          Create a new custom attribute for this test world.
-        </div>
+                title="Create Attribute"
+                size="xl"
+              >
+                <div>
+                  Create a new custom attribute for this test world.
+                </div>
         <AttributeEditor
           worldId={'world-test' as EntityID}
           mode="create"
@@ -179,12 +185,12 @@ export default function AttributeEditorTestPage() {
       <SimpleModal 
         isOpen={!!editingAttribute} 
         onClose={() => setEditingAttribute(null)}
-        title="Edit Attribute"
-        size="xl"
-      >
-        <div>
-          Modify the details of this test attribute.
-        </div>
+                title="Edit Attribute"
+                size="xl"
+              >
+                <div>
+                  Modify the details of this test attribute.
+                </div>
         {editingAttribute && (
           <AttributeEditor
             worldId={'world-test' as EntityID}

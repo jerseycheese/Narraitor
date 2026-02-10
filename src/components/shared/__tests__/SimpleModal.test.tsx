@@ -54,7 +54,6 @@ describe('SimpleModal', () => {
     );
 
     const dialog = screen.getByRole('dialog');
-    expect(dialog.className).toContain('');
   });
 
   it('supports content scrolling when requested', () => {
