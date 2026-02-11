@@ -1,7 +1,17 @@
 
 describe('featureFlags', () => {
-  const load = (env: Record<string, string | undefined>) => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
     jest.resetModules();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  const load = (env: Record<string, string | undefined>) => {
     process.env = { ...process.env, ...env };
     return require('@/lib/featureFlags') as typeof import('@/lib/featureFlags');
   };
