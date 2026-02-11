@@ -12,24 +12,24 @@ export const semanticColors = {
     default: primitiveColors.blue[500],
     hover: primitiveColors.blue[700],
     active: primitiveColors.blue[900],
-    disabled: primitiveColors.gray[500],
+    disabled: primitiveColors.zinc[500],
     foreground: primitiveColors.white,
   },
   
   // Secondary actions
   secondary: {
-    default: primitiveColors.gray[100],
-    hover: primitiveColors.gray[300],
-    active: primitiveColors.gray[500],
-    disabled: primitiveColors.gray[100],
-    foreground: primitiveColors.gray[900],
+    default: primitiveColors.zinc[100],
+    hover: primitiveColors.zinc[300],
+    active: primitiveColors.zinc[500],
+    disabled: primitiveColors.zinc[100],
+    foreground: primitiveColors.zinc[900],
   },
   
   // Muted/subtle elements
   muted: {
-    default: primitiveColors.gray[100],
-    hover: primitiveColors.gray[300],
-    foreground: primitiveColors.gray[500],
+    default: primitiveColors.zinc[100],
+    hover: primitiveColors.zinc[300],
+    foreground: primitiveColors.zinc[500],
   },
   
   // Success states
@@ -79,24 +79,24 @@ export const semanticColors = {
   // Surface colors
   surface: {
     default: primitiveColors.white,
-    muted: primitiveColors.gray[100],
-    subtle: primitiveColors.gray[100],
+    muted: primitiveColors.zinc[100],
+    subtle: primitiveColors.zinc[100],
     card: primitiveColors.white,
     overlay: primitiveColors.black + '80', // 50% black opacity using our black token
   },
   
   // Border colors
   border: {
-    default: primitiveColors.gray[300],
-    muted: primitiveColors.gray[100],
-    strong: primitiveColors.gray[300],
+    default: primitiveColors.zinc[300],
+    muted: primitiveColors.zinc[100],
+    strong: primitiveColors.zinc[300],
   },
   
   // Text colors
   text: {
-    primary: primitiveColors.gray[900],
-    secondary: primitiveColors.gray[700],
-    muted: primitiveColors.gray[500],
+    primary: primitiveColors.zinc[900],
+    secondary: primitiveColors.zinc[700],
+    muted: primitiveColors.zinc[500],
     inverse: primitiveColors.white,
     link: primitiveColors.blue[500],
     linkHover: primitiveColors.blue[700],
@@ -104,7 +104,7 @@ export const semanticColors = {
   
   // Interactive states
   interactive: {
-    hover: primitiveColors.gray[100],
+    hover: primitiveColors.zinc[100],
     focus: primitiveColors.blue[500],
     focusRing: primitiveColors.blue[300],
   },
@@ -116,89 +116,89 @@ export const semanticColorsDark = {
     default: primitiveColors.blue[500],
     hover: primitiveColors.blue[300],
     active: primitiveColors.blue[100],
-    disabled: primitiveColors.gray[500],
-    foreground: primitiveColors.gray[900],
+    disabled: primitiveColors.zinc[500],
+    foreground: primitiveColors.zinc[900],
   },
   
   secondary: {
-    default: primitiveColors.gray[700],
-    hover: primitiveColors.gray[500],
-    active: primitiveColors.gray[300],
-    disabled: primitiveColors.gray[900],
-    foreground: primitiveColors.gray[100],
+    default: primitiveColors.zinc[700],
+    hover: primitiveColors.zinc[500],
+    active: primitiveColors.zinc[300],
+    disabled: primitiveColors.zinc[900],
+    foreground: primitiveColors.zinc[100],
   },
   
   muted: {
-    default: primitiveColors.gray[900],
-    hover: primitiveColors.gray[700],
-    foreground: primitiveColors.gray[500],
+    default: primitiveColors.zinc[900],
+    hover: primitiveColors.zinc[700],
+    foreground: primitiveColors.zinc[500],
   },
   
   success: {
     default: primitiveColors.green[500],
     hover: primitiveColors.green[700],
     active: primitiveColors.green[200],
-    background: primitiveColors.gray[900],
+    background: primitiveColors.zinc[900],
     border: primitiveColors.green[700],
-    foreground: primitiveColors.gray[100],
-    muted: primitiveColors.gray[700],
+    foreground: primitiveColors.zinc[100],
+    muted: primitiveColors.zinc[700],
   },
   
   warning: {
     default: primitiveColors.amber[500],
     hover: primitiveColors.amber[200],
     active: primitiveColors.amber[200],
-    background: primitiveColors.gray[900],
+    background: primitiveColors.zinc[900],
     border: primitiveColors.amber[700],
-    foreground: primitiveColors.gray[100],
-    muted: primitiveColors.gray[700],
+    foreground: primitiveColors.zinc[100],
+    muted: primitiveColors.zinc[700],
   },
   
   danger: {
     default: primitiveColors.red[500],
     hover: primitiveColors.red[200],
     active: primitiveColors.red[200],
-    background: primitiveColors.gray[900],
+    background: primitiveColors.zinc[900],
     border: primitiveColors.red[700],
-    foreground: primitiveColors.gray[100],
-    muted: primitiveColors.gray[700],
+    foreground: primitiveColors.zinc[100],
+    muted: primitiveColors.zinc[700],
   },
   
   info: {
     default: primitiveColors.blue[300],
     hover: primitiveColors.blue[300],
     active: primitiveColors.blue[100],
-    background: primitiveColors.gray[900],
+    background: primitiveColors.zinc[900],
     border: primitiveColors.blue[700],
-    foreground: primitiveColors.gray[100],
-    muted: primitiveColors.gray[700],
+    foreground: primitiveColors.zinc[100],
+    muted: primitiveColors.zinc[700],
   },
   
   surface: {
-    default: primitiveColors.gray[900],
-    muted: primitiveColors.gray[900],
-    subtle: primitiveColors.gray[700],
-    card: primitiveColors.gray[900],
+    default: primitiveColors.zinc[900],
+    muted: primitiveColors.zinc[900],
+    subtle: primitiveColors.zinc[700],
+    card: primitiveColors.zinc[900],
     overlay: primitiveColors.black + '80', // Using our black token
   },
   
   border: {
-    default: primitiveColors.gray[700],
-    muted: primitiveColors.gray[900],
-    strong: primitiveColors.gray[500],
+    default: primitiveColors.zinc[700],
+    muted: primitiveColors.zinc[900],
+    strong: primitiveColors.zinc[500],
   },
   
   text: {
-    primary: primitiveColors.gray[100],
-    secondary: primitiveColors.gray[300],
-    muted: primitiveColors.gray[500],
-    inverse: primitiveColors.gray[900],
+    primary: primitiveColors.zinc[100],
+    secondary: primitiveColors.zinc[300],
+    muted: primitiveColors.zinc[500],
+    inverse: primitiveColors.zinc[900],
     link: primitiveColors.blue[300],
     linkHover: primitiveColors.blue[100],
   },
   
   interactive: {
-    hover: primitiveColors.gray[900],
+    hover: primitiveColors.zinc[900],
     focus: primitiveColors.blue[300],
     focusRing: primitiveColors.blue[500],
   },

@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { notFound } from 'next/navigation';
 
 export default function DevLayout({
@@ -7,8 +10,16 @@ export default function DevLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isDesignSystem = pathname === '/dev/design-system';
+
   if (process.env.NODE_ENV === 'production') {
     notFound();
+  }
+
+  // Design system page gets clean layout without header
+  if (isDesignSystem) {
+    return <>{children}</>;
   }
 
   return (

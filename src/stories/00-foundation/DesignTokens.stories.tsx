@@ -51,7 +51,7 @@ export const PrimitiveTokens: Story = {
         </p>
       </div>
       
-      <ColorScale colors={primitiveColors.gray} name="Gray Scale" />
+      <ColorScale colors={primitiveColors.zinc} name="Zinc Scale" />
       <ColorScale colors={primitiveColors.blue} name="Blue (Primary)" />
       <ColorScale colors={primitiveColors.green} name="Green (Success)" />
       <ColorScale colors={primitiveColors.red} name="Red (Danger)" />

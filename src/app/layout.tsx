@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Lora, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
@@ -8,6 +9,26 @@ import { NavigationPersistenceProvider } from '@/components/shared/NavigationPer
 import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
+
+const lora = Lora({
+  subsets: ['latin'],
+  variable: '--font-narrative',
+  display: 'swap',
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ['400', '500', '600'],
+  subsets: ['latin'],
+  variable: '--font-system',
+  display: 'swap',
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-interface',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Narraitor',
@@ -28,7 +49,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>
+      <body className={`${lora.variable} ${ibmPlexMono.variable} ${ibmPlexSans.variable}`} suppressHydrationWarning>
         <SkipLinks />
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>

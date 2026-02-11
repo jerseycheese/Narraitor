@@ -9,13 +9,19 @@ export const primitiveColors = {
   white: '#ffffff',
   black: '#000000',
   
-  // Gray scale - essential shades for UI elements
-  gray: {
-    100: '#f3f4f6',   // Light backgrounds, subtle borders
-    300: '#d1d5db',   // Borders, dividers
-    500: '#6b7280',   // Secondary text, placeholders
-    700: '#374151',   // Primary text on light backgrounds
-    900: '#111827',   // Dark text, dark mode backgrounds
+  // Zinc scale - essential shades for UI elements
+  zinc: {
+    50: '#fafafa',
+    100: '#f4f4f5',
+    200: '#e4e4e7',
+    300: '#d4d4d8',
+    400: '#a1a1aa',
+    500: '#71717a',
+    600: '#52525b',
+    700: '#3f3f46',
+    800: '#27272a',
+    900: '#18181b',
+    950: '#09090b',
   },
   
   // Blue - primary brand color

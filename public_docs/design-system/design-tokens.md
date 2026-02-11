@@ -27,12 +27,18 @@ These are the raw color values - the actual hex codes that define our palette. T
 export const primitiveColors = {
   white: '#ffffff',
   black: '#000000',
-  gray: {
-    100: '#f3f4f6',
-    300: '#d1d5db', 
-    500: '#6b7280',
-    700: '#374151',
-    900: '#111827',
+  zinc: {
+    50: '#fafafa',
+    100: '#f4f4f5',
+    200: '#e4e4e7',
+    300: '#d4d4d8',
+    400: '#a1a1aa',
+    500: '#71717a',
+    600: '#52525b',
+    700: '#3f3f46',
+    800: '#27272a',
+    900: '#18181b',
+    950: '#09090b',
   },
   blue: {
     100: '#dbeafe',
@@ -45,7 +51,7 @@ export const primitiveColors = {
 }
 ```
 
-The palette intentionally uses a simplified scale (100, 300, 500, 700, 900) rather than the full Tailwind spectrum. This keeps color decisions manageable and ensures consistency.
+The palette uses the full Zinc scale for neutrals to support subtle UI nuances, while other colors use a simplified scale (100, 300, 500, 700, 900) to keep decisions manageable.
 
 ### Semantic Tokens
 
@@ -54,12 +60,12 @@ These map primitive colors to their intended purpose in the interface. Instead o
 ```typescript
 export const semanticColors = {
   primary: primitiveColors.blue[700],      // Main action color
-  secondary: primitiveColors.gray[700],    // Secondary actions
+  secondary: primitiveColors.zinc[700],    // Secondary actions
   success: primitiveColors.green[700],     // Positive feedback
   warning: primitiveColors.amber[700],     // Caution states
   danger: primitiveColors.red[700],        // Error states
   info: primitiveColors.blue[500],         // Informational content
-  muted: primitiveColors.gray[500],        // Subtle text
+  muted: primitiveColors.zinc[500],        // Subtle text
   accent: primitiveColors.blue[300],       // Highlights
 }
 ```
@@ -128,8 +134,8 @@ For more complex styling or when you need to reference tokens in CSS, use the `t
 ```css
 .custom-component {
   background-color: theme('colors.blue.500');
-  border: 1px solid theme('colors.gray.300');
-  color: theme('colors.gray.900');
+  border: 1px solid theme('colors.zinc.300');
+  color: theme('colors.zinc.900');
 }
 ```
 
@@ -162,12 +168,12 @@ const buttonColor = isActive ? semanticColors.primary : semanticColors.muted
 - `blue-700`: Primary action color (buttons, links)
 - `blue-900`: Deep blue for emphasis
 
-**Gray Family**: Neutral elements, text, and subtle UI components
-- `gray-100`: Light backgrounds, subtle sections
-- `gray-300`: Borders, dividers, inactive states
-- `gray-500`: Muted text, secondary information  
-- `gray-700`: Primary text, active states
-- `gray-900`: High contrast text, headings
+**Zinc Family**: Neutral elements, text, and subtle UI components
+- `zinc-100`: Light backgrounds, subtle sections
+- `zinc-300`: Borders, dividers, inactive states
+- `zinc-500`: Muted text, secondary information  
+- `zinc-700`: Primary text, active states
+- `zinc-900`: High contrast text, headings
 
 **Green Family**: Success states and positive feedback
 - `green-500`: Standard success messaging
@@ -205,7 +211,7 @@ The design tokens are enforced through the Tailwind configuration, which restric
 colors: {
   white: primitiveColors.white,
   black: primitiveColors.black,  
-  gray: primitiveColors.gray,
+  zinc: primitiveColors.zinc,
   blue: primitiveColors.blue,
   green: primitiveColors.green,
   red: primitiveColors.red,
@@ -229,7 +235,7 @@ All color combinations in the token system meet WCAG accessibility standards:
 - Interactive elements maintain proper contrast in all states
 - Warning/alert colors provide sufficient contrast for accessibility compliance
 
-The gray scale particularly ensures readable text across all backgrounds, while the color families provide sufficient contrast for their intended uses.
+The zinc scale particularly ensures readable text across all backgrounds, while the color families provide sufficient contrast for their intended uses.
 
 ### Accessibility Implementation Requirements
 
