@@ -1,14 +1,21 @@
-import { getStableNarrativeMaxHeight } from '../layoutStability';
+import {
+  getStableChoicesMaxHeight,
+  getStableNarrativeMaxHeight,
+} from '../layoutStability';
 
 describe('layoutStability', () => {
-  it('returns undefined until the session has multiple segments', () => {
-    expect(getStableNarrativeMaxHeight(0, false)).toBeUndefined();
-    expect(getStableNarrativeMaxHeight(1, false)).toBe('500px');
-    expect(getStableNarrativeMaxHeight(1, true)).toBe('500px');
+  it('returns undefined until the session has narrative content', () => {
+    expect(getStableNarrativeMaxHeight(0)).toBeUndefined();
+    expect(getStableNarrativeMaxHeight(1)).toBe('500px');
   });
 
-  it('keeps narrative height stable when suggested actions are expanded', () => {
-    expect(getStableNarrativeMaxHeight(2, false)).toBe('500px');
-    expect(getStableNarrativeMaxHeight(2, true)).toBe('500px');
+  it('keeps narrative height stable once gameplay is active', () => {
+    expect(getStableNarrativeMaxHeight(2)).toBe('500px');
+  });
+
+  it('keeps choices height stable once gameplay is active', () => {
+    expect(getStableChoicesMaxHeight(0)).toBeUndefined();
+    expect(getStableChoicesMaxHeight(1)).toBe('500px');
+    expect(getStableChoicesMaxHeight(2)).toBe('500px');
   });
 });
