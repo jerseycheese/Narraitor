@@ -220,6 +220,7 @@ export default function DesignSystemPage() {
                       key={item.id}
                       href={`#${item.id}`}
                       onClick={closeNav}
+                      tabIndex={isNavOpen ? 0 : -1}
                       className="font-system"
                       style={{
                         fontSize: 12,
@@ -454,6 +455,9 @@ export default function DesignSystemPage() {
               <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>:root (Light)</h4>
               <pre
                 className="font-system"
+                tabIndex={0}
+                role="region"
+                aria-label="Light theme CSS variable definitions"
                 style={{
                   fontSize: 12,
                   lineHeight: 1.6,
@@ -500,6 +504,9 @@ export default function DesignSystemPage() {
               <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>.dark</h4>
               <pre
                 className="font-system"
+                tabIndex={0}
+                role="region"
+                aria-label="Dark theme CSS variable definitions"
                 style={{
                   fontSize: 12,
                   lineHeight: 1.6,
@@ -618,30 +625,30 @@ export default function DesignSystemPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 420 }}>
             {/* Default */}
             <div>
-              <label className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Default</label>
-              <input type="text" placeholder="Character name" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              <label htmlFor="design-system-input-default" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Default</label>
+              <input id="design-system-input-default" type="text" placeholder="Character name" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
             </div>
             {/* Focus */}
             <div>
-              <label className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Focus</label>
-              <input type="text" defaultValue="Focused narrative prompt" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #312e81', outline: '2px solid #312e81', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              <label htmlFor="design-system-input-focus" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Focus</label>
+              <input id="design-system-input-focus" type="text" defaultValue="Focused narrative prompt" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #312e81', outline: '2px solid #312e81', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
             </div>
             {/* Error */}
             <div>
-              <label className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Error</label>
-              <input type="text" defaultValue="Scene title already used" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #9f1239', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              <label htmlFor="design-system-input-error" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Error</label>
+              <input id="design-system-input-error" type="text" defaultValue="Scene title already used" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #9f1239', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
               <p style={{ fontSize: 12, marginTop: 4, color: '#9f1239' }}>Error: choose a unique title to continue.</p>
             </div>
             {/* Success */}
             <div>
-              <label className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Success</label>
-              <input type="text" defaultValue="Ravenhold Ledger" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #065f46', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              <label htmlFor="design-system-input-success" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Success</label>
+              <input id="design-system-input-success" type="text" defaultValue="Ravenhold Ledger" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #065f46', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
               <p style={{ fontSize: 12, marginTop: 4, color: '#065f46' }}>Success: title accepted and ready to save.</p>
             </div>
             {/* Disabled */}
             <div>
-              <label className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Disabled</label>
-              <input type="text" defaultValue="Locked while streaming" disabled className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'not-allowed', boxSizing: 'border-box' }} />
+              <label htmlFor="design-system-input-disabled" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Disabled</label>
+              <input id="design-system-input-disabled" type="text" defaultValue="Locked while streaming" disabled className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'not-allowed', boxSizing: 'border-box' }} />
             </div>
           </div>
         </SubSection>
