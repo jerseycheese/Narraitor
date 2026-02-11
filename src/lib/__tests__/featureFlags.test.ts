@@ -1,9 +1,8 @@
 
 describe('featureFlags', () => {
-  const load = (env: NodeJS.ProcessEnv) => {
+  const load = (env: Record<string, string | undefined>) => {
     jest.resetModules();
     process.env = { ...process.env, ...env };
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require('@/lib/featureFlags') as typeof import('@/lib/featureFlags');
   };
 
@@ -37,5 +36,14 @@ describe('featureFlags', () => {
 
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(false);
     expect(isFeatureEnabled('VIRTUALIZATION')).toBe(false);
+  });
+
+  it('supports downstream gating decisions for BUFFERED_STREAMING', () => {
+    const { isFeatureEnabled } = load({
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'true',
+    });
+
+    const mode = isFeatureEnabled('BUFFERED_STREAMING') ? 'buffered' : 'legacy';
+    expect(mode).toBe('buffered');
   });
 });
