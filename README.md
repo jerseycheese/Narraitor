@@ -75,6 +75,11 @@ cp .env.example .env.local
 # (keeps long-running sessions from ballooning prompt size)
 # ENABLE_TOKEN_BUDGET_MANAGER=true
 
+# Feature flags (default off)
+# NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
+# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=false
+# NEXT_PUBLIC_FEATURE_VIRTUALIZATION=false
+
 # Fire it up
 npm run dev
 ```
@@ -99,6 +104,20 @@ npm run dev
 ```
 
 There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
+
+### Feature Flags
+
+We use feature flags to safely roll out major changes. Configure them in `.env.local` and use the helper:
+
+```typescript
+import { isFeatureEnabled } from '@/lib/featureFlags';
+
+if (isFeatureEnabled('BUFFERED_STREAMING')) {
+  // new path
+} else {
+  // current path
+}
+```
 
 ## How It's Organized
 
@@ -233,6 +252,11 @@ The AI system routes everything through Next.js API endpoints (`/api/narrative/g
 GEMINI_API_KEY=your-api-key
 # Optional: enable token-budget-based prompt truncation
 # ENABLE_TOKEN_BUDGET_MANAGER=true
+
+# Feature flags
+# NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
+# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=false
+# NEXT_PUBLIC_FEATURE_VIRTUALIZATION=false
 ```
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
