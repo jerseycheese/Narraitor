@@ -52,7 +52,7 @@ const WorldTableRow = React.memo(
         // Don't override background color when selected (let Tailwind classes handle it)
         return {
           backgroundColor:
-            !isSelected && isHovered ? primitiveColors.gray[300] : undefined,
+            !isSelected && isHovered ? primitiveColors.zinc[300] : undefined,
           transition: 'background-color 0.15s ease',
         };
       }

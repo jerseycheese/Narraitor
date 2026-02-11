@@ -1,6 +1,7 @@
 /* Global Styles - Clean Slate (No Tailwind) */
 
-/* Scroll snap styles for narrative components */.narrative-history-container [data-radix-scroll-area-viewport] {
+/* Scroll snap styles for narrative components */
+.narrative-history-container [data-radix-scroll-area-viewport] {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 }
@@ -12,7 +13,7 @@
 
 /* Narrative Content Styling for Readable Storytelling */
 .narrative-content {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-narrative);
   line-height: 1.7;
   text-align: justify;
   hyphens: auto;
@@ -47,27 +48,42 @@
 }
 
 :root {
+  /* Design system typography tokens */
+  --font-narrative: 'Lora', serif;
+  --font-system: 'IBM Plex Mono', monospace;
+  --font-interface: 'IBM Plex Sans', sans-serif;
+
+  /* Design system color tokens (zinc-based) */
+  --color-canvas: #fdfbf7;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-text-primary: #111111;
+  --color-text-secondary: #3f3f46;
+  --color-text-muted: #71717a;
+
   /* Base shadcn/ui colors */
   --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  --foreground: 240 5.9% 10%; /* zinc-900 */
   --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --card-foreground: 240 5.9% 10%; /* zinc-900 */
   --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
+  --popover-foreground: 240 5.9% 10%; /* zinc-900 */
 
-  /* Design system aligned tokens - maps to our blue-700/gray-700 */
+  /* Design system aligned tokens */
   --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 */
   --primary-foreground: 0 0% 100%; /* white */
-  --secondary: 220 13% 25%; /* gray-700: #374151 */
+  --secondary: 240 3.8% 26.1%; /* zinc-700: #3f3f46 */
   --secondary-foreground: 0 0% 100%; /* white */
-  --muted: 240 4.8% 95.9%;
+  --muted: 240 4.8% 95.9%; /* zinc-100: #f4f4f5 */
   --muted-foreground: 240 3.8% 46.1%;
   --accent: 240 4.8% 95.9%;
   --accent-foreground: 240 5.9% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
+  --border: 240 5.2% 90%; /* zinc-200: #e4e4e7 */
+  --input: 240 5.2% 90%; /* zinc-200 */
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
   
@@ -96,7 +112,7 @@
   /* Contextual colors for storytelling features */
   --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
   --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */  
-  --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
+  --ending-mysterious: 240 5.9% 10%; /* zinc-900 - using design system zinc */
   --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
   --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
   
@@ -119,27 +135,37 @@
 }
 
 .dark {
+  /* Design system color tokens (zinc-based) */
+  --color-canvas: #09090b;
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+  --color-border: #3f3f46;
+  --color-border-strong: #52525b;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #d4d4d8;
+  --color-text-muted: #71717a;
+
   /* Base shadcn/ui dark colors */
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
+  --background: 240 10% 3.9%; /* zinc-950 */
+  --foreground: 0 0% 98%; /* zinc-50 */
+  --card: 240 10% 3.9%; /* zinc-950 */
+  --card-foreground: 0 0% 98%; /* zinc-50 */
+  --popover: 240 10% 3.9%; /* zinc-950 */
+  --popover-foreground: 0 0% 98%; /* zinc-50 */
 
   /* Design system aligned dark mode tokens */
   --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 - same in dark mode */
   --primary-foreground: 0 0% 100%; /* white */
-  --secondary: 220 13% 25%; /* gray-700: #374151 - same in dark mode */
+  --secondary: 240 5.0% 26.1%; /* zinc-700: #3f3f46 */
   --secondary-foreground: 0 0% 100%; /* white */
-  --muted: 240 3.7% 15.9%;
+  --muted: 240 3.7% 15.9%; /* zinc-800: #27272a */
   --muted-foreground: 240 5% 64.9%;
   --accent: 240 3.7% 15.9%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
+  --border: 240 3.7% 15.9%; /* zinc-800 */
+  --input: 240 3.7% 15.9%; /* zinc-800 */
   --ring: 224.3 76.3% 94.1%;
   
   /* Extended semantic tokens (dark) */
@@ -167,7 +193,7 @@
   /* Contextual colors remain the same in dark mode for consistency */
   --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
   --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */
-  --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
+  --ending-mysterious: 240 5.9% 10%; /* zinc-900 - using design system zinc */
   --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
   --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
   
@@ -188,6 +214,34 @@
   --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */
   --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
 }
+
+/* Typography role classes */
+.text-narrative {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--color-text-primary);
+}
+
+.text-technical {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.text-ui {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.font-narrative { font-family: var(--font-narrative); }
+.font-system { font-family: var(--font-system); }
+.font-interface { font-family: var(--font-interface); }
 
 /* Ending Screen Tone Styles */
 .ending-triumphant {
