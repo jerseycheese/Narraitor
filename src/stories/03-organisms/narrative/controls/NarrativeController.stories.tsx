@@ -254,6 +254,72 @@ export const LoadingState: Story = {
   render: LoadingStateStory
 };
 
+// Streaming stability simulation
+function StreamingStabilityStory() {
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([
+    {
+      id: 'seg-1',
+      content: 'This is the initial narrative segment. The adventure is just beginning.',
+      type: 'scene',
+      sessionId: 'session-streaming',
+      worldId: 'world-1',
+      timestamp: new Date(),
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
+      metadata: { tags: [], mood: 'neutral' }
+    }
+  ]);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const addSegment = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const newSegment: NarrativeSegment = {
+        id: `seg-${segments.length + 1}`,
+        content: 'This new segment will be progressively revealed if the BUFFERED_STREAMING feature is enabled. This ensures that the UI remains stable and doesn\'t jump around as content is added, providing a better reading experience for the player.',
+        type: 'scene',
+        sessionId: 'session-streaming',
+        worldId: 'world-1',
+        timestamp: new Date(),
+        createdAt: getTimestamp(),
+        updatedAt: getTimestamp(),
+        metadata: { tags: [], mood: 'neutral' }
+      };
+      setSegments(prev => [...prev, newSegment]);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <div className="w-full max-w-2xl">
+      <div className="mb-4">
+        <button 
+          onClick={addSegment}
+          disabled={isLoading}
+          className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
+        >
+          {isLoading ? 'Generating...' : 'Add Streaming Segment'}
+        </button>
+      </div>
+      <div className="h-[400px] border rounded overflow-hidden">
+        <NarrativeHistory 
+          segments={segments}
+          isLoading={isLoading}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const StreamingStability: Story = {
+  render: StreamingStabilityStory,
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-streaming',
+    triggerGeneration: false
+  }
+};
+
 // Error state
 function ErrorStateStory() {
   return (

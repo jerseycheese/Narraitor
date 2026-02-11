@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
@@ -118,6 +119,38 @@ export const LongConversation: Story = {
         i % 3 === 0 ? 'scene' : i % 3 === 1 ? 'action' : 'transition' // Changed to use valid types
       )
     ),
+    isLoading: false,
+  },
+};
+
+// Streaming simulation
+export const StreamingSimulation: Story = {
+  render: (args) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [segments, setSegments] = React.useState(args.segments);
+    
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    React.useEffect(() => {
+      const timer = setTimeout(() => {
+        const newSegment = createMockSegment(
+          `seg-${segments.length + 1}`,
+          'This is a new segment being streamed to test the stability of the narrative history component. It should appear progressively if the BUFFERED_STREAMING feature is enabled.'
+        );
+        setSegments([...segments, newSegment]);
+      }, 2000);
+      return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return <NarrativeHistory {...args} segments={segments} />;
+  },
+  args: {
+    segments: [
+      createMockSegment(
+        'seg-1',
+        'Initial historical segment that should stay static.'
+      ),
+    ],
     isLoading: false,
   },
 };

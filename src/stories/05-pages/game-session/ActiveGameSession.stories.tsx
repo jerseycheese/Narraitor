@@ -298,6 +298,62 @@ export const ActiveGameplay: Story = {
 
 
 /**
+ * Streaming stability simulation in the full page context
+ */
+export const StreamingStability: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+  },
+  decorators: [
+    (Story) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [segments, setSegments] = React.useState(mockSegments);
+
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      React.useEffect(() => {
+        // Mock a streaming event every 5 seconds
+        const timer = setInterval(() => {
+          const nextId = `seg-${segments.length + 1}`;
+          const newSegment: NarrativeSegment = {
+            id: nextId,
+            content: `A new chapter begins in segment ${segments.length + 1}. The stability of the UI is maintained through buffered streaming, ensuring that even as new content arrives, the user's reading flow is not interrupted by sudden jumps or layout shifts.`,
+            type: 'scene',
+            sessionId: 'session-123',
+            worldId: 'world-123',
+            timestamp: new Date(),
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp(),
+            metadata: { tags: [], mood: 'neutral' },
+          };
+          setSegments(prev => [...prev, newSegment]);
+        }, 5000);
+        return () => clearInterval(timer);
+      }, [segments.length]);
+
+      // Set up character and narrative store with our dynamic segments
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      React.useEffect(() => {
+        useCharacterStore.setState({
+            characters: { 'char-123': mockCharacter },
+            entities: { 'char-123': mockCharacter },
+            currentCharacterId: 'char-123',
+            currentEntityId: 'char-123',
+            error: null,
+            loading: false,
+          });
+          useSessionStore.setState({ characterId: 'char-123' });
+          populateNarrativeStore(segments, [mockDecision]);
+      }, [segments]);
+      
+      return <Story />;
+    },
+  ],
+};
+
+/**
  * No predefined choices - custom input only
  */
 export const NoChoicesAvailable: Story = {

@@ -28,15 +28,9 @@ a[href="#main-content"]:focus {
   outline-offset: 2px;
 }
 
-/* Scroll snap styles for narrative components */
+/* Scroll behavior for narrative components */
 .narrative-history-container [data-radix-scroll-area-viewport] {
-  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
-}
-
-.narrative-history-container .snap-center {
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
 }
 
 /* Narrative Content Styling for Readable Storytelling */
