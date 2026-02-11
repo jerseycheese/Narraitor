@@ -27,6 +27,14 @@ describe('useBufferedNarrativeSegments', () => {
     createMockNarrativeSegment({ id: 'seg-2', content: 'New content being streamed.' }),
   ];
 
+  const flushBufferTimers = async (ticks = 20, intervalMs = 100) => {
+    for (let i = 0; i < ticks; i += 1) {
+      await act(async () => {
+        jest.advanceTimersByTime(intervalMs);
+      });
+    }
+  };
+
   it('returns segments immediately when feature is disabled', () => {
     mockIsFeatureEnabled.mockReturnValue(false);
     const { result } = renderHook(() => useBufferedNarrativeSegments(segments));
@@ -57,13 +65,8 @@ describe('useBufferedNarrativeSegments', () => {
     expect(result.current.isBuffering).toBe(true);
 
     // Fast forward to end
-    // Note: with fake timers and recursive effects, we need to advance timers and let effects run
-    for (let i = 0; i < 10; i++) {
-        await act(async () => {
-            jest.advanceTimersByTime(100);
-        });
-    }
-    
+    await flushBufferTimers(10, 100);
+
     expect(result.current.renderedSegments[1].content).toBe('New content being streamed.');
     expect(result.current.isBuffering).toBe(false);
   });
@@ -81,18 +84,60 @@ describe('useBufferedNarrativeSegments', () => {
     // Add a new segment
     const newSegments = [...segments];
     act(() => {
-        rerender({ currentSegments: newSegments });
+      rerender({ currentSegments: newSegments });
     });
 
     expect(result.current.renderedSegments[1].content).toBe('');
-    
-    for (let i = 0; i < 10; i++) {
-        await act(async () => {
-            jest.advanceTimersByTime(100);
-        });
-    }
-    
+
+    await flushBufferTimers(10, 100);
+
     expect(result.current.renderedSegments[1].content).toBe('New content being streamed.');
+    expect(result.current.isBuffering).toBe(false);
+  });
+
+  it('continues buffering when the active segment grows with the same id', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+
+    const initialSegments = [segments[0]];
+    const firstVersion = [
+      segments[0],
+      createMockNarrativeSegment({ id: 'seg-stream', content: 'You step forward.' }),
+    ];
+
+    const { result, rerender } = renderHook(
+      ({ currentSegments }) =>
+        useBufferedNarrativeSegments(currentSegments, { intervalMs: 75, chunkSize: 1 }),
+      { initialProps: { currentSegments: initialSegments } }
+    );
+
+    act(() => {
+      rerender({ currentSegments: firstVersion });
+    });
+
+    await flushBufferTimers(20, 75);
+    expect(result.current.renderedSegments[1].content).toBe('You step forward.');
+    expect(result.current.isBuffering).toBe(false);
+
+    const grownVersion = [
+      segments[0],
+      createMockNarrativeSegment({
+        id: 'seg-stream',
+        content: 'You step forward. The floorboards creak beneath your weight.',
+      }),
+    ];
+
+    act(() => {
+      rerender({ currentSegments: grownVersion });
+    });
+
+    expect(result.current.isBuffering).toBe(true);
+    expect(result.current.renderedSegments[1].content).toContain('You step forward.');
+    expect(result.current.renderedSegments[1].content).not.toContain('floorboards');
+
+    await flushBufferTimers(40, 75);
+    expect(result.current.renderedSegments[1].content).toBe(
+      'You step forward. The floorboards creak beneath your weight.'
+    );
     expect(result.current.isBuffering).toBe(false);
   });
 });

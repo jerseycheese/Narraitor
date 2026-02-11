@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { 
-  tokenizeForBufferedRendering, 
-  buildBufferedChunks, 
-  clampBufferInterval 
+import {
+  tokenizeForBufferedRendering,
+  buildBufferedChunks,
+  clampBufferInterval,
 } from '@/lib/narrativeStreaming/bufferedRendering';
 
 interface UseBufferedNarrativeSegmentsOptions {
@@ -22,17 +22,15 @@ export function useBufferedNarrativeSegments(
 ) {
   const { intervalMs = 75, chunkSize = 2 } = options;
   const enabled = isFeatureEnabled('BUFFERED_STREAMING');
-  
+
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
   const [visibleChunkIndex, setVisibleChunkIndex] = useState(-1);
   const [isBuffering, setIsBuffering] = useState(false);
-  
-  const revealedSegmentIds = useRef<Set<string>>(new Set(
-    segments.map(s => s.id)
-  ));
-  
+
+  const revealedSegmentIds = useRef<Set<string>>(new Set(segments.map((s) => s.id)));
+
   const latestSegment = segments.length > 0 ? segments[segments.length - 1] : null;
-  
+
   useEffect(() => {
     if (!enabled || !latestSegment) return;
 
@@ -47,6 +45,19 @@ export function useBufferedNarrativeSegments(
     if (!activeSegmentId || !latestSegment || latestSegment.id !== activeSegmentId) return [];
     return buildBufferedChunks(tokenizeForBufferedRendering(latestSegment.content), chunkSize);
   }, [activeSegmentId, latestSegment, chunkSize]);
+
+  const hasPendingChunks = useMemo(() => {
+    return chunks.length > 0 && visibleChunkIndex < chunks.length - 1;
+  }, [chunks.length, visibleChunkIndex]);
+
+  useEffect(() => {
+    if (!enabled || !activeSegmentId || !latestSegment) return;
+    if (latestSegment.id !== activeSegmentId) return;
+
+    if (!isBuffering && hasPendingChunks) {
+      setIsBuffering(true);
+    }
+  }, [enabled, activeSegmentId, latestSegment, isBuffering, hasPendingChunks]);
 
   useEffect(() => {
     if (!isBuffering || !activeSegmentId || chunks.length === 0) return;
@@ -68,7 +79,7 @@ export function useBufferedNarrativeSegments(
     if (!enabled) return segments;
 
     return segments.map((segment) => {
-      if (segment.id === activeSegmentId && isBuffering) {
+      if (segment.id === activeSegmentId && hasPendingChunks) {
         if (visibleChunkIndex === -1) {
           return { ...segment, content: '' };
         }
@@ -79,7 +90,7 @@ export function useBufferedNarrativeSegments(
       }
       return segment;
     });
-  }, [segments, enabled, activeSegmentId, chunks, visibleChunkIndex, isBuffering]);
+  }, [segments, enabled, activeSegmentId, chunks, visibleChunkIndex, hasPendingChunks]);
 
   return {
     renderedSegments,
