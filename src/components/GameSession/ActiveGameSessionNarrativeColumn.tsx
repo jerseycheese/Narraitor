@@ -47,7 +47,15 @@ const ActiveGameSessionNarrativeColumn: React.FC<
     <div
       id="narrative-container"
       data-tutorial="narrative-display"
-      style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
+      style={
+        narrativeMaxHeight
+          ? {
+              height: narrativeMaxHeight,
+              maxHeight: narrativeMaxHeight,
+              overflowY: 'auto',
+            }
+          : undefined
+      }
     >
       {/* Fade-out overlay at top when multiple segments */}
       {segmentCount > 1 && <div />}
@@ -55,7 +63,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
       <NarrativeHistoryManager
         key={`display-${controllerKey}`}
         sessionId={sessionId}
-        disableInitialAutoScroll={false}
+        disableInitialAutoScroll={true}
       />
 
       {/* Hidden controller just to generate content - always include it but hide from view */}

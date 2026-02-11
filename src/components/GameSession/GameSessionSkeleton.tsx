@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
+import { GAME_SESSION_STABLE_COLUMN_HEIGHT } from './layoutStability';
 
 interface GameSessionSkeletonProps {
   className?: string;
@@ -10,12 +11,21 @@ interface GameSessionSkeletonProps {
 export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
   className = '',
 }) => {
+  const stableColumnStyle: React.CSSProperties = {
+    height: GAME_SESSION_STABLE_COLUMN_HEIGHT,
+    maxHeight: GAME_SESSION_STABLE_COLUMN_HEIGHT,
+    overflow: 'hidden',
+  };
+
   return (
     <div data-testid="game-session-skeleton" className={`${className}`}>
       {/* Two-column layout matching ActiveGameSession */}
       <div>
         {/* Narrative Column Skeleton */}
-        <div>
+        <div
+          data-testid="game-session-skeleton-narrative-column"
+          style={stableColumnStyle}
+        >
           <div>
             {/* Narrative segments skeleton */}
             <div>
@@ -43,7 +53,10 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
         </div>
 
         {/* Choices Column Skeleton */}
-        <div>
+        <div
+          data-testid="game-session-skeleton-choices-column"
+          style={stableColumnStyle}
+        >
           <div>
             {/* Choice buttons skeleton */}
             <div>

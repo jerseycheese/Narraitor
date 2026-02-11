@@ -71,4 +71,18 @@ describe('ActiveGameSessionChoicesColumn', () => {
     const choicesContainer = container.querySelector('[data-tutorial="player-choices"]');
     expect(choicesContainer).toBeInTheDocument();
   });
+
+  it('applies a stable scroll container height when segment count is greater than one', () => {
+    const { container } = render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        segmentCount={2}
+      />
+    );
+
+    const choicesContainer = container.querySelector('#choices-container') as HTMLDivElement;
+    expect(choicesContainer.style.height).toBe('500px');
+    expect(choicesContainer.style.maxHeight).toBe('500px');
+    expect(choicesContainer.style.overflowY).toBe('auto');
+  });
 });

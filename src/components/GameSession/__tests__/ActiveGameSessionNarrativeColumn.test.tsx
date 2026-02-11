@@ -12,6 +12,8 @@ jest.mock('@/components/Narrative/NarrativeHistoryManager', () => ({
   NarrativeHistoryManager: jest.fn(() => <div data-testid="narrative-history" />),
 }));
 
+import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
+
 const baseProps = {
   controllerKey: 'controller-key',
   worldId: 'world-1',
@@ -67,7 +69,9 @@ describe('ActiveGameSessionNarrativeColumn', () => {
 
     const container = document.getElementById('narrative-container');
     expect(container).not.toBeNull();
+    expect(container?.style.height).toBe('500px');
     expect(container?.style.maxHeight).toBe('500px');
+    expect(container?.style.overflowY).toBe('auto');
   });
 
   it('sets the tutorial anchor on the narrative', () => {
@@ -76,5 +80,15 @@ describe('ActiveGameSessionNarrativeColumn', () => {
     const container = document.getElementById('narrative-container');
     expect(container).not.toBeNull();
     expect(container).toHaveAttribute('data-tutorial', 'narrative-display');
+  });
+
+  it('disables initial narrative auto-scroll for stable game-session layout', () => {
+    render(<ActiveGameSessionNarrativeColumn {...baseProps} />);
+
+    const managerProps = (NarrativeHistoryManager as jest.Mock).mock.calls[0][0] as {
+      disableInitialAutoScroll?: boolean;
+    };
+
+    expect(managerProps.disableInitialAutoScroll).toBe(true);
   });
 });

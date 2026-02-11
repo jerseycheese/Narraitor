@@ -123,6 +123,9 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
 
     expect(mockScrollTo).toHaveBeenCalled();
+    expect(mockScrollTo).toHaveBeenLastCalledWith(
+      expect.objectContaining({ behavior: 'auto' })
+    );
   });
 
   it('does not force-scroll when user has scrolled away from bottom', () => {
@@ -164,5 +167,100 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
 
     expect(mockScrollTo).not.toHaveBeenCalled();
+  });
+
+  it('does not auto-scroll when viewport is not near bottom by default', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const { container, rerender } = render(
+      <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
+    );
+
+    const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
+    expect(viewport).toBeTruthy();
+
+    Object.defineProperty(viewport, 'scrollTop', {
+      configurable: true,
+      get: () => 0,
+    });
+    Object.defineProperty(viewport, 'scrollHeight', {
+      configurable: true,
+      get: () => 1200,
+    });
+    Object.defineProperty(viewport, 'clientHeight', {
+      configurable: true,
+      get: () => 200,
+    });
+
+    mockScrollTo.mockClear();
+
+    rerender(
+      <NarrativeHistory
+        segments={[
+          ...segments,
+          createMockNarrativeSegment({ id: 'seg-4', content: 'Far-from-bottom update.' }),
+        ]}
+        disableInitialAutoScroll={true}
+      />
+    );
+
+    expect(mockScrollTo).not.toHaveBeenCalled();
+  });
+
+  it('does not auto-scroll until user has interacted with the narrative viewport', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const { container, rerender } = render(
+      <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
+    );
+
+    const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
+    expect(viewport).toBeTruthy();
+
+    Object.defineProperty(viewport, 'scrollTop', {
+      configurable: true,
+      get: () => 0,
+    });
+    Object.defineProperty(viewport, 'scrollHeight', {
+      configurable: true,
+      get: () => 80,
+    });
+    Object.defineProperty(viewport, 'clientHeight', {
+      configurable: true,
+      get: () => 200,
+    });
+
+    mockScrollTo.mockClear();
+
+    rerender(
+      <NarrativeHistory
+        segments={[
+          ...segments,
+          createMockNarrativeSegment({ id: 'seg-5', content: 'No-scroll-interaction update.' }),
+        ]}
+        disableInitialAutoScroll={true}
+      />
+    );
+
+    expect(mockScrollTo).not.toHaveBeenCalled();
+  });
+
+  it('locks the scroll area root height to its container for layout stability', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const { container } = render(
+      <NarrativeHistory
+        segments={[
+          ...segments,
+          createMockNarrativeSegment({ id: 'seg-6', content: 'Height lock check.' }),
+        ]}
+        disableInitialAutoScroll={true}
+      />
+    );
+
+    const historyContainer = container.querySelector('.narrative-history-container') as HTMLDivElement;
+    expect(historyContainer).toBeTruthy();
+    expect(historyContainer.style.height).toBe('100%');
+
+    const scrollRoot = container.querySelector('.mobile-scroll') as HTMLDivElement;
+    expect(scrollRoot).toBeTruthy();
+    expect(scrollRoot.style.height).toBe('100%');
   });
 });

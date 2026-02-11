@@ -25,43 +25,39 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const prevSegmentCountRef = useRef(segments.length);
-  const userHasScrolledRef = useRef(false);
+  const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
 
-  const { renderedSegments, isBuffering } = useBufferedNarrativeSegments(segments);
+  const { renderedSegments } = useBufferedNarrativeSegments(segments);
+
+  const getIsNearBottom = useCallback(() => {
+    if (!scrollViewportRef.current) return false;
+    const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    return distanceFromBottom < 100;
+  }, []);
 
   // Detect manual scrolling
   const handleScroll = useCallback(() => {
-    if (!scrollViewportRef.current) return;
-    
-    const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    
-    // Consider "near bottom" if within 100px
-    isNearBottomRef.current = distanceFromBottom < 100;
-    
-    // If user scrolled up significantly, mark as manual scroll
-    if (distanceFromBottom > 100) {
-      userHasScrolledRef.current = true;
-    }
-  }, []);
+    hasUserScrollInteractionRef.current = true;
+    isNearBottomRef.current = getIsNearBottom();
+  }, [getIsNearBottom]);
 
 
   // Auto-scroll to bottom when new segments are added (only if near bottom)
   useEffect(() => {
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
-      // Only auto-scroll if user hasn't manually scrolled or is near bottom
-      if (!userHasScrolledRef.current || isNearBottomRef.current) {
+      const shouldFollowOutput = getIsNearBottom();
+      if (hasUserScrollInteractionRef.current && shouldFollowOutput) {
         // Scroll to the bottom of the container to show the latest content
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
-          behavior: 'smooth'
+          behavior: 'auto'
         });
-        userHasScrolledRef.current = false; // Reset manual scroll flag
       }
     }
     prevSegmentCountRef.current = segments.length;
-  }, [segments.length]);
+  }, [segments.length, getIsNearBottom]);
 
   // Auto-scroll to bottom on initial load for existing sessions
   useEffect(() => {
@@ -71,7 +67,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         if (scrollViewportRef.current) {
           scrollViewportRef.current.scrollTo({
             top: scrollViewportRef.current.scrollHeight,
-            behavior: 'smooth'
+            behavior: 'auto'
           });
         }
       }, 100);
@@ -105,18 +101,19 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           }
         }
         if (nextSegment) {
+          hasUserScrollInteractionRef.current = true;
           nextSegment.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
           });
         } else {
           // If no next segment, scroll down normally
+          hasUserScrollInteractionRef.current = true;
           scrollViewportRef.current.scrollBy({
             top: 40,
             behavior: 'smooth'
           });
         }
-        userHasScrolledRef.current = true;
         break;
       case 'ArrowUp':
         event.preventDefault();
@@ -132,52 +129,53 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           }
         }
         if (prevSegment) {
+          hasUserScrollInteractionRef.current = true;
           prevSegment.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
           });
         } else {
           // If no previous segment, scroll up normally
+          hasUserScrollInteractionRef.current = true;
           scrollViewportRef.current.scrollBy({
             top: -40,
             behavior: 'smooth'
           });
         }
-        userHasScrolledRef.current = true;
         break;
       case 'PageDown':
         event.preventDefault();
+        hasUserScrollInteractionRef.current = true;
         scrollViewportRef.current.scrollTo({
           top: Math.min(scrollTop + scrollStep, scrollHeight - clientHeight),
           behavior: 'smooth'
         });
-        userHasScrolledRef.current = true;
         break;
       case 'PageUp':
         event.preventDefault();
+        hasUserScrollInteractionRef.current = true;
         scrollViewportRef.current.scrollTo({
           top: Math.max(scrollTop - scrollStep, 0),
           behavior: 'smooth'
         });
-        userHasScrolledRef.current = true;
         break;
       case 'Home':
         event.preventDefault();
         const firstSegment = segments[0] as HTMLElement;
+        hasUserScrollInteractionRef.current = true;
         firstSegment.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
-        userHasScrolledRef.current = true;
         break;
       case 'End':
         event.preventDefault();
         // Scroll to the bottom to show the latest content
+        hasUserScrollInteractionRef.current = true;
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
           behavior: 'smooth'
         });
-        userHasScrolledRef.current = true;
         break;
       default:
         break;
@@ -254,6 +252,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       if (viewport) {
         scrollViewportRef.current = viewport;
         viewport.addEventListener('scroll', handleScroll);
+        isNearBottomRef.current = getIsNearBottom();
         
         // Setup ResizeObserver for anchoring once viewport is available
         const contentEl = scrollContentRef.current;
@@ -261,10 +260,14 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         
         if (contentEl) {
           observer = new ResizeObserver(() => {
-            if (isNearBottomRef.current && scrollViewportRef.current) {
+            if (
+              hasUserScrollInteractionRef.current &&
+              isNearBottomRef.current &&
+              scrollViewportRef.current
+            ) {
               scrollViewportRef.current.scrollTo({
                 top: scrollViewportRef.current.scrollHeight,
-                behavior: isBuffering ? 'auto' : 'smooth'
+                behavior: 'auto'
               });
             }
           });
@@ -277,18 +280,19 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         };
       }
     }
-  }, [handleScroll, isBuffering]);
+  }, [handleScroll, getIsNearBottom]);
   
   return (
     <div
       className={['narrative-history-container', className].filter(Boolean).join(' ')}
+      style={{ height: '100%' }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <ScrollArea 
         ref={scrollAreaRef}
         className={[heightClass, 'mobile-scroll'].filter(Boolean).join(' ')}
-        viewportClassName="scroll-smooth"
+        style={{ height: '100%' }}
         viewportStyle={{ scrollPaddingBlock: '2rem' }}
       >
         <div ref={scrollContentRef}>

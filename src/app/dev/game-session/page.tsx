@@ -11,6 +11,7 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import Logger from '@/lib/utils/logger';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { getTimestamp } from '@/lib/utils';
+import { GAME_SESSION_STABLE_COLUMN_HEIGHT } from '@/components/GameSession/layoutStability';
 
 // Mock world
 const mockWorld: World = {
@@ -210,7 +211,6 @@ type SessionStateDisplay = {
 
 export default function GameSessionTestHarness() {
   const [showRealComponent, setShowRealComponent] = useState(true);
-  const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
 
@@ -315,11 +315,8 @@ export default function GameSessionTestHarness() {
     logger.info('Test inventory items added');
   }, [logger]);
 
-  // Set isClient to true once component mounts to avoid hydration mismatch
+  // Seed test data and refresh session state display after mount
   useEffect(() => {
-    // Set client state
-    setIsClient(true);
-
     // Create test world only once on initial mount
     createTestWorld();
 
@@ -377,16 +374,6 @@ export default function GameSessionTestHarness() {
   const handleSessionEnd = () => {
     logger.info('Session ended');
   };
-
-  if (!isClient) {
-    // Return loading placeholder to avoid hydration mismatch
-    return (
-      <div>
-        <h1>Game Session Test Harness</h1>
-        <div>Loading test harness...</div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -483,7 +470,7 @@ export default function GameSessionTestHarness() {
         </button>
       </div>
 
-      <div>
+      <div style={{ minHeight: GAME_SESSION_STABLE_COLUMN_HEIGHT }}>
         {showRealComponent ? (
           <GameSession
             worldId={mockWorld.id}

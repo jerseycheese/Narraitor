@@ -30,7 +30,7 @@ a[href="#main-content"]:focus {
 
 /* Scroll behavior for narrative components */
 .narrative-history-container [data-radix-scroll-area-viewport] {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Narrative Content Styling for Readable Storytelling */

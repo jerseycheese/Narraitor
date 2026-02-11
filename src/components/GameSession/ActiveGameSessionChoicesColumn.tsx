@@ -6,6 +6,7 @@ import type { Decision } from '@/types/narrative.types';
 import type { WorldSkill } from '@/types/world.types';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { CharacterSkill } from '@/state/characterStore';
+import { getStableChoicesMaxHeight } from './layoutStability';
 
 interface ActiveGameSessionChoicesColumnProps {
   currentDecision: Decision | null;
@@ -44,8 +45,22 @@ const ActiveGameSessionChoicesColumn: React.FC<
   onSuggestedActionsToggle,
   endingSuggestion,
 }) => {
+  const choicesMaxHeight = getStableChoicesMaxHeight(segmentCount);
+
   return (
-    <div id="choices-container" aria-busy={isGeneratingChoices}>
+    <div
+      id="choices-container"
+      aria-busy={isGeneratingChoices}
+      style={
+        choicesMaxHeight
+          ? {
+              height: choicesMaxHeight,
+              maxHeight: choicesMaxHeight,
+              overflowY: 'auto',
+            }
+          : undefined
+      }
+    >
       <div className="player-choices-container" data-tutorial="player-choices">
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {currentDecision?.decisionWeight ||
