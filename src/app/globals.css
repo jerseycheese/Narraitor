@@ -1,5 +1,33 @@
 /* Global Styles - Clean Slate (No Tailwind) */
 
+/* Skip link - visually hidden until focused (accessibility) */
+a[href="#main-content"] {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+a[href="#main-content"]:focus {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  width: auto;
+  height: auto;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-size: 14px;
+  z-index: 9999;
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
 /* Scroll snap styles for narrative components */
 .narrative-history-container [data-radix-scroll-area-viewport] {
   scroll-snap-type: y mandatory;
@@ -47,11 +75,19 @@
   white-space: pre-line;
 }
 
+/* Base styles from design system */
+body {
+  font-family: var(--font-interface), system-ui, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+}
+
 :root {
-  /* Design system typography tokens */
-  --font-narrative: 'Lora', serif;
-  --font-system: 'IBM Plex Mono', monospace;
-  --font-interface: 'IBM Plex Sans', sans-serif;
+  /* Typography tokens are set by next/font in layout.tsx:
+     --font-narrative (Lora)
+     --font-system (IBM Plex Mono)
+     --font-interface (IBM Plex Sans)
+  */
 
   /* Design system color tokens (zinc-based) */
   --color-canvas: #fdfbf7;
@@ -61,6 +97,10 @@
   --color-border-strong: #d4d4d8;
   --color-text-primary: #111111;
   --color-text-secondary: #3f3f46;
+
+  /* Mechanical Accent - Archival Ink Blue */
+  --color-accent: #312e81; /* Indigo-900 */
+  --color-accent-hover: #1e1b4b; /* Indigo-950 */
   --color-text-muted: #71717a;
 
   /* Base shadcn/ui colors */
@@ -144,6 +184,10 @@
   --color-text-primary: #fafafa;
   --color-text-secondary: #d4d4d8;
   --color-text-muted: #71717a;
+
+  /* Mechanical Accent - Archival Ink Blue (dark mode) */
+  --color-accent: #818cf8; /* Indigo-400 */
+  --color-accent-hover: #a5b4fc; /* Indigo-300 */
 
   /* Base shadcn/ui dark colors */
   --background: 240 10% 3.9%; /* zinc-950 */

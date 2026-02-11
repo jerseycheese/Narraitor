@@ -14,7 +14,7 @@ export const endingTones = {
     border: primitiveColors.amber[700],
   },
   mysterious: {
-    background: primitiveColors.zinc[700], // #374151
+    background: primitiveColors.zinc[700], // #3f3f46
     foreground: primitiveColors.white,
     border: primitiveColors.zinc[500],
   },
