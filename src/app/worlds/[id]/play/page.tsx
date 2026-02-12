@@ -3,11 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
-import { Button } from '@/components/ui/button';
-import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { ArrowLeft } from 'lucide-react';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 
 /**
@@ -23,7 +20,6 @@ export default function PlayPage() {
 
   // Check for test data to support visual regression tests (guarded for SSR)
   // Always call hooks and use persisted store data
-  const world = useWorldStore((state) => state.worlds[worldId]);
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
 

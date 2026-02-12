@@ -15,7 +15,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { Settings, LogOut, RefreshCw, ArrowLeft } from 'lucide-react';
+import { LogOut, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
@@ -312,7 +312,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onEnd}
+                  onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
                   className="text-muted-foreground hover:text-destructive transition-colors"
                 >
                   End Session
