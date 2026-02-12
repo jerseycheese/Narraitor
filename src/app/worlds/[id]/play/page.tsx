@@ -70,25 +70,11 @@ export default function PlayPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Minimal immersive header for manuscript layout */}
-      <header className="fixed top-0 left-0 right-0 z-40 h-14 flex items-center px-4 bg-background/50 backdrop-blur-sm pointer-events-none">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="pointer-events-auto rounded-full group"
-          onClick={() => router.push(`/worlds/${worldId}`)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium truncate max-w-[200px]">
-            {world?.name || 'Back'}
-          </span>
-        </Button>
-      </header>
-
       <GameSession 
         worldId={worldId} 
         disableAutoResume={disableAutoResume}
         onStartNew={handleStartNewClick}
+        onBack={() => router.push(`/worlds/${worldId}`)}
       />
 
       {/* Confirmation dialog for starting new session */}

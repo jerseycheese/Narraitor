@@ -46,10 +46,7 @@
     "deps:html": "depcruise src --output-type err-html > public_docs/architecture/dependency-violations.html",
     "analyze": "npm run deps:validate && npm run deps:diagram:all",
     "docs:design-system:build": "node scripts/build-design-system-docs.mjs",
-    "docs:design-system:check": "npm run docs:design-system:build && git diff --exit-code -- public_docs/design-system/redesign-planning/design-system.html public/design-system/index.html",
-    "claude:pr-review": "bash scripts/claude-automation/pr-review.sh",
-    "claude:fix-lint": "bash scripts/claude-automation/auto-fix-lint.sh",
-    "claude:pre-commit": "bash scripts/claude-automation/pre-commit-review.sh"
+    "docs:design-session:check": "npm run docs:design-system:build && git diff --exit-code -- public_docs/design-system/redesign-planning/design-system.html public/design-system/index.html"
   },
   "dependencies": {
     "@google/genai": "^0.13.0",

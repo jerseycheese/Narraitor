@@ -93,7 +93,9 @@ test.describe('Manuscript Layout Specific Tests', () => {
     // Verify layout anchors
     await expect(page.locator('[data-testid="manuscript-session-shell"]')).toBeVisible();
     await expect(page.locator('[data-testid="manuscript-action-rail"]')).toBeVisible();
-    await expect(page.locator('header.fixed.top-0')).toBeVisible(); // The minimal header
+    
+    // The back button is now inside the HUD, not a separate header
+    await expect(page.getByRole('button', { name: /back to world/i })).toBeVisible();
     
     await hideDynamicContent(page);
     

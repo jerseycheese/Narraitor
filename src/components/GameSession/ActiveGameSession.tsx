@@ -15,7 +15,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { Settings, LogOut, RefreshCw } from 'lucide-react';
+import { Settings, LogOut, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
@@ -37,6 +37,7 @@ interface ActiveGameSessionProps {
   onChoiceSelected: (choiceId: string) => void;
   onEnd?: () => void;
   onStartNew?: () => void;
+  onBack?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
   choices?: Array<{
@@ -57,6 +58,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   onChoiceSelected,
   onEnd,
   onStartNew,
+  onBack,
   /* existingSegments - not currently used */
   triggerGeneration = false,
   selectedChoiceId,
@@ -247,6 +249,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onToggleCharacterSummary={() => setIsCharacterSummaryExpanded(!isCharacterSummaryExpanded)}
           isCharacterSummaryExpanded={isCharacterSummaryExpanded}
           characterSummaryPanel={character && <CharacterSummary character={character} />}
+          leftContent={
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onBack}
+              title="Back to World"
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          }
           rightContent={
             <div className="flex items-center gap-2">
               <SaveIndicator
@@ -267,15 +280,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
               >
                 <RefreshCw className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {}} // Settings toggle placeholder
-                title="Settings"
-                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
-              >
-                <Settings className="h-5 w-5" />
               </Button>
             </div>
           }
@@ -304,7 +308,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             />
             
             {!isSessionEnded(sessionId) && (
-              <div className="flex justify-end border-t pt-4">
+              <div className="flex justify-end items-center gap-4 border-t pt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onEnd}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  End Session
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"

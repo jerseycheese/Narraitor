@@ -9,6 +9,7 @@ interface ManuscriptFloatingHudProps {
   className?: string;
   characterSummaryPanel?: React.ReactNode;
   rightContent?: React.ReactNode;
+  leftContent?: React.ReactNode;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
@@ -17,6 +18,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   className,
   characterSummaryPanel,
   rightContent,
+  leftContent,
 }) => {
   return (
     <div 
@@ -24,6 +26,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
       data-testid="manuscript-floating-hud"
     >
       <div className="flex items-start gap-4">
+        {leftContent}
         <div className="flex flex-col gap-2">
           <Button
             variant="outline"

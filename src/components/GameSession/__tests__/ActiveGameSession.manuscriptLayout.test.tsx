@@ -132,6 +132,23 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(await screen.findByTestId('manuscript-floating-hud')).toBeInTheDocument();
     const hudToggle = screen.getByRole('button', { name: /character summary/i });
     expect(hudToggle).toHaveAttribute('aria-expanded');
+    
+    // Check for back button in HUD
+    expect(screen.getByRole('button', { name: /back to world/i })).toBeInTheDocument();
+  });
+
+  it('renders session control buttons in the action rail', async () => {
+    render(
+      <ActiveGameSession
+        worldId={mockWorldId}
+        sessionId={mockSessionId}
+        onChoiceSelected={jest.fn()}
+      />
+    );
+
+    expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /end session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /end story/i })).toBeInTheDocument();
   });
 
   it('does not have narrativeMaxHeight constraint in manuscript mode', async () => {
