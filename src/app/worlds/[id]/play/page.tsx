@@ -38,6 +38,16 @@ export default function PlayPage() {
     setIsClient(true);
   }, []);
 
+  // Handle Start New button click with confirmation
+  const handleStartNewClick = () => {
+    if (currentProgress > 0) {
+      setShowStartNewConfirmation(true);
+    } else {
+      // No progress to lose, directly start new session
+      router.push(`/worlds/${worldId}/play?fresh=true`);
+    }
+  };
+
   // Handle confirmed start new session
   const handleConfirmedStartNew = () => {
     setShowStartNewConfirmation(false);
@@ -61,7 +71,7 @@ export default function PlayPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Minimal immersive header for manuscript layout */}
-      <header className="fixed top-0 left-0 right-0 z-[60] h-14 flex items-center px-4 bg-background/50 backdrop-blur-sm pointer-events-none">
+      <header className="fixed top-0 left-0 right-0 z-40 h-14 flex items-center px-4 bg-background/50 backdrop-blur-sm pointer-events-none">
         <Button
           variant="ghost"
           size="sm"
@@ -75,7 +85,11 @@ export default function PlayPage() {
         </Button>
       </header>
 
-      <GameSession worldId={worldId} disableAutoResume={disableAutoResume} />
+      <GameSession 
+        worldId={worldId} 
+        disableAutoResume={disableAutoResume}
+        onStartNew={handleStartNewClick}
+      />
 
       {/* Confirmation dialog for starting new session */}
       <GameSessionConfirmationDialog

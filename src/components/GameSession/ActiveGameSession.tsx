@@ -15,7 +15,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { Settings, LogOut } from 'lucide-react';
+import { Settings, LogOut, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
@@ -36,6 +36,7 @@ interface ActiveGameSessionProps {
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
   onEnd?: () => void;
+  onStartNew?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
   choices?: Array<{
@@ -55,6 +56,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   status = 'active',
   onChoiceSelected,
   onEnd,
+  onStartNew,
   /* existingSegments - not currently used */
   triggerGeneration = false,
   selectedChoiceId,
@@ -257,6 +259,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 retryable
                 compact
               />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onStartNew}
+                title="Start New Session"
+                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </Button>
               <Button
                 variant="outline"
                 size="icon"
