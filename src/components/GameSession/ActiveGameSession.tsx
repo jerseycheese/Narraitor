@@ -25,11 +25,9 @@ import { useActiveGameSessionJournal } from './hooks/useActiveGameSessionJournal
 import { useActiveGameSessionActions } from './hooks/useActiveGameSessionActions';
 import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
-import { 
-  ManuscriptSessionShell, 
-  ManuscriptFloatingHud, 
-  ManuscriptActionRail 
-} from './manuscript';
+import { ManuscriptSessionShell } from './ManuscriptSessionShell';
+import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
+import { ManuscriptActionRail } from './ManuscriptActionRail';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -49,6 +47,7 @@ interface ActiveGameSessionProps {
   selectedChoiceId?: string;
 }
 
+// Force recompile for manuscript layout migration
 const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   worldId,
   sessionId,

@@ -63,8 +63,8 @@ test.describe('Game Session Visual Tests', () => {
     // Give page time to load and use seeded data
     await page.waitForTimeout(3000);
     
-    // Check if there's already an active session - if so, DON'T click anything
-    const hasActiveSession = await page.locator('[data-testid="game-session-active"]').count() > 0;
+    // Check if there's already an active session
+    const hasActiveSession = await page.locator('[data-testid="manuscript-session-shell"]').count() > 0;
     console.log('🎮 Has active session:', hasActiveSession);
     
     // Debug: Check the actual session state stored in the stores
