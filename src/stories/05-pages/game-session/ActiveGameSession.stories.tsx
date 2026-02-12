@@ -380,3 +380,37 @@ export const MajorDecision: Story = {
     },
   },
 };
+
+/**
+ * Loading state showing the manuscript skeleton
+ */
+export const LoadingState: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+  },
+  decorators: [
+    (Story) => {
+      // Clear segments to trigger skeleton
+      useNarrativeStore.setState({
+        segments: {},
+        sessionSegments: {},
+        decisions: {},
+        sessionDecisions: {},
+        currentEnding: null,
+        loading: true,
+      });
+      
+      return <Story />;
+    },
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the initial loading state with the manuscript skeleton while waiting for the first narrative segment.',
+      },
+    },
+  },
+};

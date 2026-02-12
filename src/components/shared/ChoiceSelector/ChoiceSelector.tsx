@@ -7,9 +7,8 @@ import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
-import { safeTrim } from '@/lib/utils';
+import { cssClasses, safeTrim } from '@/lib/utils';
 import { normalizeDecisionOptions } from './optionNormalizer';
 import {
   SkillRequirementBadges,
@@ -55,9 +54,6 @@ interface ChoiceSelectorProps {
     onAccept: () => void;
     onDismiss: () => void;
   };
-
-  // Suggested actions UI callbacks
-  onSuggestedActionsToggle?: (isExpanded: boolean) => void;
 }
 
 /**
@@ -78,7 +74,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   characterSkills = [],
   inventoryItems = [],
   endingSuggestion,
-  onSuggestedActionsToggle,
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -236,13 +231,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         )}
 
         {allOptions.length > 0 && (
-          <CollapsibleSection
-            title="Suggested Actions"
-            initialCollapsed={true}
-            onToggle={onSuggestedActionsToggle}
-          >
+          <div className="mt-6">
+            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Suggested Actions</h4>
             {/* Regular choice options */}
-            <div role="radiogroup" aria-labelledby="choices-heading">
+            <div role="radiogroup" aria-labelledby="choices-heading" className="flex flex-col gap-2">
               {allOptions.map((option) => {
                 const isOptionDisabled =
                   isDisabled || (option.isDisabledByRequirements ?? false);
@@ -251,19 +243,20 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   <Button
                     key={option.id}
                     data-testid={`choice-option-${option.id}`}
-                    variant="ghost"
+                    variant="secondary"
                     title={isOptionDisabled ? option.disabledReason : undefined}
                     data-disabled-reason={
                       isOptionDisabled ? option.disabledReason : undefined
                     }
-                    className={`${
+                    className={cssClasses(
+                      "justify-start text-left h-auto py-3 px-4",
                       option.isSelected
-                        ? ''
+                        ? 'border-primary ring-2 ring-primary/20'
                         : getAlignmentClasses(
                             option.alignment,
                             isOptionDisabled
                           )
-                    }`}
+                    )}
                     onClick={() =>
                       handleOptionSelect(
                         option.id,
@@ -274,28 +267,36 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     aria-checked={option.isSelected}
                     role="radio"
                   >
-                    <div>
-                      {option.isSelected && <ChevronRight aria-hidden="true" />}
-                      {!option.isSelected &&
-                        getAlignmentIcon(option.alignment) && (
-                          <span>{getAlignmentIcon(option.alignment)}</span>
-                        )}
-                      <span>{option.text}</span>
+                    <div className="flex flex-col gap-1 w-full text-wrap">
+                      <div className="flex items-center gap-2">
+                        {option.isSelected && <ChevronRight className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />}
+                        {!option.isSelected &&
+                          getAlignmentIcon(option.alignment) && (
+                            <span className="shrink-0">{getAlignmentIcon(option.alignment)}</span>
+                          )}
+                        <span className="font-medium">{option.text}</span>
+                      </div>
+                      
+                      {showHints && option.hint && (
+                        <div className="text-xs text-muted-foreground ml-6">{option.hint}</div>
+                      )}
+                      
+                      <div className="flex flex-wrap gap-2 ml-6">
+                        <SkillRequirementBadges
+                          requirements={option.skillRequirements || []}
+                          optionId={option.id}
+                        />
+                        <ItemRequirementBadges
+                          groups={option.itemRequirementGroups || []}
+                          optionId={option.id}
+                        />
+                      </div>
                     </div>
-                    {showHints && option.hint && <div>{option.hint}</div>}
-                    <SkillRequirementBadges
-                      requirements={option.skillRequirements || []}
-                      optionId={option.id}
-                    />
-                    <ItemRequirementBadges
-                      groups={option.itemRequirementGroups || []}
-                      optionId={option.id}
-                    />
                   </Button>
                 );
               })}
             </div>
-          </CollapsibleSection>
+          </div>
         )}
       </div>
     </div>

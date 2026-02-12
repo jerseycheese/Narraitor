@@ -45,12 +45,10 @@ describe('ActiveGameSessionChoicesColumn', () => {
     const selectorProps = (ChoiceSelector as jest.Mock).mock.calls[0][0] as {
       decision: Decision;
       isDisabled: boolean;
-      onSuggestedActionsToggle?: (isExpanded: boolean) => void;
     };
 
     expect(selectorProps.decision).toEqual(baseDecision);
     expect(selectorProps.isDisabled).toBe(false);
-    expect(selectorProps.onSuggestedActionsToggle).toBe(baseProps.onSuggestedActionsToggle);
   });
 
   it('does not render ChoiceSelector when no decision is available', () => {
