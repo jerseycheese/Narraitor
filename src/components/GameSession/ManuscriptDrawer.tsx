@@ -33,6 +33,7 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
         <DialogOverlay className="fixed inset-0 z-[220] bg-black/45 animate-in fade-in duration-300" />
         <DialogContent
           showCloseButton={false}
+          data-testid="manuscript-drawer"
           className={cssClasses(
             "fixed top-0 h-full w-full max-w-md z-[230] bg-background border-border shadow-2xl flex flex-col animate-in duration-300",
             side === 'right' 
@@ -45,7 +46,7 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
               {title}
             </DialogTitle>
             <DialogClose className="rounded-full p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring">
-              <X className="h-5 w-5 text-muted-foreground" />
+              <X className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
               <span className="sr-only">Close</span>
             </DialogClose>
           </div>

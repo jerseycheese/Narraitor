@@ -262,6 +262,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     );
   }
 
+  // Progressive disclosure responsive strategy (when flag ON):
+  // - marginContent slot: suggested actions in right margin (desktop only, hides prompt/custom input)
+  // - Action rail primary ChoicesColumn: full choices + prompt (mobile only via lg:hidden)
+  // - Action rail secondary ChoicesColumn: custom input only (desktop only via hidden lg:block)
   return (
     <ManuscriptSessionShell
       hud={
@@ -279,7 +283,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 aria-label="Character Sheet"
                 className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
               >
-                <Book className="h-5 w-5" />
+                <Book className="h-5 w-5" aria-hidden="true" />
               </Button>
               <Button
                 variant="outline"
@@ -289,7 +293,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 aria-label="Inventory"
                 className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
               >
-                <Package className="h-5 w-5" />
+                <Package className="h-5 w-5" aria-hidden="true" />
               </Button>
             </div>
           )}
