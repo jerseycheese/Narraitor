@@ -35,6 +35,7 @@ interface Character {
 
 interface CharacterSummaryProps {
   character: Character;
+  initialExpanded?: boolean;
 }
 
 /**
@@ -50,8 +51,8 @@ interface CharacterSummaryProps {
  * 
  * Supports multi-attribute skill system with attributeIds array
  */
-const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialExpanded = false }) => {
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const worldStore = useWorldStore();
   const world = worldStore.worlds[character.worldId];
 

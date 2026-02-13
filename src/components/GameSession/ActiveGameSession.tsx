@@ -28,6 +28,10 @@ import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
 import { ManuscriptActionRail } from './ManuscriptActionRail';
+import { ManuscriptDrawer } from './ManuscriptDrawer';
+import { CharacterDrawerContent, InventoryDrawerContent } from './ManuscriptDrawerPanels';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { Book, Package } from 'lucide-react';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -73,6 +77,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
+  const [activeDrawer, setActiveDrawer] = React.useState<'character' | 'inventory' | null>(null);
+  
+  const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
   
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -123,6 +130,19 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const router = useRouter();
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
+
+  React.useEffect(() => {
+    if (!isCharacterSummaryExpanded) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsCharacterSummaryExpanded(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCharacterSummaryExpanded]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -242,6 +262,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     );
   }
 
+  // Progressive disclosure responsive strategy (when flag ON):
+  // - marginContent slot: suggested actions in right margin (desktop only, hides prompt/custom input)
+  // - Action rail primary ChoicesColumn: full choices + prompt (mobile only via lg:hidden)
+  // - Action rail secondary ChoicesColumn: custom input only (desktop only via hidden lg:block)
   return (
     <ManuscriptSessionShell
       hud={
@@ -249,6 +273,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onToggleCharacterSummary={() => setIsCharacterSummaryExpanded(!isCharacterSummaryExpanded)}
           isCharacterSummaryExpanded={isCharacterSummaryExpanded}
           characterSummaryPanel={character && <CharacterSummary character={character} />}
+          drawerTriggers={isProgressiveDisclosureEnabled && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setActiveDrawer('character')}
+                title="Character Sheet"
+                aria-label="Character Sheet"
+                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              >
+                <Book className="h-5 w-5" aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setActiveDrawer('inventory')}
+                title="Inventory"
+                aria-label="Inventory"
+                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              >
+                <Package className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            </div>
+          )}
           leftContent={
             <Button
               variant="outline"
@@ -285,6 +333,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           }
         />
       }
+      marginContent={isProgressiveDisclosureEnabled && (
+        <ActiveGameSessionChoicesColumn
+          currentDecision={currentDecision}
+          segmentCount={segmentCount}
+          status={status}
+          isGenerating={isGenerating}
+          isGeneratingChoices={isGeneratingChoices}
+          isSessionEnded={isSessionEnded(sessionId)}
+          worldSkills={world?.skills || []}
+          characterSkills={characterSkills}
+          inventoryItems={inventoryItems}
+          onChoiceSelected={handleChoiceSelected}
+          onCustomSubmit={handleCustomSubmit}
+          hidePrompt={true}
+          hideCustomInput={true}
+          dataTutorial={undefined}
+        />
+      )}
       actionRail={
         <ManuscriptActionRail>
           <div className="flex flex-col gap-4">
@@ -300,12 +366,33 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               inventoryItems={inventoryItems}
               onChoiceSelected={handleChoiceSelected}
               onCustomSubmit={handleCustomSubmit}
+              className={isProgressiveDisclosureEnabled ? "lg:hidden" : ""}
               endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
                 reason: endingSuggestionReason,
                 onAccept: handleAcceptEndingSuggestion,
                 onDismiss: handleRejectEndingSuggestion,
               } : undefined}
             />
+            
+            {isProgressiveDisclosureEnabled && (
+              <ActiveGameSessionChoicesColumn
+                currentDecision={currentDecision}
+                segmentCount={segmentCount}
+                status={status}
+                isGenerating={isGenerating}
+                isGeneratingChoices={isGeneratingChoices}
+                isSessionEnded={isSessionEnded(sessionId)}
+                worldSkills={world?.skills || []}
+                characterSkills={characterSkills}
+                inventoryItems={inventoryItems}
+                onChoiceSelected={handleChoiceSelected}
+                onCustomSubmit={handleCustomSubmit}
+                hideChoices={true}
+                hidePrompt={true}
+                dataTutorial={undefined}
+                className="hidden lg:block"
+              />
+            )}
             
             {!isSessionEnded(sessionId) && (
               <div className="flex justify-end items-center gap-4 border-t pt-4">
@@ -361,6 +448,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
         />
       </div>
+
+      {isProgressiveDisclosureEnabled && (
+        <ManuscriptDrawer
+          open={activeDrawer !== null}
+          onOpenChange={(open) => !open && setActiveDrawer(null)}
+          title={activeDrawer === 'character' ? 'Character Sheet' : 'Inventory'}
+        >
+          {activeDrawer === 'character' && character && (
+            <CharacterDrawerContent character={character} />
+          )}
+          {activeDrawer === 'inventory' && characterId && (
+            <InventoryDrawerContent characterId={characterId} />
+          )}
+        </ManuscriptDrawer>
+      )}
     </ManuscriptSessionShell>
   );
 };

@@ -523,22 +523,22 @@ Use this to track progress and know when each phase is done.
 - [ ] CLS verified < 0.10 in production
 - [ ] Components ported to app component library
 - [ ] Game session using new components
-- [ ] ActiveGameSession restructured: two-column → single-column Manuscript
-- [ ] narrativeMaxHeight constraint removed
-- [ ] PageLayout/Hero wrapper evaluated for game session
-- [ ] Drafting grid background in production
-- [ ] Bottom-docked input implemented
-- [ ] Floating HUD added
-- [ ] Marginalia system ported
-- [ ] Contextual drawers migrated
-- [ ] Suggested actions in production
-- [ ] Feature flag: FEATURE_PROGRESSIVE_DISCLOSURE added
-- [ ] Tested with flags on/off
-- [ ] No content jumping in production
-- [ ] Keyboard navigation works on production game session
-- [ ] Migrated components use minimal markup (no unnecessary wrapper divs, no 10+ class utility chains)
-- [ ] Storybook stories updated for migrated components/layouts in same PR
-- [ ] `npm run build-storybook` passes after migration changes
+- [x] ActiveGameSession restructured: two-column → single-column Manuscript (#1034, PR #1056)
+- [x] narrativeMaxHeight constraint removed (#1034, PR #1056)
+- [x] PageLayout/Hero wrapper evaluated for game session (#1034, PR #1056)
+- [ ] Drafting grid background in production (deferred to #1036)
+- [x] Bottom-docked input implemented (#1034, PR #1056)
+- [x] Floating HUD added (#1034, PR #1056)
+- [ ] Marginalia system ported (deferred)
+- [x] Contextual drawers migrated (#1035)
+- [x] Suggested actions in production (#1034, PR #1056 - action rail; #1035 - margin slot)
+- [x] Feature flag: FEATURE_PROGRESSIVE_DISCLOSURE added (#1035)
+- [x] Tested with flags on/off (#1035)
+- [ ] No content jumping in production (pending #1033)
+- [x] Keyboard navigation works on production game session (#1034, PR #1056; #1035 - Escape to close)
+- [x] Migrated components use minimal markup (no unnecessary wrapper divs, no 10+ class utility chains) (#1034, PR #1056)
+- [ ] Storybook stories updated for migrated components/layouts in same PR (deferred)
+- [x] `npm run build-storybook` passes after migration changes (#1034, PR #1056)
 
 **Phase 3: Polish (As Needed)**
 - [ ] Virtualization (if long sessions slow)

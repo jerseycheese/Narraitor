@@ -302,6 +302,49 @@ export default function DesignSystemPage() {
           </div>
         </SubSection>
 
+        <SubSection title="Link Styling" description="Global anchor styling using the accent token. Underline with offset for readability.">
+          <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>DEFAULT</div>
+              <p style={{ fontSize: 16, color: 'var(--color-text-primary)' }}>
+                Visit the <a href="#colors">color palette</a> or check the <a href="#typography">typography scale</a> for reference.
+              </p>
+            </div>
+            <div>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>IN NARRATIVE CONTEXT</div>
+              <p className="text-narrative" style={{ maxWidth: 768 }}>
+                The archivist pointed to the <a href="#components">Registry of Lost Names</a>, its binding cracked but legible.
+              </p>
+            </div>
+            <div>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>CSS RULE</div>
+              <pre
+                className="font-system"
+                style={{
+                  fontSize: 12,
+                  lineHeight: 1.6,
+                  color: 'var(--color-text-secondary)',
+                  background: 'var(--color-surface-hover)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 4,
+                  padding: 16,
+                }}
+              >
+{`a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}`}
+              </pre>
+            </div>
+          </div>
+        </SubSection>
+
         <SubSection title="Semantic Colors" description="Status and feedback colors.">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
             <Swatch color="#065f46" name="emerald-800" hex="#065f46" note="Success" />

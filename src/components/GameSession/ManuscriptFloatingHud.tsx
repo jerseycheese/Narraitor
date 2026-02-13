@@ -10,6 +10,7 @@ interface ManuscriptFloatingHudProps {
   characterSummaryPanel?: React.ReactNode;
   rightContent?: React.ReactNode;
   leftContent?: React.ReactNode;
+  drawerTriggers?: React.ReactNode;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
@@ -19,6 +20,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   characterSummaryPanel,
   rightContent,
   leftContent,
+  drawerTriggers,
 }) => {
   return (
     <div 
@@ -28,17 +30,21 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
       <div className="flex items-start gap-4">
         {leftContent}
         <div className="flex flex-col gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleCharacterSummary}
-            aria-expanded={isCharacterSummaryExpanded}
-            aria-label="Character summary"
-            title="Character summary"
-            className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
-          >
-            <User className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleCharacterSummary}
+              aria-expanded={isCharacterSummaryExpanded}
+              aria-label="Character summary"
+              title="Character summary"
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+            >
+              <User className="h-5 w-5" />
+            </Button>
+            
+            {drawerTriggers}
+          </div>
           
           {isCharacterSummaryExpanded && characterSummaryPanel && (
             <div className="w-80 animate-in slide-in-from-top-2 fade-in duration-200">
