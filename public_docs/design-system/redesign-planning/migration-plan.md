@@ -27,6 +27,9 @@
 - [#1033 - Migrate streaming stability to app](https://github.com/jerseycheese/Narraitor/issues/1033)
 - [#1034 - Migrate components & layout to app](https://github.com/jerseycheese/Narraitor/issues/1034)
 - [#1035 - Migrate progressive disclosure to app](https://github.com/jerseycheese/Narraitor/issues/1035)
+- [x] [#1059 - Port manuscript overlay styling to production](https://github.com/jerseycheese/Narraitor/issues/1059)
+- [#1058 - Implement marginalia term definition system](https://github.com/jerseycheese/Narraitor/issues/1058)
+- [#1055 - Final CLS sign-off on styled game-session surface](https://github.com/jerseycheese/Narraitor/issues/1055)
 - [#1047 - Roll out design system to non-game-session surfaces](https://github.com/jerseycheese/Narraitor/issues/1047)
 
 **Phase 3: Polish (deferred)**
@@ -521,8 +524,8 @@ Use this to track progress and know when each phase is done.
 - [ ] Skeleton states added to real containers
 - [ ] Feature flag: FEATURE_BUFFERED_STREAMING added
 - [ ] CLS verified < 0.10 in production
-- [ ] Components ported to app component library
-- [ ] Game session using new components
+- [x] Components ported to app component library
+- [x] Game session using new components
 - [x] ActiveGameSession restructured: two-column → single-column Manuscript (#1034, PR #1056)
 - [x] narrativeMaxHeight constraint removed (#1034, PR #1056)
 - [x] PageLayout/Hero wrapper evaluated for game session (#1034, PR #1056)
@@ -537,7 +540,7 @@ Use this to track progress and know when each phase is done.
 - [ ] No content jumping in production (pending #1033)
 - [x] Keyboard navigation works on production game session (#1034, PR #1056; #1035 - Escape to close)
 - [x] Migrated components use minimal markup (no unnecessary wrapper divs, no 10+ class utility chains) (#1034, PR #1056)
-- [ ] Storybook stories updated for migrated components/layouts in same PR (deferred)
+- [x] Storybook stories updated for migrated components/layouts in same PR
 - [x] `npm run build-storybook` passes after migration changes (#1034, PR #1056)
 
 **Phase 3: Polish (As Needed)**
