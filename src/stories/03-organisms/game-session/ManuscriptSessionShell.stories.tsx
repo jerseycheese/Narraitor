@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ManuscriptSessionShell } from '@/components/GameSession/ManuscriptSessionShell';
 import { ManuscriptActionRail } from '@/components/GameSession/ManuscriptActionRail';
-import { ManuscriptFloatingHud } from '@/components/GameSession/ManuscriptFloatingHud';
 import React from 'react';
 
 const meta: Meta<typeof ManuscriptSessionShell> = {

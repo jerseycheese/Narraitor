@@ -107,18 +107,18 @@ body {
   */
 
   /* Design system color tokens (zinc-based) */
-  --color-canvas: #fdfbf7;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f4f4f5;
-  --color-border: #e4e4e7;
-  --color-border-strong: #d4d4d8;
-  --color-text-primary: #111111;
-  --color-text-secondary: #3f3f46;
+  --color-canvas: rgb(253 251 247);
+  --color-surface: rgb(255 255 255);
+  --color-surface-hover: rgb(244 244 245);
+  --color-border: rgb(228 228 231);
+  --color-border-strong: rgb(212 212 216);
+  --color-text-primary: rgb(17 17 17);
+  --color-text-secondary: rgb(63 63 70);
 
   /* Mechanical Accent - Archival Ink Blue */
-  --color-accent: #312e81; /* Indigo-900 */
-  --color-accent-hover: #1e1b4b; /* Indigo-950 */
-  --color-text-muted: #71717a;
+  --color-accent: rgb(49 46 129); /* Indigo-900 */
+  --color-accent-hover: rgb(30 27 75); /* Indigo-950 */
+  --color-text-muted: rgb(113 113 122);
 
   /* Base shadcn/ui colors */
   --background: 0 0% 100%;
@@ -201,18 +201,18 @@ body {
 
 .dark {
   /* Design system color tokens (zinc-based) */
-  --color-canvas: #09090b;
-  --color-surface: #18181b;
-  --color-surface-hover: #27272a;
-  --color-border: #3f3f46;
-  --color-border-strong: #52525b;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #d4d4d8;
-  --color-text-muted: #71717a;
+  --color-canvas: rgb(9 9 11);
+  --color-surface: rgb(24 24 27);
+  --color-surface-hover: rgb(39 39 42);
+  --color-border: rgb(63 63 70);
+  --color-border-strong: rgb(82 82 91);
+  --color-text-primary: rgb(250 250 250);
+  --color-text-secondary: rgb(212 212 216);
+  --color-text-muted: rgb(113 113 122);
 
   /* Mechanical Accent - Archival Ink Blue (dark mode) */
-  --color-accent: #818cf8; /* Indigo-400 */
-  --color-accent-hover: #a5b4fc; /* Indigo-300 */
+  --color-accent: rgb(129 140 248); /* Indigo-400 */
+  --color-accent-hover: rgb(165 180 252); /* Indigo-300 */
 
   /* Base shadcn/ui dark colors */
   --background: 240 10% 3.9%; /* zinc-950 */
@@ -344,8 +344,8 @@ body {
 /* DevTools specific styling */
 .devtools-panel {
   font-size: 12px;
-  background-color: #374151; /* Hardcoded gray-700 */
-  color: #d1d5db; /* Hardcoded gray-300 */
+  background-color: rgb(55 65 81); /* Hardcoded gray-700 */
+  color: rgb(209 213 219); /* Hardcoded gray-300 */
 }
 
 .devtools-panel h1,
@@ -357,27 +357,27 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   margin: 0.5rem 0;
-  color: #d1d5db;
+  color: rgb(209 213 219);
 }
 
 .devtools-panel p {
   font-size: 0.75rem;
   margin: 0.5rem 0;
-  color: #6b7280; /* gray-500 */
+  color: rgb(107 114 128); /* gray-500 */
 }
 
 .devtools-panel button {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid #6b7280;
+  border: 1px solid rgb(107 114 128);
   cursor: pointer;
-  background-color: #6b7280;
-  color: #d1d5db;
+  background-color: rgb(107 114 128);
+  color: rgb(209 213 219);
 }
 
 .devtools-panel button:hover {
-  background-color: #374151;
+  background-color: rgb(55 65 81);
 }
 
 /* Manuscript Overlay Class System */
@@ -520,6 +520,12 @@ body.manuscript-overlay-open {
 
 #manuscript-action-rail {
   touch-action: manipulation;
+  background: var(--color-overlay-surface-strong);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-overlay);
+  border-radius: var(--radius);
+  padding: clamp(0.75rem, 2vw, 1rem);
+  backdrop-filter: blur(12px);
 }
 
 .manuscript-mobile-rail-top-controls {
