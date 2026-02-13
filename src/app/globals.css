@@ -191,12 +191,12 @@ body {
   --lore-rules-text: 21 90% 31%; /* amber-700 */
 
   /* Overlay surfaces and scrims */
-  --color-overlay-surface: rgba(255, 255, 255, 0.9);
-  --color-overlay-surface-strong: rgba(255, 255, 255, 0.95);
-  --color-manuscript-gradient-start: rgba(255, 255, 255, 0.92);
-  --color-manuscript-gradient-end: rgba(244, 244, 245, 0.92);
-  --color-scrim: rgba(17, 17, 17, 0.45);
-  --shadow-overlay: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --color-overlay-surface: rgb(255 255 255 / 90%);
+  --color-overlay-surface-strong: rgb(255 255 255 / 95%);
+  --color-manuscript-gradient-start: rgb(255 255 255 / 92%);
+  --color-manuscript-gradient-end: rgb(244 244 245 / 92%);
+  --color-scrim: rgb(17 17 17 / 45%);
+  --shadow-overlay: 0 6px 18px rgb(0 0 0 / 8%);
 }
 
 .dark {
@@ -284,12 +284,12 @@ body {
   --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
 
   /* Overlay surfaces and scrims */
-  --color-overlay-surface: rgba(24, 24, 27, 0.9);
-  --color-overlay-surface-strong: rgba(24, 24, 27, 0.96);
-  --color-manuscript-gradient-start: rgba(39, 39, 42, 0.9);
-  --color-manuscript-gradient-end: rgba(24, 24, 27, 0.92);
-  --color-scrim: rgba(0, 0, 0, 0.65);
-  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --color-overlay-surface: rgb(24 24 27 / 90%);
+  --color-overlay-surface-strong: rgb(24 24 27 / 96%);
+  --color-manuscript-gradient-start: rgb(39 39 42 / 90%);
+  --color-manuscript-gradient-end: rgb(24 24 27 / 92%);
+  --color-scrim: rgb(0 0 0 / 65%);
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 40%);
 }
 
 /* Typography role classes */
@@ -378,4 +378,243 @@ body {
 
 .devtools-panel button:hover {
   background-color: #374151;
+}
+
+/* Manuscript Overlay Class System */
+
+html.manuscript-overlay-open,
+body.manuscript-overlay-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.manuscript-viewport-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  overscroll-behavior: none;
+}
+
+/* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
+#manuscript-viewport-layer {
+  margin: 0;
+}
+
+.manuscript-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-scrim);
+}
+
+.manuscript-viewport-shell {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  overscroll-behavior: none;
+}
+
+.manuscript-viewport-inner {
+  width: min(100%, 1480px);
+  margin: 0 auto;
+  height: 100%;
+  padding-inline: clamp(0.75rem, 2vw, 1.5rem);
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(0.5rem, 1.5vh, 1rem);
+  padding-block: clamp(0.5rem, 1.5vh, 1rem);
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.manuscript-overlay-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "left right";
+  align-items: start;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 30;
+}
+
+.manuscript-overlay-header-left {
+  grid-area: left;
+  justify-self: start;
+  position: relative;
+}
+
+.manuscript-overlay-header-right {
+  grid-area: right;
+  justify-self: end;
+  position: relative;
+}
+
+.manuscript-overlay-main {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+  position: relative;
+  z-index: 1;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.manuscript-main-stage {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.manuscript-characters-mobile-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--color-manuscript-gradient-end);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.375rem 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+}
+
+.manuscript-characters-mobile-label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.manuscript-characters-mobile-list {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.manuscript-characters-mobile-list::-webkit-scrollbar {
+  display: none;
+}
+
+.manuscript-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.manuscript-input-row #manuscript-send {
+  white-space: nowrap;
+}
+
+#manuscript-action-rail {
+  touch-action: manipulation;
+}
+
+.manuscript-mobile-rail-top-controls {
+  display: none;
+}
+
+.manuscript-characters-rail {
+  display: none;
+  background: var(--color-overlay-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.75rem;
+  overflow-y: auto;
+}
+
+.manuscript-rail-spacer {
+  display: none;
+}
+
+@media (width >= 1024px) {
+  .manuscript-characters-mobile-bar {
+    display: none;
+  }
+
+  .manuscript-main-stage {
+    grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr) minmax(10rem, 12rem);
+  }
+
+  .manuscript-characters-rail {
+    display: block;
+    position: sticky;
+    top: var(--manuscript-characters-rail-top, 0.25rem);
+  }
+
+  .manuscript-main-content {
+    grid-column: 2;
+  }
+
+  .manuscript-rail-spacer {
+    display: block;
+    grid-column: 3;
+  }
+}
+
+.manuscript-suggested-action {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.manuscript-suggested-action:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.manuscript-suggested-action.is-selected,
+.manuscript-suggested-action[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: hsl(0deg 0% 100%);
+}
+
+.manuscript-suggested-action.is-selected:hover,
+.manuscript-suggested-action[aria-pressed="true"]:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: hsl(0deg 0% 100%);
+}
+
+.manuscript-hud-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  z-index: 40;
+}
+
+.manuscript-hud-panel-left {
+  left: 0;
+}
+
+/* Streaming lock styles */
+.manuscript-action-rail-streaming #manuscript-input,
+.manuscript-action-rail-streaming #manuscript-send,
+.manuscript-action-rail-streaming .manuscript-suggested-action {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.manuscript-action-rail-streaming #manuscript-input {
+  background: var(--color-surface-hover);
+}
+
+.manuscript-action-rail-streaming #manuscript-input::placeholder {
+  color: var(--color-accent);
+  opacity: 1;
 }
