@@ -75,6 +75,18 @@ a[href="#main-content"]:focus {
   white-space: pre-line;
 }
 
+/* Link styling - uses archival ink accent from design system prototype */
+a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
 /* Base styles from design system */
 body {
   font-family: var(--font-interface), system-ui, sans-serif;
