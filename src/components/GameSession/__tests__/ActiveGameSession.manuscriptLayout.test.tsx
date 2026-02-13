@@ -8,6 +8,7 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useTutorial } from '@/components/TutorialProvider';
 import { useRouter } from 'next/navigation';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 // Mock dependencies
 jest.mock('@/state/narrativeStore');
@@ -16,6 +17,7 @@ jest.mock('@/state/characterStore');
 jest.mock('@/state/inventoryStore');
 jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
+jest.mock('@/lib/featureFlags');
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -92,6 +94,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
       lastSaved: null,
       saveError: null,
     });
+
+    (isFeatureEnabled as jest.Mock).mockReturnValue(false);
   });
 
   it('renders a manuscript shell instead of legacy columns', async () => {
@@ -193,5 +197,97 @@ describe('ActiveGameSession Manuscript Layout', () => {
     // Check last call to the mock
     const lastCall = (ActiveGameSessionNarrativeColumn as jest.Mock).mock.calls.slice(-1)[0][0];
     expect(lastCall.narrativeMaxHeight).toBeUndefined();
+  });
+
+  it('closes character summary when Escape key is pressed', async () => {
+    render(
+      <ActiveGameSession
+        worldId={mockWorldId}
+        sessionId={mockSessionId}
+        onChoiceSelected={jest.fn()}
+      />
+    );
+
+    const hudToggle = await screen.findByRole('button', { name: /character summary/i });
+    
+    // Open it first
+    fireEvent.click(hudToggle);
+    expect(hudToggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Press Escape
+    fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+
+    // Assert it closed
+    expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  describe('Progressive Disclosure', () => {
+    it('does not show drawer triggers when flag is OFF', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-floating-hud');
+      expect(screen.queryByTitle(/character sheet/i)).not.toBeInTheDocument();
+      expect(screen.queryByTitle(/inventory/i)).not.toBeInTheDocument();
+    });
+
+    it('shows drawer triggers when flag is ON', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-floating-hud');
+      expect(screen.getByTitle(/character sheet/i)).toBeInTheDocument();
+      expect(screen.getByTitle(/inventory/i)).toBeInTheDocument();
+    });
+
+    it('opens character drawer when trigger is clicked (flag ON)', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const trigger = await screen.findByTitle(/character sheet/i);
+      fireEvent.click(trigger);
+
+      // ManuscriptDrawer has role="dialog"
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Character Sheet')).toBeInTheDocument();
+    });
+
+    it('renders suggested actions in margin when flag is ON', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      // Margin content is inside an <aside>
+      const aside = await screen.findByRole('complementary', { name: /suggested actions/i });
+      expect(aside).toBeInTheDocument();
+      expect(aside).toHaveClass('lg:block');
+    });
   });
 });

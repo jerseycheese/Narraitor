@@ -5,6 +5,7 @@ interface ManuscriptSessionShellProps {
   children: React.ReactNode;
   hud?: React.ReactNode;
   actionRail?: React.ReactNode;
+  marginContent?: React.ReactNode;
   className?: string;
 }
 
@@ -12,6 +13,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   children,
   hud,
   actionRail,
+  marginContent,
   className,
 }) => {
   return (
@@ -31,8 +33,18 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
       {/* Main Narrative Stage */}
       <main className="flex-grow flex flex-col items-center px-4 pt-20 pb-40">
-        <div className="w-full max-w-3xl">
-          {children}
+        <div className="w-full max-w-5xl flex gap-8 justify-center">
+          <div className="w-full max-w-3xl">
+            {children}
+          </div>
+          {marginContent && (
+            <aside 
+              className="hidden lg:block w-48 flex-shrink-0 sticky top-24 self-start"
+              aria-label="Suggested actions"
+            >
+              {marginContent}
+            </aside>
+          )}
         </div>
       </main>
 

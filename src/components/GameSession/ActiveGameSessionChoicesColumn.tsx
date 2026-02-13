@@ -19,6 +19,11 @@ interface ActiveGameSessionChoicesColumnProps {
   inventoryItems: InventoryItem[];
   onChoiceSelected: (choiceId: string) => void;
   onCustomSubmit: (customText: string) => void;
+  hidePrompt?: boolean;
+  hideChoices?: boolean;
+  hideCustomInput?: boolean;
+  hideEndButtons?: boolean;
+  className?: string;
   endingSuggestion?: {
     reason: string;
     onAccept: () => void;
@@ -40,44 +45,55 @@ const ActiveGameSessionChoicesColumn: React.FC<
   inventoryItems,
   onChoiceSelected,
   onCustomSubmit,
+  hidePrompt = false,
+  hideChoices = false,
+  hideCustomInput = false,
+  hideEndButtons = false,
+  className = '',
   endingSuggestion,
 }) => {
   return (
-    <div id="choices-container" aria-busy={isGeneratingChoices}>
+    <div id="choices-container" className={className} aria-busy={isGeneratingChoices}>
       <div className="player-choices-container" data-tutorial="player-choices">
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {currentDecision?.decisionWeight ||
         (currentDecision && segmentCount > 0) ? (
-          <ChoiceSelector
-            decision={currentDecision}
-            onSelect={onChoiceSelected}
-            onCustomSubmit={onCustomSubmit}
-            enableCustomInput={true}
-            isDisabled={status !== 'active' || isGenerating || isSessionEnded}
-            worldSkills={worldSkills}
-            characterSkills={characterSkills}
-            inventoryItems={inventoryItems}
-            endingSuggestion={endingSuggestion}
-          />
+          !hideChoices && (
+            <ChoiceSelector
+              decision={currentDecision}
+              onSelect={onChoiceSelected}
+              onCustomSubmit={onCustomSubmit}
+              enableCustomInput={true}
+              hidePrompt={hidePrompt}
+              hideCustomInput={hideCustomInput}
+              isDisabled={status !== 'active' || isGenerating || isSessionEnded}
+              worldSkills={worldSkills}
+              characterSkills={characterSkills}
+              inventoryItems={inventoryItems}
+              endingSuggestion={endingSuggestion}
+            />
+          )
         ) : (
-          <div>
-            {/* Choice decision skeleton - matches ChoiceSelector layout */}
+          !hideChoices && (
             <div>
-              {/* Choice prompt skeleton */}
-              <div />
-
-              {/* Choice buttons skeleton */}
-              {[1, 2, 3].map((i) => (
-                <div key={i} />
-              ))}
-
-              {/* Custom input skeleton */}
+              {/* Choice decision skeleton - matches ChoiceSelector layout */}
               <div>
+                {/* Choice prompt skeleton */}
                 <div />
-                <div />
+
+                {/* Choice buttons skeleton */}
+                {[1, 2, 3].map((i) => (
+                  <div key={i} />
+                ))}
+
+                {/* Custom input skeleton */}
+                <div>
+                  <div />
+                  <div />
+                </div>
               </div>
             </div>
-          </div>
+          )
         )}
       </div>
     </div>

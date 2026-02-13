@@ -29,6 +29,8 @@ interface ChoiceSelectorProps {
   isDisabled?: boolean;
   className?: string;
   showHints?: boolean; // Whether to show hints when available
+  hidePrompt?: boolean;
+  hideCustomInput?: boolean;
 
   // Custom input props
   enableCustomInput?: boolean;
@@ -66,6 +68,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   isDisabled = false,
   className = '',
   showHints = true,
+  hidePrompt = false,
+  hideCustomInput = false,
   enableCustomInput = false,
   onCustomSubmit,
   customInputPlaceholder = 'Type your custom response...',
@@ -199,10 +203,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           </div>
         )}
 
-        <h3 id="choices-heading">{displayPrompt}</h3>
+        {!hidePrompt && <h3 id="choices-heading">{displayPrompt}</h3>}
 
         {/* Custom input field - shown first when enabled */}
-        {enableCustomInput && (
+        {enableCustomInput && !hideCustomInput && (
           <div>
             <Textarea
               id="custom-input"
