@@ -22,6 +22,7 @@ interface ActiveGameSessionChoicesColumnProps {
   hidePrompt?: boolean;
   hideChoices?: boolean;
   hideCustomInput?: boolean;
+  dataTutorial?: string;
   className?: string;
   endingSuggestion?: {
     reason: string;
@@ -47,12 +48,13 @@ const ActiveGameSessionChoicesColumn: React.FC<
   hidePrompt = false,
   hideChoices = false,
   hideCustomInput = false,
+  dataTutorial = 'player-choices',
   className = '',
   endingSuggestion,
 }) => {
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
-      <div className="player-choices-container" data-tutorial="player-choices">
+      <div className="player-choices-container" data-tutorial={dataTutorial}>
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {currentDecision?.decisionWeight ||
         (currentDecision && segmentCount > 0) ? (

@@ -344,6 +344,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onCustomSubmit={handleCustomSubmit}
           hidePrompt={true}
           hideCustomInput={true}
+          dataTutorial={undefined}
         />
       )}
       actionRail={
@@ -384,6 +385,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 hideChoices={true}
                 hidePrompt={true}
+                dataTutorial={undefined}
                 className="hidden lg:block"
               />
             )}
