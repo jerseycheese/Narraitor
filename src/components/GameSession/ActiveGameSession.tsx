@@ -352,7 +352,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         />
       )}
       actionRail={
-        <ManuscriptActionRail>
+        <ManuscriptActionRail isStreaming={isGenerating || isGeneratingChoices}>
           <div className="flex flex-col gap-4">
             <ActiveGameSessionChoicesColumn
               currentDecision={currentDecision}

@@ -69,4 +69,10 @@ describe('ActiveGameSessionChoicesColumn', () => {
     const choicesContainer = container.querySelector('[data-tutorial="player-choices"]');
     expect(choicesContainer).toBeInTheDocument();
   });
+
+  it('sets aria-busy when isGeneratingChoices is true', () => {
+    const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} isGeneratingChoices={true} />);
+    const root = container.firstChild as HTMLElement;
+    expect(root).toHaveAttribute('aria-busy', 'true');
+  });
 });

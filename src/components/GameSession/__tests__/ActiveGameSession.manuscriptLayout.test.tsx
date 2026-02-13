@@ -46,6 +46,10 @@ jest.mock('@/components/Narrative/NarrativeController', () => ({
   NarrativeController: () => <div data-testid="narrative-controller" />,
 }));
 
+jest.mock('../ManuscriptActionRail', () => ({
+  ManuscriptActionRail: jest.fn(({ children }) => <div data-testid="manuscript-action-rail">{children}</div>),
+}));
+
 describe('ActiveGameSession Manuscript Layout', () => {
   const mockWorldId = 'world-1';
   const mockSessionId = 'session-1';
@@ -219,6 +223,28 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
     // Assert it closed
     expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('passes isStreaming to ManuscriptActionRail when generating', async () => {
+    // We'll mock isGenerating state via the narrative controller effect
+    // But since it's an internal state, we can just check the rail prop
+    const ManuscriptActionRail = require('../ManuscriptActionRail').ManuscriptActionRail;
+    
+    render(
+      <ActiveGameSession
+        worldId={mockWorldId}
+        sessionId={mockSessionId}
+        onChoiceSelected={jest.fn()}
+      />
+    );
+
+    // Wait for initialization
+    await screen.findByTestId('manuscript-session-shell');
+
+    // Check last call to the mock
+    // Note: ActiveGameSession uses useState(true) for isGenerating initially
+    const lastCall = (ManuscriptActionRail as jest.Mock).mock.calls.slice(-1)[0][0];
+    expect(lastCall.isStreaming).toBe(true);
   });
 
   describe('Progressive Disclosure', () => {

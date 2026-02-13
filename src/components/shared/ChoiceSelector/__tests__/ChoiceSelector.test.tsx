@@ -259,4 +259,24 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText('Walk directly')).toBeInTheDocument();
     });
   });
+
+  describe('Manuscript Styling Contract', () => {
+    it('uses manuscript-input id for custom input', () => {
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+      const input = screen.getByPlaceholderText('Type your custom response...');
+      expect(input).toHaveAttribute('id', 'manuscript-input');
+    });
+
+    it('uses manuscript-send id for submit button', () => {
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+      const sendButton = screen.getByRole('button', { name: /submit/i });
+      expect(sendButton).toHaveAttribute('id', 'manuscript-send');
+    });
+
+    it('applies manuscript-suggested-action class to choice buttons', () => {
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect});
+      const choiceButton = screen.getByText('Attack').closest('button');
+      expect(choiceButton).toHaveClass('manuscript-suggested-action');
+    });
+  });
 });

@@ -207,9 +207,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
         {/* Custom input field - shown first when enabled */}
         {enableCustomInput && !hideCustomInput && (
-          <div>
+          <div className="manuscript-input-row">
             <Textarea
-              id="custom-input"
+              id="manuscript-input"
               ref={inputRef}
               value={customInputText}
               onChange={handleInputChange}
@@ -219,11 +219,12 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               aria-label="Custom response input"
               rows={3}
             />
-            <div>
+            <div className="flex flex-col items-end gap-2">
               <span className={`${characterCountClass}`}>
                 {characterCount}/{maxCustomLength}
               </span>
               <Button
+                id="manuscript-send"
                 onClick={handleCustomSubmit}
                 disabled={isDisabled || !safeTrim(customInputText)}
                 size="sm"
@@ -253,9 +254,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                       isOptionDisabled ? option.disabledReason : undefined
                     }
                     className={cssClasses(
-                      "justify-start text-left h-auto py-3 px-4",
+                      "manuscript-suggested-action justify-start text-left h-auto py-3 px-4",
                       option.isSelected
-                        ? 'border-primary ring-2 ring-primary/20'
+                        ? 'is-selected border-primary ring-2 ring-primary/20'
                         : getAlignmentClasses(
                             option.alignment,
                             isOptionDisabled
