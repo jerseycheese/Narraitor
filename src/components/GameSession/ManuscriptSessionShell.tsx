@@ -33,7 +33,10 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
       {/* Main Narrative Stage */}
       <main className="flex-grow flex flex-col items-center px-4 pt-20 pb-40">
-        <div className="w-full max-w-5xl flex gap-8 justify-center">
+        <div className={cssClasses(
+          "w-full flex gap-8 justify-center",
+          marginContent ? "max-w-5xl" : "max-w-3xl"
+        )}>
           <div className="w-full max-w-3xl">
             {children}
           </div>

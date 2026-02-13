@@ -132,8 +132,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
 
   React.useEffect(() => {
+    if (!isCharacterSummaryExpanded) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isCharacterSummaryExpanded) {
+      if (event.key === 'Escape') {
         setIsCharacterSummaryExpanded(false);
       }
     };
@@ -274,6 +276,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 size="icon"
                 onClick={() => setActiveDrawer('character')}
                 title="Character Sheet"
+                aria-label="Character Sheet"
                 className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
               >
                 <Book className="h-5 w-5" />
@@ -283,6 +286,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 size="icon"
                 onClick={() => setActiveDrawer('inventory')}
                 title="Inventory"
+                aria-label="Inventory"
                 className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
               >
                 <Package className="h-5 w-5" />

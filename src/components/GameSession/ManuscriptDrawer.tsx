@@ -34,22 +34,22 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
         <DialogContent
           showCloseButton={false}
           className={cssClasses(
-            "fixed top-0 h-full w-full max-w-md z-[230] bg-white border-zinc-200 shadow-2xl flex flex-col animate-in duration-300",
+            "fixed top-0 h-full w-full max-w-md z-[230] bg-background border-border shadow-2xl flex flex-col animate-in duration-300",
             side === 'right' 
               ? "right-0 border-l slide-in-from-right" 
               : "left-0 border-r slide-in-from-left"
           )}
         >
-          <div className="flex items-center justify-between p-4 border-b border-zinc-100">
-            <DialogTitle className="text-lg font-serif font-semibold text-zinc-900">
+          <div className="flex items-center justify-between p-4 border-b border-border/50">
+            <DialogTitle className="text-lg font-serif font-semibold text-foreground">
               {title}
             </DialogTitle>
-            <DialogClose className="rounded-full p-2 hover:bg-zinc-100 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400">
-              <X className="h-5 w-5 text-zinc-500" />
+            <DialogClose className="rounded-full p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring">
+              <X className="h-5 w-5 text-muted-foreground" />
               <span className="sr-only">Close</span>
             </DialogClose>
           </div>
-          <div className="flex-grow overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-200">
+          <div className="flex-grow overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-muted">
             {children}
           </div>
         </DialogContent>

@@ -14,7 +14,7 @@ const meta: Meta<typeof ManuscriptDrawer> = {
 export default meta;
 type Story = StoryObj<typeof ManuscriptDrawer>;
 
-const DrawerHarness = (props: any) => {
+const DrawerHarness = (props: React.ComponentProps<typeof ManuscriptDrawer>) => {
   const [open, setOpen] = useState(false);
   return (
     <div className="p-8">
