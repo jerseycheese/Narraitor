@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -149,6 +149,29 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /end session/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /end story/i })).toBeInTheDocument();
+  });
+
+  it('dispatches narraitor:end-session event when End Session is clicked', async () => {
+    // Spy on dispatchEvent
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+    
+    render(
+      <ActiveGameSession
+        worldId={mockWorldId}
+        sessionId={mockSessionId}
+        onChoiceSelected={jest.fn()}
+      />
+    );
+
+    const endSessionButton = await screen.findByRole('button', { name: /end session/i });
+    fireEvent.click(endSessionButton);
+
+    // Verify correct event was dispatched
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Event));
+    const dispatchedEvent = dispatchSpy.mock.calls[0][0] as Event;
+    expect(dispatchedEvent.type).toBe('narraitor:end-session');
+    
+    dispatchSpy.mockRestore();
   });
 
   it('does not have narrativeMaxHeight constraint in manuscript mode', async () => {
