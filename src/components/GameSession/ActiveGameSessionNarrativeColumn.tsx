@@ -20,7 +20,6 @@ interface ActiveGameSessionNarrativeColumnProps {
   onNarrativeGenerated: (segment: NarrativeSegment) => void;
   onChoicesGenerated: (decision: Decision) => void;
   onEndingSuggested: (reason: string, endingType: EndingType) => void;
-  narrativeMaxHeight?: string;
   segmentCount: number;
 }
 
@@ -40,14 +39,13 @@ const ActiveGameSessionNarrativeColumn: React.FC<
   onNarrativeGenerated,
   onChoicesGenerated,
   onEndingSuggested,
-  narrativeMaxHeight,
   segmentCount,
 }) => {
   return (
     <div
       id="narrative-container"
       data-tutorial="narrative-display"
-      style={narrativeMaxHeight ? { maxHeight: narrativeMaxHeight } : undefined}
+      className="w-full"
     >
       {/* Fade-out overlay at top when multiple segments */}
       {segmentCount > 1 && <div />}

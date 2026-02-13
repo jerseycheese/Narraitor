@@ -230,10 +230,10 @@ Component source-to-table coverage check:
 | Globals/CSS layer | `.ending-*` | Keep baseline | #1032 | Retune token values during palette migration. |
 | Globals/CSS layer | `.devtools-panel*` | Defer to migration issue | #1046 | Out of current game-session cutover scope. |
 | Globals/CSS layer | `@layer utilities` animations/touch helpers | Keep baseline | #1038 | No neutral-token conflict detected. |
-| Component layer | `narrativeMaxHeight` pattern | Defer to migration issue | #1034 | Remove as part of manuscript layout migration. |
-| Component layer | Two-column shell classes | Defer to migration issue | #1034 | Replace with manuscript layout in migration. |
-| Component layer | Choices/skeleton gray classes | Defer to migration issue | #1032/#1034 | Token and layout migration are both required. |
-| Component layer | CharacterSummary gray-heavy styling | Defer to migration issue | #1032/#1034 | Requires token + layout/system rewrite pass. |
+| Component layer | `narrativeMaxHeight` pattern | Remove in #1034 | #1034 | Pattern removed during manuscript migration. |
+| Component layer | Two-column shell classes | Replace in #1034 | #1034 | Replaced with Manuscript single-column layout. |
+| Component layer | Choices/skeleton gray classes | Defer to migration issue | #1032/#1034 | Partially addressed in #1034 skeleton update; #1032 zinc pass required. |
+| Component layer | CharacterSummary gray-heavy styling | Defer to migration issue | #1032/#1034 | Relocated to HUD in #1034; token migration remains. |
 
 ## Conflict/duplication map
 

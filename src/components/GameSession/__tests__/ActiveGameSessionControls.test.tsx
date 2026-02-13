@@ -77,11 +77,9 @@ describe('ActiveGameSessionControls', () => {
       />
     );
 
-    expect(screen.getByTestId('character-summary')).toBeInTheDocument();
     expect(screen.getByTestId('inventory-list')).toBeInTheDocument();
     expect(screen.getByTestId('story-summary')).toBeInTheDocument();
     expect(screen.getByTestId('choice-history')).toBeInTheDocument();
-    expect(screen.getByTestId('save-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
 
     const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');

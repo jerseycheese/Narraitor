@@ -14,6 +14,9 @@ import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { LogOut, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
 import ActiveGameSessionControls from './ActiveGameSessionControls';
@@ -22,6 +25,9 @@ import { useActiveGameSessionJournal } from './hooks/useActiveGameSessionJournal
 import { useActiveGameSessionActions } from './hooks/useActiveGameSessionActions';
 import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
+import { ManuscriptSessionShell } from './ManuscriptSessionShell';
+import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
+import { ManuscriptActionRail } from './ManuscriptActionRail';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -30,6 +36,8 @@ interface ActiveGameSessionProps {
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
   onEnd?: () => void;
+  onStartNew?: () => void;
+  onBack?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
   choices?: Array<{
@@ -41,6 +49,7 @@ interface ActiveGameSessionProps {
   selectedChoiceId?: string;
 }
 
+// Force recompile for manuscript layout migration
 const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   worldId,
   sessionId,
@@ -48,6 +57,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   status = 'active',
   onChoiceSelected,
   onEnd,
+  onStartNew,
+  onBack,
   /* existingSegments - not currently used */
   triggerGeneration = false,
   selectedChoiceId,
@@ -61,7 +72,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
+  const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -96,7 +107,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   const hasExistingNarrative = segmentCount > 0;
-  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -210,10 +220,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // always mount the hidden NarrativeController to drive generation.
   if (!isGameReady) {
     return (
-      <div>
+      <div className="relative min-h-screen">
         <GameSessionSkeleton />
         {/* Hidden controller that actually performs generation while skeleton shows */}
-        <div aria-hidden="true" >
+        <div aria-hidden="true" className="sr-only">
           <NarrativeController
             key={`generator-${controllerKey}`}
             worldId={worldId}
@@ -228,75 +238,130 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             generateChoices={true}
           />
         </div>
-
-        {/* Character Summary Panel - show immediately when character data is available */}
-        {character && (
-          <div>
-            <CharacterSummary character={character} />
-          </div>
-        )}
       </div>
     );
   }
 
   return (
-    <div data-testid="game-session-active" role="region" aria-label="Game session" >
-
-      {/* Two-column layout for larger screens */}
-      <div>
-        {/* Story Column */}
-        <ActiveGameSessionNarrativeColumn
-          controllerKey={controllerKey}
-          worldId={worldId}
-          sessionId={sessionId}
-          characterId={characterId || undefined}
-          decisionWeight={currentDecision?.decisionWeight}
-          triggerGeneration={triggerGeneration}
-          initialized={initialized}
-          shouldTriggerGeneration={shouldTriggerGeneration}
-          localSelectedChoiceId={localSelectedChoiceId}
-          selectedChoiceId={selectedChoiceId}
-          onNarrativeGenerated={handleNarrativeGenerated}
-          onChoicesGenerated={handleChoicesGenerated}
-          onEndingSuggested={handleEndingSuggested}
-          narrativeMaxHeight={narrativeMaxHeight}
-          segmentCount={segmentCount}
+    <ManuscriptSessionShell
+      hud={
+        <ManuscriptFloatingHud
+          onToggleCharacterSummary={() => setIsCharacterSummaryExpanded(!isCharacterSummaryExpanded)}
+          isCharacterSummaryExpanded={isCharacterSummaryExpanded}
+          characterSummaryPanel={character && <CharacterSummary character={character} />}
+          leftContent={
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onBack}
+              title="Back to World"
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          }
+          rightContent={
+            <div className="flex items-center gap-2">
+              <SaveIndicator
+                status={autoSave.status}
+                lastSaveTime={autoSave.lastSaveTime}
+                errorMessage={autoSave.errorMessage}
+                totalSaves={autoSave.totalSaves}
+                onManualSave={autoSave.triggerSave}
+                onRetryError={autoSave.retry}
+                retryable
+                compact
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onStartNew}
+                title="Start New Session"
+                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </Button>
+            </div>
+          }
         />
-
-        {/* Choices Column */}
-        <ActiveGameSessionChoicesColumn
-          currentDecision={currentDecision}
-          segmentCount={segmentCount}
-          status={status}
-          isGenerating={isGenerating}
-          isGeneratingChoices={isGeneratingChoices}
-          isSessionEnded={isSessionEnded(sessionId)}
-          worldSkills={world?.skills || []}
-          characterSkills={characterSkills}
-          inventoryItems={inventoryItems}
-          onChoiceSelected={handleChoiceSelected}
-          onCustomSubmit={handleCustomSubmit}
-          onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
-          endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-            reason: endingSuggestionReason,
-            onAccept: handleAcceptEndingSuggestion,
-            onDismiss: handleRejectEndingSuggestion,
-          } : undefined}
-        />
-      </div>
-
-      <ActiveGameSessionControls
-        character={character}
-        characterId={characterId || undefined}
+      }
+      actionRail={
+        <ManuscriptActionRail>
+          <div className="flex flex-col gap-4">
+            <ActiveGameSessionChoicesColumn
+              currentDecision={currentDecision}
+              segmentCount={segmentCount}
+              status={status}
+              isGenerating={isGenerating}
+              isGeneratingChoices={isGeneratingChoices}
+              isSessionEnded={isSessionEnded(sessionId)}
+              worldSkills={world?.skills || []}
+              characterSkills={characterSkills}
+              inventoryItems={inventoryItems}
+              onChoiceSelected={handleChoiceSelected}
+              onCustomSubmit={handleCustomSubmit}
+              endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
+                reason: endingSuggestionReason,
+                onAccept: handleAcceptEndingSuggestion,
+                onDismiss: handleRejectEndingSuggestion,
+              } : undefined}
+            />
+            
+            {!isSessionEnded(sessionId) && (
+              <div className="flex justify-end items-center gap-4 border-t pt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  End Session
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleEndStoryClick}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  End Story
+                </Button>
+              </div>
+            )}
+          </div>
+        </ManuscriptActionRail>
+      }
+    >
+      <ActiveGameSessionNarrativeColumn
+        controllerKey={controllerKey}
         worldId={worldId}
         sessionId={sessionId}
-        autoSave={autoSave}
-        showEndConfirmation={showEndConfirmation}
-        onConfirmEndStory={handleConfirmEndStory}
-        onCloseEndStory={handleCloseEndStory}
-        onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
+        characterId={characterId || undefined}
+        decisionWeight={currentDecision?.decisionWeight}
+        triggerGeneration={triggerGeneration}
+        initialized={initialized}
+        shouldTriggerGeneration={shouldTriggerGeneration}
+        localSelectedChoiceId={localSelectedChoiceId}
+        selectedChoiceId={selectedChoiceId}
+        onNarrativeGenerated={handleNarrativeGenerated}
+        onChoicesGenerated={handleChoicesGenerated}
+        onEndingSuggested={handleEndingSuggested}
+        segmentCount={segmentCount}
       />
-    </div>
+
+      <div className="mt-8 border-t pt-8">
+        <ActiveGameSessionControls
+          character={character}
+          characterId={characterId || undefined}
+          worldId={worldId}
+          sessionId={sessionId}
+          showEndConfirmation={showEndConfirmation}
+          onConfirmEndStory={handleConfirmEndStory}
+          onCloseEndStory={handleCloseEndStory}
+          onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
+        />
+      </div>
+    </ManuscriptSessionShell>
   );
 };
 

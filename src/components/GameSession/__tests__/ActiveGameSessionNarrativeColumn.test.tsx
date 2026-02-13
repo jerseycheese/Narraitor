@@ -57,19 +57,6 @@ describe('ActiveGameSessionNarrativeColumn', () => {
     expect(controllerProps.onNarrativeGenerated).toBe(baseProps.onNarrativeGenerated);
   });
 
-  it('applies the narrative max height when provided', () => {
-    render(
-      <ActiveGameSessionNarrativeColumn
-        {...baseProps}
-        narrativeMaxHeight="500px"
-      />
-    );
-
-    const container = document.getElementById('narrative-container');
-    expect(container).not.toBeNull();
-    expect(container?.style.maxHeight).toBe('500px');
-  });
-
   it('sets the tutorial anchor on the narrative', () => {
     render(<ActiveGameSessionNarrativeColumn {...baseProps} />);
 

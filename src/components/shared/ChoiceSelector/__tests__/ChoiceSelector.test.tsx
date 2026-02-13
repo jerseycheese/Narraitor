@@ -14,18 +14,9 @@ describe('ChoiceSelector', () => {
     jest.clearAllMocks();
   });
 
-  // Expand the Suggested Actions collapsible if it's present
-  const expandSuggestions = () => {
-    const toggle = screen.queryByLabelText(/Expand Suggested Actions/i);
-    if (toggle) {
-      fireEvent.click(toggle);
-    }
-  };
-
-  // Helper to render and expand suggestions
+  // Helper to render
   const renderChoiceSelector = (props: React.ComponentProps<typeof ChoiceSelector>) => {
     render(<ChoiceSelector {...props} />);
-    expandSuggestions();
   };
 
   const assertChoicesVisible = (texts: string[]) => {
@@ -187,7 +178,6 @@ describe('ChoiceSelector', () => {
           inventoryItems={[]}
         />
       );
-      expandSuggestions();
 
       // Skill requirements no longer disable options (probabilistic checks on selection)
       const sneakOption = screen.getByText('Sneak past').closest('button');
@@ -221,7 +211,6 @@ describe('ChoiceSelector', () => {
           inventoryItems={items}
         />
       );
-      expandSuggestions();
       return screen.getByTestId('choice-option-combined-opt');
     };
 
@@ -263,7 +252,6 @@ describe('ChoiceSelector', () => {
           worldSkills={mockWorldSkills}
         />
       );
-      expandSuggestions();
       
       // Should display the choice text
       expect(screen.getByText('Sneak past')).toBeInTheDocument();

@@ -20,6 +20,8 @@ interface GameSessionProps {
   worldId: string;
   onSessionStart?: () => void;
   onSessionEnd?: () => void;
+  onStartNew?: () => void;
+  onBack?: () => void;
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean; // For testing/dev harnesses
   // Optional testing props
@@ -40,6 +42,8 @@ const GameSession: React.FC<GameSessionProps> = ({
   worldId,
   onSessionStart,
   onSessionEnd,
+  onStartNew,
+  onBack,
   initialState,
   disableAutoResume = false,
   _stores,
@@ -385,6 +389,8 @@ const GameSession: React.FC<GameSessionProps> = ({
         status={sessionState.status === 'paused' ? 'paused' : 'active'}
         onChoiceSelected={handleSelectChoice}
         onEnd={handleEndSession}
+        onStartNew={onStartNew}
+        onBack={onBack}
         choices={sessionState.playerChoices || []}
         // Kick off generation in both 'active' and 'loading' states
         triggerGeneration={sessionState.status === 'active' || sessionState.status === 'loading'}

@@ -75,11 +75,11 @@ This applies the policy to known game-session surfaces from #1037.
 
 | Surface | Story file | Action (`keep`/`update`/`deprecate`) | Gap status | Owner issue | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `src/components/GameSession/ActiveGameSession.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `none` | #1034 | Page-level integration surface for layout migration. |
-| `src/components/GameSession/ActiveGameSessionNarrativeColumn.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `temporary-parent-coverage` | #1034 | Direct story absent; parent coverage accepted until composition migration lands. |
-| `src/components/GameSession/ActiveGameSessionChoicesColumn.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `temporary-parent-coverage` | #1034 | Direct story absent; parent coverage accepted until composition migration lands. |
-| `src/components/GameSession/CharacterSummary.tsx` | `src/stories/03-organisms/character/display/CharacterSummary.stories.tsx` | `update` | `none` | #1032/#1034 | Existing organism story should track token and layout changes. |
-| `src/components/GameSession/GameSessionSkeleton.tsx` | No dedicated story | `update` | `missing-direct-story` | #1038/#1034 | Close by adding dedicated skeleton story or explicit loading-state variant in page stories. |
+| `src/components/GameSession/ActiveGameSession.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `none` | #1034 | Manuscript layout migration complete. |
+| `src/components/GameSession/ActiveGameSessionNarrativeColumn.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `temporary-parent-coverage` | #1034 | Integrated into manuscript shell. |
+| `src/components/GameSession/ActiveGameSessionChoicesColumn.tsx` | `src/stories/05-pages/game-session/ActiveGameSession.stories.tsx` | `update` | `temporary-parent-coverage` | #1034 | Integrated into manuscript action rail. |
+| `src/components/GameSession/CharacterSummary.tsx` | `src/stories/03-organisms/character/display/CharacterSummary.stories.tsx` | `update` | `none` | #1032/#1034 | Relocated to floating HUD in manuscript layout. |
+| `src/components/GameSession/GameSessionSkeleton.tsx` | `src/stories/03-organisms/game-session/GameSessionSkeleton.stories.tsx` | `update` | `none` | #1034 | Dedicated story added; aligned with manuscript composition. |
 | `src/app/globals.css` (`.narrative-content*`, `.card`, `.btn`, `.btn-primary`) | Impacted game-session stories | `update` | `none` | #1038 | Story updates required in same PR as removals. |
 | Foundation token surfaces | `src/stories/00-foundation/DesignTokens.stories.tsx`, `src/stories/00-foundation/DesignSystemShowcase.stories.tsx` | `update` | `none` | #1032 | Required when gray->zinc token migration lands. |
 

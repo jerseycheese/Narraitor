@@ -19,7 +19,6 @@ interface ActiveGameSessionChoicesColumnProps {
   inventoryItems: InventoryItem[];
   onChoiceSelected: (choiceId: string) => void;
   onCustomSubmit: (customText: string) => void;
-  onSuggestedActionsToggle?: (isExpanded: boolean) => void;
   endingSuggestion?: {
     reason: string;
     onAccept: () => void;
@@ -41,7 +40,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
   inventoryItems,
   onChoiceSelected,
   onCustomSubmit,
-  onSuggestedActionsToggle,
   endingSuggestion,
 }) => {
   return (
@@ -59,7 +57,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
             worldSkills={worldSkills}
             characterSkills={characterSkills}
             inventoryItems={inventoryItems}
-            onSuggestedActionsToggle={onSuggestedActionsToggle}
             endingSuggestion={endingSuggestion}
           />
         ) : (

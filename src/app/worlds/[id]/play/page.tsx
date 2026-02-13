@@ -3,13 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
-import { PageLayout } from '@/components/shared/PageLayout';
-import { Hero } from '@/components/shared/Hero';
-import { Button } from '@/components/ui/button';
-import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 
 /**
@@ -25,10 +20,8 @@ export default function PlayPage() {
 
   // Check for test data to support visual regression tests (guarded for SSR)
   // Always call hooks and use persisted store data
-  const world = useWorldStore((state) => state.worlds[worldId]);
-  const sessionStatus = useSessionStore((state) => state.status);
   const currentSessionId = useSessionStore((state) => state.id);
-  const { getSessionSegments, currentEnding } = useNarrativeStore();
+  const { getSessionSegments } = useNarrativeStore();
 
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';
@@ -60,11 +53,9 @@ export default function PlayPage() {
   // For server rendering, show a simple placeholder
   if (!isClient) {
     return (
-      <PageLayout title="Game Session">
-        <div>
-          <p>Creating your game...</p>
-        </div>
-      </PageLayout>
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Creating your game...</p>
+      </div>
     );
   }
   
@@ -73,46 +64,14 @@ export default function PlayPage() {
     notFound();
   }
 
-
-  const pageTitle = world ? `Playing in ${world.name}` : 'Game Session';
-
   return (
-    <PageLayout>
-      {/* Ultra-thin world hero - always show with image or themed background */}
-      {world && (
-        <div>
-          <Hero
-            title={pageTitle}
-            image={world.image?.url ? {
-              url: world.image.url,
-              alt: `${world.name} world`
-            } : undefined}
-            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            titleElement="h1"
-            actions={
-              // Only show buttons during active gameplay (not on ending screen, not during initialization, etc.)
-              !currentEnding && (sessionStatus === 'active' || sessionStatus === 'paused' || sessionStatus === 'loading') ? (
-                <div>
-                  <Button size="sm" variant="outline" onClick={() => router.push(`/characters?worldId=${worldId}`)}>
-                    Switch Character
-                  </Button>
-                  <Button size="sm" variant="default" onClick={handleStartNewClick}>
-                    Start New
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={() => window.dispatchEvent(new Event('narraitor:end-story'))}>
-                    End Story
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}>
-                    End Session
-                  </Button>
-                </div>
-              ) : undefined
-            }
-          />
-        </div>
-      )}
-
-      <GameSession worldId={worldId} disableAutoResume={disableAutoResume} />
+    <div className="min-h-screen bg-background">
+      <GameSession 
+        worldId={worldId} 
+        disableAutoResume={disableAutoResume}
+        onStartNew={handleStartNewClick}
+        onBack={() => router.push(`/worlds/${worldId}`)}
+      />
 
       {/* Confirmation dialog for starting new session */}
       <GameSessionConfirmationDialog
@@ -122,6 +81,6 @@ export default function PlayPage() {
         type="start-new"
         currentProgress={currentProgress}
       />
-    </PageLayout>
+    </div>
   );
 }

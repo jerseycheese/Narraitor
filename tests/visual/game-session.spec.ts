@@ -8,12 +8,9 @@ import {
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import {
-  ensureSuggestedActionsExpanded,
   renderSeededSuggestedActions,
   seedInventoryItemsForVisual,
-  ensureSuggestedActionsContentVisible,
   removeDuplicateSuggestedActionsTextarea,
-  relaxStoryColumnHeight,
   seedStorySummaryForVisual,
 } from './utils/game-session-page-seeder';
 
@@ -66,8 +63,8 @@ test.describe('Game Session Visual Tests', () => {
     // Give page time to load and use seeded data
     await page.waitForTimeout(3000);
     
-    // Check if there's already an active session - if so, DON'T click anything
-    const hasActiveSession = await page.locator('[data-testid="game-session-active"]').count() > 0;
+    // Check if there's already an active session
+    const hasActiveSession = await page.locator('[data-testid="manuscript-session-shell"]').count() > 0;
     console.log('🎮 Has active session:', hasActiveSession);
     
     // Debug: Check the actual session state stored in the stores
@@ -163,22 +160,20 @@ test.describe('Game Session Visual Tests', () => {
     // Debug: Check what game session components are present
     const gameSessionComponents = await page.evaluate(() => {
       const components = {
-        active: document.querySelector('[data-testid="game-session-active"]') ? 'FOUND' : 'NOT FOUND',
+        active: document.querySelector('[data-testid="manuscript-session-shell"]') ? 'FOUND' : 'NOT FOUND',
+        rail: document.querySelector('[data-testid="manuscript-action-rail"]') ? 'FOUND' : 'NOT FOUND',
+        hud: document.querySelector('[data-testid="manuscript-floating-hud"]') ? 'FOUND' : 'NOT FOUND',
         loading: document.querySelector('[data-testid="game-session-loading"]') ? 'FOUND' : 'NOT FOUND',
         resume: document.querySelector('[data-testid="game-session-resume"]') ? 'FOUND' : 'NOT FOUND',
-        error: document.querySelector('[data-testid="game-session-error"]') ? 'FOUND' : 'NOT FOUND',
-        initializing: document.querySelector('[data-testid="game-session-initializing"]') ? 'FOUND' : 'NOT FOUND',
-        unknown: document.querySelector('[data-testid="game-session-unknown"]') ? 'FOUND' : 'NOT FOUND',
-        new: document.querySelector('[data-testid="game-session-new"]') ? 'FOUND' : 'NOT FOUND'
+        error: document.querySelector('[data-testid="game-session-error"]') ? 'FOUND' : 'NOT FOUND'
       };
       return components;
     });
     console.log('🎮 Game session components:', gameSessionComponents);
     
     // Wait for the real React components to render with seeded data
-    // This will capture the actual height constraints and fade effects
-    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
-    console.log('✅ ActiveGameSession component loaded');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
+    console.log('✅ ManuscriptSessionShell component loaded');
 
     // Wait for Zustand stores to fully hydrate from localStorage
     await page.waitForFunction(
@@ -216,12 +211,9 @@ test.describe('Game Session Visual Tests', () => {
     // Force the stores to refresh and React components to re-render
     await page.evaluate(() => {
       // Force Zustand stores to re-read from localStorage and notify subscribers
-      // This ensures React components get the seeded data
       try {
-        // Check if useNarrativeStore is available on window (development mode)
         if ((window as any).useNarrativeStore) {
           const store = (window as any).useNarrativeStore;
-          // Force the store to reload from localStorage
           store.persist.rehydrate();
         }
         if ((window as any).useSessionStore) {
@@ -232,105 +224,18 @@ test.describe('Game Session Visual Tests', () => {
         console.log('Store rehydration not available, using fallback...');
       }
 
-      // Fallback: trigger storage event to force store updates
       window.dispatchEvent(new Event('storage'));
     });
 
     // Wait for components to re-render with fresh store data
     await page.waitForTimeout(2000);
 
-    // Fallback: Directly inject segments into the narrative store if components aren't hydrating properly
-    await page.evaluate(() => {
-      try {
-        // Create segments to test all narrative segment types: scene, dialogue, action, transition
-        const cyberpunkSegments = [
-          {
-            worldId: 'world-cyberpunk-2077',
-            content: 'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
-            type: 'scene',
-            characterIds: ['char-cyberpunk-hacker'],
-            metadata: {
-              mood: 'tense',
-              location: 'Neo-Tokyo streets',
-              tags: [],
-              characterIds: ['char-cyberpunk-hacker']
-            },
-            timestamp: new Date('2024-01-01T02:00:00.000Z'),
-            updatedAt: '2024-01-01T02:00:00.000Z'
-          },
-          {
-            worldId: 'world-cyberpunk-2077',
-            content: '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
-            type: 'dialogue',
-            characterIds: ['char-cyberpunk-hacker'],
-            metadata: {
-              mood: 'mysterious',
-              location: 'Neo-Tokyo alley',
-              tags: [],
-              characterIds: ['char-cyberpunk-hacker', 'npc-fixer']
-            },
-            timestamp: new Date('2024-01-01T02:01:00.000Z'),
-            updatedAt: '2024-01-01T02:01:00.000Z'
-          },
-          {
-            worldId: 'world-cyberpunk-2077',
-            content: 'You crawl through the ventilation shaft, your tools muffling the hum of fans and alarms. Inside, the building pulses with corporate efficiency. Security drones patrol the upper floors in predictable patterns.',
-            type: 'action',
-            characterIds: ['char-cyberpunk-hacker'],
-            metadata: {
-              mood: 'action',
-              location: 'Arasaka building interior',
-              tags: [],
-              characterIds: ['char-cyberpunk-hacker'],
-              causedByDecisionId: 'decision-cyberpunk-route',
-              causedByDecisionText:
-                'You choose to crawl through the ventilation system - stealthy but difficult',
-              decisionOutcome: 'success'
-            },
-            timestamp: new Date('2024-01-01T02:02:00.000Z'),
-            updatedAt: '2024-01-01T02:02:00.000Z'
-          },
-          {
-            worldId: 'world-cyberpunk-2077',
-            content: 'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
-            type: 'transition',
-            characterIds: ['char-cyberpunk-hacker'],
-            metadata: {
-              mood: 'neutral',
-              location: 'Arasaka building',
-              tags: [],
-              characterIds: ['char-cyberpunk-hacker', 'npc-fixer']
-            },
-            timestamp: new Date('2024-01-01T02:03:00.000Z'),
-            updatedAt: '2024-01-01T02:03:00.000Z'
-          }
-        ];
-
-        // Try to access and update the narrative store directly
-        if ((window as any).useNarrativeStore) {
-          const store = (window as any).useNarrativeStore;
-          const state = store.getState();
-
-          // Add segments to the store
-          cyberpunkSegments.forEach(segment => {
-            state.addSegment('session-cyberpunk-ghost', segment);
-          });
-
-          console.log('✅ Directly injected segments into narrative store');
-        } else {
-          console.log('❌ Could not access narrative store for direct injection');
-        }
-      } catch (e: unknown) {
-        console.log('❌ Failed to inject segments:', e instanceof Error ? e.message : String(e));
-      }
-    });
-
     // Wait for segments to appear (more lenient timeout)
     try {
       await page.waitForFunction(
         () => {
           const segments = document.querySelectorAll('.narrative-segment');
-          return segments.length >= 2; // Accept 2+ segments instead of requiring 3
+          return segments.length >= 2;
         },
         { timeout: 3000 }
       );
@@ -339,48 +244,6 @@ test.describe('Game Session Visual Tests', () => {
       console.log('⚠️ Segments not fully rendered, continuing with test...');
     }
 
-    // Debug: Check the actual segments being passed to ActiveGameSession
-    const componentState = await page.evaluate(() => {
-      // Check if we can access the React components' state
-      const narrativeManager = document.querySelector('.narrative-history-manager');
-      if (narrativeManager) {
-        const segments = document.querySelectorAll('.narrative-segment');
-        const segmentContents = Array.from(segments).map(seg => seg.textContent?.substring(0, 50));
-        return {
-          managerFound: true,
-          renderedSegmentCount: segments.length,
-          renderedContents: segmentContents
-        };
-      }
-      return { managerFound: false };
-    });
-    console.log('🔍 Component state debug:', componentState);
-
-    // Verify the height constraint is applied when multiple segments exist
-    const storyColumnDebug = await page.evaluate(() => {
-      const storyColumn = document.querySelector('.lg\\:flex-1.min-h-0.flex.flex-col.lg\\:overflow-hidden.relative');
-      if (!storyColumn) return { error: 'Story column not found' };
-
-      const style = window.getComputedStyle(storyColumn);
-      const segments = document.querySelectorAll('.narrative-segment');
-
-      return {
-        maxHeight: style.maxHeight,
-        segmentCount: segments.length,
-        hasRelativeClass: storyColumn.classList.contains('relative'),
-        allClasses: storyColumn.className
-      };
-    });
-    console.log('📏 Story column debug:', storyColumnDebug);
-
-    // Verify the fade overlay is present when multiple segments exist
-    const fadeOverlay = await page.evaluate(() => {
-      const overlay = document.querySelector('.absolute.top-0.left-0.right-0.h-8.pointer-events-none.z-10.bg-gradient-to-b.from-background.to-transparent');
-      return overlay ? 'FOUND' : 'NOT FOUND';
-    });
-    console.log('🎨 Fade overlay:', fadeOverlay);
-
-    await ensureSuggestedActionsExpanded(page);
     await renderSeededSuggestedActions(page);
     await seedInventoryItemsForVisual(page);
     await seedStorySummaryForVisual(page);
@@ -396,9 +259,7 @@ test.describe('Game Session Visual Tests', () => {
       timeout: 2000,
     });
 
-    await ensureSuggestedActionsContentVisible(page);
     await removeDuplicateSuggestedActionsTextarea(page);
-    await relaxStoryColumnHeight(page);
 
     await waitForImagesLoaded(page);
     await waitForStableScrollHeight(page, { timeout: 8000, stableDuration: 500 });
@@ -406,10 +267,10 @@ test.describe('Game Session Visual Tests', () => {
 
     await hideDynamicContent(page);
 
-    // Take screenshot of game session page - fullPage will now capture all segments
+    // Take screenshot of game session page
     await expect(page).toHaveScreenshot('game-session.png', {
       fullPage: true,
-      threshold: 0.3,  // Higher threshold for initial update to capture component changes
+      threshold: 0.3,
       timeout: 10000,
     });
   });
