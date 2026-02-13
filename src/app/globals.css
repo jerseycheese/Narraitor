@@ -401,7 +401,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-overlay-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: var(--color-scrim);
 }
