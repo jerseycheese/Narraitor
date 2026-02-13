@@ -189,6 +189,14 @@ body {
   --lore-rules-bg: 43 76% 83%; /* amber-200 */
   --lore-rules-border: 32 95% 44%; /* amber-500 */
   --lore-rules-text: 21 90% 31%; /* amber-700 */
+
+  /* Overlay surfaces and scrims */
+  --color-overlay-surface: rgba(255, 255, 255, 0.9);
+  --color-overlay-surface-strong: rgba(255, 255, 255, 0.95);
+  --color-manuscript-gradient-start: rgba(255, 255, 255, 0.92);
+  --color-manuscript-gradient-end: rgba(244, 244, 245, 0.92);
+  --color-scrim: rgba(17, 17, 17, 0.45);
+  --shadow-overlay: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .dark {
@@ -274,6 +282,14 @@ body {
   --lore-rules-bg: 25.5 95% 7.1%; /* amber-950 */
   --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */
   --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
+
+  /* Overlay surfaces and scrims */
+  --color-overlay-surface: rgba(24, 24, 27, 0.9);
+  --color-overlay-surface-strong: rgba(24, 24, 27, 0.96);
+  --color-manuscript-gradient-start: rgba(39, 39, 42, 0.9);
+  --color-manuscript-gradient-end: rgba(24, 24, 27, 0.92);
+  --color-scrim: rgba(0, 0, 0, 0.65);
+  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Typography role classes */
