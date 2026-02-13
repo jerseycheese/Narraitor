@@ -344,7 +344,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onCustomSubmit={handleCustomSubmit}
           hidePrompt={true}
           hideCustomInput={true}
-          hideEndButtons={true}
         />
       )}
       actionRail={

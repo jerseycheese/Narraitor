@@ -35,7 +35,7 @@ export const Default: Story = {
     children: (
       <div className="space-y-4">
         <p>This is the character sheet content inside the drawer.</p>
-        <div className="h-40 bg-zinc-100 rounded-md flex items-center justify-center text-zinc-400">
+        <div className="h-40 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
           Portrait Placeholder
         </div>
         <div className="space-y-2">
