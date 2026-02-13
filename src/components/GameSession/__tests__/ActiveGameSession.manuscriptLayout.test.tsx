@@ -287,7 +287,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       // Margin content is inside an <aside>
       const aside = await screen.findByRole('complementary', { name: /suggested actions/i });
       expect(aside).toBeInTheDocument();
-      expect(aside).toHaveClass('lg:block');
+      expect(aside).toHaveClass('manuscript-characters-rail');
     });
   });
 });

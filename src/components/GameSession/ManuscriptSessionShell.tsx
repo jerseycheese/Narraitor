@@ -18,45 +18,42 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 }) => {
   return (
     <div 
-      className={cssClasses(
-        "relative min-h-screen flex flex-col bg-background",
-        className
-      )}
+      className={cssClasses("manuscript-viewport-layer", className)}
       data-testid="manuscript-session-shell"
     >
-      {/* Floating HUD Container */}
-      {hud && (
-        <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-          {hud}
-        </div>
-      )}
+      <div className="manuscript-overlay-backdrop" />
+      
+      <div className="manuscript-viewport-shell">
+        <div className="manuscript-viewport-inner">
+          {/* Header Region */}
+          <header className="manuscript-overlay-header">
+            {hud}
+          </header>
 
-      {/* Main Narrative Stage */}
-      <main className="flex-grow flex flex-col items-center px-4 pt-20 pb-40">
-        <div className={cssClasses(
-          "w-full flex gap-8 justify-center",
-          marginContent ? "max-w-5xl" : "max-w-3xl"
-        )}>
-          <div className="w-full max-w-3xl">
-            {children}
-          </div>
-          {marginContent && (
-            <aside 
-              className="hidden lg:block w-48 flex-shrink-0 sticky top-24 self-start"
-              aria-label="Suggested actions"
-            >
-              {marginContent}
-            </aside>
-          )}
-        </div>
-      </main>
+          {/* Main Narrative Stage */}
+          <main className="manuscript-overlay-main">
+            <div className="manuscript-main-stage">
+              <div className="manuscript-main-content">
+                {children}
+              </div>
+              
+              {marginContent && (
+                <aside 
+                  className="manuscript-characters-rail"
+                  aria-label="Suggested actions"
+                >
+                  {marginContent}
+                </aside>
+              )}
+              
+              <div className="manuscript-rail-spacer" />
+            </div>
+          </main>
 
-      {/* Docked Action Rail */}
-      {actionRail && (
-        <div className="fixed bottom-0 left-0 right-0 z-40">
+          {/* Docked Action Rail */}
           {actionRail}
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -27,15 +27,30 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
   children,
   side = 'right',
 }) => {
+  // Add manuscript-overlay-open class to body when drawer is open
+  React.useEffect(() => {
+    if (open) {
+      document.body.classList.add('manuscript-overlay-open');
+      document.documentElement.classList.add('manuscript-overlay-open');
+    } else {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    }
+    return () => {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    };
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="fixed inset-0 z-[220] bg-black/45 animate-in fade-in duration-300" />
+        <DialogOverlay className="manuscript-overlay-backdrop z-[220] animate-in fade-in duration-300" />
         <DialogContent
           showCloseButton={false}
           data-testid="manuscript-drawer"
           className={cssClasses(
-            "fixed top-0 h-full w-full max-w-md z-[230] bg-background border-border shadow-2xl flex flex-col animate-in duration-300",
+            "fixed top-0 h-full w-full max-w-md z-[230] bg-[var(--color-overlay-surface)] backdrop-blur-md border-border shadow-2xl flex flex-col animate-in duration-300",
             side === 'right' 
               ? "right-0 border-l slide-in-from-right" 
               : "left-0 border-r slide-in-from-left"

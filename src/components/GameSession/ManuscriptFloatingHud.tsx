@@ -24,38 +24,42 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
 }) => {
   return (
     <div 
-      className={cssClasses("w-full flex justify-between p-4 pointer-events-auto", className)}
+      className={cssClasses("contents pointer-events-none", className)}
       data-testid="manuscript-floating-hud"
     >
-      <div className="flex items-start gap-4">
-        {leftContent}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onToggleCharacterSummary}
-              aria-expanded={isCharacterSummaryExpanded}
-              aria-label="Character summary"
-              title="Character summary"
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
-            >
-              <User className="h-5 w-5" />
-            </Button>
-            
-            {drawerTriggers}
-          </div>
-          
-          {isCharacterSummaryExpanded && characterSummaryPanel && (
-            <div className="w-80 animate-in slide-in-from-top-2 fade-in duration-200">
-              {characterSummaryPanel}
+      <div className="manuscript-overlay-header-left pointer-events-auto">
+        <div className="flex items-start gap-4">
+          {leftContent}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onToggleCharacterSummary}
+                aria-expanded={isCharacterSummaryExpanded}
+                aria-label="Character summary"
+                title="Character summary"
+                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+              
+              {drawerTriggers}
             </div>
-          )}
+            
+            {isCharacterSummaryExpanded && characterSummaryPanel && (
+              <div className="manuscript-hud-panel manuscript-hud-panel-left w-80 animate-in slide-in-from-top-2 fade-in duration-200">
+                {characterSummaryPanel}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
-      <div className="flex items-start gap-4">
-        {rightContent}
+      <div className="manuscript-overlay-header-right pointer-events-auto">
+        <div className="flex items-start gap-4">
+          {rightContent}
+        </div>
       </div>
     </div>
   );

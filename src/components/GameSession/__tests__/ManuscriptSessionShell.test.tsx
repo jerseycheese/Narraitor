@@ -52,8 +52,7 @@ describe('ManuscriptSessionShell', () => {
     );
 
     const marginElement = screen.getByTestId('margin').parentElement;
-    expect(marginElement).toHaveClass('hidden');
-    expect(marginElement).toHaveClass('lg:block');
+    expect(marginElement).toHaveClass('manuscript-characters-rail');
   });
 
   it('exposes manuscript overlay CSS variables', () => {
@@ -71,5 +70,32 @@ describe('ManuscriptSessionShell', () => {
     expect(document.body.style.getPropertyValue('--color-manuscript-gradient-end')).not.toBe('');
     expect(document.body.style.getPropertyValue('--color-scrim')).not.toBe('');
     expect(document.body.style.getPropertyValue('--shadow-overlay')).not.toBe('');
+  });
+
+  it('uses semantic manuscript overlay classes', () => {
+    render(
+      <ManuscriptSessionShell hud={<div data-testid="hud" />}>
+        <div data-testid="children">Main Content</div>
+      </ManuscriptSessionShell>
+    );
+
+    const shell = screen.getByTestId('manuscript-session-shell');
+    expect(shell).toHaveClass('manuscript-viewport-layer');
+
+    // These will fail until Task 3 Step 3
+    const backdrop = shell.querySelector('.manuscript-overlay-backdrop');
+    expect(backdrop).toBeInTheDocument();
+
+    const viewportShell = shell.querySelector('.manuscript-viewport-shell');
+    expect(viewportShell).toBeInTheDocument();
+
+    const viewportInner = shell.querySelector('.manuscript-viewport-inner');
+    expect(viewportInner).toBeInTheDocument();
+
+    const main = shell.querySelector('.manuscript-overlay-main');
+    expect(main).toBeInTheDocument();
+
+    const header = shell.querySelector('.manuscript-overlay-header');
+    expect(header).toBeInTheDocument();
   });
 });

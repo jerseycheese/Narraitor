@@ -11,16 +11,18 @@ export const ManuscriptActionRail: React.FC<ManuscriptActionRailProps> = ({
   className,
 }) => {
   return (
-    <div 
+    <footer 
+      id="manuscript-action-rail"
       className={cssClasses(
-        "w-full bg-background/95 backdrop-blur-md border-t border-border shadow-lg px-4 py-4 md:py-6",
         className
       )}
       data-testid="manuscript-action-rail"
     >
-      <div className="max-w-3xl mx-auto">
-        {children}
+      <div className="manuscript-input-row">
+        <div className="w-full">
+          {children}
+        </div>
       </div>
-    </div>
+    </footer>
   );
 };

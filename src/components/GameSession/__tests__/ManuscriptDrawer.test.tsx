@@ -70,4 +70,22 @@ describe('ManuscriptDrawer', () => {
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape', code: 'Escape' });
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it('applies manuscript-overlay-open class to body when open', () => {
+    const { unmount } = render(
+      <ManuscriptDrawer
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        title="Test Drawer"
+      >
+        <div>Content</div>
+      </ManuscriptDrawer>
+    );
+
+    expect(document.body).toHaveClass('manuscript-overlay-open');
+    expect(document.documentElement).toHaveClass('manuscript-overlay-open');
+
+    unmount();
+    expect(document.body).not.toHaveClass('manuscript-overlay-open');
+  });
 });
