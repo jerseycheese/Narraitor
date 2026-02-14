@@ -3969,12 +3969,20 @@ export function PrimaryAction() {
       decisionPrompt.textContent = primaryDecision.prompt;
 
       choiceActions.innerHTML = primaryDecision.options.map((option) => {
+        const hasSkillReq = option.requirements && option.requirements.some(r => r.type === 'skill');
+        const badgeHtml = hasSkillReq ? `
+          <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style="background: rgba(49, 46, 129, 0.1); color: var(--color-accent); border: 1px solid rgba(49, 46, 129, 0.2);">
+            Skill Check
+          </span>
+        ` : '';
+
         return `<button
             type="button"
             data-suggested-action="${escapeHtml(option.text)}"
-            class="manuscript-suggested-action w-full min-w-0 text-left px-2.5 py-1.5 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            class="manuscript-suggested-action w-full min-w-0 text-left px-2.5 py-1.5 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center justify-between gap-2"
           >
-            ${escapeHtml(option.text)}
+            <span class="truncate">${escapeHtml(option.text)}</span>
+            ${badgeHtml}
           </button>`;
       }).join('');
     }

@@ -20,7 +20,12 @@ describe('ChoiceSelector', () => {
   };
 
   const assertChoicesVisible = (texts: string[]) => {
-    texts.forEach(text => expect(screen.getByText(text)).toBeInTheDocument());
+    texts.forEach(text => {
+      // Check if text is either visible content or in a title attribute
+      const hasVisibleText = screen.queryByText(text);
+      const hasTitleText = document.querySelector(`[title="${text}"]`);
+      expect(hasVisibleText || hasTitleText).toBeTruthy();
+    });
   };
 
   const createCharacterSkills = (skillLevels: Record<string, number>) => {
@@ -269,7 +274,7 @@ describe('ChoiceSelector', () => {
 
     it('uses manuscript-send id for submit button', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
-      const sendButton = screen.getByRole('button', { name: /submit/i });
+      const sendButton = screen.getByRole('button', { name: /send/i });
       expect(sendButton).toHaveAttribute('id', 'manuscript-send');
     });
 

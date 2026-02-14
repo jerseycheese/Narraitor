@@ -180,13 +180,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   return (
     <div
       data-testid="choice-selector"
-      className={['choice-selector', weightStyling.container, className]
+      className={['choice-selector', 'manuscript-choice-selector', weightStyling.container, className]
         .filter(Boolean)
         .join(' ')}
       role="group"
       aria-labelledby="choices-heading"
     >
-      <div>
+      <div className="manuscript-choice-selector-body">
         {/* Ending Suggestion Banner */}
         {endingSuggestion && (
           <EndingSuggestionBanner
@@ -198,48 +198,26 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
         {/* Context Summary */}
         {decision.contextSummary && (
-          <div data-testid="context-summary">
+          <div data-testid="context-summary" className="manuscript-context-summary">
             <p>{decision.contextSummary}</p>
           </div>
         )}
 
-        {!hidePrompt && <h3 id="choices-heading">{displayPrompt}</h3>}
-
-        {/* Custom input field - shown first when enabled */}
-        {enableCustomInput && !hideCustomInput && (
-          <div className="manuscript-input-row">
-            <Textarea
-              id="manuscript-input"
-              ref={inputRef}
-              value={customInputText}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={customInputPlaceholder}
-              disabled={isDisabled}
-              aria-label="Custom response input"
-              rows={3}
-            />
-            <div className="flex flex-col items-end gap-2">
-              <span className={`${characterCountClass}`}>
-                {characterCount}/{maxCustomLength}
-              </span>
-              <Button
-                id="manuscript-send"
-                onClick={handleCustomSubmit}
-                disabled={isDisabled || !safeTrim(customInputText)}
-                size="sm"
-              >
-                Submit
-              </Button>
-            </div>
-          </div>
+        {!hidePrompt && (
+          <h3 id="choices-heading" className="manuscript-choice-prompt">
+            {displayPrompt}
+          </h3>
         )}
 
         {allOptions.length > 0 && (
-          <div className="mt-6">
-            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Suggested Actions</h4>
+          <div className="manuscript-suggested-actions-section">
+            <h4 className="manuscript-suggested-actions-heading">Suggested Actions</h4>
             {/* Regular choice options */}
-            <div role="radiogroup" aria-labelledby="choices-heading" className="flex flex-col gap-2">
+            <div
+              role="radiogroup"
+              aria-labelledby="choices-heading"
+              className="manuscript-suggested-actions-grid"
+            >
               {allOptions.map((option) => {
                 const isOptionDisabled =
                   isDisabled || (option.isDisabledByRequirements ?? false);
@@ -249,14 +227,14 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     key={option.id}
                     data-testid={`choice-option-${option.id}`}
                     variant="secondary"
-                    title={isOptionDisabled ? option.disabledReason : undefined}
+                    title={isOptionDisabled ? option.disabledReason : (option.hint || undefined)}
                     data-disabled-reason={
                       isOptionDisabled ? option.disabledReason : undefined
                     }
                     className={cssClasses(
-                      "manuscript-suggested-action justify-start text-left h-auto py-3 px-4",
+                      'manuscript-suggested-action',
                       option.isSelected
-                        ? 'is-selected border-primary ring-2 ring-primary/20'
+                        ? 'is-selected manuscript-suggested-action-selected'
                         : getAlignmentClasses(
                             option.alignment,
                             isOptionDisabled
@@ -272,21 +250,19 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     aria-checked={option.isSelected}
                     role="radio"
                   >
-                    <div className="flex flex-col gap-1 w-full text-wrap">
-                      <div className="flex items-center gap-2">
-                        {option.isSelected && <ChevronRight className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />}
+                    <div className="manuscript-suggested-action-content">
+                      <div className="manuscript-suggested-action-title-row">
+                        {option.isSelected && (
+                          <ChevronRight className="manuscript-suggested-action-chevron" aria-hidden="true" />
+                        )}
                         {!option.isSelected &&
                           getAlignmentIcon(option.alignment) && (
-                            <span className="shrink-0">{getAlignmentIcon(option.alignment)}</span>
+                            <span className="manuscript-suggested-action-alignment-icon">{getAlignmentIcon(option.alignment)}</span>
                           )}
-                        <span className="font-medium">{option.text}</span>
+                        <span className="manuscript-suggested-action-label">{option.text}</span>
                       </div>
                       
-                      {showHints && option.hint && (
-                        <div className="text-xs text-muted-foreground ml-6">{option.hint}</div>
-                      )}
-                      
-                      <div className="flex flex-wrap gap-2 ml-6">
+                      <div className="manuscript-suggested-action-badges">
                         <SkillRequirementBadges
                           requirements={option.skillRequirements || []}
                           optionId={option.id}
@@ -300,6 +276,45 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   </Button>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Custom input field - now shown AFTER suggested actions */}
+        {enableCustomInput && !hideCustomInput && (
+          <div className="manuscript-input-row">
+            <Textarea
+              id="manuscript-input"
+              ref={inputRef}
+              value={customInputText}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder={customInputPlaceholder}
+              disabled={isDisabled}
+              aria-label="Custom response input"
+              rows={1}
+              className="manuscript-custom-input"
+            />
+            <div className="manuscript-input-meta">
+              <span
+                className={[
+                  'manuscript-input-count',
+                  characterCountClass ? 'manuscript-input-count-warning' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                {characterCount}/{maxCustomLength}
+              </span>
+              <Button
+                id="manuscript-send"
+                onClick={handleCustomSubmit}
+                disabled={isDisabled || !safeTrim(customInputText)}
+                size="sm"
+                className="manuscript-send-button"
+              >
+                Send
+              </Button>
             </div>
           </div>
         )}
