@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
@@ -15,7 +14,6 @@ import {
   ItemRequirementBadges,
 } from './RequirementBadges';
 import {
-  getAlignmentIcon,
   getAlignmentClasses,
   getDecisionWeightStyling,
 } from './choiceStyling';

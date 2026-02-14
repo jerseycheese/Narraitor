@@ -51,6 +51,7 @@ describe('ManuscriptDrawer', () => {
 
     const closeButton = screen.getByRole('button', { name: /close/i });
     expect(closeButton).toBeInTheDocument();
+    expect(closeButton).toHaveTextContent(/close/i);
     
     fireEvent.click(closeButton);
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);

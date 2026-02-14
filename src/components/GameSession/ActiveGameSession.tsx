@@ -15,7 +15,6 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { LogOut, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
@@ -31,7 +30,6 @@ import { ManuscriptActionRail } from './ManuscriptActionRail';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import { CharacterDrawerContent, InventoryDrawerContent } from './ManuscriptDrawerPanels';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { Book, Package } from 'lucide-react';
 
 interface ActiveGameSessionProps {
   worldId: string;

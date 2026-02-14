@@ -1,7 +1,5 @@
 import React from 'react';
 import { cssClasses } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
