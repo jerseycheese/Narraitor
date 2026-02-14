@@ -44,17 +44,16 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   }
 
   return (
-    <div>
+    <>
       {requirements.map((skillReq, index) => (
-        <Badge
+        <span
           key={`${optionId}-skill-${index}`}
-          variant="skill-requirement"
-          
+          className="manuscript-skill-check-badge"
         >
-          {skillReq.skillName || 'Unknown Skill'} Check Required
-        </Badge>
+          {skillReq.skillName || 'Skill'} Check
+        </span>
       ))}
-    </div>
+    </>
   );
 };
 

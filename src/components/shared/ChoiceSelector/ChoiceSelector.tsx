@@ -102,8 +102,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     requirementEvaluationContext
   );
 
-  // Use normalized options without custom input option
-  const allOptions = normalizedOptions;
+  // Use normalized options without custom input option, limited to 3 choices
+  const allOptions = normalizedOptions.slice(0, 3);
 
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;

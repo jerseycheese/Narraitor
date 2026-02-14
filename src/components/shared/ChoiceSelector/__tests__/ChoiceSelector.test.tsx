@@ -161,13 +161,29 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill badges with skill names and "Check Required" label', () => {
+    it('shows skill badges with skill names and "Check" label', () => {
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      // Skill badges should show skill name with "Check Required" label
-      expect(screen.getByText('Stealth Check Required')).toBeInTheDocument();
-      expect(screen.getByText('Intimidation Check Required')).toBeInTheDocument();
+      // Skill badges should show skill name with "Check" label
+      expect(screen.getByText(/Stealth/)).toBeInTheDocument();
+      expect(screen.getByText(/Intimidation/)).toBeInTheDocument();
+      expect(screen.getAllByText(/Check/)).toHaveLength(2);
+    });
+
+    it('limits the number of choices to 3', () => {
+      const decisionWithManyOptions: Decision = {
+        ...decision,
+        options: [
+          { id: '1', text: 'Option 1' },
+          { id: '2', text: 'Option 2' },
+          { id: '3', text: 'Option 3' },
+          { id: '4', text: 'Option 4' },
+        ]
+      };
+      renderChoiceSelector({decision: decisionWithManyOptions, onSelect: mockOnSelect});
+      expect(screen.queryByText('Option 4')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('radio')).toHaveLength(3);
     });
 
     it('disables options when character lacks required skills', async () => {
