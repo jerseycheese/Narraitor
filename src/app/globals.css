@@ -1043,23 +1043,33 @@ body.manuscript-overlay-open {
 
 .manuscript-suggested-action-label {
 
+
+
   display: block;
+
+
 
   font-size: 0.8125rem;
 
+
+
   font-family: var(--font-interface), system-ui, sans-serif;
+
+
 
   font-weight: 500;
 
+
+
   line-height: 1.2;
 
-  white-space: nowrap;
 
-  overflow: hidden;
-
-  text-overflow: ellipsis;
 
 }
+
+
+
+
 
 
 

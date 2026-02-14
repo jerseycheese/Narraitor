@@ -3981,7 +3981,7 @@ export function PrimaryAction() {
             data-suggested-action="${escapeHtml(option.text)}"
             class="manuscript-suggested-action w-full min-w-0 text-left px-2.5 py-1.5 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center justify-between gap-2"
           >
-            <span class="truncate">${escapeHtml(option.text)}</span>
+            <span>${escapeHtml(option.text)}</span>
             ${badgeHtml}
           </button>`;
       }).join('');
