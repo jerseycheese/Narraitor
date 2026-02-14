@@ -142,7 +142,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(hudToggle).toHaveAttribute('aria-expanded');
     
     // Check for back button in HUD
-    expect(screen.getByRole('button', { name: /back to world/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
   });
 
   it('renders session control buttons in the action rail', async () => {
@@ -260,8 +260,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
       );
 
       await screen.findByTestId('manuscript-floating-hud');
-      expect(screen.queryByTitle(/character sheet/i)).not.toBeInTheDocument();
-      expect(screen.queryByTitle(/inventory/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/journal/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/inventory/i)).not.toBeInTheDocument();
     });
 
     it('shows drawer triggers when flag is ON', async () => {
@@ -276,8 +276,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
       );
 
       await screen.findByTestId('manuscript-floating-hud');
-      expect(screen.getByTitle(/character sheet/i)).toBeInTheDocument();
-      expect(screen.getByTitle(/inventory/i)).toBeInTheDocument();
+      expect(screen.getByText(/journal/i)).toBeInTheDocument();
+      expect(screen.getByText(/inventory/i)).toBeInTheDocument();
     });
 
     it('opens character drawer when trigger is clicked (flag ON)', async () => {
@@ -291,7 +291,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      const trigger = await screen.findByTitle(/character sheet/i);
+      const trigger = await screen.findByText(/journal/i);
       fireEvent.click(trigger);
 
       // ManuscriptDrawer has role="dialog"

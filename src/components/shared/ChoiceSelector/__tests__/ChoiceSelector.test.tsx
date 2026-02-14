@@ -161,14 +161,13 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill badges with skill names and "Check" label', () => {
+    it('shows skill badges with skill names', () => {
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      // Skill badges should show skill name with "Check" label
+      // Skill badges should show skill name
       expect(screen.getByText(/Stealth/)).toBeInTheDocument();
       expect(screen.getByText(/Intimidation/)).toBeInTheDocument();
-      expect(screen.getAllByText(/Check/)).toHaveLength(2);
     });
 
     it('limits the number of choices to 3', () => {

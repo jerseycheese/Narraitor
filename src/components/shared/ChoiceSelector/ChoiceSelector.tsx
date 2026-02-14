@@ -211,7 +211,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
         {allOptions.length > 0 && (
           <div className="manuscript-suggested-actions-section">
-            <h4 className="manuscript-suggested-actions-heading">Suggested Actions</h4>
             {/* Regular choice options */}
             <div
               role="radiogroup"
@@ -252,13 +251,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                   >
                     <div className="manuscript-suggested-action-content">
                       <div className="manuscript-suggested-action-title-row">
-                        {option.isSelected && (
-                          <ChevronRight className="manuscript-suggested-action-chevron" aria-hidden="true" />
-                        )}
-                        {!option.isSelected &&
-                          getAlignmentIcon(option.alignment) && (
-                            <span className="manuscript-suggested-action-alignment-icon">{getAlignmentIcon(option.alignment)}</span>
-                          )}
                         <span className="manuscript-suggested-action-label">{option.text}</span>
                       </div>
                       

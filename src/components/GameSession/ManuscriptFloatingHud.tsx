@@ -23,41 +23,38 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   drawerTriggers,
 }) => {
   return (
-    <div 
-      className={cssClasses("contents pointer-events-none", className)}
+    <div
+      className={cssClasses('manuscript-floating-hud', className)}
       data-testid="manuscript-floating-hud"
     >
-      <div className="manuscript-overlay-header-left pointer-events-auto">
-        <div className="flex items-start gap-4">
+      <div className="manuscript-overlay-header-left manuscript-hud-zone">
+        <div className="manuscript-hud-group">
           {leftContent}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
+          <div className="manuscript-hud-stack">
+            <div className="manuscript-hud-controls">
+              <button
+                type="button"
                 onClick={onToggleCharacterSummary}
                 aria-expanded={isCharacterSummaryExpanded}
-                aria-label="Character summary"
-                title="Character summary"
-                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+                className="manuscript-hud-text-button"
               >
-                <User className="h-5 w-5" />
-              </Button>
-              
+                Character Summary
+              </button>
+
               {drawerTriggers}
             </div>
-            
+
             {isCharacterSummaryExpanded && characterSummaryPanel && (
-              <div className="manuscript-hud-panel manuscript-hud-panel-left w-80 animate-in slide-in-from-top-2 fade-in duration-200">
+              <div className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
                 {characterSummaryPanel}
               </div>
             )}
           </div>
         </div>
       </div>
-      
-      <div className="manuscript-overlay-header-right pointer-events-auto">
-        <div className="flex items-start gap-4">
+
+      <div className="manuscript-overlay-header-right manuscript-hud-zone">
+        <div className="manuscript-hud-group manuscript-hud-group-right">
           {rightContent}
         </div>
       </div>

@@ -240,7 +240,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // always mount the hidden NarrativeController to drive generation.
   if (!isGameReady) {
     return (
-      <div className="relative min-h-screen">
+      <div className="manuscript-loading-shell">
         <GameSessionSkeleton />
         {/* Hidden controller that actually performs generation while skeleton shows */}
         <div aria-hidden="true" className="sr-only">
@@ -274,42 +274,37 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           isCharacterSummaryExpanded={isCharacterSummaryExpanded}
           characterSummaryPanel={character && <CharacterSummary character={character} />}
           drawerTriggers={isProgressiveDisclosureEnabled && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
+            <div className="manuscript-hud-drawer-triggers">
+              <button
+                type="button"
                 onClick={() => setActiveDrawer('character')}
                 title="Character Sheet"
-                aria-label="Character Sheet"
-                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+                className="manuscript-hud-text-button"
               >
-                <Book className="h-5 w-5" aria-hidden="true" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+                Journal
+              </button>
+              <button
+                type="button"
                 onClick={() => setActiveDrawer('inventory')}
                 title="Inventory"
-                aria-label="Inventory"
-                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+                className="manuscript-hud-text-button"
               >
-                <Package className="h-5 w-5" aria-hidden="true" />
-              </Button>
+                Inventory
+              </button>
             </div>
           )}
           leftContent={
-            <Button
-              variant="outline"
-              size="icon"
+            <button
+              type="button"
               onClick={onBack}
               title="Back to World"
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+              className="manuscript-hud-text-button"
             >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+              Back
+            </button>
           }
           rightContent={
-            <div className="flex items-center gap-2">
+            <div className="manuscript-hud-right-controls">
               <SaveIndicator
                 status={autoSave.status}
                 lastSaveTime={autoSave.lastSaveTime}
@@ -320,15 +315,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 retryable
                 compact
               />
-              <Button
-                variant="outline"
-                size="icon"
+              <button
+                type="button"
                 onClick={onStartNew}
                 title="Start New Session"
-                className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+                className="manuscript-hud-text-button"
               >
-                <RefreshCw className="h-5 w-5" />
-              </Button>
+                Reset
+              </button>
             </div>
           }
         />
@@ -353,7 +347,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
       actionRail={
         <ManuscriptActionRail isStreaming={isGenerating || isGeneratingChoices}>
-          <div className="flex flex-col gap-4">
+          <div className="manuscript-action-rail-stack">
             <ActiveGameSessionChoicesColumn
               currentDecision={currentDecision}
               segmentCount={segmentCount}
@@ -366,7 +360,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               inventoryItems={inventoryItems}
               onChoiceSelected={handleChoiceSelected}
               onCustomSubmit={handleCustomSubmit}
-              className={isProgressiveDisclosureEnabled ? "lg:hidden" : ""}
+              className={isProgressiveDisclosureEnabled ? 'manuscript-rail-mobile-choices' : ''}
               endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
                 reason: endingSuggestionReason,
                 onAccept: handleAcceptEndingSuggestion,
@@ -390,29 +384,26 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 hideChoices={true}
                 hidePrompt={true}
                 dataTutorial={undefined}
-                className="hidden lg:block"
+                className="manuscript-rail-desktop-input"
               />
             )}
             
             {!isSessionEnded(sessionId) && (
-              <div className="flex justify-end items-center gap-4 border-t pt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
+              <div className="manuscript-session-actions">
+                <button
+                  type="button"
                   onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="manuscript-warning-action-button"
                 >
                   End Session
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                </button>
+                <button
+                  type="button"
                   onClick={handleEndStoryClick}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="manuscript-warning-action-button"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
                   End Story
-                </Button>
+                </button>
               </div>
             )}
           </div>
@@ -436,7 +427,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         segmentCount={segmentCount}
       />
 
-      <div className="mt-8 border-t pt-8">
+      <div className="manuscript-secondary-controls">
         <ActiveGameSessionControls
           character={character}
           characterId={characterId || undefined}

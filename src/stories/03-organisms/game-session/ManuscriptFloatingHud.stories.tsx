@@ -29,26 +29,26 @@ export const Default: Story = {
     onToggleCharacterSummary: () => {},
     isCharacterSummaryExpanded: false,
     leftContent: (
-      <Button variant="outline" size="icon" className="rounded-full shadow-md bg-background/80 backdrop-blur-sm">
-        <ArrowLeft className="h-5 w-5" />
-      </Button>
+      <button type="button" className="manuscript-hud-text-button">
+        Back
+      </button>
     ),
     rightContent: (
-      <div className="flex items-center gap-2">
-        <div className="text-xs font-system text-muted-foreground mr-2">SAVED</div>
-        <Button variant="outline" size="icon" className="rounded-full shadow-md bg-background/80 backdrop-blur-sm">
-          <RefreshCw className="h-5 w-5" />
-        </Button>
+      <div className="manuscript-hud-right-controls">
+        <div className="text-[10px] font-system text-muted-foreground mr-2">SAVED</div>
+        <button type="button" className="manuscript-hud-text-button">
+          Reset
+        </button>
       </div>
     ),
     drawerTriggers: (
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="icon" title="Character Sheet" className="rounded-full shadow-md bg-background/80 backdrop-blur-sm">
-          <Book className="h-5 w-5" />
-        </Button>
-        <Button variant="outline" size="icon" title="Inventory" className="rounded-full shadow-md bg-background/80 backdrop-blur-sm">
-          <Package className="h-5 w-5" />
-        </Button>
+      <div className="manuscript-hud-drawer-triggers">
+        <button type="button" className="manuscript-hud-text-button">
+          Journal
+        </button>
+        <button type="button" className="manuscript-hud-text-button">
+          Inventory
+        </button>
       </div>
     ),
   },

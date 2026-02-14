@@ -50,7 +50,7 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
           key={`${optionId}-skill-${index}`}
           className="manuscript-skill-check-badge"
         >
-          {skillReq.skillName || 'Skill'} Check
+          {skillReq.skillName || 'Skill'}
         </span>
       ))}
     </>
