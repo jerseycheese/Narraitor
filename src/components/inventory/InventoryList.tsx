@@ -21,7 +21,6 @@ import {
   type InventoryViewMode,
 } from './InventoryViewToggle';
 import { InventoryTable } from './InventoryTable';
-import { Trash2 } from 'lucide-react';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
 import { DropConfirmationDialog } from './DropConfirmationDialog';
 
@@ -273,7 +272,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                             aria-label={`Drop ${item.name}`}
                             title="Drop item"
                           >
-                            <Trash2 />
+                            Drop
                           </Button>
                         </div>
                       </div>

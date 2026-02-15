@@ -8,7 +8,6 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, PackageMinus } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
@@ -173,7 +172,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const isUsing = usingItemId === row.original.id;
           return (
-            <div>
+            <div className="flex gap-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -182,7 +181,7 @@ export function InventoryTable({
                 aria-label={`Use ${row.original.name}`}
                 title="Use item"
               >
-                <PackageMinus />
+                {isUsing ? 'Using...' : 'Use'}
               </Button>
               <Button
                 variant="ghost"
@@ -191,7 +190,7 @@ export function InventoryTable({
                 aria-label={`Drop ${row.original.name}`}
                 title="Drop item"
               >
-                <Trash2 />
+                Drop
               </Button>
             </div>
           );
