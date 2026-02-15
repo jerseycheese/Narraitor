@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { BookOpen } from 'lucide-react';
 import type { Character } from '@/state/characterStore';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
@@ -19,6 +18,7 @@ interface ActiveGameSessionControlsProps {
   onConfirmEndStory: () => void;
   onCloseEndStory: () => void;
   onOpenJournal: () => void;
+  isProgressiveDisclosureEnabled?: boolean;
 }
 
 const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
@@ -30,12 +30,14 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
   onConfirmEndStory,
   onCloseEndStory,
   onOpenJournal,
+  isProgressiveDisclosureEnabled = false,
 }) => {
   return (
-    <>
-      {/* Inventory Display */}
-      {characterId && (
+    <div className="manuscript-support-sections">
+      {/* Inventory Display - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && characterId && (
         <div
+          className="manuscript-support-section"
           data-testid="inventory-collapsible"
           data-tutorial="inventory-toggle"
         >
@@ -45,25 +47,34 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
         </div>
       )}
 
-      <StorySummarySection
-        worldId={worldId}
-        sessionId={sessionId}
-        characterId={characterId || undefined}
-      />
+      {/* Story Summary Section - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && (
+        <div className="manuscript-support-section">
+          <StorySummarySection
+            worldId={worldId}
+            sessionId={sessionId}
+            characterId={characterId || undefined}
+          />
+        </div>
+      )}
 
-      <ChoiceHistorySection sessionId={sessionId} />
+      {/* Choice History Section - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && (
+        <div className="manuscript-support-section">
+          <ChoiceHistorySection sessionId={sessionId} />
+        </div>
+      )}
 
-      {/* Journal Button */}
-      {character && (
-        <div>
+      {/* Journal Button - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && character && (
+        <div className="manuscript-support-section manuscript-support-section-journal">
           <Button
             onClick={onOpenJournal}
             variant="outline"
-            className="group"
+            className="manuscript-journal-button"
             data-tutorial="journal-toggle"
           >
-            <span>
-              <BookOpen />
+            <span className="manuscript-journal-button-label">
               Open Journal
             </span>
           </Button>
@@ -81,7 +92,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
         confirmText="End Story"
         cancelText="Cancel"
       />
-    </>
+    </div>
   );
 };
 

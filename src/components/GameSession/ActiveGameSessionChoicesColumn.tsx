@@ -19,6 +19,7 @@ interface ActiveGameSessionChoicesColumnProps {
   inventoryItems: InventoryItem[];
   onChoiceSelected: (choiceId: string) => void;
   onCustomSubmit: (customText: string) => void;
+  inputActions?: React.ReactNode;
   hidePrompt?: boolean;
   hideChoices?: boolean;
   hideCustomInput?: boolean;
@@ -45,6 +46,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   inventoryItems,
   onChoiceSelected,
   onCustomSubmit,
+  inputActions,
   hidePrompt = false,
   hideChoices = false,
   hideCustomInput = false,
@@ -71,6 +73,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
               characterSkills={characterSkills}
               inventoryItems={inventoryItems}
               endingSuggestion={endingSuggestion}
+              inputActions={inputActions}
             />
           )
         ) : (

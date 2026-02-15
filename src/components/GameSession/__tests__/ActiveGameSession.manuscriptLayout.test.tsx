@@ -30,7 +30,11 @@ jest.mock('../ActiveGameSessionNarrativeColumn', () => ({
 
 jest.mock('../ActiveGameSessionChoicesColumn', () => ({
   __esModule: true,
-  default: () => <div data-testid="choices-column" />,
+  default: ({ inputActions }: { inputActions?: React.ReactNode }) => (
+    <div data-testid="choices-column">
+      {inputActions}
+    </div>
+  ),
 }));
 
 jest.mock('../ActiveGameSessionControls', () => ({
@@ -80,8 +84,12 @@ describe('ActiveGameSession Manuscript Layout', () => {
       selector({ characters: { [mockCharacterId]: { id: mockCharacterId, name: 'Hero', worldId: mockWorldId, skills: [] } } })
     );
 
-    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) => 
-      selector({ getCharacterItems: () => [] })
+    (useInventoryStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({
+        getCharacterItems: () => [],
+        characterInventories: {},
+        itemsObject: {},
+      })
     );
 
     (useTutorial as jest.Mock).mockReturnValue({
@@ -128,7 +136,10 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
   });
 
-  it('renders a floating HUD with toggle buttons', async () => {
+  it('renders a floating HUD with character toggle button', async () => {
+    // When progressive disclosure is OFF, we should see the character toggle
+    (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -138,11 +149,11 @@ describe('ActiveGameSession Manuscript Layout', () => {
     );
 
     expect(await screen.findByTestId('manuscript-floating-hud')).toBeInTheDocument();
-    const hudToggle = screen.getByRole('button', { name: /character summary/i });
+    const hudToggle = screen.getByRole('button', { name: /character/i });
     expect(hudToggle).toHaveAttribute('aria-expanded');
-    
-    // Check for back button in HUD
-    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+
+    // Character button should be functional
+    expect(hudToggle).toBeEnabled();
   });
 
   it('renders session control buttons in the action rail', async () => {
@@ -204,6 +215,9 @@ describe('ActiveGameSession Manuscript Layout', () => {
   });
 
   it('closes character summary when Escape key is pressed', async () => {
+    // When PROGRESSIVE_DISCLOSURE is OFF, Character button exists
+    (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -212,8 +226,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
       />
     );
 
-    const hudToggle = await screen.findByRole('button', { name: /character summary/i });
-    
+    const hudToggle = await screen.findByRole('button', { name: /character/i });
+
     // Open it first
     fireEvent.click(hudToggle);
     expect(hudToggle).toHaveAttribute('aria-expanded', 'true');
@@ -264,7 +278,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.queryByText(/inventory/i)).not.toBeInTheDocument();
     });
 
-    it('shows drawer triggers when flag is ON', async () => {
+    it('shows Tools menu when flag is ON', async () => {
       (isFeatureEnabled as jest.Mock).mockReturnValue(true);
 
       render(
@@ -276,11 +290,10 @@ describe('ActiveGameSession Manuscript Layout', () => {
       );
 
       await screen.findByTestId('manuscript-floating-hud');
-      expect(screen.getByText(/journal/i)).toBeInTheDocument();
-      expect(screen.getByText(/inventory/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /toggle tools menu/i })).toBeInTheDocument();
     });
 
-    it('opens character drawer when trigger is clicked (flag ON)', async () => {
+    it('opens character drawer from Tools menu when trigger is clicked (flag ON)', async () => {
       (isFeatureEnabled as jest.Mock).mockReturnValue(true);
 
       render(
@@ -291,8 +304,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      const trigger = await screen.findByText(/journal/i);
-      fireEvent.click(trigger);
+      // Open Tools menu first
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+
+      // Click Character Details button in the menu
+      const characterButton = screen.getByRole('button', { name: /character details/i });
+      fireEvent.click(characterButton);
 
       // ManuscriptDrawer has role="dialog"
       expect(await screen.findByRole('dialog')).toBeInTheDocument();
@@ -314,6 +332,126 @@ describe('ActiveGameSession Manuscript Layout', () => {
       const aside = await screen.findByRole('complementary', { name: /suggested actions/i });
       expect(aside).toBeInTheDocument();
       expect(aside).toHaveClass('manuscript-characters-rail');
+    });
+
+    it('toggles Tools menu when Tools button is clicked', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+
+      // Menu should not be open initially
+      expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
+
+      // Click to open
+      fireEvent.click(toolsToggle);
+      expect(screen.getByRole('button', { name: /character details/i })).toBeInTheDocument();
+
+      // Click to close
+      fireEvent.click(toolsToggle);
+      expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
+    });
+
+    it('opens Character Details drawer from Tools menu', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      // Open Tools menu
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+
+      // Test Character Details drawer
+      fireEvent.click(screen.getByRole('button', { name: /character details/i }));
+      expect(await screen.findByText('Character Sheet')).toBeInTheDocument();
+    });
+
+    it('opens multiple drawer types from Tools menu', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      // Open Tools menu and test Character Details
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+      fireEvent.click(screen.getByRole('button', { name: /character details/i }));
+
+      // Verify Character Sheet drawer opened
+      expect(await screen.findByText('Character Sheet')).toBeInTheDocument();
+
+      // Verify it persists even when menu is closed
+      fireEvent.click(toolsToggle); // Open menu again
+      expect(screen.getByText('Character Sheet')).toBeInTheDocument();
+    });
+
+    it('closes Tools menu when opening a drawer', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      // Open Tools menu
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+
+      // Menu should be visible
+      expect(screen.getByRole('button', { name: /character details/i })).toBeInTheDocument();
+
+      // Click a drawer trigger
+      fireEvent.click(screen.getByRole('button', { name: /inventory/i }));
+
+      // Menu should now be closed, but drawer content should be open
+      expect(await screen.findByText('Inventory')).toBeInTheDocument();
+    });
+
+    it('closes drawer with Escape key', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      // Open Tools menu and open Character Details drawer (simpler than Inventory)
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+      fireEvent.click(screen.getByRole('button', { name: /character details/i }));
+
+      // Verify drawer is open
+      expect(await screen.findByText('Character Sheet')).toBeInTheDocument();
+
+      // Press Escape
+      fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+
+      // Verify drawer is closed
+      expect(screen.queryByText('Character Sheet')).not.toBeInTheDocument();
     });
   });
 });

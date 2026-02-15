@@ -1,6 +1,13 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
+// Mock ResizeObserver for jsdom
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;
+
 // DIAGNOSTIC: Log environment variable
 if (process.env.DEBUG_JEST_SETUP === 'true') {
   console.log('[jest.setup.ts] GEMINI_API_KEY before setting:', process.env.GEMINI_API_KEY ? '***MASKED***' : 'NOT SET');

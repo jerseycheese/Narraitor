@@ -59,17 +59,18 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
   return (
     <div 
       data-testid="character-summary" 
-      
+      className="manuscript-character-summary"
       role="region"
       aria-label="Character information"
     >
       {/* Compact Header - Always Visible */}
       <div 
+           className="manuscript-character-summary-header"
            onClick={() => setIsExpanded(!isExpanded)}>
-        <div>
+        <div className="manuscript-character-summary-identity">
           {/* Portrait Section - show in header when collapsed */}
           {character.portrait && (
-            <div>
+            <div className="manuscript-character-summary-portrait">
               <Link href={`/characters/${character.id}`} onClick={(e) => e.stopPropagation()}>
                 <CharacterPortrait
                   portrait={character.portrait}
@@ -80,17 +81,17 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
             </div>
           )}
           
-          <div>
-            <h2>
+          <div className="manuscript-character-summary-heading">
+            <h2 className="manuscript-character-summary-name">
               <Link 
                 href={`/characters/${character.id}`} 
-                 
+                className="manuscript-character-summary-name-link"
                 onClick={(e) => e.stopPropagation()}
               >
                 {character.name}
               </Link>
             </h2>
-            <p>Level {character.level}</p>
+            <p className="manuscript-character-summary-level">Level {character.level}</p>
           </div>
         </div>
         
@@ -98,7 +99,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
           type="button" 
           variant="link"
           size="sm"
-          
+          className="manuscript-character-summary-toggle"
           data-tutorial="character-sheet-toggle"
           onClick={(e) => {
             e.stopPropagation();
@@ -113,27 +114,27 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
 
       {/* Expanded Details - Only show when expanded */}
       {isExpanded && (
-        <div>
+        <div className="manuscript-character-summary-details">
           {character.background?.history && (
-            <p>{character.background.history}</p>
+            <p className="manuscript-character-summary-history">{character.background.history}</p>
           )}
 
           {/* Attributes and Skills in two columns */}
           {((character.attributes && character.attributes.length > 0) || (character.skills && character.skills.length > 0)) && world && (
-            <div>
+            <div className="manuscript-character-summary-columns">
               {/* Attributes Column */}
               {character.attributes && character.attributes.length > 0 && (
-                <div>
-                  <h3>Attributes</h3>
-                  <div>
+                <div className="manuscript-character-summary-column">
+                  <h3 className="manuscript-character-summary-subheading">Attributes</h3>
+                  <div className="manuscript-character-summary-list">
                     {character.attributes.map(attr => {
                       const worldAttribute = world.attributes.find(wa => wa.id === attr.worldAttributeId);
                       const displayName = worldAttribute?.name || attr.name;
                       
                       return (
-                        <div key={attr.id} >
-                          <span>{displayName}</span>
-                          <span>({attr.modifiedValue})</span>
+                        <div key={attr.id} className="manuscript-character-summary-item">
+                          <span className="manuscript-character-summary-item-label">{displayName}</span>
+                          <span className="manuscript-character-summary-item-value">({attr.modifiedValue})</span>
                         </div>
                       );
                     })}
@@ -143,17 +144,17 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
 
               {/* Skills Column */}
               {character.skills && character.skills.length > 0 && (
-                <div>
-                  <h3>Skills</h3>
-                  <div>
+                <div className="manuscript-character-summary-column">
+                  <h3 className="manuscript-character-summary-subheading">Skills</h3>
+                  <div className="manuscript-character-summary-list">
                     {character.skills.map(skill => {
                         const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
                         if (!worldSkill) {
                           // Fallback if no world skill found, just show the skill name from character
                           return (
-                            <div key={skill.id} >
-                              <span>{skill.name}</span>
-                              <span>(Level {skill.level})</span>
+                            <div key={skill.id} className="manuscript-character-summary-item">
+                              <span className="manuscript-character-summary-item-label">{skill.name}</span>
+                              <span className="manuscript-character-summary-item-value">(Level {skill.level})</span>
                             </div>
                           );
                         }
@@ -163,11 +164,11 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character, initialE
                         ).filter(Boolean) || [];
 
                         return (
-                          <div key={skill.id} >
-                            <span>{worldSkill.name}</span>
-                            <span>(Level {skill.level})</span>
+                          <div key={skill.id} className="manuscript-character-summary-item manuscript-character-summary-item-stack">
+                            <span className="manuscript-character-summary-item-label">{worldSkill.name}</span>
+                            <span className="manuscript-character-summary-item-value">(Level {skill.level})</span>
                             {linkedAttributes.length > 0 && (
-                              <div>
+                              <div className="manuscript-character-summary-links">
                                 Linked to: {linkedAttributes.join(', ')}
                               </div>
                             )}

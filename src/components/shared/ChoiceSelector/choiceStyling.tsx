@@ -1,23 +1,4 @@
-import React from 'react';
-import { Scale, Flame } from 'lucide-react';
 import { ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
-
-/**
- * Get icon for choice alignment
- */
-export const getAlignmentIcon = (
-  alignment?: ChoiceAlignment
-): React.ReactNode => {
-  switch (alignment) {
-    case 'lawful':
-      return <Scale aria-hidden="true" />;
-    case 'chaotic':
-      return <Flame aria-hidden="true" />;
-    case 'neutral':
-    default:
-      return null;
-  }
-};
 
 /**
  * Get CSS classes for alignment-based styling
@@ -26,7 +7,15 @@ export const getAlignmentClasses = (
   alignment?: ChoiceAlignment,
   isDisabled?: boolean
 ): string => {
-  return '';
+  if (isDisabled) return '';
+  switch (alignment) {
+    case 'lawful':
+      return 'manuscript-suggested-action-lawful';
+    case 'chaotic':
+      return 'manuscript-suggested-action-chaotic';
+    default:
+      return '';
+  }
 };
 
 /**

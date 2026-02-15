@@ -28,11 +28,8 @@ export const Default: Story = {
   args: {
     onToggleCharacterSummary: () => {},
     isCharacterSummaryExpanded: false,
-    leftContent: (
-      <button type="button" className="manuscript-hud-text-button">
-        Back
-      </button>
-    ),
+    onToggleToolsMenu: () => {},
+    isToolsMenuOpen: false,
     rightContent: (
       <div className="manuscript-hud-right-controls">
         <div className="text-[10px] font-system text-muted-foreground mr-2">SAVED</div>
@@ -41,16 +38,7 @@ export const Default: Story = {
         </button>
       </div>
     ),
-    drawerTriggers: (
-      <div className="manuscript-hud-drawer-triggers">
-        <button type="button" className="manuscript-hud-text-button">
-          Journal
-        </button>
-        <button type="button" className="manuscript-hud-text-button">
-          Inventory
-        </button>
-      </div>
-    ),
+    drawerTriggers: true,
   },
 };
 

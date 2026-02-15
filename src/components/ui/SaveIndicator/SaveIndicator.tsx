@@ -45,7 +45,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle error state with ErrorDisplay component
   if (status === 'error') {
     return (
-      <div className={className}>
+      <div className={cssClasses('save-indicator save-indicator-error', className)}>
         <ErrorDisplay
           variant={compact ? 'inline' : 'section'}
           severity="error"
@@ -62,33 +62,37 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle saving state with LoadingState component
   if (status === 'saving') {
     return (
-      <div className={className}>
+      <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
         <LoadingState
           variant="spinner"
           message={compact ? undefined : 'Saving...'}
           inline={true}
           centered={false}
         />
-        {onManualSave && <button disabled={true}>Save Now</button>}
+        {onManualSave && (
+          <button className="save-indicator-button" disabled={true} type="button">
+            Save Now
+          </button>
+        )}
       </div>
     );
   }
 
   // Handle idle/saved states
   return (
-    <div className={className}>
-      <div>
-        <CheckCircle aria-hidden="true" />
+    <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
+      <div className="save-indicator-status">
+        <div className="save-indicator-copy">
+          <span className="save-indicator-text">{getStatusText()}</span>
 
-        <div>
-          <span>{getStatusText()}</span>
-
-          {totalSaves > 0 && !compact && <span>{totalSaves} saves</span>}
+          {totalSaves > 0 && !compact && <span className="save-indicator-meta">{totalSaves} saves</span>}
         </div>
       </div>
 
       {onManualSave && (
-        <button onClick={() => onManualSave('manual')}>Save Now</button>
+        <button className="save-indicator-button" onClick={() => onManualSave('manual')} type="button">
+          Save Now
+        </button>
       )}
     </div>
   );

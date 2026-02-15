@@ -13,19 +13,15 @@ export const ManuscriptActionRail: React.FC<ManuscriptActionRailProps> = ({
   isStreaming = false,
 }) => {
   return (
-    <footer 
+    <footer
       id="manuscript-action-rail"
       className={cssClasses(
-        isStreaming && "manuscript-action-rail-streaming",
+        isStreaming && 'manuscript-action-rail-streaming',
         className
       )}
       data-testid="manuscript-action-rail"
     >
-      <div className="manuscript-input-row">
-        <div className="w-full">
-          {children}
-        </div>
-      </div>
+      {children}
     </footer>
   );
 };
