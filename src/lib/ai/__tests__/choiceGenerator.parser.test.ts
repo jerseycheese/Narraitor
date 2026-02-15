@@ -54,4 +54,40 @@ Hint: Loud but fast`;
     });
     expect(decision.options[1].alignment).toBe('chaotic');
   });
+
+  it('parses bracketed multi-word skill requirements', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      skills: [
+        {
+          id: 'skill-1',
+          worldId: 'world-1',
+          name: 'Lock Picking',
+          description: 'Open locks without keys',
+          difficulty: 'medium',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+        },
+      ],
+    });
+
+    const content = `Decision Weight: [minor]
+Context Summary: A locked service door blocks your path.
+Decision: What do you do?
+
+1. [Neutral] Pick the service door lock
+Hint: Quiet and precise
+Requirements: [Lock Picking 6+]
+2. [Chaotic] Kick the door open`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].requirements?.[0]).toEqual({
+      type: 'skill',
+      targetId: 'skill-1',
+      operator: 'gte',
+      value: 6,
+    });
+  });
 });

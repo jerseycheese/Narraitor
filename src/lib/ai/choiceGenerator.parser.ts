@@ -131,12 +131,13 @@ export const parseChoiceResponse = (
       if (reqMatch) {
         if (currentOption) {
           const reqText = safeTrim(reqMatch[1]);
-          const skillMatch = reqText.match(/^(\w+)\s+(\d+)\+?$/);
+          const skillMatch = reqText.match(/^\[?\s*(.+?)\s+(\d+)\+?\s*\]?$/);
           if (skillMatch) {
-            const skillName = skillMatch[1];
+            const skillName = safeTrim(skillMatch[1]).replace(/\s+/g, ' ');
+            const normalizedSkillName = skillName.toLowerCase();
             const level = parseInt(skillMatch[2]);
             const worldSkill = world.skills?.find(
-              (ws) => ws.name.toLowerCase() === skillName.toLowerCase()
+              (ws) => safeTrim(ws.name).toLowerCase() === normalizedSkillName
             );
 
             if (!worldSkill) {

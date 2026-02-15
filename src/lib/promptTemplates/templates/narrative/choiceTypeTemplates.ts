@@ -74,6 +74,14 @@ REQUIREMENTS:
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
+SKILL REQUIREMENTS (CRITICAL FOR MVP):
+Generate choices with skill requirements when the situation naturally calls for specialized abilities:
+- Analyze the current scene for opportunities where skills would logically apply
+- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+- Include a mix of skill-required and non-skill choices for player agency
+- Vary skill requirements across choices - use different character abilities when possible
+- Format skill requirements as: [SkillName X+] where X is the minimum level
+
 DECISION WEIGHT ANALYSIS:
 Carefully evaluate the narrative situation and determine the significance of this decision:
 - MINOR: Routine choices with limited consequences (casual conversations, basic exploration, everyday interactions)
@@ -89,9 +97,13 @@ Decision: What will you do?
 
 Options:
 1. [LAWFUL] [First choice - follows rules/authority/order]
+   Requirements: [Optional - SkillName X+]
 2. [NEUTRAL] [Second choice - balanced/practical approach]
+   Requirements: [Optional - SkillName X+]
 3. [NEUTRAL] [Third choice - different practical approach]
+   Requirements: [Optional - SkillName X+]
 4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
+   Requirements: [Optional - SkillName X+]
 
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
