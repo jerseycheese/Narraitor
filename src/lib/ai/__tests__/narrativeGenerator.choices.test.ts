@@ -102,7 +102,7 @@ describe('NarrativeGenerator - Player Choices', () => {
         sessionId: 'session-1', // Now includes sessionId from narrativeContext
         minOptions: 3,
         maxOptions: 4,
-        useAlignedChoices: false
+        useAlignedChoices: true
       });
     });
 
@@ -145,6 +145,11 @@ describe('NarrativeGenerator - Player Choices', () => {
       expect(result.options[0].text).toBe("Investigate further");
       expect(result.options[1].text).toBe("Talk to nearby characters");
       expect(result.options[2].text).toBe("Move to a new location");
+      result.options.forEach((option) => {
+        const skillRequirements =
+          option.requirements?.filter((req) => req.type === 'skill') ?? [];
+        expect(skillRequirements.length).toBeGreaterThan(0);
+      });
       expect(result.id).toMatch(/^decision-fallback-\d+$/);
     });
   });

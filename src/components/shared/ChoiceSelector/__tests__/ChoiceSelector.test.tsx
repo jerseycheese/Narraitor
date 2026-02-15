@@ -145,14 +145,14 @@ describe('ChoiceSelector', () => {
     it('shows custom input field when enabled', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
 
-      expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Or write your own action...')).toBeInTheDocument();
     });
 
     it('submits custom input when entered', async () => {
       const user = userEvent.setup();
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
 
-      const input = screen.getByPlaceholderText('Type your custom response...');
+      const input = screen.getByPlaceholderText('Or write your own action...');
       await user.type(input, 'Custom action');
       await user.keyboard('{Enter}');
 
@@ -161,13 +161,15 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill badges with skill names', () => {
+    it('shows skill-name badges without including requirement numbers in option text', () => {
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      // Skill badges should show skill name
-      expect(screen.getByText(/Stealth/)).toBeInTheDocument();
-      expect(screen.getByText(/Intimidation/)).toBeInTheDocument();
+      expect(screen.getByText(/^Stealth$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^Intimidation$/i)).toBeInTheDocument();
+      expect(screen.queryByText(/^Skill$/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Stealth\s*\d+/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Intimidation\s*\d+/i)).not.toBeInTheDocument();
     });
 
     it('limits the number of choices to 3', () => {
@@ -182,6 +184,25 @@ describe('ChoiceSelector', () => {
       };
       renderChoiceSelector({decision: decisionWithManyOptions, onSelect: mockOnSelect});
       expect(screen.queryByText('Option 4')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('radio')).toHaveLength(3);
+    });
+
+    it('keeps a chaotic option visible when choices are capped to 3', () => {
+      const alignedDecision: Decision = {
+        id: 'decision-aligned',
+        prompt: 'How do you respond?',
+        options: [
+          { id: 'lawful-opt', text: 'Follow protocol', alignment: 'lawful' },
+          { id: 'neutral-opt-1', text: 'Assess risks', alignment: 'neutral' },
+          { id: 'neutral-opt-2', text: 'Observe quietly', alignment: 'neutral' },
+          { id: 'chaotic-opt', text: 'Trigger a loud distraction', alignment: 'chaotic' },
+        ],
+      };
+
+      renderChoiceSelector({ decision: alignedDecision, onSelect: mockOnSelect });
+
+      expect(screen.getByText('Follow protocol')).toBeInTheDocument();
+      expect(screen.getByText('Trigger a loud distraction')).toBeInTheDocument();
       expect(screen.getAllByRole('radio')).toHaveLength(3);
     });
 
@@ -283,7 +304,7 @@ describe('ChoiceSelector', () => {
   describe('Manuscript Styling Contract', () => {
     it('uses manuscript-input id for custom input', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
-      const input = screen.getByPlaceholderText('Type your custom response...');
+      const input = screen.getByPlaceholderText('Or write your own action...');
       expect(input).toHaveAttribute('id', 'manuscript-input');
     });
 

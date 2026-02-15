@@ -147,5 +147,118 @@ describe('ChoiceGenerator', () => {
       expect(result.options.length).toBeGreaterThan(0);
       expect(result.prompt).toBeTruthy();
     });
+
+    it('ensures every returned option has a skill requirement', async () => {
+      const { useWorldStore } = require('@/state/worldStore');
+      (useWorldStore.getState as jest.Mock).mockReturnValue({
+        worlds: {
+          'world-1': {
+            id: 'world-1',
+            name: 'Test World',
+            description: 'A test world for unit tests',
+            genre: 'fantasy',
+            attributes: [],
+            settings: {
+              maxAttributes: 6,
+              maxSkills: 12,
+              attributePointPool: 27,
+              skillPointPool: 40,
+            },
+            skills: [
+              {
+                id: 'skill-stealth',
+                worldId: 'world-1',
+                name: 'Stealth',
+                description: 'Move unseen',
+                difficulty: 'medium',
+                baseValue: 3,
+                minValue: 1,
+                maxValue: 10,
+              },
+              {
+                id: 'skill-magic',
+                worldId: 'world-1',
+                name: 'Magic',
+                description: 'Arcane knowledge',
+                difficulty: 'hard',
+                baseValue: 3,
+                minValue: 1,
+                maxValue: 10,
+              },
+            ],
+          },
+        },
+        currentWorldId: 'world-1',
+      });
+
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+        
+Options:
+1. Move quietly through the trees
+2. Search the nearby ruins
+3. Signal your allies from cover`,
+        finishReason: 'STOP',
+      });
+
+      const result = await choiceGenerator.generateChoices({
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(result.options.length).toBe(3);
+      result.options.forEach((option) => {
+        const skillRequirements =
+          option.requirements?.filter((req) => req.type === 'skill') ?? [];
+        expect(skillRequirements.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('ensures every returned option has a skill requirement when world has no skills', async () => {
+      const { useWorldStore } = require('@/state/worldStore');
+      (useWorldStore.getState as jest.Mock).mockReturnValue({
+        worlds: {
+          'world-1': {
+            id: 'world-1',
+            name: 'Test World',
+            description: 'A test world for unit tests',
+            genre: 'fantasy',
+            attributes: [],
+            settings: {
+              maxAttributes: 6,
+              maxSkills: 12,
+              attributePointPool: 27,
+              skillPointPool: 40,
+            },
+            skills: [],
+          },
+        },
+        currentWorldId: 'world-1',
+      });
+
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+
+Options:
+1. Move quietly through the trees
+2. Search the nearby ruins
+3. Signal your allies from cover`,
+        finishReason: 'STOP',
+      });
+
+      const result = await choiceGenerator.generateChoices({
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(result.options.length).toBe(3);
+      result.options.forEach((option) => {
+        const skillRequirements =
+          option.requirements?.filter((req) => req.type === 'skill') ?? [];
+        expect(skillRequirements.length).toBeGreaterThan(0);
+      });
+    });
   });
 });
