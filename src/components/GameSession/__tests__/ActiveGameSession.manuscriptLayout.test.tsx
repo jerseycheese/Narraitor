@@ -32,9 +32,10 @@ jest.mock('../ActiveGameSessionNarrativeColumn', () => ({
 
 jest.mock('../ActiveGameSessionChoicesColumn', () => ({
   __esModule: true,
-  default: ({ inputActions }: { inputActions?: React.ReactNode }) => (
+  default: ({ inputActions, endStoryAction }: { inputActions?: React.ReactNode; endStoryAction?: React.ReactNode }) => (
     <div data-testid="choices-column">
       {inputActions}
+      {endStoryAction}
     </div>
   ),
 }));
@@ -169,7 +170,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(hudToggle).toBeEnabled();
   });
 
-  it('renders session control buttons in the action rail', async () => {
+  it('renders session control buttons in the action rail when progressive disclosure is ON', async () => {
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -179,6 +181,9 @@ describe('ActiveGameSession Manuscript Layout', () => {
     );
 
     expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
+    expect(await screen.findByTestId('choices-column')).toBeInTheDocument();
+    
+    // In JSDOM, CSS visibility doesn't hide elements from getByRole unless we're using a real browser or specific setup
     expect(screen.getByRole('button', { name: /end session/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /end story/i })).toBeInTheDocument();
   });
@@ -291,10 +296,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.queryByText(/inventory/i)).not.toBeInTheDocument();
     });
 
-    it('shows Tools menu when flag is ON', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('shows Tools menu when flag is ON', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -306,10 +314,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByRole('button', { name: /toggle tools menu/i })).toBeInTheDocument();
     });
 
-    it('opens character drawer from Tools menu when trigger is clicked (flag ON)', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('opens character drawer from Tools menu when trigger is clicked (flag ON)', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -330,10 +341,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByText('Character Sheet')).toBeInTheDocument();
     });
 
-    it('renders suggested actions in margin when flag is ON', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('renders suggested actions in margin when flag is ON', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -347,10 +361,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(aside).toHaveClass('manuscript-characters-rail');
     });
 
-    it('toggles Tools menu when Tools button is clicked', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('toggles Tools menu when Tools button is clicked', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -372,10 +389,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
     });
 
-    it('opens Character Details drawer from Tools menu', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('opens Character Details drawer from Tools menu', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -392,10 +412,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(await screen.findByText('Character Sheet')).toBeInTheDocument();
     });
 
-    it('opens multiple drawer types from Tools menu', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('opens multiple drawer types from Tools menu', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -416,10 +439,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByText('Character Sheet')).toBeInTheDocument();
     });
 
-    it('closes Tools menu when opening a drawer', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('closes Tools menu when opening a drawer', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -441,10 +467,13 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(await screen.findByText('Inventory')).toBeInTheDocument();
     });
 
-    it('closes drawer with Escape key', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+        it('closes drawer with Escape key', async () => {
 
-      render(
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -468,7 +497,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
     });
 
     it('opens Journal Snapshot drawer from Tools menu', async () => {
-      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
 
       (useJournalStore as unknown as jest.Mock).mockImplementation((selector) => {
         const state = {

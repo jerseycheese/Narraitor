@@ -302,22 +302,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // - Action rail primary ChoicesColumn: full choices + prompt (mobile only via lg:hidden)
   // - Action rail secondary ChoicesColumn: custom input only (desktop only via hidden lg:block)
   const sessionActions = !isSessionEnded(sessionId) && (
-    <>
-      <button
-        type="button"
-        onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
-        className="manuscript-warning-action-button"
-      >
-        End Session
-      </button>
-      <button
-        type="button"
-        onClick={handleEndStoryClick}
-        className="manuscript-warning-action-button"
-      >
-        End Story
-      </button>
-    </>
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
+      className="manuscript-warning-action-button"
+    >
+      End Session
+    </button>
+  );
+
+  const endStoryAction = !isSessionEnded(sessionId) && (
+    <button
+      type="button"
+      onClick={handleEndStoryClick}
+      className="manuscript-warning-action-button"
+    >
+      End Story
+    </button>
   );
 
   return (
@@ -398,6 +399,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onChoiceSelected={handleChoiceSelected}
               onCustomSubmit={handleCustomSubmit}
               inputActions={sessionActions}
+              endStoryAction={endStoryAction}
               endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
                 reason: endingSuggestionReason,
                 onAccept: handleAcceptEndingSuggestion,

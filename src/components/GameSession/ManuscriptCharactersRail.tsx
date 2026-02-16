@@ -29,7 +29,7 @@ export const ManuscriptCharactersRail: React.FC<ManuscriptCharactersRailProps> =
   }
 
   const participantContent = participants.map((participant) => (
-    <div
+    <span
       key={participant.id}
       className="manuscript-character-badge"
     >
@@ -42,7 +42,7 @@ export const ManuscriptCharactersRail: React.FC<ManuscriptCharactersRailProps> =
         />
       )}
       <span className="manuscript-character-name">{participant.name}</span>
-    </div>
+    </span>
   ));
 
   if (variant === 'mobile-bar') {
