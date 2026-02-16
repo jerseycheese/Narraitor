@@ -650,7 +650,8 @@ body.manuscript-overlay-open {
 }
 
 .hide-mobile-actions .manuscript-suggested-actions-section,
-.hide-mobile-actions .manuscript-choice-prompt {
+.hide-mobile-actions .manuscript-choice-prompt,
+.hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
   display: none !important;
 }
 
