@@ -122,9 +122,27 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
   // Get the latest narrative segment for the characters rail
+  // We look for the most recent segment that actually has participants, matching prototype logic
+  const latestSegmentWithParticipants = useNarrativeStore((state) => {
+    const segmentIds = state.sessionSegments[sessionId] || [];
+    if (segmentIds.length === 0) return null;
+    
+    // Search backwards for a segment with characters
+    for (let i = segmentIds.length - 1; i >= 0; i--) {
+      const segment = state.segments[segmentIds[i]];
+      if (segment && (segment.characterIds?.length > 0 || segment.metadata?.characterIds?.length > 0)) {
+        return segment;
+      }
+    }
+    
+    // Fallback to absolute latest segment
+    return state.segments[segmentIds[segmentIds.length - 1]] || null;
+  });
+
   const latestSegment = useNarrativeStore((state) => {
-    const segments = state.sessionSegments[sessionId];
-    return segments && segments.length > 0 ? segments[segments.length - 1] : null;
+    const segmentIds = state.sessionSegments[sessionId];
+    const latestId = segmentIds && segmentIds.length > 0 ? segmentIds[segmentIds.length - 1] : null;
+    return latestId ? state.segments[latestId] : null;
   });
 
   const hasExistingNarrative = segmentCount > 0;
@@ -361,9 +379,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           }
         />
       }
-      marginContent={isProgressiveDisclosureEnabled && (
-        <ManuscriptCharactersRail segment={latestSegment} />
-      )}
+      marginContent={isProgressiveDisclosureEnabled && latestSegmentWithParticipants ? (
+        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
+      ) : null}
       actionRail={
         <ManuscriptActionRail isStreaming={isGenerating || isGeneratingChoices}>
           <div className="manuscript-action-rail-stack">
@@ -391,7 +409,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       }
     >
       {isProgressiveDisclosureEnabled && (
-        <ManuscriptCharactersRail segment={latestSegment} variant="mobile-bar" />
+        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
       )}
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}

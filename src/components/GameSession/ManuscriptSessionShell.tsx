@@ -58,13 +58,15 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main">
             <div className="manuscript-main-stage manuscript-main-stage-mobile-stack">
-              <aside
-                className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
-                aria-label="Characters present"
-                ref={railRef}
-              >
-                {marginContent}
-              </aside>
+              {marginContent && (
+                <aside
+                  className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
+                  aria-label="Characters present"
+                  ref={railRef}
+                >
+                  {marginContent}
+                </aside>
+              )}
 
               <div className="manuscript-main-content">
                 <div className="max-w-3xl mx-auto">

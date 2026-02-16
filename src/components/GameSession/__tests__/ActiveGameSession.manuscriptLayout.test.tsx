@@ -66,7 +66,10 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
     // Setup store mocks
     const mockNarrativeState = {
-      sessionSegments: { [mockSessionId]: [{ id: 'seg-1', text: 'Story starts...' }] },
+      segments: {
+        'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: [] },
+      },
+      sessionSegments: { [mockSessionId]: ['seg-1'] },
       currentEnding: null,
       isGeneratingEnding: false,
       isSessionEnded: () => false,
