@@ -51,6 +51,13 @@ a[href="#main-content"]:focus {
   scroll-snap-stop: always;
 }
 
+/* Layout Utilities (Tailwind-compatible naming for manuscript support) */
+.max-w-3xl { max-width: 48rem; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-xl { max-width: 36rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.w-full { width: 100%; }
+
 /* Narrative Content Styling for Readable Storytelling */
 .text-narrative {
   font-family: var(--font-narrative);
@@ -644,12 +651,6 @@ body.manuscript-overlay-open {
 
   .manuscript-main-content {
     grid-column: 2;
-  }
-
-  .manuscript-main-content-inner {
-    max-width: 48rem; /* Equivalent to max-w-3xl */
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .manuscript-rail-spacer {
