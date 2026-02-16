@@ -7,7 +7,6 @@ import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
-import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
@@ -34,6 +33,7 @@ import {
   ChoiceHistoryDrawerContent,
   ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
+import { CharacterSnapshot } from './CharacterSnapshot';
 import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 
@@ -311,7 +311,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             setIsCharacterSummaryExpanded(false);
           }}
           isToolsMenuOpen={isToolsMenuOpen}
-          characterSummaryPanel={character && <CharacterSummary character={character} />}
+          characterSummaryPanel={character && <CharacterSnapshot character={character} />}
           toolsMenuPanel={isProgressiveDisclosureEnabled && (
             <ToolsMenuPanelContent
               activeDrawer={activeDrawer}
@@ -433,6 +433,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                   : activeDrawer === 'choice-history'
                     ? 'Choice History'
                     : ''
+          }
+          subtitle={
+            activeDrawer === 'character'
+              ? character?.name
+              : activeDrawer === 'inventory'
+                ? `Items for ${character?.name}`
+                : activeDrawer === 'story-summary' || activeDrawer === 'choice-history'
+                  ? `Session ${sessionId.slice(0, 8)}`
+                  : undefined
           }
         >
           {activeDrawer === 'character' && character && (

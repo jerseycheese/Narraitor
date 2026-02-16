@@ -15,6 +15,7 @@ interface ManuscriptDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   side?: 'left' | 'right';
 }
@@ -23,6 +24,7 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
   open,
   onOpenChange,
   title,
+  subtitle,
   children,
   side = 'right',
 }) => {
@@ -56,9 +58,14 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
           )}
         >
           <div className="manuscript-drawer-header">
-            <DialogTitle className="manuscript-drawer-title">
-              {title}
-            </DialogTitle>
+            <div className="manuscript-drawer-header-titles">
+              <DialogTitle className="manuscript-drawer-title">
+                {title}
+              </DialogTitle>
+              {subtitle && (
+                <p className="manuscript-drawer-subtitle">{subtitle}</p>
+              )}
+            </div>
             <DialogClose className="manuscript-drawer-close-text">
               Close
             </DialogClose>

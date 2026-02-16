@@ -15,7 +15,7 @@ interface CharacterDrawerContentProps {
 export const CharacterDrawerContent: React.FC<CharacterDrawerContentProps> = ({ character }) => {
   return (
     <div className="manuscript-drawer-panel-section">
-      <CharacterSummary character={character} initialExpanded={true} />
+      <CharacterSummary character={character} variant="drawer" />
     </div>
   );
 };
@@ -95,7 +95,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
   return (
     <>
-      <div className="manuscript-tools-menu-heading">Tools</div>
+      <div className="manuscript-hud-panel-title">Tools</div>
 
       <div className="manuscript-tools-menu-items">
         {drawerButtons.map((button) => (

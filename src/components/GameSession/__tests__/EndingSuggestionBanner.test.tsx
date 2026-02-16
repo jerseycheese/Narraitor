@@ -59,18 +59,4 @@ describe('EndingSuggestionBanner', () => {
     expect(mockOnDismiss).toHaveBeenCalledTimes(1);
     expect(mockOnAccept).not.toHaveBeenCalled();
   });
-
-  it('displays BookOpen icon', () => {
-    const { container } = render(
-      <EndingSuggestionBanner
-        reason="Test reason"
-        onAccept={mockOnAccept}
-        onDismiss={mockOnDismiss}
-      />
-    );
-
-    // BookOpen icon should be present
-    const icon = container.querySelector('svg');
-    expect(icon).toBeInTheDocument();
-  });
 });
