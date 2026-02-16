@@ -262,6 +262,15 @@ body > * {
   --lore-rules-border: 32 95% 44%; /* amber-500 */
   --lore-rules-text: 21 90% 31%; /* amber-700 */
 
+  /* Choice alignment colors */
+  --alignment-lawful-bg: 213 100% 96%; /* indigo-50: #eef2ff */
+  --alignment-lawful-border: 221 91% 91%; /* indigo-100: #e0e7ff */
+  --alignment-lawful-text: 224 76% 48%; /* indigo-600: #4f46e5 */
+
+  --alignment-chaotic-bg: 33 100% 96%; /* orange-50: #fff7ed */
+  --alignment-chaotic-border: 32 98% 83%; /* orange-200: #fed7aa */
+  --alignment-chaotic-text: 20 91% 48%; /* orange-600: #ea580c */
+
   /* Overlay surfaces and scrims */
   --color-overlay-surface: rgb(255 255 255 / 90%);
   --color-overlay-surface-strong: rgb(255 255 255 / 95%);
@@ -354,6 +363,15 @@ body > * {
   --lore-rules-bg: 25.5 95% 7.1%; /* amber-950 */
   --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */
   --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
+
+  /* Choice alignment colors (dark mode) */
+  --alignment-lawful-bg: 226 71% 10%; /* indigo-950: #1e1b4b */
+  --alignment-lawful-border: 226 57% 21%; /* indigo-900: #312e81 */
+  --alignment-lawful-text: 226 100% 80%; /* indigo-300: #a5b4fc */
+
+  --alignment-chaotic-bg: 24 83% 10%; /* orange-950: #431407 */
+  --alignment-chaotic-border: 20 95% 25%; /* orange-800: #9a3412 */
+  --alignment-chaotic-text: 31 97% 72%; /* orange-300: #fdba74 */
 
   /* Overlay surfaces and scrims */
   --color-overlay-surface: rgb(24 24 27 / 90%);
@@ -1199,15 +1217,15 @@ body.manuscript-overlay-open {
 
 
 .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-lawful {
-  background: #EEF2FF;
-  border-color: #C7D2FE;
-  color: #1E3A8A;
+  background: hsl(var(--alignment-lawful-bg));
+  border-color: hsl(var(--alignment-lawful-border));
+  color: hsl(var(--alignment-lawful-text));
 }
 
-  .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-chaotic {
-  background: #FFF7ED;
-  border-color: #FDBA74;
-  color: #9A3412;
+.manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+  background: hsl(var(--alignment-chaotic-bg));
+  border-color: hsl(var(--alignment-chaotic-border));
+  color: hsl(var(--alignment-chaotic-text));
 }
 
 /* Journal Snapshot Drawer */
