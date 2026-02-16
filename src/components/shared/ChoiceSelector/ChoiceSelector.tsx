@@ -240,17 +240,21 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     aria-checked={option.isSelected}
                     role="radio"
                   >
-                    <span className="manuscript-suggested-action-label">{option.text}</span>
-                    
-                    <div className="manuscript-suggested-action-badges">
-                      <SkillRequirementBadges
-                        requirements={option.skillRequirements || []}
-                        optionId={option.id}
-                      />
-                      <ItemRequirementBadges
-                        groups={option.itemRequirementGroups || []}
-                        optionId={option.id}
-                      />
+                    <div className="manuscript-suggested-action-content">
+                      <div className="manuscript-suggested-action-title-row">
+                        <span className="manuscript-suggested-action-label">{option.text}</span>
+                      </div>
+                      
+                      <div className="manuscript-suggested-action-badges">
+                        <SkillRequirementBadges
+                          requirements={option.skillRequirements || []}
+                          optionId={option.id}
+                        />
+                        <ItemRequirementBadges
+                          groups={option.itemRequirementGroups || []}
+                          optionId={option.id}
+                        />
+                      </div>
                     </div>
                   </Button>
                 );

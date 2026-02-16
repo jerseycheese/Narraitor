@@ -57,9 +57,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main">
-            <div className="manuscript-main-stage">
+            <div className="manuscript-main-stage manuscript-main-stage-mobile-stack">
               <aside
-                className="manuscript-characters-rail"
+                className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
                 aria-label="Characters present"
                 ref={railRef}
               >

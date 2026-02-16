@@ -5,8 +5,10 @@ import CharacterSummary from './CharacterSummary';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
+import { useJournalStore } from '@/state/journalStore';
 import { EntityID } from '@/types/common.types';
 import { Character } from '@/state/characterStore';
+import { titleCase, capitalize } from '@/lib/utils';
 
 interface CharacterDrawerContentProps {
   character: Character;
@@ -68,7 +70,84 @@ export const ChoiceHistoryDrawerContent: React.FC<ChoiceHistoryDrawerContentProp
   );
 };
 
-type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history';
+interface JournalSnapshotDrawerContentProps {
+  sessionId: string;
+}
+
+const JOURNAL_SNAPSHOT_LIMIT = 5;
+
+const formatEntryHeading = (title: string, type: string): string => {
+  if (title.trim().length > 0) {
+    return title;
+  }
+  return titleCase(type.replace(/_/g, ' '));
+};
+
+const formatEntryTimestamp = (createdAt: string): string => {
+  const parsedDate = new Date(createdAt);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return createdAt;
+  }
+  return parsedDate.toLocaleString();
+};
+
+export const JournalSnapshotDrawerContent: React.FC<JournalSnapshotDrawerContentProps> = ({
+  sessionId,
+}) => {
+  const entries = useJournalStore((state) => state.getSessionEntries(sessionId));
+  const snapshotEntries = entries.slice(0, JOURNAL_SNAPSHOT_LIMIT);
+
+  return (
+    <div className="manuscript-drawer-panel-section">
+      {snapshotEntries.length === 0 ? (
+        <p className="manuscript-journal-snapshot-empty">
+          No journal entries found for this session.
+        </p>
+      ) : (
+        <div className="manuscript-journal-snapshot-list">
+          {snapshotEntries.map((entry) => {
+            const relatedLabel = entry.relatedEntities
+              .map((entity) => entity.name)
+              .filter(Boolean)
+              .join(', ');
+
+            return (
+              <article key={entry.id} className="manuscript-journal-snapshot-entry">
+                <div className="manuscript-journal-snapshot-header">
+                  <h4 className="manuscript-journal-snapshot-title">
+                    {formatEntryHeading(entry.title, entry.type)}
+                  </h4>
+                  <div className="manuscript-journal-snapshot-badges">
+                    {!entry.isRead && (
+                      <span className="manuscript-journal-snapshot-badge manuscript-journal-snapshot-badge-new">
+                        New
+                      </span>
+                    )}
+                    <span className="manuscript-journal-snapshot-badge">
+                      {capitalize(entry.significance)}
+                    </span>
+                  </div>
+                </div>
+                <p className="manuscript-journal-snapshot-content">{entry.content}</p>
+                <div className="manuscript-journal-snapshot-meta">
+                  <span>{formatEntryTimestamp(entry.createdAt)}</span>
+                  {relatedLabel && <span>{relatedLabel}</span>}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+type DrawerType =
+  | 'character'
+  | 'inventory'
+  | 'story-summary'
+  | 'choice-history'
+  | 'journal';
 
 interface ToolsMenuPanelContentProps {
   activeDrawer: DrawerType | null;
@@ -91,6 +170,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
     { id: 'inventory', label: 'Inventory' },
     { id: 'story-summary', label: 'Story So Far' },
     { id: 'choice-history', label: 'Choice History' },
+    { id: 'journal', label: 'Journal Snapshot' },
   ];
 
   return (

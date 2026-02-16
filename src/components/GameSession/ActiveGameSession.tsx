@@ -31,13 +31,14 @@ import {
   InventoryDrawerContent,
   StorySummaryDrawerContent,
   ChoiceHistoryDrawerContent,
+  JournalSnapshotDrawerContent,
   ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 
-type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history';
+type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -428,21 +429,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               ? 'Character Sheet'
               : activeDrawer === 'inventory'
                 ? 'Inventory'
-                : activeDrawer === 'story-summary'
-                  ? 'Story So Far'
-                  : activeDrawer === 'choice-history'
-                    ? 'Choice History'
-                    : ''
-          }
-          subtitle={
-            activeDrawer === 'character'
-              ? character?.name
-              : activeDrawer === 'inventory'
-                ? `Items for ${character?.name}`
-                : activeDrawer === 'story-summary' || activeDrawer === 'choice-history'
-                  ? `Session ${sessionId.slice(0, 8)}`
-                  : undefined
-          }
+                              : activeDrawer === 'story-summary'
+                                ? 'Story So Far'
+                                : activeDrawer === 'choice-history'
+                                  ? 'Choice History'
+                                  : activeDrawer === 'journal'
+                                    ? 'Journal Snapshot'
+                                    : ''
+                          }
+                          subtitle={
+                            activeDrawer === 'character'
+                              ? character?.name
+                              : activeDrawer === 'inventory'
+                                ? `Items for ${character?.name}`
+                                : activeDrawer === 'story-summary' || activeDrawer === 'choice-history' || activeDrawer === 'journal'
+                                  ? `Session ${sessionId.slice(0, 8)}`
+                                  : undefined
+                          }
+                
         >
           {activeDrawer === 'character' && character && (
             <CharacterDrawerContent character={character} />
@@ -459,6 +463,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
           {activeDrawer === 'choice-history' && (
             <ChoiceHistoryDrawerContent sessionId={sessionId} />
+          )}
+          {activeDrawer === 'journal' && (
+            <JournalSnapshotDrawerContent sessionId={sessionId} />
           )}
         </ManuscriptDrawer>
       )}

@@ -4,7 +4,6 @@ import React from 'react';
 import type { Character } from '@/state/characterStore';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { Button } from '@/components/ui/button';
@@ -82,16 +81,46 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       )}
 
       {/* Manual End Story Confirmation */}
-      <ConfirmationDialog
-        isOpen={showEndConfirmation}
-        onConfirm={onConfirmEndStory}
-        onClose={onCloseEndStory}
-        title="End Story"
-        message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
-        variant="warning"
-        confirmText="End Story"
-        cancelText="Cancel"
-      />
+      {showEndConfirmation && (
+        <div 
+          className="manuscript-end-story-backdrop"
+          onClick={onCloseEndStory}
+          role="presentation"
+        >
+          <div 
+            className="manuscript-end-story-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="end-story-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="manuscript-end-story-header">
+              <h2 id="end-story-title" className="manuscript-end-story-title">End Story</h2>
+            </div>
+            
+            <div className="manuscript-end-story-body">
+              <p className="manuscript-end-story-message">
+                Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone.
+              </p>
+            </div>
+            
+            <div className="manuscript-end-story-footer">
+              <button 
+                className="manuscript-end-story-cancel"
+                onClick={onCloseEndStory}
+              >
+                Cancel
+              </button>
+              <button 
+                className="manuscript-end-story-confirm"
+                onClick={onConfirmEndStory}
+              >
+                Confirm End Story
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

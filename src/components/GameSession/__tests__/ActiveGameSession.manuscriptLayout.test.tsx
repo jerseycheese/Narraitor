@@ -5,6 +5,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useJournalStore } from '@/state/journalStore';
 import { useTutorial } from '@/components/TutorialProvider';
 import { useRouter } from 'next/navigation';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -15,6 +16,7 @@ jest.mock('@/state/narrativeStore');
 jest.mock('@/state/sessionStore');
 jest.mock('@/state/characterStore');
 jest.mock('@/state/inventoryStore');
+jest.mock('@/state/journalStore');
 jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
 jest.mock('@/lib/featureFlags');
@@ -91,6 +93,14 @@ describe('ActiveGameSession Manuscript Layout', () => {
         itemsObject: {},
       })
     );
+
+    (useJournalStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        getSessionEntries: () => [],
+        addEntry: jest.fn(),
+      };
+      return selector ? selector(state) : state;
+    });
 
     (useTutorial as jest.Mock).mockReturnValue({
       startTour: jest.fn(),
@@ -452,6 +462,49 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
       // Verify drawer is closed
       expect(screen.queryByText('Character Sheet')).not.toBeInTheDocument();
+    });
+
+    it('opens Journal Snapshot drawer from Tools menu', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+      (useJournalStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const state = {
+          addEntry: jest.fn(),
+          getSessionEntries: () => [
+            {
+              id: 'entry-1',
+              sessionId: mockSessionId,
+              worldId: mockWorldId,
+              characterId: mockCharacterId,
+              type: 'decision',
+              title: 'A difficult turn',
+              content: 'You accepted the archivist bargain.',
+              significance: 'major',
+              isRead: false,
+              relatedEntities: [],
+              metadata: { tags: [], automaticEntry: false },
+              createdAt: '2026-02-16T12:00:00.000Z',
+              updatedAt: '2026-02-16T12:00:00.000Z',
+            },
+          ],
+        };
+        return selector ? selector(state) : state;
+      });
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+      fireEvent.click(screen.getByRole('button', { name: /journal snapshot/i }));
+
+      expect(await screen.findByText('Journal Snapshot')).toBeInTheDocument();
+      expect(screen.getByText('A difficult turn')).toBeInTheDocument();
     });
   });
 });

@@ -98,4 +98,19 @@ describe('ManuscriptSessionShell', () => {
     const header = shell.querySelector('.manuscript-overlay-header');
     expect(header).toBeInTheDocument();
   });
+
+  it('applies mobile-first stack classes to the main stage and character rail', () => {
+    render(
+      <ManuscriptSessionShell marginContent={<div data-testid="margin">Margin</div>}>
+        <div>Main Content</div>
+      </ManuscriptSessionShell>
+    );
+
+    const shell = screen.getByTestId('manuscript-session-shell');
+    const mainStage = shell.querySelector('.manuscript-main-stage');
+    const characterRail = shell.querySelector('.manuscript-characters-rail');
+
+    expect(mainStage).toHaveClass('manuscript-main-stage-mobile-stack');
+    expect(characterRail).toHaveClass('manuscript-characters-rail-mobile-stack');
+  });
 });

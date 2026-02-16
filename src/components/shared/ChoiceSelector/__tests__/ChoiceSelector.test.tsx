@@ -319,5 +319,12 @@ describe('ChoiceSelector', () => {
       const choiceButton = screen.getByText('Attack').closest('button');
       expect(choiceButton).toHaveClass('manuscript-suggested-action');
     });
+
+    it('uses manuscript suggested-action content wrappers', () => {
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect});
+      const choiceButton = screen.getByText('Attack').closest('button');
+      expect(choiceButton?.querySelector('.manuscript-suggested-action-content')).toBeInTheDocument();
+      expect(choiceButton?.querySelector('.manuscript-suggested-action-title-row')).toBeInTheDocument();
+    });
   });
 });
