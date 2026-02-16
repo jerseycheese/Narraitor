@@ -60,9 +60,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
 
-  // Count only non-custom-input choices for the toggle button
-  const choiceCount = currentDecision?.options?.filter(opt => !opt.isCustomInput).length || 0;
-
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
       <div className="player-choices-container" data-tutorial={dataTutorial}>
@@ -75,7 +72,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
               aria-expanded={showSuggestedActions}
               onClick={() => setShowSuggestedActions(!showSuggestedActions)}
             >
-              {showSuggestedActions ? 'Hide' : 'Suggested Actions'} {choiceCount > 0 && `(${choiceCount})`}
+              {showSuggestedActions ? 'Hide Suggested Actions' : 'Suggested Actions'}
             </button>
             {endStoryAction}
           </div>

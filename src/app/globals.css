@@ -230,7 +230,12 @@ body > * {
   --warning-background: 43 76% 83%; /* amber-200 */
   --warning-border: 43 76% 83%; /* amber-200 */
   --warning-muted: 43 76% 83%; /* amber-200 */
-  
+
+  /* Manuscript warning button colors */
+  --color-warning: rgb(146 64 14); /* amber-800 */
+  --color-warning-soft: rgba(146, 64, 14, 0.14); /* amber-800 with 14% opacity */
+  --color-warning-border: rgba(146, 64, 14, 0.5); /* amber-800 with 50% opacity */
+
   --info: 217 91% 60%; /* blue-500 */
   --info-foreground: 210 40% 98%;
   --info-text: 224 76% 25%; /* blue-700 */
@@ -332,7 +337,12 @@ body > * {
   --warning-background: 25.5 95% 7.1%; /* amber-950 */
   --warning-border: 32.1 94.6% 23.7%; /* amber-800 */
   --warning-muted: 25.5 83.3% 14.7%; /* amber-900 */
-  
+
+  /* Manuscript warning button colors (dark mode) */
+  --color-warning: rgb(251 191 36); /* amber-400 */
+  --color-warning-soft: rgba(251, 191, 36, 0.14); /* amber-400 with 14% opacity */
+  --color-warning-border: rgba(251, 191, 36, 0.5); /* amber-400 with 50% opacity */
+
   --info: 213.1 93.9% 67.8%; /* blue-400 */
   --info-foreground: 222.2 84% 4.9%;
   --info-text: 213.1 93.9% 67.8%; /* blue-400 */
