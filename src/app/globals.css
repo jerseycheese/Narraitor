@@ -1770,6 +1770,164 @@ body.manuscript-overlay-open {
   color: var(--color-text-muted);
 }
 
+/* Manuscript Inventory Styling */
+.manuscript-inventory-category-group {
+  margin-bottom: 2rem;
+}
+
+.manuscript-inventory-category-title {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.manuscript-inventory-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .manuscript-inventory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.manuscript-inventory-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  transition: border-color 0.15s ease;
+}
+
+.manuscript-inventory-item:hover {
+  border-color: var(--color-border-strong);
+}
+
+.manuscript-inventory-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.manuscript-inventory-item-name {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.manuscript-inventory-item-quantity {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.manuscript-inventory-item-description {
+  font-family: var(--font-narrative);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.manuscript-inventory-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--color-border);
+}
+
+.manuscript-inventory-item-category {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.manuscript-inventory-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Manuscript Choice History Styling */
+.manuscript-choice-history-entry {
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+
+.manuscript-choice-history-entry:last-child {
+  margin-bottom: 0;
+}
+
+.manuscript-choice-history-choice {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.manuscript-choice-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.manuscript-choice-history-meta-item {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.manuscript-choice-history-outcome {
+  font-family: var(--font-narrative);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  border-left: 2px solid var(--color-border);
+  padding-left: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.manuscript-choice-history-details {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  padding: 0.75rem;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  border: 1px dashed var(--color-border);
+}
+
+
+
 .save-indicator {
   display: inline-flex;
   align-items: center;

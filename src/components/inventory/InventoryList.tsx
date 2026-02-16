@@ -5,8 +5,6 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { InventoryItem } from '@/types/inventory.types';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
@@ -16,11 +14,6 @@ import {
 } from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
-import {
-  InventoryViewToggle,
-  type InventoryViewMode,
-} from './InventoryViewToggle';
-import { InventoryTable } from './InventoryTable';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
 import { DropConfirmationDialog } from './DropConfirmationDialog';
 
@@ -72,22 +65,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<InventoryViewMode>(() => {
-    // Load preference from localStorage
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('inventory-view-mode');
-      return (saved as InventoryViewMode) || 'grid';
-    }
-    return 'grid';
-  });
-
-  // Persist view mode preference
-  const handleViewModeChange = (mode: InventoryViewMode) => {
-    setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('inventory-view-mode', mode);
-    }
-  };
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {
@@ -150,140 +127,86 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       role="region"
       aria-label="Character inventory"
     >
-      {/* View Toggle */}
-      <div>
-        <InventoryViewToggle
-          mode={viewMode}
-          onModeChange={handleViewModeChange}
-        />
-      </div>
-
       {/* Feedback message */}
       {errorFeedback && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{errorFeedback}</AlertDescription>
         </Alert>
       )}
 
-      {/* Table View */}
-      {viewMode === 'table' ? (
-        <InventoryTable characterId={characterId} />
-      ) : (
-        /* Grid View */
-        <>
-          {populatedCategories.map((categoryId) => {
-            const categoryItems = itemsByCategory[categoryId];
-            const metadata = getCategoryMetadata(categoryId);
-            const categoryName = metadata?.name || categoryId;
-            const categoryDescription = metadata?.description;
+      {/* Grid View - Aligned with Manuscript Design */}
+      <div className="space-y-8">
+        {populatedCategories.map((categoryId) => {
+          const categoryItems = itemsByCategory[categoryId];
+          const metadata = getCategoryMetadata(categoryId);
+          const categoryName = metadata?.name || categoryId;
 
-            return (
-              <section
-                key={categoryId}
-                className="category-group"
-                aria-labelledby={`category-${categoryId}`}
-              >
-                {/* Category Header with visual separation */}
-                <div>
-                  <h3 id={`category-${categoryId}`}>{categoryName}</h3>
-                  <p>
-                    {categoryItems.length}{' '}
-                    {categoryItems.length === 1 ? 'item' : 'items'}
-                    {categoryDescription && (
-                      <span> - {categoryDescription}</span>
+          return (
+            <section
+              key={categoryId}
+              className="manuscript-inventory-category-group"
+              aria-labelledby={`category-${categoryId}`}
+            >
+              <h3 id={`category-${categoryId}`} className="manuscript-inventory-category-title">
+                {categoryName}
+              </h3>
+
+              <div className="manuscript-inventory-grid" role="list" aria-label={`${categoryName} items`}>
+                {categoryItems.map((item) => (
+                  <article
+                    key={item.id}
+                    className="manuscript-inventory-item"
+                    role="listitem"
+                  >
+                    <div className="manuscript-inventory-item-header">
+                      <h4 className="manuscript-inventory-item-name">{item.name}</h4>
+                      {item.stackable && (
+                        <span 
+                          className="manuscript-inventory-item-quantity"
+                          aria-label={`Quantity: ${item.quantity}`}
+                        >
+                          ×{item.quantity}
+                        </span>
+                      )}
+                    </div>
+
+                    {item.description && (
+                      <p className="manuscript-inventory-item-description">{item.description}</p>
                     )}
-                  </p>
-                </div>
 
-                {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-                <div role="list" aria-label={`${categoryName} items`}>
-                  {categoryItems.map((item) => (
-                    <Card
-                      key={item.id}
-                      className="inventory-item"
-                      role="listitem"
-                    >
-                      {/* Item Image (if available) */}
-                      {item.image?.url && (
-                        <div>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.image.url}
-                            alt={item.name}
-                            className="item-image"
-                            loading="lazy"
-                          />
-                        </div>
-                      )}
+                    <div className="manuscript-inventory-item-footer">
+                      <span className="manuscript-inventory-item-category">
+                        {categoryName}
+                      </span>
 
-                      {/* Item Header: Name and Quantity */}
-                      <div>
-                        <h4 className="item-name">{item.name}</h4>
-                        {item.stackable && (
-                          <Badge
-                            variant="secondary-static"
-                            size="sm"
-                            className="item-quantity"
-                            aria-label={`Quantity: ${item.quantity}`}
-                          >
-                            ×{item.quantity}
-                          </Badge>
-                        )}
+                      <div className="manuscript-inventory-actions">
+                        <Button
+                          className="font-system text-[10px] uppercase tracking-wider h-7 px-3"
+                          variant="outline"
+                          onClick={() => handleUseItem(item.id)}
+                          disabled={
+                            usingItemId === item.id || item.quantity <= 0
+                          }
+                        >
+                          {usingItemId === item.id ? 'USING...' : 'USE'}
+                        </Button>
+                        <Button
+                          className="font-system text-[10px] uppercase tracking-wider h-7 px-3"
+                          variant="ghost"
+                          onClick={() => openDropDialog(item)}
+                          aria-label={`Drop ${item.name}`}
+                        >
+                          DROP
+                        </Button>
                       </div>
-
-                      {/* Item Description */}
-                      {item.description && (
-                        <p className="item-description">{item.description}</p>
-                      )}
-
-                      {/* Item Metadata and Actions */}
-                      <div>
-                        {/* Category Badge and Acquisition Method */}
-                        <div>
-                          <Badge
-                            variant="outline"
-                            size="sm"
-                            className="item-category"
-                            aria-label={`Category: ${categoryName}`}
-                          >
-                            {categoryName}
-                          </Badge>
-                          {item.acquisitionHistory[0] && (
-                            <span>{item.acquisitionHistory[0].method}</span>
-                          )}
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUseItem(item.id)}
-                            disabled={
-                              usingItemId === item.id || item.quantity <= 0
-                            }
-                          >
-                            {usingItemId === item.id ? 'Using...' : 'Use'}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openDropDialog(item)}
-                            aria-label={`Drop ${item.name}`}
-                            title="Drop item"
-                          >
-                            Drop
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </>
-      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       <DropConfirmationDialog
         isOpen={isDialogOpen}

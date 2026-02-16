@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useStoryCheckpointManager } from './hooks/useStoryCheckpointManager';
 import { useWorldStore } from '@/state/worldStore';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
@@ -49,20 +48,19 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
     <section
       data-testid="story-summary-section"
       data-tutorial="story-summary-section"
+      className="space-y-4"
     >
-      <CollapsibleSection title="The Story So Far" initialCollapsed>
-        <div>
-          {summaryParagraphs.length > 0 ? (
-            <div className="prose prose-gray dark:prose-invert">
-              {summaryParagraphs.map((paragraph, index) => (
-                <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
-              ))}
-            </div>
-          ) : (
-            <p>Your story will appear here once major events occur.</p>
-          )}
+      {summaryParagraphs.length > 0 ? (
+        <div className="text-narrative text-sm leading-relaxed">
+          {summaryParagraphs.map((paragraph, index) => (
+            <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
+          ))}
         </div>
-      </CollapsibleSection>
+      ) : (
+        <p className="font-system text-xs text-muted-foreground uppercase tracking-wider">
+          Your story will appear here once major events occur.
+        </p>
+      )}
     </section>
   );
 };

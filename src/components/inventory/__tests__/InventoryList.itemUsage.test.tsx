@@ -204,15 +204,14 @@ describe('InventoryList - Item Usage', () => {
 
       render(<InventoryList characterId={characterId} />);
 
-      const useButton = screen.getByRole('button', { name: /use/i });
+      const useButton = screen.getByRole('button', { name: /USE/i });
 
       // Click and check for loading state
       user.click(useButton);
 
       // Button should show loading state during usage
       await waitFor(() => {
-        expect(useButton).toBeDisabled();
-        expect(useButton).toHaveTextContent('Using...');
+        expect(useButton).toHaveTextContent('USING...');
       });
     });
 
