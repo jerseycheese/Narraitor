@@ -67,7 +67,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
               </aside>
 
               <div className="manuscript-main-content">
-                {children}
+                <div className="max-w-3xl mx-auto">
+                  {children}
+                </div>
               </div>
 
               <div className="manuscript-rail-spacer" aria-hidden="true" />

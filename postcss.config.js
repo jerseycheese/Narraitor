@@ -1,6 +1,6 @@
 const config = {
   plugins: {
-    // tailwindcss: {}, // Removed for Clean Slate
+    tailwindcss: {},
     autoprefixer: {},
   },
 };

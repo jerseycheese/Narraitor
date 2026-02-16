@@ -1,4 +1,7 @@
-/* Global Styles - Clean Slate (No Tailwind) */
+/* Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Skip link - visually hidden until focused (accessibility) */
 a[href="#main-content"] {
@@ -555,9 +558,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-main-content {
-  width: 100%;
-  max-width: 48rem; /* Equivalent to max-w-3xl */
-  justify-self: center;
+  grid-column: 2;
 }
 
 .manuscript-characters-mobile-bar {
