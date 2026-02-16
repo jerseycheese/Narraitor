@@ -34,116 +34,6 @@ describe('NarrativeDisplay', () => {
     expect(screen.getByText(/ancient forest whispered secrets/)).toBeInTheDocument();
   });
 
-  it('renders character avatars for metadata characterIds', () => {
-    const now = getTimestamp();
-    const npcs = {
-      'npc-1': {
-        id: 'npc-1',
-        name: 'Eldria Sunshadow',
-        worldId: 'world-1',
-        avatarUrl: 'https://example.com/eldria.png',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A brave adventurer',
-      },
-      'npc-2': {
-        id: 'npc-2',
-        name: 'Borin Ironfist',
-        worldId: 'world-1',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A gruff barkeep',
-      },
-    };
-
-    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
-      npcs,
-      worldNpcs: {
-        'world-1': ['npc-1', 'npc-2'],
-      },
-      getById: jest.fn((id) => npcs[id as keyof typeof npcs]),
-      getAll: jest.fn(() => Object.values(npcs)),
-      getNPCsByWorld: jest.fn((worldId) => {
-        const ids = worldId === 'world-1' ? ['npc-1', 'npc-2'] : [];
-        return ids.map((id) => npcs[id as keyof typeof npcs]).filter(Boolean) as NPC[];
-      }),
-    }));
-
-    const segment = createMockNarrativeSegment({
-      id: 'seg-characters',
-      content: 'Eldria and Borin planned their next move.',
-      type: 'scene',
-      metadata: {
-        characterIds: ['npc-1', 'npc-2'],
-        tags: ['strategy'],
-      },
-    });
-
-    render(<NarrativeDisplay segment={segment} />);
-
-    const list = screen.getByRole('list', { name: /characters present/i });
-    expect(list).toBeInTheDocument();
-    const items = within(list).getAllByRole('listitem');
-    expect(items).toHaveLength(2);
-    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
-    expect(
-      within(items[0]).getByText('Eldria Sunshadow', { selector: 'span' })
-    ).toBeInTheDocument();
-    expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
-    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
-  });
-
-  it('deduplicates character identifiers with inconsistent casing and whitespace', () => {
-    const now = getTimestamp();
-    const npcs = {
-      'npc-1': {
-        id: 'npc-1',
-        name: 'Marge, the Waitress',
-        worldId: 'world-1',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A friendly waitress.',
-      },
-    };
-
-    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
-      npcs,
-      worldNpcs: {
-        'world-1': ['npc-1'],
-      },
-      getById: jest.fn((id) => npcs[id as keyof typeof npcs]),
-      getAll: jest.fn(() => Object.values(npcs)),
-      getNPCsByWorld: jest.fn((worldId) => {
-        const ids = worldId === 'world-1' ? ['npc-1'] : [];
-        return ids.map((id) => npcs[id as keyof typeof npcs]).filter(Boolean) as NPC[];
-      }),
-    }));
-
-    const segment = createMockNarrativeSegment({
-      id: 'seg-dup',
-      content: 'Marge polishes the counter while you wait.',
-      type: 'scene',
-      metadata: {
-        characterIds: ['npc-1', 'npc-1', 'NPC-1'],
-        tags: ['diner'],
-      },
-    });
-
-    render(<NarrativeDisplay segment={segment} />);
-
-    const list = screen.getByRole('list', { name: /characters present/i });
-    expect(list).toBeInTheDocument();
-    const items = within(list).getAllByRole('listitem');
-    expect(items).toHaveLength(1);
-    expect(
-      within(items[0]).getByRole('img', { name: 'Marge, the Waitress' })
-    ).toBeInTheDocument();
-    expect(
-      within(items[0]).getByText('Marge, the Waitress', { selector: 'span' })
-    ).toBeInTheDocument();
-  });
-
   it('handles malformed NPC IDs without crashing', () => {
     const segment = createMockNarrativeSegment({
       id: 'seg-malformed',
@@ -155,9 +45,9 @@ describe('NarrativeDisplay', () => {
       },
     });
 
-    render(<NarrativeDisplay segment={segment} />);
-
-    expect(screen.getAllByText('NPC 42').length).toBeGreaterThan(0);
+    expect(() => {
+      render(<NarrativeDisplay segment={segment} />);
+    }).not.toThrow();
   });
 
   it('emphasizes participant names within the narrative text', () => {

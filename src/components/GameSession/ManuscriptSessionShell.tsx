@@ -61,7 +61,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
               {marginContent && (
                 <aside
                   className="manuscript-characters-rail"
-                  aria-label="Suggested actions"
+                  aria-label="Characters present"
                   ref={railRef}
                 >
                   {marginContent}
@@ -69,7 +69,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
               )}
 
               <div className="manuscript-main-content">
-                {children}
+                <div className="max-w-3xl mx-auto">
+                  {children}
+                </div>
               </div>
 
               <div className="manuscript-rail-spacer" />

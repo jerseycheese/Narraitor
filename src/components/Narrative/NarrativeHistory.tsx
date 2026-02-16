@@ -269,7 +269,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         viewportClassName="scroll-smooth"
         viewportStyle={{ scrollPaddingBlock: '2rem' }}
       >
-        <div>
+        <div className="space-y-5">
           {renderContent()}
         </div>
       </ScrollArea>

@@ -171,7 +171,6 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
 
     // Other segment information should still be present
     expect(screen.getByText(/investigate the mysterious area/)).toBeInTheDocument();
-    expect(screen.getByText('Old warehouse')).toBeInTheDocument();
   });
 
   it('should work with different decision text formats', () => {

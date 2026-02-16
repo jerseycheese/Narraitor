@@ -102,80 +102,32 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   }
 
   return (
-    <div>
-      <div className="narrative-segment">
-        {/* Choice Outcome Callout (Issue #971) */}
-        {resolvedSegment.metadata?.causedByDecisionId &&
-         resolvedSegment.metadata?.causedByDecisionText && (
-          <div>
-            <ChoiceOutcomeCallout
-              decisionId={resolvedSegment.metadata.causedByDecisionId}
-              decisionText={resolvedSegment.metadata.causedByDecisionText}
-              decisionOutcome={resolvedSegment.metadata.decisionOutcome}
-            />
-          </div>
+    <article className="narrative-segment space-y-3">
+      {/* Choice Outcome Callout (Issue #971) */}
+      {resolvedSegment.metadata?.causedByDecisionId &&
+        resolvedSegment.metadata?.causedByDecisionText && (
+          <ChoiceOutcomeCallout
+            decisionId={resolvedSegment.metadata.causedByDecisionId}
+            decisionText={resolvedSegment.metadata.causedByDecisionText}
+            decisionOutcome={resolvedSegment.metadata.decisionOutcome}
+          />
         )}
 
-        {isDialogue && speakerId && speakerName && (
-          <div>
-            <NarrativeCharacterAvatar
-              name={speakerName}
-              avatarUrl={speakerRecord?.avatarUrl}
-              size="sm"
-            />
-            <span>
-              {speakerName}
-            </span>
-          </div>
+      <FormattedNarrativeContent
+        content={formattedContent}
+        className={cssClasses(
+          'readable',
+          resolvedSegment.type === 'scene' ? 'scene-spacing' : '',
+          resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : '',
+          resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''
         )}
+        highlightTerms={highlightTerms}
+      />
 
-        <FormattedNarrativeContent
-          content={formattedContent}
-          className={`narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''}`}
-          highlightTerms={highlightTerms}
-        />
-        {(participants.length > 0 || resolvedSegment.metadata?.location) && (
-          <div>
-            {resolvedSegment.metadata?.location && (
-              <p>
-                {resolvedSegment.metadata?.location}
-              </p>
-            )}
-            {participants.length > 0 && (
-              <div>
-                <p>
-                  Characters Present
-                </p>
-                <div
-                  
-                  role="list"
-                  aria-label="Characters present in this scene"
-                >
-                  {participants.map((participant) => (
-                    <div
-                      key={participant.id}
-                      
-                      role="listitem"
-                    >
-                      <NarrativeCharacterAvatar
-                        name={participant.name}
-                        avatarUrl={participant.avatarUrl}
-                        size="sm"
-                      />
-                      {participant.avatarUrl ? <span>{participant.name}</span> : null}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Debug Information Section (dev mode only) */}
-        {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
-          <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
-        )}
-      </div>
-    </div>
+      {/* Debug Information Section (dev mode only) */}
+      {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
+        <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
+      )}
+    </article>
   );
 };

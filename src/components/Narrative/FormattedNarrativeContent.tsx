@@ -205,7 +205,7 @@ export const FormattedNarrativeContent: React.FC<
   return (
     <div
       data-testid="narrative-content-container"
-      className={`prose prose-gray dark:prose-invert narrative-content ${className || ''}`}
+      className={`prose prose-gray dark:prose-invert text-narrative ${className || ''}`}
     >
       {paragraphs.map((paragraph, index) => {
         const parts = paragraph.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/);

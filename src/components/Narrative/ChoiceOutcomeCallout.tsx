@@ -65,6 +65,10 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     decisionOutcome
   );
 
+  const outcomeLabel = decisionOutcome 
+    ? `OUTCOME: ${outcomeLabels[decisionOutcome].toUpperCase()}`
+    : 'OUTCOME: DECISION';
+
   return (
     <div
       className={cssClasses(
@@ -73,15 +77,8 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
       )}
       data-decision-id={decisionId}
     >
-      <span>{displayDecisionText}</span>
-      {decisionOutcome && (
-        <div>
-          <span
-            aria-hidden="true"
-          />
-          <span>{outcomeLabels[decisionOutcome]}</span>
-        </div>
-      )}
+      <div className="choice-outcome-label">{outcomeLabel}</div>
+      <p className="choice-outcome-text">{displayDecisionText}</p>
     </div>
   );
 };
