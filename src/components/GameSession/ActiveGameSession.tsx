@@ -272,6 +272,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             onChoicesGenerated={handleChoicesGenerated}
             onEndingSuggested={handleEndingSuggested}
             generateChoices={true}
+            hideHistory={true}
           />
         </div>
       </div>

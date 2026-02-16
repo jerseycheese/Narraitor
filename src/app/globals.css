@@ -559,15 +559,6 @@ body.manuscript-overlay-open {
 
 .manuscript-main-content {
   grid-column: 2;
-  display: block;
-  width: 100%;
-  min-width: 0;
-}
-
-.manuscript-content-container {
-  max-width: 48rem; /* 3xl - 768px */
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .manuscript-characters-mobile-bar {
@@ -660,15 +651,6 @@ body.manuscript-overlay-open {
 
   .manuscript-main-content {
     grid-column: 2;
-    display: block;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .manuscript-content-container {
-    max-width: 48rem;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .manuscript-rail-spacer {

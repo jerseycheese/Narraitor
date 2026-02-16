@@ -43,6 +43,7 @@ interface NarrativeControllerProps {
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
   generateChoices?: boolean; // Whether to generate choices after narrative
+  hideHistory?: boolean; // Whether to hide the narrative history UI
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -57,6 +58,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   choiceId,
   className,
   generateChoices = true,
+  hideHistory = false,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -1306,12 +1308,14 @@ Respond with JSON format:
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
-      <NarrativeHistory
-        segments={segments}
-        isLoading={isLoading || isGeneratingChoices}
-        error={error || undefined}
-        onRetry={handleRetry}
-      />
+      {!hideHistory && (
+        <NarrativeHistory
+          segments={segments}
+          isLoading={isLoading || isGeneratingChoices}
+          error={error || undefined}
+          onRetry={handleRetry}
+        />
+      )}
       {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
         <div>
           <p>

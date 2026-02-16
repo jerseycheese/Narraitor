@@ -72,6 +72,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
           onChoicesGenerated={onChoicesGenerated}
           onEndingSuggested={onEndingSuggested}
           generateChoices={true}
+          hideHistory={true}
         />
       </div>
     </div>
