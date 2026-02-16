@@ -649,12 +649,14 @@ body.manuscript-overlay-open {
   background: var(--color-surface-hover);
 }
 
-.hide-mobile-actions .manuscript-suggested-actions-section {
-  display: none;
+.hide-mobile-actions .manuscript-suggested-actions-section,
+.hide-mobile-actions .manuscript-choice-prompt {
+  display: none !important;
 }
 
-.show-mobile-actions .manuscript-suggested-actions-section {
-  display: block;
+.show-mobile-actions .manuscript-suggested-actions-section,
+.show-mobile-actions .manuscript-choice-prompt {
+  display: block !important;
 }
 
 @media (width >= 1024px) {
@@ -663,8 +665,10 @@ body.manuscript-overlay-open {
   }
 
   .hide-mobile-actions .manuscript-suggested-actions-section,
-  .show-mobile-actions .manuscript-suggested-actions-section {
-    display: block;
+  .show-mobile-actions .manuscript-suggested-actions-section,
+  .hide-mobile-actions .manuscript-choice-prompt,
+  .show-mobile-actions .manuscript-choice-prompt {
+    display: block !important;
   }
 }
 
