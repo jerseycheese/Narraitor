@@ -280,15 +280,15 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               aria-label="Custom response input"
               className="manuscript-custom-input"
             />
-            <Button
+            <button
               id="manuscript-send"
+              type="button"
               onClick={handleCustomSubmit}
               disabled={isDisabled || !safeTrim(customInputText)}
-              size="sm"
               className="manuscript-send-button"
             >
               Send
-            </Button>
+            </button>
             {inputActions}
           </div>
         )}
