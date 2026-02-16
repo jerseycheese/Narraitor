@@ -67,7 +67,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
               </aside>
 
               <div className="manuscript-main-content">
-                <div className="max-w-xl mx-auto">
+                <div className="manuscript-main-content-inner">
                   {children}
                 </div>
               </div>

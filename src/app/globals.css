@@ -646,6 +646,12 @@ body.manuscript-overlay-open {
     grid-column: 2;
   }
 
+  .manuscript-main-content-inner {
+    max-width: 48rem; /* Equivalent to max-w-3xl */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .manuscript-rail-spacer {
     display: block;
     grid-column: 3;
