@@ -400,6 +400,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onCustomSubmit={handleCustomSubmit}
               inputActions={sessionActions}
               endStoryAction={endStoryAction}
+              isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
                 reason: endingSuggestionReason,
                 onAccept: handleAcceptEndingSuggestion,
