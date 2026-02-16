@@ -390,6 +390,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </ManuscriptActionRail>
       }
     >
+      {isProgressiveDisclosureEnabled && (
+        <ManuscriptCharactersRail segment={latestSegment} variant="mobile-bar" />
+      )}
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}
         worldId={worldId}
