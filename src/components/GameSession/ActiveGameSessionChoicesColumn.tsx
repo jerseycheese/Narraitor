@@ -46,6 +46,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   worldSkills,
   characterSkills,
   inventoryItems,
+  onChoiceSelected,
   onCustomSubmit,
   inputActions,
   endStoryAction,
