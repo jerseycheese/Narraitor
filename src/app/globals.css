@@ -622,7 +622,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-mobile-rail-top-controls {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
