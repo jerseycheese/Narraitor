@@ -1316,7 +1316,7 @@ Respond with JSON format:
           onRetry={handleRetry}
         />
       )}
-      {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
+      {!hideHistory && process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
         <div>
           <p>
             NPC roster (debug)
