@@ -129,11 +129,19 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     mediaQuery.addEventListener('change', syncPosition);
 
+    // Watch for dropdown panels being added/removed from DOM
+    const mutationObserver = new MutationObserver(syncPosition);
+    mutationObserver.observe(header, {
+      childList: true,
+      subtree: true,
+    });
+
     window.addEventListener('resize', syncPosition);
     window.addEventListener('scroll', syncPosition);
 
     return () => {
       resizeObserver.disconnect();
+      mutationObserver.disconnect();
       mediaQuery.removeEventListener('change', syncPosition);
       window.removeEventListener('resize', syncPosition);
       window.removeEventListener('scroll', syncPosition);
