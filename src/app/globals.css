@@ -956,7 +956,6 @@ body.manuscript-overlay-open {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .manuscript-characters-rail-label {
