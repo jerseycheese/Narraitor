@@ -87,18 +87,10 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
       const halfSpace = Math.floor(availableSpace / 2);
 
-      // Set max-height for dropdown panels (top half)
-      if (characterPanel) {
-        characterPanel.style.maxHeight = `${halfSpace}px`;
-      }
-      if (toolsPanel) {
-        toolsPanel.style.maxHeight = `${halfSpace}px`;
-      }
-
-      // Set max-height for characters rail (bottom half)
+      // Set max-height for characters rail (bottom half of available space)
       rail.style.maxHeight = `${halfSpace}px`;
 
-      // Always anchor characters rail to the bottom (above action rail)
+      // Position characters rail at the bottom (above action rail)
       const railRect = rail.getBoundingClientRect();
       const railHeight = Math.min(railRect.height, halfSpace);
       const railTop = actionRailRect.top - railHeight - gapPx;
@@ -110,11 +102,16 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       rail.style.width = `${railWidth}px`;
       rail.style.zIndex = '20';
 
-      // Keep dropdown panel widths aligned with Characters Present rail width
+      // Calculate space for dropdown panels - fill from header to rail top
+      const panelAvailableHeight = railTop - headerRect.bottom - gapPx;
+
+      // Set max-height for dropdown panels to fill all space above the rail
       if (characterPanel) {
+        characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
         characterPanel.style.width = `${railWidth}px`;
       }
       if (toolsPanel) {
+        toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
         toolsPanel.style.width = `${railWidth}px`;
       }
     };
