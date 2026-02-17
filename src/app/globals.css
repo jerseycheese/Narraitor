@@ -703,7 +703,6 @@ body.manuscript-overlay-open {
 
 .manuscript-characters-rail {
   display: none;
-  flex-direction: column;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
   border-radius: 3px;
@@ -725,7 +724,7 @@ body.manuscript-overlay-open {
   }
 
   .manuscript-characters-rail {
-    display: flex;
+    display: block;
     position: sticky;
     top: var(--manuscript-characters-rail-top, 0.25rem);
     grid-column: 1;
@@ -957,7 +956,7 @@ body.manuscript-overlay-open {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-top: auto;
+  margin-bottom: 1rem;
 }
 
 .manuscript-characters-rail-label {

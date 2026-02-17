@@ -20,6 +20,8 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 }) => {
   const railRef = useRef<HTMLElement>(null);
   const viewportInnerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const actionRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -41,6 +43,78 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  // Position character rail at the bottom (above action rail) on desktop
+  useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+
+    const rail = railRef.current;
+    const header = headerRef.current;
+    const actionRailEl = actionRailRef.current;
+    const mainStage = rail?.closest('.manuscript-main-stage') as HTMLElement | null;
+
+    if (!rail || !header || !actionRailEl || !mainStage) return;
+
+    const syncPosition = () => {
+      const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+
+      // Only apply fixed positioning on desktop
+      if (!desktopMediaQuery.matches) {
+        rail.style.removeProperty('position');
+        rail.style.removeProperty('top');
+        rail.style.removeProperty('left');
+        rail.style.removeProperty('width');
+        rail.style.removeProperty('max-height');
+        rail.style.removeProperty('z-index');
+        return;
+      }
+
+      const headerRect = header.getBoundingClientRect();
+      const mainStageRect = mainStage.getBoundingClientRect();
+      const actionRailRect = actionRailEl.getBoundingClientRect();
+      const gapPx = 8;
+
+      // Calculate available space between header bottom and action rail top
+      const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
+      const halfSpace = Math.floor(availableSpace / 2);
+
+      // Set max-height for characters rail (bottom half)
+      rail.style.maxHeight = `${halfSpace}px`;
+
+      // Always anchor characters rail to the bottom (above action rail)
+      const railRect = rail.getBoundingClientRect();
+      const railHeight = Math.min(railRect.height, halfSpace);
+      const railTop = actionRailRect.top - railHeight - gapPx;
+      const railWidth = Math.max(0, Math.min(railRect.width, mainStageRect.width));
+
+      rail.style.position = 'fixed';
+      rail.style.top = `${railTop}px`;
+      rail.style.left = `${mainStageRect.left}px`;
+      rail.style.width = `${railWidth}px`;
+      rail.style.zIndex = '20';
+    };
+
+    // Sync on mount and when layout changes
+    syncPosition();
+
+    const resizeObserver = new ResizeObserver(syncPosition);
+    resizeObserver.observe(rail);
+    resizeObserver.observe(actionRailEl);
+
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    mediaQuery.addEventListener('change', syncPosition);
+
+    window.addEventListener('resize', syncPosition);
+    window.addEventListener('scroll', syncPosition);
+
+    return () => {
+      resizeObserver.disconnect();
+      mediaQuery.removeEventListener('change', syncPosition);
+      window.removeEventListener('resize', syncPosition);
+      window.removeEventListener('scroll', syncPosition);
+    };
+  }, []);
+
   return (
     <div
       className={cssClasses("manuscript-viewport-layer", className)}
@@ -51,7 +125,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       <div className="manuscript-viewport-shell">
         <div className="manuscript-viewport-inner" ref={viewportInnerRef}>
           {/* Header Region */}
-          <header className="manuscript-overlay-header">
+          <header className="manuscript-overlay-header" ref={headerRef}>
             {hud}
           </header>
 
@@ -79,7 +153,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           </main>
 
           {/* Docked Action Rail */}
-          {actionRail}
+          <div ref={actionRailRef}>
+            {actionRail}
+          </div>
         </div>
       </div>
     </div>
