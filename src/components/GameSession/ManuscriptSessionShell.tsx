@@ -58,6 +58,11 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     const syncPosition = () => {
       const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
 
+      // Find dropdown panels (Character Snapshot, Tools menu)
+      const characterPanel = document.querySelector('.manuscript-hud-character-panel') as HTMLElement | null;
+      const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
+      const toolsPanel = toolsPanels[0] as HTMLElement | null;
+
       // Only apply fixed positioning on desktop
       if (!desktopMediaQuery.matches) {
         rail.style.removeProperty('position');
@@ -66,6 +71,10 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
         rail.style.removeProperty('width');
         rail.style.removeProperty('max-height');
         rail.style.removeProperty('z-index');
+        if (characterPanel) characterPanel.style.removeProperty('max-height');
+        if (characterPanel) characterPanel.style.removeProperty('width');
+        if (toolsPanel) toolsPanel.style.removeProperty('max-height');
+        if (toolsPanel) toolsPanel.style.removeProperty('width');
         return;
       }
 
@@ -77,6 +86,14 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       // Calculate available space between header bottom and action rail top
       const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
       const halfSpace = Math.floor(availableSpace / 2);
+
+      // Set max-height for dropdown panels (top half)
+      if (characterPanel) {
+        characterPanel.style.maxHeight = `${halfSpace}px`;
+      }
+      if (toolsPanel) {
+        toolsPanel.style.maxHeight = `${halfSpace}px`;
+      }
 
       // Set max-height for characters rail (bottom half)
       rail.style.maxHeight = `${halfSpace}px`;
@@ -92,6 +109,14 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       rail.style.left = `${mainStageRect.left}px`;
       rail.style.width = `${railWidth}px`;
       rail.style.zIndex = '20';
+
+      // Keep dropdown panel widths aligned with Characters Present rail width
+      if (characterPanel) {
+        characterPanel.style.width = `${railWidth}px`;
+      }
+      if (toolsPanel) {
+        toolsPanel.style.width = `${railWidth}px`;
+      }
     };
 
     // Sync on mount and when layout changes
