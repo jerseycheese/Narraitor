@@ -102,8 +102,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       rail.style.width = `${railWidth}px`;
       rail.style.zIndex = '20';
 
-      // Calculate space for dropdown panels - fill from header to rail top
-      const panelAvailableHeight = railTop - headerRect.bottom - gapPx;
+      // Calculate space for dropdown panels - fill from header to rail top with gap
+      // Account for panel padding (0.75rem = 12px top + 12px bottom = 24px) and desired gap
+      const panelAvailableHeight = railTop - headerRect.bottom - (gapPx * 3);
 
       // Set max-height for dropdown panels to fill all space above the rail
       if (characterPanel) {
