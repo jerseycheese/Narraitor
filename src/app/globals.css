@@ -650,8 +650,8 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-mobile-rail-top-controls {
-  display: flex !important;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -661,7 +661,7 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem 0.75rem;
+  padding: 0.75rem 0.9375rem;
   border-radius: 2px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -690,7 +690,7 @@ body.manuscript-overlay-open {
 
 @media (width >= 1024px) {
   .manuscript-mobile-rail-top-controls {
-    display: none;
+    display: none !important;
   }
 
   .hide-mobile-actions .manuscript-suggested-actions-section,
@@ -705,7 +705,7 @@ body.manuscript-overlay-open {
   display: none;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: 3px;
   padding: 0.75rem;
   overflow-y: auto;
 }
@@ -1160,10 +1160,9 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
-  padding: 0.75rem 1.25rem;
-  height: 2.375rem;
+  padding: 0.5rem 1rem;
   background: var(--color-accent);
   color: hsl(0deg 0% 100%);
   font-family: var(--font-interface), system-ui, sans-serif;
@@ -1226,13 +1225,13 @@ body.manuscript-overlay-open {
 
 
 
-.manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-lawful {
+.manuscript-suggested-action.manuscript-suggested-action-lawful {
   background: hsl(var(--alignment-lawful-bg));
   border-color: hsl(var(--alignment-lawful-border));
   color: hsl(var(--alignment-lawful-text));
 }
 
-.manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+.manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: hsl(var(--alignment-chaotic-bg));
   border-color: hsl(var(--alignment-chaotic-border));
   color: hsl(var(--alignment-chaotic-text));
