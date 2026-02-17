@@ -539,6 +539,7 @@ Respond with JSON format:
           prompt: decision.prompt,
           options: decision.options,
           decisionWeight: decision.decisionWeight,
+          contextSummary: decision.contextSummary,
         });
 
       // Update the decision with the stored ID before passing to parent
@@ -609,6 +610,8 @@ Respond with JSON format:
             .addDecision(sessionId, {
               prompt: fallbackDecision.prompt,
               options: fallbackDecision.options,
+              decisionWeight: fallbackDecision.decisionWeight,
+              contextSummary: fallbackDecision.contextSummary,
             });
 
           // Update the fallback decision with the stored ID

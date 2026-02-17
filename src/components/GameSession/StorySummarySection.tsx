@@ -48,16 +48,16 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
     <section
       data-testid="story-summary-section"
       data-tutorial="story-summary-section"
-      className="space-y-4"
+      className="manuscript-story-summary"
     >
       {summaryParagraphs.length > 0 ? (
-        <div className="text-narrative text-sm leading-relaxed">
+        <div className="manuscript-story-summary-body">
           {summaryParagraphs.map((paragraph, index) => (
-            <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
+            <p key={`${paragraph.slice(0, 32)}-${index}`} className="manuscript-story-summary-paragraph">{paragraph}</p>
           ))}
         </div>
       ) : (
-        <p className="font-system text-xs text-muted-foreground uppercase tracking-wider">
+        <p className="manuscript-story-summary-empty">
           Your story will appear here once major events occur.
         </p>
       )}

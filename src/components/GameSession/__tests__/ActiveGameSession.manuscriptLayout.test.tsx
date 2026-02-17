@@ -345,9 +345,24 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
           (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
 
+          // Override narrative state with a segment that has characterIds
+          const mockNarrativeStateWithChars = {
+            segments: {
+              'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
+            },
+            sessionSegments: { [mockSessionId]: ['seg-1'] },
+            currentEnding: null,
+            isGeneratingEnding: false,
+            isSessionEnded: () => false,
+            generateEnding: jest.fn(),
+          };
+          (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) =>
+            selector ? selector(mockNarrativeStateWithChars) : mockNarrativeStateWithChars
+          );
+
           render(
 
-    
+
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -386,6 +401,34 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
       // Click to close
       fireEvent.click(toolsToggle);
+      expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
+    });
+
+        it('closes Tools menu when Character panel is opened', async () => {
+
+          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+          render(
+
+    
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const characterToggle = await screen.findByRole('button', { name: /character/i });
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+
+      fireEvent.click(toolsToggle);
+      expect(toolsToggle).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('button', { name: /character details/i })).toBeInTheDocument();
+
+      fireEvent.click(characterToggle);
+
+      expect(characterToggle).toHaveAttribute('aria-expanded', 'true');
+      expect(toolsToggle).toHaveAttribute('aria-expanded', 'false');
       expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
     });
 

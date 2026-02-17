@@ -15,7 +15,8 @@ jest.mock('../rateLimiter', () => ({
   }
 }));
 
-import { getSafetySettingsFromPrompt } from '../apiHelpers';
+import { getSafetySettingsFromPrompt, makeGeminiRequest } from '../apiHelpers';
+import { getAIConfig } from '../../lib/ai/config';
 
 describe('getSafetySettingsFromPrompt', () => {
   it('returns BLOCK_MEDIUM_AND_ABOVE for G-rated content', () => {
@@ -133,5 +134,24 @@ describe('getSafetySettingsFromPrompt', () => {
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
       { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
     ]);
+  });
+});
+
+describe('makeGeminiRequest', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('uses configured text model name in request URL', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: jest.fn().mockResolvedValue({}) });
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().modelName}:generateContent`;
+    await makeGeminiRequest(endpoint, 'test-key', {});
+
+    expect(global.fetch).toHaveBeenCalledWith(endpoint, expect.any(Object));
   });
 });

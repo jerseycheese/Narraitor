@@ -72,8 +72,10 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
         rail.style.removeProperty('max-height');
         rail.style.removeProperty('z-index');
         if (characterPanel) characterPanel.style.removeProperty('max-height');
+        if (characterPanel) characterPanel.style.removeProperty('height');
         if (characterPanel) characterPanel.style.removeProperty('width');
         if (toolsPanel) toolsPanel.style.removeProperty('max-height');
+        if (toolsPanel) toolsPanel.style.removeProperty('height');
         if (toolsPanel) toolsPanel.style.removeProperty('width');
         return;
       }
@@ -109,10 +111,12 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       // Set max-height for dropdown panels to fill all space above the rail
       if (characterPanel) {
         characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
+        characterPanel.style.height = `${panelAvailableHeight}px`;
         characterPanel.style.width = `${railWidth}px`;
       }
       if (toolsPanel) {
         toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
+        toolsPanel.style.height = `${panelAvailableHeight}px`;
         toolsPanel.style.width = `${railWidth}px`;
       }
     };
@@ -162,7 +166,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main">
-            <div className="manuscript-main-stage manuscript-main-stage-mobile-stack">
+            <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
               {marginContent && (
                 <aside
                   className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"

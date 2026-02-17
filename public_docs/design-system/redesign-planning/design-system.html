@@ -30,6 +30,12 @@
       --color-warning-soft: rgba(146, 64, 14, 0.14);
       --color-warning-border: rgba(146, 64, 14, 0.5);
       --color-info: #075985;    /* Sky-800 */
+      --alignment-lawful-bg: #eef2ff;
+      --alignment-lawful-border: #e0e7ff;
+      --alignment-lawful-text: #4f46e5;
+      --alignment-chaotic-bg: #fff7ed;
+      --alignment-chaotic-border: #fed7aa;
+      --alignment-chaotic-text: #ea580c;
 
       /* Overlay surfaces and scrims */
       --color-overlay-surface: rgba(255, 255, 255, 0.9);
@@ -67,6 +73,12 @@
       --color-warning-soft: rgba(251, 191, 36, 0.14);
       --color-warning-border: rgba(251, 191, 36, 0.5);
       --color-info: #38bdf8;    /* Sky-400 */
+      --alignment-lawful-bg: #1e1b4b;
+      --alignment-lawful-border: #312e81;
+      --alignment-lawful-text: #a5b4fc;
+      --alignment-chaotic-bg: #431407;
+      --alignment-chaotic-border: #9a3412;
+      --alignment-chaotic-text: #fdba74;
 
       /* Overlay surfaces and scrims */
       --color-overlay-surface: rgba(24, 24, 27, 0.9);
@@ -385,6 +397,18 @@
       color: var(--color-text-primary);
     }
 
+    .manuscript-suggested-action.manuscript-suggested-action-lawful {
+      background: var(--alignment-lawful-bg);
+      border-color: var(--alignment-lawful-border);
+      color: var(--alignment-lawful-text);
+    }
+
+    .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+      background: var(--alignment-chaotic-bg);
+      border-color: var(--alignment-chaotic-border);
+      color: var(--alignment-chaotic-text);
+    }
+
     .manuscript-suggested-action.is-selected,
     .manuscript-suggested-action[aria-pressed='true'] {
       background: var(--color-accent);
@@ -397,6 +421,29 @@
       background: var(--color-accent-hover);
       border-color: var(--color-accent-hover);
       color: #fff;
+    }
+
+    .manuscript-skill-check-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.625rem;
+      font-family: var(--font-system);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(49, 46, 129, 0.1);
+      color: var(--color-accent);
+      border: 1px solid rgba(49, 46, 129, 0.2);
+      white-space: nowrap;
+    }
+
+    .manuscript-suggested-action.is-selected .manuscript-skill-check-badge,
+    .manuscript-suggested-action[aria-pressed='true'] .manuscript-skill-check-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.35);
     }
 
     .manuscript-hud-panel {
@@ -3968,18 +4015,62 @@ export function PrimaryAction() {
 
       decisionPrompt.textContent = primaryDecision.prompt;
 
+      const toTitleCase = (value) =>
+        value
+          .split(/\s+/)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+
+      const resolveSkillRequirementLabel = (targetId) => {
+        if (typeof targetId !== 'string' || targetId.length === 0) {
+          return 'Skill';
+        }
+
+        const normalizedTarget = targetId.toLowerCase();
+        const knownSkill = manuscriptSourceRecords.character?.skills?.find((skill) => {
+          const normalizedNameId = `skill-${String(skill.name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')}`;
+          return (
+            skill.id === targetId
+            || skill.worldSkillId === targetId
+            || normalizedNameId === normalizedTarget
+          );
+        });
+
+        if (knownSkill?.name) {
+          return knownSkill.name;
+        }
+
+        const normalizedLabel = normalizedTarget.startsWith('skill-')
+          ? targetId.slice(6)
+          : targetId;
+        return toTitleCase(normalizedLabel.replace(/[-_]+/g, ' ').trim());
+      };
+
       choiceActions.innerHTML = primaryDecision.options.map((option) => {
-        const hasSkillReq = option.requirements && option.requirements.some(r => r.type === 'skill');
-        const badgeHtml = hasSkillReq ? `
-          <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style="background: rgba(49, 46, 129, 0.1); color: var(--color-accent); border: 1px solid rgba(49, 46, 129, 0.2);">
-            Skill
-          </span>
-        ` : '';
+        const alignmentClass = option.alignment === 'lawful'
+          ? 'manuscript-suggested-action-lawful'
+          : option.alignment === 'chaotic'
+            ? 'manuscript-suggested-action-chaotic'
+            : '';
+        const skillRequirementLabels = Array.from(
+          new Set(
+            (option.requirements || [])
+              .filter((requirement) => requirement.type === 'skill')
+              .map((requirement) => resolveSkillRequirementLabel(requirement.targetId))
+              .filter(Boolean)
+          )
+        );
+        const primarySkillLabel = skillRequirementLabels[0];
+        const badgeHtml = primarySkillLabel
+          ? `<span class="manuscript-skill-check-badge">${escapeHtml(primarySkillLabel)}</span>`
+          : '';
 
         return `<button
             type="button"
             data-suggested-action="${escapeHtml(option.text)}"
-            class="manuscript-suggested-action w-full min-w-0 text-left px-5 py-3 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center justify-between gap-2"
+            class="manuscript-suggested-action ${alignmentClass} w-full min-w-0 text-left px-5 py-3 rounded-sm text-xs sm:text-sm font-interface font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center justify-between gap-2"
           >
             <span>${escapeHtml(option.text)}</span>
             ${badgeHtml}

@@ -14,6 +14,7 @@ jest.mock('@/lib/utils/logger', () => {
   }));
 });
 
+import { getAIConfig } from '../config';
 import {
   callGeminiImageAPI,
   extractImageFromResponse,
@@ -142,7 +143,7 @@ describe('Gemini Image Generator', () => {
       await callGeminiImageAPI(prompt, apiKey);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent',
+        `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent`,
         {
           method: 'POST',
           headers: {

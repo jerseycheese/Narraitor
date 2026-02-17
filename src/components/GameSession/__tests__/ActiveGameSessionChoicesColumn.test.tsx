@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import ActiveGameSessionChoicesColumn from '../ActiveGameSessionChoicesColumn';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import type { Decision } from '@/types/narrative.types';
@@ -74,5 +74,49 @@ describe('ActiveGameSessionChoicesColumn', () => {
     const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} isGeneratingChoices={true} />);
     const root = container.firstChild as HTMLElement;
     expect(root).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('shows suggested actions count when progressive disclosure is enabled', () => {
+    render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        isProgressiveDisclosureEnabled={true}
+      />
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Suggested Actions (1)' })
+    ).toBeInTheDocument();
+  });
+
+  it('toggles to hide label after tapping suggested actions toggle', () => {
+    render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        isProgressiveDisclosureEnabled={true}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suggested Actions (1)' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Hide Suggested Actions' })
+    ).toBeInTheDocument();
+  });
+
+  it('passes end story action to desktop input actions when progressive disclosure is enabled', () => {
+    render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        isProgressiveDisclosureEnabled={true}
+        endStoryAction={<button type="button">End Story</button>}
+      />
+    );
+
+    const selectorProps = (ChoiceSelector as jest.Mock).mock.calls[0][0] as {
+      inputActions?: React.ReactNode;
+    };
+
+    expect(selectorProps.inputActions).toBeTruthy();
   });
 });

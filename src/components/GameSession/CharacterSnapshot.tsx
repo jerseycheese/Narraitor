@@ -10,6 +10,23 @@ interface CharacterSnapshotProps {
 export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character }) => {
   const worldStore = useWorldStore();
   const world = worldStore.worlds[character.worldId];
+  const normalizedSkills = React.useMemo(() => {
+    if (!world) return [];
+
+    return (world.skills || []).map((worldSkill) => {
+      const matchingCharacterSkill = (character.skills || []).find((skill) =>
+        skill.worldSkillId === worldSkill.id ||
+        skill.id === worldSkill.id ||
+        skill.name.toLowerCase() === worldSkill.name.toLowerCase()
+      );
+
+      return {
+        id: matchingCharacterSkill?.id ?? `${character.id}-${worldSkill.id}`,
+        name: worldSkill.name,
+        level: matchingCharacterSkill?.level ?? 0,
+      };
+    });
+  }, [character.id, character.skills, world]);
 
   return (
     <div className="manuscript-character-snapshot">
@@ -52,17 +69,14 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
           </div>
         )}
 
-        {character.skills && character.skills.length > 0 && world && (
+        {world && normalizedSkills.length > 0 && (
           <div className="manuscript-character-snapshot-section">
             <h5 className="manuscript-character-snapshot-subheading">Skills</h5>
             <div className="manuscript-character-snapshot-list">
-              {character.skills.map(skill => {
-                const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
-                const displayName = worldSkill?.name || skill.name;
-                
+              {normalizedSkills.map(skill => {
                 return (
                   <div key={skill.id} className="manuscript-character-snapshot-item">
-                    <span className="manuscript-character-snapshot-item-label">{displayName}</span>
+                    <span className="manuscript-character-snapshot-item-label">{skill.name}</span>
                     <span className="manuscript-character-snapshot-item-value">{skill.level}</span>
                   </div>
                 );

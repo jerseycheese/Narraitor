@@ -8,6 +8,7 @@
 
 import Logger from '@/lib/utils/logger';
 import { saveBase64Image, type SaveImageOptions } from '@/lib/utils/fileStorage';
+import { getAIConfig } from './config';
 
 const logger = new Logger('GeminiImageGenerator');
 
@@ -47,7 +48,7 @@ export async function callGeminiImageAPI(
   logger.debug('callGeminiImageAPI', 'Calling Gemini image generation API');
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent`,
     {
       method: 'POST',
       headers: {

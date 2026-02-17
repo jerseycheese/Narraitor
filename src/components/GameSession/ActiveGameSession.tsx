@@ -325,7 +325,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     <ManuscriptSessionShell
       hud={
         <ManuscriptFloatingHud
-          onToggleCharacterSummary={() => setIsCharacterSummaryExpanded(!isCharacterSummaryExpanded)}
+          onToggleCharacterSummary={() => {
+            setIsCharacterSummaryExpanded((prev) => {
+              const next = !prev;
+              if (next) {
+                setIsToolsMenuOpen(false);
+              }
+              return next;
+            });
+          }}
           isCharacterSummaryExpanded={isCharacterSummaryExpanded}
           onToggleToolsMenu={() => {
             setIsToolsMenuOpen(!isToolsMenuOpen);
@@ -380,7 +388,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           }
         />
       }
-      marginContent={isProgressiveDisclosureEnabled && latestSegmentWithParticipants ? (
+      marginContent={isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
+        ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
+         (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
         <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
       ) : null}
       actionRail={

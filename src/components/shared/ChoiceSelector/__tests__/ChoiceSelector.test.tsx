@@ -162,7 +162,8 @@ describe('ChoiceSelector', () => {
 
   describe('Skill Requirements', () => {
     it('shows skill-name badges without including requirement numbers in option text', () => {
-      renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills});
+      const characterSkills = createCharacterSkills({ 'stealth-skill': 5, 'intimidation-skill': 7 });
+      renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills, characterSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
       expect(screen.getByText(/^Stealth$/i)).toBeInTheDocument();

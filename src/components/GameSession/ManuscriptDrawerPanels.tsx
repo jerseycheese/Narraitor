@@ -6,6 +6,7 @@ import { InventoryList } from '@/components/inventory/InventoryList';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { useJournalStore } from '@/state/journalStore';
+import { useShallow } from 'zustand/react/shallow';
 import { EntityID } from '@/types/common.types';
 import { Character } from '@/state/characterStore';
 import { titleCase, capitalize } from '@/lib/utils';
@@ -94,7 +95,7 @@ const formatEntryTimestamp = (createdAt: string): string => {
 export const JournalSnapshotDrawerContent: React.FC<JournalSnapshotDrawerContentProps> = ({
   sessionId,
 }) => {
-  const entries = useJournalStore((state) => state.getSessionEntries(sessionId));
+  const entries = useJournalStore(useShallow((state) => state.getSessionEntries(sessionId)));
   const snapshotEntries = entries.slice(0, JOURNAL_SNAPSHOT_LIMIT);
 
   return (

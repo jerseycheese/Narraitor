@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { logger } from '@/lib/utils/logger';
+import { getAIConfig } from './config';
 
 /**
  * Event Significance Validation Result
@@ -57,7 +58,7 @@ export async function validateEventSignificance(
     }
 
     const genAI = new GoogleGenAI({ apiKey });
-    const model = 'gemini-2.0-flash-exp';
+    const model = getAIConfig().modelName;
 
     const result = await genAI.models.generateContent({
       model,

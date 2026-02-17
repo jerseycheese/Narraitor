@@ -59,6 +59,34 @@ const ActiveGameSessionChoicesColumn: React.FC<
   endingSuggestion,
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
+  const suggestedActionsCount = React.useMemo(() => {
+    if (!currentDecision) {
+      return 0;
+    }
+
+    const suggestedOptions = currentDecision.options.filter(
+      (option) => !option.isCustomInput
+    );
+    return Math.min(suggestedOptions.length, 3);
+  }, [currentDecision]);
+  const renderEndStoryAction = React.useCallback(() => {
+    if (!endStoryAction) {
+      return null;
+    }
+
+    return React.isValidElement(endStoryAction)
+      ? React.cloneElement(endStoryAction)
+      : endStoryAction;
+  }, [endStoryAction]);
+
+  const resolvedInputActions = isProgressiveDisclosureEnabled ? (
+    <>
+      {inputActions}
+      <span className="hidden lg:inline-flex">{renderEndStoryAction()}</span>
+    </>
+  ) : (
+    inputActions
+  );
 
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
@@ -72,9 +100,11 @@ const ActiveGameSessionChoicesColumn: React.FC<
               aria-expanded={showSuggestedActions}
               onClick={() => setShowSuggestedActions(!showSuggestedActions)}
             >
-              {showSuggestedActions ? 'Hide Suggested Actions' : 'Suggested Actions'}
+              {showSuggestedActions
+                ? 'Hide Suggested Actions'
+                : `Suggested Actions (${suggestedActionsCount})`}
             </button>
-            {endStoryAction}
+            <span className="lg:hidden">{renderEndStoryAction()}</span>
           </div>
         )}
 
@@ -95,7 +125,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 characterSkills={characterSkills}
                 inventoryItems={inventoryItems}
                 endingSuggestion={endingSuggestion}
-                inputActions={inputActions}
+                inputActions={resolvedInputActions}
                 isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               />
             </div>

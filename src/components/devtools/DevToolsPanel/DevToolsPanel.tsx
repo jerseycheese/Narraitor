@@ -16,6 +16,7 @@ import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
+import { QuickSetup } from '../QuickSetup';
 
 /**
  * Environment info component for the DevTools panel
@@ -124,12 +125,13 @@ export const DevToolsPanel = () => {
         <div>
           {isOpen && (
             <>
+              <QuickSetup />
               <label>
                 <input
                   type="checkbox"
                   checked={settings.showPromptDebugInfo}
                   onChange={(e) => updateSetting('showPromptDebugInfo', e.target.checked)}
-                  
+
                   title="Toggle prompt debug information in narrative segments"
                 />
                 <span>Show Prompts</span>
@@ -142,7 +144,7 @@ export const DevToolsPanel = () => {
             onClick={toggleDevTools}
             variant="ghost"
             size="sm"
-            
+
           >
             {isOpen ? 'Hide DevTools' : 'Show DevTools'}
           </Button>
