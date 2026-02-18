@@ -59,16 +59,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
   endingSuggestion,
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
-  const suggestedActionsCount = React.useMemo(() => {
-    if (!currentDecision) {
-      return 0;
-    }
-
-    const suggestedOptions = currentDecision.options.filter(
-      (option) => !option.isCustomInput
-    );
-    return Math.min(suggestedOptions.length, 3);
-  }, [currentDecision]);
   const renderEndStoryAction = React.useCallback(() => {
     if (!endStoryAction) {
       return null;
@@ -102,7 +92,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
             >
               {showSuggestedActions
                 ? 'Hide Suggested Actions'
-                : `Suggested Actions (${suggestedActionsCount})`}
+                : 'Suggested Actions'}
             </button>
             <span className="lg:hidden">{renderEndStoryAction()}</span>
           </div>

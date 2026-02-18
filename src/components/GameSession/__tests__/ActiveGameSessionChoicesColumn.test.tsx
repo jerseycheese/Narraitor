@@ -85,7 +85,7 @@ describe('ActiveGameSessionChoicesColumn', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Suggested Actions (1)' })
+      screen.getByRole('button', { name: 'Suggested Actions' })
     ).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe('ActiveGameSessionChoicesColumn', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Suggested Actions (1)' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Suggested Actions' }));
 
     expect(
       screen.getByRole('button', { name: 'Hide Suggested Actions' })

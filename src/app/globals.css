@@ -725,8 +725,6 @@ body.manuscript-overlay-open {
 
   .manuscript-characters-rail {
     display: block;
-    position: sticky;
-    top: var(--manuscript-characters-rail-top, 0.25rem);
     grid-column: 1;
   }
 

@@ -48,14 +48,16 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     // Only run in browser environment
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
-    const rail = railRef.current;
+    // Use stable refs — container, header, and action rail always render
+    const container = viewportInnerRef.current;
     const header = headerRef.current;
     const actionRailEl = actionRailRef.current;
-    const mainStage = rail?.closest('.manuscript-main-stage') as HTMLElement | null;
 
-    if (!rail || !header || !actionRailEl || !mainStage) return;
+    if (!container || !header || !actionRailEl) return;
 
     const syncPosition = () => {
+      // Read railRef fresh each call so we pick it up after it renders
+      const rail = railRef.current;
       const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
 
       // Find dropdown panels (Character Snapshot, Tools menu)
@@ -63,80 +65,103 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
       const toolsPanel = toolsPanels[0] as HTMLElement | null;
 
-      // Only apply fixed positioning on desktop
       if (!desktopMediaQuery.matches) {
-        rail.style.removeProperty('position');
-        rail.style.removeProperty('top');
-        rail.style.removeProperty('left');
-        rail.style.removeProperty('width');
-        rail.style.removeProperty('max-height');
-        rail.style.removeProperty('z-index');
-        if (characterPanel) characterPanel.style.removeProperty('max-height');
-        if (characterPanel) characterPanel.style.removeProperty('height');
-        if (characterPanel) characterPanel.style.removeProperty('width');
-        if (toolsPanel) toolsPanel.style.removeProperty('max-height');
-        if (toolsPanel) toolsPanel.style.removeProperty('height');
-        if (toolsPanel) toolsPanel.style.removeProperty('width');
+        if (rail) {
+          rail.style.removeProperty('position');
+          rail.style.removeProperty('bottom');
+          rail.style.removeProperty('left');
+          rail.style.removeProperty('width');
+          rail.style.removeProperty('max-height');
+          rail.style.removeProperty('z-index');
+        }
+        if (characterPanel) {
+          characterPanel.style.removeProperty('max-height');
+          characterPanel.style.removeProperty('height');
+          characterPanel.style.removeProperty('width');
+        }
+        if (toolsPanel) {
+          toolsPanel.style.removeProperty('max-height');
+          toolsPanel.style.removeProperty('height');
+          toolsPanel.style.removeProperty('width');
+        }
         return;
       }
 
       const headerRect = header.getBoundingClientRect();
-      const mainStageRect = mainStage.getBoundingClientRect();
       const actionRailRect = actionRailEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
       const gapPx = 8;
 
-      // Calculate available space between header bottom and action rail top
+      // Available vertical space between header and action rail
       const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
-      const halfSpace = Math.floor(availableSpace / 2);
+      const maxRailHeight = Math.floor(availableSpace / 2);
+      // Panel width matches left column (~⅓ of container, capped at 192px)
+      const panelWidth = Math.min(Math.floor(containerRect.width / 3), 192);
 
-      // Set max-height for characters rail (bottom half of available space)
-      rail.style.maxHeight = `${halfSpace}px`;
+      if (rail) {
+        const mainStage = rail.closest('.manuscript-main-stage') as HTMLElement | null;
+        const railLeft = mainStage ? mainStage.getBoundingClientRect().left : containerRect.left;
 
-      // Position characters rail at the bottom (above action rail)
-      const railRect = rail.getBoundingClientRect();
-      const railHeight = Math.min(railRect.height, halfSpace);
-      const railTop = actionRailRect.top - railHeight - gapPx;
-      const railWidth = Math.max(0, Math.min(railRect.width, mainStageRect.width));
+        // Position rail at the bottom of the viewport, just above the action rail
+        const bottomOffset = window.innerHeight - actionRailRect.top + gapPx;
 
-      rail.style.position = 'fixed';
-      rail.style.top = `${railTop}px`;
-      rail.style.left = `${mainStageRect.left}px`;
-      rail.style.width = `${railWidth}px`;
-      rail.style.zIndex = '20';
+        rail.style.position = 'fixed';
+        rail.style.removeProperty('top');
+        rail.style.bottom = `${bottomOffset}px`;
+        rail.style.left = `${railLeft}px`;
+        rail.style.width = `${panelWidth}px`;
+        rail.style.maxHeight = `${maxRailHeight}px`;
+        rail.style.zIndex = '20';
 
-      // Calculate space for dropdown panels - fill from header to rail top with gap
-      // Account for panel padding (0.75rem = 12px top + 12px bottom = 24px) and desired gap
-      const panelAvailableHeight = railTop - headerRect.bottom - (gapPx * 3);
+        // Re-measure rail after positioning to calculate accurate panel height
+        const railRect = rail.getBoundingClientRect();
+        const panelAvailableHeight = railRect.top - headerRect.bottom - (gapPx * 3);
 
-      // Set max-height for dropdown panels to fill all space above the rail
-      if (characterPanel) {
-        characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
-        characterPanel.style.height = `${panelAvailableHeight}px`;
-        characterPanel.style.width = `${railWidth}px`;
-      }
-      if (toolsPanel) {
-        toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
-        toolsPanel.style.height = `${panelAvailableHeight}px`;
-        toolsPanel.style.width = `${railWidth}px`;
+        if (characterPanel) {
+          characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
+          characterPanel.style.height = `${panelAvailableHeight}px`;
+          characterPanel.style.width = `${panelWidth}px`;
+        }
+        if (toolsPanel) {
+          toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
+          toolsPanel.style.height = `${panelAvailableHeight}px`;
+          toolsPanel.style.width = `${panelWidth}px`;
+        }
+      } else {
+        // No rail — panels fill all available space
+        if (characterPanel) {
+          characterPanel.style.maxHeight = `${availableSpace}px`;
+          characterPanel.style.height = `${availableSpace}px`;
+          characterPanel.style.width = `${panelWidth}px`;
+        }
+        if (toolsPanel) {
+          toolsPanel.style.maxHeight = `${availableSpace}px`;
+          toolsPanel.style.height = `${availableSpace}px`;
+          toolsPanel.style.width = `${panelWidth}px`;
+        }
       }
     };
 
-    // Sync on mount and when layout changes
     syncPosition();
 
-    const resizeObserver = new ResizeObserver(syncPosition);
-    resizeObserver.observe(rail);
+    const resizeObserver = new ResizeObserver(() => {
+      syncPosition();
+    });
     resizeObserver.observe(actionRailEl);
+    resizeObserver.observe(container);
 
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     mediaQuery.addEventListener('change', syncPosition);
 
-    // Watch for dropdown panels being added/removed from DOM
-    const mutationObserver = new MutationObserver(syncPosition);
-    mutationObserver.observe(header, {
-      childList: true,
-      subtree: true,
+    // Watch entire container so we detect when the rail appears (marginContent becomes non-null)
+    const mutationObserver = new MutationObserver(() => {
+      syncPosition();
+      // Start observing the rail for size changes once it exists
+      if (railRef.current) {
+        resizeObserver.observe(railRef.current);
+      }
     });
+    mutationObserver.observe(container, { childList: true, subtree: true });
 
     window.addEventListener('resize', syncPosition);
     window.addEventListener('scroll', syncPosition);
