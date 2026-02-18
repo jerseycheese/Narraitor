@@ -9,7 +9,7 @@ import { useJournalStore } from '@/state/journalStore';
 import { useShallow } from 'zustand/react/shallow';
 import { EntityID } from '@/types/common.types';
 import { Character } from '@/state/characterStore';
-import { titleCase, capitalize } from '@/lib/utils';
+import { titleCase, capitalize, cssClasses } from '@/lib/utils';
 
 interface CharacterDrawerContentProps {
   character: Character;
@@ -182,9 +182,10 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
         {drawerButtons.map((button) => (
           <button
             key={button.id}
-            className={`manuscript-tools-menu-item ${
-              activeDrawer === button.id ? 'manuscript-tools-menu-item-active' : ''
-            }`}
+            className={cssClasses(
+              'manuscript-tools-menu-item',
+              activeDrawer === button.id && 'manuscript-tools-menu-item-active'
+            )}
             onClick={() => {
               onOpenDrawer(button.id);
             }}

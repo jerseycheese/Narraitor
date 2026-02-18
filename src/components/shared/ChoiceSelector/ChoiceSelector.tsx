@@ -27,10 +27,8 @@ interface ChoiceSelectorProps {
   onSelect: (choiceId: string) => void;
   isDisabled?: boolean;
   className?: string;
-  showHints?: boolean; // Whether to show hints when available
   hidePrompt?: boolean;
   hideCustomInput?: boolean;
-  isProgressiveDisclosureEnabled?: boolean;
 
   // Custom input props
   enableCustomInput?: boolean;
@@ -70,7 +68,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   onSelect,
   isDisabled = false,
   className = '',
-  showHints = true,
   hidePrompt = false,
   hideCustomInput = false,
   enableCustomInput = false,
@@ -78,7 +75,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   customInputPlaceholder = 'Or write your own action...',
   maxCustomLength = 250,
   inputActions,
-  isProgressiveDisclosureEnabled = false,
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
@@ -87,7 +83,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [showSuggestedActions, setShowSuggestedActions] = useState(false);
 
   // Ref for auto-focusing input
   const inputRef = useRef<HTMLInputElement>(null);
@@ -164,9 +159,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     },
     [maxCustomLength]
   );
-
-  // Calculate character count styling
-  const characterCount = customInputText.length;
 
   // Don't render if no options and custom input is disabled
   if (allOptions.length === 0 && !enableCustomInput) {

@@ -116,7 +116,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 inventoryItems={inventoryItems}
                 endingSuggestion={endingSuggestion}
                 inputActions={resolvedInputActions}
-                isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               />
             </div>
           )

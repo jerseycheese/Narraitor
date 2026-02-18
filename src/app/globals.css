@@ -996,6 +996,10 @@ body.manuscript-overlay-open {
   font-family: var(--font-interface), system-ui, sans-serif;
 }
 
+.manuscript-character-avatar {
+  border: 1px solid var(--color-border);
+}
+
 .manuscript-character-name {
   flex: 1;
   min-width: 0;
