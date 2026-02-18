@@ -129,19 +129,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Search backwards for a segment with characters
     for (let i = segmentIds.length - 1; i >= 0; i--) {
       const segment = state.segments[segmentIds[i]];
-      if (segment && (segment.characterIds?.length > 0 || segment.metadata?.characterIds?.length > 0)) {
+      if (segment && ((segment.characterIds?.length ?? 0) > 0 || (segment.metadata?.characterIds?.length ?? 0) > 0)) {
         return segment;
       }
     }
     
     // Fallback to absolute latest segment
     return state.segments[segmentIds[segmentIds.length - 1]] || null;
-  });
-
-  const latestSegment = useNarrativeStore((state) => {
-    const segmentIds = state.sessionSegments[sessionId];
-    const latestId = segmentIds && segmentIds.length > 0 ? segmentIds[segmentIds.length - 1] : null;
-    return latestId ? state.segments[latestId] : null;
   });
 
   const hasExistingNarrative = segmentCount > 0;

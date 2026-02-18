@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
+import { GenreValue } from '@/types';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('QuickSetup');
 
 /**
  * Quick Setup Button - Generates a test world and character instantly
@@ -23,7 +27,7 @@ export const QuickSetup = () => {
       const worldData = {
         name: 'Test World',
         description: 'Quick test world for development',
-        genre: 'fantasy',
+        genre: 'fantasy' as GenreValue,
         attributes: [
           {
             id: 'attr-strength',
@@ -86,7 +90,7 @@ export const QuickSetup = () => {
       };
 
       const worldId = createWorld(worldData);
-      console.log(`[QuickSetup] Created world: ${worldId}`);
+      logger.info(`Created world: ${worldId}`);
 
       // Set as current world
       useWorldStore.getState().setCurrentWorld(worldId);
@@ -161,14 +165,14 @@ export const QuickSetup = () => {
       };
 
       const characterId = createCharacter(characterData);
-      console.log(`[QuickSetup] Created character: ${characterId}`);
+      logger.info(`Created character: ${characterId}`);
 
       // Navigate to play page
       router.push(`/worlds/${worldId}/play`);
-      console.log(`[QuickSetup] Navigating to play session`);
+      logger.info(`Navigating to play session`);
 
     } catch (error) {
-      console.error('[QuickSetup] Error:', error);
+      logger.error('Error during quick setup:', error);
     } finally {
       setIsGenerating(false);
     }

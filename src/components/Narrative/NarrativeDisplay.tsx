@@ -5,7 +5,6 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 import { cssClasses, parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
-import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
 import { ChoiceOutcomeCallout } from './ChoiceOutcomeCallout';
 import { useNPCStore } from '@/state/npcStore';

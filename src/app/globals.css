@@ -179,7 +179,7 @@ body > * {
   */
 
   /* Design system color tokens (zinc-based) */
-  --color-canvas: #fdfbf7;
+  --color-canvas: rgb(253 251 247);
   --color-surface: rgb(255 255 255);
   --color-surface-hover: rgb(244 244 245);
   --color-border: rgb(228 228 231);
@@ -233,8 +233,8 @@ body > * {
 
   /* Manuscript warning button colors */
   --color-warning: rgb(146 64 14); /* amber-800 */
-  --color-warning-soft: rgba(146, 64, 14, 0.14); /* amber-800 with 14% opacity */
-  --color-warning-border: rgba(146, 64, 14, 0.5); /* amber-800 with 50% opacity */
+  --color-warning-soft: rgb(146 64 14 / 14%); /* amber-800 with 14% opacity */
+  --color-warning-border: rgb(146 64 14 / 50%); /* amber-800 with 50% opacity */
 
   --info: 217 91% 60%; /* blue-500 */
   --info-foreground: 210 40% 98%;
@@ -340,8 +340,8 @@ body > * {
 
   /* Manuscript warning button colors (dark mode) */
   --color-warning: rgb(251 191 36); /* amber-400 */
-  --color-warning-soft: rgba(251, 191, 36, 0.14); /* amber-400 with 14% opacity */
-  --color-warning-border: rgba(251, 191, 36, 0.5); /* amber-400 with 50% opacity */
+  --color-warning-soft: rgb(251 191 36 / 14%); /* amber-400 with 14% opacity */
+  --color-warning-border: rgb(251 191 36 / 50%); /* amber-400 with 50% opacity */
 
   --info: 213.1 93.9% 67.8%; /* blue-400 */
   --info-foreground: 222.2 84% 4.9%;
@@ -486,6 +486,7 @@ body.manuscript-overlay-open {
   inset: 0;
   z-index: 160;
   overscroll-behavior: none;
+
   /* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
   margin: 0;
 }
@@ -1136,7 +1137,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-custom-input::placeholder {
-  color: #A1A1AA;
+  color: rgb(161 161 170);
 }
 
 .manuscript-custom-input:focus-visible {
@@ -1297,7 +1298,7 @@ body.manuscript-overlay-open {
 
 .manuscript-journal-snapshot-badge-new {
   background: var(--color-accent);
-  color: white;
+  color: rgb(255 255 255);
   border-color: var(--color-accent);
 }
 
@@ -1462,8 +1463,8 @@ body.manuscript-overlay-open {
 .manuscript-end-story-confirm {
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
-  background: #b91c1c; /* red-700 */
-  color: white;
+  background: rgb(185 28 28); /* red-700 */
+  color: rgb(255 255 255);
   font-family: var(--font-system);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1475,7 +1476,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-end-story-confirm:hover {
-  background: #991b1b; /* red-800 */
+  background: rgb(153 27 27); /* red-800 */
 }
 
 .manuscript-suggested-action-content {
@@ -1848,7 +1849,7 @@ body.manuscript-overlay-open {
 .manuscript-drawer-panel-right {
   right: 0;
   border-left: 1px solid var(--color-border);
-  box-shadow: -12px 0 24px rgba(0, 0, 0, 0.15);
+  box-shadow: -12px 0 24px rgb(0 0 0 / 15%);
 }
 
 .manuscript-drawer-panel-left {
@@ -2114,9 +2115,9 @@ body.manuscript-overlay-open {
   gap: 1rem;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .manuscript-inventory-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2536,7 +2537,7 @@ body.manuscript-overlay-open {
   border-radius: 2px;
   padding: 1rem;
   border-left: 4px solid var(--color-accent);
-  background: rgba(49, 46, 129, 0.08);
+  background: rgb(49 46 129 / 8%);
 }
 
 .choice-outcome-label {

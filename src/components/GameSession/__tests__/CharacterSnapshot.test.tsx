@@ -35,6 +35,7 @@ describe('CharacterSnapshot', () => {
     const character = {
       id: 'char-1',
       name: 'Eleanor "Ellie" Hayes',
+      description: 'A dedicated field medic.',
       worldId: 'world-1',
       level: 1,
       attributes: [],
@@ -54,6 +55,7 @@ describe('CharacterSnapshot', () => {
           level: 9,
         },
       ],
+      derivedStats: [],
       background: {
         history: '',
         personality: '',

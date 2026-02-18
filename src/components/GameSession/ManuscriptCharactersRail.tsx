@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { useNPCStore } from '@/state/npcStore';
 import { useNarrativeParticipants } from '@/components/Narrative/useNarrativeParticipants';
-import { NarrativeCharacterAvatar } from '@/components/Narrative/NarrativeCharacterAvatar';
 
 interface ManuscriptCharactersRailProps {
   segment: NarrativeSegment | null;
@@ -34,12 +34,14 @@ export const ManuscriptCharactersRail: React.FC<ManuscriptCharactersRailProps> =
       className="manuscript-character-badge"
     >
       {participant.avatarUrl && (
-        <img 
-          src={participant.avatarUrl} 
-          alt="" 
-          className="w-5 h-5 rounded-full object-cover" 
-          style={{ border: '1px solid var(--color-border)' }} 
-        />
+        <div className="relative w-5 h-5 rounded-full overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
+          <Image 
+            src={participant.avatarUrl} 
+            alt={`${participant.name}'s avatar`} 
+            fill
+            className="object-cover" 
+          />
+        </div>
       )}
       <span className="manuscript-character-name">{participant.name}</span>
     </span>
