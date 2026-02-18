@@ -12,7 +12,6 @@ import { hideDynamicContent } from './utils/wait-helpers';
  */
 
 test.describe('Manuscript Layout Specific Tests', () => {
-  
   test.beforeEach(async ({ page }) => {
     page.on('console', msg => console.log(`BROWSER CONSOLE: ${msg.type()}: ${msg.text()}`));
     page.on('pageerror', err => console.log(`BROWSER PAGE ERROR: ${err.message}`));
@@ -52,56 +51,122 @@ test.describe('Manuscript Layout Specific Tests', () => {
     });
   });
 
-  test('HUD Character Summary should toggle and render panel', async ({ page }) => {
+  test('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
     // Seed full test data including narrative segments
     await seedTestData(page);
     await mockApiEndpoints(page);
-    
+
     await page.goto('/worlds/world-cyberpunk-2077/play');
-    
+
     // Wait for the main manuscript shell to load
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
-    
-    // Find the character summary toggle in the HUD
-    const hudToggle = page.getByRole('button', { name: /character summary/i });
+
+    const hudToggle = page.getByRole('button', { name: /^character$/i });
     await expect(hudToggle).toBeVisible();
-    
-    // Click to expand the summary panel
     await hudToggle.click();
-    
-    // Wait for the panel to appear (ActiveGameSession passes CharacterSummary into the panel slot)
+
     await page.waitForSelector('[data-testid="character-summary"]');
-    
-    // Wait for animation transition (200ms duration in component)
-    await page.waitForTimeout(500);
-    
+
+    const desktopLayout = await page.evaluate(() => {
+      const rail = document.querySelector('.manuscript-characters-rail');
+      const mainContent = document.querySelector('.manuscript-main-content');
+      const panel = document.querySelector('.manuscript-hud-character-panel');
+
+      if (!rail || !mainContent || !panel) {
+        return null;
+      }
+
+      const railRect = rail.getBoundingClientRect();
+      const mainRect = mainContent.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+
+      return {
+        railDisplay: window.getComputedStyle(rail).display,
+        panelWidth: Math.round(panelRect.width),
+        railWidth: Math.round(railRect.width),
+        panelRailDelta: Math.abs(Math.round(panelRect.width - railRect.width)),
+        railIsLeftOfMain: railRect.left < mainRect.left,
+      };
+    });
+
+    expect(desktopLayout).not.toBeNull();
+    if (!desktopLayout) {
+      throw new Error('Expected desktop manuscript layout elements to be present');
+    }
+
+    expect(desktopLayout.railDisplay).not.toBe('none');
+    expect(desktopLayout.railIsLeftOfMain).toBe(true);
+    expect(desktopLayout.panelRailDelta).toBeLessThanOrEqual(2);
+
     await hideDynamicContent(page);
-    
-    // Target the snapshot to the HUD area to focus on the expanded panel
+
     await expect(page).toHaveScreenshot('manuscript-hud-expanded.png');
   });
 
-  test('Immersive Header and Action Rail should be visible in session', async ({ page }) => {
+  test('Desktop and mobile rails should render in expected positions', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);
-    
+
     await page.goto('/worlds/world-cyberpunk-2077/play');
-    
-    // Wait for the main manuscript shell to load
+
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
-    
-    // Verify layout anchors
+
     await expect(page.locator('[data-testid="manuscript-session-shell"]')).toBeVisible();
     await expect(page.locator('[data-testid="manuscript-action-rail"]')).toBeVisible();
-    
-    // The back button is now inside the HUD, not a separate header
-    await expect(page.getByRole('button', { name: /back to world/i })).toBeVisible();
-    
+
+    await expect(page.getByRole('button', { name: /close/i })).toBeVisible();
+
+    const desktopLayout = await page.evaluate(() => {
+      const rail = document.querySelector('.manuscript-characters-rail');
+      const mainContent = document.querySelector('.manuscript-main-content');
+      if (!rail || !mainContent) return null;
+
+      const railRect = rail.getBoundingClientRect();
+      const mainRect = mainContent.getBoundingClientRect();
+      return {
+        railDisplay: window.getComputedStyle(rail).display,
+        railIsLeftOfMain: railRect.left < mainRect.left,
+      };
+    });
+
+    expect(desktopLayout).not.toBeNull();
+    if (!desktopLayout) {
+      throw new Error('Expected desktop manuscript rail and content to be present');
+    }
+    expect(desktopLayout.railDisplay).not.toBe('none');
+    expect(desktopLayout.railIsLeftOfMain).toBe(true);
+
     await hideDynamicContent(page);
-    
-    // Capture full viewport to see header and rail together
+
     await expect(page).toHaveScreenshot('manuscript-full-composition.png', {
       fullPage: true,
     });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
+
+    const mobileLayout = await page.evaluate(() => {
+      const rail = document.querySelector('.manuscript-characters-rail');
+      const actionRail = document.querySelector('#manuscript-action-rail');
+      const choiceCount = document.querySelectorAll('.manuscript-suggested-action').length;
+
+      if (!rail || !actionRail) return null;
+
+      return {
+        railDisplay: window.getComputedStyle(rail).display,
+        actionRailDisplay: window.getComputedStyle(actionRail).display,
+        choiceCount,
+      };
+    });
+
+    expect(mobileLayout).not.toBeNull();
+    if (!mobileLayout) {
+      throw new Error('Expected mobile manuscript rail and action rail to be present');
+    }
+
+    expect(mobileLayout.railDisplay).toBe('none');
+    expect(mobileLayout.actionRailDisplay).not.toBe('none');
+    expect(mobileLayout.choiceCount).toBeGreaterThan(0);
   });
 });

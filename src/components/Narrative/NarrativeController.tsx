@@ -43,6 +43,7 @@ interface NarrativeControllerProps {
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
   generateChoices?: boolean; // Whether to generate choices after narrative
+  hideHistory?: boolean; // Whether to hide the narrative history UI
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -57,6 +58,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   choiceId,
   className,
   generateChoices = true,
+  hideHistory = false,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -450,16 +452,19 @@ Respond with JSON format:
           id: `option-${fallbackId}-1`,
           text: 'Investigate further',
           alignment: 'neutral',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
         {
           id: `option-${fallbackId}-2`,
           text: 'Talk to nearby characters',
           alignment: 'lawful',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
         {
           id: `option-${fallbackId}-3`,
           text: 'Move to a new location',
           alignment: 'neutral',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
       ],
       decisionWeight: 'minor',
@@ -534,6 +539,7 @@ Respond with JSON format:
           prompt: decision.prompt,
           options: decision.options,
           decisionWeight: decision.decisionWeight,
+          contextSummary: decision.contextSummary,
         });
 
       // Update the decision with the stored ID before passing to parent
@@ -579,16 +585,19 @@ Respond with JSON format:
                 id: `option-${fallbackId}-1`,
                 text: 'Investigate the situation',
                 alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
               {
                 id: `option-${fallbackId}-2`,
                 text: 'Speak with someone nearby',
                 alignment: 'lawful',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
               {
                 id: `option-${fallbackId}-3`,
                 text: 'Move to a different area',
                 alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
             ],
             decisionWeight: 'minor',
@@ -601,6 +610,8 @@ Respond with JSON format:
             .addDecision(sessionId, {
               prompt: fallbackDecision.prompt,
               options: fallbackDecision.options,
+              decisionWeight: fallbackDecision.decisionWeight,
+              contextSummary: fallbackDecision.contextSummary,
             });
 
           // Update the fallback decision with the stored ID
@@ -1300,13 +1311,15 @@ Respond with JSON format:
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
-      <NarrativeHistory
-        segments={segments}
-        isLoading={isLoading || isGeneratingChoices}
-        error={error || undefined}
-        onRetry={handleRetry}
-      />
-      {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
+      {!hideHistory && (
+        <NarrativeHistory
+          segments={segments}
+          isLoading={isLoading || isGeneratingChoices}
+          error={error || undefined}
+          onRetry={handleRetry}
+        />
+      )}
+      {!hideHistory && process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
         <div>
           <p>
             NPC roster (debug)

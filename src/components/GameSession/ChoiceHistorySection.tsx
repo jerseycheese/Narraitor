@@ -1,12 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { buildDecisionHistory } from '@/lib/narrative/decisionHistory';
-import { formatDateTime, formatRelativeTime, titleCase } from '@/lib/utils';
+import { formatDateTime, formatRelativeTime } from '@/lib/utils';
 import type {
   DecisionHistoryEntry,
   DecisionOutcome,
@@ -63,7 +60,7 @@ interface ChoiceHistoryContentProps {
 
 const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   entries,
-  initialCollapsed,
+  initialCollapsed: _initialCollapsed,
 }) => {
   const resolvedEntries = entries;
   const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(
@@ -75,96 +72,97 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
       data-testid="choice-history-section"
       data-tutorial="choice-history-section"
     >
-      <CollapsibleSection
-        title="Choice History"
-        initialCollapsed={initialCollapsed}
-      >
-        {resolvedEntries.length === 0 ? (
-          <p>
-            No recorded choices yet. Your decisions will appear here once you
-            start choosing.
-          </p>
-        ) : (
-          <div>
-            {resolvedEntries.map((entry) => {
-              const choiceText = getChoiceText(entry);
-              const decisionPrompt = entry.decision.prompt.trim();
-              const outcomeSegment = entry.outcomeSegment;
-              const outcomeText =
-                outcomeSegment?.content || 'Impact unknown yet.';
-              const outcomeLocation = outcomeSegment?.metadata?.location;
-              const decisionTime =
-                resolveDate(entry.decision.selectedAt) ||
-                resolveDate(outcomeSegment?.createdAt) ||
-                resolveDate(outcomeSegment?.timestamp);
-              const timeLabel = decisionTime
-                ? formatRelativeTime(decisionTime)
-                : 'Time unknown';
-              const timeTitle = decisionTime
-                ? formatDateTime(decisionTime)
-                : undefined;
-              const decisionOutcome = outcomeSegment?.metadata?.decisionOutcome;
-              const decisionWeight = entry.decision.decisionWeight;
-              const hasDetails = Boolean(decisionPrompt);
-              const isExpanded = expandedEntries.has(entry.decision.id);
-              const detailsId = `decision-details-${entry.decision.id}`;
+      {resolvedEntries.length === 0 ? (
+        <p className="font-system text-xs text-muted-foreground uppercase tracking-wider">
+          No recorded choices yet. Your decisions will appear here once you
+          start choosing.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {resolvedEntries.map((entry) => {
+            const choiceText = getChoiceText(entry);
+            const decisionPrompt = entry.decision.prompt.trim();
+            const outcomeSegment = entry.outcomeSegment;
+            const outcomeText =
+              outcomeSegment?.content || 'Impact unknown yet.';
+            const outcomeLocation = outcomeSegment?.metadata?.location;
+            const decisionTime =
+              resolveDate(entry.decision.selectedAt) ||
+              resolveDate(outcomeSegment?.createdAt) ||
+              resolveDate(outcomeSegment?.timestamp);
+            const timeLabel = decisionTime
+              ? formatRelativeTime(decisionTime)
+              : 'Time unknown';
+            const timeTitle = decisionTime
+              ? formatDateTime(decisionTime)
+              : undefined;
+            const decisionOutcome = outcomeSegment?.metadata?.decisionOutcome;
+            const decisionWeight = entry.decision.decisionWeight;
+            const hasDetails = Boolean(decisionPrompt);
+            const isExpanded = expandedEntries.has(entry.decision.id);
+            const detailsId = `decision-details-${entry.decision.id}`;
 
-              return (
-                <Card
-                  key={entry.decision.id}
-                  data-testid="choice-history-entry"
-                >
-                  <div>
-                    <div>
-                      <p>{choiceText}</p>
-                    </div>
-                    <div>
-                      {decisionWeight && (
-                        <Badge variant="outline" size="sm">
-                          {titleCase(decisionWeight)} decision
-                        </Badge>
-                      )}
-                      {decisionOutcome && (
-                        <Badge variant="secondary-static" size="sm">
-                          {outcomeLabels[decisionOutcome]}
-                        </Badge>
-                      )}
-                      {hasDetails && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          aria-expanded={isExpanded}
-                          aria-controls={detailsId}
-                          onClick={() => {
-                            setExpandedEntries((previous) =>
-                              buildExpandedSet(previous, entry.decision.id)
-                            );
-                          }}
-                        >
-                          {isExpanded ? 'Hide details' : 'Details'}
-                        </Button>
-                      )}
-                    </div>
+            return (
+              <article
+                key={entry.decision.id}
+                className="manuscript-choice-history-entry"
+                data-testid="choice-history-entry"
+              >
+                <h4 className="manuscript-choice-history-choice">{choiceText}</h4>
+
+                <div className="manuscript-choice-history-meta">
+                  {decisionWeight && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {decisionWeight} WEIGHT
+                    </span>
+                  )}
+                  {decisionOutcome && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {outcomeLabels[decisionOutcome]}
+                    </span>
+                  )}
+                  {decisionTime && (
+                    <span className="manuscript-choice-history-meta-item" title={timeTitle}>
+                      {timeLabel}
+                    </span>
+                  )}
+                  {outcomeLocation && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {outcomeLocation}
+                    </span>
+                  )}
+                  {hasDetails && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="font-system text-[10px] uppercase tracking-wider h-5 px-2 ml-auto"
+                      aria-expanded={isExpanded}
+                      aria-controls={detailsId}
+                      onClick={() => {
+                        setExpandedEntries((previous) =>
+                          buildExpandedSet(previous, entry.decision.id)
+                        );
+                      }}
+                    >
+                      {isExpanded ? 'HIDE DETAILS' : 'DETAILS'}
+                    </Button>
+                  )}
+                </div>
+
+                {hasDetails && isExpanded && (
+                  <div id={detailsId} className="manuscript-choice-history-details">
+                    {decisionPrompt}
                   </div>
-                  {(decisionTime || outcomeLocation) && (
-                    <div>
-                      {decisionTime && (
-                        <span title={timeTitle}>When: {timeLabel}</span>
-                      )}
-                      {outcomeLocation && <span>Where: {outcomeLocation}</span>}
-                    </div>
-                  )}
-                  {hasDetails && isExpanded && (
-                    <p id={detailsId}>{decisionPrompt}</p>
-                  )}
-                  <p>{outcomeText}</p>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </CollapsibleSection>
+                )}
+
+                <div className="manuscript-choice-history-outcome">
+                  {outcomeText}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };

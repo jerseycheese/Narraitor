@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
 import {
   Dialog,
   DialogPortal,
@@ -16,6 +15,7 @@ interface ManuscriptDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   side?: 'left' | 'right';
 }
@@ -24,33 +24,53 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
   open,
   onOpenChange,
   title,
+  subtitle,
   children,
   side = 'right',
 }) => {
+  // Add manuscript-overlay-open class to body when drawer is open
+  React.useEffect(() => {
+    if (open) {
+      document.body.classList.add('manuscript-overlay-open');
+      document.documentElement.classList.add('manuscript-overlay-open');
+    } else {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    }
+    return () => {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    };
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="fixed inset-0 z-[220] bg-black/45 animate-in fade-in duration-300" />
+        <DialogOverlay className="manuscript-overlay-backdrop manuscript-drawer-backdrop" />
         <DialogContent
           showCloseButton={false}
           data-testid="manuscript-drawer"
           className={cssClasses(
-            "fixed top-0 h-full w-full max-w-md z-[230] bg-background border-border shadow-2xl flex flex-col animate-in duration-300",
+            'manuscript-drawer-panel',
             side === 'right' 
-              ? "right-0 border-l slide-in-from-right" 
-              : "left-0 border-r slide-in-from-left"
+              ? 'manuscript-drawer-panel-right'
+              : 'manuscript-drawer-panel-left'
           )}
         >
-          <div className="flex items-center justify-between p-4 border-b border-border/50">
-            <DialogTitle className="text-lg font-serif font-semibold text-foreground">
-              {title}
-            </DialogTitle>
-            <DialogClose className="rounded-full p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring">
-              <X className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-              <span className="sr-only">Close</span>
+          <div className="manuscript-drawer-header">
+            <div className="manuscript-drawer-header-titles">
+              <DialogTitle className="manuscript-drawer-title">
+                {title}
+              </DialogTitle>
+              {subtitle && (
+                <p className="manuscript-drawer-subtitle">{subtitle}</p>
+              )}
+            </div>
+            <DialogClose className="manuscript-drawer-close-text">
+              Close
             </DialogClose>
           </div>
-          <div className="flex-grow overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-muted">
+          <div className="manuscript-drawer-content">
             {children}
           </div>
         </DialogContent>

@@ -22,12 +22,6 @@ jest.mock('@/components/ui/SaveIndicator', () => ({
   SaveIndicator: () => <div data-testid="save-indicator" />,
 }));
 
-jest.mock('@/components/ConfirmationDialog', () => ({
-  ConfirmationDialog: ({ isOpen }: { isOpen: boolean }) => (
-    <div data-testid="confirmation-dialog">{isOpen ? 'open' : 'closed'}</div>
-  ),
-}));
-
 jest.mock('@/components/ui/CollapsibleSection', () => ({
   CollapsibleSection: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="collapsible-section">{children}</div>
@@ -38,24 +32,9 @@ jest.mock('@/components/inventory/InventoryList', () => ({
   InventoryList: () => <div data-testid="inventory-list" />,
 }));
 
-const baseAutoSave = {
-  isEnabled: true,
-  status: 'idle' as const,
-  lastSaveTime: null,
-  errorMessage: null,
-  totalSaves: 0,
-  isRunning: false,
-  start: jest.fn(),
-  stop: jest.fn(),
-  triggerSave: jest.fn(async () => undefined),
-  setEnabled: jest.fn(),
-  retry: jest.fn(),
-};
-
 const baseProps = {
   worldId: 'world-1',
   sessionId: 'session-1',
-  autoSave: baseAutoSave,
   showEndConfirmation: false,
   onConfirmEndStory: jest.fn(),
   onCloseEndStory: jest.fn(),
@@ -80,7 +59,7 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.getByTestId('inventory-list')).toBeInTheDocument();
     expect(screen.getByTestId('story-summary')).toBeInTheDocument();
     expect(screen.getByTestId('choice-history')).toBeInTheDocument();
-    expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: /end story/i })).toBeNull();
 
     const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');
     expect(inventoryAnchor).toBeInTheDocument();
@@ -104,5 +83,25 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.queryByTestId('inventory-list')).toBeNull();
     expect(screen.queryByRole('button', { name: /Open Journal/i })).toBeNull();
     expect(screen.getByTestId('story-summary')).toBeInTheDocument();
+  });
+
+  it('renders manuscript end-story modal structure when confirmation is open', () => {
+    render(
+      <ActiveGameSessionControls
+        {...baseProps}
+        showEndConfirmation={true}
+        character={undefined}
+        characterId={undefined}
+      />
+    );
+
+    const dialog = screen.getByRole('dialog', { name: /end story/i });
+    expect(dialog).toHaveClass('manuscript-end-story-dialog');
+
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const confirmButton = screen.getByRole('button', { name: /confirm end story/i });
+
+    expect(cancelButton).toHaveClass('manuscript-end-story-cancel');
+    expect(confirmButton).toHaveClass('manuscript-end-story-confirm');
   });
 });

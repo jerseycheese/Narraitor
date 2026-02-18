@@ -78,6 +78,7 @@ const NAV_GROUPS = [
     title: 'SYSTEM',
     items: [
       { id: 'variables', label: 'CSS VARIABLES' },
+      { id: 'overlay', label: 'OVERLAY' },
     ],
   },
   {
@@ -585,6 +586,54 @@ a:hover {
   --border: 240 3.7% 15.9%;
 }`}
               </pre>
+            </div>
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* OVERLAY                                                           */}
+      {/* ================================================================= */}
+      <Section id="overlay" title="Manuscript Overlay System">
+        <SubSection title="Overlay Tokens" description="Translucent surface and gradient tokens for game-session overlays.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+            <Swatch color="var(--color-overlay-surface)" name="Overlay Surface" hex="rgba(255,255,255,0.9)" note="HUD & Rail backgrounds" />
+            <Swatch color="var(--color-overlay-surface-strong)" name="Overlay Strong" hex="rgba(255,255,255,0.95)" note="Modal & Drawer panels" />
+            <Swatch color="var(--color-scrim)" name="Scrim" hex="rgba(17,17,17,0.45)" note="Backdrop dimming" />
+          </div>
+          <div style={{ marginTop: 24, padding: 16, borderRadius: 4, background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', border: '1px solid var(--color-border)' }}>
+            <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>VIEWPORT GRADIENT</div>
+            <p className="text-narrative">Linear gradient applied to the manuscript viewport shell.</p>
+          </div>
+        </SubSection>
+
+        <SubSection title="Class System" description="Semantic manuscript-* classes for structural layout and state.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>SCAFFOLD</div>
+              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                <li>.manuscript-viewport-layer</li>
+                <li>.manuscript-viewport-shell</li>
+                <li>.manuscript-viewport-inner</li>
+                <li>.manuscript-overlay-backdrop</li>
+              </ul>
+            </div>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>REGIONS</div>
+              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                <li>.manuscript-overlay-header</li>
+                <li>.manuscript-overlay-main</li>
+                <li>.manuscript-main-stage</li>
+                <li>.manuscript-characters-rail</li>
+              </ul>
+            </div>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>INTERACTIONS</div>
+              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                <li>.manuscript-action-rail-streaming</li>
+                <li>.manuscript-suggested-action</li>
+                <li>.manuscript-overlay-open</li>
+              </ul>
             </div>
           </div>
         </SubSection>

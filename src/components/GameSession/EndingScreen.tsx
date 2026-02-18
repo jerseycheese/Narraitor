@@ -10,7 +10,7 @@ import React, {
   useMemo,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Globe, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -263,7 +263,6 @@ export function EndingScreen() {
       onClick: () => router.push('/worlds'),
       variant: 'primary',
       flex: true,
-      icon: <Globe aria-hidden="true" />,
     },
     {
       key: 'new-story',
@@ -339,7 +338,6 @@ export function EndingScreen() {
           ) : imageError ? (
             <div className={`ending-${currentEnding.tone}`}>
               <div>
-                <ImageOff aria-hidden="true" />
                 <p>Unable to load ending image</p>
                 <Button
                   onClick={generateEndingImage}
@@ -362,7 +360,6 @@ export function EndingScreen() {
           ) : (
             <div className={`ending-${currentEnding.tone}`}>
               <div>
-                <ImageIcon aria-hidden="true" />
                 <p>Ending image</p>
               </div>
               <div>
@@ -417,7 +414,6 @@ export function EndingScreen() {
 
                         return (
                           <li key={index}>
-                            <Star aria-hidden="true" />
                             <div>
                               <span>{title}</span>
                               {description && <span>{description}</span>}

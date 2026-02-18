@@ -60,17 +60,27 @@ export function normalizeDecisionOptions(
   evaluationContext: RequirementEvaluationContext
 ): NormalizedOption[] {
   return (decision.options || []).map(opt => {
-    // Process skill requirements
-    const skillRequirements = opt.requirements?.filter(req => req.type === 'skill').map(req => {
+    // Process skill requirements — only show badge for skills the character actually has
+    const skillRequirements = (opt.requirements?.filter(req => req.type === 'skill').map(req => {
       const skillData = resolveSkillData(req.targetId, worldSkills);
       const evaluation = evaluateRequirement(req, evaluationContext);
+
+      const normalizedTargetId = String(req.targetId).toLowerCase();
+      const characterHasSkill = evaluationContext.skills.some(skill => {
+        if (skill.worldSkillId && skill.worldSkillId === req.targetId) return true;
+        if (skill.name.toLowerCase() === normalizedTargetId) return true;
+        if (skillData?.name && skill.name.toLowerCase() === skillData.name.toLowerCase()) return true;
+        return false;
+      });
+
+      if (!characterHasSkill) return null;
 
       return {
         requirement: req,
         skillName: skillData?.name || 'Unknown Skill',
         met: evaluation.success
       };
-    }) || [];
+    }).filter((r): r is NonNullable<typeof r> => r !== null)) || [];
 
     // Process item requirements (normalized groups)
     const normalizedGroups = getNormalizedItemRequirementGroups(opt.requiredItems);

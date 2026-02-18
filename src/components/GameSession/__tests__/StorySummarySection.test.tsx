@@ -48,7 +48,6 @@ describe('StorySummarySection', () => {
     setupHook();
     setupWorldStore([]);
     render(<StorySummarySection worldId="world-1" sessionId="session-1" />);
-    fireEvent.click(screen.getByTestId('collapsible-section-header'));
 
     expect(screen.getByText(/Your story will appear here once major events occur/i)).toBeInTheDocument();
   });
@@ -69,7 +68,6 @@ describe('StorySummarySection', () => {
     setupWorldStore([checkpoint]);
 
     render(<StorySummarySection worldId="world-1" sessionId="session-1" />);
-    fireEvent.click(screen.getByTestId('collapsible-section-header'));
 
     expect(screen.getByText(/Heroes defeated the shadow court/i)).toBeInTheDocument();
   });
@@ -99,15 +97,14 @@ describe('StorySummarySection', () => {
     setupWorldStore([checkpoint2, checkpoint1]); // Out of order
 
     render(<StorySummarySection worldId="world-1" sessionId="session-1" />);
-    fireEvent.click(screen.getByTestId('collapsible-section-header'));
 
     // Verify both segments appear in chronological order
     expect(screen.getByText(/arrived in the village/i)).toBeInTheDocument();
     expect(screen.getByText(/defeated the bandits/i)).toBeInTheDocument();
 
     // Verify order by checking the full content
-    const content = screen.getByTestId('collapsible-section-content');
-    const text = content.textContent || '';
+    const container = screen.getByTestId('story-summary-section');
+    const text = container.textContent || '';
     const arrivedIndex = text.indexOf('arrived in the village');
     const defeatedIndex = text.indexOf('defeated the bandits');
     expect(arrivedIndex).toBeLessThan(defeatedIndex);
@@ -138,7 +135,6 @@ describe('StorySummarySection', () => {
     setupWorldStore([sessionCheckpoint, otherSessionCheckpoint]);
 
     render(<StorySummarySection worldId="world-1" sessionId="session-1" />);
-    fireEvent.click(screen.getByTestId('collapsible-section-header'));
 
     expect(screen.getByText(/from the current session/i)).toBeInTheDocument();
     expect(screen.queryByText(/from another session/i)).not.toBeInTheDocument();

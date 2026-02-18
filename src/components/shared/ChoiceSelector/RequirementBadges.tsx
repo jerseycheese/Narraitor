@@ -43,18 +43,32 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
     return null;
   }
 
+  const primaryRequirement =
+    requirements.find(
+      (requirement) =>
+        Boolean(requirement.skillName) &&
+        requirement.skillName !== 'Unknown Skill'
+    ) ?? requirements[0];
+
+  const hasNamedSkill =
+    Boolean(primaryRequirement.skillName) &&
+    primaryRequirement.skillName !== 'Unknown Skill';
+  const badgeLabel = hasNamedSkill
+    ? primaryRequirement.skillName!
+    : 'Skill';
+
   return (
-    <div>
-      {requirements.map((skillReq, index) => (
-        <Badge
-          key={`${optionId}-skill-${index}`}
-          variant="skill-requirement"
-          
-        >
-          {skillReq.skillName || 'Unknown Skill'} Check Required
-        </Badge>
-      ))}
-    </div>
+    <span
+      className="manuscript-skill-check-badge"
+      data-option-id={optionId}
+      aria-label={
+        hasNamedSkill
+          ? `Skill check required: ${badgeLabel}`
+          : 'Skill check required'
+      }
+    >
+      {badgeLabel}
+    </span>
   );
 };
 

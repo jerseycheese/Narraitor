@@ -231,7 +231,6 @@ export default function ChoiceAlignmentTestPage() {
                 onSelect={handleChoiceSelect}
                 enableCustomInput={true}
                 onCustomSubmit={handleCustomSubmit}
-                showHints={true}
               />
 
               {/* Debug Info */}

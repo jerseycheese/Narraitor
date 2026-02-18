@@ -1,21 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { cssClasses, safeTrim } from '@/lib/utils';
 import { normalizeDecisionOptions } from './optionNormalizer';
+import type { NormalizedOption } from './optionNormalizer';
 import {
   SkillRequirementBadges,
   ItemRequirementBadges,
 } from './RequirementBadges';
 import {
-  getAlignmentIcon,
   getAlignmentClasses,
   getDecisionWeightStyling,
 } from './choiceStyling';
@@ -28,7 +27,6 @@ interface ChoiceSelectorProps {
   onSelect: (choiceId: string) => void;
   isDisabled?: boolean;
   className?: string;
-  showHints?: boolean; // Whether to show hints when available
   hidePrompt?: boolean;
   hideCustomInput?: boolean;
 
@@ -37,6 +35,9 @@ interface ChoiceSelectorProps {
   onCustomSubmit?: (customText: string) => void;
   customInputPlaceholder?: string;
   maxCustomLength?: number;
+  
+  // Custom actions for the input row (e.g. End Session button)
+  inputActions?: React.ReactNode;
 
   // Requirement evaluation props
   worldSkills?: WorldSkill[];
@@ -67,13 +68,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   onSelect,
   isDisabled = false,
   className = '',
-  showHints = true,
   hidePrompt = false,
   hideCustomInput = false,
   enableCustomInput = false,
   onCustomSubmit,
-  customInputPlaceholder = 'Type your custom response...',
+  customInputPlaceholder = 'Or write your own action...',
   maxCustomLength = 250,
+  inputActions,
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
@@ -84,7 +85,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
   // Ref for auto-focusing input
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Create character object for requirement evaluation
   const requirementEvaluationContext = {
@@ -102,8 +103,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     requirementEvaluationContext
   );
 
-  // Use normalized options without custom input option
-  const allOptions = normalizedOptions;
+  // Keep a compact set while preserving alignment variety when possible.
+  const allOptions = selectVisibleOptions(normalizedOptions, 3);
 
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;
@@ -137,10 +138,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     }
   }, [customInputText, onCustomSubmit]);
 
-  // Handle Enter key in textarea
+  // Handle Enter key in input
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
         e.preventDefault();
         handleCustomSubmit();
       }
@@ -150,7 +151,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
   // Handle input change with character limit
   const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       if (value.length <= maxCustomLength) {
         setCustomInputText(value);
@@ -158,15 +159,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     },
     [maxCustomLength]
   );
-
-  // Calculate character count styling
-  const characterCount = customInputText.length;
-  const characterCountClass =
-    characterCount >= maxCustomLength
-      ? ''
-      : characterCount >= maxCustomLength * 0.8
-        ? ''
-        : '';
 
   // Don't render if no options and custom input is disabled
   if (allOptions.length === 0 && !enableCustomInput) {
@@ -180,13 +172,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   return (
     <div
       data-testid="choice-selector"
-      className={['choice-selector', weightStyling.container, className]
+      className={['choice-selector', 'manuscript-choice-selector', weightStyling.container, className]
         .filter(Boolean)
         .join(' ')}
       role="group"
       aria-labelledby="choices-heading"
     >
-      <div>
+      <div className="manuscript-choice-selector-body">
         {/* Ending Suggestion Banner */}
         {endingSuggestion && (
           <EndingSuggestionBanner
@@ -196,49 +188,21 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           />
         )}
 
-        {/* Context Summary */}
-        {decision.contextSummary && (
-          <div data-testid="context-summary">
-            <p>{decision.contextSummary}</p>
-          </div>
-        )}
-
-        {!hidePrompt && <h3 id="choices-heading">{displayPrompt}</h3>}
-
-        {/* Custom input field - shown first when enabled */}
-        {enableCustomInput && !hideCustomInput && (
-          <div>
-            <Textarea
-              id="custom-input"
-              ref={inputRef}
-              value={customInputText}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={customInputPlaceholder}
-              disabled={isDisabled}
-              aria-label="Custom response input"
-              rows={3}
-            />
-            <div>
-              <span className={`${characterCountClass}`}>
-                {characterCount}/{maxCustomLength}
-              </span>
-              <Button
-                onClick={handleCustomSubmit}
-                disabled={isDisabled || !safeTrim(customInputText)}
-                size="sm"
-              >
-                Submit
-              </Button>
-            </div>
-          </div>
+        {/* Dynamic Context Summary and Prompt */}
+        {(decision.contextSummary || !hidePrompt) && (
+          <h3 id="choices-heading" className="manuscript-choice-prompt">
+            {decision.contextSummary || displayPrompt}
+          </h3>
         )}
 
         {allOptions.length > 0 && (
-          <div className="mt-6">
-            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Suggested Actions</h4>
+          <div className="manuscript-suggested-actions-section">
             {/* Regular choice options */}
-            <div role="radiogroup" aria-labelledby="choices-heading" className="flex flex-col gap-2">
+            <div
+              role="radiogroup"
+              aria-labelledby="choices-heading"
+              className="manuscript-suggested-actions-grid"
+            >
               {allOptions.map((option) => {
                 const isOptionDisabled =
                   isDisabled || (option.isDisabledByRequirements ?? false);
@@ -248,14 +212,14 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     key={option.id}
                     data-testid={`choice-option-${option.id}`}
                     variant="secondary"
-                    title={isOptionDisabled ? option.disabledReason : undefined}
+                    title={isOptionDisabled ? option.disabledReason : (option.hint || undefined)}
                     data-disabled-reason={
                       isOptionDisabled ? option.disabledReason : undefined
                     }
                     className={cssClasses(
-                      "justify-start text-left h-auto py-3 px-4",
+                      'manuscript-suggested-action',
                       option.isSelected
-                        ? 'border-primary ring-2 ring-primary/20'
+                        ? 'is-selected manuscript-suggested-action-selected'
                         : getAlignmentClasses(
                             option.alignment,
                             isOptionDisabled
@@ -271,21 +235,12 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     aria-checked={option.isSelected}
                     role="radio"
                   >
-                    <div className="flex flex-col gap-1 w-full text-wrap">
-                      <div className="flex items-center gap-2">
-                        {option.isSelected && <ChevronRight className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />}
-                        {!option.isSelected &&
-                          getAlignmentIcon(option.alignment) && (
-                            <span className="shrink-0">{getAlignmentIcon(option.alignment)}</span>
-                          )}
-                        <span className="font-medium">{option.text}</span>
+                    <div className="manuscript-suggested-action-content">
+                      <div className="manuscript-suggested-action-title-row">
+                        <span className="manuscript-suggested-action-label">{option.text}</span>
                       </div>
                       
-                      {showHints && option.hint && (
-                        <div className="text-xs text-muted-foreground ml-6">{option.hint}</div>
-                      )}
-                      
-                      <div className="flex flex-wrap gap-2 ml-6">
+                      <div className="manuscript-suggested-action-badges">
                         <SkillRequirementBadges
                           requirements={option.skillRequirements || []}
                           optionId={option.id}
@@ -302,9 +257,85 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             </div>
           </div>
         )}
+
+        {/* Custom input field - now shown AFTER suggested actions */}
+        {enableCustomInput && !hideCustomInput && (
+          <div className="manuscript-input-row">
+            <Input
+              id="manuscript-input"
+              ref={inputRef}
+              value={customInputText}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder={customInputPlaceholder}
+              disabled={isDisabled}
+              aria-label="Custom response input"
+              className="manuscript-custom-input"
+            />
+            <button
+              id="manuscript-send"
+              type="button"
+              onClick={handleCustomSubmit}
+              disabled={isDisabled || !safeTrim(customInputText)}
+              className="manuscript-send-button"
+            >
+              Send
+            </button>
+            {inputActions}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default ChoiceSelector;
+
+const selectVisibleOptions = (
+  options: NormalizedOption[],
+  maxVisible: number
+): NormalizedOption[] => {
+  if (options.length <= maxVisible) {
+    return options;
+  }
+
+  const base = options.slice(0, maxVisible);
+  const hasLawful = base.some((option) => option.alignment === 'lawful');
+  const hasChaotic = base.some((option) => option.alignment === 'chaotic');
+
+  if (hasLawful && hasChaotic) {
+    return base;
+  }
+
+  const desiredAlignments: Array<'lawful' | 'chaotic'> = [];
+  if (!hasLawful) desiredAlignments.push('lawful');
+  if (!hasChaotic) desiredAlignments.push('chaotic');
+
+  const existingIds = new Set(base.map((option) => option.id));
+  const result = [...base];
+
+  for (const alignment of desiredAlignments) {
+    const candidate = options.find(
+      (option) => option.alignment === alignment && !existingIds.has(option.id)
+    );
+    if (!candidate) continue;
+
+    // Prefer replacing the last neutral option so we keep lawful/chaotic variety.
+    let replaceIndex = -1;
+    for (let i = result.length - 1; i >= 0; i -= 1) {
+      if (result[i].alignment === 'neutral') {
+        replaceIndex = i;
+        break;
+      }
+    }
+    if (replaceIndex === -1) {
+      replaceIndex = result.length - 1;
+    }
+
+    existingIds.delete(result[replaceIndex].id);
+    result[replaceIndex] = candidate;
+    existingIds.add(candidate.id);
+  }
+
+  return result;
+};

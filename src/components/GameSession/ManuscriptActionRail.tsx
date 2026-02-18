@@ -4,23 +4,24 @@ import { cssClasses } from '@/lib/utils';
 interface ManuscriptActionRailProps {
   children: React.ReactNode;
   className?: string;
+  isStreaming?: boolean;
 }
 
 export const ManuscriptActionRail: React.FC<ManuscriptActionRailProps> = ({
   children,
   className,
+  isStreaming = false,
 }) => {
   return (
-    <div 
+    <footer
+      id="manuscript-action-rail"
       className={cssClasses(
-        "w-full bg-background/95 backdrop-blur-md border-t border-border shadow-lg px-4 py-4 md:py-6",
+        isStreaming && 'manuscript-action-rail-streaming',
         className
       )}
       data-testid="manuscript-action-rail"
     >
-      <div className="max-w-3xl mx-auto">
-        {children}
-      </div>
-    </div>
+      {children}
+    </footer>
   );
 };

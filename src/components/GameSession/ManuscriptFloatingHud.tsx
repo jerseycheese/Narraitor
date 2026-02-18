@@ -1,60 +1,72 @@
 import React from 'react';
 import { cssClasses } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
   isCharacterSummaryExpanded: boolean;
+  onToggleToolsMenu: () => void;
+  isToolsMenuOpen: boolean;
   className?: string;
   characterSummaryPanel?: React.ReactNode;
+  toolsMenuPanel?: React.ReactNode;
   rightContent?: React.ReactNode;
-  leftContent?: React.ReactNode;
-  drawerTriggers?: React.ReactNode;
+  drawerTriggers?: boolean;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   onToggleCharacterSummary,
   isCharacterSummaryExpanded,
+  onToggleToolsMenu,
+  isToolsMenuOpen,
   className,
   characterSummaryPanel,
+  toolsMenuPanel,
   rightContent,
-  leftContent,
   drawerTriggers,
 }) => {
   return (
-    <div 
-      className={cssClasses("w-full flex justify-between p-4 pointer-events-auto", className)}
+    <div
+      className={cssClasses('manuscript-floating-hud-inner', className)}
       data-testid="manuscript-floating-hud"
     >
-      <div className="flex items-start gap-4">
-        {leftContent}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onToggleCharacterSummary}
-              aria-expanded={isCharacterSummaryExpanded}
-              aria-label="Character summary"
-              title="Character summary"
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+      <div className="manuscript-overlay-header-left">
+        <div className="manuscript-header-controls">
+          <button
+            type="button"
+            onClick={onToggleCharacterSummary}
+            aria-expanded={isCharacterSummaryExpanded}
+            className="manuscript-hud-text-button"
+          >
+            Character
+          </button>
+
+          {drawerTriggers && (
+            <button
+              type="button"
+              onClick={onToggleToolsMenu}
+              aria-label="Toggle Tools menu"
+              aria-expanded={isToolsMenuOpen}
+              className="manuscript-hud-text-button"
             >
-              <User className="h-5 w-5" />
-            </Button>
-            
-            {drawerTriggers}
-          </div>
-          
-          {isCharacterSummaryExpanded && characterSummaryPanel && (
-            <div className="w-80 animate-in slide-in-from-top-2 fade-in duration-200">
-              {characterSummaryPanel}
-            </div>
+              Tools
+            </button>
           )}
         </div>
+
+        {isCharacterSummaryExpanded && characterSummaryPanel && (
+          <div className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
+            {characterSummaryPanel}
+          </div>
+        )}
+
+        {isToolsMenuOpen && toolsMenuPanel && (
+          <div className="manuscript-hud-panel manuscript-hud-panel-left">
+            {toolsMenuPanel}
+          </div>
+        )}
       </div>
-      
-      <div className="flex items-start gap-4">
+
+      <div className="manuscript-overlay-header-right">
         {rightContent}
       </div>
     </div>

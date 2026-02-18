@@ -16,7 +16,7 @@ describe('featureFlags', () => {
     return require('@/lib/featureFlags') as typeof import('@/lib/featureFlags');
   };
 
-  it('defaults all flags to false when env vars are missing', () => {
+  it('defaults all flags to false when env vars are missing, except PROGRESSIVE_DISCLOSURE which defaults to true', () => {
     const { getFeatureFlags } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: undefined,
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: undefined,
@@ -25,7 +25,7 @@ describe('featureFlags', () => {
 
     expect(getFeatureFlags()).toEqual({
       BUFFERED_STREAMING: false,
-      PROGRESSIVE_DISCLOSURE: false,
+      PROGRESSIVE_DISCLOSURE: true,
       VIRTUALIZATION: false,
     });
   });
@@ -44,7 +44,7 @@ describe('featureFlags', () => {
       NEXT_PUBLIC_FEATURE_VIRTUALIZATION: '1',
     });
 
-    expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(false);
+    expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
     expect(isFeatureEnabled('VIRTUALIZATION')).toBe(false);
   });
 

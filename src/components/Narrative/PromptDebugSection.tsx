@@ -20,7 +20,7 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
   return (
     <div>
       <CollapsibleSection
-        title="🔧 Prompt Debug Info"
+        title="Prompt Debug Info"
         initialCollapsed={true}
         
       >

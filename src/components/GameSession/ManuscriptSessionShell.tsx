@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useRef, useEffect } from 'react';
 import { cssClasses } from '@/lib/utils';
 
 interface ManuscriptSessionShellProps {
@@ -16,47 +18,214 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   marginContent,
   className,
 }) => {
+  const railRef = useRef<HTMLElement>(null);
+  const viewportInnerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const actionRailRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    const container = viewportInnerRef.current;
+    if (!rail || !container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        if (width > 0) {
+          container.style.setProperty('--manuscript-rail-width', `${width}px`);
+        } else {
+          container.style.removeProperty('--manuscript-rail-width');
+        }
+      }
+    });
+
+    observer.observe(rail);
+    return () => observer.disconnect();
+  }, []);
+
+  // Position character rail at the bottom (above action rail) on desktop
+  useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+
+    // Use stable refs — container, header, and action rail always render
+    const container = viewportInnerRef.current;
+    const header = headerRef.current;
+    const actionRailEl = actionRailRef.current;
+
+    if (!container || !header || !actionRailEl) return;
+
+    let ticking = false;
+    const syncPosition = () => {
+      if (ticking) return;
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        // Read railRef fresh each call so we pick it up after it renders
+        const rail = railRef.current;
+        const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+
+        // Find dropdown panels (Character Snapshot, Tools menu)
+        const characterPanel = document.querySelector('.manuscript-hud-character-panel') as HTMLElement | null;
+        const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
+        const toolsPanel = toolsPanels[0] as HTMLElement | null;
+
+        if (!desktopMediaQuery.matches) {
+          if (rail) {
+            rail.style.removeProperty('position');
+            rail.style.removeProperty('bottom');
+            rail.style.removeProperty('left');
+            rail.style.removeProperty('width');
+            rail.style.removeProperty('max-height');
+            rail.style.removeProperty('z-index');
+          }
+          if (characterPanel) {
+            characterPanel.style.removeProperty('max-height');
+            characterPanel.style.removeProperty('height');
+            characterPanel.style.removeProperty('width');
+          }
+          if (toolsPanel) {
+            toolsPanel.style.removeProperty('max-height');
+            toolsPanel.style.removeProperty('height');
+            toolsPanel.style.removeProperty('width');
+          }
+          ticking = false;
+          return;
+        }
+
+        const headerRect = header.getBoundingClientRect();
+        const actionRailRect = actionRailEl.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const gapPx = 8;
+
+        // Available vertical space between header and action rail
+        const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
+        const maxRailHeight = Math.floor(availableSpace / 2);
+        // Panel width matches left column (~⅓ of container, capped at 192px)
+        const panelWidth = Math.min(Math.floor(containerRect.width / 3), 192);
+
+        if (rail) {
+          const mainStage = rail.closest('.manuscript-main-stage') as HTMLElement | null;
+          const railLeft = mainStage ? mainStage.getBoundingClientRect().left : containerRect.left;
+
+          // Position rail at the bottom of the viewport, just above the action rail
+          const bottomOffset = window.innerHeight - actionRailRect.top + gapPx;
+
+          rail.style.position = 'fixed';
+          rail.style.removeProperty('top');
+          rail.style.bottom = `${bottomOffset}px`;
+          rail.style.left = `${railLeft}px`;
+          rail.style.width = `${panelWidth}px`;
+          rail.style.maxHeight = `${maxRailHeight}px`;
+          rail.style.zIndex = '20';
+
+          // Re-measure rail after positioning to calculate accurate panel height
+          const railRect = rail.getBoundingClientRect();
+          const panelAvailableHeight = railRect.top - headerRect.bottom - (gapPx * 3);
+
+          if (characterPanel) {
+            characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
+            characterPanel.style.height = `${panelAvailableHeight}px`;
+            characterPanel.style.width = `${panelWidth}px`;
+          }
+          if (toolsPanel) {
+            toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
+            toolsPanel.style.height = `${panelAvailableHeight}px`;
+            toolsPanel.style.width = `${panelWidth}px`;
+          }
+        } else {
+          // No rail — panels fill all available space
+          if (characterPanel) {
+            characterPanel.style.maxHeight = `${availableSpace}px`;
+            characterPanel.style.height = `${availableSpace}px`;
+            characterPanel.style.width = `${panelWidth}px`;
+          }
+          if (toolsPanel) {
+            toolsPanel.style.maxHeight = `${availableSpace}px`;
+            toolsPanel.style.height = `${availableSpace}px`;
+            toolsPanel.style.width = `${panelWidth}px`;
+          }
+        }
+        ticking = false;
+      });
+    };
+
+    syncPosition();
+
+    const resizeObserver = new ResizeObserver(() => {
+      syncPosition();
+    });
+    resizeObserver.observe(actionRailEl);
+    resizeObserver.observe(container);
+
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    mediaQuery.addEventListener('change', syncPosition);
+
+    // Watch entire container so we detect when the rail appears (marginContent becomes non-null)
+    const mutationObserver = new MutationObserver(() => {
+      syncPosition();
+      // Start observing the rail for size changes once it exists
+      if (railRef.current) {
+        resizeObserver.observe(railRef.current);
+      }
+    });
+    mutationObserver.observe(container, { childList: true, subtree: true });
+
+    window.addEventListener('resize', syncPosition);
+    window.addEventListener('scroll', syncPosition);
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      mediaQuery.removeEventListener('change', syncPosition);
+      window.removeEventListener('resize', syncPosition);
+      window.removeEventListener('scroll', syncPosition);
+    };
+  }, []);
+
   return (
-    <div 
-      className={cssClasses(
-        "relative min-h-screen flex flex-col bg-background",
-        className
-      )}
+    <div
+      className={cssClasses("manuscript-viewport-layer", className)}
       data-testid="manuscript-session-shell"
     >
-      {/* Floating HUD Container */}
-      {hud && (
-        <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-          {hud}
-        </div>
-      )}
+      <div className="manuscript-overlay-backdrop" />
 
-      {/* Main Narrative Stage */}
-      <main className="flex-grow flex flex-col items-center px-4 pt-20 pb-40">
-        <div className={cssClasses(
-          "w-full flex gap-8 justify-center",
-          marginContent ? "max-w-5xl" : "max-w-3xl"
-        )}>
-          <div className="w-full max-w-3xl">
-            {children}
+      <div className="manuscript-viewport-shell">
+        <div className="manuscript-viewport-inner" ref={viewportInnerRef}>
+          {/* Header Region */}
+          <header className="manuscript-overlay-header" ref={headerRef}>
+            {hud}
+          </header>
+
+          {/* Main Narrative Stage */}
+          <main className="manuscript-overlay-main">
+            <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
+              {marginContent && (
+                <aside
+                  className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
+                  aria-label="Characters present"
+                  ref={railRef}
+                >
+                  {marginContent}
+                </aside>
+              )}
+
+              <div className="manuscript-main-content">
+                <div className="max-w-3xl mx-auto">
+                  {children}
+                </div>
+              </div>
+
+              <div className="manuscript-rail-spacer" aria-hidden="true" />
+            </div>
+          </main>
+
+          {/* Docked Action Rail */}
+          <div ref={actionRailRef}>
+            {actionRail}
           </div>
-          {marginContent && (
-            <aside 
-              className="hidden lg:block w-48 flex-shrink-0 sticky top-24 self-start"
-              aria-label="Suggested actions"
-            >
-              {marginContent}
-            </aside>
-          )}
         </div>
-      </main>
-
-      {/* Docked Action Rail */}
-      {actionRail && (
-        <div className="fixed bottom-0 left-0 right-0 z-40">
-          {actionRail}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

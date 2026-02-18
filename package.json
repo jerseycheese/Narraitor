@@ -11,7 +11,6 @@
     "build:app": "next build",
     "start": "next start",
     "lint": "next lint",
-    "style:no-tailwind": "bash scripts/design-system/tailwind-clean-slate/assert-no-tailwind-usage.sh",
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
@@ -61,6 +60,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.0",
     "react-joyride": "^3.0.0-7",
+    "tailwind-merge": "^3.4.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -79,6 +79,7 @@
     "@storybook/nextjs": "^8.6.14",
     "@storybook/react": "^8.6.12",
     "@storybook/test": "^8.6.14",
+    "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.5.2",
@@ -112,6 +113,7 @@
     "storybook": "^8.6.12",
     "stylelint": "^16.23.1",
     "stylelint-config-standard": "^39.0.0",
+    "tailwindcss": "^3.4.19",
     "ts-jest": "^29.4.0",
     "typescript": "^5.9.3",
     "vite": "^6.0.7",

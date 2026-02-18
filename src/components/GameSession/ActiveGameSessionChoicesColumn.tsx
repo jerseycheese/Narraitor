@@ -19,6 +19,9 @@ interface ActiveGameSessionChoicesColumnProps {
   inventoryItems: InventoryItem[];
   onChoiceSelected: (choiceId: string) => void;
   onCustomSubmit: (customText: string) => void;
+  inputActions?: React.ReactNode;
+  endStoryAction?: React.ReactNode;
+  isProgressiveDisclosureEnabled?: boolean;
   hidePrompt?: boolean;
   hideChoices?: boolean;
   hideCustomInput?: boolean;
@@ -45,6 +48,9 @@ const ActiveGameSessionChoicesColumn: React.FC<
   inventoryItems,
   onChoiceSelected,
   onCustomSubmit,
+  inputActions,
+  endStoryAction,
+  isProgressiveDisclosureEnabled = false,
   hidePrompt = false,
   hideChoices = false,
   hideCustomInput = false,
@@ -52,26 +58,66 @@ const ActiveGameSessionChoicesColumn: React.FC<
   className = '',
   endingSuggestion,
 }) => {
+  const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
+  const renderEndStoryAction = React.useCallback(() => {
+    if (!endStoryAction) {
+      return null;
+    }
+
+    return React.isValidElement(endStoryAction)
+      ? React.cloneElement(endStoryAction)
+      : endStoryAction;
+  }, [endStoryAction]);
+
+  const resolvedInputActions = isProgressiveDisclosureEnabled ? (
+    <>
+      {inputActions}
+      <span className="hidden lg:inline-flex">{renderEndStoryAction()}</span>
+    </>
+  ) : (
+    inputActions
+  );
+
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
       <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
+        {isProgressiveDisclosureEnabled && (
+          <div className="manuscript-mobile-rail-top-controls">
+            <button
+              type="button"
+              className="manuscript-mobile-suggested-actions-toggle"
+              aria-expanded={showSuggestedActions}
+              onClick={() => setShowSuggestedActions(!showSuggestedActions)}
+            >
+              {showSuggestedActions
+                ? 'Hide Suggested Actions'
+                : 'Suggested Actions'}
+            </button>
+            <span className="lg:hidden">{renderEndStoryAction()}</span>
+          </div>
+        )}
+
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
         {currentDecision?.decisionWeight ||
         (currentDecision && segmentCount > 0) ? (
           !hideChoices && (
-            <ChoiceSelector
-              decision={currentDecision}
-              onSelect={onChoiceSelected}
-              onCustomSubmit={onCustomSubmit}
-              enableCustomInput={true}
-              hidePrompt={hidePrompt}
-              hideCustomInput={hideCustomInput}
-              isDisabled={status !== 'active' || isGenerating || isSessionEnded}
-              worldSkills={worldSkills}
-              characterSkills={characterSkills}
-              inventoryItems={inventoryItems}
-              endingSuggestion={endingSuggestion}
-            />
+            <div className={isProgressiveDisclosureEnabled ? (showSuggestedActions ? 'show-mobile-actions' : 'hide-mobile-actions') : ''}>
+              <ChoiceSelector
+                decision={currentDecision}
+                onSelect={onChoiceSelected}
+                onCustomSubmit={onCustomSubmit}
+                enableCustomInput={true}
+                hidePrompt={hidePrompt}
+                hideCustomInput={hideCustomInput}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded}
+                worldSkills={worldSkills}
+                characterSkills={characterSkills}
+                inventoryItems={inventoryItems}
+                endingSuggestion={endingSuggestion}
+                inputActions={resolvedInputActions}
+              />
+            </div>
           )
         ) : (
           !hideChoices && (

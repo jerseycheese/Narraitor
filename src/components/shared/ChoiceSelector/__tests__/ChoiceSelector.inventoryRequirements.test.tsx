@@ -141,7 +141,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     expect(screen.getByText(/Requires all:/i)).toBeInTheDocument();
     const optionButton = screen.getByTestId('choice-option-opt-1');
@@ -159,7 +159,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     // Should show current quantity vs required
     expect(screen.getByText(/Requires all:/i)).toBeInTheDocument();

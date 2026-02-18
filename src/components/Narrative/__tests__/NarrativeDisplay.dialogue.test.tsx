@@ -57,12 +57,12 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
 
-    expect(screen.getAllByText('Gandalf')[0]).toBeInTheDocument();
+    expect(screen.queryByText('Gandalf')).not.toBeInTheDocument();
     expect(screen.getByText('You shall not pass!')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Gandalf' })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: 'Gandalf' })).not.toBeInTheDocument();
   });
 
-  it('displays avatar if NPC has avatarUrl', () => {
+  it('does not display avatar even if NPC has avatarUrl (handled by rail)', () => {
     const mockGetById = jest.fn((id: string) =>
       id === 'npc-2' ? {
         id: 'npc-2',
@@ -105,9 +105,8 @@ describe('NarrativeDisplay - Dialogue with Speaker', () => {
 
     render(<NarrativeDisplay segment={dialogueSegment} />);
 
-    const avatar = screen.getByAltText(/aragorn/i);
-    expect(avatar).toBeInTheDocument();
-    expect(avatar).toHaveAttribute('src', 'https://example.com/aragorn.jpg');
+    const avatar = screen.queryByAltText(/aragorn/i);
+    expect(avatar).not.toBeInTheDocument();
   });
 
   it('renders dialogue without speaker when speakerId is not provided', () => {

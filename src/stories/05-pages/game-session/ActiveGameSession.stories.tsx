@@ -414,3 +414,35 @@ export const LoadingState: Story = {
     },
   },
 };
+
+/**
+ * Full manuscript overlay layout with progressive disclosure
+ */
+export const ManuscriptOverlay: Story = {
+  args: {
+    ...ActiveGameplay.args,
+  },
+  parameters: {
+    layout: 'fullscreen',
+  },
+  decorators: [
+    (Story) => {
+      // Set up character and narrative
+      useCharacterStore.setState({
+        characters: { 'char-123': mockCharacter },
+        entities: { 'char-123': mockCharacter },
+        currentCharacterId: 'char-123',
+        currentEntityId: 'char-123',
+        error: null,
+        loading: false,
+      });
+      useSessionStore.setState({ characterId: 'char-123' });
+      populateNarrativeStore(mockSegments, [mockDecision]);
+      
+      // Note: Feature flags might need to be mocked globally or via decorator if possible
+      // But since we use isFeatureEnabled, we might need to mock it in the story file
+      
+      return <Story />;
+    },
+  ],
+};

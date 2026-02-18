@@ -59,6 +59,7 @@ export interface SafetySetting {
 export interface AIConfig {
   geminiApiKey: string;
   modelName: string;
+  imageModelName: string;
   maxRetries: number;
   timeout: number;
 }

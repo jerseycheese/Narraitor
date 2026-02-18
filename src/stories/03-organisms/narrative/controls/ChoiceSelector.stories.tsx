@@ -295,3 +295,27 @@ export const WithItemRequirements: Story = {
     },
   },
 };
+
+export const ManuscriptContext: Story = {
+  decorators: [
+    (Story) => (
+      <div className="bg-zinc-100 p-8 min-h-[400px] flex flex-col justify-end">
+        <footer id="manuscript-action-rail" className="p-6 border-t bg-background/95 backdrop-blur-md shadow-lg">
+          <Story />
+        </footer>
+      </div>
+    ),
+  ],
+  args: {
+    decision: decisionWithHints,
+    enableCustomInput: true,
+  },
+};
+
+export const ManuscriptStreaming: Story = {
+  decorators: ManuscriptContext.decorators,
+  args: {
+    ...ManuscriptContext.args,
+    isDisabled: true,
+  },
+};

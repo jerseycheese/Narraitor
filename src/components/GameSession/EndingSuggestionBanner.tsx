@@ -1,5 +1,4 @@
 import React from 'react';
-import { BookOpen } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 
@@ -17,11 +16,10 @@ export function EndingSuggestionBanner({
   return (
     <Alert variant="warning" className="ending-suggestion-banner">
       <AlertTitle>
-        <BookOpen />
         Your story could end here
       </AlertTitle>
       <AlertDescription>{reason}</AlertDescription>
-      <div>
+      <div className="flex gap-2 mt-2">
         <Button size="sm" onClick={onAccept}>
           View Ending
         </Button>

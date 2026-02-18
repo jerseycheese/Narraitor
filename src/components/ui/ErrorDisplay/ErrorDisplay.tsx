@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from 'lucide-react';
 import { cssClasses } from '@/lib/utils';
 
 export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
@@ -93,8 +92,12 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
             <p>{message}</p>
           </div>
           {showDismiss && onDismiss && (
-            <button onClick={onDismiss} aria-label="Dismiss">
-              <X aria-hidden="true" />
+            <button 
+              onClick={onDismiss} 
+              aria-label="Dismiss"
+              className="text-xs font-medium underline underline-offset-2"
+            >
+              Dismiss
             </button>
           )}
         </div>
