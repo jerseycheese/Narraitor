@@ -22,7 +22,7 @@ export const getAlignmentClasses = (
  * Get styling for decision weight using border thickness and strategic colors
  * Critical decisions use bright red, while choice alignments use muted red
  */
-export const getDecisionWeightStyling = (weight?: DecisionWeight) => {
+export const getDecisionWeightStyling = (_weight?: DecisionWeight) => {
   return {
     container: '',
     dot: '',

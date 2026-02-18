@@ -60,7 +60,7 @@ interface ChoiceHistoryContentProps {
 
 const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   entries,
-  initialCollapsed,
+  initialCollapsed: _initialCollapsed,
 }) => {
   const resolvedEntries = entries;
   const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(
