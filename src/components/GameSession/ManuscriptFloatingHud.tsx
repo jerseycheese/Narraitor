@@ -10,7 +10,7 @@ interface ManuscriptFloatingHudProps {
   characterSummaryPanel?: React.ReactNode;
   toolsMenuPanel?: React.ReactNode;
   rightContent?: React.ReactNode;
-  drawerTriggers?: React.ReactNode;
+  drawerTriggers?: boolean;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({

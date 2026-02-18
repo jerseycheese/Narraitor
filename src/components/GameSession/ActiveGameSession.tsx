@@ -60,7 +60,6 @@ interface ActiveGameSessionProps {
   selectedChoiceId?: string;
 }
 
-// Force recompile for manuscript layout migration
 const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   worldId,
   sessionId,
@@ -363,7 +362,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 lastSaveTime={autoSave.lastSaveTime}
                 errorMessage={autoSave.errorMessage}
                 totalSaves={autoSave.totalSaves}
-                onManualSave={autoSave.triggerSave}
                 onRetryError={autoSave.retry}
                 retryable
                 compact
@@ -408,7 +406,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               inventoryItems={inventoryItems}
               onChoiceSelected={handleChoiceSelected}
               onCustomSubmit={handleCustomSubmit}
-              inputActions={null}
+              inputActions={sessionActions}
               endStoryAction={endStoryAction}
               isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {

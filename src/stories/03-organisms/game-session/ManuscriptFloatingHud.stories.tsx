@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ManuscriptFloatingHud } from '@/components/GameSession/ManuscriptFloatingHud';
-import { Button } from '@/components/ui/button';
-import { Book, Package, ArrowLeft, RefreshCw } from 'lucide-react';
 import React from 'react';
 
 const meta: Meta<typeof ManuscriptFloatingHud> = {

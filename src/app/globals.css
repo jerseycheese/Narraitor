@@ -486,10 +486,7 @@ body.manuscript-overlay-open {
   inset: 0;
   z-index: 160;
   overscroll-behavior: none;
-}
-
-/* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
-#manuscript-viewport-layer {
+  /* Prevent parent `space-y-*` utilities from offsetting the fixed overlay. */
   margin: 0;
 }
 

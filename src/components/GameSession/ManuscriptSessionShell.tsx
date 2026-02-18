@@ -55,91 +55,99 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
     if (!container || !header || !actionRailEl) return;
 
+    let ticking = false;
     const syncPosition = () => {
-      // Read railRef fresh each call so we pick it up after it renders
-      const rail = railRef.current;
-      const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+      if (ticking) return;
+      ticking = true;
 
-      // Find dropdown panels (Character Snapshot, Tools menu)
-      const characterPanel = document.querySelector('.manuscript-hud-character-panel') as HTMLElement | null;
-      const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
-      const toolsPanel = toolsPanels[0] as HTMLElement | null;
+      window.requestAnimationFrame(() => {
+        // Read railRef fresh each call so we pick it up after it renders
+        const rail = railRef.current;
+        const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
 
-      if (!desktopMediaQuery.matches) {
+        // Find dropdown panels (Character Snapshot, Tools menu)
+        const characterPanel = document.querySelector('.manuscript-hud-character-panel') as HTMLElement | null;
+        const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
+        const toolsPanel = toolsPanels[0] as HTMLElement | null;
+
+        if (!desktopMediaQuery.matches) {
+          if (rail) {
+            rail.style.removeProperty('position');
+            rail.style.removeProperty('bottom');
+            rail.style.removeProperty('left');
+            rail.style.removeProperty('width');
+            rail.style.removeProperty('max-height');
+            rail.style.removeProperty('z-index');
+          }
+          if (characterPanel) {
+            characterPanel.style.removeProperty('max-height');
+            characterPanel.style.removeProperty('height');
+            characterPanel.style.removeProperty('width');
+          }
+          if (toolsPanel) {
+            toolsPanel.style.removeProperty('max-height');
+            toolsPanel.style.removeProperty('height');
+            toolsPanel.style.removeProperty('width');
+          }
+          ticking = false;
+          return;
+        }
+
+        const headerRect = header.getBoundingClientRect();
+        const actionRailRect = actionRailEl.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const gapPx = 8;
+
+        // Available vertical space between header and action rail
+        const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
+        const maxRailHeight = Math.floor(availableSpace / 2);
+        // Panel width matches left column (~⅓ of container, capped at 192px)
+        const panelWidth = Math.min(Math.floor(containerRect.width / 3), 192);
+
         if (rail) {
-          rail.style.removeProperty('position');
-          rail.style.removeProperty('bottom');
-          rail.style.removeProperty('left');
-          rail.style.removeProperty('width');
-          rail.style.removeProperty('max-height');
-          rail.style.removeProperty('z-index');
-        }
-        if (characterPanel) {
-          characterPanel.style.removeProperty('max-height');
-          characterPanel.style.removeProperty('height');
-          characterPanel.style.removeProperty('width');
-        }
-        if (toolsPanel) {
-          toolsPanel.style.removeProperty('max-height');
-          toolsPanel.style.removeProperty('height');
-          toolsPanel.style.removeProperty('width');
-        }
-        return;
-      }
+          const mainStage = rail.closest('.manuscript-main-stage') as HTMLElement | null;
+          const railLeft = mainStage ? mainStage.getBoundingClientRect().left : containerRect.left;
 
-      const headerRect = header.getBoundingClientRect();
-      const actionRailRect = actionRailEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const gapPx = 8;
+          // Position rail at the bottom of the viewport, just above the action rail
+          const bottomOffset = window.innerHeight - actionRailRect.top + gapPx;
 
-      // Available vertical space between header and action rail
-      const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
-      const maxRailHeight = Math.floor(availableSpace / 2);
-      // Panel width matches left column (~⅓ of container, capped at 192px)
-      const panelWidth = Math.min(Math.floor(containerRect.width / 3), 192);
+          rail.style.position = 'fixed';
+          rail.style.removeProperty('top');
+          rail.style.bottom = `${bottomOffset}px`;
+          rail.style.left = `${railLeft}px`;
+          rail.style.width = `${panelWidth}px`;
+          rail.style.maxHeight = `${maxRailHeight}px`;
+          rail.style.zIndex = '20';
 
-      if (rail) {
-        const mainStage = rail.closest('.manuscript-main-stage') as HTMLElement | null;
-        const railLeft = mainStage ? mainStage.getBoundingClientRect().left : containerRect.left;
+          // Re-measure rail after positioning to calculate accurate panel height
+          const railRect = rail.getBoundingClientRect();
+          const panelAvailableHeight = railRect.top - headerRect.bottom - (gapPx * 3);
 
-        // Position rail at the bottom of the viewport, just above the action rail
-        const bottomOffset = window.innerHeight - actionRailRect.top + gapPx;
-
-        rail.style.position = 'fixed';
-        rail.style.removeProperty('top');
-        rail.style.bottom = `${bottomOffset}px`;
-        rail.style.left = `${railLeft}px`;
-        rail.style.width = `${panelWidth}px`;
-        rail.style.maxHeight = `${maxRailHeight}px`;
-        rail.style.zIndex = '20';
-
-        // Re-measure rail after positioning to calculate accurate panel height
-        const railRect = rail.getBoundingClientRect();
-        const panelAvailableHeight = railRect.top - headerRect.bottom - (gapPx * 3);
-
-        if (characterPanel) {
-          characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
-          characterPanel.style.height = `${panelAvailableHeight}px`;
-          characterPanel.style.width = `${panelWidth}px`;
+          if (characterPanel) {
+            characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
+            characterPanel.style.height = `${panelAvailableHeight}px`;
+            characterPanel.style.width = `${panelWidth}px`;
+          }
+          if (toolsPanel) {
+            toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
+            toolsPanel.style.height = `${panelAvailableHeight}px`;
+            toolsPanel.style.width = `${panelWidth}px`;
+          }
+        } else {
+          // No rail — panels fill all available space
+          if (characterPanel) {
+            characterPanel.style.maxHeight = `${availableSpace}px`;
+            characterPanel.style.height = `${availableSpace}px`;
+            characterPanel.style.width = `${panelWidth}px`;
+          }
+          if (toolsPanel) {
+            toolsPanel.style.maxHeight = `${availableSpace}px`;
+            toolsPanel.style.height = `${availableSpace}px`;
+            toolsPanel.style.width = `${panelWidth}px`;
+          }
         }
-        if (toolsPanel) {
-          toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
-          toolsPanel.style.height = `${panelAvailableHeight}px`;
-          toolsPanel.style.width = `${panelWidth}px`;
-        }
-      } else {
-        // No rail — panels fill all available space
-        if (characterPanel) {
-          characterPanel.style.maxHeight = `${availableSpace}px`;
-          characterPanel.style.height = `${availableSpace}px`;
-          characterPanel.style.width = `${panelWidth}px`;
-        }
-        if (toolsPanel) {
-          toolsPanel.style.maxHeight = `${availableSpace}px`;
-          toolsPanel.style.height = `${availableSpace}px`;
-          toolsPanel.style.width = `${panelWidth}px`;
-        }
-      }
+        ticking = false;
+      });
     };
 
     syncPosition();
